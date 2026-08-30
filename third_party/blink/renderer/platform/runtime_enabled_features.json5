@@ -886,6 +886,10 @@
       status: "experimental",
     },
     {
+      name: "BatteryStatus",
+      base_feature: "none",
+    },
+    {
       name: "BidiCaretAffinity",
     },
     {

@@ -6,6 +6,7 @@
 [
     ActiveScriptWrappable,
     SecureContext,
+    RuntimeEnabled=BatteryStatus,
     Exposed=Window
 ] interface BatteryManager : EventTarget {
     [Measure] readonly attribute boolean charging;
