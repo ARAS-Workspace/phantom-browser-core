@@ -110,6 +110,20 @@ static bool CanLoadInProcess(CTFontRef ct_font) {
          kCFCompareEqualTo;
 }
 
+static bool IsSystemInstalledFont(CTFontRef ct_font) {
+  ScopedCFTypeRef<CFURLRef> url(base::apple::CFCast<CFURLRef>(
+      CTFontCopyAttribute(ct_font, kCTFontURLAttribute)));
+  if (!url) {
+    return true;
+  }
+  ScopedCFTypeRef<CFStringRef> path(
+      CFURLCopyFileSystemPath(url.get(), kCFURLPOSIXPathStyle));
+  if (!path) {
+    return true;
+  }
+  return CFStringHasPrefix(path.get(), CFSTR("/System/Library/Fonts/"));
+}
+
 const FontPlatformData* FontPlatformDataFromCTFont(
     CTFontRef ct_font,
     float size,
@@ -122,6 +136,10 @@ const FontPlatformData* FontPlatformDataFromCTFont(
     OpticalSizing optical_sizing,
     const FontVariationSettings* variation_settings) {
   DCHECK(ct_font);
+
+  if (!IsSystemInstalledFont(ct_font)) {
+    return nullptr;
+  }
 
   // fontd automatically issues a sandbox extension to permit reading
   // activated fonts that would otherwise be restricted by the sandbox.
