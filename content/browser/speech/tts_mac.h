@@ -99,6 +99,7 @@ class TtsPlatformImplMac : public content::TtsPlatformImpl {
                      base::OnceCallback<void(bool)> on_speak_finished,
                      const std::string& parsed_utterance);
 
+  void CompleteUtterance(int utterance_id);
   void UpdateSystemDefaultVoice();
   void OnGotDefaultVoice(AVSpeechSynthesisVoice* default_voice);
   const std::vector<content::VoiceData>& Voices();

@@ -13,9 +13,11 @@
 
 #include "base/apple/foundation_util.h"
 #include "base/functional/bind.h"
+#include "base/location.h"
 #include "base/memory/raw_ptr.h"
 #include "base/no_destructor.h"
 #include "base/strings/sys_string_conversions.h"
+#include "base/task/sequenced_task_runner.h"
 #include "base/task/task_traits.h"
 #include "base/task/thread_pool.h"
 #include "base/values.h"
@@ -104,6 +106,13 @@ void TtsPlatformImplMac::Speak(
   utterance_id_ = utterance_id;
   paused_ = false;
   std::move(on_speak_finished).Run(true);
+  base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
+      FROM_HERE, base::BindOnce(&TtsPlatformImplMac::CompleteUtterance,
+                                base::Unretained(this), utterance_id));
+}
+
+void TtsPlatformImplMac::CompleteUtterance(int utterance_id) {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   OnSpeechEvent(utterance_id, content::TTS_EVENT_START, /*char_index=*/0,
                 kNoLength, kNoError);
   OnSpeechEvent(utterance_id, content::TTS_EVENT_END, /*char_index=*/0,
