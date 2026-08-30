@@ -4,6 +4,7 @@
 
 [
     ActiveScriptWrappable,
+    RuntimeEnabled=AppBanner,
     Exposed=Window
 ] interface BeforeInstallPromptEvent : Event {
     [CallWith=ExecutionContext] constructor(DOMString type, optional BeforeInstallPromptEventInit eventInitDict = {});

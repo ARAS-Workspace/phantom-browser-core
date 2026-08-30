@@ -5,7 +5,8 @@
 // https://www.w3.org/TR/appmanifest/#extensions-to-the-window-object
 
 [
-    ImplementedAs=DOMWindowInstallation
+    ImplementedAs=DOMWindowInstallation,
+    RuntimeEnabled=AppBanner
 ] partial interface Window {
     attribute EventHandler onappinstalled;
     attribute EventHandler onbeforeinstallprompt;

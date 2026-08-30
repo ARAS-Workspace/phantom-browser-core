@@ -648,6 +648,10 @@
       depends_on: ["AOMAriaRelationshipProperties"],
     },
     {
+      name: "AppBanner",
+      base_feature: "none",
+    },
+    {
       // appearance:base for in-page form controls.
       // https://drafts.csswg.org/css-forms-1/
       // https://issues.chromium.org/issues/450139531
@@ -3700,7 +3704,6 @@
     {
       name: "InstalledApp",
       public: true,
-      status: "stable",
       base_feature: "none",
     },
     {
