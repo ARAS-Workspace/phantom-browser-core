@@ -41,6 +41,8 @@
 
 namespace blink {
 
+static constexpr size_t kFixedJsHeapSizeLimit = 4294705152;
+
 static constexpr base::TimeDelta kTwentyMinutes = base::Minutes(20);
 static constexpr base::TimeDelta kFiftyMs = base::Milliseconds(50);
 
@@ -51,7 +53,7 @@ static void GetHeapSize(HeapInfo& info) {
       heap_statistics.used_heap_size() + heap_statistics.external_memory();
   info.total_js_heap_size =
       heap_statistics.total_physical_size() + heap_statistics.external_memory();
-  info.js_heap_size_limit = heap_statistics.heap_size_limit();
+  info.js_heap_size_limit = kFixedJsHeapSizeLimit;
 }
 
 class HeapSizeCache {
