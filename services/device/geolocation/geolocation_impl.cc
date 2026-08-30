@@ -10,6 +10,7 @@
 #include "base/functional/bind.h"
 #include "base/logging.h"
 #include "base/metrics/histogram_functions.h"
+#include "base/time/time.h"
 #include "services/device/geolocation/geolocation_context.h"
 #include "services/device/public/cpp/geolocation/geoposition.h"
 
@@ -19,6 +20,19 @@ namespace {
 void RecordUmaGeolocationImplClientId(mojom::GeolocationClientId client_id) {
   base::UmaHistogramEnumeration("Geolocation.GeolocationImpl.ClientId",
                                 client_id);
+}
+
+constexpr double kFixedLatitude = 39.925;
+constexpr double kFixedLongitude = 32.836944;
+constexpr double kFixedAccuracyMeters = 20.0;
+
+mojom::GeopositionResultPtr MakeFixedPosition() {
+  auto position = mojom::Geoposition::New();
+  position->latitude = kFixedLatitude;
+  position->longitude = kFixedLongitude;
+  position->accuracy = kFixedAccuracyMeters;
+  position->timestamp = base::Time::Now();
+  return mojom::GeopositionResult::NewPosition(std::move(position));
 }
 }  // namespace
 
@@ -36,6 +50,8 @@ GeolocationImpl::GeolocationImpl(mojo::PendingReceiver<Geolocation> receiver,
   DCHECK(context_);
   receiver_.set_disconnect_handler(base::BindOnce(
       &GeolocationImpl::OnConnectionError, base::Unretained(this)));
+  position_override_ = MakeFixedPosition();
+  current_result_ = position_override_.Clone();
 }
 
 GeolocationImpl::~GeolocationImpl() {
@@ -65,25 +81,8 @@ void GeolocationImpl::ResumeUpdates() {
 }
 
 void GeolocationImpl::StartListeningForUpdates() {
-  const bool effective_high_accuracy =
-      high_accuracy_hint_ && has_precise_permission_;
-
-  if (effective_high_accuracy_ != effective_high_accuracy) {
-    effective_high_accuracy_ = effective_high_accuracy;
-    // When the accuracy requirement changes, we should reset `current_result_`
-    // so we will not report a stale position.
-    current_result_.reset();
-    // `geolocation_subscription_` is not explicitly reset here. Allowing a
-    // short period of concurrent high/low accuracy subscriptions is preferred
-    // over stop/start transitions that exposed crbug.com/469328127.
-    // `GeolocationProviderImpl::OnClientsChanged()` handles client priority
-    // based on `kApproximateGeolocationPermission`.
-    geolocation_subscription_ =
-        GeolocationProvider::GetInstance()->AddLocationUpdateCallback(
-            base::BindRepeating(&GeolocationImpl::OnLocationUpdate,
-                                base::Unretained(this)),
-            *effective_high_accuracy_);
-  }
+  effective_high_accuracy_ = high_accuracy_hint_ && has_precise_permission_;
+  OnLocationUpdate(*position_override_);
 }
 
 void GeolocationImpl::SetHighAccuracyHint(bool high_accuracy) {
@@ -162,7 +161,7 @@ void GeolocationImpl::SetOverride(const mojom::GeopositionResult& result) {
 }
 
 void GeolocationImpl::ClearOverride() {
-  position_override_.reset();
+  position_override_ = MakeFixedPosition();
   StartListeningForUpdates();
 }
 

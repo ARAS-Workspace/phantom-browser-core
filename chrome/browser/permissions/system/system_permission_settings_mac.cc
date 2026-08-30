@@ -50,9 +50,7 @@ class PlatformHandleImpl : public PlatformHandle {
       case ContentSettingsType::MEDIASTREAM_MIC:
         return media_cache_.CanPrompt(type);
       case ContentSettingsType::GEOLOCATION:
-        return device::GeolocationSystemPermissionManager::GetInstance()
-                   ->GetSystemPermission() ==
-               device::LocationSystemPermissionStatus::kNotDetermined;
+        return false;
       case ContentSettingsType::CLIPBOARD_READ_WRITE:
         return IsSystemPermissionPrompt(
             system_permission_settings::CheckSystemClipboardPermission());
@@ -68,9 +66,7 @@ class PlatformHandleImpl : public PlatformHandle {
       case ContentSettingsType::MEDIASTREAM_MIC:
         return media_cache_.IsDenied(type);
       case ContentSettingsType::GEOLOCATION:
-        return device::GeolocationSystemPermissionManager::GetInstance()
-                   ->GetSystemPermission() ==
-               device::LocationSystemPermissionStatus::kDenied;
+        return false;
       case ContentSettingsType::CLIPBOARD_READ_WRITE:
         return IsSystemPermissionDenied(
             system_permission_settings::CheckSystemClipboardPermission());
@@ -86,9 +82,7 @@ class PlatformHandleImpl : public PlatformHandle {
       case ContentSettingsType::MEDIASTREAM_MIC:
         return media_cache_.IsAllowed(type);
       case ContentSettingsType::GEOLOCATION:
-        return device::GeolocationSystemPermissionManager::GetInstance()
-                   ->GetSystemPermission() ==
-               device::LocationSystemPermissionStatus::kAllowed;
+        return true;
       case ContentSettingsType::CLIPBOARD_READ_WRITE:
         return IsSystemPermissionAllowed(
             system_permission_settings::CheckSystemClipboardPermission());
@@ -171,19 +165,7 @@ class PlatformHandleImpl : public PlatformHandle {
       }
       case ContentSettingsType::GEOLOCATION: {
         DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-        geolocation_callbacks_.push_back(std::move(callback));
-        // The system permission prompt is modal and requires a user decision
-        // (Allow or Deny) before it can be dismissed.
-        if (geolocation_callbacks_.size() == 1u) {
-          CHECK(!observation_);
-          // Lazily setup geolocation status observation
-          SystemPermissionChangedCallback clb = base::BindRepeating(
-              &PlatformHandleImpl::OnSystemPermissionUpdated,
-              weak_factory_.GetWeakPtr());
-          observation_ = Observe(std::move(clb));
-          CHECK_DEREF(device::GeolocationSystemPermissionManager::GetInstance())
-              .RequestSystemPermission();
-        }
+        std::move(callback).Run();
         return;
       }
       case ContentSettingsType::CLIPBOARD_READ_WRITE: {

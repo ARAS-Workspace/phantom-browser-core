@@ -77,8 +77,8 @@ class GeolocationImpl : public mojom::Geolocation {
   // The callback passed to QueryNextPosition.
   QueryNextPositionCallback position_callback_;
 
-  // Set if SetOverride() has been called and ClearOverride() has not
-  // subsequently been called, `nullptr` otherwise.
+  // Always set. Every position this class reports comes from here, so the
+  // platform location provider is never subscribed to.
   mojom::GeopositionResultPtr position_override_;
 
   mojom::GeopositionResultPtr current_result_;
