@@ -3198,7 +3198,6 @@
     },
     {
       name: "FontAccess",
-      status: {"Android": "", "default": "stable"},
     },
     {
       name: "FontDataServiceForCSSLocalFonts",
