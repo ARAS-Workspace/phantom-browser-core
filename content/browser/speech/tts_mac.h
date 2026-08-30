@@ -17,7 +17,7 @@ class TtsPlatformImplMac : public content::TtsPlatformImpl {
  public:
   static constexpr int kInvalidUtteranceId = -1;
 
-  ~TtsPlatformImplMac() override = default;
+  ~TtsPlatformImplMac() override;
 
   TtsPlatformImplMac(const TtsPlatformImplMac&) = delete;
   TtsPlatformImplMac& operator=(const TtsPlatformImplMac&) = delete;

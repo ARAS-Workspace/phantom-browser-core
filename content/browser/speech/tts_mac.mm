@@ -149,6 +149,8 @@ void TtsPlatformImplMac::OnSpeechEvent(int utterance_id,
 
 TtsPlatformImplMac::TtsPlatformImplMac() = default;
 
+TtsPlatformImplMac::~TtsPlatformImplMac() = default;
+
 // static
 TtsPlatformImplMac* TtsPlatformImplMac::GetInstance() {
   static base::NoDestructor<TtsPlatformImplMac> tts_platform;
