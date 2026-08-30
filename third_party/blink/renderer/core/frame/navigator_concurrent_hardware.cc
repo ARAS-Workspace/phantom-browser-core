@@ -4,12 +4,10 @@
 
 #include "third_party/blink/renderer/core/frame/navigator_concurrent_hardware.h"
 
-#include "base/system/sys_info.h"
-
 namespace blink {
 
 unsigned NavigatorConcurrentHardware::hardwareConcurrency() const {
-  return static_cast<unsigned>(base::SysInfo::NumberOfProcessors());
+  return 8;
 }
 
 }  // namespace blink

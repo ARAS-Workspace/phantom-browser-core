@@ -34,7 +34,6 @@
 };
 
 WorkerNavigator includes NavigatorConcurrentHardware;
-WorkerNavigator includes NavigatorDeviceMemory;
 WorkerNavigator includes NavigatorID;
 WorkerNavigator includes NavigatorLanguage;
 WorkerNavigator includes NavigatorOnLine;
