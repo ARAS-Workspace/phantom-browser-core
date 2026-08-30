@@ -1427,7 +1427,6 @@
       // https://chromestatus.com/feature/5189864286978048
       // https://github.com/WICG/cpu-performance/
       name: "CpuPerformance",
-      status: "stable",
       origin_trial_feature_name: "CpuPerformance",
       origin_trial_allows_third_party: true,
     },

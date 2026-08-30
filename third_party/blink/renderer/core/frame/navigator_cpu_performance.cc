@@ -13,23 +13,7 @@ namespace blink {
 
 // static
 uint16_t NavigatorCPUPerformance::cpuPerformance(Navigator& navigator) {
-  mojom::blink::PerformanceTier tier =
-      Platform::Current()->GetCpuPerformanceTier();
-  probe::ApplyCPUPerformanceOverride(
-      probe::ToCoreProbeSink(navigator.GetExecutionContext()), tier);
-  switch (tier) {
-    case mojom::blink::PerformanceTier::kLow:
-      return 1;
-    case mojom::blink::PerformanceTier::kMid:
-      return 2;
-    case mojom::blink::PerformanceTier::kHigh:
-      return 3;
-    case mojom::blink::PerformanceTier::kUltra:
-      return 4;
-    case mojom::blink::PerformanceTier::kUnknown:
-    default:
-      return 0;
-  }
+  return 0;
 }
 
 }  // namespace blink
