@@ -22,5 +22,5 @@
 [
     ImplementedAs=NavigatorGamepad
 ] partial interface Navigator {
-    [MeasureAs=GetGamepads, RaisesException] sequence<Gamepad?> getGamepads();
+    [RuntimeEnabled=Gamepad, MeasureAs=GetGamepads, RaisesException] sequence<Gamepad?> getGamepads();
 };

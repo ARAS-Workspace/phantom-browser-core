@@ -3282,6 +3282,11 @@
       status: "experimental",
     },
     {
+      name: "Gamepad",
+      public: true,
+      base_feature: "none",
+    },
+    {
       name: "GamepadButtonTypes",
       status: "experimental",
     },
@@ -3299,7 +3304,6 @@
     },
     {
       name: "GamepadWindowEventHandlers",
-      status: "stable",
     },
     {
       // When enabled, the drag image overlay for an element will be created
@@ -5616,7 +5620,6 @@
     },
     {
       name: "Serial",
-      status: "stable",
       base_feature: "WebSerialAPI",
     },
     {
@@ -6891,14 +6894,6 @@
     {
       name: "WebBluetooth",
       public: true,
-      status: {
-        "Android": "stable",
-        "ChromeOS": "stable",
-        "iOS": "stable",
-        "Mac": "stable",
-        "Win": "stable",
-        "default": "experimental",
-      },
       base_feature: "none",
     },
     {
@@ -6999,7 +6994,6 @@
     },
     {
       name: "WebHID",
-      status: {"Android": "", "default": "stable"},
     },
     {
       // It is only enabled in extension environment for now.
@@ -7207,7 +7201,6 @@
     {
       name: "WebUSB",
       public: true,
-      status: "stable",
       base_feature: "none",
     },
     {
