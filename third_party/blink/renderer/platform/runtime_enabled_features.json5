@@ -5336,13 +5336,11 @@
     {
       name: "ScriptedSpeechRecognition",
       public: true,
-      status: "stable",
       base_feature: "none",
     },
     {
       name: "ScriptedSpeechSynthesis",
       public: true,
-      status: "stable",
       base_feature: "none",
     },
     {
@@ -6524,7 +6522,6 @@
     // This is a kill switch for the unprefixed Web Speech API.
     {
       name: "UnprefixedSpeechRecognition",
-      status: "stable",
     },
     {
       name: "UnrestrictedMeasureUserAgentSpecificMemory",
@@ -7123,13 +7120,6 @@
     },
     {
       name: "WebSpeechRecognitionContext",
-      status: {
-        "Win": "stable",
-        "Mac": "stable",
-        "Linux": "stable",
-        "ChromeOS": "experimental",
-        "default": "",
-      },
     },
     {
       name: "WebSpeechTimestamps",
