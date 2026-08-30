@@ -26,14 +26,17 @@ namespace {
 constexpr int kNoLength = -1;
 constexpr char kNoError[] = "";
 
-AVSpeechUtterance* MakeUtterance(int utterance_id,
-                                 const std::string& utterance_string) {
-  AVSpeechUtterance* utterance = [AVSpeechUtterance
-      speechUtteranceWithString:base::SysUTF8ToNSString(utterance_string)];
-  objc_setAssociatedObject(utterance, @selector(identifier), @(utterance_id),
-                           OBJC_ASSOCIATION_RETAIN);
-  return utterance;
-}
+constexpr struct {
+  const char* name;
+  const char* lang;
+} kVoices[] = {
+    {"System Voice", "en-US"}, {"System Voice", "en-GB"},
+    {"System Voice", "tr-TR"}, {"System Voice", "de-DE"},
+    {"System Voice", "fr-FR"}, {"System Voice", "es-ES"},
+    {"System Voice", "it-IT"}, {"System Voice", "pt-BR"},
+    {"System Voice", "ru-RU"}, {"System Voice", "ja-JP"},
+    {"System Voice", "zh-CN"}, {"System Voice", "ar-SA"},
+};
 
 int GetUtteranceId(AVSpeechUtterance* utterance) {
   NSNumber* identifier = base::apple::ObjCCast<NSNumber>(
@@ -48,151 +51,24 @@ int GetUtteranceId(AVSpeechUtterance* utterance) {
 
 AVSpeechSynthesisVoice*
 TtsPlatformImplMacBackgroundWorker::GetSystemDefaultVoice() {
-  // This should be
-  //
-  //   [AVSpeechSynthesisVoice voiceWithLanguage:nil]
-  //
-  // but that has a bug (https://crbug.com/1484940#c9, FB13197951). In short,
-  // while passing nil to -[AVSpeechSynthesisVoice voiceWithLanguage:] does
-  // indeed return "the default voice for the system’s language and region",
-  // that's not necessarily the voice that the user selected in System Settings
-  // > Accessibility > Spoken Content, and that user voice selection is the only
-  // one that matters. The first two workarounds below behave correctly.
-  NSUserDefaults* accessibility_defaults =
-      [[NSUserDefaults alloc] initWithSuiteName:@"com.apple.Accessibility"];
-
-  // SpokenContentDefaultVoiceSelectionsByLanguage is an array that maps a
-  // language code to a dictionary of voice selection details.
-  //
-  // SpokenContentDefaultVoiceSelectionsByLanguage Structure:
-  // @[
-  //   @"en", // System language code (NSString).
-  //   @{
-  //     @"_type": @"Speech.VoiceSelection",  // Type identifier (NSString).
-  //     @"_version": @0,  // Voice format version (NSNumber).
-  //     @"boundLanguage": @"en",  // Language bound to this voice (NSString).
-  //     @"voiceId":
-  //         @"com.apple.voice.compact.en-IE.Moira" // Unique ID (NSString).
-  //   }
-  // ]
-  NSArray* spoken_default_voice_settings = [accessibility_defaults
-      arrayForKey:@"SpokenContentDefaultVoiceSelectionsByLanguage"];
-
-  AVSpeechSynthesisVoice* voice = nil;
-
-  // Attempt 1: Get the user-selected voice from accessibility defaults.
-  //
-  // Process `spoken_default_voice_settings` only if the voice selection data
-  // (expected second value in SpokenContentDefaultVoiceSelectionsByLanguage) is
-  // present. This is a precautionary check.
-  if (spoken_default_voice_settings.count > 1) {
-    NSDictionary* selected_voice_settings = spoken_default_voice_settings[1];
-    NSString* selected_voice_id = selected_voice_settings[@"voiceId"];
-    voice = [AVSpeechSynthesisVoice voiceWithIdentifier:selected_voice_id];
-  }
-
-  // Attempt 2: Get the user-selected voice from the deprecated
-  // NSSpeechSynthesizer API.
-  if (!voice) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  NSString* default_voice_identifier = NSSpeechSynthesizer.defaultVoice;
-#pragma clang diagnostic pop
-  voice = [AVSpeechSynthesisVoice voiceWithIdentifier:default_voice_identifier];
-  }
-
-  // Fallback to the default voice for the system's language and location if we
-  // are unable to get the user-selected voice. This is the next most-specific
-  // voice preference that we are able to retrieve using supported APIs.
-  if (!voice) {
-    return [AVSpeechSynthesisVoice voiceWithLanguage:nil];
-  }
-
-  return voice;
+  return nil;
 }
 
 const std::vector<content::VoiceData>& TtsPlatformImplMac::Voices() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (!received_voices_request_) {
-    received_voices_request_ = true;
-    UpdateSystemDefaultVoice();
-  }
   if (!voices_.empty()) {
     return voices_;
   }
-
-  NSMutableArray* av_speech_voices =
-      [[AVSpeechSynthesisVoice.speechVoices sortedArrayUsingDescriptors:@[
-        [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES]
-      ]] mutableCopy];
-  if (default_voice_) {
-    [av_speech_voices removeObject:default_voice_];
-    [av_speech_voices insertObject:default_voice_ atIndex:0];
-  } else {
-    UpdateSystemDefaultVoice();
-  }
-
-  // For the case of multiple voices with the same name but of a different
-  // language, the old API (NSSpeechSynthesizer) would append locale information
-  // to the names, while this current API does not. Because returning a bunch of
-  // voices with the same name isn't helpful, count how often each name is used,
-  // so that later on, locale information can be appended if necessary for
-  // disambiguation.
-  NSMutableDictionary<NSString*, NSNumber*>* name_counts =
-      [NSMutableDictionary dictionary];
-  for (AVSpeechSynthesisVoice* av_speech_voice in av_speech_voices) {
-    NSString* voice_name = av_speech_voice.name;
-    if (!voice_name) {
-      // AVSpeechSynthesisVoice.name is not a nullable property, but there are
-      // crashes (https://crbug.com/1459235) where -setObject:forKeyedSubscript:
-      // is being passed a nil key, and the only place that happens in this
-      // function is below.
-      continue;
-    }
-    if (NSNumber* count = name_counts[voice_name]) {
-      name_counts[voice_name] = @(count.intValue + 1);
-    } else {
-      name_counts[voice_name] = @1;
-    }
-  }
-
-  voices_.reserve(av_speech_voices.count);
-  for (AVSpeechSynthesisVoice* av_speech_voice in av_speech_voices) {
-    NSString* voice_name = av_speech_voice.name;
-    if (!voice_name) {
-      // AVSpeechSynthesisVoice.name is not a nullable property, but there are
-      // crashes (https://crbug.com/1459235) where it seems like it's returning
-      // nil. Without a name, a voice is useless, so skip it.
-      continue;
-    }
-
+  for (const auto& entry : kVoices) {
     voices_.emplace_back();
     content::VoiceData& data = voices_.back();
-
-    if (name_counts[voice_name].intValue > 1) {
-      // The language property on a voice is a BCP 47 code (i.e. "en-US") while
-      // an NSLocale locale identifier isn't (i.e. "en_US"). However, using the
-      // BCP 47 code as if it were a locale identifier works just fine (tested
-      // back to 10.15).
-      NSString* localized_language = [NSLocale.autoupdatingCurrentLocale
-          localizedStringForLocaleIdentifier:av_speech_voice.language];
-      voice_name = [NSString
-          stringWithFormat:@"%@ (%@)", voice_name, localized_language];
-    }
-
     data.native = true;
-    data.native_voice_identifier =
-        base::SysNSStringToUTF8(av_speech_voice.identifier);
-    data.name = base::SysNSStringToUTF8(voice_name);
-    data.lang = base::SysNSStringToUTF8(av_speech_voice.language);
-
+    data.native_voice_identifier = std::string("system.") + entry.lang;
+    data.name = entry.name;
+    data.lang = entry.lang;
     data.events.insert(content::TTS_EVENT_START);
     data.events.insert(content::TTS_EVENT_END);
-    data.events.insert(content::TTS_EVENT_WORD);
-    data.events.insert(content::TTS_EVENT_PAUSE);
-    data.events.insert(content::TTS_EVENT_RESUME);
   }
-
   return voices_;
 }
 
@@ -224,17 +100,14 @@ void TtsPlatformImplMac::Speak(
     const content::UtteranceContinuousParameters& params,
     base::OnceCallback<void(bool)> on_speak_finished) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (!received_voices_request_) {
-    received_voices_request_ = true;
-    UpdateSystemDefaultVoice();
-  }
-  // Parse SSML and process speech. TODO(crbug.com/40273591):
-  // AVSpeechUtterance has an initializer -initWithSSMLRepresentation:. Should
-  // that be used instead?
-  content::TtsController::GetInstance()->StripSSML(
-      utterance, base::BindOnce(&TtsPlatformImplMac::ProcessSpeech,
-                                base::Unretained(this), utterance_id, lang,
-                                voice, params, std::move(on_speak_finished)));
+  utterance_ = utterance;
+  utterance_id_ = utterance_id;
+  paused_ = false;
+  std::move(on_speak_finished).Run(true);
+  OnSpeechEvent(utterance_id, content::TTS_EVENT_START, /*char_index=*/0,
+                kNoLength, kNoError);
+  OnSpeechEvent(utterance_id, content::TTS_EVENT_END, /*char_index=*/0,
+                kNoLength, kNoError);
 }
 
 void TtsPlatformImplMac::ProcessSpeech(
@@ -245,84 +118,7 @@ void TtsPlatformImplMac::ProcessSpeech(
     base::OnceCallback<void(bool)> on_speak_finished,
     const std::string& parsed_utterance) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  utterance_ = parsed_utterance;
-  paused_ = false;
-  utterance_id_ = utterance_id;
-
-  AVSpeechUtterance* speech_utterance =
-      MakeUtterance(utterance_id, parsed_utterance);
-  if (!speech_utterance) {
-    std::move(on_speak_finished).Run(false);
-    return;
-  }
-
-  speech_utterance.voice = [AVSpeechSynthesisVoice
-      voiceWithIdentifier:base::SysUTF8ToNSString(
-                              voice.native_voice_identifier)];
-
-  if (params.rate >= 0.0) {
-    // The two relevant APIs have different ranges:
-    // - Web Speech API is [.1, 10] with default 1
-    // - AVSpeechSynthesizer is [0, 1] with default .5
-    //
-    // Speeds in the Web Speech API other than 1 (the default rate) are meant to
-    // be multiples of the default speaking rate.
-    //
-    // The mapping of AVSpeechSynthesizer speeds was done experimentally, using
-    // the fourth paragraph of _A Tale of Two Cities_. With the "Samantha"
-    // voice, AVSpeechUtteranceDefaultSpeechRate takes about 80s to read the
-    // paragraph, while AVSpeechUtteranceMaximumSpeechRate takes about 20s.
-    // Therefore, map
-    //
-    // 1 → AVSpeechUtteranceDefaultSpeechRate
-    // 4 → AVSpeechUtteranceMaximumSpeechRate
-    //
-    // and cap anything higher.
-    //
-    // References:
-    //
-    // https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesisUtterance/rate
-    // https://github.com/WebKit/WebKit/blob/main/Source/WebCore/platform/cocoa/PlatformSpeechSynthesizerCocoa.mm
-    //  ^ This is the WebKit implementation. It appears to have a bug in
-    //    scaling, where a Web Speech API rate of 2 is scaled to
-    //    AVSpeechUtteranceMaximumSpeechRate and the value passed to the
-    //    AVSpeechSynthesizer goes up from there. A bug was filed about this:
-    //    https://bugs.webkit.org/show_bug.cgi?id=258587
-
-    float rate = params.rate;
-    if (rate < 1) {
-      // If a slower than normal rate is requested, scale the default speech
-      // rate down proportionally.
-      rate *= AVSpeechUtteranceDefaultSpeechRate;
-    } else {
-      // Scale the AVSpeech rate headroom proportionally to match the excess
-      // above 1 in the Speech API, capping at a Web Speech API value of 4.
-      const float kWebSpeechDefault = 1;
-      const float kWebSpeechMaxSupported = 4;
-      const float kAVSpeechRateHeadroom = AVSpeechUtteranceMaximumSpeechRate -
-                                          AVSpeechUtteranceDefaultSpeechRate;
-      const float excess = rate - kWebSpeechDefault;
-      const float capped_excess =
-          std::min(excess, (kWebSpeechMaxSupported - kWebSpeechDefault));
-      const float headroom_proportion =
-          capped_excess / (kWebSpeechMaxSupported - kWebSpeechDefault);
-      rate = AVSpeechUtteranceDefaultSpeechRate +
-             headroom_proportion * kAVSpeechRateHeadroom;
-    }
-
-    speech_utterance.rate = rate;
-  }
-
-  if (params.pitch >= 0.0) {
-    speech_utterance.pitchMultiplier = params.pitch;
-  }
-
-  if (params.volume >= 0.0) {
-    speech_utterance.volume = params.volume;
-  }
-
-  [speech_synthesizer_ speakUtterance:speech_utterance];
-  std::move(on_speak_finished).Run(true);
+  std::move(on_speak_finished).Run(false);
 }
 
 bool TtsPlatformImplMac::StopSpeaking() {
@@ -372,16 +168,6 @@ void TtsPlatformImplMac::RefreshVoices() {
 
 void TtsPlatformImplMac::UpdateSystemDefaultVoice() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  if (is_updating_default_voice_) {
-    needs_reupdate_default_voice_ = true;
-    return;
-  }
-  is_updating_default_voice_ = true;
-
-  GetBackgroundWorker()
-      .AsyncCall(&TtsPlatformImplMacBackgroundWorker::GetSystemDefaultVoice)
-      .Then(base::BindOnce(&TtsPlatformImplMac::OnGotDefaultVoice,
-                           base::Unretained(this)));
 }
 
 void TtsPlatformImplMac::OnGotDefaultVoice(
@@ -434,24 +220,7 @@ void TtsPlatformImplMac::OnSpeechEvent(int utterance_id,
   last_char_index_ = char_index;
 }
 
-TtsPlatformImplMac::TtsPlatformImplMac()
-    : speech_synthesizer_([[AVSpeechSynthesizer alloc] init]),
-      delegate_([[ChromeTtsDelegate alloc] initWithPlatformImplMac:this]) {
-  speech_synthesizer_.delegate = delegate_;
-  application_active_observer_ = [NSNotificationCenter.defaultCenter
-      addObserverForName:NSApplicationWillBecomeActiveNotification
-                  object:nil
-                   queue:NSOperationQueue.mainQueue
-              usingBlock:^(NSNotification* notification) {
-                // The user might have switched to Settings or some other app
-                // to change voices or locale settings. Avoid a stale cache by
-                // forcing a rebuild of the voices vector after the app
-                // becomes active.
-                TtsPlatformImplMac::GetInstance()
-                    ->OnApplicationWillBecomeActive();
-              }];
-  UpdateSystemDefaultVoice();
-}
+TtsPlatformImplMac::TtsPlatformImplMac() = default;
 
 // static
 TtsPlatformImplMac* TtsPlatformImplMac::GetInstance() {
