@@ -1,0 +1,62 @@
+/* Copyright 2026 The Chromium Authors
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file. */
+
+/* #css_wrapper_metadata_start
+ * #type=style-lit
+ * #import=//resources/cr_elements/cr_shared_vars.css.js
+ * #css_wrapper_metadata_end */
+
+:host {
+  color: var(--cr-primary-text-color);
+  display: block;
+  max-width: 960px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+h1 {
+  font-size: 1.75rem;
+  margin-bottom: 8px;
+}
+
+#learn-more {
+  color: var(--cr-secondary-text-color);
+  font-size: 1rem;
+  margin-bottom: 16px;
+}
+
+#learn-more a {
+  color: var(--cr-link-color);
+  text-decoration: none;
+}
+
+#learn-more a:hover {
+  text-decoration: underline;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+#iwa-list {
+  display: flex;
+  flex-direction: column;
+}
+
+#iwa-list-message:not(:empty) {
+  border: 1px dashed var(--google-grey-300);
+  border-radius: var(--cr-card-border-radius);
+  color: var(--cr-secondary-text-color);
+  font-style: italic;
+  padding: 24px;
+  text-align: center;
+}
