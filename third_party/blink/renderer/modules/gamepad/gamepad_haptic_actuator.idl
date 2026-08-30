@@ -22,6 +22,7 @@ enum GamepadHapticsResult {
 
 // https://www.w3.org/TR/gamepad/#gamepadhapticactuator-interface
 [
+    RuntimeEnabled=Gamepad,
     Exposed=Window
 ] interface GamepadHapticActuator {
     [SameObject] readonly attribute FrozenArray<GamepadHapticEffectType> effects;

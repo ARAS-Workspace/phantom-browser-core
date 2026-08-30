@@ -13,6 +13,7 @@ enum GamepadButtonType {
 };
 
 [
+    RuntimeEnabled=Gamepad,
     Exposed=Window
 ] interface GamepadButton {
     readonly attribute boolean pressed;
