@@ -142,51 +142,32 @@ class PLATFORM_EXPORT NetworkStateNotifier {
   // whose typical performance is most similar to the measured performance of
   // the network in use.
   WebEffectiveConnectionType EffectiveType() const {
-    base::AutoLock locker(lock_);
-    const NetworkState& state = has_override_ ? override_ : state_;
-    // TODO (tbansal): Add a DCHECK to check that |state.on_line_initialized| is
-    // true once https://crbug.com/728771 is fixed.
-    return state.effective_type;
+    return WebEffectiveConnectionType::kType4G;
   }
 
   // Returns the current HTTP RTT estimate. If the estimate is unavailable, the
   // returned optional value is null.
   std::optional<base::TimeDelta> HttpRtt() const {
-    base::AutoLock locker(lock_);
-    const NetworkState& state = has_override_ ? override_ : state_;
-    // TODO (tbansal): Add a DCHECK to check that |state.on_line_initialized| is
-    // true once https://crbug.com/728771 is fixed.
-    return state.http_rtt;
+    return base::Milliseconds(50);
   }
 
   // Returns the current transport RTT estimate. If the estimate is unavailable,
   // the returned optional value is null.
   std::optional<base::TimeDelta> TransportRtt() const {
-    base::AutoLock locker(lock_);
-    const NetworkState& state = has_override_ ? override_ : state_;
-    DCHECK(state.on_line_initialized);
-    return state.transport_rtt;
+    return base::Milliseconds(50);
   }
 
   // Returns the current throughput estimate (in megabits per second). If the
   // estimate is unavailable, the returned optional value is null.
   std::optional<double> DownlinkThroughputMbps() const {
-    base::AutoLock locker(lock_);
-    const NetworkState& state = has_override_ ? override_ : state_;
-    // TODO (tbansal): Add a DCHECK to check that |state.on_line_initialized| is
-    // true once https://crbug.com/728771 is fixed.
-    return state.downlink_throughput_mbps;
+    return 10.0;
   }
 
   // Returns if the save data functionality has been enabled by the user.
   // The returned value does not account for any holdback experiments that may
   // be enabled.
   bool SaveDataEnabled() const {
-    base::AutoLock locker(lock_);
-    const NetworkState& state = has_override_ ? override_ : state_;
-    // TODO (tbansal): Add a DCHECK to check that |state.on_line_initialized| is
-    // true once https://crbug.com/728771 is fixed.
-    return state.save_data;
+    return false;
   }
 
   void SetOnLine(bool);

@@ -368,18 +368,7 @@ String NetworkStateNotifier::EffectiveConnectionTypeToString(
 }
 
 double NetworkStateNotifier::GetRandomMultiplier(const String& host) const {
-  // The random number should be a function of the hostname to reduce
-  // cross-origin fingerprinting. The random number should also be a function
-  // of randomized salt which is known only to the device. This prevents
-  // origin from removing noise from the estimates.
-  if (!host)
-    return 1.0;
-
-  unsigned hash = GetHash(host) + RandomizationSalt();
-  double random_multiplier = 0.9 + static_cast<double>((hash % 21)) * 0.01;
-  DCHECK_LE(0.90, random_multiplier);
-  DCHECK_GE(1.10, random_multiplier);
-  return random_multiplier;
+  return 1.0;
 }
 
 uint32_t NetworkStateNotifier::RoundRtt(

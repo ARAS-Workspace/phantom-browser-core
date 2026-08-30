@@ -7,7 +7,7 @@
 [
     ImplementedAs=NetworkInformation
 ] interface mixin NavigatorNetworkInformation {
-    [SameObject, MeasureAs=NetInfo] readonly attribute NetworkInformation connection;
+    [SameObject, RuntimeEnabled=NetworkInformationAPI, MeasureAs=NetInfo] readonly attribute NetworkInformation connection;
 };
 
 Navigator includes NavigatorNetworkInformation;

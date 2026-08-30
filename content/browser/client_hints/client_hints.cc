@@ -67,35 +67,6 @@ namespace content {
 namespace {
 using ::network::mojom::WebClientHintsType;
 
-uint8_t randomization_salt = 0;
-
-constexpr size_t kMaxRandomNumbers = 21;
-
-// Returns the randomization salt (weak and insecure) that should be used when
-// adding noise to the network quality metrics. This is known only to the
-// device, and is generated only once. This makes it possible to add the same
-// amount of noise for a given origin.
-uint8_t RandomizationSalt() {
-  if (randomization_salt == 0)
-    randomization_salt = base::RandIntInclusive(1, kMaxRandomNumbers);
-  DCHECK_LE(1, randomization_salt);
-  DCHECK_GE(kMaxRandomNumbers, randomization_salt);
-  return randomization_salt;
-}
-
-double GetRandomMultiplier(const std::string& host) {
-  // The random number should be a function of the hostname to reduce
-  // cross-origin fingerprinting. The random number should also be a function
-  // of randomized salt which is known only to the device. This prevents
-  // origin from removing noise from the estimates.
-  unsigned hash = std::hash<std::string>{}(host) + RandomizationSalt();
-  double random_multiplier =
-      0.9 + static_cast<double>((hash % kMaxRandomNumbers)) * 0.01;
-  DCHECK_LE(0.90, random_multiplier);
-  DCHECK_GE(1.10, random_multiplier);
-  return random_multiplier;
-}
-
 unsigned long RoundRtt(const std::string& host,
                        const std::optional<base::TimeDelta>& rtt) {
   if (!rtt.has_value()) {
@@ -108,8 +79,7 @@ unsigned long RoundRtt(const std::string& host,
   constexpr base::TimeDelta kMaxRtt = base::Seconds(3);
   constexpr base::TimeDelta kGranularity = base::Milliseconds(50);
 
-  const base::TimeDelta modified_rtt =
-      std::min(rtt.value() * GetRandomMultiplier(host), kMaxRtt);
+  const base::TimeDelta modified_rtt = std::min(rtt.value(), kMaxRtt);
   DCHECK_GE(modified_rtt, base::TimeDelta());
   return modified_rtt.RoundToMultiple(kGranularity).InMilliseconds();
 }
@@ -123,8 +93,6 @@ double RoundKbpsToMbps(const std::string& host,
 
   // If downlink is unavailable, return the fastest value.
   double randomized_downlink_kbps = downlink_kbps.value_or(kMaxDownlinkKbps);
-  randomized_downlink_kbps *= GetRandomMultiplier(host);
-
   randomized_downlink_kbps =
       std::min(randomized_downlink_kbps, kMaxDownlinkKbps);
 
@@ -183,30 +151,6 @@ std::string DoubleToSpecCompliantString(double value) {
   // '.' is the first character in |result|. Prefix one digit before the
   // period to make it spec compliant.
   return "0" + result;
-}
-
-// Return the effective connection type value overridden for web APIs.
-// If no override value has been set, a null value is returned.
-std::optional<net::EffectiveConnectionType>
-GetWebHoldbackEffectiveConnectionType() {
-  if (!base::FeatureList::IsEnabled(
-          features::kNetworkQualityEstimatorWebHoldback)) {
-    return std::nullopt;
-  }
-  std::string effective_connection_type_param =
-      base::GetFieldTrialParamValueByFeature(
-          features::kNetworkQualityEstimatorWebHoldback,
-          "web_effective_connection_type_override");
-
-  std::optional<net::EffectiveConnectionType> effective_connection_type =
-      net::GetEffectiveConnectionTypeForName(effective_connection_type_param);
-  DCHECK(effective_connection_type_param.empty() || effective_connection_type);
-
-  if (!effective_connection_type)
-    return std::nullopt;
-  DCHECK_NE(net::EFFECTIVE_CONNECTION_TYPE_UNKNOWN,
-            effective_connection_type.value());
-  return effective_connection_type;
 }
 
 void SetHeaderToDouble(net::HttpRequestHeaders* headers,
@@ -387,19 +331,7 @@ void AddRttHeader(net::HttpRequestHeaders* headers,
                   const GURL& url) {
   DCHECK(headers);
 
-  std::optional<net::EffectiveConnectionType> web_holdback_ect =
-      GetWebHoldbackEffectiveConnectionType();
-
-  base::TimeDelta http_rtt;
-  if (web_holdback_ect.has_value()) {
-    http_rtt = net::NetworkQualityEstimatorParams::GetDefaultTypicalHttpRtt(
-        web_holdback_ect.value());
-  } else if (network_quality_tracker) {
-    http_rtt = network_quality_tracker->GetHttpRTT();
-  } else {
-    http_rtt = net::NetworkQualityEstimatorParams::GetDefaultTypicalHttpRtt(
-        net::EFFECTIVE_CONNECTION_TYPE_UNKNOWN);
-  }
+  base::TimeDelta http_rtt = base::Milliseconds(50);
   SetHeaderToInt(headers, WebClientHintsType::kRtt_DEPRECATED,
                  RoundRtt(url.GetHost(), http_rtt));
 }
@@ -408,23 +340,7 @@ void AddDownlinkHeader(net::HttpRequestHeaders* headers,
                        network::NetworkQualityTracker* network_quality_tracker,
                        const GURL& url) {
   DCHECK(headers);
-  std::optional<net::EffectiveConnectionType> web_holdback_ect =
-      GetWebHoldbackEffectiveConnectionType();
-
-  int32_t downlink_throughput_kbps;
-
-  if (web_holdback_ect.has_value()) {
-    downlink_throughput_kbps =
-        net::NetworkQualityEstimatorParams::GetDefaultTypicalDownlinkKbps(
-            web_holdback_ect.value());
-  } else if (network_quality_tracker) {
-    downlink_throughput_kbps =
-        network_quality_tracker->GetDownstreamThroughputKbps();
-  } else {
-    downlink_throughput_kbps =
-        net::NetworkQualityEstimatorParams::GetDefaultTypicalDownlinkKbps(
-            net::EFFECTIVE_CONNECTION_TYPE_UNKNOWN);
-  }
+  int32_t downlink_throughput_kbps = 10 * 1000;
 
   SetHeaderToDouble(headers, WebClientHintsType::kDownlink_DEPRECATED,
                     RoundKbpsToMbps(url.GetHost(), downlink_throughput_kbps));
@@ -435,19 +351,8 @@ void AddEctHeader(net::HttpRequestHeaders* headers,
                   const GURL& url) {
   DCHECK(headers);
 
-  std::optional<net::EffectiveConnectionType> web_holdback_ect =
-      GetWebHoldbackEffectiveConnectionType();
-
-  int effective_connection_type;
-  if (web_holdback_ect.has_value()) {
-    effective_connection_type = web_holdback_ect.value();
-  } else if (network_quality_tracker) {
-    effective_connection_type =
-        static_cast<int>(network_quality_tracker->GetEffectiveConnectionType());
-  } else {
-    effective_connection_type =
-        static_cast<int>(net::EFFECTIVE_CONNECTION_TYPE_UNKNOWN);
-  }
+  int effective_connection_type =
+      static_cast<int>(net::EFFECTIVE_CONNECTION_TYPE_4G);
 
   SetHeaderToString(
       headers, WebClientHintsType::kEct_DEPRECATED,

@@ -4266,6 +4266,10 @@
       base_feature: "none",
     },
     {
+      name: "NetworkInformationAPI",
+      base_feature: "none",
+    },
+    {
       // See crbug.com/521921832
       // Any potential behavioral changes excepting bugfixes from the V2 implementation (including
       // changes to when the histogram is reported, like early-outs in Animation::PreCommit) are behind
