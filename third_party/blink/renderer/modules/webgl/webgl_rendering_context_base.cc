@@ -4169,8 +4169,7 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
       return ScriptValue::CreateNull(script_state->GetIsolate());
     case WebGLDebugRendererInfo::kUnmaskedRendererWebgl:
       if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
-        return WebGLAny(script_state,
-                        String(ContextGL()->GetString(GL_RENDERER)));
+        return WebGLAny(script_state, String("Apple GPU"));
       }
       SynthesizeGLError(
           GL_INVALID_ENUM, "getParameter",
@@ -4178,8 +4177,7 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
       return ScriptValue::CreateNull(script_state->GetIsolate());
     case WebGLDebugRendererInfo::kUnmaskedVendorWebgl:
       if (ExtensionEnabled(kWebGLDebugRendererInfoName)) {
-        return WebGLAny(script_state,
-                        String(ContextGL()->GetString(GL_VENDOR)));
+        return WebGLAny(script_state, String("Apple Inc."));
       }
       SynthesizeGLError(
           GL_INVALID_ENUM, "getParameter",
