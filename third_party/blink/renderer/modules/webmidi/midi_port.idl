@@ -54,6 +54,7 @@ enum MIDIPortType {
 
 [
     ActiveScriptWrappable,
+    RuntimeEnabled=WebMIDI,
     Exposed=Window,
     SecureContext
 ] interface MIDIPort : EventTarget {

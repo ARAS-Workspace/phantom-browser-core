@@ -31,6 +31,7 @@
 // https://webaudio.github.io/web-midi-api/#MIDIMessageEvent
 
 [
+    RuntimeEnabled=WebMIDI,
     Exposed=Window,
     SecureContext
 ] interface MIDIMessageEvent : Event {

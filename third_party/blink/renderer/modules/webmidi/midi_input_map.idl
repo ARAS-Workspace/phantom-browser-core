@@ -5,6 +5,7 @@
 // https://webaudio.github.io/web-midi-api/#MIDIInput
 
 [
+    RuntimeEnabled=WebMIDI,
     Exposed=Window,
     SecureContext
 ] interface MIDIInputMap {

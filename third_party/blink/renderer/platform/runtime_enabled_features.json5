@@ -7066,6 +7066,10 @@
       status: "experimental",
     },
     {
+      name: "WebMIDI",
+      base_feature: "none",
+    },
+    {
       name: "WebNFC",
       public: true,
       status: {"Android": "stable", "iOS": "stable", "default": "test"},

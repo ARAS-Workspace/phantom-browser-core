@@ -32,6 +32,7 @@
 
 [
     ActiveScriptWrappable,
+    RuntimeEnabled=WebMIDI,
     Exposed=Window,
     SecureContext
 ] interface MIDIAccess : EventTarget {
