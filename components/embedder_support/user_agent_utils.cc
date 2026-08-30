@@ -42,10 +42,6 @@
 #include "base/win/windows_version.h"
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(IS_MAC)
-#include "base/mac/mac_util.h"
-#endif
-
 #if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_ANDROID)
 #include "ui/base/device_form_factor.h"
 #endif
@@ -605,6 +601,8 @@ std::string GetPlatformVersion() {
   return GetWindowsPlatformVersion();
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_FUCHSIA)
   return std::string();
+#elif BUILDFLAG(IS_MAC)
+  return "10.15.7";
 #else
 
   int32_t major, minor, bugfix = 0;
@@ -727,13 +725,7 @@ std::string GetCpuArchitecture() {
     return "x86";
   }
 #elif BUILDFLAG(IS_MAC)
-  base::mac::CPUType cpu_type = base::mac::GetCPUType();
-  if (cpu_type == base::mac::CPUType::kIntel) {
-    return "x86";
-  } else if (cpu_type == base::mac::CPUType::kArm ||
-             cpu_type == base::mac::CPUType::kTranslatedIntel) {
-    return "arm";
-  }
+  return "x86";
 #elif BUILDFLAG(IS_IOS)
   return "arm";
 #elif BUILDFLAG(IS_ANDROID)
