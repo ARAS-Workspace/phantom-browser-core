@@ -38,7 +38,7 @@ export enum BrowsingDataType {
   CACHE = 1,
   SITE_DATA = 2,
   // PASSWORDS = 3, Not used on Desktop.
-  FORM_DATA = 4,
+  // FORM_DATA = 4, Not offered by this browser.
   SITE_SETTINGS = 5,
   DOWNLOADS = 6,
   HOSTED_APPS_DATA = 7,

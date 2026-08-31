@@ -931,9 +931,6 @@
     <message name="IDS_SETTINGS_CLEAR_PASSWORDS" desc="Checkbox for deleting Passwords and other sign-in data">
       Passwords and other sign-in data
     </message>
-    <message name="IDS_SETTINGS_CLEAR_FORM_DATA" desc="Checkbox for deleting form data saved for Autofill">
-      Autofill form data
-    </message>
     <message name="IDS_SETTINGS_CLEAR_HOSTED_APP_DATA" desc="Checkbox for deleting data of hosted apps">
       Hosted app data
     </message>
