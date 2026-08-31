@@ -320,12 +320,6 @@ void CustomizeToolbarHandler::ListActions(ListActionsCallback callback) {
   add_action(kActionNewIncognitoWindow,
              side_panel::customize_chrome::mojom::CategoryId::kNavigation);
 
-  add_action(kActionShowPasswordsBubbleOrPage,
-             side_panel::customize_chrome::mojom::CategoryId::kYourChrome);
-  add_action(kActionShowPaymentsBubbleOrPage,
-             side_panel::customize_chrome::mojom::CategoryId::kYourChrome);
-  add_action(kActionShowAddressesBubbleOrPage,
-             side_panel::customize_chrome::mojom::CategoryId::kYourChrome);
   add_action(kActionSidePanelShowBookmarks,
              side_panel::customize_chrome::mojom::CategoryId::kYourChrome);
   add_action(kActionSidePanelShowReadingList,
