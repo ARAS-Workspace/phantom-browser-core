@@ -219,10 +219,6 @@ void RenderViewContextMenuMac::InitToolkitMenu() {
                                    printable_selection_text));
     menu_model_.InsertSeparatorAt(index++, ui::NORMAL_SEPARATOR);
   }
-
-  if (!params_.selection_text.empty()) {
-    text_services_context_menu_.AppendToContextMenu(&menu_model_);
-  }
 }
 
 void RenderViewContextMenuMac::LookUpInDictionary() {

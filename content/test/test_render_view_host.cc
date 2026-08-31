@@ -177,9 +177,6 @@ void TestRenderWidgetHostView::SetActive(bool active) {
   // <viettrungluu@gmail.com>: Do I need to do anything here?
 }
 
-void TestRenderWidgetHostView::SpeakSelection() {
-}
-
 void TestRenderWidgetHostView::SetWindowFrameInScreen(const gfx::Rect& rect) {}
 
 void TestRenderWidgetHostView::ShowSharePicker(

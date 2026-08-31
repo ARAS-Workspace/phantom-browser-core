@@ -14,8 +14,8 @@
 
 namespace ui {
 
-// This class is used to append and handle the Speech and BiDi submenu for the
-// context menu.
+// This class is used to append and handle the BiDi submenu for the context
+// menu.
 class COMPONENT_EXPORT(UI_MENUS) TextServicesContextMenu
     : public SimpleMenuModel::Delegate {
  public:
@@ -25,11 +25,7 @@ class COMPONENT_EXPORT(UI_MENUS) TextServicesContextMenu
     // TODO(ellyjones): This is an ugly global dependency, especially on
     // //ui/views. What can we do about this? Can we get rid of the global
     // implicit namespace of command IDs?
-    kSpeechMenu = 100,
-    kSpeechStartSpeaking,
-    kSpeechStopSpeaking,
-
-    kWritingDirectionMenu,
+    kWritingDirectionMenu = 100,
     kWritingDirectionDefault,
     kWritingDirectionLtr,
     kWritingDirectionRtl,
@@ -57,15 +53,6 @@ class COMPONENT_EXPORT(UI_MENUS) TextServicesContextMenu
   TextServicesContextMenu(const TextServicesContextMenu&) = delete;
   TextServicesContextMenu& operator=(const TextServicesContextMenu&) = delete;
 
-  // Methods for speaking.
-  static void SpeakText(std::u16string_view text);
-  static void StopSpeaking();
-  static bool IsSpeaking();
-
-  // Appends text service items to |model|. A submenu is added for speech,
-  // which |this| serves as the delegate for.
-  void AppendToContextMenu(SimpleMenuModel* model);
-
   // Appends items to the context menu applicable to editable content. A
   // submenu is added for bidirection, which |this| serves as a delegate for.
   void AppendEditableItems(SimpleMenuModel* model);
@@ -79,9 +66,6 @@ class COMPONENT_EXPORT(UI_MENUS) TextServicesContextMenu
   void ExecuteCommand(int command_id, int event_flags) override;
 
  private:
-  // Model for the "Speech" submenu.
-  ui::SimpleMenuModel speech_submenu_model_;
-
   // Model for the BiDi input submenu.
   ui::SimpleMenuModel bidi_submenu_model_;
 

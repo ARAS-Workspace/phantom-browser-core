@@ -73,8 +73,6 @@ ViewsTextServicesContextMenuMac::ViewsTextServicesContextMenuMac(
     menu->InsertItemAt(0, IDS_CONTENT_CONTEXT_LOOK_UP,
                        l10n_util::GetStringFUTF16(IDS_CONTENT_CONTEXT_LOOK_UP,
                                                   truncated_text));
-
-    text_services_menu_.AppendToContextMenu(menu);
   }
 
   if (client->SupportsEditableContextMenuItems()) {

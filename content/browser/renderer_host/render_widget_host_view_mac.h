@@ -142,7 +142,6 @@ class CONTENT_EXPORT RenderWidgetHostViewMac
   bool IsPointerLocked() override;
   void SetActive(bool active) override;
   void ShowDefinitionForSelection() override;
-  void SpeakSelection() override;
   void SetWindowFrameInScreen(const gfx::Rect& rect) override;
   void SetForceSpecifiedDeadline(
       std::optional<uint32_t> deadline_in_frames) override;
@@ -440,12 +439,8 @@ class CONTENT_EXPORT RenderWidgetHostViewMac
   void Paste() override;
   void PasteAndMatchStyle() override;
   void SelectAll() override;
-  void StartSpeaking() override;
-  void StopSpeaking() override;
-  bool SyncIsSpeaking(bool* is_speaking) override;
   void GetRenderWidgetAccessibilityToken(
       GetRenderWidgetAccessibilityTokenCallback callback) override;
-  void SyncIsSpeaking(SyncIsSpeakingCallback callback) override;
   void SetRemoteAccessibilityWindowToken(
       const std::vector<uint8_t>& window_token) override;
 
@@ -546,7 +541,6 @@ class CONTENT_EXPORT RenderWidgetHostViewMac
  private:
   friend class RenderWidgetHostViewMacTest;
   friend class MockPointerLockRenderWidgetHostView;
-  FRIEND_TEST_ALL_PREFIXES(RenderWidgetHostViewMacTest, GetPageTextForSpeech);
 
   // Shuts down the render_widget_host_.  This is a separate function so we can
   // invoke it from the message loop.
@@ -585,8 +579,6 @@ class CONTENT_EXPORT RenderWidgetHostViewMac
 
   // Gets a textual view of the page's contents, and passes it to the callback
   // provided.
-  using SpeechCallback = base::OnceCallback<void(std::u16string_view)>;
-  void GetPageTextForSpeech(SpeechCallback callback);
 
   // Calls RenderWidgetHostNSView::SetTooltipText and call the observer's
   // OnTooltipTextUpdated() function, if not null.

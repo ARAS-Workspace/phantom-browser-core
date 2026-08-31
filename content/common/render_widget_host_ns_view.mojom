@@ -270,18 +270,6 @@ interface RenderWidgetHostNSViewHost {
   PasteAndMatchStyle();
   SelectAll();
 
-  // Speak the selected text of the appropriate RenderWidgetHostView using
-  // TextServicesContextMenu.
-  StartSpeaking();
-
-  // Stop speaking using TextServicesContextMenu.
-  StopSpeaking();
-
-  // Synchronously query if TextServicesContextMenu is currently speaking and
-  // return the result as |is_speaking|.
-  [Sync]
-  SyncIsSpeaking() => (bool is_speaking);
-
   // Return in |element_token| the token for the root content AX node for this
   // view and in |host_pid| the pid for the host process.
   [Sync]

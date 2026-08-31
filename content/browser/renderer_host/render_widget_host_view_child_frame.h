@@ -196,7 +196,6 @@ class CONTENT_EXPORT RenderWidgetHostViewChildFrame
   // RenderWidgetHostView implementation.
   void SetActive(bool active) override;
   void ShowDefinitionForSelection() override;
-  void SpeakSelection() override;
   void SetWindowFrameInScreen(const gfx::Rect& rect) override;
   void ShowSharePicker(
       const std::string& title,

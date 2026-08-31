@@ -1060,80 +1060,6 @@ gfx::Size RenderWidgetHostViewMac::GetRequestedRendererSize() {
   return browser_compositor_->GetRendererSize();
 }
 
-namespace {
-
-// A helper function for CombineTextNodesAndMakeCallback() below. It would
-// ordinarily be a helper lambda in that class method, but it processes a tree
-// and needs to be recursive, and that's crazy difficult to do with a lambda.
-// TODO(avi): Move this to be a lambda when P0839R0 lands in C++.
-void AddTextNodesToVector(const ui::AXNode* node,
-                          std::vector<std::u16string>* strings) {
-  if (node->GetRole() == ax::mojom::Role::kStaticText) {
-    if (node->HasStringAttribute(ax::mojom::StringAttribute::kName)) {
-      std::u16string value =
-          node->GetString16Attribute(ax::mojom::StringAttribute::kName);
-      strings->emplace_back(value);
-    }
-    return;
-  }
-
-  for (auto iter = node->UnignoredChildrenBegin();
-       iter != node->UnignoredChildrenEnd(); ++iter) {
-    AddTextNodesToVector(iter.get(), strings);
-  }
-}
-
-using SpeechCallback = base::OnceCallback<void(std::u16string_view)>;
-void CombineTextNodesAndMakeCallback(SpeechCallback callback,
-                                     ui::AXTreeUpdate& update) {
-  std::vector<std::u16string> text_node_contents;
-  text_node_contents.reserve(update.nodes.size());
-
-  ui::AXTree tree(update);
-
-  AddTextNodesToVector(tree.root(), &text_node_contents);
-
-  std::move(callback).Run(base::JoinString(text_node_contents, u"\n"));
-}
-
-}  // namespace
-
-void RenderWidgetHostViewMac::GetPageTextForSpeech(SpeechCallback callback) {
-  // Note that we are calling WebContents::RequestAXTreeSnapshot() with a limit
-  // of 5000 nodes returned. For large pages, this call might hit that limit
-  // (and in practice it may return slightly more than 5000 to ensure a
-  // well-formed tree).
-  //
-  // This is a reasonable limit. The "Start Speaking" call dates back to the
-  // earliest days of the Mac, before accessibility. It was designed to show off
-  // the speech capabilities of the Mac, which is fine, but is mostly
-  // inapplicable nowadays. Is it useful to have the Mac read megabytes of text
-  // with zero control over positioning, with no fast-forward or rewind? What
-  // does it even mean to read a Web 2.0 dynamic, AJAXy page aloud from
-  // beginning to end?
-  //
-  // If this is an issue, please file a bug explaining the situation and how the
-  // limits of this feature affect you in the real world.
-
-  GetWebContents()->RequestAXTreeSnapshot(
-      base::BindOnce(CombineTextNodesAndMakeCallback, std::move(callback)),
-      ui::AXMode::kWebContents,
-      /* max_nodes= */ 5000,
-      /* timeout= */ {}, WebContents::AXTreeSnapshotPolicy::kAll);
-}
-
-void RenderWidgetHostViewMac::SpeakSelection() {
-  const TextInputManager::TextSelection* selection = GetTextSelection();
-  if (selection && !selection->selected_text().empty()) {
-    ui::TextServicesContextMenu::SpeakText(selection->selected_text());
-    return;
-  }
-
-  // With no selection, speak an approximation of the entire contents of the
-  // page.
-  GetPageTextForSpeech(base::BindOnce(ui::TextServicesContextMenu::SpeakText));
-}
-
 void RenderWidgetHostViewMac::SetWindowFrameInScreen(const gfx::Rect& rect) {
   DCHECK(IsHeadless())
       << "This method should only be called in headless browser!";
@@ -2452,38 +2378,6 @@ void RenderWidgetHostViewMac::SelectAll() {
   if (auto* delegate = GetFocusedRenderWidgetHostDelegate()) {
     delegate->SelectAll();
   }
-}
-
-bool RenderWidgetHostViewMac::SyncIsSpeaking(bool* is_speaking) {
-  *is_speaking = ui::TextServicesContextMenu::IsSpeaking();
-  return true;
-}
-
-void RenderWidgetHostViewMac::SyncIsSpeaking(SyncIsSpeakingCallback callback) {
-  bool is_speaking;
-  SyncIsSpeaking(&is_speaking);
-  std::move(callback).Run(is_speaking);
-}
-
-void RenderWidgetHostViewMac::StartSpeaking() {
-  RenderWidgetHostView* target = this;
-  WebContents* web_contents = GetWebContents();
-  if (web_contents) {
-    content::BrowserPluginGuestManager* guest_manager =
-        web_contents->GetBrowserContext()->GetGuestManager();
-    if (guest_manager) {
-      content::WebContents* guest =
-          guest_manager->GetFullPageGuest(web_contents);
-      if (guest) {
-        target = guest->GetRenderWidgetHostView();
-      }
-    }
-  }
-  target->SpeakSelection();
-}
-
-void RenderWidgetHostViewMac::StopSpeaking() {
-  ui::TextServicesContextMenu::StopSpeaking();
 }
 
 void RenderWidgetHostViewMac::GetRenderWidgetAccessibilityToken(

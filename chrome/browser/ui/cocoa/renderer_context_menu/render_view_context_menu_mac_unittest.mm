@@ -79,24 +79,6 @@ bool MenuHasItemWithCommand(const ui::MenuModel& menu, int command) {
   return false;
 }
 
-bool MenuHasSpeechItems(RenderViewContextMenuMac* menu) {
-  using Commands = ui::TextServicesContextMenu::MenuCommands;
-  const ui::MenuModel& model = menu->menu_model();
-
-  return MenuHasItemWithCommand(model, Commands::kSpeechStartSpeaking) &&
-         MenuHasItemWithCommand(model, Commands::kSpeechStopSpeaking);
-}
-
-TEST_F(RenderViewContextMenuMacTest, SelectionImpliesSpeechItems) {
-  auto menu = MakeMenuWithSelectionText("Hello");
-  EXPECT_TRUE(MenuHasSpeechItems(menu.get()));
-}
-
-TEST_F(RenderViewContextMenuMacTest, NoSelectionImpliesNoSpeechItems) {
-  auto menu = MakeMenuWithSelectionText("");
-  EXPECT_FALSE(MenuHasSpeechItems(menu.get()));
-}
-
 TEST_F(RenderViewContextMenuMacTest,
        RemoveFromDictionaryPresentForUserAddedWord) {
   auto menu = MakeMenuWithSelectionText("customword", "customword");

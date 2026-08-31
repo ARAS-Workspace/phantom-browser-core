@@ -280,9 +280,6 @@ class CONTENT_EXPORT RenderWidgetHostView {
   // Brings up the dictionary showing a definition for the selected text.
   virtual void ShowDefinitionForSelection() = 0;
 
-  // Tells the view to speak the currently selected text.
-  virtual void SpeakSelection() = 0;
-
   // Allows to update the widget's screen rects when it is not attached to
   // a window (e.g. in headless mode).
   virtual void SetWindowFrameInScreen(const gfx::Rect& rect) = 0;

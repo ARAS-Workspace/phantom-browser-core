@@ -194,27 +194,6 @@ namespace content {
 
 namespace {
 
-class TextCallbackWaiter {
- public:
-  TextCallbackWaiter() = default;
-
-  TextCallbackWaiter(const TextCallbackWaiter&) = delete;
-  TextCallbackWaiter& operator=(const TextCallbackWaiter&) = delete;
-
-  void Wait() { run_loop_.Run(); }
-
-  const std::u16string& text() const { return text_; }
-
-  void GetText(std::u16string_view text) {
-    text_ = std::u16string(text);
-    run_loop_.Quit();
-  }
-
- private:
-  std::u16string text_;
-  base::RunLoop run_loop_;
-};
-
 class TextSelectionWaiter : public TextInputManager::Observer {
  public:
   explicit TextSelectionWaiter(RenderWidgetHostViewMac* rwhv,
@@ -260,26 +239,6 @@ class RenderWidgetHostViewMacTest : public ContentBrowserTest {
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
 };
-
-IN_PROC_BROWSER_TEST_F(RenderWidgetHostViewMacTest, GetPageTextForSpeech) {
-  GURL url(
-      "data:text/html,<span>Hello</span>"
-      "<span style='display:none'>Goodbye</span>"
-      "<span>World</span>");
-  EXPECT_TRUE(NavigateToURL(shell(), url));
-
-  RenderWidgetHostView* rwhv =
-      shell()->web_contents()->GetPrimaryMainFrame()->GetView();
-  RenderWidgetHostViewMac* rwhv_mac =
-      static_cast<RenderWidgetHostViewMac*>(rwhv);
-
-  TextCallbackWaiter waiter;
-  rwhv_mac->GetPageTextForSpeech(
-      base::BindOnce(&TextCallbackWaiter::GetText, base::Unretained(&waiter)));
-  waiter.Wait();
-
-  EXPECT_EQ(u"Hello\nWorld", waiter.text());
-}
 
 // Test that -firstRectForCharacterRange:actualRange: works when the range
 // isn't in the active selection, which requires a sync IPC to the renderer.

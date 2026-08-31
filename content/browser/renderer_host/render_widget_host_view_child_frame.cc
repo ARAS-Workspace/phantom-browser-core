@@ -984,8 +984,6 @@ void RenderWidgetHostViewChildFrame::ShowDefinitionForSelection() {
   }
 }
 
-void RenderWidgetHostViewChildFrame::SpeakSelection() {}
-
 void RenderWidgetHostViewChildFrame::SetWindowFrameInScreen(
     const gfx::Rect& rect) {}
 

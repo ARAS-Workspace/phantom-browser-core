@@ -2227,18 +2227,6 @@ static NSWindow* __weak _deferredResignKeyWindow;
 
   SEL action = [item action];
 
-  if (action == @selector(stopSpeaking:)) {
-    if (!isForMainFrame) {
-      return NO;
-    }
-    bool isSpeaking = false;
-    _host->SyncIsSpeaking(&isSpeaking);
-    return isSpeaking;
-  }
-
-  if (action == @selector(startSpeaking:))
-    return isForMainFrame;
-
   // For now, these actions are always enabled for render view,
   // this is sub-optimal.
   // TODO(suzhe): Plumb the "can*" methods up from WebCore.
@@ -2883,14 +2871,6 @@ extern NSString* NSTextInputReplacementRangeAttributeName;
   // Explicitly call SelectAll() here to make sure the renderer returns
   // selection results.
   _host->SelectAll();
-}
-
-- (void)startSpeaking:(id)sender {
-  _host->StartSpeaking();
-}
-
-- (void)stopSpeaking:(id)sender {
-  _host->StopSpeaking();
 }
 
 - (void)cancelComposition {
