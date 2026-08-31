@@ -688,12 +688,6 @@ are declared in tools/grit/grit_args.gni.
           <message name="IDS_CONTENT_CONTEXT_INSPECTBACKGROUNDPAGE" desc="The name of the Inspect Background Page command in the packaged app content area context menu">
             Inspect &amp;background page
           </message>
-          <message name="IDS_CONTENT_CONTEXT_READING_MODE" desc="Context menu menuitem to open page in reading mode view">
-           Open in reading mode
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_LISTEN_TO_THIS_PAGE" desc="Context menu item to listen to this page">
-           Listen to this page
-          </message>
           <message name="IDS_CONTENT_CONTEXT_CLOSE_GLIC" desc="Context menu item to close glic view">
            Close
           </message>
@@ -1037,12 +1031,6 @@ are declared in tools/grit/grit_args.gni.
           </message>
           <message name="IDS_CONTENT_CONTEXT_INSPECTBACKGROUNDPAGE" desc="In Title Case: The name of the Inspect Background Page command in the packaged app content area context menu">
             Inspect &amp;Background Page
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_READING_MODE" desc="Context menu menuitem to open page in reading mode view">
-           Open in Reading Mode
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_LISTEN_TO_THIS_PAGE" desc="In Title Case: Context menu item to listen to this page">
-           Listen to This Page
           </message>
           <message name="IDS_CONTENT_CONTEXT_CLOSE_GLIC" desc="Context menu item to close glic view">
            Close
@@ -9658,16 +9646,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
 
       <!-- Reading mode strings -->
       <if expr="use_titlecase">
-        <message name="IDS_SHOW_READING_MODE_SIDE_PANEL" desc="Context menu entry point to open the reading mode feature in the side panel.">
-          Reading Mode
-        </message>
-      </if>
-      <if expr="not use_titlecase">
-        <message name="IDS_SHOW_READING_MODE_SIDE_PANEL" desc="Context menu entry point to open the reading mode feature in the side panel.">
-          Reading mode
-        </message>
-      </if>
-      <if expr="use_titlecase">
         <message name="IDS_READING_MODE_TITLE" desc="Title of the reading mode feature, which gives users an accessible reading experience.">
           Reading Mode
         </message>
@@ -10055,10 +10033,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
       <message name="IDS_READING_MODE_SIDE_PANEL_PROMO"
                desc="Text for the in-product-help bubble shown for the reading mode bubble.">
         To show a simplified view of this page, open the side panel and select Reading mode
-      </message>
-      <message name="IDS_READING_MODE_SIDE_PANEL_PROMO_PINNING"
-               desc="Text for the in-product-help bubble shown for the reading mode bubble when Side Panel Pinning is enabled.">
-        To see a simplified view of this page, go to More Tools > Reading Mode
       </message>
       <message name="IDS_READING_MODE_OMNIBOX_ENTRY_POINT_PROMO"
                desc="Text for the in-product-help bubble shown for the reading mode omnibox entry point.">
