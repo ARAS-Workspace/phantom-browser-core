@@ -16,9 +16,7 @@ export interface BrowserProfile {
   profileName: string;
   history: boolean;
   favorites: boolean;
-  passwords: boolean;
   search: boolean;
-  autofillFormData: boolean;
 }
 
 /**

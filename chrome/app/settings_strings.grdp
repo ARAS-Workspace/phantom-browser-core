@@ -931,9 +931,6 @@
     <message name="IDS_SETTINGS_CLEAR_PASSWORDS" desc="Checkbox for deleting Passwords and other sign-in data">
       Passwords and other sign-in data
     </message>
-    <message name="IDS_SETTINGS_CLEAR_HOSTED_APP_DATA" desc="Checkbox for deleting data of hosted apps">
-      Hosted app data
-    </message>
     <message name="IDS_SETTINGS_CLEAR_PERIOD_15_MIN" desc="The option in the 'Delete browsing data' settings page time picker to delete browsing data from the last 15 minutes. The 'minutes' is shortened to 'min' to allow the time options in the time picker to fit in the screen.">
       Last 15 min
     </message>
@@ -3754,14 +3751,8 @@
       <message name="IDS_SETTINGS_IMPORT_FAVORITES_CHECKBOX" desc="Checkbox for importing favorites">
         Favorites/Bookmarks
       </message>
-      <message name="IDS_SETTINGS_IMPORT_PASSWORDS_CHECKBOX" desc="Checkbox for importing saved passwords">
-        Saved passwords
-      </message>
       <message name="IDS_SETTINGS_IMPORT_SEARCH_ENGINES_CHECKBOX" desc="Checkbox for importing search engines">
         Search engines
-      </message>
-      <message name="IDS_SETTINGS_IMPORT_AUTOFILL_FORM_DATA_CHECKBOX" desc="Checkbox for importing form data for autofill">
-        Autofill form data
       </message>
 
       <message name="IDS_SETTINGS_IMPORT_CHOOSE_FILE" desc="Text for the Choose File on dialog">

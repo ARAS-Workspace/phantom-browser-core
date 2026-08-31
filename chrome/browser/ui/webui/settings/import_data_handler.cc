@@ -135,17 +135,11 @@ void ImportDataHandler::HandleImportData(const base::ListValue& args) {
 
   const base::DictValue& type_dict = types.GetDict();
   uint16_t selected_items = user_data_importer::NONE;
-  if (*type_dict.FindBool(prefs::kImportDialogAutofillFormData)) {
-    selected_items |= user_data_importer::AUTOFILL_FORM_DATA;
-  }
   if (*type_dict.FindBool(prefs::kImportDialogBookmarks)) {
     selected_items |= user_data_importer::FAVORITES;
   }
   if (*type_dict.FindBool(prefs::kImportDialogHistory)) {
     selected_items |= user_data_importer::HISTORY;
-  }
-  if (*type_dict.FindBool(prefs::kImportDialogSavedPasswords)) {
-    selected_items |= user_data_importer::PASSWORDS;
   }
   if (*type_dict.FindBool(prefs::kImportDialogSearchEngine)) {
     selected_items |= user_data_importer::SEARCH_ENGINES;
@@ -225,12 +219,7 @@ void ImportDataHandler::SendBrowserProfileData(const std::string& callback_id) {
     browser_profile.Set(
         "favorites", (browser_services & user_data_importer::FAVORITES) != 0);
     browser_profile.Set(
-        "passwords", (browser_services & user_data_importer::PASSWORDS) != 0);
-    browser_profile.Set(
         "search", (browser_services & user_data_importer::SEARCH_ENGINES) != 0);
-    browser_profile.Set(
-        "autofillFormData",
-        (browser_services & user_data_importer::AUTOFILL_FORM_DATA) != 0);
 
     browser_profiles.Append(std::move(browser_profile));
   }

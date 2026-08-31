@@ -41,7 +41,7 @@ export enum BrowsingDataType {
   // FORM_DATA = 4, Not offered by this browser.
   SITE_SETTINGS = 5,
   DOWNLOADS = 6,
-  HOSTED_APPS_DATA = 7,
+  // HOSTED_APPS_DATA = 7, Not offered by this browser.
   // TABS = 8, Not used on Desktop.
 }
 // LINT.ThenChange(/components/browsing_data/core/browsing_data_utils.h:BrowsingDataType)

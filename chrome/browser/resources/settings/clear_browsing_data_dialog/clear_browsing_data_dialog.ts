@@ -87,7 +87,6 @@ const ALL_BROWSING_DATATYPES_LIST: BrowsingDataType[] = [
   BrowsingDataType.CACHE,
   BrowsingDataType.DOWNLOADS,
   BrowsingDataType.SITE_SETTINGS,
-  BrowsingDataType.HOSTED_APPS_DATA,
 ];
 
 /** The list of Browsing Data types that should be expanded by default. */
@@ -115,8 +114,6 @@ function getDataTypeLabel(datatypes: BrowsingDataType) {
       return loadTimeData.getString('siteSettings');
     case BrowsingDataType.DOWNLOADS:
       return loadTimeData.getString('clearDownloadHistory');
-    case BrowsingDataType.HOSTED_APPS_DATA:
-      return loadTimeData.getString('clearHostedAppData');
     default:
       assertNotReachedCase(datatypes);
   }
@@ -134,8 +131,6 @@ export function getDataTypePrefName(datatypes: BrowsingDataType) {
       return 'browser.clear_data.site_settings';
     case BrowsingDataType.DOWNLOADS:
       return 'browser.clear_data.download_history';
-    case BrowsingDataType.HOSTED_APPS_DATA:
-      return 'browser.clear_data.hosted_apps_data';
     default:
       assertNotReachedCase(datatypes);
   }

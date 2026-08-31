@@ -47,20 +47,10 @@ import {ImportDataStatus} from './import_data_browser_proxy.js';
                 pref-key="import_dialog_bookmarks"
                 label="$i18n{importFavorites}" no-set-pref>
             </settings-checkbox>
-            <settings-checkbox id="importDialogSavedPasswords"
-                ?hidden="${!this.selected_.passwords}"
-                pref-key="import_dialog_saved_passwords"
-                label="$i18n{importPasswords}" no-set-pref>
-            </settings-checkbox>
             <settings-checkbox id="importDialogSearchEngine"
                 ?hidden="${!this.selected_.search}"
                 pref-key="import_dialog_search_engine"
                 label="$i18n{importSearch}" no-set-pref>
-            </settings-checkbox>
-            <settings-checkbox id="importDialogAutofillFormData"
-                ?hidden="${!this.selected_.autofillFormData}"
-                pref-key="import_dialog_autofill_form_data"
-                label="$i18n{importAutofillFormData}" no-set-pref>
             </settings-checkbox>
           </div>
         </div>

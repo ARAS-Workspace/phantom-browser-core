@@ -77,9 +77,7 @@ export class SettingsImportDataDialogElement extends
     profileName: '',
     history: false,
     favorites: false,
-    passwords: false,
     search: false,
-    autofillFormData: false,
   };
   protected accessor noImportDataTypeSelected_: boolean = false;
   protected accessor importStatus_: ImportDataStatus = ImportDataStatus.INITIAL;
