@@ -83,7 +83,6 @@ export interface SettingsSecurityPageV2Element {
     httpsFirstModeToggle: SettingsToggleButtonElement,
     javascriptGuardrailsRow: SecurityPageFeatureRowElement,
     manageSiteExceptionsButton: CrButtonElement,
-    passwordsLeakToggle: SettingsToggleButtonElement,
     resetEnhancedBundleToDefaultsButton: CrButtonElement,
     resetStandardBundleToDefaultsButton: CrButtonElement,
     securitySettingsBundleEnhanced: ControlledRadioButtonElement,
@@ -583,11 +582,6 @@ export class SettingsSecurityPageV2Element extends
       this.interactions_.add(
           SecurityPageV2Interaction.STRICT_HTTPS_FIRST_MODE_RADIO_BUTTON_CLICK);
     }
-  }
-
-  private onPasswordsLeakToggleChange_() {
-    this.interactions_.add(
-        SecurityPageV2Interaction.PASSWORD_LEAK_DETECTION_TOGGLE_CLICK);
   }
 
   private onManageCertificatesClick_() {

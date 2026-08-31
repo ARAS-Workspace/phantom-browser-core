@@ -242,8 +242,6 @@ source_set("impl") {
     ]
   } else {
     sources += [
-      "generated_password_leak_detection_pref.cc",
-      "generated_password_leak_detection_pref.h",
       "password_change/glic_password_change_actuator.cc",
       "password_change/glic_password_change_actuator.h",
       "password_change/password_change_from_checkup_delegate.cc",
@@ -493,7 +491,6 @@ source_set("unit_tests") {
     ]
   } else {
     sources += [
-      "generated_password_leak_detection_pref_unittest.cc",
       "password_change/password_change_from_checkup_delegate_unittest.cc",
       "password_change/script_password_change_actuator_unittest.cc",
       "password_change_delegate_impl_unittest.cc",
