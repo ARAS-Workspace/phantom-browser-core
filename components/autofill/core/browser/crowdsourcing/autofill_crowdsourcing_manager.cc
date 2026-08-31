@@ -721,9 +721,7 @@ AutofillCrowdsourcingManager::AutofillCrowdsourcingManager(
 AutofillCrowdsourcingManager::~AutofillCrowdsourcingManager() = default;
 
 bool AutofillCrowdsourcingManager::IsEnabled() const {
-  return autofill_server_url_.is_valid() &&
-         base::FeatureList::IsEnabled(
-             features::debug::kAutofillServerCommunication);
+  return false;
 }
 
 bool AutofillCrowdsourcingManager::StartQueryRequest(

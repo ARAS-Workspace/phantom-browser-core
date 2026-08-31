@@ -59,7 +59,6 @@
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/password_manager/chrome_password_manager_client.h"
-#include "chrome/browser/password_manager/factories/password_manager_settings_service_factory.h"
 #include "chrome/browser/password_manager/password_field_classification_model_handler_factory.h"
 #include "chrome/browser/personal_context/first_run/personal_context_first_run_service_factory.h"
 #include "chrome/browser/personal_context/personal_context_eligibility_service_factory.h"
@@ -150,8 +149,6 @@
 #include "components/password_manager/content/browser/password_form_classification_util.h"
 #include "components/password_manager/core/browser/features/password_features.h"
 #include "components/password_manager/core/browser/password_manager_metrics_util.h"
-#include "components/password_manager/core/browser/password_manager_setting.h"
-#include "components/password_manager/core/browser/password_manager_settings_service.h"
 #include "components/password_manager/core/browser/password_manager_util.h"
 #include "components/password_manager/core/browser/password_requirements_service.h"
 #include "components/password_manager/core/common/password_manager_pref_names.h"
@@ -1079,11 +1076,7 @@ bool ChromeAutofillClient::IsWalletPublicPassStorageEnabled() const {
 }
 
 bool ChromeAutofillClient::IsPasswordManagerEnabled() const {
-  password_manager::PasswordManagerSettingsService* settings_service =
-      PasswordManagerSettingsServiceFactory::GetForProfile(GetProfile());
-  return settings_service &&
-         settings_service->IsSettingEnabled(
-             password_manager::PasswordManagerSetting::kOfferToSavePasswords);
+  return false;
 }
 
 bool ChromeAutofillClient::UsesPlatformAutofill() const {
