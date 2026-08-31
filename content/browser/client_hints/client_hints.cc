@@ -90,8 +90,8 @@ double RoundKbpsToMbps(const std::string& host,
   static const double kMaxDownlinkKbps = 10.0 * 1000;
 
   // If downlink is unavailable, return the fastest value.
-  double downlink =
-      std::min(downlink_kbps.value_or(kMaxDownlinkKbps), kMaxDownlinkKbps);
+  double downlink = downlink_kbps.value_or(kMaxDownlinkKbps);
+  downlink = std::min(downlink, kMaxDownlinkKbps);
 
   DCHECK_LE(0, downlink);
   DCHECK_GE(kMaxDownlinkKbps, downlink);
