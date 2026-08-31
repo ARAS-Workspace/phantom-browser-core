@@ -85,9 +85,6 @@
     <message name="IDS_SETTINGS_ACCESSIBILITY_WEB_STORE" desc="Text for an external link explaining that additional accessibility features are found on the Chrome Web Store.">
       Open Chrome Web Store
     </message>
-    <message name="IDS_SETTINGS_MORE_FEATURES_LINK" desc="Link which opens page where users can install extensions which provide additional accessibility features.">
-      Add accessibility features
-    </message>
     <message name="IDS_SETTINGS_MORE_FEATURES_LINK_DESCRIPTION" desc="Description for the link about additional accessibility features.">
       Enable accessibility features
     </message>
@@ -114,12 +111,6 @@
     </message>
     <message name="IDS_SETTINGS_MAIN_NODE_ANNOTATIONS_SUBTITLE" desc="Subtitle for screen reader main node annotation feature.">
       Identify the main landmark in web pages for assistive technology
-    </message>
-    <message name="IDS_SETTINGS_AX_TREE_FIXING_TITLE" desc="Description for screen reader tree fixing feature." translateable = "false">
-      AXTree Fixing
-    </message>
-    <message name="IDS_SETTINGS_AX_TREE_FIXING_SUBTITLE" desc="Subtitle for screen reader tree fixing feature." translateable = "false">
-      Fix the AXTree
     </message>
     <message name="IDS_SETTINGS_CAPTIONS_ENABLE_LIVE_CAPTION_TITLE" desc="Name of the setting to enable Live Caption feature.">
       Live Caption
@@ -169,24 +160,6 @@
     <if expr="is_win or is_linux or is_macosx">
       <message name="IDS_SETTINGS_OVERSCROLL_HISTORY_NAVIGATION_TITLE" desc="Title for the overscroll history navigation setting, which allows you to navigate back and forward by swiping left or right with a touch device.">
         Swipe between pages
-      </message>
-    </if>
-    <if expr="is_win or is_linux">
-      <message name="IDS_SETTINGS_OVERSCROLL_HISTORY_NAVIGATION_SUBTITLE" desc="Subtitle for the overscroll history navigation setting, which allows you to navigate back and forward by swiping left or right with a touch device.">
-        Navigate back and forward with a swipe gesture
-      </message>
-    </if>
-    <if expr="is_macosx">
-      <message name="IDS_SETTINGS_OVERSCROLL_HISTORY_NAVIGATION_SUBTITLE" desc="Subtitle for the overscroll history navigation setting, which allows you to navigate back and forward by swiping left or right with a touch device.">
-        Select the More Gestures tab, then turn on Swipe between pages to navigate back and forward
-      </message>
-    </if>
-    <if expr="not is_chromeos">
-      <message name="IDS_SETTINGS_ACCESSIBILITY_TOAST_FREQUENCY_TITLE" desc="Title for a setting that allows you to change what type of feedback messages you receive.">
-        Copied to clipboard confirmations
-      </message>
-      <message name="IDS_SETTINGS_ACCESSIBILITY_TOAST_FREQUENCY_DESCRIPTION" desc="Subtitle for a setting that allows you to change the frequency of feedback messages.">
-        Shows a confirmation when you copy links, images, or videos
       </message>
     </if>
 
@@ -728,12 +701,6 @@
     <message name="IDS_SETTINGS_ADDRESS_NONE" desc="Placeholder that is shown when there are no addresses in the list of saved addresses.">
       Saved addresses will appear here
     </message>
-    <message name="IDS_SETTINGS_PASSWORDS_LEAK_DETECTION_LABEL" desc="Label for a checkbox that allows users to choose whether chrome should check that credentials have been part of a leak.">
-      Warn you if a password was compromised in a data breach
-    </message>
-    <message name="IDS_SETTINGS_PASSWORDS_LEAK_DETECTION_SIGNED_OUT_ENABLED_DESC" desc="Text that describes the 'Password Leak Detection' functionality to signed-out users who have not disabled the feature. This text always follows a sentence describing the feature.">
-      When you sign in to your Google Account, this feature is turned on.
-    </message>
     <message name="IDS_SETTINGS_AUTOFILL_AI_WHEN_ON_SAVED_INFO" desc="Bullet 1 of 2 that appears beneath the 'When on' title. 'Autofill': the user is on the 'Autofill AI' feature page, but we want to frame this new type of autofill as just 'Autofill'. 'Can offer to save info when you submit forms': we want to convey that the user has the choice, each time a form is submitted, whether they want their info saved to Chrome for the purposes of Autofill. 'Like your driver's license or passport number': Today, supported data types for 'Autofill AI' include 1) driver's licenses, 2) passports, and 3) vehicles. Eventually we'll support more, but this example needs to mention these types of data and not others.">
       Autofill can offer to save info when you submit forms, like your driver's license or passport number
     </message>
@@ -1187,9 +1154,6 @@
     <message name="IDS_SETTINGS_LANGUAGES_MANAGE_LANGUAGES_TITLE" desc="Name of the settings dialog which allows enabling additional languages.">
       Add languages
     </message>
-    <message name="IDS_SETTINGS_LANGUAGES_NO_LANGUAGES_ADDED" desc="Placeholder for language list settings when no languages have been added, on the Manage Languages page.">
-      No languages added
-    </message>
     <if expr="not is_chromeos">
       <message name="IDS_SETTINGS_LANGUAGES_EXPAND_ACCESSIBILITY_LABEL" desc="Label for the button that toggles showing the language options. Only visible by screen reader software.">
         Show language options
@@ -1200,18 +1164,6 @@
       <message name="IDS_SETTINGS_LANGUAGES_PREFERRED_LANGUAGES_DESC" desc="Description text of the explanatory message about the list of preferred languages.">
         Let websites know the languages you speak. They'll show content in those languages, when possible.
       </message>
-      <message name="IDS_SETTINGS_LANGUAGES_OFFER_TO_ENABLE_TRANSLATE" desc="The label of the check-box that enables the prompt to translate a page.">
-        Use Google Translate
-      </message>
-      <message name="IDS_SETTINGS_LANGUAGES_OFFER_TO_ENABLE_TRANSLATE_SUBLABEL" desc="The sublabel of the check-box that enables the prompt to translate a page.">
-        When on, Google Translate will offer to translate sites into your preferred language. It can also automatically translate sites.
-      </message>
-      <message name="IDS_SETTINGS_LANGUAGES_OFFER_TO_ENABLE_TRANSLATE_SUBLABEL_WITH_PDF" desc="The sublabel of the check-box that enables the prompt to translate a page or PDF.">
-  When on, Google Translate will offer to translate sites and PDFs into your preferred language. It can also automatically translate sites.
-</message>
-      <message name="IDS_SETTINGS_LANGUAGES_TRANSLATE_TARGET" desc="The label under a language's name in a list of enabled languages indicating that pages will be translated to this language.">
-        This language is used when translating pages
-      </message>
       <message name="IDS_SETTINGS_LANGUAGES_MANAGED_DIALOG_TITLE" desc="Title text for the dialog informing users that the language they tried modifying is managed.">
         Language is set by your Organization
       </message>
@@ -1220,30 +1172,6 @@
       </message>
       <message name="IDS_SETTINGS_LANGUAGES_ADD_ARIA_LABEL" desc="Text read by screen readers when focusing on the checkbox for adding a language. This text is only announced by screen readers and is not visible in the UI.">
         Add <ph name="LANGUAGE_NAME">$1<ex>Swahili</ex></ph>
-      </message>
-      <message name="IDS_SETTINGS_LANGUAGES_REMOVE_AUTOMATIC_ARIA_LABEL" desc="Text read by screen readers when focusing on the remove icon for automatiaclly translated languages. Activating this button will remove the selected language. This text only announced by screen readers and is not visible in the UI.">
-        Remove <ph name="LANGUAGE_NAME">$1<ex>Swahili</ex></ph> from automatically translated languages
-      </message>
-      <message name="IDS_SETTINGS_LANGUAGES_REMOVE_NEVER_ARIA_LABEL" desc="Text read by screen readers when focusing on the remove icon for never offer translate languages. Activating this button will remove the selected language. This text only announced by screen readers and is not visible in the UI.">
-        Remove <ph name="LANGUAGE_NAME">$1<ex>Swahili</ex></ph> from never offer translation languages
-      </message>
-      <message name="IDS_SETTINGS_TRANSLATE_PAGE_TITLE" desc="Name of the settings page which displays translate preferences.">
-        Google Translate
-      </message>
-      <message name="IDS_SETTINGS_TARGET_TRANSLATE_LABEL" desc="Label for the element to select the target language">
-        Translate into this language
-      </message>
-      <message name="IDS_SETTINGS_LANGUAGES_AUTOMATIC_TRANSLATE" desc="Title of Translation settings that lists languages that should be automatically translated.">
-        Automatically translate these languages
-      </message>
-      <message name="IDS_SETTINGS_LANGUAGES_AUTOMATIC_TRANSLATE_ADD_ARIA_LABEL" desc="Text read by screen readers when focusing on the 'Add Languages' button for the automatically translate language list. When this button is activated a dialog for selecting and adding multiple languages is shown. This text is only announced by screen readers and is not visible in the UI.">
-        Add languages to automatically translate
-      </message>
-      <message name="IDS_SETTINGS_LANGUAGES_NEVER_LANGUAGES" desc="Title of Translation settings that lists languages that should never be offered to translate.">
-        Never offer to translate these languages
-      </message>
-      <message name="IDS_SETTINGS_LANGUAGES_NEVER_TRANSLATE_ADD_ARIA_LABEL" desc="Text read by screen readers when focusing on the 'Add Languages' button for the don't offer to translate language list. When this button is activated a dialog for selecting and adding multiple languages is shown. This text is only announced by screen readers and is not visible in the UI.">
-        Add languages to never offer translation
       </message>
       <message name="IDS_SETTINGS_LANGUAGES_SPELL_CHECK_TITLE" desc="Title for the section containing all the options for spell check settings. The options include picking between using the system's spell check or using Google's web service and a list of the enabled languages which support spell checking.">
         Spell check
@@ -1433,119 +1361,6 @@
 
 
     <!-- Privacy Guide -->
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_LABEL" desc="Label of the row in the Chrome privacy and security settings page that leads to the 'Privacy Guide'. 'Privacy Guide' is a term, see go/glossarymanager/termset?gid=27517723&amp;tsid=28b420b3.">
-      Privacy Guide
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_SUBLABEL" desc="Sublabel of the row in the Chrome privacy and security of Chrome settings that leads to the 'Privacy Guide'.">
-      Review key privacy and security controls
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_PROMO_HEADER" desc="Text of a button on a card in the settings page that starts the 'Privacy Guide'. 'Privacy Guide' is a term, see go/glossarymanager/termset?gid=27517723&amp;tsid=28b420b3.">
-      Take the Privacy Guide
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_PROMO_START_BUTTON" desc="Text of a button on a card in the settings page that starts the 'Privacy Guide'.">
-      Get started
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_BACK_TO_SETTINGS_ARIA_LABEL" desc="Text read by screen readers when focusing on the back-to-settings button that is shown in the 'Privacy Guide'. If this button is activated, it will navigate to Settings. This text is only announced by screen readers and is not visible in the UI. 'Privacy Guide' is a term, see go/glossarymanager/termset?gid=27517723&amp;tsid=28b420b3.">
-      Privacy Guide back button
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_BACK_TO_SETTINGS_ARIA_ROLE_DESC" desc="Description read by screen readers when focusing on back-to-settings button that is shown in the 'Privacy Guide'. It indicates to the user that activating the this button will cause 'Privacy Guide' to navigate away from 'Privacy Guide' and to Chrome Settings. This text is only announced by screen readers and is not visible in the UI. 'Privacy Guide' is a term, see go/glossarymanager/termset?gid=27517723&amp;tsid=28b420b3.">
-      Click to navigate away from Privacy Guide.
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_BACK_BUTTON" desc="Text of a button in the privacy guide that reverses to the previous step in the 'Privacy Guide'.">
-      Back
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_STEPS" is_accessibility_with_no_ui="true" desc="Spoken by screenreaders indicating what step the user is in and how many steps there are in total.">
-      Step <ph name="CURRENT_STEP">$1<ex>1</ex></ph> of <ph name="TOTAL_STEPS">$2<ex>2</ex></ph>
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_NEXT_BUTTON" desc="Text of a button in the 'Privacy Guide' that advances to the next step in the privacy guide.">
-      Next
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_WELCOME_CARD_HEADER" desc="A header shown at the top of the welcome card in the 'Privacy Guide', explaining to users what the 'Privacy Guide' is.">
-      A guide of your privacy choices
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_WELCOME_CARD_SUB_HEADER" desc="A subheader shown at on the welcome card in the 'Privacy Guide', explaining to users what the 'Privacy Guide' is.">
-      Take a guided tour of key privacy and security controls. For more options, go to individual settings.
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_COMPLETION_CARD_HEADER" desc="A header shown at the top of the completion card in the 'Privacy Guide' that informs users that they completed the 'Privacy Guide'.">
-      Review complete
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_COMPLETION_CARD_SUB_HEADER" desc="A subheader shown at the top of the completion card in the 'Privacy Guide' that informs users that they can explore more settings or complete the 'Privacy Guide'.">
-      Explore more settings below or finish now
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_COMPLETION_CARD_SUB_HEADER_NO_LINKS" desc="A subheader shown at the top of the completion card in the 'Privacy Guide' that informs users that they completed the 'Privacy Guide'.">
-      You can come back anytime to take another look
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_COMPLETION_CARD_LEAVE_BUTTON" desc="Text of a button in the completion card in the 'Privacy Guide' that leads the user back to Chrome settings.">
-      Done
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_COMPLETION_CARD_WAA_LABEL" desc="Text of the Web and App Activity label in the completion card of the 'Privacy Guide'.">
-      Web &#38; App Activity
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_COMPLETION_CARD_AI_SETTINGS_LABEL" desc="Text of the AI Innovations sublabel in the completion card of the 'Privacy Guide'.">
-      Learn more about how AI shapes your experience and the controls provided by Chrome
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_MSBB_CARD_HEADER" desc="Header of the 'make searches and browsing better' card in the 'Privacy Guide'.">
-      Choose your search and browsing quality
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_MSBB_FEATURE_DESCRIPTION1" desc="A part of the feature description of 'make searches and browsing better' in the 'Privacy Guide'.">
-      You'll browse faster because content is proactively loaded based on your current webpage visit
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_MSBB_FEATURE_DESCRIPTION2" desc="A part of the feature description of 'make searches and browsing better' in the 'Privacy Guide'.">
-      From the address bar, you can open page info to see additional info about the page you're visiting
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_MSBB_PRIVACY_DESCRIPTION1" desc="A part of the privacy description of 'make searches and browsing better' in the 'Privacy Guide'.">
-      URLs you visit are sent to Google to predict what sites you might visit next and to show you additional info about the page you're visiting
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_SYNC_CARD_HEADER" desc="Header of the history sync card in the 'Privacy Guide'.">
-      Choose whether to sync history
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_AND_TABS_SYNC_CARD_HEADER" desc="Header of the history sync card in the 'Privacy Guide'.">
-      Choose whether to sync history and tabs
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_SYNC_SETTING_LABEL" desc="Label of the history sync settings toggle in the 'Privacy Guide'.">
-      History sync
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_AND_TABS_SYNC_SETTING_LABEL" desc="Label of the history and tabs sync settings toggles in the 'Privacy Guide'.">
-      Sync history and tabs
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_SYNC_FEATURE_DESCRIPTION1" desc="A part of the feature description of history sync in the 'Privacy guide'.">
-      You'll have your history on all your synced devices so you can continue what you were doing
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_AND_TABS_SYNC_FEATURE_DESCRIPTION1" desc="A part of the feature description of history and tabs sync in the 'Privacy guide'.">
-      You’ll have your history and tabs on all your devices so you can continue what you were doing
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_SYNC_FEATURE_DESCRIPTION2" desc="A part of the feature description of history sync in the 'Privacy guide'.">
-      If Google is also your default search engine, you'll see better, contextually relevant suggestions
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_SYNC_PRIVACY_DESCRIPTION1" desc="A part of the privacy description of history sync in the 'Privacy guide'.">
-      The URLs you visit are saved to your Google Account
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_COOKIES_CARD_HEADER" desc="Header of the cookies card in the 'Privacy guide'.">
-      Choose your third-party cookie preferences
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_HEADER" desc="Header of the safe browsing card in the 'Privacy guide'.">
-      Choose your Safe Browsing protection
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_ENHANCED_PROTECTION_PRIVACY_DESCRIPTION1" desc="A part of the privacy description of the enhanced protection section of the safe browsing card in the 'Privacy guide'.">
-      Sends URLs to Safe Browsing to check them
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_ENHANCED_PROTECTION_PRIVACY_DESCRIPTION2" desc="A part of the privacy description of the enhanced protection section of the safe browsing card in the 'Privacy guide'.">
-      Also sends a small sample of pages, downloads, extension activity, and system information to help discover new threats
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_ENHANCED_PROTECTION_PRIVACY_DESCRIPTION3" desc="A part of the privacy description of the enhanced protection section of the safe browsing card in the 'Privacy guide'.">
-      Temporarily links this data to your Google Account when you're signed in, to protect you across Google apps
-    </message>
-    <message name="IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_STANDARD_PROTECTION_FEATURE_DESCRIPTION1" desc="A part of the feature description of the standard protection section of the safe browsing card in the 'Privacy guide'.">
-      Detects and warns you about dangerous events when they happen
-    </message>
-    <if expr="_google_chrome">
-      <message name="IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_STANDARD_PROTECTION_FEATURE_DESCRIPTION2_PROXY" desc="A part of the feature description of the standard protection section of the safe browsing card in the 'Privacy guide'.">
-        Sends an obfuscated portion of the URL to Google through a privacy server that hides your IP address
-      </message>
-      <message name="IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_STANDARD_PROTECTION_PRIVACY_DESCRIPTION1_PROXY" desc="A part of the privacy description of the standard protection section of the safe browsing card in the 'Privacy Guide'.">
-        If a site tries to steal your password, or when you download a harmful file, Chrome may also send URLs, including bits of page content, to Google
-      </message>
-    </if>
 
     <!-- Safety check -->
     <message name="IDS_SETTINGS_SAFETY_CHECK_REVIEW" desc="Text for a button that allows users to review safety check findings, such as compromised passwords or blocklisted extensions.">
@@ -1838,9 +1653,6 @@
     </message>
     <message name="IDS_SETTINGS_SECURITY_ADVANCED_PROTECTION_PROGRAM_LABEL" desc="Description of the Google Advanced Protection Program. Includes a link which takes users to the Google Advanced Protection Program external webpage.">
       If you are an activist, journalist, public figure, election worker, or someone else in a uniquely high risk role, you may be interested in Google's <ph name="BEGIN_LINK">&lt;a href="$1" target="_blank"&gt;</ph>Advanced Protection Program<ph name="END_LINK">&lt;/a&gt;</ph>.
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_PASSWORDS_LEAK_DETECTION_TITLE" desc="Label for a toggle that allows users to choose whether chrome should check if credentials have been part of a leak.">
-      Compromised password detection
     </message>
     <message name="IDS_SETTINGS_SECURITY_SECURE_DNS_TITLE" desc="Name of Secure DNS security setting">
       Secure DNS
@@ -3943,238 +3755,17 @@
     </message>
 
     <!-- Security Keys -->
-    <message name="IDS_SETTINGS_SECURITY_KEYS_TITLE" desc="Headline in the Settings UI for the subpage handling security keys. Security keys are external physcial devices for user authentication and the translation should match that used in, for example, IDS_WEBAUTHN_USB_ACTIVATE_DESCRIPTION.">
-      Manage security keys
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_DESC" desc="Description in the Settings UI for the subpage handling security keys. Security keys are external physcial devices for user authentication.">
-      Reset security keys and create PINs
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_SET_PIN" desc="A header that appears in the Settings subpage for security keys (which are external devices for user authentication). PINs are often four-digit codes, commonly used to authorise the use of ATM cards. A similar mechanism can be used with security keys and this is the heading for the section about settings them.">
-      Create a PIN
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_SET_PIN_BUTTON" desc="The label of a button that appears in the Settings subpage for security keys (which are external devices for user authentication). The button takes the user to a page where they can set or change their PIN. PINs are often four-digit codes, commonly used to authorise the use of ATM cards. A similar mechanism can be used with security keys.">
-      Set PIN
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_SET_PIN_DESC" desc="A description that appears in the Settings subpage for security keys (which are external devices for user authentication). PINs are often four-digit codes, commonly used to authorise the use of ATM cards. A similar mechanism can be used with security keys and this is the description for the section about settings them.">
-      Protect your security key with a PIN (Personal Identification Number)
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_SET_PIN_INITIAL_TITLE" desc="The title of a dialog for setting the PIN of a security key (which are external devices for user authentication). PINs are often four-digit codes, commonly used to authorise the use of ATM cards. A similar mechanism can be used with security keys and this is the heading for the section about settings them.">
-      Create a PIN
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_SET_PIN_CREATE_TITLE" desc="The title of a dialog for creating a PIN on a security key (which are external devices for user authentication). PINs are often four-digit codes, commonly used to authorise the use of ATM cards. A similar mechanism can be used with security keys and this is the heading for the section about settings them.">
-      Create a PIN
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_SET_PIN_CHANGE_TITLE" desc="The title of a dialog for changing the PIN of a security key (which are external devices for user authentication). PINs are often four-digit codes, commonly used to authorise the use of ATM cards. A similar mechanism can be used with security keys and this is the heading for the section about settings them.">
-      Change a PIN
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_RESET" desc="A header that appears in the Settings subpage for security keys (which are external devices for user authentication). This is the heading for the section about resetting them to factory settings.">
-      Reset your security key
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_RESET_DESC" desc="A header that appears in the Settings subpage for security keys (which are external devices for user authentication). This is the description for the section about resetting them to factory settings.">
-      This will delete all data on the security key, including its PIN
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_RESET_TITLE" desc="The title of a dialog for factory-resetting security keys (which are external devices for user authentication). Resetting in this context means erasing a security key and returning it to an initial, blank state.">
-      Reset your security key
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_RESET_CONFIRM_TITLE" desc="The title of a dialog for factory-resetting security keys (which are external devices for user authentication). Resetting in this context means erasing a security key and returning it to an initial, blank state.">
-      Touch to confirm reset
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_RESET_STEP1" desc="An instruction to a user to physically unplug a security key from their computer, reinsert it, and then touch the activation button that's on the device.">
-      To continue, remove your security key from your device, then reinsert and touch it
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_RESET_STEP2" desc="An instruction to a user to press the activation button on their security key a second time to confirm that they wish to reset (i.e. erase) their security key (which is an external device for user authentication).">
-      Touch your security key again to confirm reset. All information stored on the security key, including its PIN, will be deleted.
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_NO_RESET" desc="A failure message reporting to the user that it is not possible to reset the security key that they selected because the device does not support that operation.">
-      Can’t reset this security key
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_RESET_ERROR" desc="A failure message reporting to the user that the attempt to reset their security key (which is an external device for user authentication) failed. This is message is shown in uncommon cases when we don't have a more specific message to show the user and have fallen back to displaying a numerical error code reported by the device.">
-      Can’t reset this security key. Error <ph name="ERROR_CODE">$1<ex>22</ex></ph>.
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_RESET_SUCCESS" desc="A message to the user that they have successfully reset (i.e. erased) their security key (which is an external device for user authentication).">
-      Your security key has been reset
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_RESET_NOTALLOWED" desc="A message to the user that an attempt to reset (i.e. erase) their security key (an external device for user authentication) failed because the security key refused to be reset. This is usually caused because a reset is only allowed within the first few seconds after being plugged in, so the user has to perform the operation quickly.">
-      Can’t reset this security key. Try resetting the key immediately after inserting it.
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_NO_PIN" desc="A failure message shown to a user when they attempt to set a PIN on a security key that does not support PINs. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      This security key doesn’t support PINs
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CURRENT_PIN_INTRO" desc="A message shown when a user is trying to change the PIN on a security key to prompt the user to enter the current PIN for the device. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      Enter your current PIN to change it. If you don’t know your PIN, you’ll need to reset the security key, then create a new PIN.
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_PIN_INCORRECT" desc="A message shown to the user when they enter an incorrect PIN for a security key. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      Incorrect PIN
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_PIN_INCORRECT_RETRIES_SIN" desc="A message shown to the user when they enter an incorrect PIN for a security key. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      Incorrect PIN. You have one attempt remaining.
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_PIN_INCORRECT_RETRIES_PL" desc="A message shown to the user when they enter an incorrect PIN for a security key. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      Incorrect PIN. You have <ph name="RETRIES">$1<ex>8</ex></ph> attempts remaining.
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_SAME_PIN_AS_CURRENT" desc="Error message. Displayed when the user attempts to set a new PIN for their security key, and the new PIN is the same as the currently set PIN. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      Create a new PIN that's different from your current PIN
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_NEW_PIN" desc="A message shown when a user is trying to set a PIN on a security key. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      {MIN_PIN_LENGTH, plural,
-       =1 {Enter your new PIN. A PIN must be at least one character long and can contain letters, numbers, and other characters.}
-       other {Enter your new PIN. A PIN must be at least # characters long and can contain letters, numbers, and other characters.}}
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_SET_PIN_CONFIRM" desc="The label of the button shown when a user is trying to set a PIN on a security key. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      Save
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CURRENT_PIN" desc="A label shown above a text box where the user is expected to enter the current PIN for a security key. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      Current PIN
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_PIN" desc="A label shown above a text box where the user is expected to enter a new PIN for a security key. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      PIN
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_PIN_ERROR_TOO_SHORT_SMALL" desc="A validation error shown beneath a text box where the user is expected to enter a PIN for a security key. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people. This message has limited horizontal space.">
-      Too short
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_PIN_ERROR_TOO_LONG" desc="A validation error shown beneath a text box where the user is expected to enter a PIN for a security key. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      PIN must be at most 63 characters
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_PIN_ERROR_MISMATCH" desc="A validation error shown beneath a text box where the user is expected to enter a PIN for a security key. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      The PINs you entered don’t match
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CONFIRM_PIN" desc="A label shown above a text box where the user is expected to reenter a new PIN for a security key. The text box is a duplicate of an immediately preceeding text box where the user has already entered this value. The user is asked to enter the same value twice in order to ensure that they entered it correctly. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      Confirm PIN
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_PIN_SUCCESS" desc="A message shown when the user has successfully set a PIN on a security key. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      Your PIN was created
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_PIN_ERROR" desc="A message shown when setting a PIN on a security key failed with an unhandled error code. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      PIN operation failed with code <ph name="RETRIES">$1<ex>18</ex></ph>.
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_PIN_HARD_LOCK" desc="A message shown when the user attempts to change the PIN on a security key that has been locked due to too many incorrect PIN attempts. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      The security key is locked because the wrong PIN was entered too many times. You’ll need to reset the security key.
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_PIN_SOFT_LOCK" desc="A message shown when the user attempts to change the PIN on a security key that has been locked due to too many incorrect PIN attempts. PINs, in this context, are short, often numeric codes that are often used with, for example, ATM cards. Security keys are external devices used to authenticate people.">
-      The security key is locked because the wrong PIN was entered too many times. To unlock it, remove and reinsert it.
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_SHOW_PINS" desc="A tool-tip message that is shown to describe the action of an icon in the dialog where users set or enter PINs for security keys. This message indicates to the user that clicking the icon will cause the PINs to be displayed normally. Since PINs are private information they are shown by default like passwords: with the characters replaced by bullet points. (Security keys are external devices used to authenticate people and PINs are short, often numeric, codes that are commonly used with, for example, ATMs.)">
-      Show PINs
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_HIDE_PINS" desc="A tool-tip message that is shown to describe the action of an icon in the dialog where users set or enter PINs for security keys. This message indicates to the user that clicking the icon will cause the PINs to be displayed like passwords: with the characters replaced by bullet points. (Security keys are external devices used to authenticate people and PINs are short, often numeric, codes that are commonly used with, for example, ATMs.)">
-      Hide PINs
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_LABEL" desc="The label for a menu item that when clicked lets the user view and erase credentials on their security key (an authentication hardware device).">
-      Sign-in data
-    </message>
     <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_USERNAME_LABEL" desc="A column heading of a table that lists sign-in data stored on a security key (an authentication hardware device). This column contains the user name (e.g. exampleuser@google.com) for each credential.">
       Username
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_DISPLAYNAME_LABEL" desc="A column heading of a table that lists sign-in data stored on a security key (an authentication hardware device). This column contains the display name (e.g. John Smith) for each credential.">
-      Name
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_WEBSITE_LABEL" desc="A column heading of a table that lists sign-in data stored on a security key (an authentication hardware device). This column contains the domain name (e.g. google.com) for each credential.">
-      Website
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_DESC" desc="The description for a menu item that when clicked lets the user view, edit, and erase credentials on their security key (an authentication hardware device).">
-      Manage sign-in data stored on your security key
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_DIALOG_TITLE" desc="The title of a dialog that lets users manage sign-in data on their security key (an authentication hardware device).">
-      Security key sign-in data
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_UPDATE_CREDENTIAL_DIALOG_TITLE" desc="The title of a dialog that lets users update sign-in data on their security key (an authentication hardware device).">
-      Edit sign-in data
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_CONFIRM_DELETE_TITLE" desc="The title of a prompt that asks users to confirm whether they want to delete the selected sign-in data on their security key (an authentication hardware device).">
-      Delete sign-in data
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_CONFIRM_DELETE_CREDENTIAL" desc="A confirmation message shown to confirm the user wants to delete the selected sign-in data. Security keys are external devices used to authenticate people.">
-      Are you sure you want to delete the selected sign-in data?
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_INPUT_ERROR_TOO_LONG" desc="A validation error shown beneath a text box where the user is expected to enter a username or displayname for a security key. Security keys are external devices used to authenticate people.">
-      Input must be at most 62 characters
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_NO_CREDENTIALS" desc="An error message shown when a user attempts to view the credentials on their security key (an authentication hardware device) but no such credentials exist.">
-      This security key does not have any sign-in data
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_NO_CREDENTIAL_MANAGEMENT" desc="An error message shown when a user attempts to view the credentials on their security key (an authentication hardware device) but the security key is not capable of storing credentials.">
-      This security key can't store any sign-in data
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_REMOVED" desc="An error message shown when a user attempts to view the credentials on their security key (an authentication hardware device), but the user removed the security key (by unplugging it from their USB port, for example).">
-      Your security key was removed.
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_NO_PIN" desc="An error message shown when a user attempts to view the credentials on their security key (an authentication hardware device), but the user has not set up a PIN (short, often numeric codes that are often used with, for example, ATM cards) for that security key.">
-      Your security key is not protected with a PIN. To manage sign-in data, first create a PIN.
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_ERROR" desc="An error message shown when a user attempts to view the credentials on their security key (an authentication hardware device), but an error with the device was encountered.">
-      Your security key couldn't be read
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_DELETE_SUCCESS" desc="A confirmation message shown when a user deletes an individual credential on their security key (an authentication hardware device) and succeeds.">
-      Your sign-in data was deleted
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_DELETE_FAILED" desc="An error message shown when a user attempts to delete an individual credential on their security key (an authentication hardware device) and fails.">
-      Your sign-in data couldn't be deleted
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_UPDATE_SUCCESS" desc="A confirmation message shown when a user updates an individual credential on their security key (an authentication hardware device) and succeeds.">
-      Your sign-in data was updated
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_UPDATE_FAILED" desc="An error message shown when a user attempts to update an individual credential on their security key (an authentication hardware device) and fails.">
-      Your sign-in data couldn't be updated
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_SUBPAGE_LABEL" desc="The label for a menu item that when clicked lets the user view, add, rename, and delete fingerprints on their security key (an authentication hardware device).">
-      Fingerprints
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_SUBPAGE_DESCRIPTION" desc="The description for a menu item that when clicked lets the user view, add, rename, and delete fingerprints on their security key (an authentication hardware device).">
-      Add and delete fingerprints saved on your security key
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_DIALOG_TITLE" desc="The title of a dialog that lets users view, add, rename, and delete fingerprints on their security key (an authentication hardware device).">
-      Manage fingerprints
     </message>
     <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_ADD_TITLE" desc="The title of a dialog instructing a user to touch their security key (an authentication hardware device) to enroll a fingerprint on it.">
       Add fingerprint
     </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_CHOOSE_NAME" desc="A label instructing the user to provide a descriptive name for a fingerprint enrolled to a security key.">
-      Enter a name for this fingerprint
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_NAME_LABEL" desc="A label for a text input field containing a descriptive name for a fingerprint enrolled to a security key." meaning="Name of an inanimate object">
-      Name
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_NAME_LABEL_TOO_LONG" desc="A validation error shown beneath a text box where the user is expected to enter a descriptive name for a fingerprint enrolled to a security key.">
-      Try a shorter name
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_NO_ENROLLMENTS_LABEL" desc="A label informing the user that there are no fingerprints stored on their security key (authentication hardware device).">
-      Your security key has no fingerprints stored
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_ENROLLMENTS_LABEL" desc="A label describing a list of fingerprints enrolled with a security key (authentication hardware device).">
-      Fingerprints on this security key
-    </message>
     <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_ENROLLING_LABEL" desc="A label instructing the user to repeatedly touch the fingerprint sensor on their security key (authentication hardware device) to take samples for a new fingerprint.">
       Keep touching your security key until your fingerprint is captured
     </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_TRY_AGAIN_LABEL" desc="A label instructing the user to touch the fingerprint sensor on their security key (authentication hardware device) again after taking a fingerprint sample failed.">
-      Try touching your security key again
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_FAILED_LABEL" desc="An error shown after enrolling a new fingerprint to a security key (authentication hardware device) was unsuccessful.">
-      Adding a fingerprint to this security key failed
-    </message>
     <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_ENROLLING_COMPLETE_LABEL" desc="A label informing the user that adding a fingerprint to their security key succeeded.">
       Your fingerprint was captured
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_NO_BIOMETRIC_ENROLLMENT" desc="An error message shown when a user attempts to use the fingerprint sensor on their security key (an authentication hardware device) but the security key is not capable of storing fingerprints, or does not have a fingerprint sensor.">
-      Your security key can't store fingerprints
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_DELETE" desc="The label for a button that when clicked deletes a fingerprint from a security key (an authentication hardware device) with a built-in fingerprint reader.">
-      Delete this fingerprint
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_NO_PIN" desc="An error message shown when a user attempts to enroll a fingerprint on their security key (an authentication hardware device), but the user has not set up a PIN (short, often numeric codes that are often used with, for example, ATM cards) for that security key.">
-      Your security key is not protected with a PIN. To manage fingerprints, first create a PIN.
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_STORAGE_FULL" desc="An error message shown when a user attempts to enroll a fingerprint on their security key (an authentication hardware device), but the security key's internal storage for fingerprints is exhausted.">
-      Your security key can't store any more fingerprints. To add a new one, first delete an existing fingerprint.
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_TOUCH_TO_CONTINUE" desc="A label instructing the user to physically touch the activation button on their security key (an authentication hardware device).">
-      To continue, insert and touch your security key
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_PIN_PROMPT" desc="A label instructing the user to enter the PIN (short, often numeric codes that are often used with, for example, ATM cards) for their security key (an authentication hardware device).">
-      Enter the PIN for your security key. If you don’t know the PIN, you’ll need to reset the security key.
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_KEYS_FORCE_PIN_CHANGE" desc="An error message shown when a user attempts to use a security key (an authentication hardware device) that has a default PIN (short, often numeric codes that are often used with, for example, ATM cards) set. Before using the key, the user needs to change the PIN to a new code.">
-      To use your new security key, set a new PIN
     </message>
     <message name="IDS_SETTINGS_EXTENSION_OR_APP_DISPLAY_NAME" desc="The title of a page containing site settings for an extension or Isolated Web App (IWA). The display name contains a human-readable extension/IWA name followed by the extension/IWA ID.">
       <ph name="EXTENSION_OR_APP_NAME">$1<ex>Google Docs Offline</ex></ph> (ID: <ph name="EXTENSION_OR_APP_ID">$2<ex>ghbmnnjooekpmoecnnnilnnbdlolhkhi</ex></ph>)
@@ -4195,30 +3786,6 @@
     </message>
     <message name="IDS_SETTINGS_SAFETY_HUB_EMPTY_STATE_MODULE_HEADER" desc="The header of the 'Empty State Module' in the Safety Hub page. The 'Empty State Module' is visible if there is no safety recommendation.">
       Nothing else needs your attention right now
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_PASSWORD_CHECK_SUBHEADER_RECENTLY" desc="Subtitle of the passwords card in the Safety Hub page which explains how recently passwords were checked for issues. The passwords card contains information about password issues which are detected automatically. This text is shown below a header which explains there are no issues and indicates that passwords were checked for issues very recently.">
-      Checked just now
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_PASSWORD_CHECK_SUBHEADER_SOME_TIME_AGO" desc="Subtitle of the passwords card in the Safety Hub page which explains how recently passwords were checked for issues. The passwords card contains information about password issues which are detected automatically. This text is shown below a header which explains there are no issues and indicates that passwords were checked for issues some time ago.">
-      Checked <ph name="NUM_DAYS_HOURS_MINUTES">$1<ex>2 days</ex></ph> ago
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_PASSWORD_CHECK_HEADER_NO_WEAK_OR_REUSED" desc="SafetyHub has checked the user's passwords for issues and has determined the passwords are not weak or reused, which is positive. However we cannot state that there are no issues with the passwords, because one of Chrome's password checks (whether a password is known to be leaked) was not performed. The string should explicitly specify weak and reused passwords. These are Chrome Password Manager terms and should be translated the same way. This text is shown as the header of the passwords card in SafetyHub which is in a neutral state. The subheader below this explains why not all of Chrome's protections were applied here and a call to action on how to do that (e.g. 'To check for compromised passwords, sign in').">
-      No weak or reused passwords
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_PASSWORD_CHECK_SUBHEADER_SIGN_IN" desc="This text conveys to the user that they currently do not have the full protection for their passwords and informs the user that additional protection (in form of Chrome checking whether saved passwords are compromised) is available by signing into Chrome. Compromised passwords are concepts in Chrome Password Manager, this should be translated the same way. It is shown only to signed-out users. This text appears in the subtitle of the passwords card on the Safety Hub page, below a title that lists already known password issues. The title above this may read e.g. '2 weak passwords', or 'No weak or reused passwords').">
-      To check for compromised passwords, sign in to your Google Account
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_PASSWORD_CHECK_SUBHEADER_GO_TO_PASSWORD_MANAGER" desc="This text conveys to the user that they currently do not have the full protection for their passwords and informs the user that additional protection (in form of Chrome checking whether saved passwords are compromised) is available by clicking on the card containing this text, which will redirect to Google Password Manager. Compromised passwords are a concept in Chrome password manager, this should be translated the same way. This text appears in the subtitle of the passwords card one the Safety Hub page, below the title 'No weak or reused passwords'.">
-      To check for compromised passwords, go to Google Password Manager
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_PASSWORD_CHECK_HEADER_NO_PASSWORDS" desc="This text is the header of the passwords card of SafetyHub when the user has no passwords saved in Chrome. Below this text there is a subheader that give the user more details: 'Chrome can check your passwords when you save them' or 'Your organization turned off saving passwords'. The card this text is part of is in a neutral state.">
-      No saved passwords
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_PASSWORD_CHECK_SUBHEADER_NO_PASSWORDS_POLICY" desc="Subtitle of the passwords card in SafetyHub when there are no saved passwords and saving of passwords is disabled through enterprise policy. This text is shown below the header 'No saved passwords'. It explains that the SafetyHub features for passwords are not available since the user's organization has a policy in place that prevents the user from saving passwords in Chrome.">
-      Your organization turned off saving passwords
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_PASSWORD_NAVIGATION_ARIA_LABEL" desc="Safety Check settings page (chrome://settings/safetyCheck) gives users an overview over their safety status. Password card in this page shows if there is any insecure password stored. This string is for the accesibility label for the card to call out where to navigation will happen (chrome://password-manager/passwords) if the card is clicked.">
-      Go to Google Password Manager
     </message>
     <message name="IDS_SETTINGS_SAFETY_HUB_SB_ON_ENHANCED_HEADER" desc="Safety Hub settings page (chrome://settings/safetyHub) gives users an overview over their safety status. Safe browsing card in this page shows the current state of Safe browsing setting (chrome://settings/security). This string is the headline of the Safe Browsing card when the current state is Enhanced protection.">
       Enhanced Safe Browsing is on
@@ -4252,12 +3819,6 @@
     </message>
     <message name="IDS_SETTINGS_SAFETY_HUB_GO_NOTIFICATION_SETTINGS_ITEM" desc="Safety Hub settings page (chrome://settings/safetyHub) gives users an overview over their safety status. 'Review Notification Permissions' in this page shows the websites that send a lot of notifications. This label is for the action menu item that navigates users to notification the settings page.">
       Go to notification settings
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_USER_EDU_INCOGNITO_SUBHEADER" desc="The subheader of the second item in the 'User Education Module' in the Safety Hub page. This item explains Incognito mode.">
-      Incognito mode keeps <ph name="BEGIN_LINK">&lt;a href="$1" target="_blank"&gt;</ph>your browsing private from others<ph name="END_LINK">&lt;/a&gt;</ph> who use your device
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_USER_EDU_SAFE_BROWSING_HEADER" desc="The header of the second item in the 'User Education Module' in the Safety Hub page. This item explains Safe Browsing.">
-      Safe Browsing
     </message>
     <if expr="not is_chromeos">
       <message name="IDS_SETTINGS_SAFETY_HUB_VERSION_CARD_SUBHEADER_RESTART" desc="Safety Hub settings page (chrome://settings/safetyHub) gives users an overview over their safety status. The version card, which this text is a part of, informs the user whether their Chrome is up to date. This text is shown when Chrome is not up to date but there is an update available and the user needs to restart their browser to finish the update. Shown below the title 'Chrome is out of date'.">

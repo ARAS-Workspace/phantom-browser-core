@@ -1193,9 +1193,6 @@ Google Chrome is unable to recover your settings.
         </if>
       </if>
 
-      <message name="IDS_VIEW_PASSWORDS" desc="Item in the app menu which shows Password Manager page">
-        Google P&amp;assword Manager
-      </message>
 
       <!-- Chrome sign-in page -->
       <message name="IDS_CHROME_SIGNIN_TITLE" desc="Title on the about:chrome-signin page" translateable="false">

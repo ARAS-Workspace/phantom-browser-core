@@ -1492,9 +1492,6 @@ are declared in tools/grit/grit_args.gni.
           <message name="IDS_PAYMENT_METHOD_SUBMENU_OPTION" desc="The text label of the payment method for the passwords and autofill submenu">
             &amp;Payment methods
           </message>
-          <message name="IDS_YOUR_SAVED_INFO_PAYMENTS_SUBMENU_OPTION" desc="The text label of the payments option for the Your saved info submenu that allows user to manage their list of saved payment methods and Autofill preferences for payment methods.">
-            &amp;Payments
-          </message>
           <message name="IDS_SAVE_AND_SHARE_MENU" desc="The text label of the Save and share sub menu item">
             &amp;Save and share
           </message>
@@ -1639,9 +1636,6 @@ are declared in tools/grit/grit_args.gni.
           </message>
           <message name="IDS_PAYMENT_METHOD_SUBMENU_OPTION" desc="In Title Case: The text label of the payment method for the passwords and autofill submenu">
             &amp;Payment Methods
-          </message>
-          <message name="IDS_YOUR_SAVED_INFO_PAYMENTS_SUBMENU_OPTION" desc="In Title Case: The text label of the payments option for the Your saved info submenu that allows user to manage their list of saved payment methods and Autofill preferences for payment methods.">
-            &amp;Payments
           </message>
           <message name="IDS_SAVE_AND_SHARE_MENU" desc="In Title Case: The text label of the Save and share sub menu item">
             &amp;Save and Share
@@ -3583,8 +3577,6 @@ are declared in tools/grit/grit_args.gni.
       </message>
 
       <!-- Desktop omnibox PWA install icon -->
-      <if expr="not is_android">
-      </if>
 
       <if expr="not is_android">
         <message name="IDS_WEBAPP_UPDATE_REVIEW_ACCEPT_BUTTON" desc="The text content of the acceptance button for the PWA app update review dialog. Clicking on this button confirms the user wants to update how the installed app looks.">
@@ -3807,16 +3799,6 @@ are declared in tools/grit/grit_args.gni.
       </if>
 
       <!-- "Create application shortcuts" menu item -->
-      <if expr="use_titlecase">
-        <message name="IDS_ADD_TO_OS_LAUNCH_SURFACE" desc="In Title Case: Menu text for adding a bookmark app shortcut to the operating system.">
-          Create &amp;Shortcut...
-        </message>
-      </if>
-      <if expr="not use_titlecase">
-        <message name="IDS_ADD_TO_OS_LAUNCH_SURFACE" desc="Menu text for adding a bookmark app shortcut to the operating system.">
-          Create &amp;shortcut...
-        </message>
-      </if>
 
       <!-- "Install web app" menu item -->
       <if expr="use_titlecase">
@@ -11088,9 +11070,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
       </message>
       <message name="IDS_READING_LIST_ENTRY_POINT_PROMO" desc="Text shown on promotional UI to encourage users to add a tab to their reading list">
         To add this page to your reading list, click the Bookmark icon
-      </message>
-      <message name="IDS_DESKTOP_PWA_INSTALL_PROMO" desc="Text shown on promotional UI appearing next to the PWA install icon">
-        To get back here quickly, install <ph name="APP_NAME">$1<ex>Google Maps</ex></ph> by clicking the install button
       </message>
       <message name="IDS_DESKTOP_PWA_LINK_CAPTURING_TEXT" desc="Text shown on app opened via link capturing.">
         You can change how links open in App settings
