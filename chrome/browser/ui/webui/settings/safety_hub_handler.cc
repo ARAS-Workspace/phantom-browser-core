@@ -461,16 +461,6 @@ void SafetyHubHandler::HandleGetNumberOfExtensionsThatNeedReview(
                             base::Value(GetNumberOfExtensionsThatNeedReview()));
 }
 
-void SafetyHubHandler::HandleGetVersionCardData(const base::ListValue& args) {
-  AllowJavascript();
-
-  CHECK_EQ(1U, args.size());
-  const base::Value& callback_id = args[0];
-
-  ResolveJavascriptCallback(callback_id,
-                            base::Value(safety_hub_util::GetVersionCardData()));
-}
-
 void SafetyHubHandler::HandleGetSafetyHubEntryPointData(
     const base::ListValue& args) {
   AllowJavascript();
@@ -493,18 +483,12 @@ void SafetyHubHandler::HandleGetSafetyHubEntryPointData(
   }
 
   // Modules in subheader should be added in the following order: Passwords,
-  // Version, Safe Browsing, Extensions, Notifications, Permissions.
+  // Safe Browsing, Extensions, Notifications, Permissions.
   std::u16string subheader = u"";
 
   if (modules.contains(SafetyHubModule::kPasswords)) {
     AppendModuleNameToString(subheader,
                              IDS_SETTINGS_SAFETY_HUB_PASSWORDS_MODULE_NAME);
-  }
-
-  if (modules.contains(SafetyHubModule::kVersion)) {
-    AppendModuleNameToString(
-        subheader, IDS_SETTINGS_SAFETY_HUB_VERSION_MODULE_UPPERCASE_NAME,
-        IDS_SETTINGS_SAFETY_HUB_VERSION_MODULE_LOWERCASE_NAME);
   }
 
   if (modules.contains(SafetyHubModule::kSafeBrowsing)) {
@@ -548,10 +532,6 @@ SafetyHubHandler::GetSafetyHubModulesWithRecommendations() {
   CHECK(psc_service);
   if (CardHasRecommendations(psc_service->GetPasswordCardData())) {
     modules.insert(SafetyHubModule::kPasswords);
-  }
-  // Version module
-  if (CardHasRecommendations(safety_hub_util::GetVersionCardData())) {
-    modules.insert(SafetyHubModule::kVersion);
   }
   // SafeBrowsing module
   if (CardHasRecommendations(
@@ -671,10 +651,6 @@ void SafetyHubHandler::RegisterMessages() {
   web_ui()->RegisterMessageCallback(
       "getSafeBrowsingCardData",
       base::BindRepeating(&SafetyHubHandler::HandleGetSafeBrowsingCardData,
-                          base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "getVersionCardData",
-      base::BindRepeating(&SafetyHubHandler::HandleGetVersionCardData,
                           base::Unretained(this)));
   web_ui()->RegisterMessageCallback(
       "getSafetyHubEntryPointData",

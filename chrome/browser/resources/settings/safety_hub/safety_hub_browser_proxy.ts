@@ -153,9 +153,6 @@ export interface SafetyHubBrowserProxy {
   /** Gets data for the Safe Browsing top card. */
   getSafeBrowsingCardData(): Promise<CardInfo>;
 
-  /** Gets data for the version top card. */
-  getVersionCardData(): Promise<CardInfo>;
-
   /** Get the number of extensions that should be reviewed by the user. */
   getNumberOfExtensionsThatNeedReview(): Promise<number>;
 
@@ -227,10 +224,6 @@ export class SafetyHubBrowserProxyImpl implements SafetyHubBrowserProxy {
 
   getSafeBrowsingCardData() {
     return sendWithPromise<CardInfo>('getSafeBrowsingCardData');
-  }
-
-  getVersionCardData() {
-    return sendWithPromise<CardInfo>('getVersionCardData');
   }
 
   getNumberOfExtensionsThatNeedReview() {

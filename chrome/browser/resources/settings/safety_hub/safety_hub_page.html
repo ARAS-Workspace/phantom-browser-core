@@ -53,11 +53,6 @@
   $i18n{safetyHubPageCardSectionHeader}
 </h2>
 <div class="card-container">
-  <settings-safety-hub-card id="version" class="card box"
-      data="[[versionCardData_]]" on-click="onVersionClick_"
-      tabindex="0" on-keydown="onVersionKeyPress_" role="[[versionCardRole_]]"
-      aria-description="[[versionCardAriaDescription_]]">
-  </settings-safety-hub-card>
   <settings-safety-hub-card id="safeBrowsing" class="card box"
       data="[[safeBrowsingCardData_]]" on-click="onSafeBrowsingClick_"
       tabindex="0" on-keydown="onSafeBrowsingKeyPress_" role="link"
@@ -85,20 +80,5 @@
       subheader="$i18n{safetyHubEmptyStateModuleSubheader}"
       header-icon="cr:check">
   </settings-safety-hub-module>
-  <settings-safety-hub-module
-      id="userEducationModule"
-      on-sh-module-item-link-click="onEducationLinkClick_"
-      class="module box"
-      header="$i18n{safetyHubUserEduModuleHeader}"
-      header-icon="settings20:lightbulb-2"
-      sites="[[userEducationItemList_]]">
-  </settings-safety-hub-module>
 </template>
-<if expr="not is_chromeos">
-  <template is="dom-if" if="[[shouldShowRelaunchDialog]]" restamp>
-    <relaunch-confirmation-dialog restart-type="[[restartTypeEnum.RELAUNCH]]"
-        on-close="onRelaunchDialogClose" is-version-update>
-    </relaunch-confirmation-dialog>
-  </template>
-</if>
 </settings-supage>

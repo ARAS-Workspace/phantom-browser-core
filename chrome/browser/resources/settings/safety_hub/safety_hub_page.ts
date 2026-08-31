@@ -10,7 +10,6 @@
 
 import 'chrome://resources/cr_elements/cr_shared_vars.css.js';
 // <if expr="not is_chromeos">
-import '../relaunch_confirmation_dialog.js';
 // </if>
 import '../settings_page/settings_subpage.js';
 import './safety_hub_card.js';
@@ -22,12 +21,10 @@ import './unused_site_permissions_module.js';
 import {PrefsMixin} from '/shared/settings/prefs/prefs_mixin.js';
 import {I18nMixin} from 'chrome://resources/cr_elements/i18n_mixin.js';
 import {WebUiListenerMixin} from 'chrome://resources/cr_elements/web_ui_listener_mixin.js';
-import {assertNotReached} from 'chrome://resources/js/assert.js';
 import {PolymerElement} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 
 import type {MetricsBrowserProxy, SafetyHubCardState} from '../metrics_browser_proxy.js';
 import {MetricsBrowserProxyImpl, SafetyHubModuleType, SafetyHubSurfaces} from '../metrics_browser_proxy.js';
-import {RelaunchMixin, RestartType} from '../relaunch_mixin.js';
 import {routes} from '../route.js';
 import {RouteObserverMixin, Router} from '../router.js';
 import type {Route} from '../router.js';
@@ -35,18 +32,16 @@ import {SettingsViewMixin} from '../settings_page/settings_view_mixin.js';
 
 import type {CardInfo, NotificationPermission, SafetyHubBrowserProxy, UnusedSitePermissions} from './safety_hub_browser_proxy.js';
 import {CardState, SafetyHubBrowserProxyImpl, SafetyHubEvent} from './safety_hub_browser_proxy.js';
-import type {SiteInfo} from './safety_hub_module.js';
 import {getTemplate} from './safety_hub_page.html.js';
 
 export interface SettingsSafetyHubPageElement {
   $: {
     safeBrowsing: HTMLElement,
-    version: HTMLElement,
   };
 }
 
 const SettingsSafetyHubPageElementBase = RouteObserverMixin(SettingsViewMixin(
-    RelaunchMixin(PrefsMixin(WebUiListenerMixin(I18nMixin(PolymerElement))))));
+    PrefsMixin(WebUiListenerMixin(I18nMixin(PolymerElement)))));
 
 export class SettingsSafetyHubPageElement extends
     SettingsSafetyHubPageElementBase {
@@ -60,9 +55,6 @@ export class SettingsSafetyHubPageElement extends
 
   static get properties() {
     return {
-      // The object that holds data of Version Check card.
-      versionCardData_: Object,
-
       // The object that holds data of Safe Browsing card.
       safeBrowsingCardData_: Object,
 
@@ -90,7 +82,6 @@ export class SettingsSafetyHubPageElement extends
             'computeShowNoRecommendationsState_(showUnusedSitePermissions_.*, showExtensions_.*, showNotificationPermissions_.*)',
       },
 
-      userEducationItemList_: Array,
 
       // Whether the data for notification permissions is ready.
       hasDataForNotificationPermissions_: Boolean,
@@ -101,31 +92,16 @@ export class SettingsSafetyHubPageElement extends
       // Whether the data for extensions is ready.
       hasDataForExtensions_: Boolean,
 
-      // String that identifies version card's role announced by accessibility
-      // voiceover.
-      versionCardRole_: {
-        type: String,
-        computed: 'computeVersionCardRole_(versionCardData_)',
-      },
-
-      // String that identifies version card's description announced by
-      // accessibility voiceover.
-      versionCardAriaDescription_: {
-        type: String,
-        computed: 'computeVersionCardAriaDescription_(versionCardData_)',
-      },
-
     };
   }
 
   static get observers() {
     return [
-      'onAllModulesLoaded_(versionCardData_, safeBrowsingCardData_, hasDataForUnusedPermissions_, hasDataForNotificationPermissions_, hasDataForExtensions_)',
+      'onAllModulesLoaded_(safeBrowsingCardData_, hasDataForUnusedPermissions_, hasDataForNotificationPermissions_, hasDataForExtensions_)',
       'onSafeBrowsingPrefChanged_(prefs.generated.safe_browsing)',
     ];
   }
 
-  declare private versionCardData_: CardInfo;
   declare private safeBrowsingCardData_: CardInfo;
   declare private showNotificationPermissions_: boolean;
   declare private hasDataForNotificationPermissions_: boolean;
@@ -135,9 +111,6 @@ export class SettingsSafetyHubPageElement extends
   declare private showExtensions_: boolean;
   declare private hasDataForExtensions_: boolean;
   private shouldRecordMetric_: boolean = false;
-  declare private userEducationItemList_: SiteInfo[];
-  declare private versionCardRole_: string;
-  declare private versionCardAriaDescription_: string;
   private browserProxy_: SafetyHubBrowserProxy =
       SafetyHubBrowserProxyImpl.getInstance();
   private metricsBrowserProxy_: MetricsBrowserProxy =
@@ -146,7 +119,6 @@ export class SettingsSafetyHubPageElement extends
   override connectedCallback() {
     this.initializeCards_();
     this.initializeModules_();
-    this.initializeUserEducation_();
 
     super.connectedCallback();
   }
@@ -180,13 +152,8 @@ export class SettingsSafetyHubPageElement extends
   }
 
   private initializeCards_() {
-    // TODO(crbug.com/40267370): Add listeners for Password and Version cards.
     this.browserProxy_.getSafeBrowsingCardData().then((data: CardInfo) => {
       this.safeBrowsingCardData_ = data;
-    });
-
-    this.browserProxy_.getVersionCardData().then((data: CardInfo) => {
-      this.versionCardData_ = data;
     });
   }
 
@@ -215,73 +182,6 @@ export class SettingsSafetyHubPageElement extends
 
     this.browserProxy_.getNumberOfExtensionsThatNeedReview().then(
         (num: number) => this.onExtensionsChanged_(num));
-  }
-
-  private initializeUserEducation_() {
-    this.userEducationItemList_ = [
-      {
-        origin: this.i18n('safetyHubUserEduDataHeader'),
-        detail: this.i18nAdvanced('safetyHubUserEduDataSubheader'),
-        icon: 'settings20:chrome-product',
-      },
-      {
-        origin: this.i18n('safetyHubUserEduIncognitoHeader'),
-        detail: this.i18nAdvanced('safetyHubUserEduIncognitoSubheader'),
-        icon: 'settings20:incognito',
-      },
-      {
-        origin: this.i18n('safetyHubUserEduSafeBrowsingHeader'),
-        detail: this.i18nAdvanced('safetyHubUserEduSafeBrowsingSubheader'),
-        icon: 'cr:security',
-      },
-    ];
-  }
-
-  private onVersionClick_() {
-    this.metricsBrowserProxy_.recordSafetyHubCardStateClicked(
-        'Settings.SafetyHub.VersionCard.StatusOnClick',
-        this.versionCardData_.state as unknown as SafetyHubCardState);
-    this.browserProxy_.recordSafetyHubInteraction();
-
-    if (this.versionCardData_.state === CardState.WARNING) {
-      // Optional parameter alwaysShowDialog is set to true to always show the
-      // confirmation dialog regardless of the incognito windows open.
-      this.performRestart(RestartType.RELAUNCH, true);
-    } else {
-      Router.getInstance().navigateTo(
-          routes.ABOUT, /* dynamicParams= */ undefined,
-          /* removeSearch= */ true);
-    }
-  }
-
-  private onEducationLinkClick_(event: CustomEvent<HTMLAnchorElement>) {
-    this.browserProxy_.recordSafetyHubInteraction();
-    const headerString =
-        event.detail.querySelector('.site-representation')!.textContent;
-
-    switch (headerString) {
-      case this.i18n('safetyHubUserEduDataHeader'):
-        this.metricsBrowserProxy_.recordAction(
-            'Settings.SafetyHub.SafetyToolsLinkClicked');
-        break;
-      case this.i18n('safetyHubUserEduIncognitoHeader'):
-        this.metricsBrowserProxy_.recordAction(
-            'Settings.SafetyHub.IncognitoLinkClicked');
-        break;
-      case this.i18n('safetyHubUserEduSafeBrowsingHeader'):
-        this.metricsBrowserProxy_.recordAction(
-            'Settings.SafetyHub.SafeBrowsingLinkClicked');
-        break;
-      default:
-        assertNotReached();
-    }
-  }
-
-  private onVersionKeyPress_(e: KeyboardEvent) {
-    e.stopPropagation();
-    if (this.isEnterOrSpaceClicked_(e)) {
-      this.onVersionClick_();
-    }
   }
 
   private onSafeBrowsingPrefChanged_() {
@@ -337,16 +237,6 @@ export class SettingsSafetyHubPageElement extends
     this.hasDataForExtensions_ = true;
   }
 
-  private computeVersionCardRole_(): string {
-    return this.versionCardData_.state === CardState.WARNING ? 'button' : 'link';
-  }
-
-  private computeVersionCardAriaDescription_(): string {
-    return this.versionCardData_.state === CardState.WARNING ?
-        this.i18n('safetyHubVersionRelaunchAriaLabel') :
-        this.i18n('safetyHubVersionNavigationAriaLabel');
-  }
-
   private isEnterOrSpaceClicked_(e: KeyboardEvent): boolean {
     return e.key === 'Enter' || e.key === ' ';
   }
@@ -358,7 +248,7 @@ export class SettingsSafetyHubPageElement extends
     }
 
     // Wait till the data of the cards be ready.
-    if (!this.safeBrowsingCardData_ || !this.versionCardData_) {
+    if (!this.safeBrowsingCardData_) {
       return;
     }
 
@@ -375,12 +265,6 @@ export class SettingsSafetyHubPageElement extends
     if (this.safeBrowsingCardData_.state !== CardState.SAFE) {
       this.metricsBrowserProxy_.recordSafetyHubModuleWarningImpression(
           SafetyHubModuleType.SAFE_BROWSING);
-      hasAnyWarning = true;
-    }
-
-    if (this.versionCardData_.state !== CardState.SAFE) {
-      this.metricsBrowserProxy_.recordSafetyHubModuleWarningImpression(
-          SafetyHubModuleType.VERSION);
       hasAnyWarning = true;
     }
 

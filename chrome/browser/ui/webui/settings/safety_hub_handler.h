@@ -96,8 +96,6 @@ class SafetyHubHandler : public settings::SettingsPageUIHandler,
   FRIEND_TEST_ALL_PREFIXES(SafetyHubHandlerParameterizedTest,
                            PasswordCardState);
   FRIEND_TEST_ALL_PREFIXES(SafetyHubHandlerTest, PasswordCardCheckTime);
-  FRIEND_TEST_ALL_PREFIXES(SafetyHubHandlerTest, VersionCardUpToDate);
-  FRIEND_TEST_ALL_PREFIXES(SafetyHubHandlerTest, VersionCardOutOfDate);
   FRIEND_TEST_ALL_PREFIXES(SafetyHubHandlerTest,
                            ExtensionPrefAndInitialization);
   FRIEND_TEST_ALL_PREFIXES(
@@ -186,7 +184,6 @@ class SafetyHubHandler : public settings::SettingsPageUIHandler,
   void HandleGetSafeBrowsingCardData(const base::ListValue& args);
 
   // Returns the data for the version card.
-  void HandleGetVersionCardData(const base::ListValue& args);
 
   // Fetches data for the version card to return data to the UI.
   base::DictValue GetVersionCardData();

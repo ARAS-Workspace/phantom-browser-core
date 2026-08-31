@@ -2904,20 +2904,6 @@ void AddSafetyHubStrings(content::WebUIDataSource* html_source) {
        IDS_SETTINGS_SAFETY_HUB_GO_SITE_SETTINGS_ITEM},
       {"safetyHubGoNotificationSettingsItem",
        IDS_SETTINGS_SAFETY_HUB_GO_NOTIFICATION_SETTINGS_ITEM},
-      {"safetyHubUserEduModuleHeader",
-       IDS_SETTINGS_SAFETY_HUB_USER_EDU_MODULE_HEADER},
-      {"safetyHubUserEduDataHeader",
-       IDS_SETTINGS_SAFETY_HUB_USER_EDU_DATA_HEADER},
-      {"safetyHubUserEduIncognitoHeader",
-       IDS_SETTINGS_SAFETY_HUB_USER_EDU_INCOGNITO_HEADER},
-      {"safetyHubUserEduSafeBrowsingHeader",
-       IDS_SETTINGS_SAFETY_HUB_USER_EDU_SAFE_BROWSING_HEADER},
-      {"safetyHubPasswordNavigationAriaLabel",
-       IDS_SETTINGS_SAFETY_HUB_PASSWORD_NAVIGATION_ARIA_LABEL},
-      {"safetyHubVersionNavigationAriaLabel",
-       IDS_SETTINGS_SAFETY_HUB_VERSION_NAVIGATION_ARIA_LABEL},
-      {"safetyHubVersionRelaunchAriaLabel",
-       IDS_SETTINGS_SAFETY_HUB_VERSION_RELAUNCH_ARIA_LABEL},
       {"safetyHubSBNavigationAriaLabel",
        IDS_SETTINGS_SAFETY_HUB_SB_NAVIGATION_ARIA_LABEL},
       {"safetyHubReview", IDS_SETTINGS_SAFETY_CHECK_REVIEW},
@@ -2979,23 +2965,6 @@ void AddSafetyHubStrings(content::WebUIDataSource* html_source) {
           is_disruptive_notification_revocation_enabled
               ? IDS_SETTINGS_SAFETY_CHECK_UNUSED_SITE_PERMISSIONS_AND_NOTIFICATIONS_SETTING_SUBLABEL
               : IDS_SETTINGS_SAFETY_CHECK_UNUSED_SITE_PERMISSIONS_SETTING_SUBLABEL));
-
-  html_source->AddString("safetyHubUserEduDataSubheader",
-                         l10n_util::GetStringFUTF16(
-                             IDS_SETTINGS_SAFETY_HUB_USER_EDU_DATA_SUBHEADER,
-                             chrome::kChromeSafePageURL));
-
-  html_source->AddString(
-      "safetyHubUserEduIncognitoSubheader",
-      l10n_util::GetStringFUTF16(
-          IDS_SETTINGS_SAFETY_HUB_USER_EDU_INCOGNITO_SUBHEADER,
-          chrome::kIncognitoHelpCenterURL));
-
-  html_source->AddString(
-      "safetyHubUserEduSafeBrowsingSubheader",
-      l10n_util::GetStringFUTF16(
-          IDS_SETTINGS_SAFETY_HUB_USER_EDU_SAFE_BROWSING_SUBHEADER,
-          chrome::kSafeBrowsingUseInChromeURL));
 
   html_source->AddString("safetyHubHelpCenterURL",
                          chrome::kSafetyHubHelpCenterURL);
