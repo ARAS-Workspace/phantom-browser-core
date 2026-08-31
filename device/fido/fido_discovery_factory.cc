@@ -52,48 +52,6 @@ std::vector<std::unique_ptr<FidoDiscoveryBase>> FidoDiscoveryFactory::Create(
     case FidoTransportProtocol::kBluetoothLowEnergy:
       return {};
     case FidoTransportProtocol::kHybrid:
-#if BUILDFLAG(IS_MAC)
-      if (!base::DoesResponsibleProcessHaveBluetoothMetadata()) {
-        // On recent macOS a process must have listed Bluetooth metadata in
-        // its Info.plist in order to call Bluetooth APIs. Failure to do so
-        // results in the system killing with process with SIGABRT once
-        // Bluetooth calls are made.
-        //
-        // However, unless Chromium is started from the Finder, or with special
-        // posix_spawn flags, then the responsible process—the one that needs
-        // to have the right Info.plist—is one of the parent processes, often
-        // the terminal emulator. This can lead to Chromium getting killed when
-        // trying to do WebAuthn. This also affects layout tests.
-        //
-        // Thus, if the responsible process is not Chromium itself, then we
-        // disable caBLE (and thus avoid Bluetooth calls).
-        FIDO_LOG(ERROR) << "Cannot use Bluetooth because the responsible app "
-                           "for the process does not have Bluetooth metadata "
-                           "in its Info.plist. Launch from Finder to fix.";
-        return {};
-      }
-#endif  // BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_WIN)
-      {
-        device::WinWebAuthnApi* const webauthn_api =
-            device::WinWebAuthnApi::GetDefault();
-        if (webauthn_api && webauthn_api->SupportsHybrid()) {
-          FIDO_LOG(EVENT) << "Not starting hybrid because Windows handles it.";
-          return {};
-        }
-      }
-#endif  // BUILDFLAG(IS_WIN)
-      if (device::BluetoothAdapterFactory::Get()->IsLowEnergySupported() &&
-          qr_generator_key_.has_value()) {
-        std::vector<std::unique_ptr<FidoDiscoveryBase>> ret;
-          ret.emplace_back(std::make_unique<cablev2::Discovery>(
-              request_type_.value(), network_context_factory_,
-              qr_generator_key_, std::move(contact_device_stream_),
-              std::move(cable_pairing_callback_),
-              std::move(cable_invalidated_pairing_callback_),
-              std::move(cable_event_callback_), cable_must_support_ctap_));
-        return ret;
-      }
       return {};
     case FidoTransportProtocol::kNearFieldCommunication:
       // TODO(crbug.com/40568770): Add NFC support.
@@ -115,11 +73,7 @@ std::vector<std::unique_ptr<FidoDiscoveryBase>> FidoDiscoveryFactory::Create(
 
 std::optional<std::unique_ptr<FidoDiscoveryBase>>
 FidoDiscoveryFactory::MaybeCreateEnclaveDiscovery() {
-  if (!enclave_ui_request_stream_ || !network_context_factory_) {
-    return std::nullopt;
-  }
-  return std::make_unique<enclave::EnclaveAuthenticatorDiscovery>(
-      std::move(enclave_ui_request_stream_), network_context_factory_);
+  return nullptr;
 }
 
 bool FidoDiscoveryFactory::IsTestOverride() {

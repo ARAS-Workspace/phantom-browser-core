@@ -86,10 +86,6 @@ class ChromeWebAuthenticationDelegate final
       content::RenderFrameHost* render_frame_host) override;
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
- private:
-  // Caches the result from looking up whether a TPM is available for Enclave
-  // requests.
-  std::optional<bool> tpm_available_;
   base::WeakPtrFactory<ChromeWebAuthenticationDelegate> weak_ptr_factory_{this};
 };
 
