@@ -1593,7 +1593,6 @@ static_library("ui") {
       "//chrome/browser/ui/webui/media_router",
       "//chrome/browser/ui/webui/multistep_filter_internals",
       "//chrome/browser/ui/webui/on_device_internals",
-      "//chrome/browser/ui/webui/password_manager:password_manager_ui",
       "//chrome/browser/ui/webui/search_engine_choice",
       "//chrome/browser/ui/webui/side_panel/bookmarks",
       "//chrome/browser/ui/webui/side_panel/comments",

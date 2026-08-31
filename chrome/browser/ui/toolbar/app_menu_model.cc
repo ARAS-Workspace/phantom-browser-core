@@ -873,14 +873,6 @@ class PasswordsAndAutofillSubMenuModel : public ui::SimpleMenuModel {
 PasswordsAndAutofillSubMenuModel::PasswordsAndAutofillSubMenuModel(
     ui::SimpleMenuModel::Delegate* delegate)
     : SimpleMenuModel(delegate) {
-  AddItemWithStringIdAndVectorIcon(this, IDC_SHOW_PASSWORD_MANAGER,
-                                   IDS_VIEW_PASSWORDS,
-                                   features::IsRoundedIconsEnabled()
-                                       ? vector_icons::kPasswordManagerIcon
-                                       : vector_icons::kPasswordManagerOldIcon);
-  SetElementIdentifierAt(GetIndexOfCommandId(IDC_SHOW_PASSWORD_MANAGER).value(),
-                         AppMenuModel::kPasswordManagerMenuItem);
-
   AddItemWithStringIdAndVectorIcon(this, IDC_SHOW_PAYMENT_METHODS,
                                    IDS_YOUR_SAVED_INFO_PAYMENTS_SUBMENU_OPTION,
                                    features::IsRoundedIconsEnabled()
