@@ -2830,39 +2830,7 @@ void RenderViewContextMenu::AppendMediaRouterItem() {
   }
 }
 
-void RenderViewContextMenu::AppendReadAnythingItem() {
-  const bool is_menu_simplification_enabled =
-      features::IsMenuSimplificationEnabled();
-  if (is_menu_simplification_enabled && params_.is_editable) {
-    return;
-  }
-
-  // Show Read Anything option if it's not already open in the side panel.
-  if (IsNormalBrowser() && !IsReadAnythingEntryShowing(GetBrowser())) {
-    menu_model_.AddItemWithStringId(IDC_CONTENT_CONTEXT_OPEN_IN_READING_MODE,
-                                    IDS_CONTENT_CONTEXT_READING_MODE);
-
-    if (is_menu_simplification_enabled) {
-      menu_model_.SetIconForCommandId(
-          IDC_CONTENT_CONTEXT_OPEN_IN_READING_MODE,
-          ui::ImageModel::FromVectorIcon(features::IsRoundedIconsEnabled()
-                                             ? kMenuBookIcon
-                                             : kMenuBookChromeRefreshOldIcon,
-                                         ui::kColorMenuIcon, kTabMenuIconSize));
-    }
-
-    if (features::IsReadAnythingImprovedUiEnabled()) {
-      menu_model_.AddItemWithStringId(IDC_CONTENT_CONTEXT_LISTEN_TO_THIS_PAGE,
-                                      IDS_CONTENT_CONTEXT_LISTEN_TO_THIS_PAGE);
-      if (is_menu_simplification_enabled) {
-        menu_model_.SetIconForCommandId(
-            IDC_CONTENT_CONTEXT_LISTEN_TO_THIS_PAGE,
-            ui::ImageModel::FromVectorIcon(kPlayCircleIcon, ui::kColorMenuIcon,
-                                           kTabMenuIconSize));
-      }
-    }
-  }
-}
+void RenderViewContextMenu::AppendReadAnythingItem() {}
 
 void RenderViewContextMenu::AppendSaveToMemoryBanksItem() {
   if (base::FeatureList::IsEnabled(context_hub::features::kMemoryBanks)) {
