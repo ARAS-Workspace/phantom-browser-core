@@ -274,36 +274,7 @@ GURL TranslateLanguageList::TranslateLanguageUrl() {
 }
 
 void TranslateLanguageList::RequestLanguageList() {
-  // If resource requests are not allowed, we'll get a callback when they are.
-  if (!resource_requests_allowed_) {
-    request_pending_ = true;
-    return;
-  }
-
   request_pending_ = false;
-
-  if (language_list_fetcher_.get() &&
-      (language_list_fetcher_->state() == TranslateUrlFetcher::IDLE ||
-       language_list_fetcher_->state() == TranslateUrlFetcher::FAILED)) {
-    GURL url = TranslateLanguageUrl();
-    url = AddHostLocaleToUrl(url);
-    url = AddApiKeyToUrl(url);
-
-    NotifyEvent(__LINE__,
-                base::StringPrintf("Language list fetch starts (URL: %s)",
-                                   url.spec().c_str()));
-
-    bool result = language_list_fetcher_->Request(
-        url,
-        base::BindOnce(&TranslateLanguageList::OnLanguageListFetchComplete,
-                       base::Unretained(this)),
-        // Use the strictest mode for request headers, since incognito state is
-        // not known.
-        /*is_incognito=*/true);
-    if (!result) {
-      NotifyEvent(__LINE__, "Request is omitted due to retry limit");
-    }
-  }
 }
 
 void TranslateLanguageList::SetResourceRequestsAllowed(bool allowed) {
