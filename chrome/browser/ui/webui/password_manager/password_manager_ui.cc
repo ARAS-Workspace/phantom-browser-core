@@ -59,7 +59,6 @@
 #include "ui/webui/webui_util.h"
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
-#include "chrome/browser/ui/webui/settings/settings_security_key_handler.h"
 #endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
@@ -822,9 +821,6 @@ PasswordManagerUI::PasswordManagerUI(content::WebUI* web_ui)
   web_ui->AddMessageHandler(std::make_unique<SafetyHubHandler>(profile));
   web_ui->AddMessageHandler(
       std::make_unique<password_manager::NotificationCardsHandler>(profile));
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-  web_ui->AddMessageHandler(std::make_unique<settings::PasskeysHandler>());
-#endif
   auto* source = CreateAndAddPasswordsUIHTMLSource(profile, web_ui);
   policy_indicator::AddLocalizedStrings(source);
   AddPluralStrings(web_ui);

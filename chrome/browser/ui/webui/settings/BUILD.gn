@@ -25,7 +25,6 @@ source_set("settings") {
     "languages_handler.h",
     "metrics_reporting_handler.h",
     "on_startup_handler.h",
-    "password_manager_handler.h",
     "people_handler.h",
     "performance_handler.h",
     "profile_info_handler.h",
@@ -33,7 +32,6 @@ source_set("settings") {
     "recent_site_settings_helper.h",
     "reset_settings_handler.h",
     "safety_hub_handler.h",
-    "saved_info_handler.h",
     "search_engines_handler.h",
     "security_settings_provider.h",
     "settings_clear_browsing_data_handler.h",
@@ -151,7 +149,6 @@ source_set("impl") {
     "languages_handler.cc",
     "metrics_reporting_handler.cc",
     "on_startup_handler.cc",
-    "password_manager_handler.cc",
     "people_handler.cc",
     "performance_handler.cc",
     "profile_info_handler.cc",
@@ -159,7 +156,6 @@ source_set("impl") {
     "recent_site_settings_helper.cc",
     "reset_settings_handler.cc",
     "safety_hub_handler.cc",
-    "saved_info_handler.cc",
     "search_engines_handler.cc",
     "security_settings_provider.cc",
     "settings_clear_browsing_data_handler.cc",
@@ -399,16 +395,6 @@ source_set("impl") {
   }
 }
 
-source_set("test_support") {
-  testonly = true
-  sources = [ "saved_info_handler_test_api.h" ]
-  deps = [
-    ":settings",
-    "//base",
-    "//content/public/browser",
-  ]
-}
-
 source_set("browser_tests") {
   testonly = true
   defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
@@ -510,7 +496,6 @@ if (!is_android) {
       "recent_site_settings_helper_unittest.cc",
       "reset_settings_handler_unittest.cc",
       "safety_hub_handler_unittest.cc",
-      "saved_info_handler_unittest.cc",
       "search_engines_handler_unittest.cc",
       "settings_media_devices_selection_handler_unittest.cc",
       "settings_security_key_handler_unittest.cc",

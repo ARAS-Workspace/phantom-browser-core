@@ -72,11 +72,6 @@
     <div id="subpageDescription">$i18n{otherDataDescription}
     </div>
     <div class="link-rows-block">
-      <cr-link-row id="passwordManagerLink" external using-slotted-label
-          sub-label="$i18n{manageInGooglePasswordManager}"
-          on-click="onPasswordManagerClick_">
-        <div slot="label" class="label">$i18n{passwordsAndPasskeys}</div>
-      </cr-link-row>
       <template is="dom-if"
           if="[[shouldShowGoogleSearchHistoryLink_(syncStatus_, isGoogleDse_)]]"
           restamp>

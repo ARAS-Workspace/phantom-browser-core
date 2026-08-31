@@ -17,14 +17,12 @@ import 'chrome://resources/cr_elements/cr_shared_style.css.js';
 import type {SyncBrowserProxy, SyncStatus} from '/shared/settings/people_page/sync_browser_proxy.js';
 import {SyncBrowserProxyImpl} from '/shared/settings/people_page/sync_browser_proxy.js';
 import type {CrDialogElement} from 'chrome://resources/cr_elements/cr_dialog/cr_dialog.js';
-import type {CrLinkRowElement} from 'chrome://resources/cr_elements/cr_link_row/cr_link_row.js';
 import {WebUiListenerMixin} from 'chrome://resources/cr_elements/web_ui_listener_mixin.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {OpenWindowProxyImpl} from 'chrome://resources/js/open_window_proxy.js';
 import {sanitizeInnerHtml} from 'chrome://resources/js/parse_html_subset.js';
 import {PolymerElement} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 
-import {PasswordManagerImpl, PasswordManagerPage} from '../autofill_page/password_manager_proxy.js';
 import type {MetricsBrowserProxy} from '../metrics_browser_proxy.js';
 import {MetricsBrowserProxyImpl} from '../metrics_browser_proxy.js';
 
@@ -36,7 +34,6 @@ import {getTemplate} from './other_google_data_dialog.html.js';
 export interface SettingsOtherGoogleDataDialogElement {
   $: {
     dialog: CrDialogElement,
-    passwordManagerLink: CrLinkRowElement,
   };
 }
 
@@ -113,14 +110,6 @@ export class SettingsOtherGoogleDataDialogElement extends
 
   private onBackOrCancelClick_() {
     this.$.dialog.cancel();
-  }
-
-  private onPasswordManagerClick_() {
-    PasswordManagerImpl.getInstance().showPasswordManager(
-        PasswordManagerPage.PASSWORDS);
-
-    this.metricsBrowserProxy_.recordAction(
-        'Settings.DeleteBrowsingData.PasswordManagerLinkClick');
   }
 
   private onMyActivityLinkClick_() {

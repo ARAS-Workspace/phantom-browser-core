@@ -73,14 +73,12 @@
 #include "chrome/browser/ui/webui/settings/import_data_handler.h"
 #include "chrome/browser/ui/webui/settings/metrics_reporting_handler.h"
 #include "chrome/browser/ui/webui/settings/on_startup_handler.h"
-#include "chrome/browser/ui/webui/settings/password_manager_handler.h"
 #include "chrome/browser/ui/webui/settings/people_handler.h"
 #include "chrome/browser/ui/webui/settings/performance_handler.h"
 #include "chrome/browser/ui/webui/settings/profile_info_handler.h"
 #include "chrome/browser/ui/webui/settings/protocol_handlers_handler.h"
 #include "chrome/browser/ui/webui/settings/reset_settings_handler.h"
 #include "chrome/browser/ui/webui/settings/safety_hub_handler.h"
-#include "chrome/browser/ui/webui/settings/saved_info_handler.h"
 #include "chrome/browser/ui/webui/settings/search_engines_handler.h"
 #include "chrome/browser/ui/webui/settings/security_settings_provider.h"
 #include "chrome/browser/ui/webui/settings/settings_clear_browsing_data_handler.h"
@@ -287,12 +285,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
   AddSettingsPageUIHandler(std::make_unique<SecurityKeysCredentialHandler>());
   AddSettingsPageUIHandler(
       std::make_unique<SecurityKeysBioEnrollmentHandler>());
-  AddSettingsPageUIHandler(std::make_unique<PasswordManagerHandler>());
-  AddSettingsPageUIHandler(std::make_unique<SavedInfoHandler>(profile));
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-  AddSettingsPageUIHandler(std::make_unique<PasskeysHandler>());
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
   InitBrowserSettingsWebUIHandlers();
 #else

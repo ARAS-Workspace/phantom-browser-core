@@ -185,9 +185,6 @@ class SafetyHubHandler : public settings::SettingsPageUIHandler,
   // Returns the data for Safe Browsing card.
   void HandleGetSafeBrowsingCardData(const base::ListValue& args);
 
-  // Returns the data for the password card.
-  void HandleGetPasswordCardData(const base::ListValue& args);
-
   // Returns the data for the version card.
   void HandleGetVersionCardData(const base::ListValue& args);
 

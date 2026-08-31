@@ -461,20 +461,6 @@ void SafetyHubHandler::HandleGetNumberOfExtensionsThatNeedReview(
                             base::Value(GetNumberOfExtensionsThatNeedReview()));
 }
 
-void SafetyHubHandler::HandleGetPasswordCardData(const base::ListValue& args) {
-  AllowJavascript();
-
-  CHECK_EQ(1U, args.size());
-  const base::Value& callback_id = args[0];
-
-  PasswordStatusCheckService* service =
-      PasswordStatusCheckServiceFactory::GetForProfile(profile_);
-  CHECK(service);
-
-  ResolveJavascriptCallback(callback_id,
-                            base::Value(service->GetPasswordCardData()));
-}
-
 void SafetyHubHandler::HandleGetVersionCardData(const base::ListValue& args) {
   AllowJavascript();
 
@@ -685,10 +671,6 @@ void SafetyHubHandler::RegisterMessages() {
   web_ui()->RegisterMessageCallback(
       "getSafeBrowsingCardData",
       base::BindRepeating(&SafetyHubHandler::HandleGetSafeBrowsingCardData,
-                          base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "getPasswordCardData",
-      base::BindRepeating(&SafetyHubHandler::HandleGetPasswordCardData,
                           base::Unretained(this)));
   web_ui()->RegisterMessageCallback(
       "getVersionCardData",

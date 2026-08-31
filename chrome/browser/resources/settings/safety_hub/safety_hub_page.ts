@@ -25,7 +25,6 @@ import {WebUiListenerMixin} from 'chrome://resources/cr_elements/web_ui_listener
 import {assertNotReached} from 'chrome://resources/js/assert.js';
 import {PolymerElement} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 
-import {PasswordManagerImpl, PasswordManagerPage} from '../autofill_page/password_manager_proxy.js';
 import type {MetricsBrowserProxy, SafetyHubCardState} from '../metrics_browser_proxy.js';
 import {MetricsBrowserProxyImpl, SafetyHubModuleType, SafetyHubSurfaces} from '../metrics_browser_proxy.js';
 import {RelaunchMixin, RestartType} from '../relaunch_mixin.js';
@@ -41,7 +40,6 @@ import {getTemplate} from './safety_hub_page.html.js';
 
 export interface SettingsSafetyHubPageElement {
   $: {
-    passwords: HTMLElement,
     safeBrowsing: HTMLElement,
     version: HTMLElement,
   };
@@ -62,9 +60,6 @@ export class SettingsSafetyHubPageElement extends
 
   static get properties() {
     return {
-      // The object that holds data of Password Check card.
-      passwordCardData_: Object,
-
       // The object that holds data of Version Check card.
       versionCardData_: Object,
 
@@ -125,12 +120,11 @@ export class SettingsSafetyHubPageElement extends
 
   static get observers() {
     return [
-      'onAllModulesLoaded_(passwordCardData_, versionCardData_, safeBrowsingCardData_, hasDataForUnusedPermissions_, hasDataForNotificationPermissions_, hasDataForExtensions_)',
+      'onAllModulesLoaded_(versionCardData_, safeBrowsingCardData_, hasDataForUnusedPermissions_, hasDataForNotificationPermissions_, hasDataForExtensions_)',
       'onSafeBrowsingPrefChanged_(prefs.generated.safe_browsing)',
     ];
   }
 
-  declare private passwordCardData_: CardInfo;
   declare private versionCardData_: CardInfo;
   declare private safeBrowsingCardData_: CardInfo;
   declare private showNotificationPermissions_: boolean;
@@ -187,10 +181,6 @@ export class SettingsSafetyHubPageElement extends
 
   private initializeCards_() {
     // TODO(crbug.com/40267370): Add listeners for Password and Version cards.
-    this.browserProxy_.getPasswordCardData().then((data: CardInfo) => {
-      this.passwordCardData_ = data;
-    });
-
     this.browserProxy_.getSafeBrowsingCardData().then((data: CardInfo) => {
       this.safeBrowsingCardData_ = data;
     });
@@ -245,23 +235,6 @@ export class SettingsSafetyHubPageElement extends
         icon: 'cr:security',
       },
     ];
-  }
-
-  private onPasswordsClick_() {
-    this.metricsBrowserProxy_.recordSafetyHubCardStateClicked(
-        'Settings.SafetyHub.PasswordsCard.StatusOnClick',
-        this.passwordCardData_.state as unknown as SafetyHubCardState);
-    this.browserProxy_.recordSafetyHubInteraction();
-
-    PasswordManagerImpl.getInstance().showPasswordManager(
-        PasswordManagerPage.CHECKUP);
-  }
-
-  private onPasswordsKeyPress_(e: KeyboardEvent) {
-    e.stopPropagation();
-    if (this.isEnterOrSpaceClicked_(e)) {
-      this.onPasswordsClick_();
-    }
   }
 
   private onVersionClick_() {
@@ -385,8 +358,7 @@ export class SettingsSafetyHubPageElement extends
     }
 
     // Wait till the data of the cards be ready.
-    if (!this.passwordCardData_ || !this.safeBrowsingCardData_ ||
-        !this.versionCardData_) {
+    if (!this.safeBrowsingCardData_ || !this.versionCardData_) {
       return;
     }
 
@@ -400,12 +372,6 @@ export class SettingsSafetyHubPageElement extends
     this.shouldRecordMetric_ = false;
     let hasAnyWarning: boolean = false;
     // TODO(crbug.com/40267370): Iterate over the cards/modules with for loop.
-    if (this.passwordCardData_.state !== CardState.SAFE) {
-      this.metricsBrowserProxy_.recordSafetyHubModuleWarningImpression(
-          SafetyHubModuleType.PASSWORDS);
-      hasAnyWarning = true;
-    }
-
     if (this.safeBrowsingCardData_.state !== CardState.SAFE) {
       this.metricsBrowserProxy_.recordSafetyHubModuleWarningImpression(
           SafetyHubModuleType.SAFE_BROWSING);

@@ -23,7 +23,6 @@ export interface PageVisibility {
   reset?: boolean;
   safetyHub?: boolean;
   system?: boolean;
-  yourSavedInfo?: boolean;
 }
 
 export interface AppearancePageVisibility {
@@ -64,7 +63,6 @@ function createPageVisibility(): PageVisibility|undefined {
     reset: false,
     safetyHub: false,
     system: false,
-    yourSavedInfo: false,
   };
   // </if>
   // <if expr="is_chromeos">
@@ -92,7 +90,6 @@ function createPageVisibility(): PageVisibility|undefined {
     extensions: false,
     languages: true,
     performance: false,
-    yourSavedInfo: false,
   };
   // </if>
 

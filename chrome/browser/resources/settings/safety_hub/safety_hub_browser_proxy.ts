@@ -150,9 +150,6 @@ export interface SafetyHubBrowserProxy {
    */
   dismissActiveMenuNotification(): void;
 
-  /** Gets data for the password top card. */
-  getPasswordCardData(): Promise<CardInfo>;
-
   /** Gets data for the Safe Browsing top card. */
   getSafeBrowsingCardData(): Promise<CardInfo>;
 
@@ -226,10 +223,6 @@ export class SafetyHubBrowserProxyImpl implements SafetyHubBrowserProxy {
 
   dismissActiveMenuNotification() {
     chrome.send('dismissActiveMenuNotification');
-  }
-
-  getPasswordCardData() {
-    return sendWithPromise<CardInfo>('getPasswordCardData');
   }
 
   getSafeBrowsingCardData() {
