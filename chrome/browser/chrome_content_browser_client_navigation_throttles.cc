@@ -37,7 +37,6 @@
 #include "chrome/browser/supervised_user/supervised_user_google_auth_navigation_throttle.h"
 #include "chrome/browser/ui/blocked_content/tab_under_navigation_throttle.h"
 #include "chrome/browser/ui/login/login_navigation_throttle.h"
-#include "chrome/browser/ui/passwords/password_manager_navigation_throttle.h"
 #include "chrome/browser/ui/passwords/well_known_change_password_navigation_throttle.h"
 #include "chrome/browser/ui/web_applications/navigation_capturing_redirection_throttle.h"
 #include "chrome/common/chrome_features.h"
@@ -414,8 +413,6 @@ void CreateAndAddChromeThrottlesForNavigation(
 
   WellKnownChangePasswordNavigationThrottle::MaybeCreateAndAdd(registry);
 
-  PasswordManagerNavigationThrottle::MaybeCreateAndAdd(registry);
-
   content::BrowserContext* context =
       handle.GetWebContents()->GetBrowserContext();
   registry.AddThrottle(std::make_unique<PolicyBlocklistNavigationThrottle>(
@@ -597,7 +594,6 @@ void CreateAndAddChromeThrottlesForNavigation(
         registry);
   }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-
 
   MaybeCreateAndAddVisitedLinkNavigationThrottle(registry);
 

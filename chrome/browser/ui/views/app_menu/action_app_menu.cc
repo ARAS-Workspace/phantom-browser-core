@@ -56,10 +56,6 @@ void ActionAppMenu::CreateMenuHierarchy(actions::ActionItem* root) {
 
   // Your Chrome Children Setup
   chrome_ptr->AddChild(app_menu::CreateAppMenuIndirectActionItem(
-      kActionShowPasswordManager, app_menu::DisplayType::kRow,
-      your_chrome_background));
-
-  chrome_ptr->AddChild(app_menu::CreateAppMenuIndirectActionItem(
       kActionShowHistory, app_menu::DisplayType::kRow, your_chrome_background));
 
   chrome_ptr->AddChild(app_menu::CreateAppMenuIndirectActionItem(

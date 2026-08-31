@@ -72,7 +72,6 @@
 #include "chrome/browser/ui/managed_ui.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/page_info/page_info_dialog.h"
-#include "chrome/browser/ui/passwords/ui_utils.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
 #include "chrome/browser/ui/profiles/profile_view_utils.h"
 #include "chrome/browser/ui/read_anything/read_anything_controller.h"
@@ -116,7 +115,6 @@
 #include "components/enterprise/isolated_mode/settings.h"
 #include "components/input/native_web_keyboard_event.h"
 #include "components/lens/buildflags.h"
-#include "components/password_manager/core/browser/manage_passwords_referrer.h"
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/sessions/content/session_tab_helper.h"
@@ -563,7 +561,6 @@ void BrowserCommandController::GlicActiveInstanceChanged(
     glic::GlicInstance* instance) {
   UpdateGlicState();
 }
-
 
 void BrowserCommandController::FindBarVisibilityChanged() {
   // Block find command updates in locked fullscreen mode unless the instance is
@@ -1283,11 +1280,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
       break;
     case IDC_EDIT_SEARCH_ENGINES:
       ShowSearchEngineSettings(webui::GetBrowserForOpeningWebUi(browser_));
-      break;
-    case IDC_VIEW_PASSWORDS:
-      NavigateToManagePasswordsPage(
-          webui::GetBrowserForOpeningWebUi(browser_),
-          password_manager::ManagePasswordsReferrer::kChromeMenuItem);
       break;
     case IDC_CLEAR_BROWSING_DATA: {
       if (profile()->IsIncognitoProfile()) {
@@ -2405,7 +2397,6 @@ void BrowserCommandController::UpdateCommandsForFullscreenMode() {
 #endif
 
   command_updater_->UpdateCommandEnabled(IDC_EDIT_SEARCH_ENGINES, show_main_ui);
-  command_updater_->UpdateCommandEnabled(IDC_VIEW_PASSWORDS, show_main_ui);
   command_updater_->UpdateCommandEnabled(IDC_ABOUT, show_main_ui);
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   command_updater_->UpdateCommandEnabled(IDC_CHROME_TIPS, show_main_ui);

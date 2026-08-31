@@ -99,6 +99,8 @@ void BrowserCommandHandler::CanExecuteCommand(
   bool can_execute = false;
   switch (static_cast<Command>(command_id)) {
     case Command::kUnknownCommand:
+    case Command::kOpenPasswordManager:
+    case Command::kStartPasswordManagerTutorial:
       // Nothing to do.
       break;
     case Command::kOpenSafetyCheck:
@@ -124,9 +126,6 @@ void BrowserCommandHandler::CanExecuteCommand(
     case Command::kStartSavedTabGroupTutorial:
       can_execute = TutorialServiceExists() && BrowserSupportsTabGroups();
       break;
-    case Command::kOpenPasswordManager:
-      can_execute = true;
-      break;
     case Command::kNoOpCommand:
       can_execute = true;
       break;
@@ -135,9 +134,6 @@ void BrowserCommandHandler::CanExecuteCommand(
       break;
     case Command::kOpenNTPAndStartCustomizeChromeTutorial:
       can_execute = TutorialServiceExists() && DefaultSearchProviderIsGoogle();
-      break;
-    case Command::kStartPasswordManagerTutorial:
-      can_execute = TutorialServiceExists();
       break;
     case Command::kOpenAISettings:
       can_execute = true;
@@ -216,9 +212,6 @@ void BrowserCommandHandler::HandleCommandWithDisposition(
     case Command::kStartSavedTabGroupTutorial:
       StartTabGroupTutorial();
       break;
-    case Command::kOpenPasswordManager:
-      OpenPasswordManager();
-      break;
     case Command::kNoOpCommand:
       // Nothing to do.
       break;
@@ -228,9 +221,6 @@ void BrowserCommandHandler::HandleCommandWithDisposition(
       break;
     case Command::kOpenNTPAndStartCustomizeChromeTutorial:
       OpenNTPAndStartCustomizeChromeTutorial();
-      break;
-    case Command::kStartPasswordManagerTutorial:
-      StartPasswordManagerTutorial();
       break;
     case Command::kOpenAISettings:
       OpenAISettings();
@@ -306,11 +296,6 @@ void BrowserCommandHandler::NavigateToEnhancedProtectionSetting() {
       safe_browsing::SafeBrowsingSettingReferralMethod::kPromoSlingerReferral);
 }
 
-void BrowserCommandHandler::OpenPasswordManager() {
-  chrome::ShowPasswordManager(ProfileBrowserCollection::GetForProfile(profile_)
-                                  ->GetLastActiveBrowser());
-}
-
 void BrowserCommandHandler::OpenAISettings() {
   chrome::ShowSettingsSubPage(
       ProfileBrowserCollection::GetForProfile(profile_)->GetLastActiveBrowser(),
@@ -341,16 +326,6 @@ void BrowserCommandHandler::OpenNTPAndStartCustomizeChromeTutorial() {
     params.target_url = chrome::ChromeUINewTabPageURLAsGURL();
     StartTutorial(std::move(params));
   }
-}
-
-void BrowserCommandHandler::StartPasswordManagerTutorial() {
-  auto* tutorial_id = kPasswordManagerTutorialId;
-
-  StartTutorialInPage::Params params;
-  params.tutorial_id = tutorial_id;
-  params.callback = base::BindOnce(&BrowserCommandHandler::OnTutorialStarted,
-                                   base::Unretained(this), tutorial_id);
-  StartTutorial(std::move(params));
 }
 
 void BrowserCommandHandler::StartSavedTabGroupTutorial() {

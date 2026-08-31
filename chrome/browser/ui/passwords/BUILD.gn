@@ -6,7 +6,6 @@ source_set("passwords") {
   sources = [
     "account_avatar_fetcher.h",
     "manage_passwords_state.h",
-    "password_manager_navigation_throttle.h",
     "ui_utils.h",
     "well_known_change_password_navigation_throttle.h",
   ]
@@ -66,7 +65,6 @@ source_set("impl") {
   sources = [
     "account_avatar_fetcher.cc",
     "manage_passwords_state.cc",
-    "password_manager_navigation_throttle.cc",
     "ui_utils.cc",
     "well_known_change_password_navigation_throttle.cc",
   ]
@@ -276,7 +274,6 @@ source_set("unit_tests") {
       "manage_passwords_ui_controller_unittest.cc",
       "password_cross_domain_confirmation_popup_controller_impl_unittest.cc",
       "password_generation_popup_controller_impl_unittest.cc",
-      "password_manager_navigation_throttle_unittest.cc",
       "remote_actor_selection_dialog_controller_unittest.cc",
       "well_known_change_password_navigation_throttle_unittest.cc",
     ]

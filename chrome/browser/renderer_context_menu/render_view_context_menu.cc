@@ -575,7 +575,6 @@ int UmaEnumForCommand(int key, UmaEnumIdLookupType type) {
        {IDC_CONTENT_CONTEXT_OPEN_WITH1 + 13, 87},
        {IDC_CONTENT_CONTEXT_EXIT_FULLSCREEN, 88},
        {IDC_CONTENT_CONTEXT_OPENLINKBOOKMARKAPP, 89},
-       {IDC_CONTENT_CONTEXT_SHOWALLSAVEDPASSWORDS, 90},
        {IDC_CONTENT_CONTEXT_PICTUREINPICTURE, 91},
        {IDC_CONTENT_CONTEXT_EMOJI, 92},
        {IDC_CONTENT_CONTEXT_START_SMART_SELECTION_ACTION1, 93},
@@ -3594,7 +3593,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
     case kOpenLinkWithMenuId:
     case IDC_CONTENT_CONTEXT_PROTOCOL_HANDLER_SETTINGS:
     case IDC_CONTENT_CONTEXT_GENERATEPASSWORD:
-    case IDC_CONTENT_CONTEXT_SHOWALLSAVEDPASSWORDS:
     case IDC_CONTENT_CONTEXT_USE_PASSKEY_FROM_ANOTHER_DEVICE:
       return true;
 
@@ -4181,11 +4179,6 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
               source_web_contents_));
       break;
 
-    case IDC_CONTENT_CONTEXT_SHOWALLSAVEDPASSWORDS:
-      NavigateToManagePasswordsPage(
-          GetBrowser(),
-          password_manager::ManagePasswordsReferrer::kPasswordContextMenu);
-      break;
     case IDC_CONTENT_CONTEXT_USE_PASSKEY_FROM_ANOTHER_DEVICE:
       webauthn::OnPasskeyFromAnotherDeviceContextMenuItemSelected(
           GetRenderFrameHost());

@@ -118,7 +118,6 @@
 #include "chrome/browser/ui/page_info/page_info_dialog.h"
 #include "chrome/browser/ui/passwords/manage_passwords_ui_controller.h"
 #include "chrome/browser/ui/passwords/passwords_model_delegate.h"
-#include "chrome/browser/ui/passwords/ui_utils.h"
 #include "chrome/browser/ui/performance_controls/memory_saver_bubble_controller.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
 #include "chrome/browser/ui/read_anything/read_anything_entry_point_controller.h"
@@ -196,7 +195,6 @@
 #include "components/multistep_filter/core/features.h"
 #include "components/omnibox/browser/omnibox_field_trial.h"
 #include "components/omnibox/browser/vector_icons.h"
-#include "components/password_manager/core/browser/manage_passwords_referrer.h"
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/prefs/pref_member.h"
 #include "components/prefs/pref_service.h"
@@ -2353,21 +2351,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           base::BindRepeating(
               [](BrowserWindowInterface* bwi, actions::ActionItem* item,
                  actions::ActionInvocationContext context) {
-                chrome::ShowPasswordManager(bwi);
-              },
-              bwi),
-          kActionShowPasswordManager, IDS_VIEW_PASSWORDS, IDS_VIEW_PASSWORDS,
-          features::IsRoundedIconsEnabled()
-              ? vector_icons::kPasswordManagerIcon
-              : vector_icons::kPasswordManagerOldIcon)
-          .SetEnabled(!profile->IsGuestSession())
-          .Build());
-
-  root_action_item_->AddChild(
-      ChromeMenuAction(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
                 chrome::ShowPaymentMethods(bwi);
               },
               bwi),
@@ -3662,19 +3645,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               },
               bwi))
           .SetActionId(kActionEditSearchEngines)
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                NavigateToManagePasswordsPage(
-                    bwi,
-                    password_manager::ManagePasswordsReferrer::kChromeMenuItem);
-              },
-              bwi))
-          .SetActionId(kActionViewPasswords)
           .Build());
 
   root_action_item_->AddChild(
