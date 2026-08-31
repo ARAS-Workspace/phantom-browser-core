@@ -28,6 +28,10 @@ void InitializeMac() {
     // Chrome is unusable for a long period after returning from sleep.
     // https://crbug.com/41406192.
     @"NSAppSleepDisabled" : @YES,
+
+    // Keep AppKit from inserting its own "Start Dictation..." item into the
+    // Edit menu; this browser has no speech surface for it to sit beside.
+    @"NSDisabledDictationMenuItem" : @YES,
   }];
 
   // Disable NSAutoFillHeuristicController on macOS 26.0 and 26.1. On those OS

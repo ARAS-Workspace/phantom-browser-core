@@ -281,15 +281,7 @@ NSMenuItem* BuildEditMenu(NSApplication* nsapp,
                       Item(IDS_EDIT_CAPITALIZE_MAC)
                           .action(@selector(capitalizeWord:)),
               }),
-              Item(IDS_SPEECH_MAC)
-                  .submenu({
-                      Item(IDS_SPEECH_START_SPEAKING_MAC)
-                          .action(@selector(startSpeaking:)),
-                      Item(IDS_SPEECH_STOP_SPEAKING_MAC)
-                          .action(@selector(stopSpeaking:)),
-              }),
-            // The "Start Dictation..." and "Emoji & Symbols" items are
-            // inserted by AppKit.
+            // The "Emoji & Symbols" item is inserted by AppKit.
           })
           .Build();
   // clang-format on
