@@ -2003,15 +2003,6 @@ void AuthenticatorRequestDialogController::PopulateMechanisms() {
     transports_to_list_if_active.push_back(AuthenticatorTransport::kInternal);
   }
 
-  const auto kCable = AuthenticatorTransport::kHybrid;
-  const bool windows_handles_hybrid = WebAuthnApiSupportsHybrid();
-  bool include_add_phone_option = false;
-
-  if (model_->cable_qr_string.has_value() &&
-      transport_availability_.available_transports.contains(kCable)) {
-    include_add_phone_option = !windows_handles_hybrid;
-  }
-
   if (!is_get_assertion &&
       enclave_enabled_status_ == EnclaveEnabledStatus::kEnabled &&
       *transport_availability_.make_credential_attachment !=
@@ -2076,32 +2067,10 @@ void AuthenticatorRequestDialogController::PopulateMechanisms() {
     AddWindowsButton(windows_button_label->first, windows_button_label->second);
   }
 
-  // If the new UI is enabled, only show USB as an option if the QR code is
-  // not available, if tapping it would trigger a prompt to enable BLE, or if
-  // hints suggest that hybrid and USB should be separate options.
   const bool include_usb_option =
       transport_availability_.available_transports.contains(
-          AuthenticatorTransport::kUsbHumanInterfaceDevice) &&
-      (!include_add_phone_option ||
-       transport_availability_.ble_status != BleStatus::kOn ||
-       hints_.transport == AuthenticatorTransport::kUsbHumanInterfaceDevice ||
-       hints_.transport == AuthenticatorTransport::kHybrid);
+          AuthenticatorTransport::kUsbHumanInterfaceDevice);
 
-  if (include_add_phone_option) {
-    model_->show_security_key_on_qr_sheet =
-        transport_availability_.available_transports.contains(
-            AuthenticatorTransport::kUsbHumanInterfaceDevice) &&
-        !include_usb_option;
-    std::u16string label = l10n_util::GetStringUTF16(
-        GetHybridButtonLabel(model_->show_security_key_on_qr_sheet));
-    Mechanism::Type mechanism_type = Mechanism::Hybrid();
-    model_->mechanisms.emplace_back(
-        mechanism_type, label,
-        GetMechanismIcon(mechanism_type, ui_presentation()),
-        base::BindRepeating(
-            &AuthenticatorRequestDialogController::StartHybridFlow,
-            base::Unretained(this)));
-  }
   if (include_usb_option) {
     transports_to_list_if_active.push_back(
         AuthenticatorTransport::kUsbHumanInterfaceDevice);
