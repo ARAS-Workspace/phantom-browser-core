@@ -1844,8 +1844,8 @@ void BrowserCommandController::InitCommandState() {
   command_updater_->UpdateCommandEnabled(kFindAndEditMenuId, true);
   command_updater_->UpdateCommandEnabled(kSaveAndShareMenuId, true);
   command_updater_->UpdateCommandEnabled(IDC_SHOW_READING_MODE_SIDE_PANEL,
-                                         true);
-  command_updater_->UpdateCommandEnabled(IDC_SHOW_READING_MODE_KEYBOARD, true);
+                                         false);
+  command_updater_->UpdateCommandEnabled(IDC_SHOW_READING_MODE_KEYBOARD, false);
   command_updater_->UpdateCommandEnabled(IDC_SHOW_CUSTOMIZE_CHROME_SIDE_PANEL,
                                          true);
   command_updater_->UpdateCommandEnabled(IDC_SHOW_CUSTOMIZE_CHROME_TOOLBAR,
