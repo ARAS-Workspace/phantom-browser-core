@@ -508,13 +508,6 @@
           on-change="onSecureDnsToggleClick_">
       </settings-secure-dns>
     </template>
-    <template is="dom-if" if="[[enableSecurityKeysSubpage_]]">
-      <cr-link-row id="securityKeysSubpageTrigger"
-          label="$i18n{securityKeysTitle}" sub-label="$i18n{securityKeysDesc}"
-          on-click="onSecurityKeysClick_"
-          role-description="$i18n{subpageArrowRoleDescription}">
-      </cr-link-row>
-    </template>
     <cr-link-row id="manageCertificatesLinkRow"
         role-description="$i18n{subpageArrowRoleDescription}"
         label="$i18n{manageCertificates}"

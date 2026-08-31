@@ -276,15 +276,6 @@
         sub-label="[[javascriptOptimizerSubLabel_]]"
         role-description="$i18n{subpageArrowRoleDescription}">
     </cr-link-row>
-    <template is="dom-if" if="[[enableSecurityKeysSubpage_]]">
-        <cr-link-row id="securityKeysSubpageTrigger" class="hr"
-            label="$i18n{securityKeysTitle}"
-            sub-label="$i18n{securityKeysDesc}"
-            on-click="onSecurityKeysClick_"
-            role-description="$i18n{subpageArrowRoleDescription}">
-        </cr-link-row>
-    </template>
-
     <cr-link-row id="manageCertificatesLinkRow" class="hr"
         role-description="$i18n{subpageArrowRoleDescription}"
         label="$i18n{manageCertificates}"

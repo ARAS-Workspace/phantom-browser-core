@@ -163,14 +163,6 @@ export class SettingsSecurityPageElement extends
         },
       },
 
-      enableSecurityKeysSubpage_: {
-        type: Boolean,
-        readOnly: true,
-        value() {
-          return loadTimeData.getBoolean('enableSecurityKeysSubpage');
-        },
-      },
-
       enableHashPrefixRealTimeLookups_: {
         type: Boolean,
         value() {
@@ -223,7 +215,6 @@ export class SettingsSecurityPageElement extends
   declare private showSecureDnsSettingLink_: boolean;
   // </if>
 
-  declare private enableSecurityKeysSubpage_: boolean;
   declare private showDisableSafebrowsingDialog_: boolean;
   declare private enableHashPrefixRealTimeLookups_: boolean;
   declare private httpsFirstModeUncheckedValues_: HttpsFirstModeSetting[];
@@ -492,10 +483,6 @@ export class SettingsSecurityPageElement extends
     Router.getInstance().navigateTo(routes.SITE_SETTINGS_JAVASCRIPT_OPTIMIZER);
   }
 
-  private onSecurityKeysClick_() {
-    Router.getInstance().navigateTo(routes.SECURITY_KEYS);
-  }
-
   private onEnhancedProtectionLearnMoreClick_(e: Event) {
     OpenWindowProxyImpl.getInstance().openUrl(
         loadTimeData.getString('enhancedProtectionHelpCenterURL'));
@@ -627,10 +614,6 @@ export class SettingsSecurityPageElement extends
         '#javascriptOptimizerSettingLink',
       ],
     ]);
-
-    if (routes.SECURITY_KEYS) {
-      map.set(routes.SECURITY_KEYS.path, '#securityKeysSubpageTrigger');
-    }
 
     return map;
   }

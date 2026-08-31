@@ -161,8 +161,6 @@
 
 #if BUILDFLAG(IS_WIN)
 #include "chrome/browser/startup/startup_features.h"
-#include "device/fido/public/features.h"
-#include "device/fido/win/webauthn_api.h"
 #endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_LINUX)
@@ -4386,126 +4384,6 @@ void AddExtensionsStrings(content::WebUIDataSource* html_source) {
                                   IDS_SETTINGS_EXTENSIONS_CHECKBOX_LABEL);
 }
 
-void AddSecurityKeysStrings(content::WebUIDataSource* html_source) {
-  static constexpr webui::LocalizedString kSecurityKeysStrings[] = {
-      {"securityBundleResetToDefaultsButtonLabel",
-       IDS_SETTINGS_SECURITY_BUNDLE_RESET_TO_DEFAULTS_BUTTON_LABEL},
-      {"securityKeysBioEnrollmentAddTitle",
-       IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_ADD_TITLE},
-      {"securityKeysBioEnrollmentDelete",
-       IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_DELETE},
-      {"securityKeysBioEnrollmentDialogTitle",
-       IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_DIALOG_TITLE},
-      {"securityKeysBioEnrollmentEnrollingCompleteLabel",
-       IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_ENROLLING_COMPLETE_LABEL},
-      {"securityKeysBioEnrollmentEnrollingLabel",
-       IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_ENROLLING_LABEL},
-      {"securityKeysBioEnrollmentEnrollingFailedLabel",
-       IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_FAILED_LABEL},
-      {"securityKeysBioEnrollmentStorageFullLabel",
-       IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_STORAGE_FULL},
-      {"securityKeysBioEnrollmentTryAgainLabel",
-       IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_TRY_AGAIN_LABEL},
-      {"securityKeysBioEnrollmentEnrollmentsLabel",
-       IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_ENROLLMENTS_LABEL},
-      {"securityKeysBioEnrollmentNoEnrollmentsLabel",
-       IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_NO_ENROLLMENTS_LABEL},
-      {"securityKeysBioEnrollmentSubpageDescription",
-       IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_SUBPAGE_DESCRIPTION},
-      {"securityKeysBioEnrollmentSubpageLabel",
-       IDS_SETTINGS_SECURITY_KEYS_BIO_ENROLLMENT_SUBPAGE_LABEL},
-      {"securityKeysBioEnrollmentChooseName",
-       IDS_SETTINGS_SECURITY_KEYS_BIO_CHOOSE_NAME},
-      {"securityKeysBioEnrollmentNameLabel",
-       IDS_SETTINGS_SECURITY_KEYS_BIO_NAME_LABEL},
-      {"securityKeysBioEnrollmentNameLabelTooLong",
-       IDS_SETTINGS_SECURITY_KEYS_BIO_NAME_LABEL_TOO_LONG},
-      {"securityKeysConfirmPIN", IDS_SETTINGS_SECURITY_KEYS_CONFIRM_PIN},
-      {"securityKeysCredentialManagementDesc",
-       IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_DESC},
-      {"securityKeysCredentialManagementConfirmDeleteTitle",
-       IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_CONFIRM_DELETE_TITLE},
-      {"securityKeysCredentialManagementDialogTitle",
-       IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_DIALOG_TITLE},
-      {"securityKeysUpdateCredentialDialogTitle",
-       IDS_SETTINGS_SECURITY_KEYS_UPDATE_CREDENTIAL_DIALOG_TITLE},
-      {"securityKeysCredentialWebsiteLabel",
-       IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_WEBSITE_LABEL},
-      {"securityKeysCredentialUsernameLabel",
-       IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_USERNAME_LABEL},
-      {"securityKeysCredentialDisplayNameLabel",
-       IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_DISPLAYNAME_LABEL},
-      {"securityKeysCredentialManagementLabel",
-       IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_LABEL},
-      {"securityKeysCredentialManagementConfirmDeleteCredential",
-       IDS_SETTINGS_SECURITY_KEYS_CREDENTIAL_MANAGEMENT_CONFIRM_DELETE_CREDENTIAL},
-      {"securityKeysInputTooLong",
-       IDS_SETTINGS_SECURITY_KEYS_INPUT_ERROR_TOO_LONG},
-      {"securityKeysCurrentPIN", IDS_SETTINGS_SECURITY_KEYS_CURRENT_PIN},
-      {"securityKeysCurrentPINIntro",
-       IDS_SETTINGS_SECURITY_KEYS_CURRENT_PIN_INTRO},
-      {"securityKeysDesc", IDS_SETTINGS_SECURITY_KEYS_DESC},
-      {"securityKeysHidePINs", IDS_SETTINGS_SECURITY_KEYS_HIDE_PINS},
-      {"securityKeysNewPIN", IDS_SETTINGS_SECURITY_KEYS_NEW_PIN},
-      {"securityKeysNoPIN", IDS_SETTINGS_SECURITY_KEYS_NO_PIN},
-      {"securityKeysNoReset", IDS_SETTINGS_SECURITY_KEYS_NO_RESET},
-      {"securityKeysPIN", IDS_SETTINGS_SECURITY_KEYS_PIN},
-      {"securityKeysPINError", IDS_SETTINGS_SECURITY_KEYS_PIN_ERROR},
-      {"securityKeysPINHardLock", IDS_SETTINGS_SECURITY_KEYS_PIN_HARD_LOCK},
-      {"securityKeysPINIncorrect", IDS_SETTINGS_SECURITY_KEYS_PIN_INCORRECT},
-      {"securityKeysPINIncorrectRetriesPl",
-       IDS_SETTINGS_SECURITY_KEYS_PIN_INCORRECT_RETRIES_PL},
-      {"securityKeysPINIncorrectRetriesSin",
-       IDS_SETTINGS_SECURITY_KEYS_PIN_INCORRECT_RETRIES_SIN},
-      {"securityKeysPINMismatch",
-       IDS_SETTINGS_SECURITY_KEYS_PIN_ERROR_MISMATCH},
-      {"securityKeysPINPrompt", IDS_SETTINGS_SECURITY_KEYS_PIN_PROMPT},
-      {"securityKeysPINSoftLock", IDS_SETTINGS_SECURITY_KEYS_PIN_SOFT_LOCK},
-      {"securityKeysPINSuccess", IDS_SETTINGS_SECURITY_KEYS_PIN_SUCCESS},
-      {"securityKeysPINTooLong", IDS_SETTINGS_SECURITY_KEYS_PIN_ERROR_TOO_LONG},
-      {"securityKeysPINTooShort",
-       IDS_SETTINGS_SECURITY_KEYS_PIN_ERROR_TOO_SHORT_SMALL},
-      {"securityKeysReset", IDS_SETTINGS_SECURITY_KEYS_RESET},
-      {"securityKeysResetConfirmTitle",
-       IDS_SETTINGS_SECURITY_KEYS_RESET_CONFIRM_TITLE},
-      {"securityKeysResetDesc", IDS_SETTINGS_SECURITY_KEYS_RESET_DESC},
-      {"securityKeysResetError", IDS_SETTINGS_SECURITY_KEYS_RESET_ERROR},
-      {"securityKeysResetNotAllowed",
-       IDS_SETTINGS_SECURITY_KEYS_RESET_NOTALLOWED},
-      {"securityKeysResetStep1", IDS_SETTINGS_SECURITY_KEYS_RESET_STEP1},
-      {"securityKeysResetStep2", IDS_SETTINGS_SECURITY_KEYS_RESET_STEP2},
-      {"securityKeysResetSuccess", IDS_SETTINGS_SECURITY_KEYS_RESET_SUCCESS},
-      {"securityKeysResetTitle", IDS_SETTINGS_SECURITY_KEYS_RESET_TITLE},
-      {"securityKeysSetPIN", IDS_SETTINGS_SECURITY_KEYS_SET_PIN},
-      {"securityKeysSetPINChangeTitle",
-       IDS_SETTINGS_SECURITY_KEYS_SET_PIN_CHANGE_TITLE},
-      {"securityKeysSetPINConfirm", IDS_SETTINGS_SECURITY_KEYS_SET_PIN_CONFIRM},
-      {"securityKeysSetPINCreateTitle",
-       IDS_SETTINGS_SECURITY_KEYS_SET_PIN_CREATE_TITLE},
-      {"securityKeysSetPINDesc", IDS_SETTINGS_SECURITY_KEYS_SET_PIN_DESC},
-      {"securityKeysSetPINInitialTitle",
-       IDS_SETTINGS_SECURITY_KEYS_SET_PIN_INITIAL_TITLE},
-      {"securityKeysShowPINs", IDS_SETTINGS_SECURITY_KEYS_SHOW_PINS},
-      {"securityKeysTitle", IDS_SETTINGS_SECURITY_KEYS_TITLE},
-      {"securityKeysTouchToContinue",
-       IDS_SETTINGS_SECURITY_KEYS_TOUCH_TO_CONTINUE},
-      {"securityKeysSetPinButton", IDS_SETTINGS_SECURITY_KEYS_SET_PIN_BUTTON},
-      {"securityKeysSamePINAsCurrent",
-       IDS_SETTINGS_SECURITY_KEYS_SAME_PIN_AS_CURRENT},
-  };
-  html_source->AddLocalizedStrings(kSecurityKeysStrings);
-  bool win_native_api_available = false;
-#if BUILDFLAG(IS_WIN)
-  win_native_api_available =
-      base::FeatureList::IsEnabled(device::kWebAuthUseNativeWinApi) &&
-      device::WinWebAuthnApi::GetDefault()->IsAvailable();
-#endif
-  html_source->AddBoolean("enableSecurityKeysSubpage",
-                          !win_native_api_available);
-  html_source->AddBoolean("enableSecurityKeysBioEnrollment",
-                          !win_native_api_available);
-}
-
 void AddShortcutInputStrings(content::WebUIDataSource* html_source) {
   static constexpr webui::LocalizedString kShortcutInputStrings[] = {
       {"shortcutIncludeStartModifier", IDS_SHORTCUT_INCLUDE_START_MODIFIER},
@@ -4561,7 +4439,6 @@ void AddLocalizedStrings(content::WebUIDataSource* html_source,
 #endif
 
   policy_indicator::AddLocalizedStrings(html_source);
-  AddSecurityKeysStrings(html_source);
 
   html_source->UseStringsJs();
 }

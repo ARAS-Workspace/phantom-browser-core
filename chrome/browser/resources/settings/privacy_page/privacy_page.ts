@@ -218,7 +218,6 @@ export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
         triggerId = 'thirdPartyCookiesLinkRow';
         break;
       case 'security':
-      case 'securityKeys':
         triggerId = 'securityLinkRow';
         break;
       case 'siteSettings':

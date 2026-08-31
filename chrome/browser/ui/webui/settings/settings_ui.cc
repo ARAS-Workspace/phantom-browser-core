@@ -86,7 +86,6 @@
 #include "chrome/browser/ui/webui/settings/settings_media_devices_selection_handler.h"
 #include "chrome/browser/ui/webui/settings/settings_page_ui_handler.h"
 #include "chrome/browser/ui/webui/settings/settings_secure_dns_handler.h"
-#include "chrome/browser/ui/webui/settings/settings_security_key_handler.h"
 #include "chrome/browser/ui/webui/settings/settings_startup_pages_handler.h"
 #include "chrome/browser/ui/webui/settings/shared_settings_localized_strings_provider.h"
 #include "chrome/browser/ui/webui/settings/site_settings_handler.h"
@@ -280,11 +279,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
   AddSettingsPageUIHandler(std::make_unique<SecureDnsHandler>());
   AddSettingsPageUIHandler(std::make_unique<SiteSettingsHandler>(profile));
   AddSettingsPageUIHandler(std::make_unique<StartupPagesHandler>(web_ui));
-  AddSettingsPageUIHandler(std::make_unique<SecurityKeysPINHandler>());
-  AddSettingsPageUIHandler(std::make_unique<SecurityKeysResetHandler>());
-  AddSettingsPageUIHandler(std::make_unique<SecurityKeysCredentialHandler>());
-  AddSettingsPageUIHandler(
-      std::make_unique<SecurityKeysBioEnrollmentHandler>());
 #if BUILDFLAG(IS_CHROMEOS)
   InitBrowserSettingsWebUIHandlers();
 #else
@@ -429,8 +423,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
 
   // Add a handler to provide pluralized strings.
   auto plural_string_handler = std::make_unique<PluralStringHandler>();
-  plural_string_handler->AddLocalizedString("securityKeysNewPIN",
-                                            IDS_SETTINGS_SECURITY_KEYS_NEW_PIN);
   plural_string_handler->AddLocalizedString(
       "safetyHubExtensionsReviewLabel",
       IDS_SETTINGS_SAFETY_CHECK_REVIEW_EXTENSIONS);

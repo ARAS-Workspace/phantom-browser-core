@@ -124,12 +124,6 @@ export class SettingsPrivacyPageIndexElement extends
         value: () => loadTimeData.getBoolean('enablePersistentPermissions'),
       },
 
-      enableSecurityKeysSubpage_: {
-        type: Boolean,
-        readOnly: true,
-        value: () => loadTimeData.getBoolean('enableSecurityKeysSubpage'),
-      },
-
       // <if expr="is_chromeos">
       enableSmartCardReadersContentSetting_: {
         type: Boolean,
@@ -199,7 +193,6 @@ export class SettingsPrivacyPageIndexElement extends
   declare private enableLocalNetworkAccessSetting_: boolean;
   declare private enablePaymentHandlerContentSetting_: boolean;
   declare private enablePersistentPermissions_: boolean;
-  declare private enableSecurityKeysSubpage_: boolean;
   declare private enableWebAppInstallation_: boolean;
   declare private enableWebBluetoothNewPermissionsBackend_: boolean;
 

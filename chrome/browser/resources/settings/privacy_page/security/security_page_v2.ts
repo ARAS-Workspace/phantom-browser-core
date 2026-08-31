@@ -207,14 +207,6 @@ export class SettingsSecurityPageV2Element extends
         }),
       },
 
-      enableSecurityKeysSubpage_: {
-        type: Boolean,
-        readOnly: true,
-        value() {
-          return loadTimeData.getBoolean('enableSecurityKeysSubpage');
-        },
-      },
-
       enableBundledSecuritySettingsSecureDnsV2_: {
         type: Boolean,
         value: () =>
@@ -277,7 +269,6 @@ export class SettingsSecurityPageV2Element extends
   // Keep in alphabetical order.
   declare private currentSafeBrowsingSetting_: SafeBrowsingSetting;
   declare private enableBundledSecuritySettingsSecureDnsV2_: boolean;
-  declare private enableSecurityKeysSubpage_: boolean;
   declare private httpsFirstModeUncheckedValues_: HttpsFirstModeSetting[];
   declare private httpsFirstModeStateTextMap_: Object;
   declare private isResettingToDefaults_: boolean;
@@ -604,10 +595,6 @@ export class SettingsSecurityPageV2Element extends
         PrivacyElementInteractions.MANAGE_CERTIFICATES);
     OpenWindowProxyImpl.getInstance().openUrl(
         loadTimeData.getString('certManagementV2URL'));
-  }
-
-  private onSecurityKeysClick_() {
-    Router.getInstance().navigateTo(routes.SECURITY_KEYS);
   }
 
   private onAdvancedProtectionProgramClick_(e: Event) {

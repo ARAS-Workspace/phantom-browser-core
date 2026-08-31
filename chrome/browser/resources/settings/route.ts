@@ -32,10 +32,6 @@ function addPrivacyChildRoutes(r: Partial<SettingsRoutes>) {
 
   r.COOKIES = r.PRIVACY.createChild('/cookies');
 
-  if (loadTimeData.getBoolean('enableSecurityKeysSubpage')) {
-    r.SECURITY_KEYS = r.SECURITY.createChild('/securityKeys');
-  }
-
   r.SITE_SETTINGS_ALL = r.SITE_SETTINGS.createChild('all');
   r.SITE_SETTINGS_SITE_DETAILS =
       r.SITE_SETTINGS_ALL.createChild('/content/siteDetails');

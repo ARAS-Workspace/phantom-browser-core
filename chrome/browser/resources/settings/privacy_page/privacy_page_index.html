@@ -78,17 +78,6 @@
     </template>
   </template>
 
-  <template is="dom-if" if="[[enableSecurityKeysSubpage_]]">
-    <template is="dom-if" if="[[renderView_(
-        routes_.SECURITY_KEYS, currentRoute, inSearchMode)]]"
-        update-when-false>
-      <security-keys-subpage slot="view" id="securityKeys"
-        data-parent-view-id="privacy"
-        route-path$="[[routes_.SECURITY_KEYS.path]]">
-      </security-keys-subpage>
-    </template>
-  </template>
-
   <template is="dom-if" if="[[renderView_(
       routes_.SITE_SETTINGS, currentRoute, inSearchMode)]]"
       update-when-false>
