@@ -293,38 +293,7 @@ bool ChromePasswordManagerClient::IsSavingAndFillingEnabled(
 bool ChromePasswordManagerClient::IsFillingEnabled(
     const url::Origin& origin,
     base::optional_ref<const GURL> url) const {
-  if (origin.opaque() &&
-      base::FeatureList::IsEnabled(
-          password_manager::features::kPasswordBlockOpaqueOrigins)) {
-    return false;
-  }
-
-  const Profile* profile =
-      Profile::FromBrowserContext(web_contents()->GetBrowserContext());
-  // Guest profiles don't have PasswordStore at all, so filling should be
-  // disabled for them.
-  if (!profile || profile->IsGuestSession()) {
-    return false;
-  }
-
-  // Filling is impossible if password store in unavailable.
-  if (!GetProfilePasswordStore()) {
-    return false;
-  }
-
-  const bool ssl_errors = net::IsCertStatusError(GetMainFrameCertStatus());
-  autofill::LogManager* log_manager = GetOrCreateLogManager();
-  if (log_manager && log_manager->IsLoggingActive()) {
-    password_manager::BrowserSavePasswordProgressLogger logger(log_manager);
-    logger.LogBoolean(Logger::STRING_SSL_ERRORS_PRESENT, ssl_errors);
-  }
-
-  if (url && !base::FeatureList::IsEnabled(
-                 password_manager::features::kPasswordBlockOpaqueOrigins)) {
-    return !ssl_errors && IsPasswordManagementEnabledForCurrentPage(*url);
-  }
-  return !ssl_errors &&
-         IsPasswordManagementEnabledForCurrentPage(origin.GetURL());
+  return false;
 }
 
 bool ChromePasswordManagerClient::IsFieldFilledWithOtp(
