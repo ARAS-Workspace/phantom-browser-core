@@ -1863,8 +1863,6 @@ void BrowserCommandController::InitCommandState() {
                                          true);
   command_updater_->UpdateCommandEnabled(IDC_SEND_TAB_TO_SELF, false);
   command_updater_->UpdateCommandEnabled(IDC_QRCODE_GENERATOR, false);
-  command_updater_->UpdateCommandEnabled(kPasswordsAndAutofillMenuId,
-                                         !guest_session);
   command_updater_->UpdateCommandEnabled(IDC_SAFETY_HUB_SHOW_PASSWORD_CHECKUP,
                                          !guest_session);
   command_updater_->UpdateCommandEnabled(IDC_SHOW_PAYMENT_METHODS,

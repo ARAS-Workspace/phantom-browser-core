@@ -103,7 +103,6 @@
 #include "chrome/browser/ui/views/js_optimization/js_optimizations_page_action_controller.h"
 #include "chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_page_action_controller.h"
 #include "chrome/browser/ui/views/location_bar/lens_overlay_homework_page_action_controller.h"
-#include "chrome/browser/ui/views/passwords/manage_passwords_page_action_controller.h"
 #include "chrome/browser/ui/views/side_panel/customize_chrome/side_panel_controller_views.h"
 #include "chrome/browser/ui/views/side_panel/extensions/extension_side_panel_manager.h"
 #include "chrome/browser/ui/views/translate/translate_page_action_controller.h"
@@ -246,12 +245,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
         GetUserDataFactory()
             .CreateInstance<commerce::PriceInsightsPageActionViewController>(
                 tab, tab, *page_action_controller_);
-  }
-
-  if (page_action_controller_->ActionExists(kActionShowPasswordsBubbleOrPage)) {
-    manage_passwords_page_action_controller_ =
-        std::make_unique<ManagePasswordsPageActionController>(
-            *page_action_controller_);
   }
 
   if (page_action_controller_->ActionExists(kActionShowCookieControls)) {

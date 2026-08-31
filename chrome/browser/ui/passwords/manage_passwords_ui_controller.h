@@ -268,9 +268,6 @@ class ManagePasswordsUIController
   // Called when the manage passwords icon needs to be shown and it sets the
   // state of the icon, and shows the associated bubble without user
   // interaction.
-  void UpdatePasswordIconAndBubbleState(
-      ManagePasswordsPageActionController* controller,
-      actions::ActionItem* passwords_action_item);
 
   // Called to create the account chooser dialog. Mocked in tests.
   virtual std::unique_ptr<AccountChooserPrompt> CreateAccountChooser(

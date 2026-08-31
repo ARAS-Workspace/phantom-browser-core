@@ -1469,38 +1469,6 @@ void BrowserActions::InitializeChromeMenuActions() {
                  actions::ActionInvocationContext context) {
                 auto page_action_trigger =
                     context.GetProperty(page_actions::kPageActionTriggerKey);
-                // If triggered by omnibox page action, do nothing.
-                if (page_action_trigger !=
-                    page_actions::kInvalidPageActionTrigger) {
-                  return;
-                }
-
-                auto* controller = autofill::AddressBubblesIconController::Get(
-                    tab_strip_model->GetActiveWebContents());
-                if (controller && controller->GetBubbleView()) {
-                  controller->GetBubbleView()->Hide();
-                } else {
-                  chrome::ShowAddresses(bwi);
-                }
-              },
-              bwi, tab_strip_model),
-          kActionShowAddressesBubbleOrPage,
-          IDS_ADDRESSES_AND_MORE_SUBMENU_OPTION,
-          IDS_ADDRESSES_AND_MORE_SUBMENU_OPTION,
-          features::IsRoundedIconsEnabled()
-              ? vector_icons::kLocationOnIcon
-              : vector_icons::kLocationOnChromeRefreshOldIcon)
-          .SetEnabled(!is_guest_session)
-          .Build());
-
-  root_action_item_->AddChild(
-      ChromeMenuAction(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, TabStripModel* tab_strip_model,
-                 actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                auto page_action_trigger =
-                    context.GetProperty(page_actions::kPageActionTriggerKey);
                 // When page action is migrated, clicking on the omnibox page
                 // should not close the bubble or navigate to `Payment Methods`
                 // settings page.
@@ -1552,38 +1520,6 @@ void BrowserActions::InitializeChromeMenuActions() {
             .SetVisible(ShouldShowChromeLabsUI(profile))
             .Build());
   }
-
-  root_action_item_->AddChild(
-      ChromeMenuAction(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, TabStripModel* tab_strip_model,
-                 actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                content::WebContents* const web_contents =
-                    tab_strip_model->GetActiveWebContents();
-                if (PasswordsModelDelegateFromWebContents(web_contents)
-                        ->GetState() == password_manager::ui::INACTIVE_STATE) {
-                  chrome::ShowPasswordManager(bwi);
-                } else {
-                  auto* const controller =
-                      ManagePasswordsUIController::FromWebContents(
-                          web_contents);
-                  if (controller->IsShowingBubble()) {
-                    controller->HideBubble(
-                        /*initiated_by_bubble_manager=*/false);
-                  } else {
-                    chrome::ManagePasswordsForPage(bwi);
-                  }
-                }
-              },
-              bwi, tab_strip_model),
-          kActionShowPasswordsBubbleOrPage, IDS_VIEW_PASSWORDS,
-          IDS_VIEW_PASSWORDS,
-          features::IsRoundedIconsEnabled()
-              ? vector_icons::kPasswordManagerIcon
-              : vector_icons::kPasswordManagerOldIcon)
-          .SetEnabled(!is_guest_session)
-          .Build());
 
   root_action_item_->AddChild(
       actions::ActionItem::Builder(

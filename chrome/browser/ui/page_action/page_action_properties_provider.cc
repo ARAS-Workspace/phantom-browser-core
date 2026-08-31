@@ -165,14 +165,6 @@ constexpr auto kPageActionProperties = base::MakeFixedFlatMap<
         },
     },
     {
-        kActionShowPasswordsBubbleOrPage,
-        {
-            .histogram_name = "ManagePasswords",
-            .type = PageActionIconType::kManagePasswords,
-            .element_identifier = kPasswordsOmniboxKeyIconElementId,
-        },
-    },
-    {
         kActionShowCollaborationRecentActivity,
         {
             .histogram_name = "ShowCollaborationRecentActivity",

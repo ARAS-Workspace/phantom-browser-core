@@ -33,7 +33,6 @@
 #include "chrome/browser/sync/sync_ui_util.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/autofill/bubble_manager.h"
-#include "chrome/browser/ui/browser_actions.h"
 #include "chrome/browser/ui/browser_command_controller.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window.h"
@@ -56,11 +55,9 @@
 #include "chrome/browser/ui/simple_message_box.h"
 #include "chrome/browser/ui/singleton_tabs.h"
 #include "chrome/browser/ui/tab_dialogs.h"
-#include "chrome/browser/ui/tabs/public/tab_features.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
-#include "chrome/browser/ui/views/passwords/manage_passwords_page_action_controller.h"
 #include "chrome/browser/ui/views/passwords/password_bubble_view_base.h"
 #include "chrome/browser/web_applications/web_app_utils.h"
 #include "chrome/common/url_constants.h"
@@ -96,7 +93,6 @@
 #include "components/signin/public/base/signin_switches.h"
 #include "components/signin/public/identity_manager/account_info.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
-#include "components/tabs/public/tab_interface.h"
 #include "components/user_education/common/feature_promo/feature_promo_controller.h"
 #include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/web_contents.h"
@@ -1234,83 +1230,6 @@ void ManagePasswordsUIController::UpdateBubbleAndIconVisibility() {
 
   // If Actor is operating on the tab, suppress all popups.
   if (passwords_data_.client()->IsActorTaskActive()) {
-    ClearPopUpFlagForBubble();
-  }
-
-  BrowserWindowInterface* browser =
-      GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
-          web_contents());
-  if (!browser) {
-    return;
-  }
-
-  tabs::TabInterface* const tab_interface =
-      tabs::TabInterface::MaybeGetFromContents(web_contents());
-  // The tab interface can be null if the web contents is not a tab.
-  if (!tab_interface) {
-    return;
-  }
-  tabs::TabFeatures* const tab_features = tab_interface->GetTabFeatures();
-  // During tab teardown, TabFeatures is destroyed before WebContents.
-  // Destroying other tab features (like ReadAnything) can trigger
-  // visibility changes on the WebContents, which calls this method
-  // when TabFeatures is already gone.
-  if (!tab_features) {
-    return;
-  }
-  // Retrieve the controller responsible for managing the page action's
-  // visibility and state.
-  ManagePasswordsPageActionController* const controller =
-      tab_features->manage_passwords_page_action_controller();
-  // Get the action item associated with the passwords UI.
-  actions::ActionItem* passwords_action_item =
-      actions::ActionManager::Get().FindAction(
-          kActionShowPasswordsBubbleOrPage,
-          BrowserActions::From(browser)->root_action_item());
-  UpdatePasswordIconAndBubbleState(controller, passwords_action_item);
-}
-
-void ManagePasswordsUIController::UpdatePasswordIconAndBubbleState(
-    ManagePasswordsPageActionController* controller,
-    actions::ActionItem* passwords_action_item) {
-  password_manager::ui::State state = GetState();
-  // If the UI state has changed since the last update,
-  // close the current bubble to ensure that the UI reflects the new state.
-  if (state != last_page_action_state_) {
-    PasswordBubbleViewBase::CloseCurrentBubble();
-  }
-  // Update the last known state.
-  last_page_action_state_ = state;
-  // Determine whether the bubble should be shown automatically based on
-  // current conditions.
-  const bool show_bubble =
-      IsAutomaticallyOpeningBubble() ||
-      bubble_status_ == BubbleStatus::SHOULD_POP_UP_WITH_FOCUS;
-  // If the bubble is not to be shown, and there's a dialog controller active
-  // and the state is Credential Request, force the state to inactive to
-  // prevent icon from being active.
-  if (!show_bubble && dialog_controller_ &&
-      state == password_manager::ui::CREDENTIAL_REQUEST_STATE) {
-    state = password_manager::ui::INACTIVE_STATE;
-  }
-
-  // If the auto sign-in toast is shown (Unified UI), hide the icon.
-  if (state == password_manager::ui::AUTO_SIGNIN_STATE &&
-      base::FeatureList::IsEnabled(
-          password_manager::features::kCredentialManagementUnifiedUi)) {
-    state = password_manager::ui::INACTIVE_STATE;
-  }
-
-  // Update the visibility of the page action based on the current state
-  // and the passwords action item.
-  controller->UpdateVisibility(state, *this, *passwords_action_item);
-
-  if (show_bubble) {
-    PasswordBubbleViewBase::CloseCurrentBubble();
-    // This will detach any existing bubble so OnBubbleHidden() isn't called.
-    weak_ptr_factory_.InvalidateWeakPtrs();
-    QueueOrShowBubble(/*user_action=*/false);
-    // If the bubble appeared then the status is updated in OnBubbleShown().
     ClearPopUpFlagForBubble();
   }
 }

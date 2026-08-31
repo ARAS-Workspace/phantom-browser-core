@@ -859,47 +859,7 @@ void ProfileSubMenuModel::BuildManageGoogleAccountRow(Profile* profile) {
 }
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 
-class PasswordsAndAutofillSubMenuModel : public ui::SimpleMenuModel {
- public:
-  explicit PasswordsAndAutofillSubMenuModel(
-      ui::SimpleMenuModel::Delegate* delegate);
-  PasswordsAndAutofillSubMenuModel(const PasswordsAndAutofillSubMenuModel&) =
-      delete;
-  PasswordsAndAutofillSubMenuModel& operator=(
-      const PasswordsAndAutofillSubMenuModel&) = delete;
-  ~PasswordsAndAutofillSubMenuModel() override = default;
-};
 
-PasswordsAndAutofillSubMenuModel::PasswordsAndAutofillSubMenuModel(
-    ui::SimpleMenuModel::Delegate* delegate)
-    : SimpleMenuModel(delegate) {
-  AddItemWithStringIdAndVectorIcon(this, IDC_SHOW_PAYMENT_METHODS,
-                                   IDS_YOUR_SAVED_INFO_PAYMENTS_SUBMENU_OPTION,
-                                   features::IsRoundedIconsEnabled()
-                                       ? kCreditCardIcon
-                                       : kCreditCardChromeRefreshOldIcon);
-
-  AddItemWithStringIdAndVectorIcon(
-      this, IDC_SHOW_CONTACT_INFO,
-      IDS_YOUR_SAVED_INFO_CONTACT_INFO_SUBMENU_OPTION,
-      features::IsRoundedIconsEnabled()
-          ? vector_icons::kLocationOnIcon
-          : vector_icons::kLocationOnChromeRefreshOldIcon);
-  SetElementIdentifierAt(GetIndexOfCommandId(IDC_SHOW_CONTACT_INFO).value(),
-                         AppMenuModel::kContactInfoMenuItem);
-  AddItemWithStringIdAndVectorIcon(
-      this, IDC_SHOW_IDENTITY_DOCS, IDS_IDENTITY_DOCS_SUBMENU_OPTION,
-      features::IsRoundedIconsEnabled() ? vector_icons::kIdCardIcon
-                                        : vector_icons::kIdCardOldIcon);
-  SetElementIdentifierAt(GetIndexOfCommandId(IDC_SHOW_IDENTITY_DOCS).value(),
-                         AppMenuModel::kIdentityDocsMenuItem);
-  AddItemWithStringIdAndVectorIcon(
-      this, IDC_SHOW_TRAVEL, IDS_TRAVEL_SUBMENU_OPTION,
-      features::IsRoundedIconsEnabled() ? vector_icons::kTripIcon
-                                        : vector_icons::kTripOldIcon);
-  SetElementIdentifierAt(GetIndexOfCommandId(IDC_SHOW_TRAVEL).value(),
-                         AppMenuModel::kTravelMenuItem);
-}
 
 class FindAndEditSubMenuModel : public ui::SimpleMenuModel {
  public:
@@ -2259,19 +2219,6 @@ void AppMenuModel::Build() {
   AddSeparator(ui::SPACING_SEPARATOR);
 #endif
 
-  if (!browser_->GetProfile()->IsGuestSession()) {
-    sub_menus_.push_back(
-        std::make_unique<PasswordsAndAutofillSubMenuModel>(this));
-    AddSubMenuWithStringIdAndVectorIcon(
-        this, kPasswordsAndAutofillMenuPlaceholder,
-        IDS_PASSWORDS_AND_AUTOFILL_MENU, sub_menus_.back().get(),
-        features::IsRoundedIconsEnabled()
-            ? vector_icons::kPasswordManagerIcon
-            : vector_icons::kPasswordManagerOldIcon);
-    SetElementIdentifierAt(
-        GetIndexOfCommandId(kPasswordsAndAutofillMenuPlaceholder).value(),
-        kPasswordAndAutofillMenuItem);
-  }
 
   if (!browser_->GetProfile()->IsOffTheRecord()) {
     auto recent_tabs_sub_menu =

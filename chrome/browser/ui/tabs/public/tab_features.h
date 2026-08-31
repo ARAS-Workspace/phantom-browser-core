@@ -49,7 +49,6 @@ class JsOptimizationsPageActionController;
 class LensOverlayController;
 class LensOverlayHomeworkPageActionController;
 class LensSearchController;
-class ManagePasswordsPageActionController;
 class MemorySaverChipTabHelper;
 class NewTabPagePreloadPipelineManager;
 class PinnedTranslateActionListener;
@@ -297,11 +296,6 @@ class TabFeatures {
     return file_system_access_page_action_controller_.get();
   }
 
-  ManagePasswordsPageActionController*
-  manage_passwords_page_action_controller() {
-    return manage_passwords_page_action_controller_.get();
-  }
-
   zoom::ZoomViewController* zoom_view_controller() {
     return zoom_view_controller_.get();
   }
@@ -472,10 +466,6 @@ class TabFeatures {
   // Responsible for managing all page actions of a tab. Other controllers
   // interact with this to have their feature's page action shown.
   std::unique_ptr<page_actions::PageActionController> page_action_controller_;
-
-  // Responsible for managing the "Manage Passwords" page action.
-  std::unique_ptr<ManagePasswordsPageActionController>
-      manage_passwords_page_action_controller_;
 
   // Responsible for managing the "Translate" page action.
   std::unique_ptr<TranslatePageActionController>
