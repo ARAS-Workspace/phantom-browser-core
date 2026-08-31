@@ -236,7 +236,7 @@ void SetCreditCardFIDOAuthEnabled(PrefService* prefs, bool enabled) {
 }
 
 bool IsAutofillPaymentMethodsEnabled(const PrefService* prefs) {
-  return prefs->GetBoolean(kAutofillCreditCardEnabled);
+  return false;
 }
 
 void SetAutofillPaymentMethodsEnabled(PrefService* prefs, bool enabled) {
@@ -266,7 +266,7 @@ bool IsAutofillTypesBlockedManaged(const PrefService* prefs) {
 }
 
 bool IsAutofillProfileEnabled(const PrefService* prefs) {
-  return prefs->GetBoolean(kAutofillProfileEnabled);
+  return false;
 }
 
 void SetAutofillProfileEnabled(PrefService* prefs, bool enabled) {
