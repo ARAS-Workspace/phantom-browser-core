@@ -9,7 +9,6 @@
 #include "base/observer_list.h"
 #include "base/timer/elapsed_timer.h"
 #include "components/password_manager/core/browser/leak_detection/bulk_leak_check.h"
-#include "components/password_manager/core/browser/leak_detection/leak_detection_check_factory_impl.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
 namespace password_manager {
@@ -72,7 +71,7 @@ BulkLeakCheckService::BulkLeakCheckService(
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory)
     : identity_manager_(identity_manager),
       url_loader_factory_(std::move(url_loader_factory)),
-      leak_check_factory_(std::make_unique<LeakDetectionCheckFactoryImpl>()) {}
+      leak_check_factory_(nullptr) {}
 
 BulkLeakCheckService::~BulkLeakCheckService() = default;
 
@@ -102,8 +101,10 @@ void BulkLeakCheckService::CheckUsernamePasswordPairs(
     return;
   }
 
-  bulk_leak_check_ = leak_check_factory_->TryCreateBulkLeakCheck(
-      this, identity_manager_, url_loader_factory_);
+  bulk_leak_check_ = leak_check_factory_
+                         ? leak_check_factory_->TryCreateBulkLeakCheck(
+                               this, identity_manager_, url_loader_factory_)
+                         : nullptr;
   if (!bulk_leak_check_) {
     // The factory may have called OnError() so the service contains the correct
     // error state.

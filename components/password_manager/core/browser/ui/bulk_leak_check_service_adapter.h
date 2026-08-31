@@ -8,7 +8,7 @@
 #include "base/memory/raw_ptr.h"
 #include "components/password_manager/core/browser/leak_detection/bulk_leak_check.h"
 #include "components/password_manager/core/browser/leak_detection/bulk_leak_check_service_interface.h"
-#include "components/password_manager/core/browser/leak_detection/leak_detection_request_utils.h"
+#include "components/password_manager/core/browser/leak_detection/leak_detection_types.h"
 #include "components/password_manager/core/browser/ui/saved_passwords_presenter.h"
 
 class PrefService;

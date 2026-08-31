@@ -58,14 +58,9 @@ class LeakDetectionCheck {
   static bool CanStartLeakCheck(
       const PrefService& prefs,
       const GURL& form_url,
-      std::unique_ptr<autofill::SavePasswordProgressLogger> logger);
-
- private:
-  // Leak check is blocked for domains from SafeBrowsingAllowlistDomains policy
-  static bool IsURLBlockedByPolicy(
-      const PrefService& prefs,
-      const GURL& form_url,
-      autofill::SavePasswordProgressLogger* logger);
+      std::unique_ptr<autofill::SavePasswordProgressLogger> logger) {
+    return false;
+  }
 };
 
 }  // namespace password_manager

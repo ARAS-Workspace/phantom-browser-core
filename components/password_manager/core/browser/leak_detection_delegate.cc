@@ -17,7 +17,6 @@
 #include "components/password_manager/core/browser/features/password_features.h"
 #include "components/password_manager/core/browser/form_parsing/form_data_parser.h"
 #include "components/password_manager/core/browser/leak_detection/leak_detection_check.h"
-#include "components/password_manager/core/browser/leak_detection/leak_detection_check_factory_impl.h"
 #include "components/password_manager/core/browser/leak_detection_delegate_helper.h"
 #include "components/password_manager/core/browser/leak_detection_dialog_utils.h"
 #include "components/password_manager/core/browser/password_change_service_interface.h"
@@ -102,8 +101,7 @@ LeakDetectionUrlType GetLeakDetectionUrlType(const GURL& url) {
 }  // namespace
 
 LeakDetectionDelegate::LeakDetectionDelegate(PasswordManagerClient* client)
-    : client_(client),
-      leak_factory_(std::make_unique<LeakDetectionCheckFactoryImpl>()) {}
+    : client_(client), leak_factory_(nullptr) {}
 
 LeakDetectionDelegate::~LeakDetectionDelegate() = default;
 
@@ -116,7 +114,8 @@ void LeakDetectionDelegate::StartLeakCheck(
     return;
   }
 
-  if (!LeakDetectionCheck::CanStartLeakCheck(*client_->GetPrefs(), form_url,
+  if (!leak_factory_ ||
+      !LeakDetectionCheck::CanStartLeakCheck(*client_->GetPrefs(), form_url,
                                              GetLogger(client_))) {
     return;
   }

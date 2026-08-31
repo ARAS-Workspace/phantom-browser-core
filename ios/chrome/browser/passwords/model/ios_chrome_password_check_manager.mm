@@ -123,8 +123,7 @@ void IOSChromePasswordCheckManager::StartPasswordCheck(
   if (is_initialized_) {
     IOSChromePasswordCheckManagerHolder data(
         scoped_refptr<IOSChromePasswordCheckManager>(this),
-        password_manager::ShouldTriggerBackendNotificationForInitiator(
-            password_check_initiator_));
+        password_manager::TriggerBackendNotification(false));
     bulk_leak_check_service_adapter_.StartBulkLeakCheck(
         password_check_initiator_, kPasswordCheckDataKey, &data);
 

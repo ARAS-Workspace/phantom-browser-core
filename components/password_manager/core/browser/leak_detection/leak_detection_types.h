@@ -44,6 +44,20 @@ enum class LeakDetectionUrlType {
 };
 // LINT.ThenChange(//tools/metrics/histograms/metadata/password/enums.xml:PasswordLeakDetectionUrlType)
 
+// These values are persisted to logs. Entries should not be renumbered and
+// numeric values should never be reused.
+enum class LeakDetectionInitiator {
+  kSignInCheck = 0,
+  kBulkSyncedPasswordsCheck = 1,
+  kEditCheck = 2,
+  kIGABulkSyncedPasswordsCheck = 3,
+  kClientUseCaseUnspecified = 4,
+  kDesktopProactivePasswordCheckup = 5,
+  kIosProactivePasswordCheckup = 6,
+  kIOSWebViewSignInCheck = 7,
+  kMaxValue = kIOSWebViewSignInCheck,
+};
+
 using IsLeaked = base::StrongAlias<class IsLeakedTag, bool>;
 
 }  // namespace password_manager

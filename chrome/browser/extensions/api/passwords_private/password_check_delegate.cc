@@ -352,10 +352,8 @@ void PasswordCheckDelegate::StartPasswordAnalyses(
   }
 
   password_check_progress_ = progress->GetWeakPtr();
-  PasswordCheckData data(
-      std::move(progress),
-      password_manager::ShouldTriggerBackendNotificationForInitiator(
-          password_check_initiator_));
+  PasswordCheckData data(std::move(progress),
+                         password_manager::TriggerBackendNotification(false));
 
   is_check_running_ = bulk_leak_check_service_adapter_.StartBulkLeakCheck(
       password_check_initiator_, kPasswordCheckDataKey, &data);

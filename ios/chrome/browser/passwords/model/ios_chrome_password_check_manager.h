@@ -16,7 +16,7 @@
 #import "base/sequence_checker.h"
 #import "base/time/time.h"
 #import "components/keyed_service/core/refcounted_keyed_service.h"
-#import "components/password_manager/core/browser/leak_detection/leak_detection_request_utils.h"
+#import "components/password_manager/core/browser/leak_detection/leak_detection_types.h"
 #import "components/password_manager/core/browser/ui/bulk_leak_check_service_adapter.h"
 #import "components/password_manager/core/browser/ui/credential_utils.h"
 #import "components/password_manager/core/browser/ui/insecure_credentials_manager.h"
