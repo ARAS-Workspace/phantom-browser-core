@@ -73,7 +73,7 @@ std::vector<std::unique_ptr<FidoDiscoveryBase>> FidoDiscoveryFactory::Create(
 
 std::optional<std::unique_ptr<FidoDiscoveryBase>>
 FidoDiscoveryFactory::MaybeCreateEnclaveDiscovery() {
-  return nullptr;
+  return std::nullopt;
 }
 
 bool FidoDiscoveryFactory::IsTestOverride() {
