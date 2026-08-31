@@ -31,7 +31,6 @@
 
 #include "base/memory/raw_ptr.h"
 #include "base/notreached.h"
-#include "base/rand_util.h"
 #include "base/synchronization/lock.h"
 #include "base/task/single_thread_task_runner.h"
 #include "base/time/time.h"
@@ -258,12 +257,6 @@ class PLATFORM_EXPORT NetworkStateNotifier {
   double RoundMbps(const String& host,
                    const std::optional<double>& downlink_mbps) const;
 
-  // Returns the randomization salt (weak and insecure) that should be used when
-  // adding noise to the network quality metrics. This is known only to the
-  // device, and is generated only once. This makes it possible to add the same
-  // amount of noise for a given origin.
-  uint8_t RandomizationSalt() const { return randomization_salt_; }
-
   // Returns the overriding effective connection type that should be returned to
   // the web consumers. If the returned value is null, then the actual network
   // quality value should be returned to the web consumers.
@@ -328,11 +321,6 @@ class PLATFORM_EXPORT NetworkStateNotifier {
                       NetworkStateObserver*,
                       scoped_refptr<base::SingleThreadTaskRunner>);
 
-  // A random number by which the RTT and downlink estimates are multiplied
-  // with. The returned random multiplier is a function of the hostname.
-  // Adding this noise reduces the chances of cross-origin fingerprinting.
-  double GetRandomMultiplier(const String& host) const;
-
   mutable base::Lock lock_;
   NetworkState state_ GUARDED_BY(lock_);
   bool has_override_ GUARDED_BY(lock_);
@@ -340,8 +328,6 @@ class PLATFORM_EXPORT NetworkStateNotifier {
 
   ObserverListMap connection_observers_;
   ObserverListMap on_line_state_observers_;
-
-  const uint8_t randomization_salt_ = base::RandIntInclusive(1, 20);
 };
 
 PLATFORM_EXPORT NetworkStateNotifier& GetNetworkStateNotifier();

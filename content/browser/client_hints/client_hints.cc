@@ -41,11 +41,9 @@
 #include "net/http/http_response_headers.h"
 #include "net/http/structured_headers.h"
 #include "net/nqe/effective_connection_type.h"
-#include "net/nqe/network_quality_estimator_params.h"
 #include "services/network/public/cpp/client_hints.h"
 #include "services/network/public/cpp/features.h"
 #include "services/network/public/cpp/is_potentially_trustworthy.h"
-#include "services/network/public/cpp/network_quality_tracker.h"
 #include "services/network/public/cpp/permissions_policy/client_hints_permissions_policy_mapping.h"
 #include "services/network/public/cpp/permissions_policy/permissions_policy.h"
 #include "services/network/public/cpp/permissions_policy/permissions_policy_declaration.h"
@@ -92,16 +90,14 @@ double RoundKbpsToMbps(const std::string& host,
   static const double kMaxDownlinkKbps = 10.0 * 1000;
 
   // If downlink is unavailable, return the fastest value.
-  double randomized_downlink_kbps = downlink_kbps.value_or(kMaxDownlinkKbps);
-  randomized_downlink_kbps =
-      std::min(randomized_downlink_kbps, kMaxDownlinkKbps);
+  double downlink =
+      std::min(downlink_kbps.value_or(kMaxDownlinkKbps), kMaxDownlinkKbps);
 
-  DCHECK_LE(0, randomized_downlink_kbps);
-  DCHECK_GE(kMaxDownlinkKbps, randomized_downlink_kbps);
+  DCHECK_LE(0, downlink);
+  DCHECK_GE(kMaxDownlinkKbps, downlink);
   // Round down to the nearest kGranularityKbps kbps value.
   double downlink_kbps_rounded =
-      std::round(randomized_downlink_kbps / kGranularityKbps) *
-      kGranularityKbps;
+      std::round(downlink / kGranularityKbps) * kGranularityKbps;
 
   // Convert from Kbps to Mbps.
   return downlink_kbps_rounded / 1000;
@@ -326,9 +322,7 @@ void AddViewportHeightHeader(net::HttpRequestHeaders* headers,
   }
 }
 
-void AddRttHeader(net::HttpRequestHeaders* headers,
-                  network::NetworkQualityTracker* network_quality_tracker,
-                  const GURL& url) {
+void AddRttHeader(net::HttpRequestHeaders* headers, const GURL& url) {
   DCHECK(headers);
 
   base::TimeDelta http_rtt = base::Milliseconds(50);
@@ -336,9 +330,7 @@ void AddRttHeader(net::HttpRequestHeaders* headers,
                  RoundRtt(url.GetHost(), http_rtt));
 }
 
-void AddDownlinkHeader(net::HttpRequestHeaders* headers,
-                       network::NetworkQualityTracker* network_quality_tracker,
-                       const GURL& url) {
+void AddDownlinkHeader(net::HttpRequestHeaders* headers, const GURL& url) {
   DCHECK(headers);
   int32_t downlink_throughput_kbps = 10 * 1000;
 
@@ -346,9 +338,7 @@ void AddDownlinkHeader(net::HttpRequestHeaders* headers,
                     RoundKbpsToMbps(url.GetHost(), downlink_throughput_kbps));
 }
 
-void AddEctHeader(net::HttpRequestHeaders* headers,
-                  network::NetworkQualityTracker* network_quality_tracker,
-                  const GURL& url) {
+void AddEctHeader(net::HttpRequestHeaders* headers, const GURL& url) {
   DCHECK(headers);
 
   int effective_connection_type =
@@ -790,16 +780,14 @@ void AddRequestClientHintsHeaders(
           data, network::mojom::WebClientHintsType::kViewportHeight)) {
     AddViewportHeightHeader(headers, context, url, frame_tree_node, delegate);
   }
-  network::NetworkQualityTracker* network_quality_tracker =
-      delegate->GetNetworkQualityTracker();
   if (ShouldAddClientHint(data, WebClientHintsType::kRtt_DEPRECATED)) {
-    AddRttHeader(headers, network_quality_tracker, url);
+    AddRttHeader(headers, url);
   }
   if (ShouldAddClientHint(data, WebClientHintsType::kDownlink_DEPRECATED)) {
-    AddDownlinkHeader(headers, network_quality_tracker, url);
+    AddDownlinkHeader(headers, url);
   }
   if (ShouldAddClientHint(data, WebClientHintsType::kEct_DEPRECATED)) {
-    AddEctHeader(headers, network_quality_tracker, url);
+    AddEctHeader(headers, url);
   }
 
   UpdateNavigationRequestClientUaHeadersImpl(

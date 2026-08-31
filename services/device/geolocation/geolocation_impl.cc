@@ -67,9 +67,7 @@ GeolocationImpl::~GeolocationImpl() {
   }
 }
 
-void GeolocationImpl::PauseUpdates() {
-  geolocation_subscription_ = {};
-}
+void GeolocationImpl::PauseUpdates() {}
 
 void GeolocationImpl::ResumeUpdates() {
   if (position_override_) {
@@ -81,7 +79,6 @@ void GeolocationImpl::ResumeUpdates() {
 }
 
 void GeolocationImpl::StartListeningForUpdates() {
-  effective_high_accuracy_ = high_accuracy_hint_ && has_precise_permission_;
   OnLocationUpdate(*position_override_);
 }
 
@@ -113,29 +110,7 @@ void GeolocationImpl::QueryNextPosition(QueryNextPositionCallback callback) {
 
 void GeolocationImpl::QueryCachedPosition(
     QueryCachedPositionCallback callback) {
-  if (position_override_) {
-    std::move(callback).Run(position_override_.Clone());
-    return;
-  }
-
-  mojom::GeopositionResultPtr result =
-      GeolocationProvider::GetInstance()->GetCachedPosition();
-
-  // If the cached position is precise but the client only has approximate
-  // permission, treat it as unavailable to avoid leaking precise location.
-  if (result && result->is_position() && result->get_position()->is_precise &&
-      !has_precise_permission_) {
-    result.reset();
-  }
-
-  if (result) {
-    std::move(callback).Run(std::move(result));
-    return;
-  }
-
-  std::move(callback).Run(
-      mojom::GeopositionResult::NewError(mojom::GeopositionError::New(
-          mojom::GeopositionErrorCode::kPositionUnavailable, "", "")));
+  std::move(callback).Run(position_override_.Clone());
 }
 
 void GeolocationImpl::SetOverride(const mojom::GeopositionResult& result) {
@@ -154,8 +129,6 @@ void GeolocationImpl::SetOverride(const mojom::GeopositionResult& result) {
       (result.is_position() && !ValidateGeoposition(*result.get_position()))) {
     ResumeUpdates();
   }
-
-  geolocation_subscription_ = {};
 
   OnLocationUpdate(*position_override_);
 }
@@ -176,7 +149,6 @@ void GeolocationImpl::OnPermissionUpdated(
               /*error_technical=*/"")));
       position_callback_.Reset();
     }
-    geolocation_subscription_ = {};
   } else {
     has_precise_permission_ =
         (permission_level == mojom::GeolocationPermissionLevel::kPrecise);

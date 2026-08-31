@@ -319,9 +319,6 @@ NetworkInformation::NetworkInformation(NavigatorBase& navigator)
 
   http_rtt_msec_ = GetNetworkStateNotifier().RoundRtt(Host(), http_rtt);
   downlink_mbps_ = GetNetworkStateNotifier().RoundMbps(Host(), downlink_mbps);
-
-  DCHECK_LE(1u, GetNetworkStateNotifier().RandomizationSalt());
-  DCHECK_GE(20u, GetNetworkStateNotifier().RandomizationSalt());
 }
 
 void NetworkInformation::Trace(Visitor* visitor) const {

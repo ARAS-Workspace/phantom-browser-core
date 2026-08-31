@@ -71,9 +71,6 @@ class GeolocationImpl : public mojom::Geolocation {
   // Owns this object.
   raw_ptr<GeolocationContext> context_;
 
-  // Token that unsubscribes from GeolocationProvider updates when destroyed.
-  base::CallbackListSubscription geolocation_subscription_;
-
   // The callback passed to QueryNextPosition.
   QueryNextPositionCallback position_callback_;
 
@@ -83,15 +80,8 @@ class GeolocationImpl : public mojom::Geolocation {
 
   mojom::GeopositionResultPtr current_result_;
 
-  // True if the client has requested high accuracy. The actual accuracy used
-  // is determined by `effective_high_accuracy_`, which also considers
-  // permission levels.
+  // True if the client has requested high accuracy.
   bool high_accuracy_hint_;
-
-  // Caches the last effective high accuracy value sent to the provider. A new
-  // subscription is initiated only if this value changes. `std::optional`
-  // ensures a subscription is always created on the very first update request.
-  std::optional<bool> effective_high_accuracy_;
 
   // True if requesting precise geolocation accuracy is permitted by the current
   // permission level.

@@ -367,10 +367,6 @@ String NetworkStateNotifier::EffectiveConnectionTypeToString(
       static_cast<size_t>(type));
 }
 
-double NetworkStateNotifier::GetRandomMultiplier(const String& host) const {
-  return 1.0;
-}
-
 uint32_t NetworkStateNotifier::RoundRtt(
     const String& host,
     const std::optional<base::TimeDelta>& rtt) const {
@@ -384,8 +380,7 @@ uint32_t NetworkStateNotifier::RoundRtt(
   constexpr auto kMaxRtt = base::Seconds(3);
   constexpr auto kGranularity = base::Milliseconds(50);
 
-  const base::TimeDelta modified_rtt =
-      std::min(rtt.value() * GetRandomMultiplier(host), kMaxRtt);
+  const base::TimeDelta modified_rtt = std::min(rtt.value(), kMaxRtt);
   DCHECK_GE(modified_rtt, base::TimeDelta());
   return static_cast<uint32_t>(
       modified_rtt.RoundToMultiple(kGranularity).InMilliseconds());
@@ -406,8 +401,6 @@ double NetworkStateNotifier::RoundMbps(
   } else {
     downlink_kbps = downlink_mbps.value() * 1000;
   }
-  downlink_kbps *= GetRandomMultiplier(host);
-
   downlink_kbps = std::min(downlink_kbps, kMaxDownlinkKbps);
 
   DCHECK_LE(0, downlink_kbps);
