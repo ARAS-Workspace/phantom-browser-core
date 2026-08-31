@@ -81,7 +81,6 @@ import './site_settings/web_applications_page.js';
 import './site_settings/window_management_page.js';
 import './site_settings/zoom_levels.js';
 // <if expr="not is_chromeos">
-import './a11y_page/live_caption.js';
 import './people_page/import_data_dialog.js';
 import './people_page/manage_profile.js';
 // </if>
@@ -91,7 +90,6 @@ import './people_page/signout_dialog.js';
 import './people_page/sync_controls_page.js';
 import './people_page/sync_page.js';
 // Sections
-import './a11y_page/a11y_page_index.js';
 import './downloads_page/downloads_page.js';
 // <if expr="is_chromeos">
 import './languages_page/languages_page_index_cros.js';
@@ -107,10 +105,6 @@ import './system_page/system_page.js';
 // </if>
 
 // <if expr="not is_chromeos">
-export {AxAnnotationsBrowserProxyImpl, ScreenAiInstallStatus} from '/shared/settings/a11y_page/ax_annotations_browser_proxy.js';
-export type {AxAnnotationsBrowserProxy} from '/shared/settings/a11y_page/ax_annotations_browser_proxy.js';
-export {CaptionsBrowserProxyImpl} from '/shared/settings/a11y_page/captions_browser_proxy.js';
-export type {CaptionsBrowserProxy, LiveCaptionLanguageList} from '/shared/settings/a11y_page/captions_browser_proxy.js';
 // </if>
 
 export {FontsBrowserProxyImpl} from '/shared/settings/appearance_page/fonts_browser_proxy.js';
@@ -134,15 +128,9 @@ export type {PageHandlerInterface} from 'chrome://resources/js/batch_upload_prom
 export {BatchUploadPromoProxyImpl} from 'chrome://resources/js/batch_upload_promo/batch_upload_promo_proxy.js';
 export type {BatchUploadPromoProxy} from 'chrome://resources/js/batch_upload_promo/batch_upload_promo_proxy.js';
 export type {IronListElement} from 'chrome://resources/polymer/v3_0/iron-list/iron-list.js';
-export {AccessibilityBrowserProxyImpl} from './a11y_page/a11y_browser_proxy.js';
-export type {AccessibilityBrowserProxy} from './a11y_page/a11y_browser_proxy.js';
-export {SettingsA11yPageElement, ToastAlertLevel} from './a11y_page/a11y_page.js';
 // <if expr="is_win or is_linux or is_macosx">
-export {SettingsAxAnnotationsSectionElement} from './a11y_page/ax_annotations_section.js';
 // </if>
 // <if expr="not is_chromeos">
-export {SettingsLiveCaptionElement} from './a11y_page/live_caption.js';
-export {SettingsLiveTranslateElement} from './a11y_page/live_translate.js';
 // </if>
 
 export {SettingsAiModeSearchPageElement} from './ai_page/ai_mode_search_page.js';

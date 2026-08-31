@@ -185,6 +185,8 @@ namespace {
 
 void AddCommonStrings(content::WebUIDataSource* html_source, Profile* profile) {
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
+      {"settingsSliderRoleDescription",
+       IDS_SETTINGS_SLIDER_MIN_MAX_ARIA_ROLE_DESCRIPTION},
       {"add", IDS_ADD},
       {"advancedPageTitle", IDS_SETTINGS_ADVANCED},
       {"back", IDS_ACCNAME_BACK},
@@ -260,47 +262,6 @@ void AddCommonStrings(content::WebUIDataSource* html_source, Profile* profile) {
 #endif
 
   html_source->AddBoolean("isChildAccount", profile->IsChild());
-}
-
-void AddA11yStrings(content::WebUIDataSource* html_source) {
-  static constexpr webui::LocalizedString kLocalizedStrings[] = {
-      {"moreFeaturesLink", IDS_SETTINGS_MORE_FEATURES_LINK},
-      {"a11yPageTitle", IDS_SETTINGS_ACCESSIBILITY},
-      {"a11yWebStore", IDS_SETTINGS_ACCESSIBILITY_WEB_STORE},
-      {"moreFeaturesLinkDescription",
-       IDS_SETTINGS_MORE_FEATURES_LINK_DESCRIPTION},
-      {"accessibleImageLabelsTitle",
-       IDS_SETTINGS_ACCESSIBLE_IMAGE_LABELS_TITLE},
-      {"accessibleImageLabelsSubtitle",
-       IDS_SETTINGS_ACCESSIBLE_IMAGE_LABELS_SUBTITLE},
-      {"settingsSliderRoleDescription",
-       IDS_SETTINGS_SLIDER_MIN_MAX_ARIA_ROLE_DESCRIPTION},
-      {"caretBrowsingTitle", IDS_SETTINGS_ENABLE_CARET_BROWSING_TITLE},
-      {"caretBrowsingSubtitle", IDS_SETTINGS_ENABLE_CARET_BROWSING_SUBTITLE},
-#if BUILDFLAG(IS_CHROMEOS)
-      {"manageAccessibilityFeatures",
-       IDS_SETTINGS_ACCESSIBILITY_MANAGE_ACCESSIBILITY_FEATURES},
-#else  // !BUILDFLAG(IS_CHROMEOS)
-      {"focusHighlightLabel",
-       IDS_SETTINGS_ACCESSIBILITY_FOCUS_HIGHLIGHT_DESCRIPTION},
-      {"toastAlertLevelTitle",
-       IDS_SETTINGS_ACCESSIBILITY_TOAST_FREQUENCY_TITLE},
-      {"toastAlertLevelDescription",
-       IDS_SETTINGS_ACCESSIBILITY_TOAST_FREQUENCY_DESCRIPTION},
-#endif
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-      {"overscrollHistoryNavigationTitle",
-       IDS_SETTINGS_OVERSCROLL_HISTORY_NAVIGATION_TITLE},
-      {"overscrollHistoryNavigationSubtitle",
-       IDS_SETTINGS_OVERSCROLL_HISTORY_NAVIGATION_SUBTITLE},
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-      {"axTreeFixingTitle", IDS_SETTINGS_AX_TREE_FIXING_TITLE},
-      {"axTreeFixingSubtitle", IDS_SETTINGS_AX_TREE_FIXING_SUBTITLE},
-  };
-  html_source->AddLocalizedStrings(kLocalizedStrings);
-
-  AddAxAnnotationsSectionStrings(html_source);
-  AddCaptionSubpageStrings(html_source);
 }
 
 void AddAboutStrings(content::WebUIDataSource* html_source, Profile* profile) {
@@ -4276,7 +4237,6 @@ extern void AddPrivacySandboxStrings(content::WebUIDataSource* html_source,
 void AddLocalizedStrings(content::WebUIDataSource* html_source,
                          Profile* profile,
                          content::WebContents* web_contents) {
-  AddA11yStrings(html_source);
   AddAboutStrings(html_source, profile);
   AddAiStrings(html_source);
   AddAutofillStrings(html_source, profile, web_contents);

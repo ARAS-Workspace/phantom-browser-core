@@ -243,15 +243,6 @@ function createRoutes(): SettingsRoutes {
         loadTimeData.getString('downloadsPageTitle'));
   }
 
-  if (visibility.a11y !== false) {
-    r.ACCESSIBILITY = r.ADVANCED.createSection(
-        '/accessibility', 'a11y', loadTimeData.getString('a11yPageTitle'));
-
-    // <if expr="is_linux">
-    r.CAPTIONS = r.ACCESSIBILITY.createChild('/captions');
-    // </if>
-  }
-
   // <if expr="not is_chromeos">
   if (visibility.system !== false) {
     r.SYSTEM = r.ADVANCED.createSection(

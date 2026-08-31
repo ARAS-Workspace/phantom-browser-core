@@ -170,8 +170,6 @@
 #include "chrome/browser/ui/uma_browsing_activity_observer.h"
 #include "chrome/browser/upgrade_detector/upgrade_detector.h"
 #include "chrome/browser/usb/web_usb_detector.h"
-#include "components/soda/soda_installer.h"
-#include "components/soda/soda_util.h"
 #endif
 
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || \
@@ -616,20 +614,6 @@ bool ProcessSingletonNotificationCallback(
                                 std::move(command_line), current_directory));
 }
 #endif  // BUILDFLAG(ENABLE_PROCESS_SINGLETON)
-
-#if !BUILDFLAG(IS_ANDROID)
-bool ShouldInstallSodaDuringPostProfileInit(
-    const base::CommandLine& command_line,
-    const Profile* const profile) {
-#if BUILDFLAG(IS_CHROMEOS)
-  return base::FeatureList::IsEnabled(
-             ash::features::kOnDeviceSpeechRecognition) &&
-         ash::IsUserBrowserContext(const_cast<Profile*>(profile));
-#else
-  return !command_line.HasSwitch(switches::kDisableComponentUpdate);
-#endif
-}
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 void DisallowKeyedServiceFactoryRegistration() {
   // From this point, do not allow KeyedServiceFactories to be registered, all
@@ -1618,17 +1602,6 @@ void ChromeBrowserMainParts::PostProfileInit(Profile* profile,
       {base::MayBlock(), base::TaskPriority::BEST_EFFORT,
        base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN},
       base::BindOnce(&DeleteDeprecatedPrivacySandboxData, profile->GetPath()));
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
-  if (ShouldInstallSodaDuringPostProfileInit(
-          *base::CommandLine::ForCurrentProcess(), profile)) {
-    base::UmaHistogramBoolean(
-        "Accessibility.WebSpeech.IsOnDeviceSpeechRecognitionSupported",
-        speech::IsOnDeviceSpeechRecognitionSupported());
-    speech::SodaInstaller::GetInstance()->Init(profile->GetPrefs(),
-                                               browser_process_->local_state());
-  }
 #endif
 
 #if BUILDFLAG(ENABLE_RLZ) && !BUILDFLAG(IS_CHROMEOS)

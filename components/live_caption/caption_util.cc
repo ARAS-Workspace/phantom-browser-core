@@ -24,7 +24,6 @@
 #endif
 
 #if !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_ANDROID)
-#include "components/soda/soda_util.h"
 #endif
 
 namespace {
@@ -125,11 +124,7 @@ std::optional<ui::CaptionStyle> GetCaptionStyleFromUserSettings(
 }
 
 bool IsLiveCaptionFeatureSupported() {
-#if !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_ANDROID)
-  return speech::IsOnDeviceSpeechRecognitionSupported();
-#else
   return false;
-#endif  // !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_ANDROID)
 }
 
 bool IsHeadlessCaptionFeatureSupported() {
