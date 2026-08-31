@@ -1182,16 +1182,6 @@ void ToolsMenuModel::Build(BrowserWindowInterface* browser) {
   AddSeparator(ui::NORMAL_SEPARATOR);
 
   AddItemWithStringIdAndVectorIcon(
-      this, IDC_SHOW_READING_MODE_SIDE_PANEL, IDS_SHOW_READING_MODE_SIDE_PANEL,
-      features::IsRoundedIconsEnabled() ? kMenuBookIcon
-                                        : kMenuBookChromeRefreshOldIcon);
-  SetElementIdentifierAt(
-      GetIndexOfCommandId(IDC_SHOW_READING_MODE_SIDE_PANEL).value(),
-      kReadingModeMenuItem);
-
-  AddSeparator(ui::NORMAL_SEPARATOR);
-
-  AddItemWithStringIdAndVectorIcon(
       this, IDC_PERFORMANCE, IDS_SHOW_PERFORMANCE,
       features::IsRoundedIconsEnabled() ? kSpeedIcon : kPerformanceOldIcon);
   SetElementIdentifierAt(GetIndexOfCommandId(IDC_PERFORMANCE).value(),
@@ -2337,9 +2327,6 @@ void AppMenuModel::Build() {
         BrowserUserEducationInterface::From(browser())->MaybeShowNewBadgeFor(
             lens::features::kLensOverlay));
   }
-
-  AddItemWithStringIdAndVectorIcon(this, IDC_SHOW_TRANSLATE, IDS_SHOW_TRANSLATE,
-                                   vector_icons::kGTranslateIcon);
 
   CreateFindAndEditSubMenu();
 
