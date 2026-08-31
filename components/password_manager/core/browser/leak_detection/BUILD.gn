@@ -33,6 +33,7 @@ source_set("leak_detection") {
   ]
   if (!is_android) {
     sources += [
+      "bulk_leak_check.cc",
       "bulk_leak_check_service.cc",
       "bulk_leak_check_service_interface.cc",
     ]
