@@ -14,17 +14,6 @@
     margin: 6px 0 0 0;
   }
 
-  div.list-item.non-target .target-info {
-    display: none;
-  }
-
-  /* Any .target.target-info following another .target element needs to
-  be hidden. We only want to show the _first_ .target-info of the list.
-  This is a way to do a :first-of-class selector. */
-  div.list-item.target ~  div.list-item.target .target-info {
-    display: none;
-  }
-
   #languagesSectionHeader {
     padding-bottom: 12px;
     padding-top: 12px;
@@ -76,15 +65,11 @@
   <div class="list-frame vertical-list" role="list">
     <template is="dom-repeat" items="[[languages.enabled]]">
       <div class$="list-item [[getLanguageItemClass_(
-          item.language.code, language.prospectiveUILanguage)]]
-          [[isTranslationTarget_(item.language.code,
-          languages.translateTarget)]]" role="listitem">
+          item.language.code, language.prospectiveUILanguage)]]"
+          role="listitem">
         <div class="start cr-padded-text">
           <div title="[[item.language.nativeDisplayName]]" role="none">
             [[formatIndex_(index)]]. [[item.language.displayName]]
-          </div>
-          <div class="target-info secondary">
-            $i18n{translateTargetLabel}
           </div>
 <if expr="is_win">
           <div class="explain-selected"

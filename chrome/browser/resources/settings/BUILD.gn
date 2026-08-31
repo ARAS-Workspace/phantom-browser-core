@@ -167,7 +167,6 @@ build_webui("build") {
       "languages_page/languages_page.ts",
       "languages_page/languages_page_index.ts",
       "languages_page/spell_check_page.ts",
-      "languages_page/translate_page.ts",
       "people_page/import_data_dialog.ts",
       "people_page/manage_profile.ts",
       "relaunch_confirmation_dialog.ts",

@@ -182,7 +182,6 @@ export {LanguageSettingsActionType, LanguageSettingsMetricsProxyImpl, LanguageSe
 export type {LanguageSettingsMetricsProxy} from './languages_page/languages_settings_metrics_proxy.js';
 export type {LanguageHelper, LanguagesModel} from './languages_page/languages_types.js';
 export {SettingsSpellCheckPageElement} from './languages_page/spell_check_page.js';
-export {SettingsTranslatePageElement} from './languages_page/translate_page.js';
 // </if>
 
 export {SettingsAccountPageElement} from './people_page/account_page.js';

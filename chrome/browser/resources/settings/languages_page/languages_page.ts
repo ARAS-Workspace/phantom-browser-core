@@ -50,7 +50,6 @@ import type {LanguageSettingsMetricsProxy} from './languages_settings_metrics_pr
 import {LanguageSettingsActionType, LanguageSettingsMetricsProxyImpl, LanguageSettingsPageImpressionType} from './languages_settings_metrics_proxy.js';
 import type {LanguageHelper, LanguagesModel, LanguageState} from './languages_types.js';
 import {getLanguageHelperInstance} from './languages.js';
-import {convertLanguageCodeForTranslate} from './languages_util.js';
 
 // clang-format on
 
@@ -209,21 +208,6 @@ export class SettingsLanguagesPageElement extends
   private showMoveDown_(): boolean {
     return this.languages !== undefined &&
         !this.isNthLanguage_(this.languages.enabled.length - 1);
-  }
-
-  /**
-   * @param languageCode The language code identifying a language.
-   * @param translateTarget The target language.
-   * @return 'target' if |languageCode| matches the target language,
-   *     'non-target' otherwise.
-   */
-  private isTranslationTarget_(languageCode: string, translateTarget: string):
-      string {
-    if (convertLanguageCodeForTranslate(languageCode) === translateTarget) {
-      return 'target';
-    } else {
-      return 'non-target';
-    }
   }
 
   // <if expr="is_win">

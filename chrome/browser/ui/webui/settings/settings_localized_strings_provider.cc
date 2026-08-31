@@ -114,7 +114,6 @@
 #include "components/sync/service/sync_service.h"
 #include "components/sync/service/sync_service_utils.h"
 #include "components/sync/service/sync_user_settings.h"
-#include "components/translate/core/common/translate_features.h"
 #include "components/wallet/core/browser/walletable_permission_utils.h"
 #include "components/wallet/core/common/wallet_features.h"
 #include "components/zoom/page_zoom_constants.h"
@@ -1423,24 +1422,7 @@ void AddLanguagesStrings(content::WebUIDataSource* html_source,
       {"displayInThisLanguage",
        IDS_SETTINGS_LANGUAGES_DISPLAY_IN_THIS_LANGUAGE},
 #endif
-      {"offerToEnableTranslate",
-       IDS_SETTINGS_LANGUAGES_OFFER_TO_ENABLE_TRANSLATE},
-      {"noLanguagesAdded", IDS_SETTINGS_LANGUAGES_NO_LANGUAGES_ADDED},
       {"addLanguageAriaLabel", IDS_SETTINGS_LANGUAGES_ADD_ARIA_LABEL},
-      {"removeAutomaticLanguageAriaLabel",
-       IDS_SETTINGS_LANGUAGES_REMOVE_AUTOMATIC_ARIA_LABEL},
-      {"removeNeverLanguageAriaLabel",
-       IDS_SETTINGS_LANGUAGES_REMOVE_NEVER_ARIA_LABEL},
-      {"translatePageTitle", IDS_SETTINGS_TRANSLATE_PAGE_TITLE},
-      {"targetLanguageLabel", IDS_SETTINGS_TARGET_TRANSLATE_LABEL},
-      {"automaticallyTranslateLanguages",
-       IDS_SETTINGS_LANGUAGES_AUTOMATIC_TRANSLATE},
-      {"addAutomaticallyTranslateLanguagesAriaLabel",
-       IDS_SETTINGS_LANGUAGES_AUTOMATIC_TRANSLATE_ADD_ARIA_LABEL},
-      {"neverTranslateLanguages", IDS_SETTINGS_LANGUAGES_NEVER_LANGUAGES},
-      {"addNeverTranslateLanguagesAriaLabel",
-       IDS_SETTINGS_LANGUAGES_NEVER_TRANSLATE_ADD_ARIA_LABEL},
-      {"translateTargetLabel", IDS_SETTINGS_LANGUAGES_TRANSLATE_TARGET},
       {"spellCheckTitle", IDS_SETTINGS_LANGUAGES_SPELL_CHECK_TITLE},
       {"spellCheckBasicLabel", IDS_SETTINGS_LANGUAGES_SPELL_CHECK_BASIC_LABEL},
       {"spellCheckEnhancedLabel",
@@ -1484,13 +1466,6 @@ void AddLanguagesStrings(content::WebUIDataSource* html_source,
 #endif
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
-#if !BUILDFLAG(IS_CHROMEOS)
-  html_source->AddLocalizedString(
-      "offerToEnableTranslateSublabel",
-      base::FeatureList::IsEnabled(translate::kEnableTranslatePdf)
-          ? IDS_SETTINGS_LANGUAGES_OFFER_TO_ENABLE_TRANSLATE_SUBLABEL_WITH_PDF
-          : IDS_SETTINGS_LANGUAGES_OFFER_TO_ENABLE_TRANSLATE_SUBLABEL);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(IS_CHROMEOS)
   html_source->AddString("osSettingsLanguagesPageUrl",
                          chromeos::settings::GetOSSettingsUrl(
