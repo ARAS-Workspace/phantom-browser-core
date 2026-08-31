@@ -16,7 +16,6 @@ import '../icons.html.js';
 import '../privacy_icons.html.js';
 import '../settings_page/settings_section.js';
 import '../settings_shared.css.js';
-import './privacy_guide/privacy_guide_dialog.js';
 
 import {PrefsMixin} from '/shared/settings/prefs/prefs_mixin.js';
 import type {CrLinkRowElement} from 'chrome://resources/cr_elements/cr_link_row/cr_link_row.js';
@@ -27,7 +26,7 @@ import {focusWithoutInk} from 'chrome://resources/js/focus_without_ink.js';
 import {afterNextRender, PolymerElement} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 
 import type {MetricsBrowserProxy} from '../metrics_browser_proxy.js';
-import {MetricsBrowserProxyImpl, PrivacyGuideInteractions} from '../metrics_browser_proxy.js';
+import {MetricsBrowserProxyImpl} from '../metrics_browser_proxy.js';
 import {routes} from '../route.js';
 import {RouteObserverMixin, Router} from '../router.js';
 import type {Route} from '../router.js';
@@ -35,7 +34,6 @@ import {SettingsViewMixin} from '../settings_page/settings_view_mixin.js';
 import {CookieControlsMode} from '../site_settings/constants.js';
 
 import {HatsBrowserProxyImpl, TrustSafetyInteraction} from './hats_browser_proxy.js';
-import {PrivacyGuideAvailabilityMixin} from './privacy_guide/privacy_guide_availability_mixin.js';
 import {getTemplate} from './privacy_page.html.js';
 
 export interface SettingsPrivacyPageElement {
@@ -47,8 +45,7 @@ export interface SettingsPrivacyPageElement {
 }
 
 const SettingsPrivacyPageElementBase =
-    PrivacyGuideAvailabilityMixin(SettingsViewMixin(
-        RouteObserverMixin(I18nMixin(PrefsMixin(PolymerElement)))));
+    SettingsViewMixin(RouteObserverMixin(I18nMixin(PrefsMixin(PolymerElement))));
 
 export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
   static get is() {
@@ -62,7 +59,6 @@ export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
   static get properties() {
     return {
       showClearBrowsingDataDialog_: Boolean,
-      showPrivacyGuideDialog_: Boolean,
 
       // The label of the confirmation toast that is displayed after deletion
       // from 'Delete Browsing data' is completed.
@@ -79,7 +75,6 @@ export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
   }
 
   declare private showClearBrowsingDataDialog_: boolean;
-  declare private showPrivacyGuideDialog_: boolean;
   declare private dbdDeletionConfirmationToastLabel_: string;
   declare private shouldShowDbdDeletionConfirmationToast_: boolean;
 
@@ -91,9 +86,6 @@ export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
 
     this.showClearBrowsingDataDialog_ =
         Router.getInstance().getCurrentRoute() === routes.CLEAR_BROWSER_DATA;
-    this.showPrivacyGuideDialog_ =
-        Router.getInstance().getCurrentRoute() === routes.PRIVACY_GUIDE &&
-        this.isPrivacyGuideAvailable;
   }
 
   private onClearBrowsingDataClick_() {
@@ -131,14 +123,6 @@ export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
     });
   }
 
-  private onPrivacyGuideDialogClosed_() {
-    Router.getInstance().navigateToPreviousRoute();
-    const toFocus =
-        this.shadowRoot!.querySelector<HTMLElement>('#privacyGuideLinkRow');
-    assert(toFocus);
-    focusWithoutInk(toFocus);
-  }
-
   private onSiteSettingsLinkRowClick_() {
     this.interactedWithPage_();
 
@@ -150,16 +134,6 @@ export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
     this.metricsBrowserProxy_.recordAction(
         'SafeBrowsing.Settings.ShowedFromParentSettings');
     Router.getInstance().navigateTo(routes.SECURITY);
-  }
-
-  private onPrivacyGuideClick_() {
-    this.metricsBrowserProxy_.recordPrivacyGuideEntryExitHistogram(
-        PrivacyGuideInteractions.SETTINGS_LINK_ROW_ENTRY);
-    this.metricsBrowserProxy_.recordAction(
-        'Settings.PrivacyGuide.StartPrivacySettings');
-    Router.getInstance().navigateTo(
-        routes.PRIVACY_GUIDE, /* dynamicParams */ undefined,
-        /* removeSearch */ true);
   }
 
   private interactedWithPage_() {
@@ -193,10 +167,6 @@ export class SettingsPrivacyPageElement extends SettingsPrivacyPageElementBase {
 
     if (routes.COOKIES) {
       map.set(routes.COOKIES.path, '#thirdPartyCookiesLinkRow');
-    }
-
-    if (routes.PRIVACY_GUIDE) {
-      map.set(routes.PRIVACY_GUIDE.path, '#privacyGuideLinkRow');
     }
 
     if (routes.SECURITY) {

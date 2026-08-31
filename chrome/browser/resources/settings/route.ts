@@ -23,10 +23,6 @@ function addPrivacyChildRoutes(r: Partial<SettingsRoutes>) {
   if (visibility.safetyHub !== false) {
     r.SAFETY_HUB = r.PRIVACY.createChild('/safetyCheck');
   }
-
-  if (loadTimeData.getBoolean('showPrivacyGuide')) {
-    r.PRIVACY_GUIDE = r.PRIVACY.createChild('guide');
-  }
   r.SITE_SETTINGS = r.PRIVACY.createChild('/content');
   r.SECURITY = r.PRIVACY.createChild('/security');
 

@@ -2884,96 +2884,6 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
                              .spec());
 }
 
-void AddPrivacyGuideStrings(content::WebUIDataSource* html_source,
-                            Profile* profile) {
-  static constexpr webui::LocalizedString kLocalizedStrings[] = {
-      {"privacyGuideLabel", IDS_SETTINGS_PRIVACY_GUIDE_LABEL},
-      {"privacyGuideSublabel", IDS_SETTINGS_PRIVACY_GUIDE_SUBLABEL},
-      {"privacyGuidePromoHeader", IDS_SETTINGS_PRIVACY_GUIDE_PROMO_HEADER},
-      {"privacyGuidePromoBody", IDS_SETTINGS_PRIVACY_GUIDE_PROMO_BODY},
-      {"privacyGuidePromoStartButton",
-       IDS_SETTINGS_PRIVACY_GUIDE_PROMO_START_BUTTON},
-      {"privacyGuideBackToSettingsAriaLabel",
-       IDS_SETTINGS_PRIVACY_GUIDE_BACK_TO_SETTINGS_ARIA_LABEL},
-      {"privacyGuideBackToSettingsAriaRoleDescription",
-       IDS_SETTINGS_PRIVACY_GUIDE_BACK_TO_SETTINGS_ARIA_ROLE_DESC},
-      {"privacyGuideBackButton", IDS_SETTINGS_PRIVACY_GUIDE_BACK_BUTTON},
-      {"privacyGuideSteps", IDS_SETTINGS_PRIVACY_GUIDE_STEPS},
-      {"privacyGuideNextButton", IDS_SETTINGS_PRIVACY_GUIDE_NEXT_BUTTON},
-      {"privacyGuideWelcomeCardHeader",
-       IDS_SETTINGS_PRIVACY_GUIDE_WELCOME_CARD_HEADER},
-      {"privacyGuideWelcomeCardSubHeader",
-       IDS_SETTINGS_PRIVACY_GUIDE_WELCOME_CARD_SUB_HEADER},
-      {"privacyGuideCompletionCardHeader",
-       IDS_SETTINGS_PRIVACY_GUIDE_COMPLETION_CARD_HEADER},
-      {"privacyGuideCompletionCardSubHeader",
-       IDS_SETTINGS_PRIVACY_GUIDE_COMPLETION_CARD_SUB_HEADER},
-      {"privacyGuideCompletionCardSubHeaderNoLinks",
-       IDS_SETTINGS_PRIVACY_GUIDE_COMPLETION_CARD_SUB_HEADER_NO_LINKS},
-      {"privacyGuideCompletionCardLeaveButton",
-       IDS_SETTINGS_PRIVACY_GUIDE_COMPLETION_CARD_LEAVE_BUTTON},
-      {"privacyGuideCompletionCardWaaLabel",
-       IDS_SETTINGS_PRIVACY_GUIDE_COMPLETION_CARD_WAA_LABEL},
-      {"privacyGuideCompletionCardWaaSubLabel",
-       IDS_SETTINGS_PRIVACY_GUIDE_COMPLETION_CARD_WAA_SUB_LABEL},
-      {"privacyGuideCompletionCardAiSettingsLabel",
-       IDS_SETTINGS_PRIVACY_GUIDE_COMPLETION_CARD_AI_SETTINGS_LABEL},
-      {"privacyGuideMsbbCardHeader",
-       IDS_SETTINGS_PRIVACY_GUIDE_MSBB_CARD_HEADER},
-      {"privacyGuideMsbbFeatureDescription1",
-       IDS_SETTINGS_PRIVACY_GUIDE_MSBB_FEATURE_DESCRIPTION1},
-      {"privacyGuideMsbbFeatureDescription2",
-       IDS_SETTINGS_PRIVACY_GUIDE_MSBB_FEATURE_DESCRIPTION2},
-      {"privacyGuideMsbbFeatureDescription3",
-       IDS_SETTINGS_PRIVACY_GUIDE_MSBB_FEATURE_DESCRIPTION3},
-      {"privacyGuideMsbbPrivacyDescription1",
-       IDS_SETTINGS_PRIVACY_GUIDE_MSBB_PRIVACY_DESCRIPTION1},
-      {"privacyGuideMsbbPrivacyDescription2",
-       IDS_SETTINGS_PRIVACY_GUIDE_MSBB_PRIVACY_DESCRIPTION2},
-      {"privacyGuideHistorySyncCardHeader",
-       IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_SYNC_CARD_HEADER},
-      {"privacyGuideHistoryAndTabsSyncCardHeader",
-       IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_AND_TABS_SYNC_CARD_HEADER},
-      {"privacyGuideHistorySyncSettingLabel",
-       IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_SYNC_SETTING_LABEL},
-      {"privacyGuideHistoryAndTabsSyncSettingLabel",
-       IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_AND_TABS_SYNC_SETTING_LABEL},
-      {"privacyGuideHistorySyncFeatureDescription1",
-       IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_SYNC_FEATURE_DESCRIPTION1},
-      {"privacyGuideHistoryAndTabsSyncFeatureDescription1",
-       IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_AND_TABS_SYNC_FEATURE_DESCRIPTION1},
-      {"privacyGuideHistorySyncFeatureDescription2",
-       IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_SYNC_FEATURE_DESCRIPTION2},
-      {"privacyGuideHistorySyncPrivacyDescription1",
-       IDS_SETTINGS_PRIVACY_GUIDE_HISTORY_SYNC_PRIVACY_DESCRIPTION1},
-      {"privacyGuideCookiesCardHeader",
-       IDS_SETTINGS_PRIVACY_GUIDE_COOKIES_CARD_HEADER},
-      {"privacyGuideSafeBrowsingCardHeader",
-       IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_HEADER},
-      {"privacyGuideSafeBrowsingCardEnhancedProtectionPrivacyDescription1",
-       IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_ENHANCED_PROTECTION_PRIVACY_DESCRIPTION1},
-      {"privacyGuideSafeBrowsingCardEnhancedProtectionPrivacyDescription2",
-       IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_ENHANCED_PROTECTION_PRIVACY_DESCRIPTION2},
-      {"privacyGuideSafeBrowsingCardEnhancedProtectionPrivacyDescription3",
-       IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_ENHANCED_PROTECTION_PRIVACY_DESCRIPTION3},
-      {"privacyGuideSafeBrowsingCardStandardProtectionFeatureDescription1",
-       IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_STANDARD_PROTECTION_FEATURE_DESCRIPTION1},
-      {"privacyGuideSafeBrowsingCardStandardProtectionFeatureDescription2",
-       IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_STANDARD_PROTECTION_FEATURE_DESCRIPTION2},
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-      {"privacyGuideSafeBrowsingCardStandardProtectionFeatureDescription2Proxy",
-       IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_STANDARD_PROTECTION_FEATURE_DESCRIPTION2_PROXY},
-#endif
-      {"privacyGuideSafeBrowsingCardStandardProtectionPrivacyDescription1",
-       IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_STANDARD_PROTECTION_PRIVACY_DESCRIPTION1},
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-      {"privacyGuideSafeBrowsingCardStandardProtectionPrivacyDescription1Proxy",
-       IDS_SETTINGS_PRIVACY_GUIDE_SAFE_BROWSING_CARD_STANDARD_PROTECTION_PRIVACY_DESCRIPTION1_PROXY},
-#endif
-  };
-  html_source->AddLocalizedStrings(kLocalizedStrings);
-}
-
 void AddSafetyHubStrings(content::WebUIDataSource* html_source) {
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
       {"safetyHub", IDS_SETTINGS_SAFETY_HUB},
@@ -4422,7 +4332,6 @@ void AddLocalizedStrings(content::WebUIDataSource* html_source,
   AddOnStartupStrings(html_source);
   AddPeopleStrings(html_source, profile);
   AddPrivacySandboxStrings(html_source, profile);
-  AddPrivacyGuideStrings(html_source, profile);
   AddPrivacyStrings(html_source, profile);
   AddSafetyHubStrings(html_source);
   AddShortcutInputStrings(html_source);

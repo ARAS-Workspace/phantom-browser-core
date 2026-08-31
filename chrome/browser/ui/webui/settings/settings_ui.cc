@@ -50,7 +50,6 @@
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/hats/hats_service.h"
 #include "chrome/browser/ui/hats/hats_service_factory.h"
-#include "chrome/browser/ui/managed_ui.h"
 #include "chrome/browser/ui/passwords/ui_utils.h"
 #include "chrome/browser/ui/toasts/toast_features.h"
 #include "chrome/browser/ui/ui_features.h"
@@ -345,11 +344,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
   // This is the browser settings page.
   html_source->AddBoolean("isOSSettings", false);
 #endif  // BUILDFLAG(IS_CHROMEOS)
-
-  bool show_privacy_guide =
-      base::FeatureList::IsEnabled(features::kPrivacyGuideForceAvailable) ||
-      (!ShouldDisplayManagedUi(profile) && !profile->IsChild());
-  html_source->AddBoolean("showPrivacyGuide", show_privacy_guide);
 
   html_source->AddBoolean("enableHandTrackingContentSetting",
 #if BUILDFLAG(ENABLE_VR)
