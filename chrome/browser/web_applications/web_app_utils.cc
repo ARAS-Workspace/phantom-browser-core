@@ -250,9 +250,7 @@ bool IsWebAppInstallByUserPolicyEnabled(Profile* profile) {
 }
 
 bool AreWebAppsUserInstallable(Profile* profile) {
-  return AreWebAppsEnabled(profile) && !profile->IsGuestSession() &&
-         !profile->IsOffTheRecord() &&
-         IsWebAppInstallByUserPolicyEnabled(profile);
+  return false;
 }
 
 // Policy installed apps are only allowed on:

@@ -3596,12 +3596,6 @@ are declared in tools/grit/grit_args.gni.
 
       <!-- Desktop omnibox PWA install icon -->
       <if expr="not is_android">
-        <message name="IDS_OMNIBOX_PWA_INSTALL_ICON_LABEL" desc="String for the omnibox icon label promoting an app installation">
-          Install
-        </message>
-        <message name="IDS_OMNIBOX_PWA_INSTALL_ICON_TOOLTIP" desc="Tooltip for the omnibox icon label promoting an app installation">
-          Install <ph name="APP_NAME">$1<ex>Google Maps</ex></ph>
-        </message>
       </if>
 
       <if expr="not is_android">

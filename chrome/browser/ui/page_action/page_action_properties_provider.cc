@@ -146,16 +146,6 @@ constexpr auto kPageActionProperties = base::MakeFixedFlatMap<
         },
     },
     {
-        kActionInstallPwa,
-        {
-            .histogram_name = "PwaInstall",
-            .type = PageActionIconType::kPwaInstall,
-            .element_identifier = kInstallPwaElementId,
-            .priority =
-                page_actions::PageActionPriorityCategory::kCoreSiteUtility,
-        },
-    },
-    {
         kActionCommercePriceInsights,
         {
             .histogram_name = "PriceInsights",

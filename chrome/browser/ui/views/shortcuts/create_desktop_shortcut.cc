@@ -16,6 +16,7 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/dialogs/browser_dialogs.h"
+#include "chrome/browser/ui/shortcuts/desktop_shortcuts_utils.h"
 #include "chrome/browser/ui/views/controls/site_icon_text_and_origin_view.h"
 #include "chrome/browser/ui/views/shortcuts/create_desktop_shortcut_delegate.h"
 #include "chrome/grit/branded_strings.h"
@@ -161,7 +162,7 @@ void CreateDesktopShortcutForActiveWebContents(Browser* browser) {
   content::WebContents* const web_contents =
       browser->tab_strip_model()->GetActiveWebContents();
 
-  if (!web_contents) {
+  if (!web_contents || !shortcuts::CanCreateDesktopShortcut(web_contents)) {
     return;
   }
 

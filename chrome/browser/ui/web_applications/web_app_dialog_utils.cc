@@ -23,7 +23,6 @@
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/views/web_apps/progress_delay.h"
 #include "chrome/browser/ui/views/web_apps/web_app_install_flow_dialog_delegate.h"
-#include "chrome/browser/ui/web_applications/pwa_install_page_action.h"
 #include "chrome/browser/ui/web_applications/web_app_dialogs.h"
 #include "chrome/browser/web_applications/mojom/user_display_mode.mojom.h"
 #include "chrome/browser/web_applications/web_app_command_manager.h"
@@ -438,44 +437,6 @@ void CreateWebAppForManifestInstall(
                      PwaInProductHelpState::kNotShown, std::move(tracker),
                      /*show_initiating_origin=*/true),
       std::move(installed_callback));
-}
-
-void ShowPwaInstallDialog(BrowserWindowInterface* bwi) {
-  CHECK(bwi);
-
-  base::RecordAction(base::UserMetricsAction("PWAInstallIcon"));
-
-  content::WebContents* const web_contents =
-      bwi->GetTabStripModel()->GetActiveWebContents();
-  CHECK(web_contents);
-
-  PwaInstallPageActionController* const pwa_install_controller =
-      bwi->GetActiveTabInterface()
-          ->GetTabFeatures()
-          ->pwa_install_page_action_controller();
-  pwa_install_controller->SetIsExecuting(true);
-
-  // Close PWA install IPH if it is showing.
-  PwaInProductHelpState iph_state = PwaInProductHelpState::kNotShown;
-  const bool install_icon_clicked_after_iph_shown =
-      BrowserUserEducationInterface::From(bwi)->NotifyFeaturePromoFeatureUsed(
-          feature_engagement::kIPHDesktopPwaInstallFeature,
-          FeaturePromoFeatureUsedAction::kClosePromoIfPresent);
-  if (install_icon_clicked_after_iph_shown) {
-    iph_state = PwaInProductHelpState::kShown;
-  }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  metrics::structured::StructuredMetricsClient::Record(
-      metrics::structured::events::v2::cr_os_events::
-          AppDiscovery_Browser_OmniboxInstallIconClicked()
-              .SetIPHShown(install_icon_clicked_after_iph_shown));
-#endif
-
-  CreateWebAppFromManifest(web_contents,
-                           webapps::WebappInstallSource::OMNIBOX_INSTALL_ICON,
-                           base::DoNothing(), iph_state);
-  pwa_install_controller->SetIsExecuting(false);
 }
 
 void SetInstalledCallbackForTesting(WebAppInstalledCallback callback) {

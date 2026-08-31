@@ -1021,11 +1021,6 @@ SaveAndShareSubMenuModel::SaveAndShareSubMenuModel(
                             : kDesktopWindowsChromeRefreshOldIcon,
                         ui::kColorMenuIcon, kDefaultIconSize));
   }
-  AddItemWithStringIdAndVectorIcon(
-      this, IDC_CREATE_SHORTCUT, IDS_ADD_TO_OS_LAUNCH_SURFACE,
-      features::IsRoundedIconsEnabled() ? kDriveShortcutIcon
-                                        : kDriveShortcutChromeRefreshOldIcon);
-  SetElementIdentifierAt(GetItemCount() - 1, AppMenuModel::kCreateShortcutItem);
   if (!sharing_hub::SharingIsDisabledByPolicy(browser->GetProfile()) ||
       sharing_hub::DesktopScreenshotsFeatureEnabled(browser->GetProfile())) {
     AddSeparator(ui::NORMAL_SEPARATOR);

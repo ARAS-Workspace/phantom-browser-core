@@ -642,15 +642,6 @@ void MaybeRegisterChromeFeaturePromos(
                        "Triggered when the Autofill payment omnibox chip "
                        "is shown.")));
 
-  // kIPHDesktopPwaInstallFeature:
-  registry.RegisterFeature(
-      std::move(FeaturePromoSpecification::CreateForLegacyPromo(
-                    &feature_engagement::kIPHDesktopPwaInstallFeature,
-                    kInstallPwaElementId, IDS_DESKTOP_PWA_INSTALL_PROMO)
-                    .SetMetadata(89, "phillis@chromium.org",
-                                 "Triggered after user navigates to a "
-                                 "page with a promotable PWA.")));
-
   // kIPHDesktopCustomizeChromeExperimentFeature:
   registry.RegisterFeature(std::move(
       FeaturePromoSpecification::CreateForCustomAction(

@@ -2052,28 +2052,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               l10n_util::GetStringUTF16(IDS_SHOW_CUSTOMIZE_CHROME_TOOLBAR)))
           .Build());
 
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                base::RecordAction(
-                    base::UserMetricsAction("InstallWebAppFromMenu"));
-                web_app::CreateWebAppFromCurrentWebContents(
-                    bwi, web_app::WebAppInstallFlow::kInstallSite);
-              },
-              bwi))
-          .SetActionId(kActionInstallPwa)
-          .SetImage(ui::ImageModel::FromVectorIcon(
-              features::IsRoundedIconsEnabled()
-                  ? vector_icons::kInstallDesktopIcon
-                  : kInstallDesktopChromeRefreshOldIcon,
-              ui::kColorIcon))
-          .SetProperty(actions::kActionItemPinnableKey, false)
-          // Text and TooltipText are not populated yet because they are
-          // dynamic. They depend on the current tab WebContents.
-          .Build());
-
   // Actions that do not directly show up in chrome UI.
   root_action_item_->AddChild(
       actions::ActionItem::Builder(

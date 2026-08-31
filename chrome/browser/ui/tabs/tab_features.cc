@@ -108,7 +108,6 @@
 #include "chrome/browser/ui/views/side_panel/extensions/extension_side_panel_manager.h"
 #include "chrome/browser/ui/views/translate/translate_page_action_controller.h"
 #include "chrome/browser/ui/views/zoom/zoom_view_controller.h"
-#include "chrome/browser/ui/web_applications/pwa_install_page_action.h"
 #include "chrome/browser/ui/webui/webui_embedding_context.h"
 #include "components/autofill/core/common/autofill_payments_features.h"
 #include "components/contextual_tasks/public/features.h"
@@ -240,12 +239,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
   if (page_action_controller_->ActionExists(kActionShowZoomBubble)) {
     zoom_view_controller_ = std::make_unique<zoom::ZoomViewController>(
         tab, *page_action_controller_);
-  }
-
-  if (page_action_controller_->ActionExists(kActionInstallPwa)) {
-    pwa_install_page_action_controller_ =
-        std::make_unique<PwaInstallPageActionController>(
-            tab, *page_action_controller_);
   }
 
   if (page_action_controller_->ActionExists(kActionCommercePriceInsights)) {

@@ -54,7 +54,6 @@ class MemorySaverChipTabHelper;
 class NewTabPagePreloadPipelineManager;
 class PinnedTranslateActionListener;
 class Profile;
-class PwaInstallPageActionController;
 class QwacWebContentsObserver;
 class ReadAnythingController;
 class ReadAnythingSidePanelController;
@@ -320,10 +319,6 @@ class TabFeatures {
   }
 #endif
 
-  PwaInstallPageActionController* pwa_install_page_action_controller() {
-    return pwa_install_page_action_controller_.get();
-  }
-
   RecordReplayPageActionController* record_replay_page_action_controller() {
     return record_replay_page_action_controller_.get();
   }
@@ -485,10 +480,6 @@ class TabFeatures {
   // Responsible for managing the "Translate" page action.
   std::unique_ptr<TranslatePageActionController>
       translate_page_action_controller_;
-
-  // Responsible for managing the "PWA Install" page action.
-  std::unique_ptr<PwaInstallPageActionController>
-      pwa_install_page_action_controller_;
 
   // Responsible for managing the "Zoom" page action and bubble.
   std::unique_ptr<zoom::ZoomViewController> zoom_view_controller_;
