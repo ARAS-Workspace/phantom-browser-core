@@ -31,9 +31,11 @@
 
 namespace {
 
+#if BUILDFLAG(IS_ANDROID)
 // Interval to show notification for compromised password in Safety Hub
 // notifications.
 const base::TimeDelta kPasswordCheckNotificationInterval = base::Days(0);
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // Interval to show notification for revoked permissions in Safety Hub
 // notifications.
