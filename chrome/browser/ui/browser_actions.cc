@@ -3546,17 +3546,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 
   root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::ShowPasswordCheck(bwi);
-              },
-              bwi))
-          .SetActionId(kActionSafetyHubShowPasswordCheckup)
-          .Build());
-
-  root_action_item_->AddChild(
       ChromeMenuAction(
           base::BindRepeating(
               [](BrowserWindowInterface* bwi, actions::ActionItem* item,

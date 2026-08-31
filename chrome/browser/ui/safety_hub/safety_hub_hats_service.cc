@@ -17,8 +17,6 @@
 #include "chrome/browser/ui/safety_hub/notification_permission_review_result.h"
 #include "chrome/browser/ui/safety_hub/notification_permission_review_service.h"
 #include "chrome/browser/ui/safety_hub/notification_permission_review_service_factory.h"
-#include "chrome/browser/ui/safety_hub/password_status_check_service.h"
-#include "chrome/browser/ui/safety_hub/password_status_check_service_factory.h"
 #include "chrome/browser/ui/safety_hub/revoked_permissions_result.h"
 #include "chrome/browser/ui/safety_hub/revoked_permissions_service.h"
 #include "chrome/browser/ui/safety_hub/revoked_permissions_service_factory.h"
@@ -151,15 +149,10 @@ safety_hub::SafetyHubCardState SafetyHubHatsService::GetOverallState() {
     }
   }
 
-  // Get the card data for all remaining modules (Chrome Version, Password
-  // Status Check, Safe Browsing).
+  // Get the card data for all remaining modules (Chrome Version, Safe
+  // Browsing).
   std::vector<base::DictValue> cards;
   cards.push_back(safety_hub_util::GetVersionCardData());
-
-  PasswordStatusCheckService* psc_service =
-      PasswordStatusCheckServiceFactory::GetForProfile(&profile_.get());
-  CHECK(psc_service);
-  cards.push_back(psc_service->GetPasswordCardData());
 
   cards.push_back(SafetyHubSafeBrowsingResult::GetSafeBrowsingCardData(
       profile_->GetPrefs()));

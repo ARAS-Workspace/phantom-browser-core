@@ -21,7 +21,6 @@
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/extensions/extension_management_test_util.h"
 #include "chrome/browser/extensions/updater/extension_updater.h"
-#include "chrome/browser/ui/safety_hub/password_status_check_service_factory.h"
 #include "components/crx_file/id_util.h"  // nogncheck crbug.com/40147906
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "extensions/browser/extension_prefs.h"
@@ -81,12 +80,6 @@ static extensions::CWSInfoService::CWSInfo cws_info_no_trigger{
     extensions::CWSInfoService::CWSViolationType::kNone,
     false,
     false};
-
-std::unique_ptr<KeyedService> BuildPasswordStatusCheckService(
-    content::BrowserContext* context) {
-  return std::make_unique<PasswordStatusCheckService>(
-      Profile::FromBrowserContext(context));
-}
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 std::unique_ptr<KeyedService> BuildRevokedPermissionsService(
@@ -128,30 +121,6 @@ using password_manager::BulkLeakCheckService;
 MockCWSInfoService::MockCWSInfoService(Profile* profile)
     : extensions::CWSInfoService(profile) {}
 MockCWSInfoService::~MockCWSInfoService() = default;
-
-PasswordStatusCheckService* CreateAndUsePasswordStatusService(
-    content::BrowserContext* context) {
-  return static_cast<PasswordStatusCheckService*>(
-      PasswordStatusCheckServiceFactory::GetInstance()->SetTestingFactoryAndUse(
-          context, base::BindRepeating(&BuildPasswordStatusCheckService)));
-}
-
-void UpdatePasswordCheckServiceAsync(
-    PasswordStatusCheckService* password_service) {
-  password_service->UpdateInsecureCredentialCountAsync();
-  ASSERT_TRUE(base::test::RunUntil([&]() {
-    return !password_service->IsUpdateRunning() &&
-           !password_service->IsInfrastructureReady();
-  }));
-}
-
-void RunUntilPasswordCheckCompleted(Profile* profile) {
-  PasswordStatusCheckService* service =
-      PasswordStatusCheckServiceFactory::GetForProfile(profile);
-  ASSERT_TRUE(base::test::RunUntil([&]() {
-    return !service->IsUpdateRunning() && !service->IsInfrastructureReady();
-  }));
-}
 
 std::unique_ptr<testing::NiceMock<MockCWSInfoService>> GetMockCWSInfoService(
     Profile* profile,

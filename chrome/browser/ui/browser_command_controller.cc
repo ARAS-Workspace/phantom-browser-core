@@ -988,9 +988,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
       signin_ui_util::ShowReauthForPrimaryAccountWithAuthError(
           browser_->GetProfile(), signin_metrics::AccessPoint::kMenu);
       break;
-    case IDC_SAFETY_HUB_SHOW_PASSWORD_CHECKUP:
-      ShowPasswordCheck(browser_);
-      break;
     case IDC_SHOW_PAYMENT_METHODS:
       ShowPaymentMethods(browser_);
       break;
@@ -1855,8 +1852,6 @@ void BrowserCommandController::InitCommandState() {
                                          true);
   command_updater_->UpdateCommandEnabled(IDC_SEND_TAB_TO_SELF, false);
   command_updater_->UpdateCommandEnabled(IDC_QRCODE_GENERATOR, false);
-  command_updater_->UpdateCommandEnabled(IDC_SAFETY_HUB_SHOW_PASSWORD_CHECKUP,
-                                         !guest_session);
   command_updater_->UpdateCommandEnabled(IDC_SHOW_PAYMENT_METHODS,
                                          !guest_session);
   command_updater_->UpdateCommandEnabled(IDC_SHOW_SYNC_SETTINGS, true);

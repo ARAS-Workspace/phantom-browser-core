@@ -21,7 +21,6 @@
 #include "components/keyed_service/core/keyed_service.h"
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/safety_hub/password_status_check_service.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
 struct MenuNotificationEntry {
@@ -71,9 +70,6 @@ class SafetyHubMenuNotificationService : public KeyedService {
       PrefService* pref_service,
       RevokedPermissionsService* revoked_permissions_service,
       NotificationPermissionsReviewService* notification_permissions_service,
-#if !BUILDFLAG(IS_ANDROID)
-      PasswordStatusCheckService* password_check_service,
-#endif  // BUILDFLAG(IS_ANDROID)
       Profile* profile);
   SafetyHubMenuNotificationService(const SafetyHubMenuNotificationService&) =
       delete;

@@ -26,8 +26,6 @@
 #include "chrome/browser/ui/safety_hub/menu_notification_service_factory.h"
 #include "chrome/browser/ui/safety_hub/notification_permission_review_service.h"
 #include "chrome/browser/ui/safety_hub/notification_permission_review_service_factory.h"
-#include "chrome/browser/ui/safety_hub/password_status_check_service.h"
-#include "chrome/browser/ui/safety_hub/password_status_check_service_factory.h"
 #include "chrome/browser/ui/safety_hub/revoked_permissions_service.h"
 #include "chrome/browser/ui/safety_hub/revoked_permissions_service_factory.h"
 #include "chrome/browser/ui/safety_hub/safe_browsing_result.h"
@@ -482,14 +480,9 @@ void SafetyHubHandler::HandleGetSafetyHubEntryPointData(
     return;
   }
 
-  // Modules in subheader should be added in the following order: Passwords,
-  // Safe Browsing, Extensions, Notifications, Permissions.
+  // Modules in subheader should be added in the following order: Safe
+  // Browsing, Extensions, Notifications, Permissions.
   std::u16string subheader = u"";
-
-  if (modules.contains(SafetyHubModule::kPasswords)) {
-    AppendModuleNameToString(subheader,
-                             IDS_SETTINGS_SAFETY_HUB_PASSWORDS_MODULE_NAME);
-  }
 
   if (modules.contains(SafetyHubModule::kSafeBrowsing)) {
     AppendModuleNameToString(subheader,
@@ -526,13 +519,6 @@ std::set<SafetyHubHandler::SafetyHubModule>
 SafetyHubHandler::GetSafetyHubModulesWithRecommendations() {
   std::set<SafetyHubModule> modules;
 
-  // Passwords module
-  PasswordStatusCheckService* psc_service =
-      PasswordStatusCheckServiceFactory::GetForProfile(profile_);
-  CHECK(psc_service);
-  if (CardHasRecommendations(psc_service->GetPasswordCardData())) {
-    modules.insert(SafetyHubModule::kPasswords);
-  }
   // SafeBrowsing module
   if (CardHasRecommendations(
           SafetyHubSafeBrowsingResult::GetSafeBrowsingCardData(

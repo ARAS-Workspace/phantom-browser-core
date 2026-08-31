@@ -39,20 +39,6 @@ class MockCWSInfoService : public extensions::CWSInfoService {
               (const, override));
 };
 
-// This will run UpdateInsecureCredentialCountAsync on
-// PasswordStatusCheckService and return when the check is completed.
-void UpdatePasswordCheckServiceAsync(
-    PasswordStatusCheckService* password_service);
-
-// Creates a new instance of the PasswordStatusService and associates it with
-// `context`. Immediately returns the created service.
-PasswordStatusCheckService* CreateAndUsePasswordStatusService(
-    content::BrowserContext* context);
-
-// This will run until ongoing checks in PasswordStatusCheckService to be
-// completed.
-void RunUntilPasswordCheckCompleted(Profile* profile);
-
 // Creates a mock service that returns mock results for the CWS info service.
 // If |with_calls| is true, total six extensions with different properties are
 // mocked: malware, policy violation, unpublished, combination of malware and
