@@ -864,14 +864,6 @@
     },
     {
       name: "BarcodeDetector",
-      status: {
-        // Built-in barcode detection APIs are only available from some
-        // platforms. See //services/shape_detection.
-        "Android": "stable",
-        "ChromeOS": "stable",
-        "Mac": "stable",
-        "default": "test",
-      },
     },
     {
       // Removes special layout code from customizable select which was
