@@ -329,7 +329,6 @@ class RenderViewContextMenu
   void AppendPartialTranslateItem();
   void AppendTranslateItem();
   void AppendMediaRouterItem();
-  void AppendReadAnythingItem();
   void AppendSaveToMemoryBanksItem();
   void AppendGlicItems();
   void AppendRotationItems();
@@ -438,8 +437,6 @@ class RenderViewContextMenu
 #if BUILDFLAG(ENABLE_COMPOSE)
   void ExecOpenCompose();
 #endif
-  void ExecOpenInReadAnything();
-  void ExecListenToThisPage();
   void ExecSaveToMemoryBanks();
 
   void MediaPlayerAction(const blink::mojom::MediaPlayerAction& action);
