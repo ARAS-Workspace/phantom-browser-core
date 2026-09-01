@@ -3784,15 +3784,7 @@
     },
     {
       name: "LanguageDetectionAPI",
-      status: {
-        "Win": "stable",
-        "Mac": "stable",
-        "Linux": "stable",
-        "ChromeOS": "stable",
-        "Android": "test",
-        "default": "",
-      },
-      base_feature_status: "enabled",
+      base_feature_status: "disabled",
       copied_from_base_feature_if: "overridden",
     },
     {
@@ -6435,14 +6427,7 @@
     },
     {
       name: "TranslationAPI",
-      status: {
-        "Win": "stable",
-        "Mac": "stable",
-        "Linux": "stable",
-        "ChromeOS": "stable",
-        "default": "",
-      },
-      base_feature_status: "enabled",
+      base_feature_status: "disabled",
       copied_from_base_feature_if: "overridden",
     },
     {
