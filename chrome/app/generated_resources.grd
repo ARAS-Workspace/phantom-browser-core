@@ -10062,9 +10062,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
       <message name="IDS_GOOGLE_LENS_TITLE" desc="Title of the Google Lens side panel">
         Google Lens
       </message>
-      <message name="IDS_LENS_DEFAULT_TITLE" desc="Default title of the Lens side panel">
-        Image Search
-      </message>
       <message name="IDS_LENS_COBROWSE_IPH_HEADER" desc="Instruction for the user to use Google Lens visual selection in co browse panel.">
         Select anything on the page to search
       </message>

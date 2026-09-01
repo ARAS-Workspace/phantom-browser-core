@@ -602,17 +602,6 @@ void BrowserActions::InitializeSidePanelActions() {
             .Build());
   }
 
-  // Create the lens action item. The icon and text are set appropriately in the
-  // lens side panel coordinator. They have default values here.
-  root_action_item_->AddChild(
-      SidePanelAction(SidePanelEntryId::kLens, IDS_LENS_DEFAULT_TITLE,
-                      IDS_LENS_DEFAULT_TITLE,
-                      features::IsRoundedIconsEnabled()
-                          ? vector_icons::kImageSearchIcon
-                          : vector_icons::kImageSearchOldIcon,
-                      kActionSidePanelShowLens, bwi, false)
-          .Build());
-
   if (CommentsSidePanelCoordinator::IsSupported()) {
     root_action_item_->AddChild(
         SidePanelAction(SidePanelEntryId::kComments,
