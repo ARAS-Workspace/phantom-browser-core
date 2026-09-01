@@ -405,11 +405,11 @@ chromium-metrics-reviews@google.com.
   <int value="100004" label="AccessibilityImageLabelsEnabledAndroid"/>
   <int value="100005" label="AccessibilityImageLabelsOnlyOnWifi"/>
   <int value="100006" label="PromptForDownloadAndroid"/>
-  <int value="100007" label="AccessibilityReadAnythingFontName"/>
-  <int value="100008" label="AccessibilityReadAnythingFontScale"/>
-  <int value="100009" label="AccessibilityReadAnythingColorInfo"/>
-  <int value="100010" label="AccessibilityReadAnythingLineSpacing"/>
-  <int value="100011" label="AccessibilityReadAnythingLetterSpacing"/>
+  <int value="100007" label="(obsolete) AccessibilityReadAnythingFontName"/>
+  <int value="100008" label="(obsolete) AccessibilityReadAnythingFontScale"/>
+  <int value="100009" label="(obsolete) AccessibilityReadAnythingColorInfo"/>
+  <int value="100010" label="(obsolete) AccessibilityReadAnythingLineSpacing"/>
+  <int value="100011" label="(obsolete) AccessibilityReadAnythingLetterSpacing"/>
   <int value="100012" label="LensRegionSearchEnabled"/>
   <int value="100013" label="HatsSurveyMetadata"/>
   <int value="100014" label="HomePage"/>
@@ -641,9 +641,9 @@ chromium-metrics-reviews@google.com.
   <int value="100225" label="UserSpeakOnMuteDetectionEnabled"/>
   <int value="100226" label="ShouldShowSpeakOnMuteOptInNudge"/>
   <int value="100227" label="SpeakOnMuteOptInNudgeShownCount"/>
-  <int value="100228" label="AccessibilityReadAnythingVoiceName"/>
-  <int value="100229" label="AccessibilityReadAnythingSpeechRate"/>
-  <int value="100230" label="AccessibilityReadAnythingHighlightGranularity"/>
+  <int value="100228" label="(obsolete) AccessibilityReadAnythingVoiceName"/>
+  <int value="100229" label="(obsolete) AccessibilityReadAnythingSpeechRate"/>
+  <int value="100230" label="(obsolete) AccessibilityReadAnythingHighlightGranularity"/>
   <int value="100231"
       label="(Obsolete) AccessibilityReadAnythingHighlightColor"/>
   <int value="100232" label="PinnedActions"/>
@@ -665,7 +665,7 @@ chromium-metrics-reviews@google.com.
   <int value="100247" label="ApplicationLocale"/>
   <int value="100248" label="ListenToThisPageEnabled"/>
   <int value="100249" label="(Obsolete) IpProtectionEnabled"/>
-  <int value="100250" label="AccessibilityReadAnythingLinksEnabled"/>
+  <int value="100250" label="(obsolete) AccessibilityReadAnythingLinksEnabled"/>
   <int value="100251"
       label="kProfileContentSettingsPartitionedExceptionsAntiAbuse"/>
   <int value="100252"
@@ -707,7 +707,7 @@ chromium-metrics-reviews@google.com.
       label="(obsolete) ProfileDefaultContentSettingValuesTrackingProtection"/>
   <int value="100276" label="ShowForwardButton"/>
   <int value="100277" label="AccessibilityMagnifierFollowsSts"/>
-  <int value="100278" label="AccessibilityReadAnythingLanguagesEnabled"/>
+  <int value="100278" label="(obsolete) AccessibilityReadAnythingLanguagesEnabled"/>
   <int value="100279" label="KeyboardDefaultSplitModifierSettings"/>
   <int value="100280" label="DisplayAmbientLightSensorLastEnabled"/>
   <int value="100281" label="AccessibilityMainNodeAnnotationsEnabled"/>
@@ -718,7 +718,7 @@ chromium-metrics-reviews@google.com.
   <int value="100286" label="kAccessibilityFaceGazeCursorControlEnabled"/>
   <int value="100287" label="kAccessibilityFaceGazeAdjustSpeedSeparately"/>
   <int value="100288" label="KeyboardAmbientLightSensorLastEnabled"/>
-  <int value="100289" label="AccessibilityReadAnythingImagesEnabled"/>
+  <int value="100289" label="(obsolete) AccessibilityReadAnythingImagesEnabled"/>
   <int value="100290" label="ShelfMallAppPinRolls"/>
   <int value="100291" label="DesktopToiOSAddressPromoLastImpressionTimestamp"/>
   <int value="100292" label="DesktopToiOSAddressPromoImpressionsCounter"/>
@@ -804,8 +804,8 @@ chromium-metrics-reviews@google.com.
   <int value="100367" label="ClassManagementToolsOOBEAccessCountSetting"/>
   <int value="100368" label="ClassManagementToolsKioskReceiverCodes"/>
   <int value="100369" label="PinContextualTaskButton"/>
-  <int value="100370" label="AccessibilityReadAnythingOmniboxChipIgnoredCount"/>
-  <int value="100371" label="AccessibilityReadAnythingLineFocus"/>
+  <int value="100370" label="(obsolete) AccessibilityReadAnythingOmniboxChipIgnoredCount"/>
+  <int value="100371" label="(obsolete) AccessibilityReadAnythingLineFocus"/>
   <int value="100372" label="OrganizerPanelEntrypointEnabled"/>
   <int value="100373" label="iOSTabGroupsPromoLastImpressionTimestamp"/>
   <int value="100374" label="iOSTabGroupsPromoImpressionsCounter"/>
@@ -813,10 +813,10 @@ chromium-metrics-reviews@google.com.
   <int value="100376" label="iOSPriceTrackingPromoLastImpressionTimestamp"/>
   <int value="100377" label="iOSPriceTrackingPromoImpressionsCounter"/>
   <int value="100378" label="iOSPriceTrackingPromoOptOut"/>
-  <int value="100379" label="AccessibilityReadAnythingLineFocusEnabledMode"/>
+  <int value="100379" label="(obsolete) AccessibilityReadAnythingLineFocusEnabledMode"/>
   <int value="100380" label="AppRatingPromptShown"/>
   <int value="100381"
-      label="AccessibilityReadAnythingLastOpenedPresentationState"/>
+      label="(obsolete) AccessibilityReadAnythingLastOpenedPresentationState"/>
   <int value="100382" label="ProfileContentSettingsExceptionsInlineCueMenu"/>
   <int value="100383"
       label="ProfileContentSettingsPartitionedExceptionsInlineCueMenu"/>

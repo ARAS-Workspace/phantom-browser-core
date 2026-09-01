@@ -11,7 +11,6 @@
 #include "chrome/browser/accessibility/tree_fixing/pref_names.h"
 #include "chrome/browser/desktop_to_mobile_promos/promos_pref_names.h"
 #include "chrome/browser/glic/glic_pref_names.h"
-#include "chrome/browser/ui/read_anything/read_anything_prefs.h"
 #include "chrome/browser/ui/toolbar/toolbar_pref_names.h"
 #include "chrome/common/pref_names.h"
 #include "components/desktop_to_mobile_promos/pref_names.h"
@@ -64,11 +63,11 @@ enum {
   kAccessibilityImageLabelsEnabledAndroid = 100004,
   kAccessibilityImageLabelsOnlyOnWifi = 100005,
   kPromptForDownloadAndroid = 100006,
-  kAccessibilityReadAnythingFontName = 100007,
-  kAccessibilityReadAnythingFontScale = 100008,
-  kAccessibilityReadAnythingColorInfo = 100009,
-  kAccessibilityReadAnythingLineSpacing = 100010,
-  kAccessibilityReadAnythingLetterSpacing = 100011,
+  // kAccessibilityReadAnythingFontName = 100007,  // deprecated
+  // kAccessibilityReadAnythingFontScale = 100008,  // deprecated
+  // kAccessibilityReadAnythingColorInfo = 100009,  // deprecated
+  // kAccessibilityReadAnythingLineSpacing = 100010,  // deprecated
+  // kAccessibilityReadAnythingLetterSpacing = 100011,  // deprecated
   kLensRegionSearchEnabled = 100012,
   kHatsSurveyMetadata = 100013,
   kHomePage = 100014,
@@ -287,9 +286,9 @@ enum {
   kUserSpeakOnMuteDetectionEnabled = 100225,
   kShouldShowSpeakOnMuteOptInNudge = 100226,
   kSpeakOnMuteOptInNudgeShownCount = 100227,
-  kAccessibilityReadAnythingVoiceName = 100228,
-  kAccessibilityReadAnythingSpeechRate = 100229,
-  kAccessibilityReadAnythingHighlightGranularity = 100230,
+  // kAccessibilityReadAnythingVoiceName = 100228,  // deprecated
+  // kAccessibilityReadAnythingSpeechRate = 100229,  // deprecated
+  // kAccessibilityReadAnythingHighlightGranularity = 100230,  // deprecated
   // kAccessibilityReadAnythingHighlightColor = 100231, (deprecated, never used)
   kPinnedActions = 100232,
   kPinnedSearchCompanionMigrationComplete = 100233,
@@ -309,7 +308,7 @@ enum {
   kApplicationLocale = 100247,
   kListenToThisPageEnabled = 100248,
   // kIpProtectionEnabled = 100249, (deprecated)
-  kAccessibilityReadAnythingLinksEnabled = 100250,
+  // kAccessibilityReadAnythingLinksEnabled = 100250,  // deprecated
   kProfileContentSettingsPartitionedExceptionsAntiAbuse = 100251,
   kProfileContentSettingsPartitionedExceptionsAutomaticDownloads = 100252,
   kProfileContentSettingsPartitionedExceptionsCookies = 100253,
@@ -338,7 +337,7 @@ enum {
   kProfileDefaultContentSettingValuesTrackingProtection = 100275,
   kShowForwardButton = 100276,
   kAccessibilityMagnifierFollowsSts = 100277,
-  kAccessibilityReadAnythingLanguagesEnabled = 100278,
+  // kAccessibilityReadAnythingLanguagesEnabled = 100278,  // deprecated
   kKeyboardDefaultSplitModifierSettings = 100279,
   kDisplayAmbientLightSensorLastEnabled = 100280,
   kAccessibilityMainNodeAnnotationsEnabled = 100281,
@@ -349,7 +348,7 @@ enum {
   kAccessibilityFaceGazeCursorControlEnabled = 100286,
   kAccessibilityFaceGazeAdjustSpeedSeparately = 100287,
   kKeyboardAmbientLightSensorLastEnabled = 100288,
-  kAccessibilityReadAnythingImagesEnabled = 100289,
+  // kAccessibilityReadAnythingImagesEnabled = 100289,  // deprecated
   kShelfMallAppPinRolls = 100290,
   kDesktopToiOSAddressPromoLastImpressionTimestamp = 100291,
   kDesktopToiOSAddressPromoImpressionsCounter = 100292,
@@ -430,8 +429,8 @@ enum {
   kClassManagementToolsOOBEAccessCountSetting = 100367,
   kClassManagementToolsKioskReceiverCodes = 100368,
   kPinContextualTaskButton = 100369,
-  kAccessibilityReadAnythingOmniboxChipIgnoredCount = 100370,
-  kAccessibilityReadAnythingLineFocus = 100371,
+  // kAccessibilityReadAnythingOmniboxChipIgnoredCount = 100370,  // deprecated
+  // kAccessibilityReadAnythingLineFocus = 100371,  // deprecated
   kOrganizerPanelEntrypointEnabled = 100372,
   kDesktopToiOSTabGroupsPromoLastImpressionTimestamp = 100373,
   kDesktopToiOSTabGroupsPromoImpressionsCounter = 100374,
@@ -439,9 +438,9 @@ enum {
   kDesktopToiOSPriceTrackingPromoLastImpressionTimestamp = 100376,
   kDesktopToiOSPriceTrackingPromoImpressionsCounter = 100377,
   kDesktopToiOSPriceTrackingPromoOptOut = 100378,
-  kAccessibilityReadAnythingLastNonDisabledLineFocus = 100379,
+  // kAccessibilityReadAnythingLastNonDisabledLineFocus = 100379,  // deprecated
   kAppRatingPromptShown = 100380,
-  kAccessibilityReadAnythingLastOpenedPresentationState = 100381,
+  // kAccessibilityReadAnythingLastOpenedPresentationState = 100381,  // deprecated
   kProfileContentSettingsExceptionsInlineCueMenu = 100382,
   kProfileContentSettingsPartitionedExceptionsInlineCueMenu = 100383,
   kProfileDefaultContentSettingValuesInlineCueMenu = 100384,
@@ -511,66 +510,6 @@ constexpr auto kChromeSyncablePrefsAllowlist = base::MakeFixedFlatMap<
       sync_preferences::PrefSensitivity::kNone,
       sync_preferences::MergeBehavior::kNone}},
 #else
-    {prefs::kAccessibilityReadAnythingFontName,
-     {syncable_prefs_ids::kAccessibilityReadAnythingFontName,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityReadAnythingFontScale,
-     {syncable_prefs_ids::kAccessibilityReadAnythingFontScale,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityReadAnythingColorInfo,
-     {syncable_prefs_ids::kAccessibilityReadAnythingColorInfo,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityReadAnythingLineSpacing,
-     {syncable_prefs_ids::kAccessibilityReadAnythingLineSpacing,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityReadAnythingLetterSpacing,
-     {syncable_prefs_ids::kAccessibilityReadAnythingLetterSpacing,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityReadAnythingVoiceName,
-     {syncable_prefs_ids::kAccessibilityReadAnythingVoiceName,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityReadAnythingSpeechRate,
-     {syncable_prefs_ids::kAccessibilityReadAnythingSpeechRate,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityReadAnythingHighlightGranularity,
-     {syncable_prefs_ids::kAccessibilityReadAnythingHighlightGranularity,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityReadAnythingLinksEnabled,
-     {syncable_prefs_ids::kAccessibilityReadAnythingLinksEnabled,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityReadAnythingImagesEnabled,
-     {syncable_prefs_ids::kAccessibilityReadAnythingImagesEnabled,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityReadAnythingLanguagesEnabled,
-     {syncable_prefs_ids::kAccessibilityReadAnythingLanguagesEnabled,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityReadAnythingOmniboxChipIgnoredCount,
-     {syncable_prefs_ids::kAccessibilityReadAnythingOmniboxChipIgnoredCount,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityReadAnythingLineFocus,
-     {syncable_prefs_ids::kAccessibilityReadAnythingLineFocus,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityReadAnythingLastNonDisabledLineFocus,
-     {syncable_prefs_ids::kAccessibilityReadAnythingLastNonDisabledLineFocus,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
-    {prefs::kAccessibilityReadAnythingLastOpenedPresentationState,
-     {syncable_prefs_ids::kAccessibilityReadAnythingLastOpenedPresentationState,
-      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
-      sync_preferences::MergeBehavior::kNone}},
     {prefs::kLensRegionSearchEnabled,
      {syncable_prefs_ids::kLensRegionSearchEnabled, syncer::PREFERENCES,
       sync_preferences::PrefSensitivity::kNone,

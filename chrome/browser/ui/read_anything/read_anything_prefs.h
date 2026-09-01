@@ -10,10 +10,6 @@
 
 #if !BUILDFLAG(IS_ANDROID)
 
-namespace user_prefs {
-class PrefRegistrySyncable;
-}
-
 namespace prefs {
 
 // String to represent the user's preferred font name for the read anything UI.
@@ -102,9 +98,6 @@ inline constexpr char kAccessibilityReadAnythingRecentUsagesStartTimes[] =
     "settings.a11y.read_anything.recent_usages_start_times";
 
 }  // namespace prefs
-
-void RegisterReadAnythingProfilePrefs(
-    user_prefs::PrefRegistrySyncable* registry);
 
 #endif  // !BUILDFLAG(IS_ANDROID)
 

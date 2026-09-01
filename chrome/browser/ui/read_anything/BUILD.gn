@@ -10,10 +10,7 @@ import("//extensions/buildflags/buildflags.gni")
 import("//testing/test.gni")
 
 source_set("prefs") {
-  sources = [
-    "read_anything_prefs.cc",
-    "read_anything_prefs.h",
-  ]
+  sources = [ "read_anything_prefs.h" ]
 
   deps = [
     "//base",
