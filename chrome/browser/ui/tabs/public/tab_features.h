@@ -47,7 +47,6 @@ class HttpAuthCacheStatus;
 class IntentPickerViewPageActionController;
 class JsOptimizationsPageActionController;
 class LensOverlayController;
-class LensOverlayHomeworkPageActionController;
 class LensSearchController;
 class MemorySaverChipTabHelper;
 class NewTabPagePreloadPipelineManager;
@@ -503,8 +502,6 @@ class TabFeatures {
       cookie_controls_page_action_controller_;
 
   // Manages the Lens Overlay Homework page action.
-  std::unique_ptr<LensOverlayHomeworkPageActionController>
-      lens_overlay_homework_page_action_controller_;
 
   // Manages the Bookmark page action.
   std::unique_ptr<BookmarkPageActionController>

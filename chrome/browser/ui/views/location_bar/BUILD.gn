@@ -15,7 +15,6 @@ source_set("location_bar") {
     public += [
       "content_setting_image_view.h",
       "custom_tab_bar_view.h",
-      "lens_overlay_homework_page_action_controller.h",
       "location_bar_bubble_delegate_view.h",
       "location_bar_layout.h",
       "location_bar_view.h",
@@ -85,7 +84,6 @@ source_set("impl") {
     sources += [
       "content_setting_image_view.cc",
       "custom_tab_bar_view.cc",
-      "lens_overlay_homework_page_action_controller.cc",
       "location_bar_actions.cc",
       "location_bar_bubble_delegate_view.cc",
       "location_bar_layout.cc",

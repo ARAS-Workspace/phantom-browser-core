@@ -33,7 +33,6 @@
 #include "chrome/browser/ui/tabs/public/tab_features.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
-#include "chrome/browser/ui/views/location_bar/lens_overlay_homework_page_action_controller.h"
 #include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
 #include "chrome/browser/ui/webui/new_tab_page_third_party/new_tab_page_third_party_ui.h"
 #include "chrome/browser/ui/webui/ntp/new_tab_ui.h"
@@ -219,15 +218,6 @@ void LensOverlayEntryPointController::UpdateEntryPointsState(
     }
   }
   UpdatePageActionState();
-
-  CHECK(browser_window_interface_);
-
-  // `tab_interface` can be null early during browser startup.
-  if (auto* tab_interface =
-          browser_window_interface_->GetActiveTabInterface()) {
-    LensOverlayHomeworkPageActionController::From(*tab_interface)
-        ->UpdatePageActionIcon();
-  }
 }
 
 bool LensOverlayEntryPointController::IsUrlEduEligible(const GURL& url) const {
@@ -307,17 +297,6 @@ void LensOverlayEntryPointController::InvokeAction(
 
 void LensOverlayEntryPointController::OnLocationBarFocusChanged() {
   UpdatePageActionState();
-
-  // `tab_interface` can be null early during browser startup.
-  if (auto* tab_interface =
-          browser_window_interface_->GetActiveTabInterface()) {
-    // The controller may be null during tab destruction, which triggers the
-    // focus change leading to this.
-    if (auto* controller =
-            LensOverlayHomeworkPageActionController::From(*tab_interface)) {
-      controller->UpdatePageActionIcon();
-    }
-  }
 }
 
 void LensOverlayEntryPointController::OnFullscreenStateChanged() {

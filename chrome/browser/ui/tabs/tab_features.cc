@@ -102,7 +102,6 @@
 #include "chrome/browser/ui/views/intent_picker/intent_picker_view_page_action_controller.h"
 #include "chrome/browser/ui/views/js_optimization/js_optimizations_page_action_controller.h"
 #include "chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_page_action_controller.h"
-#include "chrome/browser/ui/views/location_bar/lens_overlay_homework_page_action_controller.h"
 #include "chrome/browser/ui/views/side_panel/customize_chrome/side_panel_controller_views.h"
 #include "chrome/browser/ui/views/side_panel/extensions/extension_side_panel_manager.h"
 #include "chrome/browser/ui/views/translate/translate_page_action_controller.h"
@@ -252,13 +251,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
         GetUserDataFactory().CreateInstance<CookieControlsPageActionController>(
             tab, tab, *profile, *page_action_controller_);
     cookie_controls_page_action_controller_->Init();
-  }
-
-  if (page_action_controller_->ActionExists(kActionLensOverlayHomework)) {
-    lens_overlay_homework_page_action_controller_ =
-        GetUserDataFactory()
-            .CreateInstance<LensOverlayHomeworkPageActionController>(
-                tab, tab, *profile, *page_action_controller_);
   }
 
   if (tab.GetBrowserWindowInterface()->GetType() ==

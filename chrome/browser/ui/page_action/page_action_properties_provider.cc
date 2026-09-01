@@ -58,16 +58,6 @@ constexpr auto kPageActionProperties = base::MakeFixedFlatMap<
         },
     },
     {
-        kActionLensOverlayHomework,
-        {
-            .histogram_name = "LensOverlayHomework",
-            .type = PageActionIconType::kLensOverlayHomework,
-            .element_identifier = kLensOverlayHomeworkPageActionIconElementId,
-            .priority =
-                page_actions::PageActionPriorityCategory::kDiscoveryNudge,
-        },
-    },
-    {
         kActionShowTranslate,
         {
             .histogram_name = "Translate",
