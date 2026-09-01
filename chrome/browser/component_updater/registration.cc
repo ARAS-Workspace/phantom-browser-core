@@ -78,10 +78,6 @@
 #include "chrome/browser/component_updater/smart_dim_component_installer.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-#include "chrome/browser/component_updater/translate_kit_component_installer.h"
-#include "chrome/browser/component_updater/translate_kit_language_pack_component_installer.h"
-#endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
 
 #if BUILDFLAG(ENABLE_WIDEVINE_CDM_COMPONENT)
 #include "chrome/browser/component_updater/widevine_cdm_component_installer.h"
@@ -207,18 +203,6 @@ void RegisterComponentsForUpdate() {
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
 
   RegisterCommerceHeuristicsComponent(cus);
-
-#if BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
-  // TODO(crbug.com/364795294): Support other platforms.
-  RegisterTranslateKitComponent(cus, g_browser_process->local_state(),
-                                /*force_install=*/false,
-                                /*registered_callback=*/base::OnceClosure(),
-                                /*on_ready_callback=*/base::DoNothing());
-  RegisterTranslateKitLanguagePackComponentsForUpdate(
-      cus, g_browser_process->local_state());
-  RegisterTranslateKitLanguagePackComponentsForAutoDownload(
-      cus, g_browser_process->local_state());
-#endif  // BUILDFLAG(ENABLE_ON_DEVICE_TRANSLATION)
 
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
     BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
