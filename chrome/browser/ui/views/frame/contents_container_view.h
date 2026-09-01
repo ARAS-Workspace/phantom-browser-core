@@ -24,7 +24,6 @@ class ContentsWebView;
 class MultiContentsViewMiniToolbar;
 class ScrimView;
 class ActorOverlayWebView;
-class ReadAnythingImmersiveOverlayView;
 
 namespace gfx {
 class Rect;
@@ -82,9 +81,6 @@ class ContentsContainerView : public views::View,
   }
   ActorOverlayWebView* actor_overlay_web_view() {
     return actor_overlay_web_view_;
-  }
-  ReadAnythingImmersiveOverlayView* read_anything_immersive_overlay_view() {
-    return read_anything_immersive_overlay_view_;
   }
   glic::ContextSharingBorderView* glic_border_view() { return glic_border_; }
   new_tab_footer::NewTabFooterWebView* new_tab_footer_view() {
@@ -185,11 +181,6 @@ class ContentsContainerView : public views::View,
   raw_ptr<ScrimView> devtools_scrim_view_ = nullptr;
   DevToolsDockedPlacement current_devtools_docked_placement_ =
       DevToolsDockedPlacement::kNone;
-
-  // The view that contains the Immersive Reading Mode. This view is an overlay
-  // on top of the ContentsWebView.
-  raw_ptr<ReadAnythingImmersiveOverlayView>
-      read_anything_immersive_overlay_view_ = nullptr;
 
   // The view that shows a footer at the bottom of the contents
   // container on new tab pages.
