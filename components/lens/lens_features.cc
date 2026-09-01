@@ -647,7 +647,7 @@ bool GetShouldIssueProcessPrewarmingForLens() {
 }
 
 bool IsLensOverlayEnabled() {
-  return base::FeatureList::IsEnabled(kLensOverlay);
+  return false;
 }
 
 std::string GetLensOverlayActivityURL() {
