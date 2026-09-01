@@ -110,16 +110,6 @@ constexpr auto kPageActionProperties = base::MakeFixedFlatMap<
         },
     },
     {
-        kActionSidePanelShowReadAnything,
-        {
-            .histogram_name = "ReadingMode",
-            .type = PageActionIconType::kReadingMode,
-            .element_identifier = kReadAnythingPageActionElementId,
-            .priority =
-                page_actions::PageActionPriorityCategory::kCoreSiteUtility,
-        },
-    },
-    {
         kActionOffersAndRewardsForPage,
         {
             .histogram_name = "PaymentsOfferNotification",

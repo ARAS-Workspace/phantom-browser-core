@@ -118,7 +118,6 @@
 #include "chrome/browser/ui/passwords/passwords_model_delegate.h"
 #include "chrome/browser/ui/performance_controls/memory_saver_bubble_controller.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
-#include "chrome/browser/ui/read_anything/read_anything_entry_point_controller.h"
 #include "chrome/browser/ui/search/omnibox_utils.h"
 #include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_bubble.h"
 #include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_toolbar_icon_controller.h"
@@ -457,115 +456,6 @@ void BrowserActions::InitializeSidePanelActions() {
                         kActionSidePanelShowHistory, bwi, true)
             .Build());
   }
-
-  ui::Accelerator reading_mode_accelerator;
-  std::u16string reading_mode_shortcut;
-  if (GetAcceleratorForCommandId(IDC_SHOW_READING_MODE_KEYBOARD,
-                                 &reading_mode_accelerator)) {
-    reading_mode_shortcut = reading_mode_accelerator.GetShortcutText();
-  }
-
-  if (features::IsReadAnythingOmniboxChipEnabled() ||
-      features::IsImmersiveReadAnythingEnabled()) {
-    root_action_item_->AddChild(
-        actions::ActionItem::Builder(
-            base::BindRepeating(
-                [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                   actions::ActionInvocationContext context) {
-                  read_anything::ReadAnythingEntryPointController::
-                      InvokePageAction(bwi, context);
-                },
-                bwi))
-            .SetActionId(kActionSidePanelShowReadAnything)
-            .SetText(l10n_util::GetStringUTF16(IDS_READING_MODE_TITLE))
-            .SetTooltipText(l10n_util::GetStringFUTF16(IDS_READING_MODE_TOOLTIP,
-                                                       reading_mode_shortcut))
-            .SetImage(ui::ImageModel::FromVectorIcon(
-                features::IsRoundedIconsEnabled()
-                    ? kMenuBookIcon
-                    : kMenuBookChromeRefreshOldIcon,
-                ui::kColorIcon))
-            .SetProperty(
-                actions::kActionItemPinnableKey,
-                static_cast<
-                    std::underlying_type_t<actions::ActionPinnableState>>(
-                    actions::ActionPinnableState::kPinnable))
-            .Build());
-  } else {
-    root_action_item_->AddChild(
-        actions::ActionItem::Builder(
-            CreateToggleSidePanelActionCallback(
-                SidePanelEntryKey(SidePanelEntryId::kReadAnything), bwi))
-            .SetActionId(kActionSidePanelShowReadAnything)
-            .SetText(l10n_util::GetStringUTF16(IDS_READING_MODE_TITLE))
-            .SetTooltipText(l10n_util::GetStringFUTF16(IDS_READING_MODE_TOOLTIP,
-                                                       reading_mode_shortcut))
-            .SetImage(ui::ImageModel::FromVectorIcon(
-                features::IsRoundedIconsEnabled()
-                    ? kMenuBookIcon
-                    : kMenuBookChromeRefreshOldIcon,
-                ui::kColorIcon))
-            .SetProperty(
-                actions::kActionItemPinnableKey,
-                static_cast<
-                    std::underlying_type_t<actions::ActionPinnableState>>(
-                    actions::ActionPinnableState::kPinnable))
-            .Build());
-  }
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                read_anything::ReadAnythingEntryPointController::ToggleUI(
-                    bwi, read_anything::mojom::ReadAnythingOpenTrigger::
-                             kKeyboardShortcut);
-              },
-              bwi))
-          .SetActionId(kActionShowReadingModeKeyboard)
-          .SetText(l10n_util::GetStringUTF16(IDS_READING_MODE_TITLE))
-          .SetTooltipText(l10n_util::GetStringFUTF16(IDS_READING_MODE_TOOLTIP,
-                                                     reading_mode_shortcut))
-          .SetImage(ui::ImageModel::FromVectorIcon(
-              features::IsRoundedIconsEnabled() ? kMenuBookIcon
-                                                : kMenuBookChromeRefreshOldIcon,
-              ui::kColorIcon))
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                std::underlying_type_t<SidePanelOpenTrigger>
-                    side_panel_trigger =
-                        context.GetProperty(kSidePanelOpenTriggerKey);
-                read_anything::mojom::ReadAnythingOpenTrigger open_trigger =
-                    read_anything::mojom::ReadAnythingOpenTrigger::kAppMenu;
-                if (side_panel_trigger != -1) {
-                  std::optional<read_anything::mojom::ReadAnythingOpenTrigger>
-                      mapped_trigger =
-                          read_anything::SidePanelToReadAnythingOpenTrigger(
-                              static_cast<SidePanelOpenTrigger>(
-                                  side_panel_trigger));
-                  if (mapped_trigger.has_value()) {
-                    open_trigger = mapped_trigger.value();
-                  }
-                }
-                read_anything::ReadAnythingEntryPointController::ShowUI(
-                    bwi, open_trigger);
-              },
-              bwi))
-          .SetActionId(kActionShowReadingModeSidePanel)
-          .SetText(l10n_util::GetStringUTF16(IDS_READING_MODE_TITLE))
-          .SetTooltipText(l10n_util::GetStringFUTF16(IDS_READING_MODE_TOOLTIP,
-                                                     reading_mode_shortcut))
-          .SetImage(ui::ImageModel::FromVectorIcon(
-              features::IsRoundedIconsEnabled() ? kMenuBookIcon
-                                                : kMenuBookChromeRefreshOldIcon,
-              ui::kColorIcon))
-          .Build());
 
   if (lens::features::IsLensOverlayEnabled()) {
     const gfx::VectorIcon& icon =
