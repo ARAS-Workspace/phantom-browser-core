@@ -108,9 +108,7 @@
 #include "chrome/browser/ui/customize_chrome/side_panel_controller.h"
 #include "chrome/browser/ui/dialogs/browser_dialogs.h"
 #include "chrome/browser/ui/intent_picker_tab_helper.h"
-#include "chrome/browser/ui/lens/lens_overlay_controller.h"
 #include "chrome/browser/ui/lens/lens_overlay_entry_point_controller.h"
-#include "chrome/browser/ui/lens/lens_search_controller.h"
 #include "chrome/browser/ui/lens/lens_string_utils.h"
 #include "chrome/browser/ui/omnibox/ai_mode_page_action_controller.h"
 #include "chrome/browser/ui/page_action/page_action_controller.h"
@@ -189,7 +187,6 @@
 #include "components/contextual_tasks/public/features.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/lens/lens_features.h"
-#include "components/lens/lens_overlay_invocation_source.h"
 #include "components/media_router/browser/media_router_dialog_controller.h"
 #include "components/media_router/browser/media_router_metrics.h"
 #include "components/multistep_filter/core/features.h"
@@ -216,8 +213,6 @@
 #include "chrome/browser/ui/ash/multi_user/multi_user_context_menu.h"
 #include "chrome/browser/ui/browser_commands_chromeos.h"
 #endif
-#include "chrome/browser/ui/lens/lens_search_controller.h"
-#include "components/lens/lens_overlay_invocation_source.h"
 #include "components/user_prefs/user_prefs.h"
 #include "components/vector_icons/vector_icons.h"
 #include "printing/buildflags/buildflags.h"
@@ -3356,37 +3351,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
                 if (!web_contents) {
                   return;
                 }
-                if (lens::features::IsLensOverlayEnabled()) {
-                  LensSearchController* const controller =
-                      LensSearchController::FromTabWebContents(web_contents);
-                  if (controller) {
-                    controller->OpenLensOverlay(
-                        lens::LensOverlayInvocationSource::
-                            kContentAreaContextMenuPage);
-                    return;
-                  }
-                }
-                chrome::ExecLensRegionSearch(bwi);
-              },
-              bwi))
-          .SetActionId(kActionContentContextLensRegionSearch)
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                tabs::TabInterface* const active_tab =
-                    bwi->GetActiveTabInterface();
-                if (!active_tab) {
-                  return;
-                }
-                content::WebContents* const web_contents =
-                    active_tab->GetContents();
-                if (!web_contents) {
-                  return;
-                }
                 if (base::FeatureList::IsEnabled(
                         features::kDevToolsShowPolicyDialog) &&
                     !DevToolsWindow::AllowDevToolsFor(bwi->GetProfile(),
@@ -3772,31 +3736,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               },
               bwi))
           .SetActionId(kActionShowFullUrls)
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::ToggleShowGoogleLensShortcut(bwi);
-              },
-              bwi))
-          .SetActionId(kActionShowGoogleLensShortcut)
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                if (!bwi) {
-                  return;
-                }
-                chrome::ExecLensOverlay(bwi);
-              },
-              bwi))
-          .SetActionId(kActionShowLensOverlayFromAppMenu)
           .Build());
 
   root_action_item_->AddChild(

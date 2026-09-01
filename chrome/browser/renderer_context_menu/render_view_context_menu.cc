@@ -1579,31 +1579,7 @@ int RenderViewContextMenu::GetSearchForVideoFrameIdc() const {
 }
 
 const TemplateURL* RenderViewContextMenu::GetImageSearchProvider() const {
-  if (!GetBrowser()) {
-    return nullptr;
-  }
-
-  // TODO(b/266624865): Image Search items do not function correctly when
-  // |GetBrowser| returns nullptr, as is the case for a context menu in the
-  // side panel, so for now we do not append image items in that case.
-  // TODO(nguyenbryan): Refactor to use lens_region_search_helper.cc after PDF
-  // support is cleaned up.
-  auto* service = TemplateURLServiceFactory::GetForProfile(GetProfile());
-  if (!service) {
-    return nullptr;
-  }
-
-  const TemplateURL* provider = service->GetDefaultSearchProvider();
-  if (!provider) {
-    return nullptr;
-  }
-
-  if (provider->image_url().empty() ||
-      !provider->image_url_ref().IsValid(service->search_terms_data())) {
-    return nullptr;
-  }
-
-  return provider;
+  return nullptr;
 }
 
 std::u16string RenderViewContextMenu::GetImageSearchProviderName(
@@ -5878,25 +5854,7 @@ bool RenderViewContextMenu::CanAppendRegionSearchItem() const {
 }
 
 bool RenderViewContextMenu::CanAppendGlicShareImageItem() const {
-  if (!IsNormalBrowser()) {
-    return false;
-  }
-
-  if (!glic::GlicEnabling::IsShareImageEnabledForProfile(GetProfile()) ||
-      IsGlicWindow(this, browser_context_)) {
-    return false;
-  }
-
-  tabs::TabInterface* tab =
-      tabs::TabInterface::MaybeGetFromContents(source_web_contents_);
-  if (!tab) {
-    return false;
-  }
-
-  auto* helper = tabs::PageContextEligibilityHelper::From(tab);
-  return helper &&
-         helper->IsPageContextEligible() ==
-             optimization_guide::PageContextEligibilityStatus::kEligible;
+  return false;
 }
 
 void RenderViewContextMenu::AppendLensGeminiSection() {
