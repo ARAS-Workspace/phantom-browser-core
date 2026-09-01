@@ -11,7 +11,6 @@
 
 #if defined(TOOLKIT_VIEWS)
 #include "chrome/browser/ui/webui/data_sharing/data_sharing_ui.h"
-#include "chrome/browser/ui/webui/side_panel/read_anything/read_anything_untrusted_ui.h"
 #include "components/compose/buildflags.h"
 #if BUILDFLAG(ENABLE_COMPOSE)
 #include "chrome/browser/ui/webui/compose/compose_untrusted_ui.h"
@@ -53,8 +52,6 @@ void RegisterChromeUntrustedWebUIConfigs() {
 #if defined(TOOLKIT_VIEWS)
   map.AddUntrustedWebUIConfig(
       std::make_unique<ttc::AiOverlayDialogUntrustedUIConfig>());
-  map.AddUntrustedWebUIConfig(
-      std::make_unique<ReadAnythingUIUntrustedConfig>());
   map.AddUntrustedWebUIConfig(std::make_unique<DataSharingUIConfig>());
 
 #if BUILDFLAG(ENABLE_COMPOSE)
