@@ -73,8 +73,6 @@
 #include "chrome/browser/ui/performance_controls/memory_saver_chip_controller.h"
 #include "chrome/browser/ui/performance_controls/memory_saver_chip_tab_helper.h"
 #include "chrome/browser/ui/performance_controls/tab_resource_usage_tab_helper.h"
-#include "chrome/browser/ui/read_anything/read_anything_controller.h"
-#include "chrome/browser/ui/read_anything/read_anything_side_panel_controller.h"
 #include "chrome/browser/ui/search_engine_choice/search_engine_choice_tab_helper.h"
 #include "chrome/browser/ui/side_panel/side_panel_registry.h"
 #include "chrome/browser/ui/tab_ui_helper.h"
@@ -456,20 +454,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
 
   data_protection_tab_controller_ = std::make_unique<
       enterprise_data_protection::DataProtectionNavigationController>(&tab);
-
-  // Create the ReadAnythingController first to ensure it exists before
-  // any potential consumers, like the side panel controller.
-  if (features::IsImmersiveReadAnythingEnabled()) {
-    read_anything_controller_ =
-        GetUserDataFactory().CreateInstance<ReadAnythingController>(
-            tab, &tab, side_panel_registry_.get());
-  } else {
-    // TODO(crbug.com/447418049): This will be removed in the future when
-    // ownership of this controller is migrated to ReadAnythingController.
-    read_anything_side_panel_controller_ =
-        std::make_unique<ReadAnythingSidePanelController>(
-            &tab, side_panel_registry_.get());
-  }
 
   // Create the HttpAuthCacheStatus to start observing resource load
   // completions.
