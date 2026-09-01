@@ -135,7 +135,6 @@
 #include "chrome/browser/ui/tabs/tab_enums.h"
 #include "chrome/browser/ui/tabs/tab_strip_prefs.h"
 #include "chrome/browser/ui/tabs/vertical_tab_strip_state_controller.h"
-#include "chrome/browser/ui/toolbar/cast/cast_toolbar_button_util.h"
 #include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_utils.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
@@ -264,26 +263,6 @@ actions::ActionItem::ActionItemBuilder ChromeMenuAction(
                             actions::ActionPinnableState::kPinnable));
   }
   return builder;
-}
-
-actions::StatefulImageActionItem::StatefulImageActionItemBuilder
-StatefulChromeMenuAction(actions::ActionItem::InvokeActionCallback callback,
-                         actions::ActionId action_id,
-                         int title_id,
-                         int tooltip_id,
-                         const gfx::VectorIcon& icon) {
-  ui::ImageModel image = ui::ImageModel::FromVectorIcon(icon, ui::kColorIcon);
-  return actions::StatefulImageActionItem::Builder(callback)
-      .SetActionId(action_id)
-      .SetText(BrowserActions::GetCleanTitleAndTooltipText(
-          l10n_util::GetStringUTF16(title_id)))
-      .SetTooltipText(BrowserActions::GetCleanTitleAndTooltipText(
-          l10n_util::GetStringUTF16(tooltip_id)))
-      .SetImage(image)
-      .SetStatefulImage(image)
-      .SetProperty(actions::kActionItemPinnableKey,
-                   std::underlying_type_t<actions::ActionPinnableState>(
-                       actions::ActionPinnableState::kPinnable));
 }
 
 actions::ActionItem::ActionItemBuilder SidePanelAction(
@@ -1578,32 +1557,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .SetEnabled(chrome::CanCopyUrl(bwi))
           .SetVisible(!sharing_hub::SharingIsDisabledByPolicy(profile))
           .Build());
-
-  // TODO(crbug.com/435220196): Ideally this action would have
-  // CastBrowserController passed in as a dependency directly.
-  actions::ActionItem* media_router_action;
-  root_action_item_->AddChild(
-      StatefulChromeMenuAction(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                // TODO(crbug.com/356468503): Figure out how to capture
-                // action invocation location.
-                auto* cast_browser_controller =
-                    bwi->GetFeatures().cast_browser_controller();
-                if (cast_browser_controller) {
-                  cast_browser_controller->ToggleDialog();
-                }
-              },
-              bwi),
-          kActionRouteMedia, IDS_MEDIA_ROUTER_MENU_ITEM_TITLE,
-          IDS_MEDIA_ROUTER_ICON_TOOLTIP_TEXT,
-          features::IsRoundedIconsEnabled() ? kCastIcon
-                                            : kCastChromeRefreshOldIcon)
-          .SetEnabled(chrome::CanRouteMedia(bwi))
-          .CopyAddressTo(&media_router_action)
-          .Build());
-  CastToolbarButtonUtil::AddCastChildActions(media_router_action, bwi);
 
   // TODO(crbug.com/435220196): Ideally this action would have
   // DownloadToolbarUIController passed in as a dependency directly.

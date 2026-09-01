@@ -344,8 +344,6 @@ void CustomizeToolbarHandler::ListActions(ListActionsCallback callback) {
              side_panel::customize_chrome::mojom::CategoryId::kTools);
   add_action(kActionQrCodeGenerator,
              side_panel::customize_chrome::mojom::CategoryId::kTools);
-  add_action(kActionRouteMedia,
-             side_panel::customize_chrome::mojom::CategoryId::kTools);
   add_action(kActionCopyUrl,
              side_panel::customize_chrome::mojom::CategoryId::kTools);
   add_action(kActionSendTabToSelf,

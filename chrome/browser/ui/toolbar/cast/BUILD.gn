@@ -7,7 +7,6 @@ assert(is_win || is_mac || is_linux || is_chromeos)
 source_set("cast") {
   sources = [
     "cast_toolbar_button_controller.h",
-    "cast_toolbar_button_util.h",
   ]
   public_deps = [
     "//base",
@@ -23,7 +22,6 @@ source_set("cast") {
 source_set("impl") {
   sources = [
     "cast_toolbar_button_controller.cc",
-    "cast_toolbar_button_util.cc",
   ]
   deps = [
     ":cast",
