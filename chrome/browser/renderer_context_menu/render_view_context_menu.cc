@@ -2549,8 +2549,6 @@ void RenderViewContextMenu::AppendPageItems() {
     return;
   }
 
-  const bool use_simplified_text_selection = ShouldUseSimplifiedTextSelection();
-
   menu_model_.AddItemWithStringId(IDC_BACK, IDS_CONTENT_CONTEXT_BACK);
   menu_model_.AddItemWithStringId(IDC_FORWARD, IDS_CONTENT_CONTEXT_FORWARD);
   menu_model_.AddItemWithStringId(IDC_RELOAD, IDS_CONTENT_CONTEXT_RELOAD);
