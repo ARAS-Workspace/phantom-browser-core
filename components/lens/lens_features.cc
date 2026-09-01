@@ -263,7 +263,7 @@ const base::FeatureParam<bool>
 
 constexpr base::FeatureParam<std::string> kLensOverlayEndpointUrl{
     &kLensOverlay, "endpoint-url",
-    "https://lensfrontend-pa.googleapis.com/v1/crupload"};
+    ""};
 
 constexpr base::FeatureParam<bool> kUseOauthForLensOverlayRequests{
     &kLensOverlay, "use-oauth-for-requests", true};
@@ -348,7 +348,7 @@ constexpr base::FeatureParam<int> kLensOverlayPageContentRequestTimeoutMs{
 
 constexpr base::FeatureParam<std::string> kLensOverlayClusterInfoEndpointUrl{
     &kLensOverlayContextualSearchbox, "cluster-info-endpoint-url",
-    "https://lensfrontend-pa.googleapis.com/v1/gsessionid"};
+    ""};
 
 constexpr base::FeatureParam<bool> kLensOverlaySendLensInputsForLensSuggest{
     &kLensOverlaySuggestionsMigration, "send-lens-inputs-for-lens-suggest",
@@ -501,7 +501,7 @@ constexpr base::FeatureParam<bool>
         true};
 
 constexpr base::FeatureParam<std::string> kHomepageURLForLens{
-    &kLensStandalone, "lens-homepage-url", "https://lens.google.com/v3/"};
+    &kLensStandalone, "lens-homepage-url", ""};
 
 constexpr base::FeatureParam<bool> kEnableLensHtmlRedirectFix{
     &kLensStandalone, "lens-html-redirect-fix", false};
@@ -520,7 +520,7 @@ constexpr base::FeatureParam<size_t> kLensOverlayChunkSizeBytes{
 
 constexpr base::FeatureParam<std::string> kLensOverlayUploadChunkEndpointUrl{
     &kLensOverlayUploadChunking, "upload-chunk-endpoint-url",
-    "https://lensfrontend-pa.googleapis.com/v1/uploadChunk"};
+    ""};
 
 constexpr base::FeatureParam<int> kLensOverlayUploadChunkRequestTimeoutMs{
     &kLensOverlayUploadChunking, "upload-chunk-request-timeout-ms", 60000};
@@ -1313,18 +1313,18 @@ constexpr base::FeatureParam<std::string>
     kLensComposeboxIdentityDelegationClusterInfoEndpointUrl{
         &kLensComposeboxIdentityDelegation,
         "lens-composebox-cluster-info-endpoint-url",
-        "https://lensfrontend-pa.clients6.google.com/v1/gsessionid"};
+        ""};
 
 constexpr base::FeatureParam<std::string>
     kLensComposeboxIdentityDelegationEndpointUrl{
         &kLensComposeboxIdentityDelegation, "lens-composebox-endpoint-url",
-        "https://lensfrontend-pa.clients6.google.com/v1/crupload"};
+        ""};
 
 constexpr base::FeatureParam<std::string>
     kLensComposeboxIdentityDelegationUploadChunkEndpointUrl{
         &kLensComposeboxIdentityDelegation,
         "lens-composebox-upload-chunk-endpoint-url",
-        "https://lensfrontend-pa.clients6.google.com/v1/uploadChunk"};
+        ""};
 
 bool UseIdentityDelegationForLensComposeboxRequests() {
   return base::FeatureList::IsEnabled(kLensComposeboxIdentityDelegation);
