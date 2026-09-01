@@ -22,8 +22,8 @@ void RecordUmaGeolocationImplClientId(mojom::GeolocationClientId client_id) {
                                 client_id);
 }
 
-constexpr double kFixedLatitude = 39.925;
-constexpr double kFixedLongitude = 32.836944;
+constexpr double kFixedLatitude = 0.0;
+constexpr double kFixedLongitude = 0.0;
 constexpr double kFixedAccuracyMeters = 20.0;
 
 mojom::GeopositionResultPtr MakeFixedPosition() {
