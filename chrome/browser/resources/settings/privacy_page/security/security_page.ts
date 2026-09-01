@@ -456,10 +456,6 @@ export class SettingsSecurityPageElement extends
         loadTimeData.getString('certManagementV2URL'));
   }
 
-  private onAdvancedProtectionProgramLinkClick_() {
-    window.open(loadTimeData.getString('advancedProtectionURL'));
-  }
-
   private onJavascriptOptimizerSettingsClick_() {
     Router.getInstance().navigateTo(routes.SITE_SETTINGS_JAVASCRIPT_OPTIMIZER);
   }

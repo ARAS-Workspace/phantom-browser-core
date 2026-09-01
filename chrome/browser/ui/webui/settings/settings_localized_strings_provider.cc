@@ -2452,10 +2452,6 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
       {"siteSettingsSublabel", IDS_SETTINGS_PERMISSIONS_DESCRIPTION},
       {"securityPageTitle", IDS_SETTINGS_SECURITY},
       {"securityPageDescription", IDS_SETTINGS_SECURITY_DESCRIPTION},
-      {"advancedProtectionProgramTitle",
-       IDS_SETTINGS_ADVANCED_PROTECTION_PROGRAM},
-      {"advancedProtectionProgramDesc",
-       IDS_SETTINGS_ADVANCED_PROTECTION_PROGRAM_DESC},
       {"secureConnectionsSectionTitle",
        IDS_SETTINGS_SECURE_CONNECTIONS_SECTION_TITLE},
       {"secureConnectionsSectionDescription",
@@ -2762,25 +2758,6 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
   html_source->AddString("certManagementV2URL",
                          chrome::kChromeUICertificateManagerDialogURL);
 #endif  // BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
-
-  // The link to the Advanced Protection Program landing page, with a referrer
-  // from Chrome settings.
-  GURL advanced_protection_url(
-      "https://landing.google.com/advancedprotection/");
-  advanced_protection_url = net::AppendQueryParameter(advanced_protection_url,
-                                                      "utm_source", "Chrome");
-  advanced_protection_url = net::AppendQueryParameter(
-      advanced_protection_url, "utm_medium", "ChromeSecuritySettings");
-  advanced_protection_url = net::AppendQueryParameter(
-      advanced_protection_url, "utm_campaign", "ChromeSettings");
-  html_source->AddString("advancedProtectionURL",
-                         advanced_protection_url.spec());
-
-  html_source->AddString(
-      "securityAdvancedProtectionProgramLabel",
-      l10n_util::GetStringFUTF16(
-          IDS_SETTINGS_SECURITY_ADVANCED_PROTECTION_PROGRAM_LABEL,
-          base::UTF8ToUTF16(advanced_protection_url.spec())));
 
   AddPersonalizationOptionsStrings(html_source);
   AddSecureDnsStrings(html_source);

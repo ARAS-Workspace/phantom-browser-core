@@ -1566,14 +1566,6 @@
     <message name="IDS_SETTINGS_SECURITY_DESCRIPTION" desc="Description of the controls available on the security settings page">
       Safe Browsing (protection from dangerous sites) and other security settings
     </message>
-    <message name="IDS_SETTINGS_ADVANCED_PROTECTION_PROGRAM" desc="Name of the link which takes users
-      to the Google Advanced Protection Program external webpage">
-      Google Advanced Protection Program
-    </message>
-    <message name="IDS_SETTINGS_ADVANCED_PROTECTION_PROGRAM_DESC" desc="Description of the Google
-      Advanced Protection Program">
-      Provides Google’s strongest account security for people at risk of targeted attacks
-    </message>
 
     <!-- Bundled Security Settings (chrome://settings/security) -->
     <message name="IDS_SETTINGS_SECURITY_BUNDLE_TOAST_FOR_USER_OPTED_INTO_ENHANCED_BUNDLE" desc="Text on the toast shown when an Enhanced Safe Browsing user is enrolled in the enhanced bundle for bundled security settings.">
@@ -1650,9 +1642,6 @@
     </message>
     <message name="IDS_SETTINGS_SECURITY_ACCOUNT_AND_NETWORK_SECTION_TITLE" desc="Name of the security page's 'account and network protection' section.">
       Account and network protection
-    </message>
-    <message name="IDS_SETTINGS_SECURITY_ADVANCED_PROTECTION_PROGRAM_LABEL" desc="Description of the Google Advanced Protection Program. Includes a link which takes users to the Google Advanced Protection Program external webpage.">
-      If you are an activist, journalist, public figure, election worker, or someone else in a uniquely high risk role, you may be interested in Google's <ph name="BEGIN_LINK">&lt;a href="$1" target="_blank"&gt;</ph>Advanced Protection Program<ph name="END_LINK">&lt;/a&gt;</ph>.
     </message>
     <message name="IDS_SETTINGS_SECURITY_SECURE_DNS_TITLE" desc="Name of Secure DNS security setting">
       Secure DNS

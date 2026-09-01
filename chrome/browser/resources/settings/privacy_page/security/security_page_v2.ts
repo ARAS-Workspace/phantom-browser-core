@@ -591,19 +591,6 @@ export class SettingsSecurityPageV2Element extends
         loadTimeData.getString('certManagementV2URL'));
   }
 
-  private onAdvancedProtectionProgramClick_(e: Event) {
-    OpenWindowProxyImpl.getInstance().openUrl(
-        loadTimeData.getString('advancedProtectionURL'));
-    // The Advanced Protection Program link is part of a string that is
-    // contained in a link-row. The default link navigation action will
-    // be ignored to ensure that the click will only be registered for
-    // the link inside the string and not also for the link-row.
-    if ((e.target as HTMLElement).tagName === 'A') {
-      e.preventDefault();
-      return;
-    }
-  }
-
   private onManageSiteExceptionsClick_() {
     Router.getInstance().navigateTo(routes.SITE_SETTINGS_JAVASCRIPT_OPTIMIZER);
   }

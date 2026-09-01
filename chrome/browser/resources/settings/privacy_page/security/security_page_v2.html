@@ -86,10 +86,6 @@
     margin-inline-end: 10px;
   }
 
-  #advancedProtectionProgramLinkRow {
-    background-color: var(--cr-fallback-color-surface2);
-  }
-
   #bundlesRadioGroup controlled-radio-button {
     align-content: flex-start;
     display: flex;
@@ -507,14 +503,6 @@
         label="$i18n{manageCertificates}"
         sub-label="$i18n{manageCertificatesDescription}"
         on-click="onManageCertificatesClick_" external>
-    </cr-link-row>
-  </settings-section>
-  <settings-section>
-    <cr-link-row id="advancedProtectionProgramLinkRow" class="box"
-        start-icon="settings20:gshield"
-        on-click="onAdvancedProtectionProgramClick_"
-        external using-slotted-label>
-      <div slot="label">$i18nRaw{securityAdvancedProtectionProgramLabel}</div>
     </cr-link-row>
   </settings-section>
   <template is="dom-if" if="[[showDisableSafebrowsingDialog_]]" restamp>
