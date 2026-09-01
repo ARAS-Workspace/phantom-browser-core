@@ -125,7 +125,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
 #if !BUILDFLAG(IS_ANDROID)
       kChromeUIAppServiceInternalsHost,
 #endif
-      kChromeUIAutofillInternalsHost,
       kChromeUIBluetoothInternalsHost,
       kChromeUIChromeFindsInternalsHost,
       kChromeUIChromeURLsHost,
@@ -164,7 +163,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUIOnDeviceInternalsHost,
 #endif
       optimization_guide_internals::kChromeUIOptimizationGuideInternalsHost,
-      kChromeUIPasswordManagerInternalsHost,
       kChromeUIPolicyHost,
       kChromeUIPredictorsHost,
       kChromeUIPrefsInternalsHost,
@@ -187,13 +185,11 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUITermsHost,
 #endif
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
-      kChromeUIUpdaterHost,
 #endif
       kChromeUIUsbInternalsHost,
       kChromeUIUserActionsHost,
       kChromeUIVersionHost,
 #if !BUILDFLAG(IS_ANDROID)
-      kChromeUIWebAppInternalsHost,
 #endif
       content::kChromeUIBlobInternalsHost,
       content::kChromeUIDinoHost,
@@ -256,7 +252,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUIDiscardsHost,
 #endif
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-      kChromeUIWebAppSettingsHost,
 #endif
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
       kChromeUILinuxProxyConfigHost,
