@@ -246,12 +246,10 @@ ReadAnythingUntrustedUI::ReadAnythingUntrustedUI(content::WebUI* web_ui)
   source->OverrideContentSecurityPolicy(
       network::mojom::CSPDirectiveName::ScriptSrc,
       "script-src 'self' chrome-untrusted://resources "
-      "chrome-untrusted://webui-test https://translate.googleapis.com "
-      "https://translate.google.com;");
+      "chrome-untrusted://webui-test;");
   source->OverrideContentSecurityPolicy(
       network::mojom::CSPDirectiveName::ConnectSrc,
-      "connect-src 'self' https://translate.googleapis.com "
-      "https://translate.google.com;");
+      "connect-src 'self';");
   source->OverrideContentSecurityPolicy(
       network::mojom::CSPDirectiveName::StyleSrc,
       "style-src 'self' chrome-untrusted://resources chrome-untrusted://theme "

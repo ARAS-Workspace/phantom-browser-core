@@ -53,7 +53,7 @@ DataRegion GetDataRegionFromPref(PrefService* prefs) {
 }  // namespace
 
 const char TranslateScript::kScriptURL[] =
-    "https://translate.googleapis.com/translate_a/element.js";
+    "";
 
 const char TranslateScript::kRequestHeaderName[] =
     "Google-Translate-Element-Mode";

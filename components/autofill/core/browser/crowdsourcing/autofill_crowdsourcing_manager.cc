@@ -124,8 +124,7 @@ constexpr net::BackoffEntry::Policy kAutofillBackoffPolicy = {
     false,
 };
 
-constexpr char kDefaultAutofillServerURL[] =
-    "https://content-autofill.googleapis.com/";
+constexpr char kDefaultAutofillServerURL[] = "";
 
 // Header to get base64 encoded serialized proto from API for safety.
 constexpr char kGoogEncodeResponseIfExecutable[] =
