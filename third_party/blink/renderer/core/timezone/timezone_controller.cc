@@ -40,7 +40,7 @@ namespace {
 // no later than January 2025.
 BASE_FEATURE(kLazyBlinkTimezoneInit, base::FEATURE_DISABLED_BY_DEFAULT);
 
-constexpr char kFixedTimeZoneId[] = "Europe/Istanbul";
+constexpr char kFixedTimeZoneId[] = "UTC";
 
 // Notify V8 that the date/time configuration of the system might have changed.
 void NotifyTimezoneChangeToV8(v8::Isolate* isolate) {
