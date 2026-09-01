@@ -13,7 +13,6 @@
 #include "components/commerce/core/commerce_constants.h"
 #include "components/history_clusters/history_clusters_internals/webui/url_constants.h"
 #include "components/optimization_guide/optimization_guide_internals/webui/url_constants.h"
-#include "components/password_manager/content/common/web_ui_constants.h"
 #include "components/safe_browsing/core/common/web_ui_constants.h"
 #include "device/vr/buildflags/buildflags.h"
 #include "extensions/buildflags/buildflags.h"
@@ -166,7 +165,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
 #endif
       optimization_guide_internals::kChromeUIOptimizationGuideInternalsHost,
       kChromeUIPasswordManagerInternalsHost,
-      password_manager::kChromeUIPasswordManagerHost,
       kChromeUIPolicyHost,
       kChromeUIPredictorsHost,
       kChromeUIPrefsInternalsHost,
@@ -188,7 +186,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUITabsFromOtherDevicesSidePanelHost,
       kChromeUITermsHost,
 #endif
-      kChromeUITranslateInternalsHost,
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
       kChromeUIUpdaterHost,
 #endif
