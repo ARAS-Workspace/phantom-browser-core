@@ -4816,7 +4816,6 @@
     {
       name: "Presentation",
       public: true,
-      status: "stable",
       base_feature: "none",
     },
     {
@@ -5051,7 +5050,6 @@
     {
       name: "RemotePlayback",
       public: true,
-      status: "stable",
       base_feature: "none",
     },
     {
