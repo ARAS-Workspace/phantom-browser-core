@@ -26,8 +26,7 @@ namespace password_manager {
 
 using metrics_util::LeakDialogType;
 
-constexpr char kPasswordCheckupURL[] =
-    "https://passwords.google.com/checkup/start?hideExplanation=true";
+constexpr char kPasswordCheckupURL[] = "";
 
 LeakedPasswordDetails::LeakedPasswordDetails(CredentialLeakType leak_type,
                                              PasswordForm credentials,

@@ -19,14 +19,13 @@ const base::FilePath::CharType kLoginDataJournalForAccountFileName[] =
     FILE_PATH_LITERAL("Login Data For Account-journal");
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-const char kPasswordManagerAccountDashboardURL[] =
-    "https://passwords.google.com";
+const char kPasswordManagerAccountDashboardURL[] = "";
 
 const char kPasswordManagerHelpCenteriOSURL[] =
     "https://support.google.com/chrome/answer/95606?ios=1";
 
-const char kManageMyPasswordsURL[] = "https://passwords.google.com/app";
+const char kManageMyPasswordsURL[] = "";
 
-const char kReferrerURL[] = "https://passwords.google/";
+const char kReferrerURL[] = "";
 
 }  // namespace password_manager

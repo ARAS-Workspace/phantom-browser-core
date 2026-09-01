@@ -52,7 +52,7 @@
 
 namespace {
 
-constexpr std::string_view kMagicArchUrl = "https://passwords.google.com";
+constexpr std::string_view kMagicArchUrl = "";
 constexpr std::string_view kGpmPasskeyPinResetPath = "/encryption/pin/reset";
 constexpr std::string_view kGpmPasskeyResetSuccessPath =
     "/embedded/passkeys/reset/done";

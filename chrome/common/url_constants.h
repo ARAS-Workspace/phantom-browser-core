@@ -284,8 +284,7 @@ inline constexpr char kGoogleTwoFactorIntersitialURL[] =
     "https://myaccount.google.com/interstitials/twosvrequired";
 
 // URL of the Google Password Manager.
-inline constexpr char kGooglePasswordManagerURL[] =
-    "https://passwords.google.com";
+inline constexpr char kGooglePasswordManagerURL[] = "";
 
 // URL of the Google Photos.
 inline constexpr char kGooglePhotosURL[] = "https://photos.google.com";
