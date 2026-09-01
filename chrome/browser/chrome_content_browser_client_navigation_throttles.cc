@@ -94,7 +94,6 @@
 #include "chrome/browser/page_info/web_view_side_panel_throttle.h"
 #include "chrome/browser/themes/theme_service_factory.h"
 #include "chrome/browser/ui/lens/lens_overlay_side_panel_navigation_throttle.h"
-#include "chrome/browser/ui/read_anything/read_anything_side_panel_navigation_throttle.h"
 #include "chrome/browser/ui/search/chrome_search_navigation_throttle.h"
 #include "chrome/browser/ui/search/new_tab_page_navigation_throttle.h"
 #include "chrome/browser/ui/web_applications/tabbed_web_app_navigation_throttle.h"
@@ -539,8 +538,6 @@ void CreateAndAddChromeThrottlesForNavigation(
   payments::PaymentHandlerNavigationThrottle::MaybeCreateAndAdd(registry);
 
 #if !BUILDFLAG(IS_ANDROID)
-  ReadAnythingSidePanelNavigationThrottle::CreateAndAdd(registry);
-
   if (lens::features::IsLensOverlayEnabled()) {
     if (profile) {
       if (ThemeService* theme_service =

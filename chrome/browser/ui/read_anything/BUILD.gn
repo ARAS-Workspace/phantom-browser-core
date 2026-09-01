@@ -49,8 +49,6 @@ source_set("read_anything") {
     "read_anything_side_panel_controller.h",
     "read_anything_side_panel_controller_utils.cc",
     "read_anything_side_panel_controller_utils.h",
-    "read_anything_side_panel_navigation_throttle.cc",
-    "read_anything_side_panel_navigation_throttle.h",
     "read_anything_side_panel_web_view.cc",
     "read_anything_side_panel_web_view.h",
     "read_anything_soft_navigation_observer.cc",
