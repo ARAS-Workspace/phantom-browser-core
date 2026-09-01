@@ -966,9 +966,6 @@ are declared in tools/grit/grit_args.gni.
           <message name="IDS_CONTENT_CONTEXT_SEARCHLENSFORIMAGE" desc="The name of the Search Lens for Image command in the content area context menu">
             Search image with <ph name="VISUAL_SEARCH_PROVIDER">$1<ex>Google Lens</ex></ph>
           </message>
-          <message name="IDS_CONTENT_CONTEXT_LENS_REGION_SEARCH_ALT1" desc="The name of the Lens Region Search command in the content area context menu">
-            Search page with <ph name="VISUAL_SEARCH_PROVIDER">$1<ex>Google Lens</ex></ph>
-          </message>
           <message name="IDS_CONTENT_CONTEXT_LENS_REGION_SEARCH" desc="The name of the Lens Region Search command in the content area context menu">
             Search images with <ph name="VISUAL_SEARCH_PROVIDER">$1<ex>Google Lens</ex></ph>
           </message>
@@ -1324,9 +1321,6 @@ are declared in tools/grit/grit_args.gni.
           </message>
           <message name="IDS_CONTENT_CONTEXT_SEARCHLENSFORIMAGE" desc="In Title Case: The name of the Search Lens for Image command in the content area context menu">
             Search Image with <ph name="VISUAL_SEARCH_PROVIDER">$1<ex>Google Lens</ex></ph>
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_LENS_REGION_SEARCH_ALT1" desc="In Title Case: The name of the Lens Region Search command in the content area context menu">
-            Search Page with <ph name="VISUAL_SEARCH_PROVIDER">$1<ex>Google</ex></ph>
           </message>
           <message name="IDS_CONTENT_CONTEXT_LENS_REGION_SEARCH" desc="In Title Case: The name of the Lens Region Search command in the content area context menu">
             Search Images with <ph name="VISUAL_SEARCH_PROVIDER">$1<ex>Google Lens</ex></ph>
@@ -10059,9 +10053,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
       </message>
 
       <!-- Google Lens side panel -->
-      <message name="IDS_GOOGLE_LENS_TITLE" desc="Title of the Google Lens side panel">
-        Google Lens
-      </message>
       <message name="IDS_LENS_COBROWSE_IPH_HEADER" desc="Instruction for the user to use Google Lens visual selection in co browse panel.">
         Select anything on the page to search
       </message>
@@ -10179,9 +10170,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
       </message>
       <message name="IDS_LENS_SEARCH_UPLOAD_DIALOG_CLOSE_BUTTON_LABEL" desc="Aria label for the button to close the upload dialog.">
         Close
-      </message>
-      <message name="IDS_LENS_SEARCH_UPLOAD_DIALOG_TITLE" desc="Title on dialog to upload an image to Google Lens.">
-        Search any image with Google Lens
       </message>
       <message name="IDS_LENS_SEARCH_UPLOAD_DIALOG_TITLE_SHORT" desc="Short title on dialog to upload an image to Google Lens.">
         Search any image with Lens

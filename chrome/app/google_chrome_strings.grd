@@ -2133,22 +2133,9 @@ Google Chrome is unable to recover your settings.
           desc="Text that is shown in the more options menu to open the help center article.">
           Learn more
         </message>
-        <message name="IDS_LENS_OVERLAY_INITIAL_TOAST_LABEL"
-          desc="Accessibility label for the initial user eduction bubble that appears at the top of the screen after the user invokes the Lens Overlay feature. Informs the user to select an object to search with Google Lens, or use the escape key to exit the feature.">
-          Select anything to search with Google Lens or press escape to exit Google Lens
-        </message>
-        <message name="IDS_LENS_OVERLAY_COBROWSE_INITIAL_TOAST_LABEL"
-          desc="Label for the initial user education bubble when invoking the Lens Overlay along side the cobrowse side panel, instructing the user to select a region of the screen.">
-          Select region of screen to search
-        </message>
         <message name="IDS_LENS_OVERLAY_INITIAL_TOAST_MESSAGE"
           desc="Text that is shown in the Lens Overlay education bubble when starting the feature. Informs the user to tap an object or drag over the screen to select a region to search with Google Lens.">
           Select anything to search with Google Lens
-        </message>
-        <message name="IDS_LENS_OVERLAY_INITIAL_TOAST_LABEL_SIMPLIFIED"
-          desc="Accessibility label for the initial user eduction bubble that appears at the top of the screen after the user invokes the Lens Overlay feature. Informs the user to select an object to search with Google Lens, or use the escape key to exit the feature."
-          is_accessibility_with_no_ui="true">
-          Select any text or image to search with Google Lens or press escape to exit Google Lens
         </message>
         <message name="IDS_LENS_OVERLAY_INITIAL_TOAST_MESSAGE_SIMPLIFIED"
           desc="Text that is shown in the Lens Overlay education bubble when starting the feature. Informs the user to tap an object or drag over the screen to select a region to search with Google Lens.">
@@ -2182,10 +2169,6 @@ Google Chrome is unable to recover your settings.
           desc="Text that is shown in the Lens Overlay tooltip that appears beneath the cursor. Informs the user to click to exit Google Lens.">
           Click to exit Google Lens
         </message>
-        <message name="IDS_LENS_OVERLAY_AUTO_DETECT_LANGUAGE_LABEL"
-          desc="Label for the language picker button denoting that source language of the page will be automatically detected.">
-          Auto-detect
-        </message>
         <message name="IDS_LENS_OVERLAY_TRANSLATE_BUTTON_LABEL"
           desc="Label for the translate button. Informs the user that the entire screen will be translated when clicked.">
           Translate screen
@@ -2205,10 +2188,6 @@ Google Chrome is unable to recover your settings.
         <message name="IDS_LENS_OVERLAY_ALL_LANGUAGES_LABEL"
           desc="Label in the language picker menu denoting that the following language menu items are all of the possible selections that can be made.">
           All languages
-        </message>
-        <message name="IDS_LENS_OVERLAY_DETECTED_LABEL"
-          desc="Label in the language picker menu denoting that the following language is the one that has been detected.">
-          Detected
         </message>
         <message name="IDS_LENS_OVERLAY_DETECT_LANGUAGE_LABEL"
           desc="Label in the language picker menu denoting that the following language is the one that has been detected.">
@@ -2276,21 +2255,9 @@ Google Chrome is unable to recover your settings.
         </message>
 
         <!-- Entrypoint Strings -->
-        <message name="IDS_CONTENT_CONTEXT_LENS_OVERLAY"
-          desc="The name of the Lens overlay command in the content area context menu">
-          Search with Google Lens
-        </message>
         <message name="IDS_CONTENT_LENS_OVERLAY_ENTRYPOINT_LABEL"
           desc="The label of the Lens overlay entrypoint in the omnibox">
           Google Lens
-        </message>
-        <message name="IDS_CONTENT_LENS_OVERLAY_HOMEWORK_ENTRYPOINT_LABEL"
-          desc="The label of the Lens overlay entrypoint in the omnibox offering homework help">
-          Homework help
-        </message>
-        <message name="IDS_SIDE_PANEL_LENS_OVERLAY_TOOLBAR_TOOLTIP"
-          desc="The tooltip for the Lens overlay toolbar button.">
-          Search with Google Lens
         </message>
 
         <message name="IDS_LENS_OVERLAY_IMAGE_ENTRYPOINT_LABEL_ALT3"
@@ -2383,15 +2350,8 @@ Google Chrome is unable to recover your settings.
             desc="In Title Case: The text label of the omnibox context menu option to show the 'Search with Google Lens' shortcut button">
             Always Show Google Lens Shortcut
           </message>
-          <message name="IDS_SHOW_LENS_OVERLAY"
-            desc="In Title Case: The text label of the Lens overlay menu item">
-            Search with Google Lens
-          </message>
         </if>
         <if expr="not use_titlecase">
-          <message name="IDS_SHOW_LENS_OVERLAY" desc="The text label of the Lens overlay menu item">
-            Search with Google Lens
-          </message>
           <message name="IDS_CONTEXT_MENU_SHOW_GOOGLE_LENS_SHORTCUT"
             desc="The text label of the omnibox context menu option to show the 'Search with Google Lens' shortcut button">
             Always show Google Lens shortcut
@@ -2399,34 +2359,15 @@ Google Chrome is unable to recover your settings.
         </if>
 
         <!-- CSB Strings -->
-        <message name="IDS_LENS_CONTEXTUAL_SEARCH_DEFAULT_QUERY"
-          desc="Default query for Lens searchbox to request help with the current page context.">
-          help me with this
-        </message>
-        <message name="IDS_LENS_CONTEXTUAL_SEARCH_ZERO_STATE_QUERY"
-          is_accessibility_with_no_ui="true"
-          desc="Default query for Lens searchbox to request help with the current page context in a low intent state.">
-          **Summarize:** In a single sentence under 30 words, describe the primary subject and purpose of the content in the screenshot.
-
-          **Suggest Questions:** Generate a bulleted list of 3-5 thought-provoking questions a user could ask to better understand the screenshot. These questions should include at least one that is specifically about a visual object, its design, or its placement.
-        </message>
 
         <!-- AI Mode Strings -->
         <message name="IDS_LENS_COMPOSEBOX_HINT_TEXT"
           desc="The hint text of the AI mode searchbox in the Lens side panel. This text is shown in the searchbox when the user has not yet typed any text, and prompts the user to ask a follow up question.">
           Ask a follow up
         </message>
-        <message name="IDS_LENS_COMPOSEBOX_HINT_TEXT_SEARCH_PAGE"
-          desc="The hint text of the AI mode searchbox in the Lens side panel. This text is shown in the searchbox when the user has not yet typed any text but has opened the overlay to make AIM follow up queries.">
-          Search anything on page
-        </message>
         <message name="IDS_LENS_COMPOSEBOX_HINT_TEXT_SELECT_PAGE"
           desc="The hint text of the AI mode searchbox in the Lens side panel. This text is shown in the searchbox when the user has not yet typed any text but has opened the overlay to make AIM follow up queries.">
           Select anything on page
-        </message>
-        <message name="IDS_LENS_COMPOSEBOX_HINT_TEXT_ASK_ANYTHING"
-          desc="The hint text of the AI mode searchbox in the Lens tab. This text is shown in the searchbox when the user has not yet typed any text, and prompts the user to ask a question.">
-          Ask anything
         </message>
 
         <message name="IDS_AI_MODE_ASK_ABOUT_THIS_TAB"
