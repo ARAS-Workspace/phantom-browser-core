@@ -11,9 +11,6 @@
 #include "base/no_destructor.h"
 #include "chrome/browser/accessibility_annotator/content_annotator/content_annotator_service_factory.h"
 #include "chrome/browser/accessibility_annotator/content_annotator/content_annotator_tab_helper.h"
-#include "chrome/browser/actor/actor_keyed_service.h"
-#include "chrome/browser/actor/actor_tab_data.h"
-#include "chrome/browser/actor/ui/actor_ui_tab_controller.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "chrome/browser/commerce/in_stock_notification/in_stock_notification_manager.h"
 #include "chrome/browser/commerce/shopping_service_factory.h"
@@ -366,16 +363,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
               .CreateInstance<glic::GlicSidePanelCoordinatorImpl>(
                   tab, &tab, side_panel_registry_.get());
     }
-    // TODO(crbug.com/433973411): Move this logic to a helper function.
-    if (base::FeatureList::IsEnabled(features::kGlicActor) &&
-        base::FeatureList::IsEnabled(features::kGlicActorUi) &&
-        profile->IsRegularProfile()) {
-      // The associated tab is passed to CreateInstance twice: for dependency
-      // injection callbacks and as a direct constructor argument.
-      actor_ui_tab_controller_ =
-          GetUserDataFactory().CreateInstance<actor::ui::ActorUiTabController>(
-              tab, tab, actor::ActorKeyedService::Get(profile));
-    }
     if (base::FeatureList::IsEnabled(features::kSkillsEnabled)) {
       skills_ui_tab_controller_ =
           GetUserDataFactory().CreateInstance<skills::SkillsUiTabController>(
@@ -391,11 +378,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
               ChromeTranslateClient::FromWebContents(tab.GetContents()));
     }
   }  // IsInNormalWindow() end.
-
-  if (base::FeatureList::IsEnabled(features::kGlicActor)) {
-    actor_tab_data_ =
-        GetUserDataFactory().CreateInstance<actor::ActorTabData>(tab, &tab);
-  }
 
   // This block instantiates the page action controllers that depends on the
   // `commerce_ui_tab_helper_` and not need to be created before.

@@ -6,7 +6,6 @@
 
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
-#include "chrome/browser/actor/ui/actor_overlay_ui.h"
 #include "chrome/browser/chrome_browser_interface_binders_webui_parts.h"
 #include "chrome/browser/contextual_cueing/internals/contextual_cueing_internals.mojom.h"
 #include "chrome/browser/contextual_cueing/internals/contextual_cueing_internals_ui.h"
@@ -265,13 +264,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
         lens::LensSidePanelUntrustedUI>(map);
     RegisterWebUIControllerInterfaceBinder<lens::mojom::LensPageHandlerFactory,
                                            lens::LensOverlayUntrustedUI>(map);
-  }
-
-  if (base::FeatureList::IsEnabled(features::kGlicActorUi) &&
-      features::kGlicActorUiOverlay.Get()) {
-    RegisterWebUIControllerInterfaceBinder<
-        actor::ui::mojom::ActorOverlayPageHandlerFactory,
-        actor::ui::ActorOverlayUI>(map);
   }
 
   if (user_education::features::GetNtpBrowserPromoType() !=

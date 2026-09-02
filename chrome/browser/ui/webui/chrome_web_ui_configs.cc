@@ -77,7 +77,6 @@
 #include "chrome/browser/ui/webui/private_ai_internals/private_ai_internals_ui.h"
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/actor/ui/actor_overlay_ui.h"
 #include "chrome/browser/contextual_cueing/internals/contextual_cueing_internals_ui.h"
 #include "chrome/browser/ui/tabs/tab_group_home/tab_group_home_ui.h"
 #include "chrome/browser/ui/webui/content_annotator_internals/content_annotator_internals_ui.h"
@@ -316,7 +315,6 @@ void RegisterChromeWebUIConfigs() {
       std::make_unique<
           content_annotator_internals::ContentAnnotatorInternalsUIConfig>());
   map.AddWebUIConfig(std::make_unique<media_router::AccessCodeCastUIConfig>());
-  map.AddWebUIConfig(std::make_unique<actor::ui::ActorOverlayUIConfig>());
   map.AddWebUIConfig(std::make_unique<AppServiceInternalsUIConfig>());
   map.AddWebUIConfig(std::make_unique<AutofillMlInternalsUIConfig>());
   map.AddWebUIConfig(std::make_unique<BookmarksSidePanelUIConfig>());

@@ -85,14 +85,6 @@ class WalletReminderNoticeBubbleController;
 class WalletReminderNoticePageActionController;
 }  // namespace autofill
 
-namespace actor {
-class ActorTabData;
-}  // namespace actor
-
-namespace actor::ui {
-class ActorUiTabControllerInterface;
-}  // namespace actor::ui
-
 namespace commerce {
 class CommerceUiTabHelper;
 class DiscountsPageActionViewController;
@@ -544,9 +536,6 @@ class TabFeatures {
 
   std::unique_ptr<QwacWebContentsObserver> qwac_web_contents_observer_;
 
-  std::unique_ptr<actor::ui::ActorUiTabControllerInterface>
-      actor_ui_tab_controller_;
-
   std::unique_ptr<TabCreationMetricsController>
       tab_creation_metrics_controller_;
 
@@ -581,8 +570,6 @@ class TabFeatures {
 
   std::unique_ptr<AskBeforeHttpDialogController>
       ask_before_http_dialog_controller_;
-
-  std::unique_ptr<actor::ActorTabData> actor_tab_data_;
 
 #if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<record_replay::RecordReplayClient> record_replay_client_;
