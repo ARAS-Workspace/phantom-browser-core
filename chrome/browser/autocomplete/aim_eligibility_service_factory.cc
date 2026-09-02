@@ -92,7 +92,7 @@ AimEligibilityServiceFactory::~AimEligibilityServiceFactory() = default;
 std::unique_ptr<KeyedService>
 AimEligibilityServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
-  return BuildServiceInstance(context);
+  return nullptr;
 }
 
 bool AimEligibilityServiceFactory::ServiceIsCreatedWithBrowserContext() const {
