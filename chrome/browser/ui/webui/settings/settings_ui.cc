@@ -29,7 +29,6 @@
 #include "chrome/browser/glic/public/features.h"
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/glic/public/glic_keyed_service.h"
-#include "chrome/browser/history_embeddings/history_embeddings_utils.h"
 #include "chrome/browser/metrics/variations/google_groups_manager_factory.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
@@ -132,7 +131,6 @@
 #include "components/search_engines/template_url_service.h"
 #include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/base/signin_switches.h"
-#include "components/skills/features.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/subscription_eligibility/subscription_eligibility_service.h"
 #include "components/sync/base/features.h"
@@ -576,22 +574,18 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
 
   std::pair<const std::string_view, bool> optimization_guide_features[] = {
       {"showComposeControl", compose_visible},
-      {"showHistorySearchControl",
-       history_embeddings::IsHistoryEmbeddingsSettingVisible(profile)},
+      {"showHistorySearchControl", false},
       {"showPasswordChangeControl",
        PasswordChangeServiceFactory::GetForProfile(profile) &&
            PasswordChangeServiceFactory::GetForProfile(profile)
                ->UserIsActivePasswordChangeUser()},
-      {"showAiSuggestionsControl",
-       base::FeatureList::IsEnabled(contextual_cueing::kContextualCueingV2)},
+      {"showAiSuggestionsControl", false},
       {"showInlineCueMenuControl",
        base::FeatureList::IsEnabled(features::kGlicSelectionPrompt) &&
            glic_enablement.ShouldShowSettingsPage()},
-      {"showSkillsSettingPage",
-       base::FeatureList::IsEnabled(features::kSkillsEnabled)},
-      {"showIndigoControl", base::FeatureList::IsEnabled(features::kIndigo)},
-      {"showGoogleSearchAiModeWorkspaceControl",
-       base::FeatureList::IsEnabled(features::kGoogleSearchAiModeWorkspace)},
+      {"showSkillsSettingPage", false},
+      {"showIndigoControl", false},
+      {"showGoogleSearchAiModeWorkspaceControl", false},
       {"showDictationControl", show_dictation_control},
   };
 
