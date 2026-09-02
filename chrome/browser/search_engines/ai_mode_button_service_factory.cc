@@ -41,11 +41,5 @@ AiModeButtonServiceFactory::~AiModeButtonServiceFactory() = default;
 std::unique_ptr<KeyedService>
 AiModeButtonServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
-  Profile* profile = Profile::FromBrowserContext(context);
-  TemplateURLService* template_url_service =
-      TemplateURLServiceFactory::GetForProfile(profile);
-  if (!template_url_service) {
-    return nullptr;
-  }
-  return std::make_unique<AiModeButtonService>(template_url_service);
+  return nullptr;
 }
