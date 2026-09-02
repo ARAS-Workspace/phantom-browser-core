@@ -1345,9 +1345,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
         chrome::ShowChromeEnterpriseReleaseNotes(browser_);
       }
       break;
-    case IDC_ROUTE_MEDIA:
-      RouteMediaInvokedFromAppMenu(browser_);
-      break;
     case IDC_WINDOW_MUTE_SITE:
       MuteSite(browser_);
       break;
@@ -2661,9 +2658,6 @@ void BrowserCommandController::UpdateCommandsForMediaRouter() {
     return;
   }
 #endif
-
-  UpdateCommandAndActionEnabled(IDC_ROUTE_MEDIA, kActionRouteMedia,
-                                CanRouteMedia(browser_));
 }
 
 void BrowserCommandController::UpdateCommandsForTabKeyboardFocus(

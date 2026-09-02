@@ -33,7 +33,6 @@
 #include "chrome/browser/glic/browser_ui/glic_vector_icon_manager.h"
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/glic/resources/grit/glic_browser_resources.h"
-#include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_attributes_entry.h"
@@ -209,7 +208,6 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel, kIdentityDocsMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel, kTravelMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel, kShowLensOverlay);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel, kSaveAndShareMenuItem);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel, kCastTitleItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel, kInstallAppItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel, kCreateShortcutItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel,
@@ -945,15 +943,6 @@ SaveAndShareSubMenuModel::SaveAndShareSubMenuModel(
     ui::SimpleMenuModel::Delegate* delegate,
     BrowserWindowInterface* browser)
     : SimpleMenuModel(delegate) {
-  if (media_router::MediaRouterEnabled(browser->GetProfile())) {
-    AddTitle(l10n_util::GetStringUTF16(IDS_SAVE_AND_SHARE_MENU_CAST));
-    SetElementIdentifierAt(GetItemCount() - 1, AppMenuModel::kCastTitleItem);
-    AddItemWithStringIdAndVectorIcon(
-        this, IDC_ROUTE_MEDIA, IDS_MEDIA_ROUTER_MENU_ITEM_TITLE,
-        features::IsRoundedIconsEnabled() ? kCastIcon
-                                          : kCastChromeRefreshOldIcon);
-    AddSeparator(ui::NORMAL_SEPARATOR);
-  }
   AddTitle(l10n_util::GetStringUTF16(IDS_SAVE_AND_SHARE_MENU_SAVE));
   AddItemWithStringIdAndVectorIcon(this, IDC_SAVE_PAGE, IDS_SAVE_PAGE,
                                    features::IsRoundedIconsEnabled()
@@ -1610,13 +1599,6 @@ void AppMenuModel::LogMenuMetrics(int command_id) {
       }
       LogMenuAction(MENU_ACTION_CREATE_QR_CODE);
       break;
-    case IDC_ROUTE_MEDIA:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes("WrenchMenu.TimeToAction.Cast", delta);
-      }
-      LogMenuAction(MENU_ACTION_CAST);
-      break;
-
     // Tools menu.
     case IDC_MANAGE_EXTENSIONS:
       if (!uma_action_recorded_) {
@@ -2332,11 +2314,9 @@ void AppMenuModel::Build() {
 
   sub_menus_.push_back(
       std::make_unique<SaveAndShareSubMenuModel>(this, browser_));
-  int string_id = media_router::MediaRouterEnabled(browser()->GetProfile())
-                      ? IDS_CAST_SAVE_AND_SHARE_MENU
-                      : IDS_SAVE_AND_SHARE_MENU;
   AddSubMenuWithStringIdAndVectorIcon(
-      this, kSaveAndShareMenuPlaceholder, string_id, sub_menus_.back().get(),
+      this, kSaveAndShareMenuPlaceholder, IDS_SAVE_AND_SHARE_MENU,
+      sub_menus_.back().get(),
       features::IsRoundedIconsEnabled() ? kFileSaveIcon
                                         : kFileSaveChromeRefreshOldIcon);
   SetElementIdentifierAt(

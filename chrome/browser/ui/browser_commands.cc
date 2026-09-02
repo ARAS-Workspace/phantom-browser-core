@@ -41,7 +41,6 @@
 #include "chrome/browser/feedback/report_unsafe_site_dialog.h"
 #include "chrome/browser/feedback/show_feedback_page.h"
 #include "chrome/browser/lifetime/application_lifetime.h"
-#include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/reading_list/reading_list_model_factory.h"
@@ -155,8 +154,6 @@
 #include "components/lens/buildflags.h"
 #include "components/lens/lens_features.h"
 #include "components/lens/lens_overlay_invocation_source.h"
-#include "components/media_router/browser/media_router_dialog_controller.h"  // nogncheck
-#include "components/media_router/browser/media_router_metrics.h"
 #include "components/omnibox/browser/autocomplete_classifier.h"
 #include "components/omnibox/browser/autocomplete_match.h"
 #include "components/omnibox/browser/omnibox_prefs.h"
@@ -2455,27 +2452,6 @@ bool CanBasicPrint(BrowserWindowInterface* browser) {
 #endif  // BUILDFLAG(ENABLE_BASIC_PRINT_DIALOG)
 }
 #endif  // BUILDFLAG(ENABLE_PRINTING)
-
-bool CanRouteMedia(BrowserWindowInterface* browser) {
-  // Do not allow user to open Media Router dialog when there is already an
-  // active modal dialog. This avoids overlapping dialogs.
-  return media_router::MediaRouterEnabled(browser->GetProfile()) &&
-         !IsShowingWebContentsModalDialog(browser);
-}
-
-void RouteMediaInvokedFromAppMenu(BrowserWindowInterface* browser) {
-  DCHECK(CanRouteMedia(browser));
-
-  media_router::MediaRouterDialogController* dialog_controller =
-      media_router::MediaRouterDialogController::GetOrCreateForWebContents(
-          browser->GetTabStripModel()->GetActiveWebContents());
-  if (!dialog_controller) {
-    return;
-  }
-
-  dialog_controller->ShowMediaRouterDialog(
-      media_router::MediaRouterDialogActivationLocation::APP_MENU);
-}
 
 void Find(BrowserWindowInterface* browser) {
   base::RecordAction(UserMetricsAction("Find"));

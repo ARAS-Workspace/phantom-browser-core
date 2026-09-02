@@ -348,9 +348,6 @@ NSMenuItem* BuildViewMenu(NSApplication* nsapp,
               Item(IDS_TEXT_SMALLER_MAC)
                   .command_id(IDC_ZOOM_MINUS),
               Item().is_separator(),
-              Item(IDS_MEDIA_ROUTER_MENU_ITEM_TITLE)
-                  .command_id(IDC_ROUTE_MEDIA),
-              Item().is_separator(),
               Item(IDS_DEVELOPER_MENU_MAC)
                   .tag(kDeveloperMenuId)
                   .submenu({

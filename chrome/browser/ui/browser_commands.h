@@ -282,11 +282,9 @@ bool CanPrint(BrowserWindowInterface* browser);
 void BasicPrint(BrowserWindowInterface* browser);
 bool CanBasicPrint(BrowserWindowInterface* browser);
 #endif  // ENABLE_PRINTING
-bool CanRouteMedia(BrowserWindowInterface* browser);
 // NOTE: For metrics collection purposes, this method is assumed to be invoked
 // from the app menu. That will need to be changed if this is to be invoked from
 // elsewhere.
-void RouteMediaInvokedFromAppMenu(BrowserWindowInterface* browser);
 void Find(BrowserWindowInterface* browser);
 void FindNext(BrowserWindowInterface* browser);
 void FindPrevious(BrowserWindowInterface* browser);

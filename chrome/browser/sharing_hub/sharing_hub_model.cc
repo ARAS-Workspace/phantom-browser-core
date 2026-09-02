@@ -14,7 +14,6 @@
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/app/vector_icons/vector_icons.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/send_tab_to_self/send_tab_to_self_util.h"
 #include "chrome/browser/sharing_hub/sharing_hub_features.h"
@@ -120,16 +119,6 @@ void SharingHubModel::PopulateFirstPartyActions() {
       IDC_QRCODE_GENERATOR,
       l10n_util::GetStringUTF16(IDS_SHARING_HUB_GENERATE_QR_CODE_LABEL),
       &kQrcodeGeneratorCustomIcon, "SharingHubDesktop.QRCodeSelected", 0);
-
-  if (media_router::MediaRouterEnabled(context_)) {
-    first_party_action_list_.emplace_back(
-        IDC_ROUTE_MEDIA,
-        l10n_util::GetStringUTF16(IDS_SHARING_HUB_MEDIA_ROUTER_LABEL),
-        &(features::IsRoundedIconsEnabled()
-              ? vector_icons::kCastIcon
-              : vector_icons::kMediaRouterIdleOldIcon),
-        "SharingHubDesktop.CastSelected", 0);
-  }
 
   first_party_action_list_.emplace_back(
       IDC_SAVE_PAGE, l10n_util::GetStringUTF16(IDS_SHARING_HUB_SAVE_PAGE_LABEL),

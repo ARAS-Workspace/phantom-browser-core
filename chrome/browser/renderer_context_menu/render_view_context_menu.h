@@ -328,7 +328,6 @@ class RenderViewContextMenu
   void AppendPrintItem();
   void AppendPartialTranslateItem();
   void AppendTranslateItem();
-  void AppendMediaRouterItem();
   void AppendSaveToMemoryBanksItem();
   void AppendGlicItems();
   void AppendRotationItems();
@@ -393,7 +392,6 @@ class RenderViewContextMenu
   bool IsPasteAndMatchStyleEnabled() const;
   bool IsPrintPreviewEnabled() const;
   bool IsQRCodeGeneratorEnabled() const;
-  bool IsRouteMediaEnabled() const;
   bool IsOpenLinkAllowedByDlp(const GURL& link_url) const;
   bool IsRegionSearchEnabled() const;
   bool IsAddANoteEnabled() const;
@@ -428,7 +426,6 @@ class RenderViewContextMenu
   void ExecReloadPackagedApp();
   void ExecRestartPackagedApp();
   void ExecPrint();
-  void ExecRouteMedia();
   void ExecTranslate();
   void ExecPartialTranslate();
   void ExecLanguageSettings(int event_flags);

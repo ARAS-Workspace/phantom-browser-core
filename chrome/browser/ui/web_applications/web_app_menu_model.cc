@@ -11,7 +11,6 @@
 #include "build/build_config.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/app/vector_icons/vector_icons.h"
-#include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
@@ -252,11 +251,4 @@ void WebAppMenuModel::Build() {
       this, IDC_PRINT, IDS_PRINT,
       features::IsRoundedIconsEnabled() ? kPrintIcon : kPrintMenuOldIcon);
   CreateFindAndEditSubMenu();
-
-  if (media_router::MediaRouterEnabled(browser()->GetProfile())) {
-    AddItemWithStringIdAndVectorIcon(
-        this, IDC_ROUTE_MEDIA, IDS_MEDIA_ROUTER_MENU_ITEM_TITLE,
-        features::IsRoundedIconsEnabled() ? kCastIcon
-                                          : kCastChromeRefreshOldIcon);
-  }
 }

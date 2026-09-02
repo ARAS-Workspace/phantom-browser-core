@@ -2,12 +2,6 @@
 <!-- Media Router-specific strings (included from generated_resources.grd). -->
 <grit-part>
   <!-- General -->
-  <message name="IDS_MEDIA_ROUTER_ICON_TOOLTIP_TEXT" desc="Tooltip for the Media Router Action icon, which appears in the toolbar. The tooltip appears on mouseover of the icon.">
-   Display on another screen
-  </message>
-  <message name="IDS_MEDIA_ROUTER_MENU_ITEM_TITLE" desc="Title of menu item for Media Router, which appears in the overflow menu and page contextual menus.">
-    &amp;Cast...
-  </message>
 
   <!-- Cast Modes -->
   <message name="IDS_MEDIA_ROUTER_PRESENTATION_CAST_MODE" desc="Title for the presentation cast mode, which is used when the page is cast enabled. This is shown as a dropdown option, and if selected, also appears as the header of a list of devices.">
@@ -26,15 +20,6 @@
   </message>
 
   <!-- Contextual Menu -->
-  <message name="IDS_MEDIA_ROUTER_ABOUT" desc="Title of a menu item which, on click, opens a page with product information about Google Cast.">
-    About
-  </message>
-  <message name="IDS_MEDIA_ROUTER_HELP" desc="Title of a menu item which, on click, opens a page to the Google Cast help center.">
-    Help
-  </message>
-  <message name="IDS_MEDIA_ROUTER_TOGGLE_MEDIA_REMOTING" desc="Title of a menu item which, on click, toggles (enables or disables) the feature to optimize casting fullscreen videos to a casting device. This menu item has a checkmark when the feature is enabled.">
-    Optimize fullscreen videos
-  </message>
 
   <!-- Issue Messaging -->
   <message name="IDS_MEDIA_ROUTER_ISSUE_CREATE_ROUTE_TIMEOUT_WITH_HOSTNAME" desc="Title of an issue to show when the user attempts to cast from a website and it times out while waiting for a cast session to start.">

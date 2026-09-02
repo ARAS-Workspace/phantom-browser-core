@@ -17,7 +17,6 @@
 #include "chrome/browser/apps/app_shim/app_shim_manager_mac.h"
 #include "chrome/browser/browsing_data/browsing_data_important_sites_util.h"
 #include "chrome/browser/global_keyboard_shortcuts_mac.h"
-#include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/actions/chrome_action_properties.h"
 #include "chrome/browser/ui/browser_actions.h"
@@ -411,12 +410,6 @@ void BrowserNativeWidgetMac::ValidateUserInterfaceItem(
       result->new_hidden_state =
           browser->GetType() == BrowserWindowInterface::Type::TYPE_NORMAL ||
           browser->GetType() == BrowserWindowInterface::Type::TYPE_DEVTOOLS;
-      break;
-    }
-    case IDC_ROUTE_MEDIA: {
-      // Hide this menu option if Media Router is disabled.
-      result->new_hidden_state =
-          !media_router::MediaRouterEnabled(browser->GetProfile());
       break;
     }
     case IDC_BACK:

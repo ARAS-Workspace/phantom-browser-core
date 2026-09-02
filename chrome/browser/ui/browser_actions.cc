@@ -35,7 +35,6 @@
 #include "chrome/browser/glic/resources/grit/glic_browser_resources.h"
 #include "chrome/browser/indigo/indigo_page_action_controller.h"
 #include "chrome/browser/lifetime/application_lifetime.h"
-#include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/ai_mode_button_service_factory.h"
@@ -146,7 +145,6 @@
 #include "chrome/browser/ui/views/js_optimization/js_optimizations_page_action_controller.h"
 #include "chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_page_action_controller.h"
 #include "chrome/browser/ui/views/location_bar/record_replay_page_action_controller.h"
-#include "chrome/browser/ui/views/media_router/cast_browser_controller.h"
 #include "chrome/browser/ui/views/page_info/page_info_view_factory.h"
 #include "chrome/browser/ui/views/send_tab_to_self/send_tab_to_self_toolbar_bubble_controller.h"
 #include "chrome/browser/ui/views/side_panel/comments/comments_side_panel_coordinator.h"
@@ -184,8 +182,6 @@
 #include "components/contextual_tasks/public/features.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/lens/lens_features.h"
-#include "components/media_router/browser/media_router_dialog_controller.h"
-#include "components/media_router/browser/media_router_metrics.h"
 #include "components/multistep_filter/core/features.h"
 #include "components/omnibox/browser/omnibox_field_trial.h"
 #include "components/omnibox/browser/vector_icons.h"
@@ -4332,19 +4328,14 @@ void BrowserActions::InitializeSubmenuActions() {
           /*is_pinnable=*/false)
           .Build());
 
-  int save_and_share_menu_string_id =
-      media_router::MediaRouterEnabled(bwi->GetProfile())
-          ? IDS_CAST_SAVE_AND_SHARE_MENU
-          : IDS_SAVE_AND_SHARE_MENU;
-
   root_action_item_->AddChild(
       ChromeMenuAction(
           base::BindRepeating(
               [](BrowserWindowInterface* bwi, actions::ActionItem* item,
                  actions::ActionInvocationContext context) {},
               bwi),
-          kActionMenuSaveAndShareSubmenu, save_and_share_menu_string_id,
-          save_and_share_menu_string_id,
+          kActionMenuSaveAndShareSubmenu, IDS_SAVE_AND_SHARE_MENU,
+          IDS_SAVE_AND_SHARE_MENU,
           features::IsRoundedIconsEnabled() ? kFileSaveIcon
                                             : kFileSaveChromeRefreshOldIcon,
           /*is_pinnable=*/false)

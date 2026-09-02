@@ -68,7 +68,6 @@
 #include "chrome/browser/glic/public/glic_passkeys.h"
 #include "chrome/browser/glic/resources/grit/glic_browser_resources.h"
 #include "chrome/browser/language/language_model_manager_factory.h"
-#include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor_features.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service.h"
 #include "chrome/browser/navigation_predictor/navigation_predictor_keyed_service_factory.h"
@@ -178,8 +177,6 @@
 #include "components/lens/lens_overlay_invocation_source.h"
 #include "components/live_caption/caption_util.h"
 #include "components/live_caption/pref_names.h"
-#include "components/media_router/browser/media_router_dialog_controller.h"
-#include "components/media_router/browser/media_router_metrics.h"
 #include "components/omnibox/browser/autocomplete_classifier.h"
 #include "components/omnibox/browser/autocomplete_input.h"
 #include "components/omnibox/browser/autocomplete_match.h"
@@ -215,7 +212,6 @@
 #include "components/url_formatter/url_formatter.h"
 #include "components/user_prefs/user_prefs.h"
 #include "components/vector_icons/vector_icons.h"
-#include "components/web_modal/web_contents_modal_dialog_manager.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/child_process_security_policy.h"
 #include "content/public/browser/download_manager.h"
@@ -2320,7 +2316,6 @@ void RenderViewContextMenu::AppendAudioItems() {
                                   IDS_CONTENT_CONTEXT_SAVEAUDIOAS);
   menu_model_.AddItemWithStringId(IDC_CONTENT_CONTEXT_COPYAVLOCATION,
                                   IDS_CONTENT_CONTEXT_COPYAUDIOLOCATION);
-  AppendMediaRouterItem();
 }
 
 void RenderViewContextMenu::AppendCanvasItems() {
@@ -2337,15 +2332,6 @@ void RenderViewContextMenu::AppendVideoItems() {
   if (use_submenu) {
     menu_model_.AddItemWithStringId(IDC_CONTENT_CONTEXT_PICTUREINPICTURE,
                                     IDS_CONTENT_CONTEXT_PICTUREINPICTURE);
-
-    if (media_router::MediaRouterEnabled(browser_context_)) {
-      menu_model_.AddItemWithStringIdAndIcon(
-          IDC_ROUTE_MEDIA, IDS_MEDIA_ROUTER_MENU_ITEM_TITLE,
-          ui::ImageModel::FromVectorIcon(features::IsRoundedIconsEnabled()
-                                             ? kCastIcon
-                                             : kCastChromeRefreshOldIcon,
-                                         ui::kColorMenuIcon, kTabMenuIconSize));
-    }
 
     menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
   }
@@ -2386,7 +2372,6 @@ void RenderViewContextMenu::AppendVideoItems() {
   if (!use_submenu) {
     menu_model_.AddCheckItemWithStringId(IDC_CONTENT_CONTEXT_PICTUREINPICTURE,
                                          IDS_CONTENT_CONTEXT_PICTUREINPICTURE);
-    AppendMediaRouterItem();
   }
 
   // Search for video frame menu item.
@@ -2526,9 +2511,6 @@ void RenderViewContextMenu::AppendPageItems() {
       AppendSaveToMemoryBanksItem();
     }
 
-    // Cast
-    AppendMediaRouterItem();
-
     // Send to your devices
     if (GetBrowser() &&
         send_tab_to_self::ShouldDisplayEntryPoint(embedder_web_contents_)) {
@@ -2560,7 +2542,6 @@ void RenderViewContextMenu::AppendPageItems() {
                                   IDS_CONTENT_CONTEXT_SAVEPAGEAS);
   menu_model_.AddItemWithStringId(IDC_PRINT, IDS_CONTENT_CONTEXT_PRINT);
   AppendLiveCaptionItem();
-  AppendMediaRouterItem();
 
   if (features::IsReadAnythingMenuShuffleExperimentEnabled()) {
     if (IsRegionSearchEnabled()) {
@@ -2747,15 +2728,6 @@ void RenderViewContextMenu::AppendTranslateItem() {
           GetTargetLanguageDisplayName(/*is_full_page_translation=*/true)),
       ui::ImageModel::FromVectorIcon(vector_icons::kGTranslateIcon,
                                      ui::kColorMenuIcon, kTabMenuIconSize));
-}
-
-void RenderViewContextMenu::AppendMediaRouterItem() {
-  if (media_router::MediaRouterEnabled(browser_context_)) {
-    AddItemWithOptionalIcon(IDC_ROUTE_MEDIA, IDS_MEDIA_ROUTER_MENU_ITEM_TITLE,
-                            features::IsRoundedIconsEnabled()
-                                ? kCastIcon
-                                : kCastChromeRefreshOldIcon);
-  }
 }
 
 void RenderViewContextMenu::AppendSaveToMemoryBanksItem() {
@@ -3485,9 +3457,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
     case IDC_CONTENT_CONTEXT_USE_PASSKEY_FROM_ANOTHER_DEVICE:
       return true;
 
-    case IDC_ROUTE_MEDIA:
-      return IsRouteMediaEnabled();
-
     case IDC_CONTENT_CONTEXT_RELOAD_GLIC:
     case IDC_CONTENT_CONTEXT_ARCHIVE_GLIC:
     case IDC_CONTENT_CONTEXT_GLIC:
@@ -3906,10 +3875,6 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
 
     case IDC_PRINT:
       ExecPrint();
-      break;
-
-    case IDC_ROUTE_MEDIA:
-      ExecRouteMedia();
       break;
 
     case IDC_CONTENT_CONTEXT_EXIT_FULLSCREEN:
@@ -4667,31 +4632,6 @@ RenderViewContextMenu::CreateDataEndpoint(bool notify_if_restricted) const {
   return nullptr;
 }
 
-bool RenderViewContextMenu::IsRouteMediaEnabled() const {
-  if (!media_router::MediaRouterEnabled(browser_context_)) {
-    return false;
-  }
-
-  BrowserWindowInterface* browser = GetBrowser();
-  if (!browser) {
-    return false;
-  }
-
-  // Disable the command if there is an active modal dialog.
-  // We don't use |source_web_contents_| here because it could be the
-  // WebContents for something that's not the current tab (e.g., WebUI
-  // modal dialog).
-  WebContents* web_contents =
-      browser->GetTabStripModel()->GetActiveWebContents();
-  if (!web_contents) {
-    return false;
-  }
-
-  const web_modal::WebContentsModalDialogManager* manager =
-      web_modal::WebContentsModalDialogManager::FromWebContents(web_contents);
-  return !manager || !manager->IsDialogActive();
-}
-
 void RenderViewContextMenu::ExecOpenWebApp() {
   std::optional<webapps::AppId> app_id =
       web_app::FindInstalledAppWithUrlInScope(
@@ -5294,20 +5234,6 @@ void RenderViewContextMenu::ExecPrint() {
 #endif
                        print_preview_disabled, !params_.selection_text.empty());
 #endif  // BUILDFLAG(ENABLE_PRINTING)
-}
-
-void RenderViewContextMenu::ExecRouteMedia() {
-  base::RecordAction(UserMetricsAction("MediaContextMenu_RouteMedia"));
-
-  media_router::MediaRouterDialogController* dialog_controller =
-      media_router::MediaRouterDialogController::GetOrCreateForWebContents(
-          embedder_web_contents_);
-  if (!dialog_controller) {
-    return;
-  }
-
-  dialog_controller->ShowMediaRouterDialog(
-      media_router::MediaRouterDialogActivationLocation::CONTEXTUAL_MENU);
 }
 
 void RenderViewContextMenu::ExecTranslate() {
