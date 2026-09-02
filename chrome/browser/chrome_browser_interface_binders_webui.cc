@@ -35,7 +35,6 @@
 #include "chrome/common/webui_url_constants.h"
 #include "components/commerce/content/browser/commerce_internals_ui.h"
 #include "components/commerce/core/internals/mojom/commerce_internals.mojom.h"
-#include "components/contextual_tasks/public/features.h"
 #include "components/enterprise/connectors/connectors_internals.mojom.h"
 #include "components/history_clusters/history_clusters_internals/webui/history_clusters_internals_ui.h"
 #include "components/policy/core/common/features.h"
@@ -232,15 +231,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
           policy::features::kPolicyPageMojoMigration)) {
     RegisterWebUIControllerInterfaceBinder<
         policy::mojom::PolicyPageHandlerFactory, PolicyUI>(map);
-  }
-
-  if (contextual_tasks::IsContextualTasksUIEnabled()) {
-    RegisterWebUIControllerInterfaceBinder<
-        contextual_tasks::mojom::PageHandlerFactory, ContextualTasksUI>(map);
-    RegisterWebUIControllerInterfaceBinder<
-        contextual_tasks_internals::mojom::
-            ContextualTasksInternalsPageHandlerFactory,
-        ContextualTasksUI>(map);
   }
 
   RegisterWebUIControllerInterfaceBinder<

@@ -15,7 +15,6 @@
 #if BUILDFLAG(ENABLE_COMPOSE)
 #include "chrome/browser/ui/webui/compose/compose_untrusted_ui.h"
 #endif  // BUILDFLAG(ENABLE_COMPOSE)
-#include "chrome/browser/ui/webui/ai_overlay_dialog/ai_overlay_dialog_untrusted_ui.h"
 #endif  // defined(TOOLKIT_VIEWS)
 
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
@@ -49,8 +48,6 @@ void RegisterChromeUntrustedWebUIConfigs() {
         // BUILDFLAG(IS_ANDROID)
 
 #if defined(TOOLKIT_VIEWS)
-  map.AddUntrustedWebUIConfig(
-      std::make_unique<ttc::AiOverlayDialogUntrustedUIConfig>());
   map.AddUntrustedWebUIConfig(std::make_unique<DataSharingUIConfig>());
 
 #if BUILDFLAG(ENABLE_COMPOSE)
