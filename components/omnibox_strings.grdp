@@ -553,23 +553,11 @@
   <message name="IDS_SEARCH_ENGINES_STARTER_PACK_TABS_KEYWORD" desc = "The keyword required to trigger tab search in keyword mode. This will be prepended with an '@'.">
     Tabs
   </message>
-  <message name="IDS_SEARCH_ENGINES_STARTER_PACK_GEMINI_NAME" desc = "The name of the Gemini engine as it appears on chrome://settings/searchEngines.">
-    Gemini
-  </message>
-  <message name="IDS_SEARCH_ENGINES_STARTER_PACK_GEMINI_KEYWORD" desc = "The keyword required to trigger Ask Gemini in keyword mode. This will be prepended with an '@'.">
-    Gemini
-  </message>
   <message name="IDS_SEARCH_ENGINES_STARTER_PACK_PAGE_NAME" desc = "The name of the search engine to search with the current page context as it appears on chrome://settings/searchEngines." translateable="false">
     Page
   </message>
   <message name="IDS_SEARCH_ENGINES_STARTER_PACK_PAGE_KEYWORD" desc = "The keyword required to trigger page context search in keyword mode. This will be prepended with an '@'." translateable="false">
     Page
-  </message>
-  <message name="IDS_SEARCH_ENGINES_STARTER_PACK_AI_MODE_NAME" desc = "The name of the Google AI Mode search engine as it appears on chrome://settings/searchEngines.">
-    Google AI Mode
-  </message>
-  <message name="IDS_SEARCH_ENGINES_STARTER_PACK_AI_MODE_KEYWORD" desc = "The keyword required to trigger the Google AI Mode search engine. This will be stripped of whitespace and prepended with an '@'.">
-    AI Mode
   </message>
   <message name="IDS_STARTER_PACK_PAGE_KEYWORD_TEXT" desc="The text shown at the front of the Omnibox when a user has selected the starter pack page keyword mode." translateable="false">
     Ask about this page
