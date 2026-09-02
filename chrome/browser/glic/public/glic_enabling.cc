@@ -386,6 +386,8 @@ GlicEnabling::ProfileEnablement ComputeProfileEnablement(
     return result;
   }
 
+  result.feature_enabled = false;
+
   GlicGlobalEnabling& global_enabling =
       g_browser_process->GetFeatures()->glic_global_enabling();
 
