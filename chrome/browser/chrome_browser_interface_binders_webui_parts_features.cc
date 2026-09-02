@@ -4,21 +4,15 @@
 
 #include "chrome/browser/chrome_browser_interface_binders_webui_parts.h"
 #include "chrome/browser/contextual_tasks/contextual_tasks_ui.h"
-#include "chrome/browser/glic/experimental_opt_in/glic_experimental_opt_in_ui.h"
 #include "chrome/browser/glic/host/glic_ui.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
-#include "chrome/browser/ui/webui/private_ai_internals/private_ai_internals_ui.h"
 #include "chrome/common/buildflags.h"
 #include "chrome/common/chrome_features.h"
 #include "components/compose/buildflags.h"
 #include "components/contextual_tasks/public/features.h"
 #include "components/enterprise/buildflags/buildflags.h"
 #include "components/on_device_translation/buildflags/buildflags.h"
-#include "components/private_ai/features.h"
-#include "components/private_ai/private_ai_internals/webui/private_ai_internals.mojom.h"
 #include "components/safe_browsing/buildflags.h"
 #include "components/signin/public/base/signin_buildflags.h"
-#include "content/public/browser/render_process_host.h"
 #include "content/public/browser/web_ui_browser_interface_broker_registry.h"
 #include "content/public/browser/web_ui_controller_interface_binder.h"
 #include "extensions/buildflags/buildflags.h"
@@ -104,26 +98,6 @@ void PopulateChromeWebUIFrameBindersPartsFeatures(
       extensions::ZeroStatePromoController>(map);
 #endif
 
-  if (glic::GlicEnabling::IsProfileEligible(Profile::FromBrowserContext(
-          render_frame_host->GetProcess()->GetBrowserContext()))) {
-    // Register binders for all eligible profiles.
-
-    // For GlicUI, the WebUI page will check whether Glic is policy-enabled and
-    // restrict access if needed.
-    RegisterWebUIControllerInterfaceBinder<glic::mojom::PageHandlerFactory,
-                                           glic::GlicUI>(map);
-    RegisterWebUIControllerInterfaceBinder<
-        glic::mojom::GlicPreloadHandlerFactory, glic::GlicUI>(map);
-    RegisterWebUIControllerInterfaceBinder<
-        glic::mojom::ExperimentalOptInPageHandler,
-        glic::GlicExperimentalOptInUI>(map);
-  }
-
-  if (glic::GlicEnabling::IsInternalsWebUIEnabled(Profile::FromBrowserContext(
-          render_frame_host->GetProcess()->GetBrowserContext()))) {
-    RegisterWebUIControllerInterfaceBinder<
-        glic::mojom::InternalsPageHandlerFactory, glic::GlicUI>(map);
-  }
 #if !BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   if (base::FeatureList::IsEnabled(contextual_tasks::kContextualTasks)) {
     RegisterWebUIControllerInterfaceBinder<
@@ -145,12 +119,6 @@ void PopulateChromeWebUIFrameBindersPartsFeatures(
   RegisterWebUIControllerInterfaceBinder<watermark::mojom::PageHandlerFactory,
                                          WatermarkUI>(map);
 #endif
-
-  if (base::FeatureList::IsEnabled(private_ai::kPrivateAi)) {
-    RegisterWebUIControllerInterfaceBinder<
-        private_ai_internals::mojom::PrivateAiInternalsPageHandler,
-        private_ai::PrivateAiInternalsUI>(map);
-  }
 
 #if BUILDFLAG(FULL_SAFE_BROWSING)
   RegisterWebUIControllerInterfaceBinder<::mojom::ResetPasswordHandler,

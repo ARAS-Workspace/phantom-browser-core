@@ -15,7 +15,6 @@
 #if BUILDFLAG(ENABLE_COMPOSE)
 #include "chrome/browser/ui/webui/compose/compose_untrusted_ui.h"
 #endif  // BUILDFLAG(ENABLE_COMPOSE)
-#include "chrome/browser/glic/selection/selection_overlay_untrusted_ui.h"
 #include "chrome/browser/ui/webui/ai_overlay_dialog/ai_overlay_dialog_untrusted_ui.h"
 #endif  // defined(TOOLKIT_VIEWS)
 
@@ -57,9 +56,6 @@ void RegisterChromeUntrustedWebUIConfigs() {
 #if BUILDFLAG(ENABLE_COMPOSE)
   map.AddUntrustedWebUIConfig(std::make_unique<ComposeUIUntrustedConfig>());
 #endif  // BUILDFLAG(ENABLE_COMPOSE)
-
-  map.AddUntrustedWebUIConfig(
-      std::make_unique<glic::SelectionOverlayUntrustedUIConfig>());
 
 #endif  // defined(TOOLKIT_VIEWS)
 

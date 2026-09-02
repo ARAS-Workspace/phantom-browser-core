@@ -9,8 +9,6 @@
 #include "chrome/browser/chrome_browser_interface_binders_webui_parts.h"
 #include "chrome/browser/contextual_tasks/contextual_tasks_ui.h"
 #include "chrome/browser/media/media_engagement_score_details.mojom.h"
-#include "chrome/browser/optimization_guide/optimization_guide_internals_ui.h"
-#include "chrome/browser/ui/webui/actor_internals/actor_internals_ui.h"
 #include "chrome/browser/ui/webui/bluetooth_internals/bluetooth_internals.mojom.h"
 #include "chrome/browser/ui/webui/bluetooth_internals/bluetooth_internals_ui.h"
 #include "chrome/browser/ui/webui/chrome_finds_internals/chrome_finds_internals.mojom.h"
@@ -19,8 +17,6 @@
 #include "chrome/browser/ui/webui/connectors_internals/connectors_internals_ui.h"
 #include "chrome/browser/ui/webui/content_settings/content_settings_internals.mojom.h"
 #include "chrome/browser/ui/webui/content_settings/content_settings_ui.h"
-#include "chrome/browser/ui/webui/context_hub/context_hub.mojom.h"
-#include "chrome/browser/ui/webui/context_hub/context_hub_ui.h"
 #include "chrome/browser/ui/webui/data_sharing_internals/data_sharing_internals_ui.h"
 #include "chrome/browser/ui/webui/engagement/site_engagement_ui.h"
 #include "chrome/browser/ui/webui/location_internals/location_internals.mojom.h"
@@ -37,7 +33,6 @@
 #include "chrome/browser/ui/webui/usb_internals/usb_internals.mojom.h"
 #include "chrome/browser/ui/webui/usb_internals/usb_internals_ui.h"
 #include "chrome/common/webui_url_constants.h"
-#include "components/actor/public/mojom/actor_internals.mojom.h"
 #include "components/commerce/content/browser/commerce_internals_ui.h"
 #include "components/commerce/core/internals/mojom/commerce_internals.mojom.h"
 #include "components/contextual_tasks/public/features.h"
@@ -56,8 +51,6 @@
 
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/history/history_ui.h"
-#include "chrome/browser/ui/webui/indigo_internals/indigo_internals.mojom.h"
-#include "chrome/browser/ui/webui/indigo_internals/indigo_internals_ui.h"
 #include "chrome/browser/ui/webui/omnibox_popup/mojom/omnibox_popup.mojom.h"
 #include "chrome/browser/ui/webui/omnibox_popup/mojom/omnibox_popup_aim.mojom.h"
 #include "chrome/browser/ui/webui/omnibox_popup/omnibox_popup_ui.h"
@@ -194,8 +187,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
   RegisterWebUIControllerInterfaceBinder<
       omnibox_popup::mojom::PageHandlerFactory, OmniboxPopupUI>(map);
   RegisterWebUIControllerInterfaceBinder<
-      indigo_internals::mojom::PageHandlerFactory, IndigoInternalsUI>(map);
-  RegisterWebUIControllerInterfaceBinder<
       webnn_internals::mojom::PageHandlerFactory, WebNNInternalsUI>(map);
 #endif
   RegisterWebUIControllerInterfaceBinder<::mojom::OmniboxPageHandler,
@@ -214,10 +205,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
   RegisterWebUIControllerInterfaceBinder<
       history_clusters_internals::mojom::PageHandlerFactory,
       HistoryClustersInternalsUI>(map);
-
-  RegisterWebUIControllerInterfaceBinder<
-      optimization_guide_internals::mojom::PageHandlerFactory,
-      OptimizationGuideInternalsUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<
       segmentation_internals::mojom::PageHandlerFactory,
@@ -241,9 +228,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
   RegisterWebUIControllerInterfaceBinder<::mojom::LocationInternalsHandler,
                                          LocationInternalsUI>(map);
 
-  RegisterWebUIControllerInterfaceBinder<
-      actor_internals::mojom::PageHandlerFactory, ActorInternalsUI>(map);
-
   if (base::FeatureList::IsEnabled(
           policy::features::kPolicyPageMojoMigration)) {
     RegisterWebUIControllerInterfaceBinder<
@@ -265,9 +249,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
 
   RegisterWebUIControllerInterfaceBinder<suggest_internals::mojom::PageHandler,
                                          SuggestInternalsUI>(map);
-
-  RegisterWebUIControllerInterfaceBinder<
-      browser::context_hub::mojom::PageHandlerFactory, ContextHubUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<
       content_settings_internals::mojom::PageHandlerFactory,
