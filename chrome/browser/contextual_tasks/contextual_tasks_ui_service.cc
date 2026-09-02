@@ -88,7 +88,6 @@
 #include "content/public/browser/site_instance.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_ui.h"
-#include "content/public/common/content_switches.h"
 #include "content/public/common/url_constants.h"
 #include "google_apis/gaia/gaia_urls.h"
 #include "net/base/registry_controlled_domains/registry_controlled_domain.h"
@@ -1172,52 +1171,7 @@ void ContextualTasksUiService::OnSearchResultsNavigationInSidePanel(
 bool ContextualTasksUiService::ShouldRedirectIneligibleRequest(
     const GURL& url,
     content::WebContents* source_contents) const {
-  // If it's a top-level frame refresh/navigation while viewing an internal
-  // context, and the user environment isn't eligible, bounce immediately.
-  if (eligibility_manager_ && eligibility_manager_->IsEligible()) {
-    return false;
-  }
-
-  // If the user is signed in and eligible without identity, but identity token
-  // loading is still pending (e.g. during cold start on Android), do not
-  // redirect yet.
-  if (eligibility_manager_ &&
-      eligibility_manager_->IsEligibleWithoutIdentity() && identity_manager_ &&
-      identity_manager_->HasPrimaryAccount(signin::ConsentLevel::kSignin) &&
-      !identity_manager_->AreRefreshTokensLoaded()) {
-    return false;
-  }
-
-  base::Uuid task_id;
-  std::string task_id_str;
-  if (net::GetValueForKeyInQuery(url, kTaskQueryParam, &task_id_str)) {
-    task_id = base::Uuid::ParseLowercase(task_id_str);
-  }
-
-  // Bypasses the redirect check if the session was started from Lens and the
-  // Lens side panel unification feature is enabled (either as an active
-  // session or a pending session for the given task ID), or if the active tab
-  // is present in context on the WebContents.
-  if (IsSessionAllowedWhileIneligible(source_contents, task_id) ||
-      IsActiveTabInContext(source_contents)) {
-    return false;
-  }
-
-  if (!IsContextualTasksUrl(url)) {
-    return false;
-  }
-  // Don't intercept internal debugging tools
-  if (url.path() == "/internals") {
-    return false;
-  }
-  // Don't intercept WebUI tests
-  if (url.path() == "/test_loader.html" ||
-      base::CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kBrowserTest)) {
-    return false;
-  }
-
-  return true;
+  return false;
 }
 
 bool ContextualTasksUiService::IsSessionAllowedWhileIneligible(
