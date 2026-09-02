@@ -836,29 +836,7 @@ bool GlicEnabling::IsLikelyDogfoodClient() {
 
 // static
 bool GlicEnabling::IsProfileEligible(Profile* profile) {
-  if (g_bypass_enablement_checks_for_testing) {
-    return true;
-  }
-
-  // Glic is supported only in regular profiles (i.e. disabled in incognito,
-  // guest, system profile, etc.).
-  if (!profile || !profile->IsRegularProfile()) {
-    return false;
-  }
-
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!IsChromeOSProfileEligible(profile)) {
-    return false;
-  }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
-  bool global_criteria = IsEnabledByGlobalCriteria();
-  bool consented = HasConsentedForProfile(profile);
-
-  // A profile is eligible if global criteria are met OR if the user previously
-  // onboarded and the anchor override is active (to keep the entry point
-  // visible for error states).
-  return global_criteria || IsAnchoredButIneligible(global_criteria, consented);
+  return false;
 }
 
 // static
@@ -912,7 +890,7 @@ void GlicEnabling::RecordProfileIneligibilityMetricsAtStartup(
 
 // static
 bool GlicEnabling::IsEnabledForProfile(Profile* profile) {
-  return EnablementForProfile(profile).IsEnabled();
+  return false;
 }
 
 // static
