@@ -348,14 +348,11 @@ inline constexpr char16_t kMyActivityGeminiAppsUrl[] =
     u"https://myactivity.google.com/product/gemini";
 
 // The URL for Glic activity button.
-inline constexpr char kGlicActivityUrl[] =
-    "https://myactivity.google.com/product/gemini?utm_source=gemini";
+inline constexpr char kGlicActivityUrl[] = "";
 
-inline constexpr char16_t kMyActivityAiModeUrl[] =
-    u"https://myactivity.google.com/myactivity?product=83";
+inline constexpr char16_t kMyActivityAiModeUrl[] = u"";
 
-inline constexpr char16_t kMyActivitySearchServicesAppsUrl[] =
-    u"https://myactivity.google.com/search-services/apps";
+inline constexpr char16_t kMyActivitySearchServicesAppsUrl[] = u"";
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 // "Learn more" URL for On-Device AI.

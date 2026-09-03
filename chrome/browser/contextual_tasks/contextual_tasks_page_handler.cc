@@ -76,7 +76,7 @@
 #endif
 
 namespace {
-constexpr char kMyActivityUrl[] = "https://myactivity.google.com/myactivity";
+constexpr char kMyActivityUrl[] = "";
 
 void OpenUrlWithDisposition(Profile* profile,
                             const GURL& url,

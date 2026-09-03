@@ -171,9 +171,8 @@ constexpr base::FeatureParam<int> kLensUpdatedFeedbackToastTimeoutMs{
     &kLensUpdatedFeedbackEntrypoint, "feedback-toast-timeout-ms", 8000};
 const base::FeatureParam<int> kLensOverlayMinRamMb{&kLensOverlay, "min_ram_mb",
                                                    /*default=value=*/-1};
-const base::FeatureParam<std::string> kActivityUrl{
-    &kLensOverlay, "activity-url",
-    "https://myactivity.google.com/myactivity?pli=1"};
+const base::FeatureParam<std::string> kActivityUrl{&kLensOverlay,
+                                                   "activity-url", ""};
 const base::FeatureParam<std::string> kHelpCenterUrl{
     &kLensOverlay, "help-center-url",
     "https://support.google.com/chrome?p=search_from_page"};
