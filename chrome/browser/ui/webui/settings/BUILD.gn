@@ -4,6 +4,7 @@
 
 import("//build/config/ozone.gni")
 import("//build/config/ui.gni")
+import("//components/compose/features.gni")
 import("//components/signin/features.gni")
 
 assert(is_win || is_mac || is_linux || is_chromeos)
@@ -191,7 +192,6 @@ source_set("impl") {
     "//chrome/browser/bluetooth",
     "//chrome/browser/browsing_data",
     "//chrome/browser/browsing_data:constants",
-    "//chrome/browser/compose",
     "//chrome/browser/content_settings",
     "//chrome/browser/content_settings:content_settings_util",
     "//chrome/browser/contextual_tasks",
@@ -314,6 +314,9 @@ source_set("impl") {
     "//ui/webui/tracked_element",
     "//v8:v8_version",
   ]
+  if (enable_compose) {
+    deps += [ "//chrome/browser/compose" ]
+  }
 
   if (is_win || is_mac || is_linux) {
     sources += [

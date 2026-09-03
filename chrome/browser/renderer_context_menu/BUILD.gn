@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//components/compose/features.gni")
 import("//components/spellcheck/spellcheck_build_features.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
@@ -119,7 +120,6 @@ source_set("impl") {
       "//chrome/browser/apps/app_service",
       "//chrome/browser/apps/platform_apps",
       "//chrome/browser/autocomplete",
-      "//chrome/browser/compose",
       "//chrome/browser/context_hub",
       "//chrome/browser/custom_handlers",
       "//chrome/browser/devtools",
@@ -186,6 +186,9 @@ source_set("impl") {
       "//ui/menus",
       "//url",
     ]
+    if (enable_compose) {
+      deps += [ "//chrome/browser/compose" ]
+    }
 
     if (enable_print_preview) {
       deps += [ "//chrome/browser/printing" ]
@@ -272,7 +275,9 @@ static_library("test_support") {
       "render_view_context_menu_test_util.cc",
     ]
     public_deps += [ "//extensions/buildflags" ]
-    deps += [ "//chrome/browser/compose" ]
+    if (enable_compose) {
+      deps += [ "//chrome/browser/compose" ]
+    }
   }
 
   if (is_chromeos) {
