@@ -29,11 +29,6 @@
   padding: 8px 0;
 }
 
-#promoCard {
-  margin-bottom: 18px;
-  padding: 0;
-}
-
 .centered-message {
   align-items: center;
   color: var(--md-loading-message-color);

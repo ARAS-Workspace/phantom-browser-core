@@ -5,7 +5,6 @@
 import 'chrome://resources/cr_elements/cr_lazy_list/cr_lazy_list.js';
 import '/strings.m.js';
 import './item.js';
-import './promo_card.js';
 
 import {getInstance as getAnnouncerInstance} from 'chrome://resources/cr_elements/cr_a11y_announcer/cr_a11y_announcer.js';
 import type {CrLazyListElement} from 'chrome://resources/cr_elements/cr_lazy_list/cr_lazy_list.js';
@@ -56,7 +55,6 @@ export class BookmarksListElement extends BookmarksListElementBase {
       selectedFolder_: {type: String},
       selectedItems_: {type: Object},
       focusedIndex_: {type: Number},
-      shouldShowPromoCard_: {type: Boolean},
     };
   }
 
@@ -66,7 +64,6 @@ export class BookmarksListElement extends BookmarksListElementBase {
   private accessor searchTerm_: string = '';
   protected accessor selectedFolder_: string = '';
   private accessor selectedItems_: Set<string> = new Set();
-  protected accessor shouldShowPromoCard_: boolean = false;
 
   override connectedCallback() {
     super.connectedCallback();
@@ -427,11 +424,6 @@ export class BookmarksListElement extends BookmarksListElementBase {
 
   protected getAriaSelected_(id: string): boolean {
     return this.selectedItems_.has(id);
-  }
-
-  protected onShouldShowPromoCard_(
-      e: CustomEvent<{shouldShowPromoCard: boolean}>) {
-    this.shouldShowPromoCard_ = e.detail.shouldShowPromoCard;
   }
 
   setDisplayedIdsForTesting(ids: string[]) {
