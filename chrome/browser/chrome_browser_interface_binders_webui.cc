@@ -9,8 +9,6 @@
 #include "chrome/browser/chrome_browser_interface_binders_webui_parts.h"
 #include "chrome/browser/contextual_tasks/contextual_tasks_ui.h"
 #include "chrome/browser/media/media_engagement_score_details.mojom.h"
-#include "chrome/browser/ui/webui/bluetooth_internals/bluetooth_internals.mojom.h"
-#include "chrome/browser/ui/webui/bluetooth_internals/bluetooth_internals_ui.h"
 #include "chrome/browser/ui/webui/chrome_finds_internals/chrome_finds_internals.mojom.h"
 #include "chrome/browser/ui/webui/chrome_finds_internals/chrome_finds_internals_ui.h"
 #include "chrome/browser/ui/webui/chrome_urls/chrome_urls_ui.h"
@@ -32,8 +30,6 @@
 #include "chrome/browser/ui/webui/usb_internals/usb_internals.mojom.h"
 #include "chrome/browser/ui/webui/usb_internals/usb_internals_ui.h"
 #include "chrome/common/webui_url_constants.h"
-#include "components/commerce/content/browser/commerce_internals_ui.h"
-#include "components/commerce/core/internals/mojom/commerce_internals.mojom.h"
 #include "components/enterprise/connectors/connectors_internals.mojom.h"
 #include "components/history_clusters/history_clusters_internals/webui/history_clusters_internals_ui.h"
 #include "components/policy/core/common/features.h"
@@ -170,9 +166,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
       chrome_finds_internals::mojom::PageHandlerFactory,
       chrome_finds_internals::ChromeFindsInternalsUI>(map);
 
-  RegisterWebUIControllerInterfaceBinder<::mojom::BluetoothInternalsHandler,
-                                         BluetoothInternalsUI>(map);
-
   RegisterWebUIControllerInterfaceBinder<
       media::mojom::MediaEngagementScoreDetailsProvider, MediaEngagementUI>(
       map);
@@ -202,10 +195,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
   RegisterWebUIControllerInterfaceBinder<
       segmentation_internals::mojom::PageHandlerFactory,
       SegmentationInternalsUI>(map);
-
-  RegisterWebUIControllerInterfaceBinder<
-      commerce::mojom::CommerceInternalsHandlerFactory,
-      commerce::CommerceInternalsUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<chrome_urls::mojom::PageHandlerFactory,
                                          chrome_urls::ChromeUrlsUI>(map);

@@ -10,7 +10,6 @@
 #include "base/containers/fixed_flat_set.h"
 #include "base/no_destructor.h"
 #include "build/build_config.h"
-#include "components/commerce/core/commerce_constants.h"
 #include "components/history_clusters/history_clusters_internals/webui/url_constants.h"
 #include "components/optimization_guide/optimization_guide_internals/webui/url_constants.h"
 #include "components/safe_browsing/core/common/web_ui_constants.h"
@@ -125,11 +124,9 @@ base::span<const base::cstring_view> ChromeURLHosts() {
 #if !BUILDFLAG(IS_ANDROID)
       kChromeUIAppServiceInternalsHost,
 #endif
-      kChromeUIBluetoothInternalsHost,
       kChromeUIChromeFindsInternalsHost,
       kChromeUIChromeURLsHost,
       kChromeUIComponentsHost,
-      commerce::kChromeUICommerceInternalsHost,
       kChromeUIConnectorsInternalsHost,
 #if !BUILDFLAG(IS_ANDROID)
       kChromeUIContextualCueingInternalsHost,
@@ -137,7 +134,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUICrashesHost,
       kChromeUICreditsHost,
       kChromeUICrossDeviceSigninQrBubbleHost,
-      kChromeUIDeviceLogHost,
       kChromeUIDownloadInternalsHost,
       kChromeUIFamilyLinkUserInternalsHost,
       kChromeUIFlagsHost,
