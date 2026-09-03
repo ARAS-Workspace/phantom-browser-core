@@ -96,8 +96,6 @@
 #endif
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
     BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/webui/skills/skills.mojom.h"
-#include "chrome/browser/ui/webui/skills/skills_ui.h"
 #endif
 
 namespace chrome::internal {
@@ -350,14 +348,6 @@ void PopulateChromeWebUIFrameBinders(
 
   RegisterWebUIControllerInterfaceBinder<discards::mojom::SiteDataProvider,
                                          DiscardsUI>(map);
-#endif
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
-  RegisterWebUIControllerInterfaceBinder<skills::mojom::PageHandlerFactory,
-                                         skills::SkillsUI>(map);
-  RegisterWebUIControllerInterfaceBinder<skills::mojom::SkillsPageHandler,
-                                         skills::SkillsUI>(map);
 #endif
 
   // When possible, please one one of the Parts functions above and avoid making

@@ -24,20 +24,15 @@ BASE_FEATURE(kSkillsWebViewV2Enabled, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kSkillsServiceApi, base::FEATURE_DISABLED_BY_DEFAULT);
 const base::FeatureParam<std::string> kSkillsServiceApiUrl{
-    &kSkillsServiceApi, "endpoint",
-    "https://chromeskills.pa.googleapis.com/v1/management/"
-    "firstPartySkills"};
+    &kSkillsServiceApi, "endpoint", ""};
 const base::FeatureParam<std::string> kSkillsServiceApiOAuth2Scope{
-    &kSkillsServiceApi, "oauth2_scope",
-    "https://www.googleapis.com/auth/chromeskills"};
+    &kSkillsServiceApi, "oauth2_scope", ""};
 
 BASE_FEATURE(kEnterprisePublishedSkillsPolicyEnabled,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 const base::FeatureParam<std::string> kInterceptedSkillsUrl{
-    &kSkillsWebViewV2Enabled, "intercepted_skills_url",
-    "https://clients5.google.com/chromeskills/"
-    "settings?utm_source=chrome-skills-settings"};
+    &kSkillsWebViewV2Enabled, "intercepted_skills_url", ""};
 
 const base::FeatureParam<std::string> kSkillsSettingsPageUrl{
     &kSkillsWebViewV2Enabled, "skills_settings_page_url",

@@ -63,10 +63,6 @@ class TabUIHelper;
 class TranslatePageActionController;
 class ZeroSuggestPrefetchTabHelper;
 
-namespace skills {
-class SkillsUiTabControllerInterface;
-}  // namespace skills
-
 namespace back_to_opener {
 class BackToOpenerController;
 }  // namespace back_to_opener
@@ -143,12 +139,6 @@ class ZoomViewController;
 namespace permissions {
 class PermissionIndicatorsTabData;
 }  // namespace permissions
-
-#if !BUILDFLAG(IS_ANDROID)
-namespace skills {
-class SkillsUpdateObserver;
-}  // namespace skills
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace sync_sessions {
 class SyncSessionsRouterTabHelper;
@@ -591,9 +581,6 @@ class TabFeatures {
   std::unique_ptr<back_to_opener::BackToOpenerController>
       back_to_opener_controller_;
 
-  std::unique_ptr<skills::SkillsUiTabControllerInterface>
-      skills_ui_tab_controller_;
-
   std::unique_ptr<tabs::PageContextEligibilityHelper>
       page_context_eligibility_helper_;
 
@@ -604,10 +591,6 @@ class TabFeatures {
 
   std::unique_ptr<contextual_tasks::ContextualTasksTabVisitTracker>
       contextual_tasks_tab_visit_tracker_;
-
-#if !BUILDFLAG(IS_ANDROID)
-  std::unique_ptr<skills::SkillsUpdateObserver> skills_update_observer_;
-#endif  //  !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || \
     BUILDFLAG(IS_CHROMEOS)

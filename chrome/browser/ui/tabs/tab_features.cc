@@ -106,7 +106,6 @@
 #include "components/contextual_tasks/public/features.h"
 #include "components/enterprise/browser/reporting/reporting_features.h"
 #include "components/multistep_filter/core/features.h"
-#include "components/skills/features.h"
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
     BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/contextual_tasks/contextual_tasks_tab_visit_tracker.h"
@@ -129,8 +128,6 @@
 #include "chrome/browser/glic/public/widget/glic_side_panel_coordinator_impl.h"
 #include "chrome/browser/glic/selection/selection_overlay_controller.h"
 #include "chrome/browser/glic/service/glic_instance_helper.h"
-#include "chrome/browser/skills/skills_ui_tab_controller.h"
-#include "chrome/browser/skills/skills_update_observer.h"
 #include "chrome/browser/ui/contextual_search/tab_contextualization_controller.h"
 #include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/tabs/tab_attachment_tracker.h"
@@ -362,11 +359,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
           GetUserDataFactory()
               .CreateInstance<glic::GlicSidePanelCoordinatorImpl>(
                   tab, &tab, side_panel_registry_.get());
-    }
-    if (base::FeatureList::IsEnabled(features::kSkillsEnabled)) {
-      skills_ui_tab_controller_ =
-          GetUserDataFactory().CreateInstance<skills::SkillsUiTabController>(
-              tab, tab);
     }
 
     if (accessibility_annotator::
@@ -608,10 +600,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
   }
 #endif
 
-  if (base::FeatureList::IsEnabled(features::kSkillsEnabled)) {
-    skills_update_observer_ =
-        std::make_unique<skills::SkillsUpdateObserver>(tab);
-  }
   if (base::FeatureList::IsEnabled(features::kIndigo)) {
     indigo_page_action_controller_ =
         std::make_unique<indigo::IndigoPageActionController>(
