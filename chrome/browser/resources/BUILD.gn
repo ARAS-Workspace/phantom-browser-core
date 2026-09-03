@@ -178,10 +178,6 @@ group("resources") {
     ]
   }
 
-  if (enable_dice_support || is_chromeos) {
-    public_deps += [ "signin/batch_upload:resources" ]
-  }
-
   if (enable_dice_support) {
     public_deps += [
       "feature_showcase:resources",

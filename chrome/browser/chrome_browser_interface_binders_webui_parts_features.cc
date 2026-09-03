@@ -29,8 +29,6 @@
 #endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT) || BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/ui/webui/signin/batch_upload/batch_upload.mojom.h"
-#include "chrome/browser/ui/webui/signin/batch_upload_ui.h"
 #endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
@@ -74,11 +72,6 @@ void PopulateChromeWebUIFrameBindersPartsFeatures(
       certificate_manager::mojom::CertificateManagerPageHandlerFactory,
       CertificateManagerUI>(map);
 #endif  // BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
-
-#if BUILDFLAG(ENABLE_DICE_SUPPORT) || BUILDFLAG(IS_CHROMEOS)
-  RegisterWebUIControllerInterfaceBinder<
-      batch_upload::mojom::PageHandlerFactory, BatchUploadUI>(map);
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   RegisterWebUIControllerInterfaceBinder<

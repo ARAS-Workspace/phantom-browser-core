@@ -238,10 +238,6 @@ static_library("test_support") {
     ]
   }
 
-  if (enable_dice_support || is_chromeos) {
-    deps += [ "//chrome/browser/profiles/batch_upload:test_support" ]
-  }
-
   if (is_chromeos) {
     deps += [ "//chrome/browser/media_galleries" ]
   }
@@ -3615,10 +3611,6 @@ if (!is_android) {
       deps += [ "//chrome/browser/ui/views/search_ai_mode:browser_tests" ]
     }
 
-    if (enable_dice_support || is_chromeos) {
-      deps += [ "//chrome/browser/profiles/batch_upload:browser_tests" ]
-    }
-
     if (is_win || is_linux) {
       sources += [
         "../browser/ui/views/profiles/history_sync_optin_ui_browsertest.cc",
@@ -3632,7 +3624,6 @@ if (!is_android) {
       deps += [
         "//chrome/browser/consent_auditor",
         "//chrome/browser/consent_auditor:test_support",
-        "//chrome/browser/profiles/batch_upload:test_support",
       ]
     }
 
@@ -3760,9 +3751,6 @@ if (!is_android) {
             [ "//chrome/browser/ui/views:critical_notification_bubble_view" ]
       }
 
-      if (enable_dice_support || is_chromeos) {
-        deps += [ "//chrome/browser/profiles/batch_upload:test_support" ]
-      }
       if (enable_dice_support) {
         deps += [
           "//chrome/browser/ui/webui/signin/signout_confirmation",
@@ -3821,10 +3809,6 @@ if (!is_android) {
         ]
       }
       if (enable_dice_support || is_chromeos) {
-        sources += [
-          "../browser/ui/views/profiles/batch_upload_dialog_view_browsertest.cc",
-          "../browser/ui/views/profiles/batch_upload_dialog_view_pixel_browsertest.cc",
-        ]
       }
       deps += [
         ":test_support_ui",
@@ -6113,10 +6097,6 @@ test("unit_tests") {
     ]
   }
 
-  if (enable_dice_support || is_chromeos) {
-    deps += [ "//chrome/browser/profiles/batch_upload:unit_tests" ]
-  }
-
   if (enable_bound_session_credentials) {
     sources += [
       "../renderer/bound_session_credentials/bound_session_request_throttled_handler_renderer_impl_unittest.cc",
@@ -6572,10 +6552,6 @@ test("unit_tests") {
       "//chrome/browser/ui/passwords:impl",
       "//chrome/browser/ui/views/passwords/password_change:password_change_toast",
     ]
-
-    if (enable_dice_support || is_chromeos) {
-      deps += [ "//chrome/browser/profiles/batch_upload:test_support" ]
-    }
 
     if (is_win) {
       deps += [

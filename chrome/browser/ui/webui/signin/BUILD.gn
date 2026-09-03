@@ -474,45 +474,6 @@ if (!is_chromeos) {
   }
 }
 
-if (enable_dice_support || is_chromeos) {
-  source_set("batch_upload") {
-    sources = [
-      "batch_upload_handler.cc",
-      "batch_upload_ui.cc",
-    ]
-    public = [
-      "batch_upload_handler.h",
-      "batch_upload_ui.h",
-    ]
-    public_deps = [ "//chrome/browser:browser_public_dependencies" ]
-    deps = [
-      ":signin",
-      "batch_upload:mojo_bindings",
-      "//base",
-      "//chrome/app:generated_resources",
-      "//chrome/browser/device_reauth",
-      "//chrome/browser/profiles:profile",
-      "//chrome/browser/profiles/batch_upload",
-      "//chrome/browser/resources/signin/batch_upload:resources",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/tabs:tab_model",
-      "//chrome/browser/ui/tabs:tab_strip",
-      "//chrome/browser/ui/webui:favicon_source",
-      "//chrome/browser/ui/webui:plural_string_handler",
-      "//chrome/common",
-      "//components/device_reauth",
-      "//components/favicon_base",
-      "//components/signin/public/identity_manager",
-      "//components/strings:components_strings",
-      "//components/sync/base",
-      "//components/sync/service",
-      "//content/public/browser",
-      "//mojo/public/cpp/bindings",
-      "//ui/webui",
-    ]
-  }
-}
-
 source_set("unit_tests") {
   testonly = true
 

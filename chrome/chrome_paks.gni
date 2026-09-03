@@ -578,11 +578,6 @@ template("chrome_extra_paks") {
       ]
     }
 
-    if (enable_dice_support || is_chromeos) {
-      sources += [ "$root_gen_dir/chrome/batch_upload_resources.pak" ]
-      deps += [ "//chrome/browser/resources/signin/batch_upload:resources" ]
-    }
-
     if (enable_dice_support) {
       sources += [
         "$root_gen_dir/chrome/feature_showcase_resources.pak",

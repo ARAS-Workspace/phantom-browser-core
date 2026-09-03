@@ -299,10 +299,6 @@ source_set("impl") {
   }
 
   if (enable_dice_support || is_chromeos) {
-    deps += [
-      "//chrome/browser/profiles/batch_upload",
-      "//chrome/browser/profiles/batch_upload:impl",
-    ]
   }
 
   if (is_android) {
@@ -634,7 +630,6 @@ source_set("unit_tests") {
     sources += [ "signin_promo_unittest.cc" ]
     deps += [
       "//chrome/browser/autofill",
-      "//chrome/browser/profiles/batch_upload:test_support",
       "//components/sync/base",
       "//components/sync_bookmarks",
       "//device/bluetooth:mocks",

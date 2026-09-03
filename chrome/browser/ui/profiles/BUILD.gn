@@ -44,11 +44,6 @@ source_set("profiles") {
       "//url",
     ]
   }
-
-  if (enable_dice_support || is_chromeos) {
-    sources += [ "batch_upload_ui_delegate.h" ]
-    public_deps += [ "//chrome/browser/profiles/batch_upload" ]
-  }
 }
 
 source_set("impl") {
@@ -119,10 +114,6 @@ source_set("impl") {
         "//chrome/browser/ui/webui/signin:profile",
       ]
     }
-  }
-
-  if (enable_dice_support || is_chromeos) {
-    sources += [ "batch_upload_ui_delegate.cc" ]
   }
 
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]

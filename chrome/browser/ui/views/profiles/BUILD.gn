@@ -152,7 +152,6 @@ if (toolkit_views) {
       "//chrome/browser/profiles:profile_manager",
       "//chrome/browser/profiles:profile_test_util",
       "//chrome/browser/profiles:profile_util",
-      "//chrome/browser/profiles/batch_upload:test_support",
       "//chrome/browser/profiles/keep_alive",
       "//chrome/browser/signin",
       "//chrome/browser/signin:identity_test_support",

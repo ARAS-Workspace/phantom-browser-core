@@ -150,9 +150,6 @@ source_set("browser_tests") {
     ]
   }
 
-  if (enable_dice_support || is_chromeos) {
-    sources += [ "signin/batch_upload_view_browsertest.cc" ]
-  }
   if (enable_dice_support) {
     sources += [
       "feature_showcase/feature_showcase_browsertest.cc",
