@@ -30,7 +30,6 @@ namespace optimization_guide {
 
 BASE_DECLARE_FEATURE(kOptimizationGuideManifestBroker);
 
-class ChromeModelComponentStateManagerObserver;
 class ModelBrokerState;
 class OptimizationGuideGlobalFeature;
 class OptimizationGuideGlobalStateTest;
@@ -123,11 +122,6 @@ class OptimizationGuideGlobalState final
               base::BindRepeating(&RegisterPredictionModelComponent));
 
   std::unique_ptr<OnDeviceCapability> on_device_capability_;
-#if BUILDFLAG(USE_ON_DEVICE_MODEL_SERVICE)
-  std::unique_ptr<ChromeModelComponentStateManagerObserver>
-      component_state_manager_observer_;
-#endif  // BUILDFLAG(USE_ON_DEVICE_MODEL_SERVICE)
-
   base::WeakPtrFactory<OptimizationGuideGlobalState> weak_ptr_factory_{this};
 };
 
