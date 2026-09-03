@@ -17,6 +17,7 @@
 #include "base/memory/raw_ref.h"
 #include "base/memory/weak_ptr.h"
 #include "base/metrics/histogram_functions.h"
+#include "base/notreached.h"
 #include "base/scoped_observation.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/supports_user_data.h"
@@ -1328,16 +1329,11 @@ class PromoStateProvider : public StateProvider {
       case signin::ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo:
         return l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SYNC_HISTORY);
       case signin::ProfileMenuAvatarButtonPromoInfo::Type::kBatchUploadPromo:
-        return l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_BATCH_UPLOAD_PROMO);
       case signin::ProfileMenuAvatarButtonPromoInfo::Type::
           kBatchUploadBookmarksPromo:
-        return l10n_util::GetStringUTF16(
-            IDS_AVATAR_BUTTON_BATCH_UPLOAD_PROMO_WITH_BOOKMARK_CLEANUP_PROMO);
       case signin::ProfileMenuAvatarButtonPromoInfo::Type::
           kBatchUploadWindows10DepreciationPromo:
-        // Note: Sync promo does not explicitly mention "sync" but invites the
-        // user to back-up their data. It is fine to be used here.
-        return l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SYNC_PROMO);
+        NOTREACHED();
       case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSyncPromo:
         CHECK(switches::IsAvatarSyncPromoFeatureEnabled());
         return l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SYNC_PROMO);

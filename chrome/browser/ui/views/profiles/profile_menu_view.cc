@@ -25,8 +25,6 @@
 #include "chrome/browser/enterprise/browser_management/browser_management_service.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
-#include "chrome/browser/profiles/batch_upload/batch_upload_service.h"
-#include "chrome/browser/profiles/batch_upload/batch_upload_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_attributes_entry.h"
 #include "chrome/browser/profiles/profile_avatar_icon_util.h"
@@ -530,49 +528,6 @@ void ProfileMenuView::OnYourSavedInfoSettingsButtonClicked() {
   chrome::ShowSettingsSubPage(&browser(), chrome::kAutofillSubPage);
 }
 
-void ProfileMenuView::OnBatchUploadButtonClicked(ActionableItem button_type) {
-  OnActionableItemClicked(button_type);
-  if (!perform_menu_actions()) {
-    return;
-  }
-
-  BatchUploadService::EntryPoint batch_upload_entry_point;
-  switch (button_type) {
-    case ActionableItem::kBatchUploadButton:
-      batch_upload_entry_point =
-          BatchUploadService::EntryPoint::kProfileMenuRowButtonAction;
-      break;
-    case ActionableItem::kBatchUploadAsPrimaryButton:
-      batch_upload_entry_point =
-          from_avatar_promo_
-              ? BatchUploadService::EntryPoint::
-                    kProfileMenuPrimaryButtonActionFromAvatarPromo
-              : BatchUploadService::EntryPoint::kProfileMenuPrimaryButtonAction;
-      break;
-    case ActionableItem::kBatchUploadWithBookmarksAsPrimaryButton:
-      batch_upload_entry_point =
-          from_avatar_promo_
-              ? BatchUploadService::EntryPoint::
-                    kProfileMenuPrimaryButtonWithBookmarksActionFromAvatarPromo
-              : BatchUploadService::EntryPoint::
-                    kProfileMenuPrimaryButtonWithBookmarksAction;
-      break;
-    case ActionableItem::kBatchUploadWindows10DepreciationAsPrimaryButton:
-      batch_upload_entry_point =
-          from_avatar_promo_
-              ? BatchUploadService::EntryPoint::
-                    kProfileMenuPrimaryButtonWithWindows10DepreciationActionFromAvatarPromo
-              : BatchUploadService::EntryPoint::
-                    kProfileMenuPrimaryButtonWithWindows10DepreciationAction;
-      break;
-    default:
-      NOTREACHED() << "This actionable item should not trigger Batch Upload.";
-  }
-
-  BatchUploadServiceFactory::GetForProfile(&profile())
-      ->OpenBatchUpload(&browser(), batch_upload_entry_point);
-}
-
 void ProfileMenuView::SetMenuTitleForAccessibility() {
   const signin::IdentityManager* identity_manager =
       IdentityManagerFactory::GetForProfile(&profile());
@@ -669,7 +624,6 @@ ProfileMenuView::GetIdentitySectionParams(const ProfileAttributesEntry& entry) {
   const AccountInfo primary_extended_account_info =
       identity_manager->FindExtendedAccountInfo(primary_account_info);
   CoreAccountInfo account_info_for_signin_action = primary_account_info;
-
 
   IdentitySectionParams params;
   params.title = GetProfileIdentifier(entry);
@@ -878,46 +832,13 @@ ProfileMenuView::GetIdentitySectionParams(const ProfileAttributesEntry& entry) {
             break;
           case signin::ProfileMenuAvatarButtonPromoInfo::Type::
               kBatchUploadPromo:
-            params.email_subtitle =
-                base::UTF8ToUTF16(primary_account_info.email);
-            params.subtitle = l10n_util::GetStringUTF16(
-                IDS_PROFILE_MENU_PROMO_DESCRIPTION_WITH_BATCH_UPLOAD);
-            params.button_text = l10n_util::GetStringUTF16(
-                IDS_PROFILE_MENU_PROMO_BUTTON_WITH_BATCH_UPLOAD);
-            params.button_action = base::BindRepeating(
-                &ProfileMenuView::OnBatchUploadButtonClicked,
-                base::Unretained(this),
-                ActionableItem::kBatchUploadAsPrimaryButton);
-            break;
+            NOTREACHED();
           case signin::ProfileMenuAvatarButtonPromoInfo::Type::
               kBatchUploadBookmarksPromo:
-            params.email_subtitle =
-                base::UTF8ToUTF16(primary_account_info.email);
-            params.subtitle = l10n_util::GetStringUTF16(
-                IDS_PROFILE_MENU_PROMO_DESCRIPTION_WITH_BATCH_UPLOAD_BOOKMARK_CLEANUP);
-            params.button_text = l10n_util::GetStringUTF16(
-                IDS_PROFILE_MENU_PROMO_BUTTON_WITH_BATCH_UPLOAD);
-            params.button_action = base::BindRepeating(
-                &ProfileMenuView::OnBatchUploadButtonClicked,
-                base::Unretained(this),
-                ActionableItem::kBatchUploadWithBookmarksAsPrimaryButton);
-            break;
+            NOTREACHED();
           case signin::ProfileMenuAvatarButtonPromoInfo::Type::
               kBatchUploadWindows10DepreciationPromo:
-            params.email_subtitle =
-                base::UTF8ToUTF16(primary_account_info.email);
-            // Note: Sync promo does not explicitly mention "sync" but invites
-            // the user to back-up their data. It is fine to be used here.
-            params.subtitle = l10n_util::GetStringUTF16(
-                IDS_PROFILE_MENU_DESCRIPTION_WITH_SYNC_PROMO);
-            params.button_text = l10n_util::GetStringUTF16(
-                IDS_PROFILE_MENU_BUTTON_LABEL_WITH_SYNC_PROMO);
-            params.button_action = base::BindRepeating(
-                &ProfileMenuView::OnBatchUploadButtonClicked,
-                base::Unretained(this),
-                ActionableItem::
-                    kBatchUploadWindows10DepreciationAsPrimaryButton);
-            break;
+            NOTREACHED();
           case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSyncPromo:
             CHECK(switches::IsAvatarSyncPromoFeatureEnabled());
             params.subtitle = l10n_util::GetStringUTF16(
@@ -993,25 +914,6 @@ void ProfileMenuView::BuildIdentityWithCallToAction() {
   }
 
   SetProfileIdentityWithCallToAction(GetIdentitySectionParams(*entry));
-}
-
-void ProfileMenuView::MaybeBuildBatchUploadButton() {
-  if (!syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    return;
-  }
-
-  if (promo_info_.local_data_count == 0) {
-    return;
-  }
-
-  AddFeatureButton(
-      l10n_util::GetPluralStringFUTF16(IDS_PROFILE_MENU_BATCH_UPLOAD_BUTTON,
-                                       promo_info_.local_data_count),
-      base::BindRepeating(&ProfileMenuView::OnBatchUploadButtonClicked,
-                          base::Unretained(this),
-                          ActionableItem::kBatchUploadButton),
-      features::IsRoundedIconsEnabled() ? vector_icons::kCloudUploadIcon
-                                        : vector_icons::kSaveCloudOldIcon);
 }
 
 void ProfileMenuView::BuildAutofillSettingsButton() {
@@ -1257,8 +1159,6 @@ void ProfileMenuView::BuildFeatureButtons() {
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
   signin::IdentityManager* identity_manager =
       IdentityManagerFactory::GetForProfile(&profile());
-  // May add the button asynchronously, order is not be guaranteed.
-  MaybeBuildBatchUploadButton();
   BuildAutofillSettingsButton();
   MaybeBuildManageGoogleAccountButton();
   BuildCustomizeProfileButton();

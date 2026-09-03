@@ -320,24 +320,6 @@ bool IsAllowedByPromoFrequency(Profile& profile,
   return (gap >= switches::kSearchAIModePromoFrequency.Get());
 }
 
-bool WasPreviouslySyncingWithPrimaryAccount(Profile* profile) {
-  const GaiaId last_syncing_gaia_id(
-      profile->GetPrefs()->GetString(prefs::kGoogleServicesLastSyncingGaiaId));
-  if (last_syncing_gaia_id.empty()) {
-    return false;
-  }
-
-  const GaiaId primary_account_gaia_id =
-      IdentityManagerFactory::GetForProfile(profile)
-          ->GetPrimaryAccountInfo(ConsentLevel::kSignin)
-          .gaia;
-  if (primary_account_gaia_id.empty()) {
-    return false;
-  }
-
-  return last_syncing_gaia_id == primary_account_gaia_id;
-}
-
 ProfileMenuAvatarButtonPromoInfo
 ComputeProfileMenuAvatarButtonPromoInfoWithBatchUploadResult(
     Profile* profile,
@@ -359,35 +341,12 @@ ComputeProfileMenuAvatarButtonPromoInfoWithBatchUploadResult(
         return current_count + local_data.second.local_data_models.size();
       });
 
-  // Batch Upload promo: Windows 10 depreciation promo.
-  if (local_data_count > 0 && switches::IsSigninWindows10DepreciationState()) {
-    return {.type = ProfileMenuAvatarButtonPromoInfo::Type::
-                kBatchUploadWindows10DepreciationPromo,
-            .local_data_count = local_data_count};
-  }
-
-  // Batch Upload Bookmarks promo: for users that have local bookmarks and were
-  // previously syncing with the current primary account.
-  if (WasPreviouslySyncingWithPrimaryAccount(profile)) {
-    if (auto it = local_map_result.find(syncer::BOOKMARKS);
-        it != local_map_result.end() && !it->second.local_data_models.empty()) {
-      return {.type = ProfileMenuAvatarButtonPromoInfo::Type::
-                  kBatchUploadBookmarksPromo,
-              .local_data_count = local_data_count};
-    }
-  }
   // History sync promo.
   if (signin_util::ShouldShowHistorySyncOptinScreen(*profile) ==
           signin_util::ShouldShowHistorySyncOptinResult::kShow &&
       !signin_util::HasExplicitlyDisabledHistorySync(
           SyncServiceFactory::GetForProfile(profile), identity_manager)) {
     return {.type = ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo,
-            .local_data_count = local_data_count};
-  }
-
-  // Regular Batch Upload promo: for users that have any local data type.
-  if (local_data_count > 0) {
-    return {.type = ProfileMenuAvatarButtonPromoInfo::Type::kBatchUploadPromo,
             .local_data_count = local_data_count};
   }
 

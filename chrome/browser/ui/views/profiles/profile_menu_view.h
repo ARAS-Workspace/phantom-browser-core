@@ -96,7 +96,6 @@ class ProfileMenuView : public ProfileMenuViewBase {
   void OnManageProfilesButtonClicked();
   void OnEditProfileButtonClicked();
   void OnYourSavedInfoSettingsButtonClicked();
-  void OnBatchUploadButtonClicked(ActionableItem button_type);
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   void OnCrossDeviceSigninButtonClicked();
 #endif
@@ -114,7 +113,6 @@ class ProfileMenuView : public ProfileMenuViewBase {
   // Helper methods for building the menu.
   void SetMenuTitleForAccessibility();
   void BuildGuestIdentity();
-  void MaybeBuildBatchUploadButton();
   void BuildAutofillSettingsButton();
   void BuildCustomizeProfileButton();
   void MaybeBuildChromeAccountSettingsButtonWithSync();
