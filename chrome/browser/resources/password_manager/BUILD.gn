@@ -27,8 +27,6 @@ build_webui("build") {
       "chrome_branded_manifest.webmanifest",
       "images/access_on_any_device_promo.svg",
       "images/access_on_any_device_promo_dark.svg",
-      "images/move_passwords_promo.svg",
-      "images/move_passwords_promo_dark.svg",
       "images/password_checkup_promo.svg",
       "images/password_checkup_promo_dark.svg",
       "images/password_shortcut_promo.svg",

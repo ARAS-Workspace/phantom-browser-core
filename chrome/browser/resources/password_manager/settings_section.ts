@@ -27,7 +27,6 @@ import {WebUiListenerMixin} from 'chrome://resources/cr_elements/web_ui_listener
 import {assert, assertNotReached} from 'chrome://resources/js/assert.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {OpenWindowProxyImpl} from 'chrome://resources/js/open_window_proxy.js';
-import {PluralStringProxyImpl} from 'chrome://resources/js/plural_string_proxy.js';
 import type {DomRepeatEvent} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 import {PolymerElement} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 
@@ -41,7 +40,7 @@ import type {PrefToggleButtonElement} from './prefs/pref_toggle_button.js';
 import type {Route} from './router.js';
 import {Page, RouteObserverMixin, Router, UrlParam} from './router.js';
 import {getTemplate} from './settings_section.html.js';
-import {BatchUploadPasswordsEntryPoint, SyncBrowserProxyImpl, TrustedVaultBannerState} from './sync_browser_proxy.js';
+import {SyncBrowserProxyImpl, TrustedVaultBannerState} from './sync_browser_proxy.js';
 import {UserUtilMixin} from './user_utils_mixin.js';
 
 export interface SettingsSectionElement {
@@ -147,11 +146,6 @@ export class SettingsSectionElement extends SettingsSectionElementBase {
         value: TrustedVaultBannerState.NOT_SHOWN,
       },
 
-      movePasswordsLabel_: {
-        type: String,
-        value: '',
-      },
-
       canAddShortcut_: {
         type: Boolean,
         value() {
@@ -187,11 +181,6 @@ export class SettingsSectionElement extends SettingsSectionElementBase {
       removeActorLoginPermissionSite_: {
         type: Object,
       },
-
-      localPasswordCount_: {
-        type: Number,
-        value: 0,
-      },
     };
   }
 
@@ -219,7 +208,6 @@ export class SettingsSectionElement extends SettingsSectionElementBase {
   declare private isAutomatedPasswordChangeVisible_: boolean;
   declare private canAddShortcut_: boolean;
   declare private trustedVaultBannerState_: TrustedVaultBannerState;
-  declare private movePasswordsLabel_: string;
   declare private isPasswordManagerPinAvailable_: boolean;
   declare private isConnectedToCloudAuthenticator_: boolean;
   declare private isDisconnectCloudAuthenticatorInProgress_: boolean;
@@ -229,7 +217,6 @@ export class SettingsSectionElement extends SettingsSectionElementBase {
       undefined;
   // This variable depend on the sync service API, which the Batch Upload Dialog
   // uses.
-  declare private localPasswordCount_: number;
 
   private setBlockedSitesListListener_: BlockedSitesListChangedListener|null =
       null;
@@ -247,11 +234,7 @@ export class SettingsSectionElement extends SettingsSectionElementBase {
   override connectedCallback() {
     super.connectedCallback();
 
-    const updateLocalPasswordCount = (localPasswordCount: number) => {
-      this.updateLocalPasswordCount_(localPasswordCount);
-    };
     const syncBrowserProxy = SyncBrowserProxyImpl.getInstance();
-    syncBrowserProxy.getLocalPasswordCount().then(updateLocalPasswordCount);
 
     this.setBlockedSitesListListener_ = blockedSites => {
       this.blockedSites_ = blockedSites;
@@ -261,18 +244,9 @@ export class SettingsSectionElement extends SettingsSectionElementBase {
     PasswordManagerImpl.getInstance().addBlockedSitesListChangedListener(
         this.setBlockedSitesListListener_);
 
-    this.addWebUiListener(
-        'sync-service-local-password-count', updateLocalPasswordCount);
-
     this.setCredentialsChangedListener_ =
         (passwords: chrome.passwordsPrivate.PasswordUiEntry[]) => {
           this.hasPasswordsToExport_ = passwords.length > 0;
-          // Update the local password count based on the SyncService API
-          // whenever the password list was modified.
-          syncBrowserProxy.getLocalPasswordCount().then(
-              (localPasswordCount: number) => {
-                this.updateLocalPasswordCount_(localPasswordCount);
-              });
           if (this.isActorLoginPermissionsEnabled_) {
             PasswordManagerImpl.getInstance().getActorLoginPermissions().then(
                 actorLoginPermissions => this.actorLoginPermissions_ =
@@ -485,36 +459,6 @@ export class SettingsSectionElement extends SettingsSectionElementBase {
       isFedCmEmbedderInitiatedLoginEnabled: boolean): boolean {
     return actorLoginPermissionsLength > 0 && isActorLoginPermissionsEnabled &&
         !isFedCmEmbedderInitiatedLoginEnabled;
-  }
-
-  private onMovePasswordsClicked_(e: Event) {
-    e.preventDefault();
-    SyncBrowserProxyImpl.getInstance().openBatchUpload(
-        BatchUploadPasswordsEntryPoint.PASSWORD_MANAGER);
-  }
-
-  private shouldShowMovePasswordsEntry_(): boolean {
-    // Only show the move password entry if there are passwords returned from
-    // the sync service API. This is needed to be consistent with the
-    // availability of data in the dialog which uses the same API.
-    return this.localPasswordCount_ > 0;
-  }
-
-  private getAriaDescriptionMovePasswordsButton_(movePasswordsLabel: string):
-      string {
-    return [
-      movePasswordsLabel,
-      this.i18n('movePasswordsInSettingsSubLabel'),
-    ].join('. ');
-  }
-
-  // This updates the local password count coming from the Sync Service API.
-  private async updateLocalPasswordCount_(localPasswordCount: number) {
-    this.localPasswordCount_ = localPasswordCount;
-
-    this.movePasswordsLabel_ =
-        await PluralStringProxyImpl.getInstance().getPluralString(
-            'deviceOnlyPasswordsIconTooltip', this.localPasswordCount_);
   }
 
   private updateIsPasswordManagerPinAvailable_() {

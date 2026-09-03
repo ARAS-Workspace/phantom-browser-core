@@ -16,7 +16,6 @@ import {PolymerElement} from 'chrome://resources/polymer/v3_0/polymer/polymer_bu
 
 import {PasswordManagerImpl} from '../password_manager_proxy.js';
 import {Page, Router, UrlParam} from '../router.js';
-import {BatchUploadPasswordsEntryPoint, SyncBrowserProxyImpl} from '../sync_browser_proxy.js';
 
 import {getTemplate} from './notification_card.html.js';
 import type {NotificationCard} from './notification_cards_browser_proxy.js';
@@ -127,11 +126,6 @@ export class NotificationCardElement extends NotificationCardElementBase {
       case NotificationCardId.RELAUNCH_CHROME:
         chrome.send('restartBrowser');
         recordNotificationCardAction(NotificationCardMetricId.RELAUNCH_CHROME);
-        break;
-      case NotificationCardId.MOVE_PASSWORDS:
-        SyncBrowserProxyImpl.getInstance().openBatchUpload(
-            BatchUploadPasswordsEntryPoint.PROMO_CARD);
-        recordNotificationCardAction(NotificationCardMetricId.MOVE_PASSWORDS);
         break;
       default:
         assertNotReached();

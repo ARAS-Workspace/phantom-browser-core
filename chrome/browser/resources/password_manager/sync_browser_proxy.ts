@@ -12,14 +12,6 @@ export enum TrustedVaultBannerState {
   OPTED_IN = 2,
 }
 
-// Entry points to the BatchUpload dialog in the Password setting sections.
-// WARNING: Keep synced with
-// chrome/browser/ui/webui/password_manager/sync_handler.cc.
-export enum BatchUploadPasswordsEntryPoint {
-  PASSWORD_MANAGER = 0,
-  PROMO_CARD = 1,
-}
-
 /**
  * @see chrome/browser/ui/webui/password_manager/sync_handler.cc
  */
@@ -31,7 +23,6 @@ export interface AccountInfo {
 export interface SyncInfo {
   isSyncingPasswords: boolean;
 }
-
 
 export interface SyncBrowserProxy {
   /**
@@ -58,7 +49,6 @@ export interface SyncBrowserProxy {
    * Opens the batch upload dialog on top of the current page with the passwords
    * entry point as input.
    */
-  openBatchUpload(entryPoint: BatchUploadPasswordsEntryPoint): void;
 }
 
 export class SyncBrowserProxyImpl implements SyncBrowserProxy {
@@ -77,10 +67,6 @@ export class SyncBrowserProxyImpl implements SyncBrowserProxy {
 
   getLocalPasswordCount() {
     return sendWithPromise<number>('GetLocalPasswordCount');
-  }
-
-  openBatchUpload(entryPoint: BatchUploadPasswordsEntryPoint): void {
-    chrome.send('OpenBatchUpload', [entryPoint]);
   }
 
   static getInstance(): SyncBrowserProxy {

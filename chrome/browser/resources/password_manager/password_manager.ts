@@ -56,7 +56,7 @@ export {SharePasswordRecipientElement} from './sharing/share_password_recipient.
 export {PasswordManagerSideBarElement} from './side_bar.js';
 export {SiteFaviconElement} from './site_favicon.js';
 export type {AccountInfo, SyncBrowserProxy, SyncInfo} from './sync_browser_proxy.js';
-export {BatchUploadPasswordsEntryPoint, SyncBrowserProxyImpl, TrustedVaultBannerState} from './sync_browser_proxy.js';
+export {SyncBrowserProxyImpl, TrustedVaultBannerState} from './sync_browser_proxy.js';
 export {PasswordManagerToolbarElement} from './toolbar.js';
 export {UserUtilMixin} from './user_utils_mixin.js';
 export type {UserUtilMixinInterface} from './user_utils_mixin.js';
