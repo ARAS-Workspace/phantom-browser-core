@@ -166,37 +166,6 @@ function createRoutes(): SettingsRoutes {
     r.SYNC_ADVANCED = r.SYNC.createChild('/syncSetup/advanced');
   }
 
-  if (visibility.ai !== false && loadTimeData.getBoolean('showAiPage')) {
-    r.AI = r.BASIC.createSection(
-        '/ai', 'ai', loadTimeData.getString('aiPageTitle'));
-    if (loadTimeData.getBoolean('enableAiModeSearchSetting')) {
-      r.AI_MODE_SEARCH = r.AI.createChild('/ai/aiModeSearch');
-    }
-    if (loadTimeData.getBoolean('showHistorySearchControl')) {
-      r.HISTORY_SEARCH = r.AI.createChild('/ai/historySearch');
-    }
-    if (loadTimeData.getBoolean('showComposeControl')) {
-      r.OFFER_WRITING_HELP = r.AI.createChild('/ai/helpMeWrite');
-    }
-    if (loadTimeData.getBoolean('showGlicSettings')) {
-      r.GEMINI = r.AI.createChild('/ai/gemini');
-      if (loadTimeData.getBoolean('actorLoginFederatedLoginSupportEnabled')) {
-        r.GEMINI_LOGIN = r.GEMINI.createChild('/ai/gemini/login');
-      }
-    }
-    if (loadTimeData.getBoolean('showAiSuggestionsControl')) {
-      r.AI_SUGGESTIONS = r.AI.createChild('/ai/suggestions');
-    }
-    if (loadTimeData.getBoolean('showInlineCueMenuControl')) {
-      r.INLINE_CUE_MENU = r.AI.createChild('/ai/inlineCueMenu');
-    }
-    if (loadTimeData.getBoolean('showSkillsSettingPage')) {
-      r.SKILLS = r.AI.createChild('/ai/skills');
-    }
-    if (loadTimeData.getBoolean('showDictationControl')) {
-      r.DICTATION = r.AI.createChild('/ai/dictation');
-    }
-  }
 
   if (visibility.appearance !== false) {
     r.APPEARANCE = r.BASIC.createSection(

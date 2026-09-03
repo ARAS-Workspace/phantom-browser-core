@@ -3,12 +3,6 @@
 // found in the LICENSE file.
 
 // Subpages
-import './ai_page/ai_mode_search_page.js';
-import './ai_page/ai_suggestions_page.js';
-import './ai_page/dictation_page.js';
-import './ai_page/history_search_page.js';
-import './ai_page/offer_writing_help_page.js';
-import './ai_page/skills_page.js';
 import './appearance_page/appearance_fonts_page.js';
 // <if expr="not is_chromeos">
 import './clear_browsing_data_dialog/clear_browsing_data_account_indicator.js';
@@ -46,7 +40,6 @@ import './site_settings/hand_tracking_page.js';
 import './site_settings/hid_devices_page.js';
 import './site_settings/idle_detection_page.js';
 import './site_settings/images_page.js';
-import './ai_page/inline_cue_menu_page.js';
 import './site_settings/insecure_content_page.js';
 import './site_settings/javascript_page.js';
 import './site_settings/keyboard_lock_page.js';
@@ -133,21 +126,9 @@ export type {IronListElement} from 'chrome://resources/polymer/v3_0/iron-list/ir
 // <if expr="not is_chromeos">
 // </if>
 
-export {SettingsAiModeSearchPageElement} from './ai_page/ai_mode_search_page.js';
-export {isFeatureDisabledByPolicy, SettingsAiPolicyIndicator} from './ai_page/ai_policy_indicator.js';
-export {SettingsAiSuggestionsPageElement} from './ai_page/ai_suggestions_page.js';
 export {AiEnterpriseFeaturePrefName, AiPageActions, FeatureOptInState, SettingsAiPageFeaturePrefName} from './ai_page/constants.js';
-export type {DictationBrowserProxy} from './ai_page/dictation_browser_proxy.js';
-export {DictationBrowserProxyImpl} from './ai_page/dictation_browser_proxy.js';
-export {SettingsDictationPageElement} from './ai_page/dictation_page.js';
-export {SettingsHistorySearchPageElement} from './ai_page/history_search_page.js';
-export {InlineCueMenuPageElement} from './ai_page/inline_cue_menu_page.js';
-export {COMPOSE_PROACTIVE_NUDGE_DISABLED_SITES_PREF, COMPOSE_PROACTIVE_NUDGE_PREF, SettingsOfferWritingHelpPageElement} from './ai_page/offer_writing_help_page.js';
 // <if expr="_google_chrome">
-export type {OnDeviceAiBrowserProxy, OnDeviceAiEnabled} from './ai_page/on_device_ai_browser_proxy.js';
-export {OnDeviceAiBrowserProxyImpl} from './ai_page/on_device_ai_browser_proxy.js';
 // </if>
-export {SettingsSkillsPageElement} from './ai_page/skills_page.js';
 export {SettingsAppearanceFontsPageElement} from './appearance_page/appearance_fonts_page.js';
 // <if expr="not is_chromeos">
 export {SettingsClearBrowsingDataAccountIndicator} from './clear_browsing_data_dialog/clear_browsing_data_account_indicator.js';

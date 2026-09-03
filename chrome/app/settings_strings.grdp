@@ -1296,44 +1296,11 @@
     </if>
 
     <!-- Offer Writing Help Page -->
-    <message name="IDS_SETTINGS_AI_COMPOSE_SUBLABEL_V2" desc="This string is the subheading of a setting for ‘Help me write’. This subheading summarizes the user benefit of the Help Me Write feature. This is an AI (artificial intelligence) feature that suggests writing help when users are writing short-form text on the web. The tone should be motivating.">
-      Helps you write short-form text for things on the web, like reviews
-    </message>
-    <message name="IDS_SETTINGS_OFFER_WRITING_HELP_TOGGLE_LABEL" desc="Label of the setting that enables the feature that provides writing help suggestions.">
-      Offer writing help
-    </message>
-    <message name="IDS_SETTINGS_OFFER_WRITING_HELP_TOGGLE_SUB_LABEL" desc="Sub-label of the setting that enables the feature that provides writing help suggestions.">
-      "Help me write" can automatically open when a text box on a site can be filled with short-form content
-    </message>
     <message name="IDS_SETTINGS_OFFER_WRITING_HELP_ENABLED_SUB_LABEL" desc="Sub-label for the site settings writing help page link, used when the offer writing help preference is enabled.">
       Allow "Help me write" to automatically open
     </message>
     <message name="IDS_SETTINGS_OFFER_WRITING_HELP_DISABLED_SUB_LABEL" desc="Sub-label for the site settings writing help page link, used when the offer writing help preference is disabled.">
       Don't allow "Help me write" to automatically open
-    </message>
-    <message name="IDS_SETTINGS_OFFER_WRITING_HELP_DISABLED_SITES_LABEL_V2" desc="Label of the list of sites on which the writing help suggestion feature is disabled.">
-      Not allowed to offer writing help
-    </message>
-    <message name="IDS_SETTINGS_OFFER_WRITING_HELP_NO_DISABLED_SITES" desc="Placeholder text for the writing help suggestions disabled sites list, when no sites have been added.">
-      No sites added
-    </message>
-    <message name="IDS_SETTINGS_OFFER_WRITING_HELP_REMOVE_SITE_ARIA_LABEL" desc="Text read by screen readers when focusing on the remove icon for disabled sites. Activating this button will remove the corresponding site. This text only announced by screen readers and is not visible in the UI.">
-      Remove <ph name="SITE_NAME">$1<ex>https://www.google.com</ex></ph> from disabled sites
-    </message>
-    <message name="IDS_SETTINGS_COMPOSE_SETTING_LINK_A11Y" desc="This string is found in a link that takes the user to the Help Me Write help center article when the user taps it. It is at the end of the Help Me Write setting description that users see when they visit the ‘AI innovations’ section of settings (AI = artificial intelligence). The tone should be informative.">
-      Learn more about Help me write
-    </message>
-    <message name="IDS_SETTINGS_COMPOSE_WHEN_ON_WRITING_HELP" desc="This string is a bullet point in the ‘When used’ column, which describes the behavior of this feature. This string explains that this feature suggests writing help when users are writing on the web. The tone should be motivating.">
-      Helps you write anything on the web with a little extra polish or creative inspiration
-    </message>
-    <message name="IDS_SETTINGS_COMPOSE_WHEN_ON_WRITING_EXAMPLES" desc="This string is a bullet point in the ‘When used’ column, which describes the behavior of this feature. This string explains that users can get writing help on a variety of content, from short-form (social media posts) to long-form (essays). The tone should be motivating.">
-      You can get help with reviews, emails, social media posts, essays, and more
-    </message>
-    <message name="IDS_SETTINGS_COMPOSE_WHEN_ON_WRITING_REFERENCES" desc="This string is a bullet point in the ‘When used’ column, which describes the behavior of this feature. This string explains that writing help will be smart and contextual, based on the page content and the user’s input. The tone should be motivating.">
-      Writing suggestions are based on your prompts and the content of the web page
-    </message>
-    <message name="IDS_SETTINGS_COMPOSE_CONSIDER_DATA" desc="This is a bullet point in the ‘Things to consider’ column, which describes things users should consider about a feature. This string explains that AI features will send data to Google servers in order to provide the feature’s respective benefit. The tone should be informative.">
-      When you get writing help, the page’s URL, content, and your text are sent to Google. Don’t enter personal info (like medical or financial details)
     </message>
 
     <!-- Anti-abuse Page -->
@@ -3571,65 +3538,8 @@
     </if>
 
     <!-- History search -->
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_SETTING_LABEL" desc="Title of the page of the settings that enables history search.">
-      History search, powered by AI
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_SETTING_SUBLABEL_V2" desc="This string is the subheading of a setting for ‘History search, powered by AI’. This subheading summarizes the user benefit of the History Search feature. This is an AI (artificial intelligence) feature that improves the search functionality so that users can write queries in natural language and search their Chrome browsing history. The tone should be motivating.">
-      Use everyday language to search your browsing history and find sites you visited
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_LEARN_MORE_A11Y_LABEL" desc="Label for the 'Learn more' link in the toggle for the setting that enables history search.">
-      Learn more about history searches
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_WHEN_ON_PAGE_CONTENT" desc="This string is a bullet point in the ‘When on’ column, which describes the behavior of this feature. This string explains how users can write queries in natural language and search their Chrome browsing history. The tone should be motivating.">
-      You can search your browsing history based on general page content, not only page title and URL, and see improved results
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_WHEN_ON_SEARCH_FROM" desc="This string is a bullet point in the ‘When on’ column, which describes the behavior of this feature. This string explains how users search their Chrome browsing history from the address bar (always shown on the top of Chrome). They can also search from the History page itself. The tone should be motivating.">
-      You can search in the address bar using "@history", as well as from the History page
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_WHEN_ON_LOG_START" desc="This string is a bullet point in the ‘When on’ column, which describes the behavior of this feature. This string explains that the AI-powered history search results will only use data about sites the user visits after they turn on this feature. Earlier history data, from when the feature setting was turned off, won’t appear in the search results. The tone should be informative.">
-      Only sites you visit after turning on this feature are shown in AI-powered history results
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_CONSIDER_DATA" desc="This is a bullet point in the ‘Things to consider’ column, which describes things users should consider about a feature. This string explains that AI features will send data to Google servers in order to provide the feature’s respective benefit. The tone should be informative.">
-      When you search browsing history, your history searches, the page content of best matches, and generated model outputs are sent to Google
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_CONSIDER_DATA_ENCRYPTED" desc="This is a bullet point in the ‘Things to consider’ column, which describes things users should consider about a feature. This string explains that AI features will save data to the user’s device in order to provide the feature’s respective benefit. The data will be appropriately encrypted for security. The tone should be informative.">
-      As you browse sites, their page contents are encrypted and saved to your device
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_SUBLABEL_ON" desc="This string is the subheading of a setting for ‘History search, powered by AI’. This subheading notes that the setting is currently turned on. Then, it summarizes the user benefit of the History Search feature. This is an AI (artificial intelligence) feature that improves the search functionality so that users can write queries in natural language and search their Chrome browsing history. The tone should be motivating.">
-      Use everyday language to search your browsing history and find sites you visited. This setting is on.
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_SUBLABEL_OFF" desc="This string is the subheading of a setting for ‘History search, powered by AI’. This subheading notes that the setting is currently turned on. Then, it summarizes the user benefit of the History Search feature. This is an AI (artificial intelligence) feature that improves the search functionality so that users can write queries in natural language and search their Chrome browsing history. The tone should be motivating.">
-      Use everyday language to search your browsing history and find sites you visited. This setting is off.
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_WITH_ANSWERS_SETTING_SUBLABEL_V2" desc="Sublabel of the setting that enables history search, powered by AI, with answers enabled.">
-      Use everyday language to search your browsing history and find sites you visited. You can also ask questions and get answers based on your browsing history
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_WITH_ANSWERS_WHEN_ON_PAGE_CONTENT" desc="This string is a bullet point in the ‘When on’ column, which describes the behavior of this feature. This string explains how users can write queries in natural language and search their Chrome browsing history to get answers. The tone should be motivating.">
-      When you search your browsing history, answers and search results are based on the content of a page. This gives you improved results
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_WITH_ANSWERS_WHEN_ON_RECALL_INFO" desc="This string is a bullet point in the ‘When on’ column, which describes the behavior of this feature. This string explains how users can write questions (using question words like ‘what’, ‘who’, ‘where’) and get answer summaries based on their Chrome browsing history. The tone should be motivating.">
-      When you ask questions about your history, you can get answers about specific information from a page you visited
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_WITH_ANSWERS_CONSIDER_DATA_ENCRYPTED" desc="This is a bullet point in the ‘Things to consider’ column, which describes things users should consider about a feature. This string explains that AI features will save data to the user’s device in order to provide the feature’s respective benefit. The data will be appropriately encrypted for security. The tone should be informative.">
-      As you browse sites, their page contents are encrypted and saved to your device. This may affect Chrome's performance
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_WITH_ANSWERS_CONSIDER_OUTDATED" desc="This is a bullet point in the ‘Things to consider’ column, which describes things users should consider about a feature. This string explains that history search results and answers powered by AI may become outdated since they are dependent on the user's last visit to the page contents.">
-      AI-powered history search results and answers may become outdated if site content has changed since your last visit
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_WITH_ANSWERS_SUBLABEL_ON" desc="This string is the subheading of a setting for ‘History search, powered by AI’ when answers are available. This subheading notes that the setting is currently turned on. Then, it summarizes the user benefit of the History Search feature. This is an AI (artificial intelligence) feature that improves the search functionality so that users can write queries in natural language and search their Chrome browsing history. The tone should be motivating.">
-      Use everyday language to search your browsing history and find sites you visited. You can also ask questions and get answers based on your browsing history. This setting is on.
-    </message>
-    <message name="IDS_SETTINGS_HISTORY_SEARCH_WITH_ANSWERS_SUBLABEL_OFF" desc="This string is the subheading of a setting for ‘History search, powered by AI’ when answers are available. This subheading notes that the setting is currently turned on. Then, it summarizes the user benefit of the History Search feature. This is an AI (artificial intelligence) feature that improves the search functionality so that users can write queries in natural language and search their Chrome browsing history. The tone should be motivating.">
-      Use everyday language to search your browsing history and find sites you visited. You can also ask questions and get answers based on your browsing history. The setting is off.
-    </message>
 
     <!-- Google Search AI Mode and connected apps (AIM Workspace) -->
-    <message name="IDS_SETTINGS_GOOGLE_SEARCH_AI_MODE_WORKSPACE_LABEL" desc="Label of the setting row that opens connection settings for Google Search AI Mode and Workspace connected apps.">
-      Google Search AI Mode and connected apps
-    </message>
-    <message name="IDS_SETTINGS_GOOGLE_SEARCH_AI_MODE_WORKSPACE_SUBLABEL" desc="Sublabel of the setting row that opens connection settings for Google Search AI Mode and Workspace connected apps. This sublabel explains that the user can manage the connection between search personalization services and their Google Workspace apps (like Google Drive).">
-      Manage the connection between Search services and Google Workspace apps, like Google Drive
-    </message>
 
     <!-- Web Content -->
     <message name="IDS_SETTINGS_PAGE_ZOOM_LABEL" desc="Label for the page zoom dropdown menu in settings.">
@@ -3728,12 +3638,6 @@
       </message>
     </if>
     <if expr="_google_chrome">
-      <message name="IDS_SETTINGS_SYSTEM_FEATURE_ON_DEVICE_AI_ENABLED_LABEL" desc="Label for the toggle that allows or prevents chrome to download on device GenAI models to local disk.">
-        On-device AI
-      </message>
-      <message name="IDS_SETTINGS_SYSTEM_FEATURE_ON_DEVICE_AI_ENABLED_SUB_LABEL" desc="This string describes what turning off the toggle implies.">
-        To power features like scam detection, Chrome can use AI models that run directly on your device. When this is off, these features might not work. <ph name="BEGIN_LINK">&lt;a href="$1" target="_blank" aria-description="$2"&gt;</ph>Learn more about on-device AI<ph name="END_LINK">&lt;/a&gt;</ph>
-      </message>
       <message name="IDS_SETTINGS_SYSTEM_ON_DEVICE_AI_LINK_SUBTITLE" desc="Subtitle for the link row that points to the on-device AI settings.">
         Choose whether Chrome uses AI models that run directly on your device
       </message>
@@ -3880,37 +3784,10 @@
       ,
     </message>
 
-      <message name="IDS_SETTINGS_AI_INNOVATIONS_PAGE_TITLE" desc="This label is on the left Navigation sidebar in Chrome’s settings. It tells the user that they can see settings related to AI (artificial intelligence) in this section. It is a noun phrase that refers to our collection of AI settings. These settings include Help me write and more. If possible, translate this so that it closely matches the Navigation tab title at the top of this marketing page: https://www.google.com/chrome/ai-innovations.">
-        AI innovations
-      </message>
-      <message name="IDS_SETTINGS_AI_PAGE_TITLE" desc="This label is on the left Navigation sidebar in Chrome’s settings. It tells the user that they can see settings related to AI (artificial intelligence) in this section. It is a noun phrase that refers to our collection of AI settings. These settings include Help me write and more.">
-        AI in Chrome
-      </message>
-      <message name="IDS_SETTINGS_AI_PAGE_MAIN_SUBLABEL_3" desc="This is a bullet point on a card that sets the context for the ‘AI innovations’ section of Chrome’s settings. Here, the user can see settings related to AI (artificial intelligence) in this section; these settings include Help me write and more. This bullet point is after the ‘Reimagine Chrome, supercharged with AI’ title and ‘Things to consider’ subheading. We want users to read this card and understand the considerations that apply to all Chrome’s AI features. This bullet point specifically notes that AI features are actively developing and results may include errors. The tone should be informative.">
-        Data sent to Google may be seen by human reviewers to improve Chrome AI’s technology
-      </message>
-      <message name="IDS_SETTINGS_AI_PAGE_MAIN_MANAGED_LEARN_MORE_ACCESSIBILITY_LABEL" desc="This string is found in a link that takes the user to the AI features and policies help center article when the user taps it. The tone should be informative">
-        Learn more about using generative AI at work
-      </message>
-      <message name="IDS_SETTINGS_AI_SUBPAGE_SUBLABEL_AI" desc="This is a bullet point in the ‘Things to consider’ column, which describes things users should consider about a feature. This string explains that AI features are actively developing and results may include errors. The tone should be informative.">
-        This feature uses AI, is in early development, and won’t always get it right
-      </message>
-      <message name="IDS_SETTINGS_AI_SUBPAGE_SUBLABEL_REVIEWERS" desc="This is a bullet point in the ‘Things to consider’ column, which describes things users should consider about a feature. This string explains that AI features are actively developing, and that humans may review feature usage and corresponding data in order to further improve the feature. The tone should be informative.">
-        Data sent to Google may be seen by human reviewers to improve this feature
-      </message>
-      <message name="IDS_SETTINGS_AI_SUBPAGE_SUBLABEL_LOGGING_MANAGED_DISABLED" desc="This is a bullet point in the ‘Things to consider’ column, which describes things users should consider about a feature. This string explains that AI features are actively developing, and that humans may review feature usage and corresponding data in order to further improve the feature. The tone should be informative.">
-        Your content will not be used by human reviewers to improve AI. Your organization may change these settings at any time
-      </message>
-      <message name="IDS_SETTINGS_AI_SUBPAGE_FEATURE_MANAGED_DISABLED_LABEL" desc="This is an indicator on the top of the AI feature settings subpage, which informs the user that this feature is not available because it was turned off by their organization. The tone should be informative.">
-        This feature is disabled by your organization
-      </message>
 
       <!-- Experimental settings - Password Change -->
       <message name="IDS_SETTINGS_PASSWORD_CHANGE_LABEL" desc="Primary label for password change entry in settings. The user is in settings and this string represents the name of the feature. We were careful to choose “automated” and not “automatic” because we don’t want to give the user the impression that this will happen without their knowledge. There is an ‘automated’ process that the user initiates, but the process isn’t ‘automatic’ in the sense that it might be happening behind the scenes without the user’s knowledge.">
         Automated Password Change
-      </message>
-      <message name="IDS_SETTINGS_PASSWORD_CHANGE_SUBLABEL" desc="Sublabel for password change entry in settings. The description of the feature beneath the “Automated password change” feature title. This and the bullets beneath this paragraph represent the full description of the feature. * “public” does two things: 1) it provides distance between “Chrome” and “data breach”, because we don’t want users to associate the breach with Chrome (Chrome didn’t have a data leak, 2) and related, it might reassure the user to know that Chrome is using public information to establish these lists of compromised passwords. * “Google Password Manager can offer…”: The user has to agree to have this feature update their password for them each time. So Google Password Manager is ‘offering’ to do something for the user.">
-        If Chrome finds one of your passwords in a public data breach, Google Password Manager can offer to change your password for you if you're signed in.
       </message>
       <message name="IDS_SETTINGS_PASSWORD_CHANGE_DATA_BREACH" desc="Bullet 1 of 2 that appears beneath the “When used” subtitle. This string is repetitive of the feature description, but we want to have a complete description of what happens when the feature is used. * “Google Password Manager asks…”: This part is similar to the general feature description above, but it’s written as if the feature is being used by the user, so we use “asks” and not “can offer”. * “Strong password”: As an existing autofill feature, Google Password Manager can offer to generate and save passwords for the user. These passwords are typically stronger than passwords the user might create on their own">
         If one of your passwords is found in a data breach, Google Password Manager asks if you want it changed to a strong password
@@ -3945,25 +3822,10 @@
   </if>
 
   <!-- Experimental settings strings -->
-  <message name="IDS_SETTINGS_AI_PAGE_MAIN_TITLE" desc="This string is the title of a card that sets the context for the ‘AI innovations’ section of Chrome’s settings. Here, the user can see settings related to AI (artificial intelligence) in this section; these settings include Help me write and more. This title is before the ‘Things to consider’ subheading and bullet points. We want users to read this card and understand the considerations that apply to all Chrome’s AI features. The tone should be motivating." formatter_data="android_java">
-    Reimagine Chrome, supercharged with AI
-  </message>
-  <message name="IDS_SETTINGS_AI_PAGE_MAIN_SUBLABEL_1" desc="This is a bullet point on a card that sets the context for the ‘AI innovations’ section of Chrome’s settings. Here, the user can see settings related to AI (artificial intelligence) in this section; these settings include Help me write and more. This bullet point is after the ‘Reimagine Chrome, supercharged with AI’ title and ‘Things to consider’ subheading. We want users to read this card and understand the considerations that apply to all Chrome’s AI features. This bullet point specifically notes that AI features are actively developing and results may include errors. The tone should be informative." formatter_data="android_java">
-    These features use AI, are in early development, and won’t always get it right
-  </message>
-  <message name="IDS_SETTINGS_AI_PAGE_MAIN_SUBLABEL_2" desc="This is a bullet point on a card that sets the context for the ‘AI innovations’ section of Chrome’s settings. Here, the user can see settings related to AI (artificial intelligence) in this section; these settings include Help me write and more. This bullet point is after the ‘Reimagine Chrome, supercharged with AI’ title and ‘Things to consider’ subheading. We want users to read this card and understand the considerations that apply to all Chrome’s AI features. This bullet point specifically notes that AI features will send data to Google servers in order to provide the feature’s respective benefit. The tone should be informative." formatter_data="android_java">
-    When you use these features, relevant data is sent to Google in order to create AI experiences
-  </message>
   <if expr="is_android">
     <then>
-      <message name="IDS_SETTINGS_AI_PAGE_MAIN_MANAGED_SUBLABEL_3" desc="This is a bullet point on a card that sets the context for the ‘AI innovations’ section of Chrome’s settings. Here, the user can see settings related to AI (artificial intelligence) in this section; these settings include Help me write and more. This bullet point is after the ‘Reimagine Chrome, supercharged with AI’ title and ‘Things to consider’ subheading. We want users to read this card and understand the considerations that apply to all Chrome’s AI features. This bullet point specifically notes that AI features are actively developing, and that humans may review feature usage and corresponding data in order to further improve the feature. The tone should be informative." formatter_data="android_java">
-        Your organization manages how data collected by these features may be used. <ph name="BEGIN_LINK">&lt;link&gt;</ph>Learn more<ph name="END_LINK">&lt;/link&gt;</ph>
-      </message>
     </then>
     <else>
-      <message name="IDS_SETTINGS_AI_PAGE_MAIN_MANAGED_SUBLABEL_3" desc="This is a bullet point on a card that sets the context for the ‘AI innovations’ section of Chrome’s settings. Here, the user can see settings related to AI (artificial intelligence) in this section; these settings include Help me write and more. This bullet point is after the ‘Reimagine Chrome, supercharged with AI’ title and ‘Things to consider’ subheading. We want users to read this card and understand the considerations that apply to all Chrome’s AI features. This bullet point specifically notes that AI features are actively developing, and that humans may review feature usage and corresponding data in order to further improve the feature. The tone should be informative.">
-        Your organization manages how data collected by these features may be used.
-      </message>
     </else>
   </if>
 
@@ -4004,39 +3866,9 @@
     Tier 4: ULTRA
   </message>
   <!-- Skills Settings Page -->
-  <message name="IDS_SETTINGS_SKILLS_SETTING_SUBLABEL" desc="Sublabel for the Skills setting entry point in Settings > AI page.">
-    Skills allow you to easily reuse prompts for repetitive tasks
-  </message>
-  <message name="IDS_SETTINGS_SKILLS_GALLERY_HEADER" desc="Header for the Skills Gallery link section.">
-    Skills Gallery
-  </message>
-  <message name="IDS_SETTINGS_SKILLS_GALLERY_LABEL" desc="Label for the link row that opens the Skills Gallery.">
-    View and manage your skills
-  </message>
   <message name="IDS_SETTINGS_SYNC_GO_TO_SKILLS_BUTTON" desc="Label for the button on the Sync page that redirects the user to the Skills settings page.">
     Go to AI Innovations
   </message>
-  <message name="IDS_SETTINGS_SKILLS_WHEN_ON_BULLET_ONE" desc="First bullet point under the 'When on' column in the Skills settings page.">
-    Build your own or add from the skills library
-  </message>
-  <message name="IDS_SETTINGS_SKILLS_THINGS_TO_CONSIDER_BULLET_ONE" desc="First bullet point under the 'Things to consider' column in the Skills settings page.">
-    Tab titles and URLs are sent to Google when you use skill
-  </message>
-  <message name="IDS_SETTINGS_SKILLS_THINGS_TO_CONSIDER_BULLET_TWO" desc="Second bullet point under the 'Things to consider' column in the Skills settings page.">
-    Skills are saved to your Google Account
-  </message>
   <!-- Dictation Settings Page -->
   <!-- TODO(b/510738735): Make these translatable when finalized. -->
-  <message name="IDS_SETTINGS_DICTATION_PREFERENCES_HEADER" translateable="false" desc="Header for the Preferences section in Dictation settings page.">
-    Preferences
-  </message>
-  <message name="IDS_SETTINGS_DICTATION_SHORTCUT_LABEL" translateable="false" desc="Label for the keyboard shortcut setting in Dictation settings page.">
-    Keyboard shortcut
-  </message>
-  <message name="IDS_SETTINGS_DICTATION_SHORTCUT_EDIT_LABEL" translateable="false" desc="Accessibility label for the edit keyboard shortcut button icon.">
-    Edit keyboard shortcut
-  </message>
-  <message name="IDS_SETTINGS_DICTATION_SHORTCUT_CLEAR_LABEL" translateable="false" desc="Accessibility label for the clear keyboard shortcut button icon.">
-    Clear keyboard shortcut
-  </message>
 </grit-part>

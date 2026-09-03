@@ -46,7 +46,6 @@ const pathToActionMap: Map<string, string> = new Map([
   ['/people', 'SettingsMenu_PeopleClicked'],
   ['/privacy', 'SettingsMenu_PrivacyClicked'],
   ['/performance', 'SettingsMenu_PerformanceClicked'],
-  ['/ai', 'SettingsMenu_AiPageEntryPointClicked'],
   ['/appearance', 'SettingsMenu_AppearanceClicked'],
   ['/search', 'SettingsMenu_SearchClicked'],
   ['/defaultBrowser', 'SettingsMenu_DefaultBrowserClicked'],
@@ -79,23 +78,12 @@ export class SettingsMenuElement extends SettingsMenuElementBase {
         type: Object,
         value: () => pageVisibility,
       },
-
-      showAiPage_: {
-        type: Boolean,
-        value: () => loadTimeData.getBoolean('showAiPage'),
-      },
     };
   }
 
   declare private pageVisibility_?: PageVisibility;
-  declare private showAiPage_: boolean;
   private metricsBrowserProxy_: MetricsBrowserProxy =
       MetricsBrowserProxyImpl.getInstance();
-
-  private showAiPageMenuItem_(): boolean {
-    return this.showAiPage_ &&
-        (!this.pageVisibility_ || this.pageVisibility_.ai !== false);
-  }
 
   override currentRouteChanged(newRoute: Route) {
     // Focus the initially selected path.
