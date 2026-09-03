@@ -5,7 +5,6 @@
 #ifndef CHROME_BROWSER_UI_WEBUI_SETTINGS_SETTINGS_UI_H_
 #define CHROME_BROWSER_UI_WEBUI_SETTINGS_SETTINGS_UI_H_
 
-#include "base/callback_list.h"
 #include "build/build_config.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/buildflags.h"
@@ -122,11 +121,6 @@ class SettingsUI
   // Makes a request to show a HaTS survey.
   void TryShowHatsSurveyWithTimeout();
 
-  // Updates, based on account and profile state, the loadTimeData values that
-  // control whether the glic settings page should be shown. Returns the enabled
-  // value.
-  void UpdateShowGlicState();
-
 #if !BUILDFLAG(IS_CHROMEOS)
   // theme_color_picker::mojom::ThemeColorPickerHandlerFactory:
   void CreateThemeColorPickerHandler(
@@ -181,8 +175,6 @@ class SettingsUI
   mojo::Receiver<customize_color_scheme_mode::mojom::
                      CustomizeColorSchemeModeHandlerFactory>
       customize_color_scheme_mode_handler_factory_receiver_{this};
-
-  base::CallbackListSubscription glic_settings_state_subscription_;
 
   WEB_UI_CONTROLLER_TYPE_DECL();
 };
