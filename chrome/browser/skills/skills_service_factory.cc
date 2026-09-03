@@ -16,6 +16,7 @@
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/skills/public/skills_features.h"
 #include "components/skills/public/skills_prefs.h"
+#include "components/skills/public/skills_service.h"
 
 namespace skills {
 
