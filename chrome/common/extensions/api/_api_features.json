@@ -805,17 +805,10 @@
     "dependencies": ["permission:pageCapture"],
     "contexts": ["privileged_extension"]
   },
-  "passwordsPrivate": [{
+  "passwordsPrivate": {
     "dependencies": ["permission:passwordsPrivate"],
     "contexts": ["privileged_extension"]
-  }, {
-    "channel": "stable",
-    "contexts": ["webui"],
-    "matches": [
-      "chrome://settings/*",
-      "chrome://password-manager/*"
-    ]
-  }],
+  },
   "permissions": {
     "channel": "stable",
     "extension_types": [
