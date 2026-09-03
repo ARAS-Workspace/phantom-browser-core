@@ -8,7 +8,6 @@
 
 #include "build/build_config.h"
 #include "chrome/browser/feedback/system_logs/log_sources/chrome_internal_log_source.h"
-#include "chrome/browser/feedback/system_logs/log_sources/device_event_log_source.h"
 #include "chrome/browser/feedback/system_logs/log_sources/memory_details_log_source.h"
 #include "chrome/browser/feedback/system_logs/log_sources/related_website_sets_source.h"
 #include "chrome/browser/first_party_sets/first_party_sets_policy_service_factory.h"
@@ -50,7 +49,6 @@ SystemLogsFetcher* BuildAboutSystemLogsFetcher(content::WebUI* web_ui) {
   SystemLogsFetcher* fetcher = new SystemLogsFetcher(scrub_data);
 
   fetcher->AddSource(std::make_unique<ChromeInternalLogSource>());
-  fetcher->AddSource(std::make_unique<DeviceEventLogSource>());
   fetcher->AddSource(std::make_unique<MemoryDetailsLogSource>());
   fetcher->AddSource(std::make_unique<RelatedWebsiteSetsSource>(
       first_party_sets::FirstPartySetsPolicyServiceFactory::

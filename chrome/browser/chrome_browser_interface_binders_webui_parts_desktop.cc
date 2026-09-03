@@ -26,10 +26,8 @@
 #include "chrome/browser/ui/webui/access_code_cast/access_code_cast_ui.h"
 #include "chrome/browser/ui/webui/app_service_internals/app_service_internals.mojom.h"
 #include "chrome/browser/ui/webui/app_service_internals/app_service_internals_ui.h"
-#include "chrome/browser/ui/webui/autofill_ml_internals/autofill_ml_internals_ui.h"
 #include "chrome/browser/ui/webui/color_pipeline_internals/color_pipeline_internals_ui.h"
 #include "chrome/browser/ui/webui/commerce/shopping_insights_side_panel_ui.h"
-#include "chrome/browser/ui/webui/content_annotator_internals/content_annotator_internals_ui.h"
 #include "chrome/browser/ui/webui/customize_buttons/customize_buttons.mojom.h"
 #include "chrome/browser/ui/webui/data_sharing/data_sharing.mojom.h"
 #include "chrome/browser/ui/webui/data_sharing/data_sharing_ui.h"
@@ -47,8 +45,6 @@
 #include "chrome/browser/ui/webui/iwa_dev/iwa_dev.mojom.h"
 #include "chrome/browser/ui/webui/iwa_dev/iwa_dev_ui.h"
 #include "chrome/browser/ui/webui/metrics_reporter/metrics_reporter_service.h"
-#include "chrome/browser/ui/webui/multistep_filter_internals/multistep_filter_internals.mojom.h"
-#include "chrome/browser/ui/webui/multistep_filter_internals/multistep_filter_internals_ui.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer.mojom.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer_ui.h"
 #include "chrome/browser/ui/webui/new_tab_page/new_tab_page.mojom.h"
@@ -88,8 +84,6 @@
 #include "chrome/browser/ui/webui_browser/webui_browser.h"
 #include "chrome/browser/ui/webui_browser/webui_browser_ui.h"
 #include "chrome/common/chrome_features.h"
-#include "components/accessibility_annotator/core/logging/accessibility_annotator_internals.mojom.h"
-#include "components/autofill/core/browser/ml_model/logging/autofill_ml_internals.mojom.h"
 #include "components/browser_apis/bookmarks/bookmarks_api.mojom.h"
 #include "components/browser_apis/browser_controls/browser_controls_api.mojom.h"
 #include "components/browser_apis/tab_drag/tab_drag_api.mojom.h"
@@ -100,7 +94,6 @@
 #include "components/guest_contents/common/guest_contents.mojom.h"
 #include "components/history_clusters/core/history_clusters_service.h"
 #include "components/lens/lens_features.h"
-#include "components/multistep_filter/core/features.h"
 #include "components/omnibox/browser/searchbox.mojom.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/optimization_guide/core/optimization_guide_features.h"
@@ -153,11 +146,6 @@
 #include "chrome/browser/ui/webui/updater/updater_ui.mojom.h"
 #include "chrome/browser/ui/webui/whats_new/whats_new_ui.h"
 #endif
-
-#if BUILDFLAG(IS_MAC)
-#include "chrome/browser/ui/webui/unexportable_keys_internals/unexportable_keys_internals.mojom.h"
-#include "chrome/browser/ui/webui/unexportable_keys_internals/unexportable_keys_internals_ui.h"
-#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ash/webui/diagnostics_ui/diagnostics_ui.h"
@@ -495,16 +483,8 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       UserEducationInternalsUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<
-      accessibility_annotator_internals::mojom::PageHandlerFactory,
-      content_annotator_internals::ContentAnnotatorInternalsUI>(map);
-
-  RegisterWebUIControllerInterfaceBinder<
       ::mojom::app_service_internals::AppServiceInternalsPageHandler,
       AppServiceInternalsUI>(map);
-
-  RegisterWebUIControllerInterfaceBinder<
-      ::autofill_ml_internals::mojom::PageHandlerFactory,
-      AutofillMlInternalsUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<
       access_code_cast::mojom::PageHandlerFactory,
@@ -518,11 +498,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
                                          WebAppInternalsUI>(map);
   RegisterWebUIControllerInterfaceBinder<::iwa_dev::mojom::PageHandlerFactory,
                                          IwaDevUI>(map);
-  if (base::FeatureList::IsEnabled(multistep_filter::kMultistepFilter)) {
-    RegisterWebUIControllerInterfaceBinder<
-        multistep_filter_internals::mojom::PageHandlerFactory,
-        multistep_filter_internals::MultistepFilterInternalsUI>(map);
-  }
   RegisterWebUIControllerInterfaceBinder<
       guest_contents::mojom::GuestContentsHost, WebUIBrowserUI>(map);
 
@@ -585,12 +560,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   RegisterWebUIControllerInterfaceBinder<updater_ui::mojom::PageHandlerFactory,
                                          UpdaterUI>(map);
 #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_MAC)
-  RegisterWebUIControllerInterfaceBinder<
-      unexportable_keys_internals::mojom::PageHandlerFactory,
-      UnexportableKeysInternalsUI>(map);
-#endif  // BUILDFLAG(IS_MAC)
 
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
   auto prompt_surface = default_browser::GetDefaultBrowserPromptSurface();

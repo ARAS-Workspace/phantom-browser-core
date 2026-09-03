@@ -137,7 +137,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUIDownloadInternalsHost,
       kChromeUIFamilyLinkUserInternalsHost,
       kChromeUIFlagsHost,
-      kChromeUIGCMInternalsHost,
       kChromeUIHistoryHost,
       history_clusters_internals::kChromeUIHistoryClustersInternalsHost,
       kChromeUIInterstitialHost,
@@ -171,7 +170,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUISiteEngagementHost,
       kChromeUISkillsHost,
       kChromeUISubresourceFilterInternalsHost,
-      kChromeUISuggestInternalsHost,
       kChromeUINTPTilesInternalsHost,
       safe_browsing::kChromeUISafeBrowsingHost,
       kChromeUISyncInternalsHost,
@@ -182,7 +180,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
 #endif
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
 #endif
-      kChromeUIUsbInternalsHost,
       kChromeUIUserActionsHost,
       kChromeUIVersionHost,
 #if !BUILDFLAG(IS_ANDROID)
@@ -267,7 +264,6 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUIPrintHost,
 #endif
       kChromeUIWebRtcLogsHost,
-      kChromeUIWebNNInternalsHost,
 #if BUILDFLAG(IS_CHROMEOS)
       ash::kChromeUIDlpInternalsHost,
 #endif  // BUILDFLAG(IS_CHROMEOS)

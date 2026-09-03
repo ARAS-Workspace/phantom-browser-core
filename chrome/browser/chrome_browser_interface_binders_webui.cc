@@ -17,18 +17,12 @@
 #include "chrome/browser/ui/webui/content_settings/content_settings_ui.h"
 #include "chrome/browser/ui/webui/data_sharing_internals/data_sharing_internals_ui.h"
 #include "chrome/browser/ui/webui/engagement/site_engagement_ui.h"
-#include "chrome/browser/ui/webui/location_internals/location_internals.mojom.h"
-#include "chrome/browser/ui/webui/location_internals/location_internals_ui.h"
 #include "chrome/browser/ui/webui/media/media_engagement_ui.h"
 #include "chrome/browser/ui/webui/omnibox/omnibox_internals.mojom.h"
 #include "chrome/browser/ui/webui/omnibox/omnibox_ui.h"
 #include "chrome/browser/ui/webui/policy/policy_ui.h"
 #include "chrome/browser/ui/webui/segmentation_internals/segmentation_internals_ui.h"
 #include "chrome/browser/ui/webui/subresource_filter/subresource_filter_internals_ui.h"
-#include "chrome/browser/ui/webui/suggest_internals/suggest_internals.mojom.h"
-#include "chrome/browser/ui/webui/suggest_internals/suggest_internals_ui.h"
-#include "chrome/browser/ui/webui/usb_internals/usb_internals.mojom.h"
-#include "chrome/browser/ui/webui/usb_internals/usb_internals_ui.h"
 #include "chrome/common/webui_url_constants.h"
 #include "components/enterprise/connectors/connectors_internals.mojom.h"
 #include "components/history_clusters/history_clusters_internals/webui/history_clusters_internals_ui.h"
@@ -53,8 +47,6 @@
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_ui.h"
 #include "chrome/browser/ui/webui/side_panel/reading_list/reading_list_ui.h"
 #include "chrome/browser/ui/webui/user_education_internals/user_education_internals_ui.h"
-#include "chrome/browser/ui/webui/webnn_internals/webnn_internals.mojom.h"
-#include "chrome/browser/ui/webui/webnn_internals/webnn_internals_ui.h"
 #if !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ui/webui/signin/profile_picker_ui.h"
 #endif
@@ -175,8 +167,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
       omnibox_popup_aim::mojom::PageHandlerFactory, OmniboxPopupUI>(map);
   RegisterWebUIControllerInterfaceBinder<
       omnibox_popup::mojom::PageHandlerFactory, OmniboxPopupUI>(map);
-  RegisterWebUIControllerInterfaceBinder<
-      webnn_internals::mojom::PageHandlerFactory, WebNNInternalsUI>(map);
 #endif
   RegisterWebUIControllerInterfaceBinder<::mojom::OmniboxPageHandler,
                                          OmniboxUI>(map);
@@ -184,9 +174,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
   RegisterWebUIControllerInterfaceBinder<
       site_engagement::mojom::SiteEngagementDetailsProvider, SiteEngagementUI>(
       map);
-
-  RegisterWebUIControllerInterfaceBinder<::mojom::UsbInternalsPageHandler,
-                                         UsbInternalsUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<
       history_clusters_internals::mojom::PageHandlerFactory,
@@ -207,9 +194,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
       connectors_internals::mojom::PageHandler,
       enterprise_connectors::ConnectorsInternalsUI>(map);
 
-  RegisterWebUIControllerInterfaceBinder<::mojom::LocationInternalsHandler,
-                                         LocationInternalsUI>(map);
-
   if (base::FeatureList::IsEnabled(
           policy::features::kPolicyPageMojoMigration)) {
     RegisterWebUIControllerInterfaceBinder<
@@ -219,9 +203,6 @@ void PopulateChromeWebUIFrameBindersPartsAllPlatforms(
   RegisterWebUIControllerInterfaceBinder<
       subresource_filter::mojom::SubresourceFilterInternalsHandler,
       subresource_filter::SubresourceFilterInternalsUI>(map);
-
-  RegisterWebUIControllerInterfaceBinder<suggest_internals::mojom::PageHandler,
-                                         SuggestInternalsUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<
       content_settings_internals::mojom::PageHandlerFactory,
