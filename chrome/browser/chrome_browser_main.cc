@@ -310,10 +310,6 @@
 #include "ui/aura/env.h"
 #endif
 
-#if BUILDFLAG(USE_ON_DEVICE_MODEL_SERVICE)
-#include "chrome/browser/optimization_guide/chrome_browser_main_extra_parts_optimization_guide.h"
-#endif
-
 // Separate per-platform blocks specifically for chrome_browser_main code. Put
 // other per-platform includes in the appropriate section above.
 #if BUILDFLAG(IS_WIN)
@@ -827,11 +823,6 @@ std::unique_ptr<content::BrowserMainParts> ChromeBrowserMainParts::Create(
 #if BUILDFLAG(CHROME_FOR_TESTING)
   main_parts->AddParts(
       std::make_unique<chrome_for_testing::ChromeBrowserMainExtraPartsCft>());
-#endif
-
-#if BUILDFLAG(USE_ON_DEVICE_MODEL_SERVICE)
-  main_parts->AddParts(
-      std::make_unique<ChromeBrowserMainExtraPartsOptimizationGuide>());
 #endif
 
   // Always add ChromeBrowserMainExtraPartsGpu last to make sure
