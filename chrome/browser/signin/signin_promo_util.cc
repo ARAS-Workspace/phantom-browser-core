@@ -15,8 +15,6 @@
 #include "base/strings/strcat.h"
 #include "base/time/time.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/profiles/batch_upload/batch_upload_service.h"
-#include "chrome/browser/profiles/batch_upload/batch_upload_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/account_preview_data_service_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
@@ -320,38 +318,27 @@ bool IsAllowedByPromoFrequency(Profile& profile,
   return (gap >= switches::kSearchAIModePromoFrequency.Get());
 }
 
-ProfileMenuAvatarButtonPromoInfo
-ComputeProfileMenuAvatarButtonPromoInfoWithBatchUploadResult(
-    Profile* profile,
-    std::map<syncer::DataType, syncer::LocalDataDescription> local_map_result) {
+ProfileMenuAvatarButtonPromoInfo ComputeSignedInProfileMenuAvatarButtonPromoInfo(
+    Profile* profile) {
   CHECK(syncer::IsReplaceSyncPromosWithSignInPromosEnabled());
 
   signin::IdentityManager* identity_manager =
       IdentityManagerFactory::GetForProfile(profile);
   if (base::FeatureList::IsEnabled(switches::kSigninPromoOnAvatarPill) &&
       !identity_manager->HasPrimaryAccount(signin::ConsentLevel::kSignin)) {
-    return {.type = ProfileMenuAvatarButtonPromoInfo::Type::kSigninPromo,
-            .local_data_count = 0u};
+    return {.type = ProfileMenuAvatarButtonPromoInfo::Type::kSigninPromo};
   }
-
-  size_t local_data_count = std::accumulate(
-      local_map_result.begin(), local_map_result.end(), 0u,
-      [](size_t current_count,
-         std::pair<syncer::DataType, syncer::LocalDataDescription> local_data) {
-        return current_count + local_data.second.local_data_models.size();
-      });
 
   // History sync promo.
   if (signin_util::ShouldShowHistorySyncOptinScreen(*profile) ==
           signin_util::ShouldShowHistorySyncOptinResult::kShow &&
       !signin_util::HasExplicitlyDisabledHistorySync(
           SyncServiceFactory::GetForProfile(profile), identity_manager)) {
-    return {.type = ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo,
-            .local_data_count = local_data_count};
+    return {.type = ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo};
   }
 
   // No promo.
-  return {.type = std::nullopt, .local_data_count = local_data_count};
+  return {.type = std::nullopt};
 }
 
 syncer::DataType GetDataTypeFromSignInPromoType(SignInPromoType type) {
@@ -979,20 +966,8 @@ void ComputeProfileMenuAvatarButtonPromoInfo(
     base::OnceCallback<void(ProfileMenuAvatarButtonPromoInfo)>
         result_callback) {
   if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    BatchUploadService* batch_upload =
-        BatchUploadServiceFactory::GetForProfile(&profile);
-    if (!batch_upload) {
-      std::move(result_callback).Run(ProfileMenuAvatarButtonPromoInfo{});
-      return;
-    }
-
-    // Note: `GetLocalDataDescriptionsForAvailableTypes()` will return no data
-    // if the SyncService is not initialized.
-    batch_upload->GetLocalDataDescriptionsForAvailableTypes(
-        base::BindOnce(
-            &ComputeProfileMenuAvatarButtonPromoInfoWithBatchUploadResult,
-            &profile)
-            .Then(std::move(result_callback)));
+    std::move(result_callback)
+        .Run(ComputeSignedInProfileMenuAvatarButtonPromoInfo(&profile));
     return;
   }
 
@@ -1002,8 +977,7 @@ void ComputeProfileMenuAvatarButtonPromoInfo(
       signin_util::ShouldShowAvatarSyncPromo(&profile)) {
     std::move(result_callback)
         .Run(ProfileMenuAvatarButtonPromoInfo{
-            .type = ProfileMenuAvatarButtonPromoInfo::Type::kSyncPromo,
-            .local_data_count = 0});
+            .type = ProfileMenuAvatarButtonPromoInfo::Type::kSyncPromo});
     return;
   }
 
