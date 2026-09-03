@@ -380,7 +380,6 @@ if (!is_android) {
       ":test_support",
       "//base/test:test_support",
       "//chrome/browser",
-      "//chrome/browser/compose:test_support",
       "//chrome/browser/context_hub",
       "//chrome/browser/devtools",
       "//chrome/browser/enterprise/data_controls:test_support",
@@ -415,6 +414,9 @@ if (!is_android) {
       "//ui/events:test_support",
       "//url",
     ]
+    if (enable_compose) {
+      deps += [ "//chrome/browser/compose:test_support" ]
+    }
 
     if (is_linux || is_chromeos || is_win) {
       sources += [
