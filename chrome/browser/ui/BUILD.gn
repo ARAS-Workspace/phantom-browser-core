@@ -1794,10 +1794,8 @@ static_library("ui") {
       deps += [
         "//chrome/browser/profiles/batch_upload",
         "//chrome/browser/profiles/batch_upload:impl",
-        "//chrome/browser/ui/webui/batch_upload_promo",
       ]
       allow_circular_includes_from += [
-        "//chrome/browser/ui/webui/batch_upload_promo",
         "//chrome/browser/profiles/batch_upload:impl",
       ]
     }

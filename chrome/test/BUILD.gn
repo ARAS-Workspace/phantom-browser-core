@@ -7524,8 +7524,6 @@ test("unit_tests") {
 
   if (enable_dice_support || is_chromeos) {
     deps += [
-      "//chrome/browser/ui/webui/batch_upload_promo",
-      "//chrome/browser/ui/webui/batch_upload_promo:unit_tests",
     ]
   }
 

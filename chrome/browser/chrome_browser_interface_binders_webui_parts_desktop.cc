@@ -190,8 +190,6 @@
 #include "chrome/browser/ui/webui/signin/signout_confirmation/signout_confirmation_ui.h"
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
-#include "ui/webui/resources/js/batch_upload_promo/batch_upload_promo.mojom.h"
-
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/default_browser/default_browser_features.h"
 #include "chrome/browser/ui/webui/default_browser/default_browser_modal.mojom.h"
@@ -353,9 +351,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       feature_showcase::mojom::GoogleLensPageHandlerFactory, FeatureShowcaseUI>(
       map);
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-  RegisterWebUIControllerInterfaceBinder<
-      batch_upload_promo::mojom::PageHandlerFactory, settings::SettingsUI>(map);
-
   RegisterWebUIControllerInterfaceBinder<
       browser_command::mojom::CommandHandlerFactory,
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -617,7 +612,6 @@ void PopulateChromeWebUIFrameInterfaceBrokersTrustedPartsDesktop(
       .Add<theme_color_picker::mojom::ThemeColorPickerHandlerFactory>()
       .Add<signin::mojom::SigninPageHandlerFactory>()
 #endif  // !BUILDFLAG(IS_CHROMEOS)
-      .Add<batch_upload_promo::mojom::PageHandlerFactory>()
       .Add<customize_color_scheme_mode::mojom::
                CustomizeColorSchemeModeHandlerFactory>()
       .Add<help_bubble::mojom::HelpBubbleHandlerFactory>();

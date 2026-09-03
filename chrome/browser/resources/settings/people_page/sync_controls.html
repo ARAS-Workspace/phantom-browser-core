@@ -57,12 +57,6 @@ import {UserSelectableType} from '/shared/settings/people_page/sync_browser_prox
         <div class="cr-secondary-text flex">$i18n{accountDataTypesBody}</div>
 </if>
       </div>
-      <div class="cr-row continuation"
-          ?hidden="${!this.shouldShowBatchUploadPromo_()}">
-        <div class="cr-secondary-text flex" id="batchUploadPromo"
-            .innerHTML="${this.batchUploadPromoHTML_}">
-        </div>
-      </div>
     </div>
 
     <div class="list-frame" id="sync-data-types">

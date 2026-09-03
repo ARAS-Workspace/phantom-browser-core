@@ -33,7 +33,6 @@
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/ssl/https_upgrades_util.h"
 #include "chrome/browser/subscription_eligibility/subscription_eligibility_service_factory.h"
-#include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/hats/hats_service.h"
 #include "chrome/browser/ui/hats/hats_service_factory.h"
@@ -190,8 +189,6 @@
 #if BUILDFLAG(ENABLE_VR)
 #include "device/vr/public/cpp/features.h"
 #endif
-
-#include "chrome/browser/ui/webui/batch_upload_promo/batch_upload_promo_handler.h"
 
 namespace settings {
 
@@ -418,8 +415,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
   plural_string_handler->AddLocalizedString(
       "safetyHubNotificationPermissionsSecondaryLabel",
       IDS_SETTINGS_SAFETY_HUB_NOTIFICATION_PERMISSIONS_SECONDARY_LABEL);
-  plural_string_handler->AddLocalizedString(
-      "batchUploadPromoLabel", IDS_BATCH_UPLOAD_PROMO_SUBTITLE_ITEMS_WITH_LINK);
   plural_string_handler->AddLocalizedString("cpuPerformanceCores",
                                             IDS_SETTINGS_CPU_PERFORMANCE_CORES);
   web_ui->AddMessageHandler(std::move(plural_string_handler));
@@ -633,15 +628,6 @@ void SettingsUI::BindInterface(
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 
 void SettingsUI::BindInterface(
-    mojo::PendingReceiver<batch_upload_promo::mojom::PageHandlerFactory>
-        pending_receiver) {
-  if (batch_upload_promo_factory_receiver_.is_bound()) {
-    batch_upload_promo_factory_receiver_.reset();
-  }
-  batch_upload_promo_factory_receiver_.Bind(std::move(pending_receiver));
-}
-
-void SettingsUI::BindInterface(
     mojo::PendingReceiver<help_bubble::mojom::HelpBubbleHandlerFactory>
         pending_receiver) {
   if (help_bubble_handler_factory_receiver_.is_bound()) {
@@ -691,23 +677,6 @@ void SettingsUI::CreateSigninPageHandler(
 #endif
 }
 #endif  // !BUILDFLAG(IS_CHROMEOS)
-
-void SettingsUI::CreateBatchUploadPromoHandler(
-    mojo::PendingRemote<batch_upload_promo::mojom::Page> pending_page,
-    mojo::PendingReceiver<batch_upload_promo::mojom::PageHandler>
-        pending_page_handler) {
-  Profile* profile = Profile::FromWebUI(web_ui());
-  CHECK(profile);
-
-  // Batch upload needs the sync service to be present in order to start.
-  if (!SyncServiceFactory::GetForProfile(profile)) {
-    return;
-  }
-
-  batch_upload_promo_handler_ = std::make_unique<BatchUploadPromoHandler>(
-      std::move(pending_page_handler), std::move(pending_page),
-      Profile::FromWebUI(web_ui()), web_ui()->GetWebContents());
-}
 
 void SettingsUI::CreateHelpBubbleHandler(
     mojo::PendingRemote<help_bubble::mojom::HelpBubbleClient> client,

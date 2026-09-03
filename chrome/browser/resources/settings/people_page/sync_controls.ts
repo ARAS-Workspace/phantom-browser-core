@@ -27,10 +27,6 @@ import {loadTimeData} from '../i18n_setup.js';
 import type {Route} from '../router.js';
 import {RouteObserverMixinLit} from '../router.js';
 
-import {PluralStringProxyImpl} from 'chrome://resources/js/plural_string_proxy.js';
-import {sanitizeInnerHtml} from 'chrome://resources/js/parse_html_subset.js';
-import {BatchUploadPromoProxyImpl} from 'chrome://resources/js/batch_upload_promo/batch_upload_promo_proxy.js';
-
 // clang-format on
 
 /**
@@ -100,8 +96,6 @@ export class SettingsSyncControlsElement extends
        * and the user navigates to the account page.
        */
       isAccountSettingsPage_: {type: Boolean},
-
-      batchUploadPromoHTML_: {type: String},
     };
   }
 
@@ -117,31 +111,12 @@ export class SettingsSyncControlsElement extends
   private cachedSyncPrefs_: Partial<SyncPrefs>|null = null;
   accessor showSyncDisabledInformation: boolean = false;
   protected accessor isAccountSettingsPage_: boolean = false;
-  protected accessor batchUploadPromoHTML_: TrustedHTML =
-      window.trustedTypes!.emptyHTML;
 
   override connectedCallback() {
     super.connectedCallback();
 
     this.addWebUiListener(
         'sync-prefs-changed', this.handleSyncPrefsChanged_.bind(this));
-
-    const showBatchUploadPromo = loadTimeData.valueExists('unoPhase2FollowUp') ?
-        loadTimeData.getBoolean('unoPhase2FollowUp') :
-        loadTimeData.getBoolean('replaceSyncPromosWithSignInPromos');
-
-    if (showBatchUploadPromo) {
-      BatchUploadPromoProxyImpl.getInstance()
-          .callbackRouter.onLocalDataCountChanged.addListener(
-              (localDataCount: number) => {
-                this.batchUploadPromoLocalDataCountChanged_(localDataCount);
-              });
-      BatchUploadPromoProxyImpl.getInstance()
-          .handler.getBatchUploadPromoLocalDataCount()
-          .then(({localDataCount}) => {
-            this.batchUploadPromoLocalDataCountChanged_(localDataCount);
-          });
-    }
 
     const router = Router.getInstance();
     const currentRoute = router.getCurrentRoute();
@@ -174,88 +149,11 @@ export class SettingsSyncControlsElement extends
     }
   }
 
-  override updated(changedProperties: PropertyValues<this>) {
-    super.updated(changedProperties);
-
-    const changedPrivateProperties =
-        changedProperties as Map<PropertyKey, unknown>;
-
-    if (changedPrivateProperties.has('batchUploadPromoHTML_')) {
-      this.attachOpenBatchUploadLinkClick_();
-    }
-  }
-
   /**
    * Handler for when the sync preferences are updated.
    */
   private handleSyncPrefsChanged_(syncPrefs: SyncPrefs) {
     this.syncPrefs = syncPrefs;
-  }
-
-  private async batchUploadPromoLocalDataCountChanged_(localDataCount: number):
-      Promise<void> {
-    const showBatchUploadPromo = loadTimeData.valueExists('unoPhase2FollowUp') ?
-        loadTimeData.getBoolean('unoPhase2FollowUp') :
-        loadTimeData.getBoolean('replaceSyncPromosWithSignInPromos');
-
-    if (!showBatchUploadPromo) {
-      return;
-    }
-
-    if (localDataCount === 0) {
-      this.batchUploadPromoHTML_ = window.trustedTypes!.emptyHTML;
-      return;
-    }
-
-    const batchUploadPromoString =
-        await PluralStringProxyImpl.getInstance().getPluralString(
-            'batchUploadPromoLabel', localDataCount);
-
-    // We need the HTML representation instead of the string since the string
-    // holds a link.
-    this.batchUploadPromoHTML_ =
-        sanitizeInnerHtml(batchUploadPromoString, {tags: ['a'], attrs: ['id']});
-  }
-
-  protected shouldShowBatchUploadPromo_(): boolean {
-    const showBatchUploadPromo = loadTimeData.valueExists('unoPhase2FollowUp') ?
-        loadTimeData.getBoolean('unoPhase2FollowUp') :
-        loadTimeData.getBoolean('replaceSyncPromosWithSignInPromos');
-
-    if (!showBatchUploadPromo) {
-      return false;
-    }
-
-    if (!this.isAccountSettingsPage_) {
-      return false;
-    }
-
-    return this.batchUploadPromoHTML_ !== window.trustedTypes!.emptyHTML;
-  }
-
-  /** Attach the click action and aria label to the batch upload promo link. */
-  private attachOpenBatchUploadLinkClick_(): void {
-    const element: HTMLElement|null|undefined =
-        this.shadowRoot?.querySelector(`#openBatchUploadLink`);
-    if (element !== null && element !== undefined) {
-      element.addEventListener('click', (me: MouseEvent) => {
-        this.onPromoClicked_(me);
-      });
-
-      // Since there is a link for the batch upload, we can also be sure that
-      // the containing element exists.
-      const batchUploadElement: HTMLElement|null|undefined =
-          this.shadowRoot?.querySelector(`#batchUploadPromo`);
-      element.setAttribute('aria-label', batchUploadElement!.textContent);
-    }
-  }
-
-  private onPromoClicked_(event: Event): void {
-    assert(this.shouldShowBatchUploadPromo_());
-
-    // Prevent navigation to href='#' and open the batch upload dialog instead.
-    event.preventDefault();
-    BatchUploadPromoProxyImpl.getInstance().handler.onBatchUploadPromoClicked();
   }
 
   /**

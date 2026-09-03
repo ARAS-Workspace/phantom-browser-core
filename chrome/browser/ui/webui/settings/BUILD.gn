@@ -95,11 +95,6 @@ source_set("settings") {
     "//url",
   ]
 
-  if (enable_dice_support || is_chromeos) {
-    public_deps +=
-        [ "//ui/webui/resources/js/batch_upload_promo:mojo_bindings" ]
-  }
-
   if (enable_dice_support) {
     public_deps += [ "//ui/webui/resources/cr_components/signin:mojo_bindings" ]
   }
@@ -266,7 +261,6 @@ source_set("impl") {
     "//chrome/browser/ui/webui:policy_indicator_localized_strings_provider",
     "//chrome/browser/ui/webui:theme_source",
     "//chrome/browser/ui/webui:webui_util",
-    "//chrome/browser/ui/webui/batch_upload_promo",
     "//chrome/browser/ui/webui/cr_components/customize_color_scheme_mode",
     "//chrome/browser/ui/webui/cr_components/theme_color_picker:impl",
     "//chrome/browser/ui/webui/management",
