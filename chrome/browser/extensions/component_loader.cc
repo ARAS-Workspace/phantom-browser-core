@@ -27,7 +27,6 @@
 #include "chrome/browser/extensions/component_extensions_allowlist/allowlist.h"
 #include "chrome/browser/extensions/component_loader_factory.h"
 #include "chrome/browser/extensions/data_deleter.h"
-#include "chrome/browser/extensions/glic_util.h"
 #include "chrome/browser/extensions/profile_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/channel_info.h"
@@ -35,14 +34,11 @@
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/extensions/extension_constants.h"
-#include "chrome/grit/aim_eligibility_extension_resources.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/browser_resources.h"
 #include "chrome/grit/component_extension_resources.h"
-#include "chrome/grit/contextual_tasks_extension_resources.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/crx_file/id_util.h"
-#include "components/omnibox/common/omnibox_features.h"
 #include "components/version_info/version_info.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/common/content_switches.h"
@@ -399,29 +395,6 @@ void ComponentLoader::AddNetworkSpeechSynthesisExtension() {
   }
 }
 
-void ComponentLoader::AddAimEligibilityExtension() {
-  if (base::FeatureList::IsEnabled(
-          omnibox::kAimEligibilityComponentExtension)) {
-    Add(IDR_AIM_ELIGIBILITY_EXTENSION_MANIFEST_JSON,
-        base::FilePath(FILE_PATH_LITERAL("aim_eligibility_extension")));
-  }
-}
-
-void ComponentLoader::AddGlicExtension() {
-  if (IsApiGlicPrivateEnabled()) {
-    Add(IDR_GLIC_EXTENSION_MANIFEST,
-        base::FilePath(FILE_PATH_LITERAL("glic_extension")));
-  }
-}
-
-void ComponentLoader::AddContextualTasksExtension() {
-  if (base::FeatureList::IsEnabled(
-          extensions_features::kApiContextualTasksPrivate)) {
-    Add(IDR_CONTEXTUAL_TASKS_EXTENSION_MANIFEST_JSON,
-        base::FilePath(FILE_PATH_LITERAL("contextual_tasks_extension")));
-  }
-}
-
 void ComponentLoader::AddWithNameAndDescription(
     int manifest_resource_id,
     const base::FilePath& root_directory,
@@ -635,10 +608,6 @@ void ComponentLoader::AddDefaultComponentExtensionsWithBackgroundPages(
         base::FilePath(FILE_PATH_LITERAL("chromeos/arc_support")));
 #endif  // BUILDFLAG(IS_CHROMEOS)
   }
-
-  AddAimEligibilityExtension();
-  AddGlicExtension();
-  AddContextualTasksExtension();
 
 // http://crbug.com/41070702
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_CHROMEOS)
