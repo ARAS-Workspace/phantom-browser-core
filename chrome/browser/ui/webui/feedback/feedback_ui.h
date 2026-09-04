@@ -6,8 +6,6 @@
 #define CHROME_BROWSER_UI_WEBUI_FEEDBACK_FEEDBACK_UI_H_
 
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/webui/feedback/report_unsafe_site/report_unsafe_site.mojom.h"
-#include "chrome/browser/ui/webui/feedback/report_unsafe_site/report_unsafe_site_handler.h"
 #include "chrome/browser/ui/webui/top_chrome/top_chrome_web_ui_controller.h"
 #include "chrome/browser/ui/webui/top_chrome/top_chrome_webui_config.h"
 #include "content/public/browser/web_contents.h"
@@ -15,9 +13,7 @@
 #include "ui/web_dialogs/web_dialog_ui.h"
 
 // The implementation for the chrome://feedback page.
-class FeedbackUI
-    : public ui::MojoWebDialogUI,
-      public feedback::report_unsafe_site::mojom::PageHandlerFactory {
+class FeedbackUI : public ui::MojoWebDialogUI {
  public:
   explicit FeedbackUI(content::WebUI* web_ui);
   FeedbackUI(const FeedbackUI&) = delete;
@@ -33,36 +29,8 @@ class FeedbackUI
     embedder_ = embedder;
   }
 
-  void set_triggering_web_contents(content::WebContents* web_contents) {
-    triggering_web_contents_ = web_contents->GetWeakPtr();
-  }
-
-  void set_dialog_widget(views::Widget* dialog) {
-    dialog_ = dialog->GetWeakPtr();
-  }
-
-  void set_screenshot_taker(
-      std::unique_ptr<feedback::ScreenshotTaker> screenshot_taker) {
-    screenshot_taker_ = std::move(screenshot_taker);
-  }
-
-  void BindInterface(
-      mojo::PendingReceiver<
-          feedback::report_unsafe_site::mojom::PageHandlerFactory> receiver);
-
-  // report_unsafe_site::mojom::PageHandlerFactory:
-  void CreatePageHandler(
-      mojo::PendingReceiver<feedback::report_unsafe_site::mojom::PageHandler>
-          handler) override;
-
  private:
-  std::unique_ptr<ReportUnsafeSitePageHandler> report_unsafe_site_page_handler_;
-  mojo::Receiver<feedback::report_unsafe_site::mojom::PageHandlerFactory>
-      report_unsafe_site_factory_receiver_{this};
   base::WeakPtr<TopChromeWebUIController::Embedder> embedder_;
-  base::WeakPtr<content::WebContents> triggering_web_contents_;
-  base::WeakPtr<views::Widget> dialog_;
-  std::unique_ptr<feedback::ScreenshotTaker> screenshot_taker_;
 
   WEB_UI_CONTROLLER_TYPE_DECL();
 };

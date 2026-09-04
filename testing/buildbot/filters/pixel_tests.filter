@@ -153,7 +153,6 @@ RecentActivityBubbleDialogViewInteractiveUiTest.*
 RelaunchRecommendedBubbleViewDialogTest.*
 RelaunchRequiredDialogViewDialogTest.*
 ReopenTabPromoControllerDialogBrowserTest.*
-ReportUnsafeSiteDialogInteractiveUiTest.ExcludeScreenshotPixelTest
 SafetyTipPageInfoBubbleViewDialogTest.*
 ScreenCaptureNotificationUiBrowserTest.*
 SearchEngineChoiceUIPixelTest.*

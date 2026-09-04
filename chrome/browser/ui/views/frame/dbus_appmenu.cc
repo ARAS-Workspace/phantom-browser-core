@@ -22,7 +22,6 @@
 #include "build/branding_buildflags.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/feedback/report_unsafe_site_dialog.h"
 #include "chrome/browser/history/top_sites_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
@@ -172,9 +171,6 @@ std::vector<DbusAppmenuCommand> BuildHelpMenu(Profile& profile) {
   std::vector<DbusAppmenuCommand> help_menu;
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   help_menu.push_back({IDC_FEEDBACK, IDS_FEEDBACK});
-  if (feedback::ReportUnsafeSiteDialog::IsEnabled(profile)) {
-    help_menu.push_back({IDC_REPORT_UNSAFE_SITE, IDS_REPORT_UNSAFE_SITE});
-  }
 #endif
   help_menu.push_back({IDC_HELP_PAGE_VIA_MENU, IDS_HELP_PAGE});
   return help_menu;

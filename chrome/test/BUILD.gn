@@ -5839,7 +5839,6 @@ test("unit_tests") {
     deps += [
       "//chrome/browser/background:unit_tests",
       "//chrome/browser/dictation:unit_tests",
-      "//chrome/browser/feedback/report_unsafe_site:unit_tests",
       "//chrome/browser/glic/selection:unit_tests",
       "//chrome/browser/lifetime:unit_tests",
       "//chrome/browser/new_tab_page/chrome_colors:generate_chrome_colors_info",
@@ -8509,7 +8508,6 @@ if (!is_android && !is_chromeos_device) {
       "//chrome/browser/dictation:interactive_ui_tests",
       "//chrome/browser/download:test_support",
       "//chrome/browser/feedback:feedback_impl",
-      "//chrome/browser/feedback:interactive_ui_tests",
       "//chrome/browser/file_system_access",
       "//chrome/browser/gcm",
       "//chrome/browser/glic/browser_ui",

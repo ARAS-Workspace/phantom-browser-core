@@ -11,7 +11,6 @@
 
 #include "base/memory/weak_ptr.h"
 #include "base/time/time.h"
-#include "build/branding_buildflags.h"
 #include "build/build_config.h"
 #include "chrome/browser/devtools/devtools_toggle_action.h"
 #include "chrome/browser/task_manager/task_manager_metrics_recorder.h"
@@ -322,9 +321,6 @@ void OpenFeedbackDialog(BrowserWindowInterface* browser,
                         feedback::FeedbackSource source,
                         const std::string& description_template = std::string(),
                         const std::string& category_tag = std::string());
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-void OpenReportUnsafeSiteDialog(BrowserWindowInterface* browser);
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 #if BUILDFLAG(IS_WIN)
 void OpenMoveWindow(BrowserWindowInterface* browser);
 void OpenSizeWindow(BrowserWindowInterface* browser);

@@ -585,58 +585,6 @@ IN_PROC_BROWSER_TEST_F(AppMenuModelTest, Feedback_UserFeedbackAllowedPolicy) {
   }
 }
 
-class AppMenuReportUnsafeSiteTest : public base::test::WithFeatureOverride,
-                                    public AppMenuModelTest {
- public:
-  AppMenuReportUnsafeSiteTest()
-      : WithFeatureOverride(features::kReportUnsafeSite) {}
-  ~AppMenuReportUnsafeSiteTest() override = default;
-};
-
-IN_PROC_BROWSER_TEST_P(AppMenuReportUnsafeSiteTest,
-                       ReportUnsafeSite_UserFeedbackAllowedPolicy) {
-  browser()->GetProfile()->GetPrefs()->SetBoolean(prefs::kUserFeedbackAllowed,
-                                                  true);
-  {
-    AppMenuModel model(this, browser());
-    model.Init();
-    EXPECT_EQ(IsParamFeatureEnabled(),
-              DoesHelpMenuHaveCommand(model, IDC_REPORT_UNSAFE_SITE));
-  }
-
-  browser()->GetProfile()->GetPrefs()->SetBoolean(prefs::kUserFeedbackAllowed,
-                                                  false);
-  {
-    AppMenuModel model(this, browser());
-    model.Init();
-    EXPECT_FALSE(DoesHelpMenuHaveCommand(model, IDC_REPORT_UNSAFE_SITE));
-  }
-}
-
-IN_PROC_BROWSER_TEST_P(AppMenuReportUnsafeSiteTest,
-                       ReportUnsafeSite_SafeBrowsingDisabled) {
-  browser()->GetProfile()->GetPrefs()->SetBoolean(prefs::kUserFeedbackAllowed,
-                                                  true);
-  browser()->GetProfile()->GetPrefs()->SetBoolean(prefs::kSafeBrowsingEnabled,
-                                                  true);
-  {
-    AppMenuModel model(this, browser());
-    model.Init();
-    EXPECT_EQ(IsParamFeatureEnabled(),
-              DoesHelpMenuHaveCommand(model, IDC_REPORT_UNSAFE_SITE));
-  }
-
-  browser()->GetProfile()->GetPrefs()->SetBoolean(prefs::kSafeBrowsingEnabled,
-                                                  false);
-  {
-    AppMenuModel model(this, browser());
-    model.Init();
-    EXPECT_FALSE(DoesHelpMenuHaveCommand(model, IDC_REPORT_UNSAFE_SITE));
-  }
-}
-
-INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(AppMenuReportUnsafeSiteTest);
-
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 class AppMenuModelSigninPromoTest : public base::test::WithFeatureOverride,

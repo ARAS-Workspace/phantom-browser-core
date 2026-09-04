@@ -28,7 +28,6 @@
 #include "chrome/browser/defaults.h"
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/extensions/extension_ui_util.h"
-#include "chrome/browser/feedback/report_unsafe_site_dialog.h"
 #include "chrome/browser/feedback/show_feedback_page.h"
 #include "chrome/browser/glic/browser_ui/glic_vector_icon_manager.h"
 #include "chrome/browser/glic/public/glic_enabling.h"
@@ -213,7 +212,6 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ExtensionsMenuModel,
                                       kManageExtensionsMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ExtensionsMenuModel,
                                       kVisitChromeWebStoreMenuItem);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(HelpMenuModel, kReportUnsafeSiteMenuItem);
 
 namespace {
 
@@ -1073,16 +1071,6 @@ void HelpMenuModel::Build(BrowserWindowInterface* browser) {
     AddItemWithStringIdAndVectorIcon(
         this, IDC_FEEDBACK, IDS_FEEDBACK,
         features::IsRoundedIconsEnabled() ? kFeedbackIcon : kReportOldIcon);
-
-    if (feedback::ReportUnsafeSiteDialog::IsEnabled(*browser->GetProfile())) {
-      AddItemWithStringIdAndVectorIcon(
-          this, IDC_REPORT_UNSAFE_SITE, IDS_REPORT_UNSAFE_SITE,
-          features::IsRoundedIconsEnabled() ? vector_icons::kWarningFilledIcon
-                                            : vector_icons::kWarningOldIcon);
-      SetElementIdentifierAt(
-          GetIndexOfCommandId(IDC_REPORT_UNSAFE_SITE).value(),
-          HelpMenuModel::kReportUnsafeSiteMenuItem);
-    }
   }
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 }

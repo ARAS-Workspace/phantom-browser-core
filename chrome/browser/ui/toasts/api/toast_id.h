@@ -57,7 +57,7 @@ enum class ToastId {
   kSendTabToSelfTabOpened = 34,
   kSendTabToSelfTabsOpenedInBackground = 35,
   kSendTabToSelfSuccess = 36,
-  kReportUnsafeSiteConfirmation = 37,
+  // kReportUnsafeSiteConfirmation = 37,
   kSendTabToSelfFailure = 38,
   kSendTabToSelfSuccessThrottled = 39,
   kDefaultBrowserUpdateSuccess = 40,

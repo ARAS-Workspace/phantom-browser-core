@@ -172,8 +172,6 @@ class ExtensionsMenuModel : public ui::SimpleMenuModel {
 
 class HelpMenuModel : public ui::SimpleMenuModel {
  public:
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kReportUnsafeSiteMenuItem);
-
   HelpMenuModel(ui::SimpleMenuModel::Delegate* delegate,
                 BrowserWindowInterface* browser);
 

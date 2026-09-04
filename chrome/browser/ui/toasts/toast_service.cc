@@ -554,14 +554,6 @@ void ToastService::RegisterToasts(
           .AddCloseButton()
           .Build());
 
-  // Report a scam confirmation toast.
-  toast_registry_->RegisterToast(
-      ToastId::kReportUnsafeSiteConfirmation,
-      ToastSpecification::Builder(
-          features::IsRoundedIconsEnabled() ? kCheckSmallIcon : kCheckOldIcon,
-          IDS_REPORT_UNSAFE_SITE_CONFIRMATION_TOAST)
-          .Build());
-
 #if !BUILDFLAG(IS_CHROMEOS)
   // Global-scoped: on the visual guide path this is triggered as the guide tab
   // navigates to the New Tab Page, and a tab-scoped toast would be dismissed

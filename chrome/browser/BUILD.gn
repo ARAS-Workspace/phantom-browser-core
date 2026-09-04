@@ -2872,7 +2872,6 @@ source_set("browser") {
       "//chrome/browser/ui/webui/customize_buttons",
       "//chrome/browser/ui/webui/customize_buttons:impl",
       "//chrome/browser/ui/webui/downloads",
-      "//chrome/browser/ui/webui/feedback/report_unsafe_site:mojo_bindings",
       "//chrome/browser/ui/webui/history",
       "//chrome/browser/ui/webui/infobar_internals",
       "//chrome/browser/ui/webui/infobar_internals:impl",

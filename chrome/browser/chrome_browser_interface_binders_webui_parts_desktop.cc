@@ -37,8 +37,6 @@
 #include "chrome/browser/ui/webui/drive_picker_host/drive_picker_host_ui.h"
 #include "chrome/browser/ui/webui/drive_picker_host/untrusted/drive_picker_host_untrusted.mojom.h"
 #include "chrome/browser/ui/webui/drive_picker_host/untrusted/drive_picker_host_untrusted_ui.h"
-#include "chrome/browser/ui/webui/feedback/feedback_ui.h"
-#include "chrome/browser/ui/webui/feedback/report_unsafe_site/report_unsafe_site.mojom.h"
 #include "chrome/browser/ui/webui/history/history_ui.h"
 #include "chrome/browser/ui/webui/infobar_internals/infobar_internals.mojom.h"
 #include "chrome/browser/ui/webui/infobar_internals/infobar_internals_ui.h"
@@ -528,10 +526,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       visual_guided_setter::mojom::PageHandlerFactory, VisualGuidedSetterUI>(
       map);
 #endif
-
-  RegisterWebUIControllerInterfaceBinder<
-      feedback::report_unsafe_site::mojom::PageHandlerFactory, FeedbackUI>(map);
-
 }
 
 void PopulateChromeWebUIFrameInterfaceBrokersTrustedPartsDesktop(
