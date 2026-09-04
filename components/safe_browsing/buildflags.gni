@@ -24,7 +24,7 @@ declare_args() {
   } else if (is_android) {
     safe_browsing_mode = 2
   } else {
-    safe_browsing_mode = 1
+    safe_browsing_mode = 0
   }
 
   # Allows building without //third_party/unrar included, for license reasons
