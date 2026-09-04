@@ -3796,12 +3796,6 @@
   </if>
 
   <!-- Experimental settings strings -->
-  <if expr="is_android">
-    <then>
-    </then>
-    <else>
-    </else>
-  </if>
 
   <!-- Experimental settings - CPU Performance Override -->
   <message name="IDS_SETTINGS_CPU_PERFORMANCE_OVERRIDE_TITLE" desc="Title for the CPU performance override setting.">
