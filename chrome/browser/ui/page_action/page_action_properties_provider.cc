@@ -250,13 +250,6 @@ constexpr auto kPageActionProperties = base::MakeFixedFlatMap<
         },
     },
     {
-        kActionAnchoredContextualCue,
-        {
-            .histogram_name = "ContextualCueing",
-            .type = PageActionIconType::kAnchoredContextualCue,
-        },
-    },
-    {
         kActionWebAuthnAmbientSignin,
         {
             .histogram_name = "WebAuthnAmbientSignin",

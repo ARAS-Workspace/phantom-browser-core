@@ -102,7 +102,6 @@ class WebContents;
 
 namespace contextual_cueing {
 class ContextualCueingController;
-class ContextualCueingWebContentsObserver;
 }  // namespace contextual_cueing
 
 namespace contextual_tasks {
@@ -119,7 +118,6 @@ class ExtensionSidePanelManager;
 
 namespace glic {
 class ContextualCueingHelper;
-class GlicCueTabState;
 class GlicInstanceHelper;
 class GlicTabIndicatorHelper;
 class GlicSidePanelCoordinator;
@@ -483,9 +481,6 @@ class TabFeatures {
   // Observes page loads to decide when to offer glic contextual cueing.
   std::unique_ptr<glic::ContextualCueingHelper> contextual_cueing_helper_;
 
-  // Per-tab eligibility state for the glic contextual cue.
-  std::unique_ptr<glic::GlicCueTabState> glic_cue_tab_state_;
-
   std::unique_ptr<memory_saver::MemorySaverChipController>
       memory_saver_chip_controller_;
 
@@ -514,9 +509,6 @@ class TabFeatures {
 
   std::unique_ptr<contextual_cueing::ContextualCueingController>
       contextual_cueing_controller_;
-
-  std::unique_ptr<contextual_cueing::ContextualCueingWebContentsObserver>
-      contextual_cueing_web_contents_observer_;
 
   std::unique_ptr<TabUIHelper> tab_ui_helper_;
 

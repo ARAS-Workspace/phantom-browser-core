@@ -39,11 +39,7 @@ ContextualCueingServiceFactory::~ContextualCueingServiceFactory() = default;
 std::unique_ptr<KeyedService>
 ContextualCueingServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
-  if (!base::FeatureList::IsEnabled(kContextualCueingV2)) {
-    return nullptr;
-  }
-  Profile* profile = Profile::FromBrowserContext(context);
-  return std::make_unique<ContextualCueingService>(profile->GetPrefs());
+  return nullptr;
 }
 
 bool ContextualCueingServiceFactory::ServiceIsCreatedWithBrowserContext()

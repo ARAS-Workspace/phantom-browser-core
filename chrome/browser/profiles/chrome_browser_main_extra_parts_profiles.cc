@@ -69,7 +69,6 @@
 #include "chrome/browser/content_settings/cookie_settings_factory.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/context_hub/context_hub_service_factory.h"
-#include "chrome/browser/contextual_cueing/contextual_cueing_service_factory.h"
 #include "chrome/browser/contextual_search/contextual_search_service_factory.h"
 #include "chrome/browser/contextual_tasks/contextual_tasks_context_service_factory.h"
 #include "chrome/browser/contextual_tasks/contextual_tasks_service_factory.h"
@@ -924,7 +923,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
 
   ContextHubServiceFactory::GetInstance();
-  contextual_cueing::ContextualCueingServiceFactory::GetInstance();
 
   contextual_tasks::ContextualTasksContextServiceFactory::GetInstance();
   contextual_tasks::ContextualTasksServiceFactory::GetInstance();
