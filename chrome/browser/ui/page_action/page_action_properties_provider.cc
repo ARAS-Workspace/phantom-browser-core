@@ -28,16 +28,6 @@ constexpr auto kPageActionProperties = base::MakeFixedFlatMap<
         },
     },
     {
-        kActionIndigo,
-        {
-            .histogram_name = "Indigo",
-            .type = PageActionIconType::kIndigo,
-            .element_identifier = kIndigoPageActionIconElementId,
-            .priority =
-                page_actions::PageActionPriorityCategory::kContextualCue,
-        },
-    },
-    {
         kActionMultistepFilter,
         {
             .histogram_name = "MultistepFilter",

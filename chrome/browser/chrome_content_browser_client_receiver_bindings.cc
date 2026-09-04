@@ -97,12 +97,10 @@
 
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/badging/badge_manager.h"
-#include "chrome/browser/indigo/onboarding/indigo_onboarding_dialog.h"
 #include "chrome/browser/password_manager/remote_actor/remote_actor_credential_sharing_impl.h"
 #include "chrome/browser/record_replay/chrome_record_replay_client.h"
 #include "chrome/browser/ui/search/search_tab_helper.h"
 #include "chrome/browser/ui/webui_browser/webui_browser_ui.h"
-#include "chrome/common/indigo/indigo.mojom.h"
 #include "chrome/common/password_manager/remote_actor_credential_sharing_policy.h"
 #include "components/record_replay/core/common/record_replay.mojom.h"
 #endif
@@ -650,20 +648,6 @@ void ChromeContentBrowserClient::
                     std::move(receiver), render_frame_host);
               },
               &render_frame_host));
-
-#if !BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(features::kIndigo)) {
-    associated_registry.AddInterface<chrome::mojom::IndigoOnboardingDialogHost>(
-        base::BindRepeating(
-            [](content::RenderFrameHost* render_frame_host,
-               mojo::PendingAssociatedReceiver<
-                   chrome::mojom::IndigoOnboardingDialogHost> receiver) {
-              indigo::IndigoOnboardingDialog::BindOnboardingDialogHost(
-                  std::move(receiver), render_frame_host);
-            },
-            &render_frame_host));
-  }
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 void ChromeContentBrowserClient::BindGpuHostReceiver(

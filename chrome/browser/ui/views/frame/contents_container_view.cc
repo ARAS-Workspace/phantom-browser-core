@@ -28,7 +28,6 @@
 #include "chrome/browser/ui/views/frame/scrim_view.h"
 #include "chrome/browser/ui/views/frame/tab_modal_dialog_host.h"
 #include "chrome/browser/ui/views/frame/top_container_view.h"
-#include "chrome/browser/ui/views/indigo/indigo_toolbar.h"
 #include "chrome/browser/ui/views/new_tab_footer/footer_web_view.h"
 #include "chrome/common/chrome_features.h"
 #include "components/search/ntp_features.h"
@@ -104,11 +103,6 @@ ContentsContainerView::ContentsContainerView(BrowserView* browser_view)
       AddChildView(std::make_unique<
                    enterprise_data_protection::DataProtectionOverlayView>());
 
-  if (base::FeatureList::IsEnabled(features::kIndigo)) {
-    indigo_overlay_view_ = AddChildView(indigo::CreateIndigoOverlayView());
-    indigo_overlay_view_->InsertBeforeInFocusList(contents_view_);
-  }
-
   if (base::FeatureList::IsEnabled(features::kAiOverlayDialog)) {
     auto ai_overlay_dialog_view =
         std::make_unique<views::WebView>(browser_view->GetProfile());
@@ -163,9 +157,7 @@ ContentsContainerView::ContentsContainerView(BrowserView* browser_view)
   view_bounds_observer_.Observe(contents_view_);
 }
 
-ContentsContainerView::~ContentsContainerView() {
-  indigo_overlay_view_ = nullptr;
-}
+ContentsContainerView::~ContentsContainerView() = default;
 
 std::vector<views::View*> ContentsContainerView::GetAccessiblePanes() {
   std::vector<views::View*> accessible_panes;
@@ -571,12 +563,6 @@ views::ProposedLayout ContentsContainerView::CalculateProposedLayout(
         glic_selection_overlay_view_.get(),
         glic_selection_overlay_view_->GetVisible(),
         non_devtools_contents_bounds, size_bounds);
-  }
-
-  if (indigo_overlay_view_) {
-    layouts.child_layouts.emplace_back(indigo_overlay_view_.get(),
-                                       indigo_overlay_view_->GetVisible(),
-                                       non_devtools_contents_bounds);
   }
 
   if (mini_toolbar_) {

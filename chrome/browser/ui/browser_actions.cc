@@ -33,7 +33,6 @@
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/glic/public/glic_keyed_service.h"
 #include "chrome/browser/glic/resources/grit/glic_browser_resources.h"
-#include "chrome/browser/indigo/indigo_page_action_controller.h"
 #include "chrome/browser/lifetime/application_lifetime.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
@@ -65,7 +64,6 @@
 #include "chrome/browser/feedback/show_feedback_page.h"
 #include "chrome/browser/geic/geic_enabling.h"
 #include "chrome/browser/glic/public/glic_enabling.h"
-#include "chrome/browser/indigo/resources/grit/indigo_strings.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/multistep_filter/ui/filter_ui_controller.h"
 #include "chrome/browser/platform_util.h"
@@ -1948,52 +1946,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
             glic::GlicVectorIconManager::GetVectorIcon(
                 IDR_GLIC_BUTTON_VECTOR_ICON),
             /*is_pinnable=*/false)
-            .Build());
-  }
-
-  if (base::FeatureList::IsEnabled(features::kIndigo)) {
-    root_action_item_->AddChild(
-        actions::ActionItem::Builder(
-            base::BindRepeating(
-                [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                   actions::ActionInvocationContext context) {
-                  if (!bwi) {
-                    return;
-                  }
-                  auto* tab = bwi->GetActiveTabInterface();
-                  if (!tab) {
-                    return;
-                  }
-                  auto* controller =
-                      indigo::IndigoPageActionController::From(tab);
-                  if (controller) {
-                    auto entry_point = [&]() {
-                      auto raw_entry_point =
-                          static_cast<page_actions::PageActionEntryPoint>(
-                              context.GetProperty(
-                                  page_actions::kPageActionEntryPointKey));
-                      switch (raw_entry_point) {
-                        case page_actions::PageActionEntryPoint::
-                            kSuggestionChip:
-                          return indigo::EntryPoint::kSuggestionChip;
-                        case page_actions::PageActionEntryPoint::
-                            kAnchoredMessage:
-                          return indigo::EntryPoint::kAnchoredMessage;
-                      }
-                      NOTREACHED();
-                    }();
-                    controller->InvokeAction(entry_point);
-                  }
-                },
-                bwi))
-            .SetActionId(kActionIndigo)
-            .SetTooltipText(l10n_util::GetStringUTF16(
-                IDS_INDIGO_ENTRYPOINT_CHIP_TOOLTIP_TEXT))
-            .SetImage(ui::ImageModel::FromVectorIcon(
-                glic::GlicVectorIconManager::GetVectorIcon(
-                    IDR_GLIC_BUTTON_VECTOR_ICON),
-                ui::kColorSysOnSurface))
-            .SetText(l10n_util::GetStringUTF16(IDS_INDIGO_ENTRYPOINT_CHIP_TEXT))
             .Build());
   }
 

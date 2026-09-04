@@ -6479,7 +6479,6 @@
     },
     {
       name: "UAImageReplacementAPI",
-      origin_trial_feature_name: "UAImageReplacementAPI",
     },
     {
       // The Unbounded Element API. See crbug.com/508672616.

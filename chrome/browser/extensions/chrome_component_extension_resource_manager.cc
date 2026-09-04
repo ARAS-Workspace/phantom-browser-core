@@ -53,7 +53,6 @@
 #endif  // BUILDFLAG(ENABLE_PDF)
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/indigo/indigo_extension_utils.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
@@ -116,19 +115,6 @@ ChromeComponentExtensionResourceManager::Data::Data() {
           extensions_features::kApiContextualTasksPrivate)) {
     AddComponentResourceEntries(kContextualTasksExtensionResources);
   }
-
-#if !BUILDFLAG(IS_ANDROID)
-  if (base::FeatureList::IsEnabled(features::kIndigo)) {
-    AddComponentResourceEntries(indigo_extension_utils::GetResources());
-    if (ui::ResourceBundle::HasSharedInstance()) {
-      base::DictValue dict = indigo_extension_utils::GetStrings();
-      ui::TemplateReplacements indigo_replacements;
-      ui::TemplateReplacementsFromDictionaryValue(dict, &indigo_replacements);
-      template_replacements_[extension_misc::kIndigoExtensionId] =
-          std::move(indigo_replacements);
-    }
-  }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_CHROMEOS)
   // Add Files app JS modules resources.

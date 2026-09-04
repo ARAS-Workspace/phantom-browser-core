@@ -33,9 +33,6 @@ IndigoServiceFactory::~IndigoServiceFactory() = default;
 std::unique_ptr<KeyedService>
 IndigoServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
-  Profile* profile = Profile::FromBrowserContext(context);
-  return std::make_unique<IndigoService>(
-      profile, IdentityManagerFactory::GetForProfile(profile),
-      profile->GetPrefs());
+  return nullptr;
 }
 }  // namespace indigo
