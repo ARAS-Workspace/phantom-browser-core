@@ -528,7 +528,7 @@ bool ChromeAutocompleteProviderClient::SearchSuggestEnabled() const {
                ->essential_search_manager()
                ->ShouldDisableSearchSuggest());
 #else
-  return profile_->GetPrefs()->GetBoolean(prefs::kSearchSuggestEnabled);
+  return false;
 #endif
 }
 

@@ -67,13 +67,5 @@ std::unique_ptr<KeyedService> SearchEnginePreconnectorKeyedServiceFactory::
     return nullptr;
   }
 
-  auto search_engine_preconnector =
-      std::make_unique<SearchEnginePreconnector>(context);
-
-  // Start preconnecting to the search engine.
-  if (search_engine_preconnector) {
-    search_engine_preconnector->StartPreconnecting(
-        /*with_startup_delay=*/true);
-  }
-  return search_engine_preconnector;
+  return std::make_unique<SearchEnginePreconnector>(context);
 }

@@ -118,15 +118,6 @@ import {RestartType} from '../relaunch_mixin_lit.js';
     </cr-link-row>
 </if><!-- chromeos -->
 </if><!-- _google_chrome -->
-    ${this.showSearchSuggestToggle_() ? html`
-      <settings-toggle-button id="searchSuggestToggle"
-          class="hr"
-          pref-key="search.suggest_enabled"
-          label="$i18n{searchSuggestPref}"
-          sub-label="$i18n{searchSuggestPrefDesc}">
-      </settings-toggle-button>
-    ` : ''}
-
     <!-- This toggle is only shown for users with the appropriate enterprise
         policy enabled. The state is not changeable by the user, so when shown,
         it is alays selected but disabled. -->

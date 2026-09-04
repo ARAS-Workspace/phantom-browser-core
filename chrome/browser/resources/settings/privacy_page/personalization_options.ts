@@ -49,8 +49,6 @@ import {OpenWindowProxyImpl} from 'chrome://resources/js/open_window_proxy.js';
 
 import type {SettingsToggleButtonElement} from '../controls/settings_toggle_button.js';
 import {loadTimeData} from '../i18n_setup.js';
-import {pageVisibility} from '../page_visibility.js';
-import type {PrivacyPageVisibility} from '../page_visibility.js';
 import type {SettingsSignoutDialogElement} from '../people_page/signout_dialog.js';
 import {RelaunchMixinLit, RestartType} from '../relaunch_mixin_lit.js';
 
@@ -259,15 +257,6 @@ export class SettingsPersonalizationOptionsElement extends
     }
   }
   // </if>
-
-  protected showSearchSuggestToggle_(): boolean {
-    if (pageVisibility?.privacy === undefined) {
-      // pageVisibility isn't defined in non-Guest profiles
-      // (crbug.com/40211731).
-      return true;
-    }
-    return (pageVisibility.privacy as PrivacyPageVisibility).searchPrediction;
-  }
 
   // <if expr="is_chromeos">
   protected onMetricsReportingLinkClick_() {

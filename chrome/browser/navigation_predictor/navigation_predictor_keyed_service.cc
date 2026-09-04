@@ -11,7 +11,6 @@
 #include "base/observer_list.h"
 #include "base/time/default_tick_clock.h"
 #include "base/values.h"
-#include "build/build_config.h"
 #include "chrome/browser/profiles/profile.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/browser_thread.h"
@@ -120,13 +119,6 @@ NavigationPredictorKeyedService::NavigationPredictorKeyedService(
     : search_engine_preconnector_(browser_context) {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   DCHECK(!browser_context->IsOffTheRecord());
-
-#if !BUILDFLAG(IS_ANDROID)
-  if (!SearchEnginePreconnector::ShouldBeEnabledAsKeyedService()) {
-    // Start preconnecting to the search engine.
-    search_engine_preconnector_.StartPreconnecting(/*with_startup_delay=*/true);
-  }
-#endif
 }
 
 NavigationPredictorKeyedService::~NavigationPredictorKeyedService() {
