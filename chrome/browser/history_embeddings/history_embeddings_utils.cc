@@ -17,37 +17,9 @@
 #include "components/optimization_guide/core/optimization_guide_features.h"
 #include "components/prefs/pref_service.h"
 #include "components/strings/grit/components_strings.h"
-#include "components/variations/service/variations_service.h"
 #include "content/public/browser/web_ui_data_source.h"
 
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/constants/chromeos_features.h"
-#endif
-
 namespace history_embeddings {
-
-namespace {
-
-// Returns the country code from the variations service.
-std::string GetCountryCode(variations::VariationsService* variations_service) {
-  std::string country_code;
-  // The variations service may be nullptr in unit tests.
-  if (variations_service) {
-    country_code = variations_service->GetStoredPermanentCountry();
-    if (country_code.empty()) {
-      country_code = variations_service->GetLatestCountry();
-    }
-  }
-  return country_code;
-}
-
-bool IsCountryAndLocale(const std::string& country, const std::string& locale) {
-  return g_browser_process &&
-         g_browser_process->GetApplicationLocale() == locale &&
-         GetCountryCode(g_browser_process->variations_service()) == country;
-}
-
-}  // namespace
 
 constexpr auto kEnabledByDefaultForDesktopOnly =
 #if BUILDFLAG(IS_ANDROID)
@@ -171,19 +143,7 @@ void PopulateSourceForWebUI(content::WebUIDataSource* source,
 }
 
 bool IsHistoryEmbeddingsFeatureEnabled() {
-#if BUILDFLAG(IS_CHROMEOS)
-  if (!chromeos::features::IsFeatureManagementHistoryEmbeddingEnabled()) {
-    return false;
-  }
-#endif
-  // If the feature is overridden manually or via Finch, return its value.
-  if (base::FeatureList::GetStateIfOverridden(kHistoryEmbeddings).has_value()) {
-    return base::FeatureList::IsEnabled(kHistoryEmbeddings);
-  }
-  // Otherwise return true for "us" and "en-US", leaving a Finch hook just in
-  // case.
-  return IsCountryAndLocale("us", "en-US") &&
-         base::FeatureList::IsEnabled(kLaunchedHistoryEmbeddings);
+  return false;
 }
 
 bool IsHistoryEmbeddingsAnswersFeatureEnabled() {
