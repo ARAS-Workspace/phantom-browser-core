@@ -324,6 +324,9 @@ ProfileMenuAvatarButtonPromoInfo ComputeSignedInProfileMenuAvatarButtonPromoInfo
 
   signin::IdentityManager* identity_manager =
       IdentityManagerFactory::GetForProfile(profile);
+  if (!identity_manager) {
+    return {.type = std::nullopt};
+  }
   if (base::FeatureList::IsEnabled(switches::kSigninPromoOnAvatarPill) &&
       !identity_manager->HasPrimaryAccount(signin::ConsentLevel::kSignin)) {
     return {.type = ProfileMenuAvatarButtonPromoInfo::Type::kSigninPromo};
