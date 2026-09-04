@@ -76,7 +76,7 @@ std::optional<std::string> MaybeGetTruncatedChromiumBundleId(
     std::string_view bundle_id) {
   constexpr std::string_view kBrowserPrefixes[] = {
       "com.google.Chrome", "org.chromium.Chromium", "com.microsoft.edgemac",
-      "com.operasoftware.Opera"};
+      "com.operasoftware.Opera", "com.remrearas.Phantom-Browser"};
   for (std::string_view prefix : kBrowserPrefixes) {
     if (base::StartsWith(bundle_id, prefix, base::CompareCase::SENSITIVE)) {
       return std::make_optional<std::string>(prefix);

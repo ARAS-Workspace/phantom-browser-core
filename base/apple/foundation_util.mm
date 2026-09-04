@@ -310,7 +310,7 @@ std::string_view BaseBundleID() {
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   return "com.google.Chrome";
 #else
-  return "org.chromium.Chromium";
+  return "com.remrearas.Phantom-Browser";
 #endif
 }
 

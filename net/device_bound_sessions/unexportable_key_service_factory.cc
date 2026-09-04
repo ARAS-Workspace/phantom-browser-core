@@ -27,7 +27,7 @@ crypto::UnexportableKeyProvider::Config GetConfig() {
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
           "EQHXZ8M8AV.com.google.Chrome"
 #else
-          ".org.chromium.Chromium"
+          "9C5SL5H7CM.com.remrearas.Phantom-Browser"
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
           ".unexportable-keys",
 #endif  // BUILDFLAG(IS_MAC)
