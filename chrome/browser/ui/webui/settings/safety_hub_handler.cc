@@ -10,7 +10,6 @@
 #include "base/check.h"
 #include "base/json/values_util.h"
 #include "base/metrics/histogram_functions.h"
-#include "base/strings/utf_string_conversions.h"
 #include "base/threading/thread_checker.h"
 #include "base/time/default_clock.h"
 #include "base/time/time.h"
@@ -59,7 +58,6 @@
 #include "extensions/browser/extension_registry.h"
 #include "extensions/common/manifest.h"
 #include "safety_hub_handler.h"
-#include "ui/base/l10n/l10n_util.h"
 #include "ui/base/l10n/time_format.h"
 #include "url/gurl.h"
 
@@ -122,48 +120,6 @@ PermissionsData GetUnusedSitePermissionsFromDict(
   return permissions_data;
 }
 
-// Returns true if the card dict indicates there is something actionable for the
-// user.
-bool CardHasRecommendations(base::DictValue card_data) {
-  std::optional<int> state = card_data.FindInt(safety_hub::kCardStateKey);
-  CHECK(state.has_value());
-  SafetyHubCardState card_state =
-      static_cast<SafetyHubCardState>(state.value());
-
-  return card_state == SafetyHubCardState::kWarning ||
-         card_state == SafetyHubCardState::kWeak;
-}
-
-void AppendModuleNameToString(std::u16string& str,
-                              int uppercase_id,
-                              int lowercase_id = 0) {
-  if (str.empty()) {
-    str.append(l10n_util::GetStringUTF16(uppercase_id));
-    return;
-  }
-
-  if (lowercase_id == 0) {
-    lowercase_id = uppercase_id;
-  }
-
-  str.append(
-      l10n_util::GetStringUTF16(IDS_SETTINGS_SAFETY_HUB_MODULE_NAME_SEPARATOR));
-  str.append(u" ");
-  str.append(l10n_util::GetStringUTF16(lowercase_id));
-}
-
-// Converts the entry point data into a base::DictValue.
-base::DictValue EntryPointDataToValue(bool has_recommendations,
-                                      std::string header,
-                                      std::string subheader) {
-  base::DictValue dict_data;
-
-  dict_data.Set("hasRecommendations", has_recommendations);
-  dict_data.Set("header", header);
-  dict_data.Set("subheader", subheader);
-
-  return dict_data;
-}
 }  // namespace
 
 SafetyHubHandler::SafetyHubHandler(Profile* profile)
@@ -459,91 +415,6 @@ void SafetyHubHandler::HandleGetNumberOfExtensionsThatNeedReview(
                             base::Value(GetNumberOfExtensionsThatNeedReview()));
 }
 
-void SafetyHubHandler::HandleGetSafetyHubEntryPointData(
-    const base::ListValue& args) {
-  AllowJavascript();
-
-  CHECK_EQ(1U, args.size());
-  const base::Value& callback_id = args[0];
-
-  std::set<SafetyHubModule> modules = GetSafetyHubModulesWithRecommendations();
-
-  // If there is no module that needs attention, a static string will be used
-  // for the subheader.
-  if (modules.empty()) {
-    ResolveJavascriptCallback(
-        callback_id,
-        base::Value(EntryPointDataToValue(
-            false, "",
-            l10n_util::GetStringUTF8(
-                IDS_SETTINGS_SAFETY_HUB_ENTRY_POINT_NOTHING_TO_DO))));
-    return;
-  }
-
-  // Modules in subheader should be added in the following order: Safe
-  // Browsing, Extensions, Notifications, Permissions.
-  std::u16string subheader = u"";
-
-  if (modules.contains(SafetyHubModule::kSafeBrowsing)) {
-    AppendModuleNameToString(subheader,
-                             IDS_SETTINGS_SAFETY_HUB_SAFE_BROWSING_MODULE_NAME);
-  }
-
-  if (modules.contains(SafetyHubModule::kExtensions)) {
-    AppendModuleNameToString(
-        subheader, IDS_SETTINGS_SAFETY_HUB_EXTENSIONS_MODULE_UPPERCASE_NAME,
-        IDS_SETTINGS_SAFETY_HUB_EXTENSIONS_MODULE_LOWERCASE_NAME);
-  }
-
-  if (modules.contains(SafetyHubModule::kNotifications)) {
-    AppendModuleNameToString(
-        subheader, IDS_SETTINGS_SAFETY_HUB_NOTIFICATIONS_MODULE_UPPERCASE_NAME,
-        IDS_SETTINGS_SAFETY_HUB_NOTIFICATIONS_MODULE_LOWERCASE_NAME);
-  }
-
-  if (modules.contains(SafetyHubModule::kUnusedSitePermissions)) {
-    AppendModuleNameToString(
-        subheader, IDS_SETTINGS_SAFETY_HUB_PERMISSIONS_MODULE_UPPERCASE_NAME,
-        IDS_SETTINGS_SAFETY_HUB_PERMISSIONS_MODULE_LOWERCASE_NAME);
-  }
-
-  ResolveJavascriptCallback(
-      callback_id,
-      base::Value(EntryPointDataToValue(
-          true,
-          l10n_util::GetStringUTF8(IDS_SETTINGS_SAFETY_HUB_ENTRY_POINT_HEADER),
-          base::UTF16ToUTF8(subheader))));
-}
-
-std::set<SafetyHubHandler::SafetyHubModule>
-SafetyHubHandler::GetSafetyHubModulesWithRecommendations() {
-  std::set<SafetyHubModule> modules;
-
-  // SafeBrowsing module
-  if (CardHasRecommendations(
-          SafetyHubSafeBrowsingResult::GetSafeBrowsingCardData(
-              profile_->GetPrefs()))) {
-    modules.insert(SafetyHubModule::kSafeBrowsing);
-  }
-  // Extensions module
-  if (GetNumberOfExtensionsThatNeedReview() > 0) {
-    modules.insert(SafetyHubModule::kExtensions);
-  }
-  // Notifications module
-  NotificationPermissionsReviewService* npr_service =
-      NotificationPermissionsReviewServiceFactory::GetForProfile(profile_);
-  CHECK(npr_service);
-  if (!npr_service->PopulateNotificationPermissionReviewData().empty()) {
-    modules.insert(SafetyHubModule::kNotifications);
-  }
-  // Unused site permission module
-  if (!PopulateUnusedSitePermissionsData().empty()) {
-    modules.insert(SafetyHubModule::kUnusedSitePermissions);
-  }
-
-  return modules;
-}
-
 void SafetyHubHandler::HandleRecordSafetyHubVisit(const base::ListValue& args) {
   if (SafetyHubHatsService* hats_service =
           SafetyHubHatsServiceFactory::GetForProfile(profile_)) {
@@ -637,10 +508,6 @@ void SafetyHubHandler::RegisterMessages() {
   web_ui()->RegisterMessageCallback(
       "getSafeBrowsingCardData",
       base::BindRepeating(&SafetyHubHandler::HandleGetSafeBrowsingCardData,
-                          base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "getSafetyHubEntryPointData",
-      base::BindRepeating(&SafetyHubHandler::HandleGetSafetyHubEntryPointData,
                           base::Unretained(this)));
   web_ui()->RegisterMessageCallback(
       "getNumberOfExtensionsThatNeedReview",

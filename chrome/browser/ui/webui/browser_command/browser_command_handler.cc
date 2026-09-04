@@ -46,9 +46,6 @@
 #include "components/performance_manager/public/features.h"
 #include "components/prefs/pref_service.h"
 #include "components/safe_browsing/content/browser/web_ui/safe_browsing_ui.h"
-#include "components/safe_browsing/core/common/safe_browsing_policy_handler.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
-#include "components/safe_browsing/core/common/safebrowsing_referral_methods.h"
 #include "components/saved_tab_groups/public/features.h"
 #include "components/split_tabs/split_tab_visual_data.h"
 #include "components/tabs/public/tab_interface.h"
@@ -103,16 +100,6 @@ void BrowserCommandHandler::CanExecuteCommand(
     case Command::kStartPasswordManagerTutorial:
       // Nothing to do.
       break;
-    case Command::kOpenSafetyCheck:
-      can_execute = !enterprise_util::IsBrowserManaged(profile_);
-      break;
-    case Command::kOpenSafeBrowsingEnhancedProtectionSettings: {
-      bool managed = safe_browsing::SafeBrowsingPolicyHandler::
-          IsSafeBrowsingProtectionLevelSetByPolicy(profile_->GetPrefs());
-      bool already_enabled =
-          safe_browsing::IsEnhancedProtectionEnabled(*(profile_->GetPrefs()));
-      can_execute = !managed && !already_enabled;
-    } break;
     case Command::kOpenFeedbackForm:
       can_execute = true;
       break;
@@ -136,9 +123,6 @@ void BrowserCommandHandler::CanExecuteCommand(
       can_execute = TutorialServiceExists() && DefaultSearchProviderIsGoogle();
       break;
     case Command::kOpenAISettings:
-      can_execute = true;
-      break;
-    case Command::kOpenSafetyCheckFromWhatsNew:
       can_execute = true;
       break;
     case Command::kOpenPaymentsSettings:
@@ -188,17 +172,6 @@ void BrowserCommandHandler::HandleCommandWithDisposition(
     case Command::kUnknownCommand:
       // Nothing to do.
       break;
-    case Command::kOpenSafetyCheck:
-      NavigateToURL(GURL(chrome::GetSettingsUrl(chrome::kSafetyCheckSubPage)),
-                    disposition);
-      base::RecordAction(
-          base::UserMetricsAction("NewTabPage_Promos_SafetyCheck"));
-      break;
-    case Command::kOpenSafeBrowsingEnhancedProtectionSettings:
-      NavigateToEnhancedProtectionSetting();
-      base::RecordAction(
-          base::UserMetricsAction("NewTabPage_Promos_EnhancedProtection"));
-      break;
     case Command::kOpenFeedbackForm:
       OpenFeedbackForm();
       break;
@@ -224,10 +197,6 @@ void BrowserCommandHandler::HandleCommandWithDisposition(
       break;
     case Command::kOpenAISettings:
       OpenAISettings();
-      break;
-    case Command::kOpenSafetyCheckFromWhatsNew:
-      NavigateToURL(GURL(chrome::GetSettingsUrl(chrome::kSafetyCheckSubPage)),
-                    disposition);
       break;
     case Command::kOpenPaymentsSettings:
       NavigateToURL(GURL(chrome::GetSettingsUrl(chrome::kPaymentsSubPage)),
@@ -288,12 +257,6 @@ void BrowserCommandHandler::StartTabGroupTutorial() {
                                      base::Unretained(this), tutorial_id);
     StartTutorial(std::move(params));
   }
-}
-
-void BrowserCommandHandler::NavigateToEnhancedProtectionSetting() {
-  chrome::ShowSafeBrowsingEnhancedProtectionWithIph(
-      ProfileBrowserCollection::GetForProfile(profile_)->GetLastActiveBrowser(),
-      safe_browsing::SafeBrowsingSettingReferralMethod::kPromoSlingerReferral);
 }
 
 void BrowserCommandHandler::OpenAISettings() {

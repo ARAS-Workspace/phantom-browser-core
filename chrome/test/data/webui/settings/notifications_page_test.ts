@@ -3,16 +3,14 @@
 // found in the LICENSE file.
 
 // clang-format off
-import {webUIListenerCallback} from 'chrome://resources/js/cr.js';
 import type {NotificationsPageElement} from 'chrome://settings/lazy_load.js';
-import {ContentSetting, ContentSettingsTypes, SiteSettingsBrowserProxyImpl, SafetyHubBrowserProxyImpl, SafetyHubEvent, SettingsState} from 'chrome://settings/lazy_load.js';
+import {ContentSetting, ContentSettingsTypes, SiteSettingsBrowserProxyImpl, SettingsState} from 'chrome://settings/lazy_load.js';
 import type {SettingsPrefsElement} from 'chrome://settings/settings.js';
-import {CrSettingsPrefs, loadTimeData, resetRouterForTesting, resetPageVisibilityForTesting} from 'chrome://settings/settings.js';
+import {CrSettingsPrefs} from 'chrome://settings/settings.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
-import {isChildVisible, isVisible} from 'chrome://webui-test/test_util.js';
+import {isVisible} from 'chrome://webui-test/test_util.js';
 import {flushTasks} from 'chrome://webui-test/polymer_test_util.js';
 
-import {TestSafetyHubBrowserProxy} from './test_safety_hub_browser_proxy.js';
 import {TestSiteSettingsBrowserProxy} from './test_site_settings_browser_proxy.js';
 import type {SiteSettingsPref} from './test_util.js';
 import {createContentSettingTypeToValuePair, createDefaultContentSetting, createSiteSettingsPrefs} from './test_util.js';
@@ -105,78 +103,5 @@ suite(`NotificationsPage`, function() {
     assertTrue(isVisible(cpssRadioGroup));
     assertEquals(
         SettingsState.CPSS, page.get('prefs.generated.notification.value'));
-  });
-});
-
-suite('NotificationPermissionReview', function() {
-  let page: NotificationsPageElement;
-  let siteSettingsBrowserProxy: TestSafetyHubBrowserProxy;
-
-  const oneElementMockData = [{
-    origin: 'www.example.com',
-    notificationInfoString: 'About 4 notifications a day',
-  }];
-
-  setup(function() {
-    document.body.innerHTML = window.trustedTypes!.emptyHTML;
-
-    siteSettingsBrowserProxy = new TestSafetyHubBrowserProxy();
-    SafetyHubBrowserProxyImpl.setInstance(siteSettingsBrowserProxy);
-    // return createPage();
-  });
-
-  teardown(function() {
-    page.remove();
-  });
-
-  function createPage() {
-    page = document.createElement('settings-notifications-page');
-    document.body.appendChild(page);
-    return flushTasks();
-  }
-
-  test('InvisibleWhenGuestMode', async function() {
-    loadTimeData.overrideValues({isGuest: true});
-    resetPageVisibilityForTesting();
-    resetRouterForTesting();
-    await createPage();
-
-    // The UI should remain invisible even when there's an event that the
-    // notification permissions may have changed.
-    webUIListenerCallback(
-        SafetyHubEvent.NOTIFICATION_PERMISSIONS_MAYBE_CHANGED,
-        oneElementMockData);
-    await flushTasks();
-    assertFalse(isChildVisible(page, '#safetyHubEntryPoint'));
-
-    // Set guest mode back to false.
-    loadTimeData.overrideValues({isGuest: false});
-    resetPageVisibilityForTesting();
-    resetRouterForTesting();
-  });
-
-  test('VisibilityWithChangingPermissionList', async function() {
-    // The element is not visible when there is nothing to review.
-    await createPage();
-    assertFalse(isChildVisible(page, '#safetyHubEntryPoint'));
-
-    // The element becomes visible if the list of permissions is no longer
-    // empty.
-    webUIListenerCallback(
-        SafetyHubEvent.NOTIFICATION_PERMISSIONS_MAYBE_CHANGED,
-        oneElementMockData);
-    await flushTasks();
-    assertTrue(isChildVisible(page, '#safetyHubEntryPoint'));
-
-    // Once visible, it remains visible regardless of list length.
-    webUIListenerCallback(
-        SafetyHubEvent.NOTIFICATION_PERMISSIONS_MAYBE_CHANGED, []);
-    await flushTasks();
-    assertTrue(isChildVisible(page, '#safetyHubEntryPoint'));
-    webUIListenerCallback(
-        SafetyHubEvent.NOTIFICATION_PERMISSIONS_MAYBE_CHANGED,
-        oneElementMockData);
-    await flushTasks();
-    assertTrue(isChildVisible(page, '#safetyHubEntryPoint'));
   });
 });

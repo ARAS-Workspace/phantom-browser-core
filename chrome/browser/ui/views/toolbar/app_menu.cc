@@ -50,8 +50,6 @@
 #include "chrome/browser/ui/hats/trust_safety_sentiment_service_factory.h"
 #include "chrome/browser/ui/layout_constants.h"
 #include "chrome/browser/ui/profiles/profile_view_utils.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_hats_service.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_hats_service_factory.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/toolbar/app_menu_model.h"
 #include "chrome/browser/ui/ui_features.h"
@@ -1466,22 +1464,6 @@ bool AppMenu::ShouldCloseOnDragDropCompleted() {
 }
 
 void AppMenu::OnMenuClosed(views::MenuItemView* menu) {
-  // If the menu contained a Safety Hub notification, mark as trigger for HaTS
-  // survey if the menu was open for at least 5 seconds.
-  static constexpr auto kSafetyHubCommandIds =
-      std::array{IDC_OPEN_SAFETY_HUB, IDC_SAFETY_HUB_MANAGE_EXTENSIONS};
-  const bool has_safety_hub_notification = std::ranges::any_of(
-      kSafetyHubCommandIds,
-      [&](int id) { return command_id_to_entry_.contains(id); });
-  if (has_safety_hub_notification &&
-      menu_opened_timer_.Elapsed() >= base::Seconds(5)) {
-    if (SafetyHubHatsService* hats_service =
-            SafetyHubHatsServiceFactory::GetForProfile(
-                browser_->GetProfile())) {
-      hats_service->SafetyHubNotificationSeen();
-    }
-  }
-
   on_menu_closed_callback_.Run();
 
   if (bookmark_menu_delegate_.get()) {

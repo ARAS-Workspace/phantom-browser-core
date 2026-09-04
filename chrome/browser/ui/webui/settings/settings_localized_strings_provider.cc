@@ -2058,11 +2058,6 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
 void AddSafetyHubStrings(content::WebUIDataSource* html_source) {
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
       {"safetyHub", IDS_SETTINGS_SAFETY_HUB},
-      {"safetyHubEntryPointHeader", IDS_SETTINGS_SAFETY_HUB_ENTRY_POINT_HEADER},
-      {"safetyHubEntryPointNothingToDo",
-       IDS_SETTINGS_SAFETY_HUB_ENTRY_POINT_NOTHING_TO_DO},
-      {"safetyHubEntryPointButtonLabel",
-       IDS_SETTINGS_SAFETY_HUB_ENTRY_POINT_BUTTON_LABEL},
       {"safetyHubPageCardSectionHeader",
        IDS_SETTINGS_SAFETY_HUB_PAGE_CARD_SECTION_HEADER},
       {"safetyHubPageModuleSectionHeader",

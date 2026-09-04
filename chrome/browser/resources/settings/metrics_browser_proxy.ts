@@ -121,30 +121,6 @@ export enum SafetyCheckUnusedSitePermissionsModuleInteractions {
 // LINT.ThenChange(//tools/metrics/histograms/metadata/settings/enums.xml:SafetyCheckUnusedSitePermissionsModuleInteractions)
 
 /**
- * Contains all entry points for Safety Hub page.
- *
- * These values are persisted to logs. Entries should not be renumbered and
- * numeric values should never be reused.
- *
- * Must be kept in sync with the SafetyHubEntryPoint enum in
- * histograms/enums.xml and safety_hub/safety_hub_constants.h.
- */
-// LINT.IfChange(SafetyHubEntryPoint)
-export enum SafetyHubEntryPoint {
-  PRIVACY_SAFE = 0,
-  PRIVACY_WARNING = 1,
-  SITE_SETTINGS = 2,
-  THREE_DOT_MENU = 3,
-  NOTIFICATIONS = 4,
-  // COUNT should be updated whenever new entries are added.
-  COUNT = 5,
-}
-// LINT.ThenChange(
-//   //tools/metrics/histograms/metadata/settings/enums.xml:SafetyHubEntryPoint,
-//   //chrome/browser/ui/safety_hub/safety_hub_constants.h:SafetyHubEntryPoint
-// )
-
-/**
  * Contains all Safety Hub modules.
  *
  * These values are persisted to logs. Entries should not be renumbered and
@@ -542,18 +518,6 @@ export interface MetricsBrowserProxy {
 
   /**
    * Helper function that calls recordHistogram for the
-   * Settings.SafetyHub.EntryPointShown histogram
-   */
-  recordSafetyHubEntryPointShown(page: SafetyHubEntryPoint): void;
-
-  /**
-   * Helper function that calls recordHistogram for the
-   *Settings.SafetyHub.EntryPointClicked histogram
-   */
-  recordSafetyHubEntryPointClicked(page: SafetyHubEntryPoint): void;
-
-  /**
-   * Helper function that calls recordHistogram for the
    * Settings.SafetyHub.DashboardWarning histogram
    */
   recordSafetyHubModuleWarningImpression(module: SafetyHubModuleType): void;
@@ -760,22 +724,6 @@ export class MetricsBrowserProxyImpl implements MetricsBrowserProxy {
     chrome.send(
         'metricsHandler:recordInHistogram',
         [histogramName, state, SafetyHubCardState.COUNT]);
-  }
-
-  recordSafetyHubEntryPointShown(page: SafetyHubEntryPoint) {
-    chrome.send('metricsHandler:recordInHistogram', [
-      'Settings.SafetyHub.EntryPointImpression',
-      page,
-      SafetyHubEntryPoint.COUNT,
-    ]);
-  }
-
-  recordSafetyHubEntryPointClicked(page: SafetyHubEntryPoint) {
-    chrome.send('metricsHandler:recordInHistogram', [
-      'Settings.SafetyHub.EntryPointInteraction',
-      page,
-      SafetyHubEntryPoint.COUNT,
-    ]);
   }
 
   recordSafetyHubModuleWarningImpression(module: SafetyHubModuleType) {

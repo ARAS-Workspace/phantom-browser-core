@@ -159,9 +159,7 @@
   E(kActionHelpPageViaMenu, IDC_HELP_PAGE_VIA_MENU) \
   E(kActionShowAppMenu, IDC_SHOW_APP_MENU) \
   E(kActionManageExtensions, IDC_MANAGE_EXTENSIONS) \
-  E(kActionSafetyHubManageExtensions, IDC_SAFETY_HUB_MANAGE_EXTENSIONS) \
   E(kActionFindExtensions, IDC_FIND_EXTENSIONS) \
-  E(kActionOpenSafetyHub, IDC_OPEN_SAFETY_HUB) \
   E(kActionChromeEnterpriseReleaseNotes, \
     IDC_CHROME_ENTERPRISE_RELEASE_NOTES) \
   E(kActionDevToolsInspect, IDC_DEV_TOOLS_INSPECT) \
@@ -188,8 +186,6 @@
   E(kActionShowAiModeOmniboxButton, IDC_SHOW_AI_MODE_OMNIBOX_BUTTON) \
   E(kActionRecordReplay) \
   E(kActionShowSearchTools, IDC_SHOW_SEARCH_TOOLS) \
-  E(kActionSafetyHubShowPasswordCheckup, \
-    IDC_SAFETY_HUB_SHOW_PASSWORD_CHECKUP) \
   E(kActionShowContactInfo, IDC_SHOW_CONTACT_INFO) \
   E(kActionShowIdentityDocs, IDC_SHOW_IDENTITY_DOCS) \
   E(kActionShowTravel, IDC_SHOW_TRAVEL) \

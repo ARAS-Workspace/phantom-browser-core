@@ -1633,12 +1633,6 @@ IN_PROC_BROWSER_TEST_F(SettingsNotificationsPageTest, NotificationsPage) {
           "runMochaSuite('NotificationsPage')");
 }
 
-IN_PROC_BROWSER_TEST_F(SettingsNotificationsPageTest,
-                       NotificationPermissionReview) {
-  RunTest("settings/notifications_page_test.js",
-          "runMochaSuite('NotificationPermissionReview')");
-}
-
 class SettingsGeolocationPageTest : public SettingsBrowserTest {};
 
 IN_PROC_BROWSER_TEST_F(SettingsGeolocationPageTest, GeolocationPage) {
@@ -1681,10 +1675,6 @@ using SettingsSafetyHubTest = SettingsBrowserTest;
 
 IN_PROC_BROWSER_TEST_F(SettingsSafetyHubTest, SafetyHubCard) {
   RunTest("settings/safety_hub_card_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSafetyHubTest, SafetyHubEntryPoint) {
-  RunTest("settings/safety_hub_entry_point_test.js", "mocha.run()");
 }
 
 IN_PROC_BROWSER_TEST_F(SettingsSafetyHubTest, SafetyHubModule) {
@@ -1814,18 +1804,6 @@ class SettingsSiteSettingsPageTest : public SettingsBrowserTest {
 IN_PROC_BROWSER_TEST_F(SettingsSiteSettingsPageTest, MAYBE_SiteSettingsPage) {
   RunTest("settings/site_settings_page_test.js",
           "runMochaSuite('SiteSettingsPage')");
-}
-
-// TODO(crbug.com/40884439): Flaky.
-#if BUILDFLAG(IS_LINUX) && !defined(NDEBUG)
-#define MAYBE_UnusedSitePermissionsReview DISABLED_UnusedSitePermissionsReview
-#else
-#define MAYBE_UnusedSitePermissionsReview UnusedSitePermissionsReview
-#endif
-IN_PROC_BROWSER_TEST_F(SettingsSiteSettingsPageTest,
-                       MAYBE_UnusedSitePermissionsReview) {
-  RunTest("settings/site_settings_page_test.js",
-          "runMochaSuite('UnusedSitePermissionsReview')");
 }
 
 IN_PROC_BROWSER_TEST_F(SettingsSiteSettingsPageTest,

@@ -115,7 +115,6 @@ enum class SafetyHubEntryPoint {
   kMaxValue = kNotificationSettings,
 };
 // LINT.ThenChange(
-//   //chrome/browser/resources/settings/metrics_browser_proxy.ts:SafetyHubEntryPoint,
 //   //tools/metrics/histograms/metadata/settings/enums.xml:SafetyHubEntryPoint
 // )
 

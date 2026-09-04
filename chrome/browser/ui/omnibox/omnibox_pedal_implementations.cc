@@ -26,10 +26,6 @@
 #include "components/vector_icons/vector_icons.h"
 #include "ui/base/ui_base_features.h"
 
-#if BUILDFLAG(IS_ANDROID)
-#include "base/android/device_info.h"
-#endif
-
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 #include "chrome/app/vector_icons/vector_icons.h"
 #endif
@@ -332,67 +328,6 @@ class OmniboxPedalUpdateChrome : public OmniboxPedal {
   ~OmniboxPedalUpdateChrome() override = default;
 };
 #endif  // !BUILDFLAG(IS_ANDROID)
-
-// =============================================================================
-
-class OmniboxPedalRunChromeSafetyCheck : public OmniboxPedal {
- public:
-  OmniboxPedalRunChromeSafetyCheck()
-      : OmniboxPedal(OmniboxPedalId::RUN_CHROME_SAFETY_CHECK,
-                     GetLabelStrings(),
-                     GetUrl()) {}
-
-  std::vector<SynonymGroupSpec> SpecifySynonymGroups(
-      bool locale_is_english) const override {
-    if (locale_is_english) {
-      return {
-          {
-              false,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_RUN_CHROME_SAFETY_CHECK_ONE_OPTIONAL_ACTIVATE,
-          },
-          {
-              false,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_RUN_CHROME_SAFETY_CHECK_ONE_OPTIONAL_GOOGLE_CHROME,
-          },
-          {
-              true,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_RUN_CHROME_SAFETY_CHECK_ONE_REQUIRED_CHECKUP,
-          },
-          {
-              true,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_RUN_CHROME_SAFETY_CHECK_ONE_REQUIRED_PASSWORDS,
-          },
-      };
-    } else {
-      return {
-          {
-              true,
-              true,
-              IDS_OMNIBOX_PEDAL_SYNONYMS_RUN_CHROME_SAFETY_CHECK_ONE_REQUIRED_RUN_CHROME_SAFETY_CHECK,
-          },
-      };
-    }
-  }
-
- protected:
-  ~OmniboxPedalRunChromeSafetyCheck() override = default;
-
-  LabelStrings GetLabelStrings() {
-      return LabelStrings(
-          IDS_OMNIBOX_PEDAL_RUN_CHROME_SAFETY_CHECK_V2_HINT,
-          IDS_OMNIBOX_PEDAL_RUN_CHROME_SAFETY_CHECK_V2_SUGGESTION_CONTENTS,
-          IDS_ACC_OMNIBOX_PEDAL_RUN_CHROME_SAFETY_CHECK_V2_SUFFIX,
-          IDS_ACC_OMNIBOX_PEDAL_RUN_CHROME_SAFETY_CHECK_V2);
-  }
-
-  GURL GetUrl() {
-    return GURL("chrome://settings/safetyCheck");
-  }
-};
 
 // =============================================================================
 
@@ -1993,9 +1928,6 @@ GetPedalImplementations(bool incognito, bool guest, bool testing) {
   }
   add(new OmniboxPedalUpdateCreditCard());
   add(new OmniboxPedalLaunchIncognito());
-  if (!base::android::device_info::is_automotive()) {
-    add(new OmniboxPedalRunChromeSafetyCheck());
-  }
   add(new OmniboxPedalPlayChromeDinoGame());
   add(new OmniboxPedalManageSiteSettings());
   add(new OmniboxPedalManageChromeSettings());
@@ -2011,7 +1943,6 @@ GetPedalImplementations(bool incognito, bool guest, bool testing) {
   add(new OmniboxPedalLaunchIncognito());
   add(new OmniboxPedalTranslate());
   add(new OmniboxPedalUpdateChrome());
-  add(new OmniboxPedalRunChromeSafetyCheck());
   add(new OmniboxPedalManageSecuritySettings());
   add(new OmniboxPedalManageCookies());
   add(new OmniboxPedalManageAddresses());

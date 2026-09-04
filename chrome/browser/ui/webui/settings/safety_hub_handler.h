@@ -36,15 +36,6 @@ class SafetyHubHandler : public settings::SettingsPageUIHandler,
                          public extensions::ExtensionPrefsObserver,
                          public extensions::ExtensionRegistryObserver {
  public:
-  enum class SafetyHubModule {
-    kExtensions,
-    kNotifications,
-    kPasswords,
-    kSafeBrowsing,
-    kUnusedSitePermissions,
-    kVersion
-  };
-
   explicit SafetyHubHandler(Profile* profile);
 
   ~SafetyHubHandler() override;
@@ -188,24 +179,12 @@ class SafetyHubHandler : public settings::SettingsPageUIHandler,
   // Fetches data for the version card to return data to the UI.
   base::DictValue GetVersionCardData();
 
-  // Returns the data for Safety Hub entry point.
-  void HandleGetSafetyHubEntryPointData(const base::ListValue& args);
-
-  // Returns true if Safety Hub has recommendations.
-  void HandleGetSafetyHubHasRecommendations(const base::ListValue& args);
-
-  // Returns the subheader for Safety Hub entry point in settings.
-  void HandleGetSafetyHubEntryPointSubheader(const base::ListValue& args);
-
   // Sends the list of notification permissions to review to the WebUI.
   void SendNotificationPermissionReviewList();
 
   // Creates the safety hub results object which tracks triggering
   // extensions.
   void InitSafetyHubExtensionResults();
-
-  // Returns the set of Safety Hub modules which require the user's attention.
-  std::set<SafetyHubModule> GetSafetyHubModulesWithRecommendations();
 
   // Calculate the number of extensions that need to be reviewed by the
   // user.

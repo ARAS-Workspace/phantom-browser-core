@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import {SuggestionsFromGeminiAction, SuggestionsFromGeminiEntryPoint, YourSavedInfoDataCategory, YourSavedInfoDataChip, YourSavedInfoRelatedService} from 'chrome://settings/settings.js';
-import type {AiPageComposeInteractions, AiPageHistorySearchInteractions, AiPageInteractions, AiPageSuggestionsInteractions, AutofillSettingsReferrer, DeleteBrowsingDataAction, MetricsBrowserProxy, PrivacyElementInteractions, PrivacyGuideInteractions, PrivacyGuideSettingsStates, PrivacyGuideStepsEligibleAndReached, SafetyCheckNotificationsModuleInteractions, SafetyCheckUnusedSitePermissionsModuleInteractions, SafetyHubCardState, SafetyHubEntryPoint, SafetyHubModuleType, SafetyHubSurfaces} from 'chrome://settings/settings.js';
+import type {AiPageComposeInteractions, AiPageHistorySearchInteractions, AiPageInteractions, AiPageSuggestionsInteractions, AutofillSettingsReferrer, DeleteBrowsingDataAction, MetricsBrowserProxy, PrivacyElementInteractions, PrivacyGuideInteractions, PrivacyGuideSettingsStates, PrivacyGuideStepsEligibleAndReached, SafetyCheckNotificationsModuleInteractions, SafetyCheckUnusedSitePermissionsModuleInteractions, SafetyHubCardState, SafetyHubModuleType, SafetyHubSurfaces} from 'chrome://settings/settings.js';
 import {TestBrowserProxy} from 'chrome://webui-test/test_browser_proxy.js';
 
 export class TestMetricsBrowserProxy extends TestBrowserProxy implements
@@ -22,8 +22,6 @@ export class TestMetricsBrowserProxy extends TestBrowserProxy implements
       'recordSafetyHubAbusiveNotificationPermissionRevocationInteractionsHistogram',
       'recordSafetyHubCardStateClicked',
       'recordSafetyHubDashboardAnyWarning',
-      'recordSafetyHubEntryPointClicked',
-      'recordSafetyHubEntryPointShown',
       'recordSafetyHubImpression',
       'recordSafetyHubInteraction',
       'recordSafetyHubModuleWarningImpression',
@@ -107,14 +105,6 @@ export class TestMetricsBrowserProxy extends TestBrowserProxy implements
 
   recordSafetyHubDashboardAnyWarning(visible: boolean) {
     this.methodCalled('recordSafetyHubDashboardAnyWarning', visible);
-  }
-
-  recordSafetyHubEntryPointClicked(page: SafetyHubEntryPoint) {
-    this.methodCalled('recordSafetyHubEntryPointClicked', page);
-  }
-
-  recordSafetyHubEntryPointShown(page: SafetyHubEntryPoint) {
-    this.methodCalled('recordSafetyHubModuleWarningImpression', page);
   }
 
   recordSafetyHubImpression(surface: SafetyHubSurfaces) {

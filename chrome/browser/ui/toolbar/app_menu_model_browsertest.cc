@@ -30,8 +30,6 @@
 #include "chrome/browser/ui/global_error/global_error.h"
 #include "chrome/browser/ui/global_error/global_error_service.h"
 #include "chrome/browser/ui/global_error/global_error_service_factory.h"
-#include "chrome/browser/ui/safety_hub/password_status_check_service.h"
-#include "chrome/browser/ui/safety_hub/password_status_check_service_factory.h"
 #include "chrome/browser/ui/safety_hub/safety_hub_test_util.h"
 #include "chrome/browser/ui/startup/default_browser_prompt/default_browser_prompt_manager.h"
 #include "chrome/browser/ui/tabs/recent_tabs_sub_menu_model.h"
@@ -842,60 +840,6 @@ IN_PROC_BROWSER_TEST_F(AppMenuModelTest, DisableSettingsItem) {
 }
 
 #endif  // BUILDFLAG(IS_CHROMEOS)
-
-class TestAppMenuModelSafetyHubTest : public AppMenuModelTest {
- public:
-  TestAppMenuModelSafetyHubTest() {
-    // Disruptive notification revocation disables the notification review
-    // module.
-    // TODO(https://crbug.com/496616827): Clean up this test when removing the
-    // notification review module logic.
-    scoped_feature_list_.InitAndDisableFeature(
-        features::kSafetyHubDisruptiveNotificationRevocation);
-  }
-
-  void SetUpBrowserContextKeyedServices(
-      content::BrowserContext* context) override {
-    AppMenuModelTest::SetUpBrowserContextKeyedServices(context);
-    CreateAndUseTestPasswordStore(context);
-  }
-
-  void SetUpOnMainThread() override {
-    AppMenuModelTest::SetUpOnMainThread();
-
-    // Let PasswordStatusCheckService run until it fetches the latest data.
-    PasswordStatusCheckService* password_service =
-        safety_hub_test_util::CreateAndUsePasswordStatusService(profile());
-
-    safety_hub_test_util::UpdatePasswordCheckServiceAsync(password_service);
-    EXPECT_EQ(password_service->compromised_credential_count(), 0UL);
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(TestAppMenuModelSafetyHubTest,
-                       SafetyHubMenuNotification) {
-  // When there is no issue identified by Safety Hub, there shouldn't be an
-  // entry in the AppMenu either.
-  AppMenuModel model(this, browser());
-  model.Init();
-  EXPECT_FALSE(model.GetIndexOfCommandId(IDC_OPEN_SAFETY_HUB).has_value());
-
-  safety_hub_test_util::GenerateSafetyHubMenuNotification(profile());
-
-  AppMenuModel new_model(this, browser());
-  new_model.Init();
-
-  // The notification should be shown with the correct label and command.
-  EXPECT_TRUE(new_model.GetIndexOfCommandId(IDC_OPEN_SAFETY_HUB).has_value());
-  const size_t menu_index =
-      new_model.GetIndexOfCommandId(IDC_OPEN_SAFETY_HUB).value();
-  new_model.ActivatedAt(menu_index);
-  EXPECT_TRUE(new_model.IsEnabledAt(menu_index));
-  EXPECT_FALSE(new_model.GetLabelAt(menu_index).empty());
-}
 
 class TabSearchMenuModelTest : public AppMenuModelTest {
  public:

@@ -69,10 +69,6 @@
 #include "chrome/browser/ui/managed_ui.h"
 #include "chrome/browser/ui/profiles/profile_colors_util.h"
 #include "chrome/browser/ui/profiles/profile_view_utils.h"
-#include "chrome/browser/ui/safety_hub/menu_notification_service_factory.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_constants.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_hats_service.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_hats_service_factory.h"
 #include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_context_menu_delegate.h"
 #include "chrome/browser/ui/side_panel/side_panel_action_callback.h"
 #include "chrome/browser/ui/side_panel/side_panel_enums.h"
@@ -1322,23 +1318,6 @@ void AppMenuModel::ExecuteCommand(int command_id, int event_flags) {
   }
 }
 
-void AppMenuModel::LogSafetyHubInteractionMetrics(
-    safety_hub::SafetyHubModuleType sh_module,
-    int event_flags) {
-  base::UmaHistogramEnumeration("Settings.SafetyHub.Interaction",
-                                safety_hub::SafetyHubSurfaces::kThreeDotMenu);
-  base::UmaHistogramEnumeration(
-      "Settings.SafetyHub.EntryPointInteraction",
-      safety_hub::SafetyHubEntryPoint::kMenuNotifications);
-  base::UmaHistogramEnumeration("Settings.SafetyHub.MenuNotificationClicked",
-                                sh_module);
-
-  if (SafetyHubHatsService* hats_service =
-          SafetyHubHatsServiceFactory::GetForProfile(browser_->GetProfile())) {
-    hats_service->SafetyHubNotificationClicked(sh_module);
-  }
-}
-
 void AppMenuModel::LogMenuMetrics(int command_id) {
   base::TimeDelta delta = timer_.Elapsed();
 
@@ -1931,30 +1910,6 @@ void AppMenuModel::LogMenuMetrics(int command_id) {
       }
       LogMenuAction(MENU_ACTION_SET_BROWSER_AS_DEFAULT);
       break;
-    case IDC_SAFETY_HUB_SHOW_PASSWORD_CHECKUP:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes(
-            "WrenchMenu.TimeToAction.SafetyHubNotificationPasswordCheck",
-            delta);
-      }
-      LogMenuAction(MENU_ACTION_SAFETY_HUB_SHOW_PASSWORD_CHECKUP);
-      break;
-    case IDC_OPEN_SAFETY_HUB:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes(
-            "WrenchMenu.TimeToAction.SafetyHubNotificationOpenSafetyHub",
-            delta);
-      }
-      LogMenuAction(MENU_ACTION_SHOW_SAFETY_HUB);
-      break;
-    case IDC_SAFETY_HUB_MANAGE_EXTENSIONS:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes(
-            "WrenchMenu.TimeToAction.SafetyHubNotificationManageExtensions",
-            delta);
-      }
-      LogMenuAction(MENU_ACTION_SAFETY_HUB_MANAGE_EXTENSIONS);
-      break;
     case IDC_TOGGLE_VERTICAL_TABS:
       if (auto* controller =
               tabs::VerticalTabStripStateController::From(browser_)) {
@@ -2083,8 +2038,7 @@ void AppMenuModel::Build() {
     }
   }
 
-  if (AddSafetyHubMenuItem() || AddGlobalErrorMenuItems() ||
-      AddDefaultBrowserMenuItems()) {
+  if (AddGlobalErrorMenuItems() || AddDefaultBrowserMenuItems()) {
     AddSeparator(ui::NORMAL_SEPARATOR);
   }
 
@@ -2431,37 +2385,6 @@ bool AppMenuModel::AddDefaultBrowserMenuItems() {
   }
 #endif
   return false;
-}
-
-bool AppMenuModel::AddSafetyHubMenuItem() {
-  auto* safety_hub_menu_notification_service =
-      SafetyHubMenuNotificationServiceFactory::GetForProfile(
-          browser_->GetProfile());
-  if (!safety_hub_menu_notification_service) {
-    return false;
-  }
-
-  std::optional<MenuNotificationEntry> notification =
-      safety_hub_menu_notification_service->GetNotificationToShow();
-  if (!notification.has_value()) {
-    return false;
-  }
-  base::UmaHistogramEnumeration("Settings.SafetyHub.Impression",
-                                safety_hub::SafetyHubSurfaces::kThreeDotMenu);
-  base::UmaHistogramEnumeration(
-      "Settings.SafetyHub.EntryPointImpression",
-      safety_hub::SafetyHubEntryPoint::kMenuNotifications);
-  base::UmaHistogramEnumeration("Settings.SafetyHub.MenuNotificationImpression",
-                                notification->module);
-  const auto safety_hub_icon = ui::ImageModel::FromVectorIcon(
-      features::IsRoundedIconsEnabled() ? kSecurityIcon : kSecurityOldIcon,
-      ui::kColorMenuIcon, kDefaultIconSize);
-  AddItemWithIcon(notification->command, notification->label, safety_hub_icon);
-  SetExecuteCallbackAt(
-      GetIndexOfCommandId(notification->command).value(),
-      base::BindRepeating(&AppMenuModel::LogSafetyHubInteractionMetrics,
-                          base::Unretained(this), notification->module));
-  return true;
 }
 
 #if BUILDFLAG(IS_CHROMEOS)

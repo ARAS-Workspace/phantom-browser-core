@@ -3784,21 +3784,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           base::BindRepeating(
               [](BrowserWindowInterface* bwi, actions::ActionItem* item,
                  actions::ActionInvocationContext context) {
-                chrome::ShowExtensions(bwi);
-              },
-              bwi),
-          kActionSafetyHubManageExtensions, IDS_MANAGE_EXTENSIONS,
-          IDS_MANAGE_EXTENSIONS,
-          features::IsRoundedIconsEnabled()
-              ? vector_icons::kChromeExtensionIcon
-              : vector_icons::kExtensionChromeRefreshOldIcon,
-          /*is_pinnable=*/false)
-          .Build());
-  root_action_item_->AddChild(
-      ChromeMenuAction(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
                 chrome::ShowWebStore(bwi, extension_urls::kAppMenuUtmSource);
               },
               bwi),
@@ -3806,19 +3791,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           features::IsRoundedIconsEnabled()
               ? vector_icons::kChromeExtensionIcon
               : vector_icons::kExtensionChromeRefreshOldIcon,
-          /*is_pinnable=*/false)
-          .Build());
-  root_action_item_->AddChild(
-      ChromeMenuAction(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::ShowSettingsSubPage(bwi, chrome::kSafetyHubSubPage);
-              },
-              bwi),
-          kActionOpenSafetyHub, IDS_SETTINGS_SAFETY_HUB,
-          IDS_SETTINGS_SAFETY_HUB,
-          features::IsRoundedIconsEnabled() ? kSecurityIcon : kSecurityOldIcon,
           /*is_pinnable=*/false)
           .Build());
   if (base::FeatureList::IsEnabled(features::kEnterpriseReleaseNotes)) {

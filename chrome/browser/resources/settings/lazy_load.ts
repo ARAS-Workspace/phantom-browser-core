@@ -11,7 +11,6 @@ import './clear_browsing_data_dialog/clear_browsing_data_dialog.js';
 import './clear_browsing_data_dialog/clear_browsing_data_time_picker.js';
 import './privacy_page/cookies_page.js';
 import './privacy_page/security/security_page_v2.js';
-import './safety_hub/safety_hub_entry_point.js';
 import './safety_hub/safety_hub_page.js';
 import './search_page/search_engines_page.js';
 import './simple_confirmation_dialog.js';
@@ -183,9 +182,8 @@ export {SettingsResetProfileDialogElement} from './reset_page/reset_profile_dial
 export {SettingsSafetyHubExtensionsModuleElement} from './safety_hub/extensions_module.js';
 export {SettingsSafetyHubNotificationPermissionsModuleElement} from './safety_hub/notification_permissions_module.js';
 export {CardState, PermissionsRevocationType, SafetyHubBrowserProxyImpl, SafetyHubEvent} from './safety_hub/safety_hub_browser_proxy.js';
-export type {CardInfo, EntryPointInfo, NotificationPermission, SafetyHubBrowserProxy, UnusedSitePermission, UnusedSitePermissions} from './safety_hub/safety_hub_browser_proxy.js';
+export type {CardInfo, NotificationPermission, SafetyHubBrowserProxy, UnusedSitePermission, UnusedSitePermissions} from './safety_hub/safety_hub_browser_proxy.js';
 export {SettingsSafetyHubCardElement} from './safety_hub/safety_hub_card.js';
-export {SettingsSafetyHubEntryPointElement} from './safety_hub/safety_hub_entry_point.js';
 export {SettingsSafetyHubModuleElement} from './safety_hub/safety_hub_module.js';
 export type {SiteInfo, SiteInfoWithTarget} from './safety_hub/safety_hub_module.js';
 export {SettingsSafetyHubPageElement} from './safety_hub/safety_hub_page.js';

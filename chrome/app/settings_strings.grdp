@@ -3499,9 +3499,6 @@
     <message name="IDS_SETTINGS_SAFETY_HUB" desc="Name of a page in settings that gives users an overview over their safety status and where users can take action to improve their safety.">
       Safety Check
     </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_ENTRY_POINT_BUTTON_LABEL" desc="This is the label of a button that takes users to the Safety Check page in Chrome settings. This button appears in a section in privacy settings, after the 'Safety Check' and 'Chrome found some safety recommendations for your review' strings. The words 'Safety Check' should be translated to match https://localizer.google.com/glossary/termset?gid=27517723&#38;tsid=4e021eb4 or if it's not available https://localizer.google.com/messages/details/ChromeClient/7810354727545555354. The tone should be terse, because we need this button to be as short as possible. If it is impossible to say 'Go to Safety Check' in 30 characters, you may translate this as 'Review'. (CHAR LIMIT = 30)">
-      Go to Safety Check
-    </message>
     <message name="IDS_SETTINGS_SAFETY_HUB_PAGE_CARD_SECTION_HEADER" desc="The title of the first section in the Safety Hub page. The 'Safety at a glance' section gives an overview about the current state of passwords, browser version and safe browsing setting of the browser. ">
       Safety at a glance
     </message>
@@ -3589,30 +3586,6 @@
     </message>
     <message name="IDS_SETTINGS_SAFETY_HUB_PASSWORDS_MODULE_NAME" desc="The entry point shown on the screenshot leads to Safety Check settings page (chrome://settings/safetyCheck) when at least on of the Safety Check modules have recommendations. The subheader of the entry point lists the modules with recommendations. This string is the upper case version (i.e. version that comes first in the sentence) for the name of passwords module.">
       Passwords
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_SAFE_BROWSING_MODULE_NAME" desc="The entry point shown on the screenshot leads to Safety Check settings page (chrome://settings/safetyCheck) when at least on of the Safety Check modules have recommendations. The subheader of the entry point lists the modules with recommendations. This string is the upper case version (i.e. version that comes first in the sentence) for the name of Safe Browsing module.">
-      Safe Browsing
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_EXTENSIONS_MODULE_UPPERCASE_NAME" desc="The entry point shown on the screenshot leads to Safety Check settings page (chrome://settings/safetyCheck) when at least on of the Safety Check modules have recommendations. The subheader of the entry point lists the modules with recommendations. This string is the upper case version (i.e. version that comes first in the sentence) for the name of extensions module.">
-      Extensions
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_EXTENSIONS_MODULE_LOWERCASE_NAME" desc="The entry point shown on the screenshot leads to Safety Check settings page (chrome://settings/safetyCheck) when at least on of the Safety Check modules have recommendations. The subheader of the entry point lists the modules with recommendations. This string is the lower case version (i.e. version that comes in the middle of the sentence) for the name of extensions module.">
-      extensions
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_NOTIFICATIONS_MODULE_UPPERCASE_NAME" desc="The entry point shown on the screenshot leads to Safety Check settings page (chrome://settings/safetyCheck) when at least on of the Safety Check modules have recommendations. The subheader of the entry point lists the modules with recommendations. This string is the upper case version (i.e. version that comes first in the sentence) for the name of notifications module.">
-      Notifications
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_NOTIFICATIONS_MODULE_LOWERCASE_NAME" desc="The entry point shown on the screenshot leads to Safety Check settings page (chrome://settings/safetyCheck) when at least on of the Safety Check modules have recommendations. The subheader of the entry point lists the modules with recommendations. This string is the lower case version (i.e. version that comes in the middle of the sentence) for the name of notifications module.">
-      notifications
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_PERMISSIONS_MODULE_UPPERCASE_NAME" desc="The entry point shown on the screenshot leads to Safety Check settings page (chrome://settings/safetyCheck) when at least on of the Safety Check modules have recommendations. The subheader of the entry point lists the modules with recommendations. This string is the upper case version (i.e. version that comes first in the sentence) for the name of permissions module.">
-      Permissions
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_PERMISSIONS_MODULE_LOWERCASE_NAME" desc="The entry point shown on the screenshot leads to Safety Check settings page (chrome://settings/safetyCheck) when at least on of the Safety Check modules have recommendations. The subheader of the entry point lists the modules with recommendations. This string is the lower case version (i.e. version that comes in the middle of the sentence) for the name of permissions module.">
-      permissions
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_MODULE_NAME_SEPARATOR" desc="The entry point shown on the screenshot leads to Safety Check settings page (chrome://settings/safetyCheck) when at least on of the Safety Check modules have recommendations. The subheader of the entry point lists the modules with recommendations using a separator between them (in English it is a comma used between all items in a series). This string is the separator between the module names and is used like 'Passwords, extensions, notifications'.">
-      ,
     </message>
 
 

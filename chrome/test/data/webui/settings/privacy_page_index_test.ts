@@ -93,8 +93,7 @@ suite('PrivacyPageIndex', function() {
 
   suite('Main', function() {
     test('Routing', async function() {
-      const defaultViews =
-          ['privacy', 'privacyGuidePromo', 'safetyHubEntryPoint'];
+      const defaultViews = ['privacy', 'privacyGuidePromo'];
 
       await testViewsForRoute(routes.PRIVACY, defaultViews);
       await testViewsForRoute(routes.BASIC, defaultViews);
@@ -106,7 +105,7 @@ suite('PrivacyPageIndex', function() {
         {
           route: routes.SAFETY_HUB,
           viewId: 'safetyHub',
-          parentViewId: 'safetyHubEntryPoint',
+          parentViewId: 'privacy',
         },
         {
           route: routes.SECURITY,

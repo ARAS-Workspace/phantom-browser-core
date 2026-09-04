@@ -3,17 +3,15 @@
 // found in the LICENSE file.
 
 // clang-format off
-import {webUIListenerCallback} from 'chrome://resources/js/cr.js';
 import {flush} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 import type {CrExpandButtonElement, SettingsSiteSettingsPageElement} from 'chrome://settings/lazy_load.js';
-import {ContentSetting, CookieControlsMode, ContentSettingsTypes, defaultSettingLabel, SettingsState, SafetyHubBrowserProxyImpl, SafetyHubEvent, SiteSettingsBrowserProxyImpl} from 'chrome://settings/lazy_load.js';
+import {ContentSetting, CookieControlsMode, ContentSettingsTypes, defaultSettingLabel, SettingsState, SiteSettingsBrowserProxyImpl} from 'chrome://settings/lazy_load.js';
 import type {CrLinkRowElement, Route, SettingsPrefsElement, SettingsToggleButtonElement} from 'chrome://settings/settings.js';
 import {CrSettingsPrefs, loadTimeData, Router, routes} from 'chrome://settings/settings.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {isChildVisible} from 'chrome://webui-test/test_util.js';
 import {flushTasks} from 'chrome://webui-test/polymer_test_util.js';
 
-import {TestSafetyHubBrowserProxy} from './test_safety_hub_browser_proxy.js';
 import {TestSiteSettingsBrowserProxy} from './test_site_settings_browser_proxy.js';
 import {createContentSettingTypeToValuePair, createDefaultContentSetting, createSiteSettingsPrefs} from './test_util.js';
 
@@ -259,83 +257,6 @@ suite('SiteSettingsPage', function() {
     flush();
     assertTrue(Boolean(page.get(
         'prefs.safety_hub.unused_site_permissions_revocation.enabled.value')));
-  });
-});
-
-const unusedSitePermissionMockData = [{
-  origin: 'www.example.com',
-  permissions: [ContentSettingsTypes.CAMERA],
-  expiration: '13317004800000000',  // Represents 2023-01-01T00:00:00.
-}];
-
-suite('UnusedSitePermissionsReview', function() {
-  let page: SettingsSiteSettingsPageElement;
-  let safetyHubBrowserProxy: TestSafetyHubBrowserProxy;
-
-  setup(async function() {
-    safetyHubBrowserProxy = new TestSafetyHubBrowserProxy();
-    SafetyHubBrowserProxyImpl.setInstance(safetyHubBrowserProxy);
-    document.body.innerHTML = window.trustedTypes!.emptyHTML;
-    page = document.createElement('settings-site-settings-page');
-    document.body.appendChild(page);
-    await flushTasks();
-  });
-
-  test('VisibilityWithChangingPermissionList', async function() {
-    // The element is not visible when there is nothing to review.
-    assertFalse(isChildVisible(page, '#safetyHubModule'));
-
-    // The element becomes visible if the list of permissions is no longer
-    // empty.
-    webUIListenerCallback(
-        SafetyHubEvent.UNUSED_PERMISSIONS_MAYBE_CHANGED,
-        unusedSitePermissionMockData);
-    await flushTasks();
-    assertTrue(isChildVisible(page, '#safetyHubModule'));
-
-    // Once visible, it remains visible regardless of list length.
-    webUIListenerCallback(SafetyHubEvent.UNUSED_PERMISSIONS_MAYBE_CHANGED, []);
-    await flushTasks();
-    assertTrue(isChildVisible(page, '#safetyHubModule'));
-
-    webUIListenerCallback(
-        SafetyHubEvent.UNUSED_PERMISSIONS_MAYBE_CHANGED,
-        unusedSitePermissionMockData);
-    await flushTasks();
-    assertTrue(isChildVisible(page, '#safetyHubModule'));
-  });
-
-  test('Button Click', async function() {
-    // The element becomes visible if the list of permissions isn't empty.
-    webUIListenerCallback(
-        SafetyHubEvent.UNUSED_PERMISSIONS_MAYBE_CHANGED,
-        unusedSitePermissionMockData);
-    await flushTasks();
-
-    const safetyHubButton =
-        page.shadowRoot!.querySelector<HTMLElement>('#safetyHubButton');
-    assertTrue(!!safetyHubButton);
-    safetyHubButton.click();
-    // Ensure the safety hub page is shown.
-    assertEquals(routes.SAFETY_HUB, Router.getInstance().getCurrentRoute());
-  });
-
-  test('InvisibleWhenGuestMode', async function() {
-    loadTimeData.overrideValues({
-      isGuest: true,
-    });
-
-    // The element is not visible since it is guest mode.
-    webUIListenerCallback(
-        SafetyHubEvent.UNUSED_PERMISSIONS_MAYBE_CHANGED,
-        unusedSitePermissionMockData);
-    await flushTasks();
-    assertFalse(isChildVisible(page, '#safetyHubModule'));
-
-    // Reset loadTimeData values.
-    loadTimeData.overrideValues({
-      isGuest: false,
-    });
   });
 });
 

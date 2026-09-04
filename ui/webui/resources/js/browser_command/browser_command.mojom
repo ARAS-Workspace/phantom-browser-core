@@ -16,8 +16,8 @@ module browser_command.mojom;
 // LINT.IfChange(Command)
 enum Command {
   kUnknownCommand = 0,
-  kOpenSafetyCheck = 1,
-  kOpenSafeBrowsingEnhancedProtectionSettings = 2,
+  // kOpenSafetyCheck = 1, - deprecated
+  // kOpenSafeBrowsingEnhancedProtectionSettings = 2, - deprecated
   kOpenFeedbackForm = 3,
   kOpenPrivacyGuide = 4,
   kStartTabGroupTutorial = 5,
@@ -28,7 +28,7 @@ enum Command {
   kStartPasswordManagerTutorial = 10,
   kStartSavedTabGroupTutorial = 11,
   kOpenAISettings = 12,
-  kOpenSafetyCheckFromWhatsNew = 13,
+  // kOpenSafetyCheckFromWhatsNew = 13, - deprecated
   kOpenPaymentsSettings = 14,
   // kOpenHistorySearchSettings = 15 - deprecated
   kOpenGlic = 16,

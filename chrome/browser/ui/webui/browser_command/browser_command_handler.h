@@ -91,7 +91,6 @@ class BrowserCommandHandler : public CommandUpdaterDelegate,
       user_education::TutorialService* tutorial_service);
   virtual void StartTutorial(StartTutorialInPage::Params params);
   virtual bool TutorialServiceExists();
-  virtual void NavigateToEnhancedProtectionSetting();
   virtual void OpenAISettings();
   virtual void OpenGlic();
   virtual void OpenGlicSettings();

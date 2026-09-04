@@ -16,17 +16,11 @@
 
   <template is="dom-if" if="[[showPage_(pageVisibility_.safetyHub)]]">
     <template is="dom-if" if="[[renderView_(
-        routes_.PRIVACY, currentRoute, inSearchMode)]]" update-when-false>
-      <settings-safety-hub-entry-point slot="view" id="safetyHubEntryPoint">
-      </settings-safety-hub-entry-point>
-    </template>
-
-    <template is="dom-if" if="[[renderView_(
         routes_.SAFETY_HUB, currentRoute, inSearchMode)]]"
         update-when-false>
       <!-- TODO(crbug.com/40267370): Make the page searchable.-->
       <settings-safety-hub-page slot="view" id="safetyHub" no-search
-          data-parent-view-id="safetyHubEntryPoint" prefs="{{prefs}}"
+          data-parent-view-id="privacy" prefs="{{prefs}}"
           route-path$="[[routes_.SAFETY_HUB.path]]">
       </settings-safety-hub-page>
     </template>

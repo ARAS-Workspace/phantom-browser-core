@@ -81,14 +81,6 @@ export enum CardState {
 //   //chrome/browser/resources/settings/metrics_browser_proxy.ts:SafetyHubCardState
 // )
 
-// The information for the entry point of the Safety Hub on Privacy and Security
-// page.
-export interface EntryPointInfo {
-  hasRecommendations: boolean;
-  header: string;
-  subheader: string;
-}
-
 export interface SafetyHubBrowserProxy {
   /**
    * Mark revoked permissions of unused sites as reviewed by the user so they
@@ -155,9 +147,6 @@ export interface SafetyHubBrowserProxy {
 
   /** Get the number of extensions that should be reviewed by the user. */
   getNumberOfExtensionsThatNeedReview(): Promise<number>;
-
-  /** Get the subheader for Safety Hub entry point in settings. */
-  getSafetyHubEntryPointData(): Promise<EntryPointInfo>;
 
   /* Record a visit to the Safety Hub page. */
   recordSafetyHubPageVisit(): void;
@@ -228,10 +217,6 @@ export class SafetyHubBrowserProxyImpl implements SafetyHubBrowserProxy {
 
   getNumberOfExtensionsThatNeedReview() {
     return sendWithPromise<number>('getNumberOfExtensionsThatNeedReview');
-  }
-
-  getSafetyHubEntryPointData() {
-    return sendWithPromise<EntryPointInfo>('getSafetyHubEntryPointData');
   }
 
   recordSafetyHubPageVisit() {

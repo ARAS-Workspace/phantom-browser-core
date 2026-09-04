@@ -4,7 +4,7 @@
 // found in the LICENSE file.
 
 // clang-format off
-import type {CardInfo, EntryPointInfo, NotificationPermission, SafetyHubBrowserProxy, UnusedSitePermissions} from 'chrome://settings/lazy_load.js';
+import type {CardInfo, NotificationPermission, SafetyHubBrowserProxy, UnusedSitePermissions} from 'chrome://settings/lazy_load.js';
 import {CardState} from 'chrome://settings/lazy_load.js';
 import {TestBrowserProxy} from 'chrome://webui-test/test_browser_proxy.js';
 // clang-format on
@@ -22,19 +22,12 @@ export class TestSafetyHubBrowserProxy extends TestBrowserProxy implements
     state: CardState.INFO,
   };
 
-  private dummyEntryPointInfo: EntryPointInfo = {
-    hasRecommendations: false,
-    header: 'Dummy Header',
-    subheader: 'Dummy Subheader',
-  };
-
   private unusedSitePermissions_: UnusedSitePermissions[] = [];
   private reviewNotificationList_: NotificationPermission[] = [];
   private numberOfExtensionsThatNeedReview_: number = 0;
   private passwordCardData_: CardInfo = this.dummyCardInfo;
   private safeBrowsingCardData_: CardInfo = this.dummyCardInfo;
   private versionCardData_: CardInfo = this.dummyCardInfo;
-  private entryPointData_: EntryPointInfo = this.dummyEntryPointInfo;
 
   constructor() {
     super([
@@ -53,7 +46,6 @@ export class TestSafetyHubBrowserProxy extends TestBrowserProxy implements
       'getPasswordCardData',
       'getSafeBrowsingCardData',
       'getVersionCardData',
-      'getSafetyHubEntryPointData',
       'dismissActiveMenuNotification',
       'recordSafetyHubPageVisit',
       'recordSafetyHubInteraction',
@@ -154,14 +146,6 @@ export class TestSafetyHubBrowserProxy extends TestBrowserProxy implements
 
   setVersionCardData(data: CardInfo): void {
     this.versionCardData_ = data;
-  }
-
-  getSafetyHubEntryPointData() {
-    return Promise.resolve(this.entryPointData_);
-  }
-
-  setSafetyHubEntryPointData(value: EntryPointInfo) {
-    this.entryPointData_ = value;
   }
 
   dismissActiveMenuNotification() {

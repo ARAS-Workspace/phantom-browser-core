@@ -4,7 +4,6 @@
 
 import 'chrome://resources/cr_elements/cr_view_manager/cr_view_manager.js';
 import '/shared/settings/prefs/prefs.js';
-import '../safety_hub/safety_hub_entry_point.js';
 import '../settings_page/settings_section.js';
 import '../settings_shared.css.js';
 import './privacy_page.js';
@@ -188,13 +187,7 @@ export class SettingsPrivacyPageIndexElement extends
   }
 
   private getDefaultViews_(): string[] {
-    const defaultViews = ['privacy'];
-
-    if (this.showPage_(this.pageVisibility_.safetyHub)) {
-      defaultViews.push('safetyHubEntryPoint');
-    }
-
-    return defaultViews;
+    return ['privacy'];
   }
 
   private isRouteHostedWithinPrivacyView_(route: Route): boolean {

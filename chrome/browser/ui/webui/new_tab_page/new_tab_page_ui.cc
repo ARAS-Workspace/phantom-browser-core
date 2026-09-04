@@ -1272,8 +1272,6 @@ void NewTabPageUI::CreateBrowserCommandHandler(
 #if !BUILDFLAG(IS_ANDROID)
   using browser_command::mojom::Command;
   std::vector<Command> supported_commands = {
-      Command::kOpenSafetyCheck,
-      Command::kOpenSafeBrowsingEnhancedProtectionSettings,
       Command::kNoOpCommand,
   };
   promo_browser_command_handler_ = std::make_unique<BrowserCommandHandler>(
