@@ -83,7 +83,6 @@ class ProfileMenuView : public ProfileMenuViewBase {
   void OnGuestProfileButtonClicked();
   void OnExitProfileButtonClicked();
   void OnSyncSettingsButtonClicked();
-  void OnGoogleServicesSettingsButtonClicked();
   void OnAccountSettingsButtonClicked();
   void OnSyncErrorButtonClicked(syncer::SyncService::UserActionableError error);
   void OnPasskeyUnlockButtonClicked();
@@ -95,7 +94,6 @@ class ProfileMenuView : public ProfileMenuViewBase {
   void OnAddNewProfileButtonClicked();
   void OnManageProfilesButtonClicked();
   void OnEditProfileButtonClicked();
-  void OnYourSavedInfoSettingsButtonClicked();
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   void OnCrossDeviceSigninButtonClicked();
 #endif
@@ -113,11 +111,9 @@ class ProfileMenuView : public ProfileMenuViewBase {
   // Helper methods for building the menu.
   void SetMenuTitleForAccessibility();
   void BuildGuestIdentity();
-  void BuildAutofillSettingsButton();
   void BuildCustomizeProfileButton();
   void MaybeBuildChromeAccountSettingsButtonWithSync();
   void MaybeBuildChromeAccountSettingsButton();
-  void MaybeBuildGoogleServicesSettingsButton();
   void MaybeBuildManageGoogleAccountButton();
   void MaybeBuildCloseBrowsersButton();
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)

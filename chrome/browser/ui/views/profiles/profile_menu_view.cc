@@ -71,8 +71,6 @@
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
-#include "components/autofill/core/browser/metrics/autofill_settings_metrics.h"
-#include "components/autofill/core/common/autofill_features.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/signin/core/browser/account_preview_data_service.h"
 #include "components/signin/public/base/consent_level.h"
@@ -297,14 +295,6 @@ void ProfileMenuView::OnSyncSettingsButtonClicked() {
   chrome::ShowSettingsSubPage(&browser(), chrome::kSyncSetupSubPage);
 }
 
-void ProfileMenuView::OnGoogleServicesSettingsButtonClicked() {
-  OnActionableItemClicked(ActionableItem::kGoogleServicesSettingsButton);
-  if (!perform_menu_actions()) {
-    return;
-  }
-  chrome::ShowSettingsSubPage(&browser(), chrome::kGoogleServicesSubpage);
-}
-
 void ProfileMenuView::OnAccountSettingsButtonClicked() {
   OnActionableItemClicked(ActionableItem::kAccountSettingsButton);
   if (!perform_menu_actions()) {
@@ -515,17 +505,6 @@ void ProfileMenuView::OnEditProfileButtonClicked() {
     return;
   }
   chrome::ShowSettingsSubPage(&browser(), chrome::kManageProfileSubPage);
-}
-
-void ProfileMenuView::OnYourSavedInfoSettingsButtonClicked() {
-  OnActionableItemClicked(ActionableItem::kAutofillSettingsButton);
-  if (!perform_menu_actions()) {
-    return;
-  }
-  base::UmaHistogramEnumeration(
-      "Autofill.YourSavedInfoSettingsPage.VisitReferrer",
-      autofill::autofill_metrics::AutofillSettingsReferrer::kProfileMenu);
-  chrome::ShowSettingsSubPage(&browser(), chrome::kAutofillSubPage);
 }
 
 void ProfileMenuView::SetMenuTitleForAccessibility() {
@@ -916,21 +895,6 @@ void ProfileMenuView::BuildIdentityWithCallToAction() {
   SetProfileIdentityWithCallToAction(GetIdentitySectionParams(*entry));
 }
 
-void ProfileMenuView::BuildAutofillSettingsButton() {
-  CHECK(!profile().IsGuestSession());
-
-  int message_id = IDS_PROFILE_MENU_AUTOFILL_SETTINGS_BUTTON;
-  const gfx::VectorIcon& icon = features::IsRoundedIconsEnabled()
-                                    ? vector_icons::kPasswordManagerIcon
-                                    : vector_icons::kPasswordManagerOldIcon;
-
-  AddFeatureButton(l10n_util::GetStringUTF16(message_id),
-                   base::BindRepeating(
-                       &ProfileMenuView::OnYourSavedInfoSettingsButtonClicked,
-                       base::Unretained(this)),
-                   icon);
-}
-
 void ProfileMenuView::BuildCustomizeProfileButton() {
   CHECK(!profile().IsGuestSession());
   AddFeatureButton(
@@ -1011,30 +975,6 @@ void ProfileMenuView::MaybeBuildChromeAccountSettingsButtonWithSync() {
       base::BindRepeating(&ProfileMenuView::OnSyncSettingsButtonClicked,
                           base::Unretained(this)),
       *icon);
-}
-
-void ProfileMenuView::MaybeBuildGoogleServicesSettingsButton() {
-  CHECK(!profile().IsGuestSession());
-
-  signin::IdentityManager* identity_manager =
-      IdentityManagerFactory::GetForProfile(&profile());
-
-  if (!identity_manager) {
-    return;
-  }
-
-  // Show the services settings button  if signin is disallowed.
-  if (profile().GetPrefs()->GetBoolean(prefs::kSigninAllowed)) {
-    return;
-  }
-  AddFeatureButton(
-      l10n_util::GetStringUTF16(IDS_PROFILE_MENU_OPEN_ACCOUNT_SETTINGS),
-      base::BindRepeating(
-          &ProfileMenuView::OnGoogleServicesSettingsButtonClicked,
-          base::Unretained(this)),
-      features::IsRoundedIconsEnabled()
-          ? vector_icons::kSettingsIcon
-          : vector_icons::kSettingsChromeRefreshOldIcon);
 }
 
 void ProfileMenuView::MaybeBuildManageGoogleAccountButton() {
@@ -1159,7 +1099,6 @@ void ProfileMenuView::BuildFeatureButtons() {
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
   signin::IdentityManager* identity_manager =
       IdentityManagerFactory::GetForProfile(&profile());
-  BuildAutofillSettingsButton();
   MaybeBuildManageGoogleAccountButton();
   BuildCustomizeProfileButton();
   (syncer::IsReplaceSyncPromosWithSignInPromosEnabled() &&
@@ -1167,9 +1106,6 @@ void ProfileMenuView::BuildFeatureButtons() {
     !identity_manager->HasPrimaryAccount(signin::ConsentLevel::kSync)))
       ? MaybeBuildChromeAccountSettingsButton()
       : MaybeBuildChromeAccountSettingsButtonWithSync();
-  if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-    MaybeBuildGoogleServicesSettingsButton();
-  }
   MaybeBuildCloseBrowsersButton();
   MaybeBuildSignoutButton();
 }
