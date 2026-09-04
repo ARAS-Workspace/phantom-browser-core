@@ -7,13 +7,11 @@
 #include <memory>
 #include <utility>
 
-#include "base/command_line.h"
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/no_destructor.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/first_run/first_run.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_selections.h"
 #include "chrome/browser/profiles/profiles_state.h"
@@ -22,7 +20,6 @@
 #include "chrome/browser/ui/profiles/profile_customization_util.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_utils.h"
-#include "chrome/common/chrome_switches.h"
 #include "chrome/common/pref_names.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
@@ -33,33 +30,6 @@
 #include "content/public/browser/browser_context.h"
 
 namespace {
-bool IsFirstRunEligibleProfile(Profile* profile) {
-  if (profile->IsOffTheRecord()) {
-    return false;
-  }
-
-  // The parent guest and the profiles in a ChromeOS Guest session get through
-  // the OTR check above.
-  if (profile->IsGuestSession()) {
-    return false;
-  }
-
-  return true;
-}
-
-bool IsFirstRunEligibleProcess() {
-  if (!first_run::IsChromeFirstRun()) {
-    return false;
-  }
-
-  // TODO(crbug.com/40232971): `IsChromeFirstRun()` should be a sufficient check
-  // for Dice platforms. We currently keep this because some tests add
-  // `--force-first-run` while keeping `--no-first-run`. We should updated the
-  // affected tests to handle correctly the FRE opening instead of a tab.
-  return !base::CommandLine::ForCurrentProcess()->HasSwitch(
-      switches::kNoFirstRun);
-}
-
 void SetFirstRunFinished(FirstRunService::FinishedReason reason) {
   PrefService* local_state = g_browser_process->local_state();
   local_state->SetBoolean(prefs::kFirstRunFinished, true);
@@ -315,6 +285,5 @@ FirstRunServiceFactory::BuildServiceInstanceForBrowserContext(
 // Helpers ---------------------------------------------------------------------
 
 bool ShouldOpenFirstRun(Profile* profile) {
-  return IsFirstRunEligibleProcess() && IsFirstRunEligibleProfile(profile) &&
-         !IsFirstRunMarkedFinishedInPrefs();
+  return false;
 }
