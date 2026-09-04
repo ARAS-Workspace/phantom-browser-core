@@ -508,7 +508,6 @@ inline constexpr char kChromeUIProfilePickerUrl[] = "chrome://profile-picker/";
 inline constexpr char kChromeUIHistorySyncOptinHost[] = "history-sync-optin";
 inline constexpr char kChromeUIHistorySyncOptinURL[] =
     "chrome://history-sync-optin/";
-inline constexpr char kChromeUIUpdaterHost[] = "updater";
 #endif
 
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)

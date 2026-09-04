@@ -6562,9 +6562,6 @@ test("unit_tests") {
 
     if (is_linux || is_mac || is_win) {
       deps += [
-        "//chrome/browser/ui/webui/updater",
-        "//chrome/browser/ui/webui/updater:mojo_bindings",
-        "//chrome/browser/ui/webui/updater:unit_tests",
         "//chrome/enterprise_companion:constants_prod",
       ]
       if (is_mac) {

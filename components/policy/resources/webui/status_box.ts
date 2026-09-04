@@ -53,12 +53,6 @@ export class StatusBoxElement extends CrLitElement {
 
     return [
       {
-        label: loadTimeData.getString('labelVersion'),
-        value: this.status.version || '',
-        className: 'version',
-        show: this.scope === 'updater' && !!this.status.version,
-      },
-      {
         label: loadTimeData.getString('labelMachineEnrollmentMachineName'),
         value: this.status.machine || '',
         className: 'machine-enrollment-name',
@@ -69,7 +63,6 @@ export class StatusBoxElement extends CrLitElement {
         value: this.status.domain || '',
         className: 'machine-enrollment-domain',
         show: this.scope === 'machine' ||
-            (this.scope === 'updater' && !!this.status.domain) ||
             (this.scope !== 'device' && hasEnrollmentToken),
       },
       {
@@ -77,8 +70,7 @@ export class StatusBoxElement extends CrLitElement {
         value: this.status.enrollmentToken || '',
         className: 'machine-enrollment-token',
         show: this.scope === 'machine' ||
-            (this.scope !== 'device' && this.scope !== 'updater' &&
-             hasEnrollmentToken),
+            (this.scope !== 'device' && hasEnrollmentToken),
       },
       {
         label: loadTimeData.getString('labelMachineEntrollmentDeviceId'),
@@ -91,7 +83,7 @@ export class StatusBoxElement extends CrLitElement {
         value: this.status.username ?? this.getNotSpecified(),
         className: 'username',
         show: this.scope !== 'device' && this.scope !== 'machine' &&
-            this.scope !== 'updater' && !hasEnrollmentToken,
+            !hasEnrollmentToken,
       },
       {
         label: loadTimeData.getString('labelManagedBy'),
@@ -104,21 +96,19 @@ export class StatusBoxElement extends CrLitElement {
         value: this.status.gaiaId || this.getNotSpecified(),
         className: 'gaia-id',
         show: this.scope !== 'device' && this.scope !== 'machine' &&
-            this.scope !== 'updater' && !hasEnrollmentToken,
+            !hasEnrollmentToken,
       },
       {
         label: loadTimeData.getString('labelClientId'),
         value: this.status.clientId || '',
         className: 'client-id',
-        show: this.scope === 'device' ||
-            (this.scope !== 'machine' && this.scope !== 'updater'),
+        show: this.scope === 'device' || this.scope !== 'machine',
       },
       {
         label: loadTimeData.getString('labelProfileId'),
         value: this.status.profileId ?? this.getNotSpecified(),
         className: 'profile-id',
-        show: this.scope !== 'device' && this.scope !== 'machine' &&
-            this.scope !== 'updater',
+        show: this.scope !== 'device' && this.scope !== 'machine',
       },
       {
         label: loadTimeData.getString('labelAssetId'),
@@ -142,14 +132,13 @@ export class StatusBoxElement extends CrLitElement {
         label: loadTimeData.getString('labelRefreshInterval'),
         value: this.status.refreshInterval || '',
         className: 'refresh-interval',
-        show: this.scope !== 'updater' && !!this.status.refreshInterval,
+        show: !!this.status.refreshInterval,
       },
       {
         label: loadTimeData.getString('labelPoliciesPush'),
         value: this.getPolicyPushString(),
         className: 'policy-push',
-        show: this.scope !== 'updater' &&
-            this.status.policiesPushAvailable !== null &&
+        show: this.status.policiesPushAvailable !== null &&
             this.status.policiesPushAvailable !== undefined,
       },
       {
@@ -157,8 +146,7 @@ export class StatusBoxElement extends CrLitElement {
         value: this.getIsAffiliatedString(),
         className: 'is-affiliated',
         show: this.scope !== 'device' && this.scope !== 'machine' &&
-            this.scope !== 'updater' && !hasEnrollmentToken &&
-            this.status.isAffiliated !== null &&
+            !hasEnrollmentToken && this.status.isAffiliated !== null &&
             this.status.isAffiliated !== undefined,
       },
       {
@@ -200,7 +188,7 @@ export class StatusBoxElement extends CrLitElement {
         label: loadTimeData.getString('labelStatus'),
         value: this.status.status || '',
         className: 'status',
-        show: this.scope !== 'updater' && !!this.status.status,
+        show: !!this.status.status,
       },
       {
         label: loadTimeData.getString('labelError') + ':',

@@ -240,7 +240,6 @@ source_set("configs") {
     deps += [
       "//chrome/browser/ui/webui/browser_switch",
       "//chrome/browser/ui/webui/on_device_translation_internals",
-      "//chrome/browser/ui/webui/updater",
     ]
   }
 

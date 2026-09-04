@@ -66,10 +66,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-#include "chrome/browser/google/google_update_policy_fetcher.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ash/login/test/device_state_mixin.h"
 #include "chrome/browser/ash/login/test/logged_in_user_mixin.h"
@@ -243,16 +239,6 @@ void PolicyUITestBase::VerifyPolicies(
     std::vector<std::vector<std::string>> expected_policies) {
   ASSERT_TRUE(
       content::NavigateToURL(web_contents(), GURL(chrome::kChromeUIPolicyURL)));
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-  // Google Update policies are fetched asynchronously and always displayed
-  // eventually.
-  for (const auto& key_value : GetGoogleUpdatePolicySchemas()) {
-    expected_policies.push_back(
-        PopulateExpectedPolicy(key_value.first, std::string(), std::string(),
-                               nullptr, false, "updater"));
-  }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
 
   // Retrieve the text contents of the policy table cells for all policies.
   // Policy rendering is async under Mojo. Poll to avoid race conditions with

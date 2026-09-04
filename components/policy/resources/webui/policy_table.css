@@ -104,11 +104,6 @@ a {
   text-decoration: underline;
 }
 
-.updater-link {
-  font-size: smaller;
-  margin-inline-start: 10px;
-}
-
 .toggle {
   cursor: pointer;
 }

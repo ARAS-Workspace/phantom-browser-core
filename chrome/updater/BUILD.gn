@@ -570,7 +570,6 @@ if (is_win || is_mac || is_linux) {
       "//chrome/browser/component_updater:unit_tests",
       "//chrome/browser/ui",
       "//chrome/browser/ui/webui/help:*",
-      "//chrome/browser/ui/webui/updater:*",
       "//chrome/browser/updater:*",
       "//chrome/enterprise_companion:*",
       "//chrome/enterprise_companion/device_management_storage:*",

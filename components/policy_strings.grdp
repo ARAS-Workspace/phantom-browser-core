@@ -522,11 +522,6 @@ Additional details:
   <message name="IDS_POLICY_STATUS_MACHINE" desc="Title for the machine policy status box.">
     Machine policies
   </message>
- <if expr="is_win or is_macosx or is_linux">
-  <message name="IDS_POLICY_STATUS_UPDATER" desc="Title for the updater policy status box on windows.">
-    Google Update
-  </message>
- </if>
   <message name="IDS_POLICY_STATUS_ERROR_MANAGED_NO_POLICY" desc="Message to display when a managed device does not have a policy loaded.">
     Managed user or device has no policy loaded.
   </message>

@@ -10,8 +10,6 @@ source_set("google") {
   sources = [
     "google_brand.cc",
     "google_brand.h",
-    "google_update_policy_fetcher.cc",
-    "google_update_policy_fetcher.h",
   ]
 
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
@@ -19,7 +17,6 @@ source_set("google") {
   deps = [
     "//base",
     "//chrome/common:constants",
-    "//components/policy/core/browser",
     "//components/policy/core/common",
     "//components/prefs",
     "//content/public/browser",
@@ -80,7 +77,6 @@ source_set("unit_tests") {
   testonly = true
 
   sources = [
-    "google_update_policy_fetcher_unittest.cc",
     "google_update_settings_unittest.cc",
   ]
 
@@ -90,8 +86,6 @@ source_set("unit_tests") {
     "//base/test:test_support",
     "//chrome/common:constants",
     "//chrome/installer/util:with_no_strings",
-    "//components/policy/core/common",
-    "//content/test:test_support",
     "//testing/gtest",
   ]
 

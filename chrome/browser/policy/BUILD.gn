@@ -1474,23 +1474,6 @@ source_set("impl") {
     deps += [ "//chrome/browser:app_controller_mac" ]
   }
 
-  if (is_win || is_mac) {
-    sources += [
-      "status_provider/updater_status_and_value_provider.cc",
-      "status_provider/updater_status_and_value_provider.h",
-    ]
-    deps += [
-      "//chrome/browser/google",
-      "//chrome/browser/updater",
-    ]
-    if (is_win) {
-      sources += [ "status_provider/updater_status_and_value_provider_win.cc" ]
-    }
-    if (is_mac) {
-      sources += [ "status_provider/updater_status_and_value_provider_mac.cc" ]
-    }
-  }
-
   if (is_linux || is_win || is_mac || is_chromeos) {
     sources += [
       "battery_saver_policy_handler.cc",

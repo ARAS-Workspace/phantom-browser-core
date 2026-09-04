@@ -1336,7 +1336,6 @@ source_set("core") {
       "//chrome/browser/ui/startup/default_browser_prompt",
       "//chrome/browser/ui/webui/app_settings",
       "//chrome/browser/ui/webui/on_device_translation_internals",
-      "//chrome/browser/ui/webui/updater",
     ]
   }
 
@@ -3548,7 +3547,6 @@ source_set("browser") {
       "//chrome/browser/ui/webui/app_settings",
       "//chrome/browser/ui/webui/app_settings:impl",
       "//chrome/browser/ui/webui/signin/history_sync_optin:mojo_bindings",
-      "//chrome/browser/ui/webui/updater:mojo_bindings",
       "//chrome/browser/updates:impl",
       "//chrome/browser/updates:update_metrics",
       "//chrome/updater:browser_sources",
@@ -3591,7 +3589,6 @@ source_set("browser") {
       "//chrome/browser/browser_switcher",
       "//chrome/browser/browser_switcher:impl",
       "//chrome/browser/ui/webui/on_device_translation_internals",
-      "//chrome/browser/ui/webui/updater",
     ]
   }
 

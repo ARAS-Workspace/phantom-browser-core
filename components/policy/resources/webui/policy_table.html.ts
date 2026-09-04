@@ -12,12 +12,6 @@ export function getHtml(this: PolicyTableElement) {
 <div class="policy-table" role="table" aria-labelledby="policy-header">
   <h2 class="header" id="policy-header">
     ${this.dataModel?.name}
-    ${this.dataModel?.id === 'updater' ? html`
-      <a href="chrome://updater" class="updater-link" target="_blank"
-          rel="noopener noreferrer">
-        (chrome://updater)
-      </a>
-    ` : ''}
   </h2>
   <p class="id" ?hidden="${!this.dataModel?.isExtension}">
     ${this.dataModel?.id}

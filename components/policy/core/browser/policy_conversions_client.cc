@@ -470,16 +470,6 @@ bool PolicyConversionsClient::GetUserPoliciesEnabled() const {
   return user_policies_enabled_;
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-base::DictValue PolicyConversionsClient::ConvertUpdaterPolicies(
-    PolicyMap updater_policies,
-    std::optional<PolicyConversions::PolicyToSchemaMap>
-        updater_policy_schemas) {
-  return GetPolicyValues(updater_policies, nullptr, PoliciesSet(),
-                         PoliciesSet(), updater_policy_schemas);
-}
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-
 std::string PolicyConversionsClient::GetPolicyScope(
     const std::string& policy_name,
     const PolicyScope& policy_scope) const {

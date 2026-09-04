@@ -168,7 +168,6 @@ void CreateAndAddPolicyUIHtmlSource(Profile* profile) {
       {"labelTimeSinceLastRefresh", IDS_POLICY_LABEL_TIME_SINCE_LAST_REFRESH},
       {"labelUsername", IDS_POLICY_LABEL_USERNAME},
       {"labelManagedBy", IDS_POLICY_LABEL_MANAGED_BY},
-      {"labelVersion", IDS_POLICY_LABEL_VERSION},
       {"moreActions", IDS_POLICY_MORE_ACTIONS},
       {"noPoliciesSet", IDS_POLICY_NO_POLICIES_SET},
       {"offHoursActive", IDS_POLICY_OFFHOURS_ACTIVE},
@@ -188,9 +187,6 @@ void CreateAndAddPolicyUIHtmlSource(Profile* profile) {
       {"statusFlexOrgNoPolicy", IDS_POLICY_STATUS_FLEX_ORG_NO_POLICY},
       {"statusDevice", IDS_POLICY_STATUS_DEVICE},
       {"statusMachine", IDS_POLICY_STATUS_MACHINE},
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-      {"statusUpdater", IDS_POLICY_STATUS_UPDATER},
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       {"statusUser", IDS_POLICY_STATUS_USER},
 #if !BUILDFLAG(IS_CHROMEOS)
       {"uploadReport", IDS_UPLOAD_REPORT},

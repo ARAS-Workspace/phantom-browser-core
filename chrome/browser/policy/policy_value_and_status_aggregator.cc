@@ -44,10 +44,6 @@
 #include "components/prefs/pref_service.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-#include "chrome/browser/policy/status_provider/updater_status_and_value_provider.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "chrome/browser/policy/cloud/extension_install_policy_service_factory.h"
 #include "chrome/browser/policy/value_provider/extension_install_policies_value_provider.h"
@@ -149,10 +145,6 @@ const char kDeviceStatusKey[] = "device";
 constexpr char kMachineStatusKey[] = "machine";
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-constexpr char kUpdaterStatusKey[] = "updater";
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-
 std::unique_ptr<PolicyValueAndStatusAggregator>
 PolicyValueAndStatusAggregator::CreateDefaultPolicyValueAndStatusAggregator(
     Profile* profile) {
@@ -209,13 +201,6 @@ PolicyValueAndStatusAggregator::CreateDefaultPolicyValueAndStatusAggregator(
         kMachineStatusKey, GetMachinePolicyStatusProvider(manager));
   }
 #endif  // !BUILDFLAG(IS_CHROMEOS)
-
-  // Updater policies.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-  aggregator->AddPolicyStatusAndValueProvider(
-      kUpdaterStatusKey,
-      std::make_unique<UpdaterStatusAndValueProvider>(profile));
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
   return aggregator;
 }
 
