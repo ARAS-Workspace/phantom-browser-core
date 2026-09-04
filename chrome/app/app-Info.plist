@@ -161,6 +161,8 @@
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
 	<string>${CHROMIUM_CREATOR}</string>
+	<key>CrProductDirName</key>
+	<string>${CHROMIUM_SHORT_NAME}</string>
 	<key>NSAppleScriptEnabled</key>
 	<true/>
 	<key>OSAScriptingDefinition</key>
