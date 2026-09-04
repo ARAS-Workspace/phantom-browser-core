@@ -19,6 +19,7 @@
 #include "base/time/time.h"
 #include "components/file_access/scoped_file_access.h"
 #include "components/file_access/scoped_file_access_delegate.h"
+#include "components/safe_browsing/buildflags.h"
 #include "components/safe_browsing/core/common/features.h"
 #include "components/safe_browsing/core/common/utils.h"
 #include "net/base/mime_util.h"
@@ -31,7 +32,7 @@
 #include "services/network/public/mojom/data_pipe_getter.mojom.h"
 #include "services/network/public/mojom/url_response_head.mojom.h"
 
-#if !BUILDFLAG(IS_IOS)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 #include "components/safe_browsing/content/browser/web_ui/web_ui_content_info_singleton.h"
 #endif
 
@@ -232,7 +233,7 @@ void MultipartUploadRequestBase::SendRequest() {
   resource_request->url = base_url_;
   resource_request->method = "POST";
   SetRequestHeaders(resource_request.get());
-#if !BUILDFLAG(IS_IOS)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   safe_browsing::WebUIContentInfoSingleton::GetInstance()
       ->AddHeadersToDeepScanRequests(request_token_, resource_request->headers);
 #endif

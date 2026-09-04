@@ -20,6 +20,7 @@
 #include "base/time/time.h"
 #include "components/enterprise/connectors/core/features.h"
 #include "components/file_access/scoped_file_access_delegate.h"
+#include "components/safe_browsing/buildflags.h"
 #include "components/safe_browsing/core/common/utils.h"
 #include "net/http/http_status_code.h"
 #include "net/traffic_annotation/network_traffic_annotation.h"
@@ -28,7 +29,7 @@
 #include "services/network/public/cpp/simple_url_loader.h"
 #include "services/network/public/mojom/url_response_head.mojom.h"
 
-#if !BUILDFLAG(IS_IOS)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 #include "components/safe_browsing/content/browser/web_ui/web_ui_content_info_singleton.h"
 #endif
 
@@ -274,7 +275,7 @@ void ResumableUploadRequestBase::SendMetadataRequest() {
   resource_request->url = base_url_;
   resource_request->method = "POST";
   SetMetadataRequestHeaders(resource_request.get());
-#if !BUILDFLAG(IS_IOS)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   safe_browsing::WebUIContentInfoSingleton::GetInstance()
       ->AddHeadersToDeepScanRequests(request_token_, resource_request->headers);
 #endif

@@ -524,6 +524,7 @@ source_set("impl") {
     "//components/pref_registry",
     "//components/reporting/storage:storage_configuration",
     "//components/reporting/storage:storage_module",
+    "//components/safe_browsing:buildflags",
     "//components/safe_browsing/content/browser",
     "//components/safe_browsing/content/browser/web_ui",
     "//components/safe_browsing/core/browser:referrer_chain_provider",

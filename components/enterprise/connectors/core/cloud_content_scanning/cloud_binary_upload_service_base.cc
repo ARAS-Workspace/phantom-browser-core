@@ -15,11 +15,12 @@
 #include "components/enterprise/connectors/core/cloud_content_scanning/resumable_uploader.h"
 #include "components/enterprise/connectors/core/features.h"
 #include "components/enterprise/connectors/core/reporting_utils.h"
+#include "components/safe_browsing/buildflags.h"
 #include "net/http/http_status_code.h"
 #include "net/traffic_annotation/network_traffic_annotation.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_IOS)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 #include "components/safe_browsing/content/browser/web_ui/web_ui_content_info_singleton.h"
 #endif
 
@@ -362,7 +363,7 @@ void CloudBinaryUploadServiceBase::LogResponseDebugInfo(
     ScanRequestUploadResult result,
     BinaryUploadRequest* request,
     const ContentAnalysisResponse& response) {
-#if !BUILDFLAG(IS_IOS)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   safe_browsing::WebUIContentInfoSingleton::GetInstance()
       ->AddToDeepScanRequests(request->per_profile_request(),
                               request->access_token(), upload_info,

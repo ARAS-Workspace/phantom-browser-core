@@ -151,6 +151,7 @@ if (enterprise_cloud_content_analysis || is_android) {
       "//components/enterprise/obfuscation/core:enterprise_obfuscation",
       "//components/file_access",
       "//components/policy/core/browser",
+      "//components/safe_browsing:buildflags",
       "//components/safe_browsing/core/common",
       "//crypto",
       "//mojo/public/cpp/bindings",

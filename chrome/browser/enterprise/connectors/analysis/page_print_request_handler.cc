@@ -18,6 +18,7 @@
 #include "components/enterprise/connectors/core/cloud_content_scanning/request_handler_base.h"
 #include "components/enterprise/connectors/core/features.h"
 #include "components/enterprise/connectors/core/reporting_constants.h"
+#include "components/safe_browsing/buildflags.h"
 #include "components/safe_browsing/content/browser/web_ui/web_ui_content_info_singleton.h"
 
 namespace enterprise_connectors {
@@ -199,6 +200,7 @@ void PagePrintRequestHandler::OnContentAnalysisResponse(
 
 void PagePrintRequestHandler::FinishLargeDataRequestEarly(
     std::unique_ptr<BinaryUploadRequest> request) {
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   // We add the request here in case we never actually uploaded anything, so
   // it wasn't added in OnGetRequestData
   safe_browsing::WebUIContentInfoSingleton::GetInstance()
@@ -212,6 +214,7 @@ void PagePrintRequestHandler::FinishLargeDataRequestEarly(
           ScanRequestUploadResultToString(
               ScanRequestUploadResult::kFileTooLarge),
           enterprise_connectors::ContentAnalysisResponse());
+#endif
 
   request->FinishRequest(ScanRequestUploadResult::kFileTooLarge,
                          enterprise_connectors::ContentAnalysisResponse());

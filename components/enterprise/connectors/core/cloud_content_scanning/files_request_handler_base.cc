@@ -13,8 +13,9 @@
 #include "components/enterprise/connectors/core/features.h"
 #include "components/enterprise/connectors/core/reporting_constants.h"
 #include "components/enterprise/connectors/core/reporting_event_router.h"
+#include "components/safe_browsing/buildflags.h"
 
-#if !BUILDFLAG(IS_IOS)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
 #include "components/safe_browsing/content/browser/web_ui/web_ui_content_info_singleton.h"
 #endif
 
@@ -240,7 +241,7 @@ void FilesRequestHandlerBase::MaybeTrackCancellation() {
 void FilesRequestHandlerBase::FinishRequestEarly(
     std::unique_ptr<BinaryUploadRequest> request,
     ScanRequestUploadResult result) {
-#if !BUILDFLAG(IS_IOS)
+#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
   // We add the request here in case we never actually uploaded anything, so it
   // wasn't added in OnGetRequestData
   safe_browsing::WebUIContentInfoSingleton::GetInstance()
