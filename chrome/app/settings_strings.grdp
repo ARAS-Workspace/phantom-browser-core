@@ -928,12 +928,6 @@
     <message name="IDS_SETTINGS_CLEAR_BROWSING_DATA_MORE" desc="Label of the 'More' chip in the time picker in the 'Delete browsing data' dialog. Clicking on this chip will show a menu with more time period options for deleting browsing data.">
       More
     </message>
-    <message name="IDS_SETTINGS_MANAGE_IN_YOUR_GEMINI_APPS_ACTIVITY" desc="Description for the Gemini Apps Activity linkout.">
-      Manage your Gemini Apps activity
-  </message>
-  <message name="IDS_SETTINGS_GEMINI_APPS_ACTIVITY" desc="Title for the Gemini Apps Activity section in Other Data.">
-      Gemini Apps activity
-  </message>
     <message name="IDS_SETTINGS_DELETE_DATA_FROM_DEVICE" desc="This is the label for the primary button on the 'Delete browsing data' dialog. Clicking on this will trigger the deletion. This is the label shown when account data cannot be cleared, for example: the user is signed out. It indicates that the deletion will only affect data stored on this device and will not affect synced data.">
       Delete from this device
     </message>
@@ -942,9 +936,6 @@
     </message>
     <message name="IDS_SETTINGS_DELETION_CONFIRMATION_ALL_TIME_TOAST_LABEL" desc="This is the label for the confirmation toast shown on the 'Privacy and security' page after the deletion is completed in the 'Delete browsing data' dialog and the dialog was closed. This is the label shown when the user selected the data to be deleted for all time.">
       Deleted
-    </message>
-    <message name="IDS_SETTINGS_SEARCH_GEMINI_PASSWORDS_OTHER_DATA_SUB_LABEL" desc="Sub-label for the 'Manage Other Google Data' option in the 'Delete Browsing Data' dialog, explaining to the user that search history, Gemini history, and passwords can be deleted outside of Chrome in their respective management settings.">
-      Search history, Gemini history, and passwords can be deleted in their management settings
     </message>
 
     <!-- Downloads Page -->

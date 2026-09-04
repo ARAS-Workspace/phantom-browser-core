@@ -34,7 +34,6 @@ build_webui("build") {
     "clear_browsing_data_dialog/clear_browsing_data_dialog.ts",
     "clear_browsing_data_dialog/clear_browsing_data_time_picker.ts",
     "clear_browsing_data_dialog/history_deletion_dialog.ts",
-    "clear_browsing_data_dialog/other_google_data_dialog.ts",
     "controls/collapse_radio_button.ts",
     "controls/controlled_button.ts",
     "controls/controlled_radio_button.ts",

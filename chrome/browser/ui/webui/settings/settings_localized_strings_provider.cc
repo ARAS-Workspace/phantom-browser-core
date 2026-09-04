@@ -492,13 +492,6 @@ void AddClearBrowsingDataStrings(content::WebUIDataSource* html_source,
       {"historyDeletionDialogTitle",
        IDS_CLEAR_BROWSING_DATA_HISTORY_NOTICE_TITLE},
       {"historyDeletionDialogOK", IDS_CLEAR_BROWSING_DATA_HISTORY_NOTICE_OK},
-      {"manageOtherDataLabel", IDS_SETTINGS_MANAGE_OTHER_DATA_LABEL},
-      {"manageOtherGoogleDataLabel",
-       IDS_SETTINGS_MANAGE_OTHER_GOOGLE_DATA_LABEL},
-      {"manageOtherDataSubLabel", IDS_SETTINGS_MANAGE_OTHER_DATA_SUB_LABEL},
-      {"managePasswordsSubLabel", IDS_SETTINGS_MANAGE_PASSWORDS_SUB_LABEL},
-      {"manageSearchGeminiPasswordsSubLabel",
-       IDS_SETTINGS_SEARCH_GEMINI_PASSWORDS_OTHER_DATA_SUB_LABEL},
       {"passwordsDeletionDialogTitle",
        IDS_CLEAR_BROWSING_DATA_PASSWORDS_NOTICE_TITLE},
       {"passwordsDeletionDialogOK",
@@ -506,18 +499,6 @@ void AddClearBrowsingDataStrings(content::WebUIDataSource* html_source,
       {"notificationWarning", IDS_SETTINGS_NOTIFICATION_WARNING},
       {"clearBrowsingDataShowMore", IDS_SETTINGS_CLEAR_BROWSING_DATA_SHOW_MORE},
       {"clearBrowsingDataMore", IDS_SETTINGS_CLEAR_BROWSING_DATA_MORE},
-      {"otherDataTitle", IDS_SETTINGS_OTHER_DATA_TITLE},
-      {"otherGoogleDataTitle", IDS_SETTINGS_OTHER_GOOGLE_DATA_TITLE},
-      {"otherDataDescription", IDS_SETTINGS_OTHER_DATA_DESCRIPTION},
-      {"passwordsAndPasskeys", IDS_SETTINGS_PASSWORDS_AND_PASSKEYS},
-      {"manageInGooglePasswordManager",
-       IDS_SETTINGS_MANAGE_IN_GOOGLE_PASSWORD_MANAGER},
-      {"searchHistory", IDS_SETTINGS_SEARCH_HISTORY},
-      {"myActivity", IDS_SETTINGS_MY_ACTIVITY},
-      {"manageInYourGoogleAccount", IDS_SETTINGS_MANAGE_IN_YOUR_GOOGLE_ACCOUNT},
-      {"geminiAppsActivity", IDS_SETTINGS_GEMINI_APPS_ACTIVITY},
-      {"manageInYourGeminiAppsActivity",
-       IDS_SETTINGS_MANAGE_IN_YOUR_GEMINI_APPS_ACTIVITY},
       {"deletionConfirmationToast",
        IDS_SETTINGS_DELETION_CONFIRMATION_TOAST_LABEL},
       {"deletionConfirmationAllTimeToast",
@@ -543,10 +524,6 @@ void AddClearBrowsingDataStrings(content::WebUIDataSource* html_source,
       l10n_util::GetStringFUTF16(
           IDS_CLEAR_BROWSING_DATA_PASSWORDS_NOTICE,
           l10n_util::GetStringUTF16(IDS_PASSWORDS_WEB_LINK)));
-  html_source->AddString("deleteBrowsingDataMyActivityUrl",
-                         chrome::kMyActivityUrlInClearBrowsingData);
-  html_source->AddString("deleteBrowsingDataSearchHistoryUrl",
-                         chrome::kSearchHistoryUrlInClearBrowsingData);
   html_source->AddString("geminiPersonalContextUrl",
                          chrome::kGeminiPersonalContextUrl);
 
@@ -2534,8 +2511,6 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
                          chrome::kContentSettingsExceptionsLearnMoreURL);
   html_source->AddString("enhancedProtectionHelpCenterURL",
                          chrome::kSafeBrowsingInChromeHelpCenterURL);
-  html_source->AddString("myActivityGeminiAppsUrl",
-                         chrome::kMyActivityGeminiAppsUrl);
 
   // TODO(crbug.com/349860796): Add a learn-more link for HTTPS-First Mode for
   // the new Settings UI, which can be used by the settings-toggle-button.

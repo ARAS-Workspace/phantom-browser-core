@@ -504,8 +504,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
       base::FeatureList::IsEnabled(
           autofill::features::kAutofillAiWalletPrivatePasses));
 
-  html_source->AddBoolean("showGlicSettings", false);
-
   const auto& autofill_client =
       *autofill::ContentAutofillClient::FromWebContents(
           web_ui->GetWebContents());
