@@ -690,8 +690,7 @@ void BaseUIManager::RemoveAllowlistUrlSet(
 }
 
 void BaseUIManager::RemoveAllowlistUrlSetThreatType(
-    base::PassKey<SuspiciousSiteControllerAndroid,
-                  SuspiciousSiteControllerDesktop>,
+    base::PassKey<SuspiciousSiteControllerAndroid>,
     const GURL& allowlist_url,
     const std::optional<int64_t> navigation_id,
     WebContents* web_contents,

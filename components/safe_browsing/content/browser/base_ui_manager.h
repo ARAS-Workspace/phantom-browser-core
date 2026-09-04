@@ -35,7 +35,6 @@ namespace safe_browsing {
 class ChromePasswordProtectionService;
 class SafeBrowsingUIManagerTest;
 class SuspiciousSiteControllerAndroid;
-class SuspiciousSiteControllerDesktop;
 
 typedef unsigned ThreatSeverity;
 
@@ -193,8 +192,7 @@ class BaseUIManager : public base::RefCountedThreadSafe<BaseUIManager> {
   // |threat_type| from the allowlist for |web_contents|. Called on the UI
   // thread.
   void RemoveAllowlistUrlSetThreatType(
-      base::PassKey<SuspiciousSiteControllerAndroid,
-                    SuspiciousSiteControllerDesktop>,
+      base::PassKey<SuspiciousSiteControllerAndroid>,
       const GURL& allowlist_url,
       const std::optional<int64_t> navigation_id,
       content::WebContents* web_contents,

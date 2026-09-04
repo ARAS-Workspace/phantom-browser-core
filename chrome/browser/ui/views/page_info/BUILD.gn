@@ -27,7 +27,6 @@ source_set("page_info") {
     "safety_tip_page_info_bubble_view.h",
     "security_information_view.h",
     "star_rating_view.h",
-    "suspicious_site_bubble_view.h",
     "web_view_side_panel_view.h",
   ]
 
@@ -75,7 +74,6 @@ source_set("impl") {
     "safety_tip_page_info_bubble_view.cc",
     "security_information_view.cc",
     "star_rating_view.cc",
-    "suspicious_site_bubble_view.cc",
     "web_view_side_panel_view.cc",
   ]
 
@@ -87,7 +85,6 @@ source_set("impl") {
     "//chrome/browser/file_system_access",
     "//chrome/browser/page_info",
     "//chrome/browser/safe_browsing",
-    "//chrome/browser/safe_browsing/suspicious_site_warnings",
     "//chrome/browser/ui:chrome_pages",
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/browser_web_contents_delegate",
@@ -107,7 +104,6 @@ source_set("impl") {
     "//components/omnibox/browser:vector_icons",
     "//components/page_info/core",
     "//components/privacy_sandbox:features",
-    "//components/safe_browsing/core/browser:suspicious_site_warning_allowlist",
     "//components/strings:components_branded_strings_grit",
     "//components/strings:components_strings_grit",
     "//components/strings:privacy_sandbox_strings_grit",
@@ -133,7 +129,6 @@ source_set("unit_tests") {
     "page_info_permission_content_view_unittest.cc",
     "safety_tip_page_info_bubble_view_unittest.cc",
     "star_rating_view_unittest.cc",
-    "suspicious_site_bubble_view_unittest.cc",
   ]
   deps = [
     ":page_info",
@@ -146,7 +141,6 @@ source_set("unit_tests") {
     "//chrome/test:test_support",
     "//components/media_effects/test:test_support",
     "//components/omnibox/browser:vector_icons",
-    "//components/safe_browsing/core/browser:suspicious_site_warning_allowlist",
     "//content/test:test_support",
     "//testing/gtest",
     "//ui/views:test_support",
@@ -164,7 +158,6 @@ source_set("browser_tests") {
     "page_info_bubble_view_dialog_browsertest.cc",
     "page_info_bubble_view_sync_browsertest.cc",
     "safety_tip_page_info_bubble_view_browsertest.cc",
-    "suspicious_site_bubble_view_browsertest.cc",
   ]
   deps = [
     ":page_info",
@@ -189,7 +182,6 @@ source_set("browser_tests") {
     "//components/lookalikes/core:proto_gen",
     "//components/lookalikes/core:safety_tips",
     "//components/safe_browsing/content/browser/password_protection:test_support",
-    "//components/safe_browsing/core/browser:suspicious_site_warning_allowlist",
     "//content/test:test_support",
     "//testing/gtest",
     "//ui/events:test_support",

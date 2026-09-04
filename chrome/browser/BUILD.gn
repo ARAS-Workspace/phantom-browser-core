@@ -3652,7 +3652,6 @@ source_set("browser") {
   }
 
   if (enable_dice_support) {
-
     if (!is_android) {
       deps += [
         "//chrome/browser/ui/webui/feature_showcase",
@@ -3856,10 +3855,7 @@ source_set("browser") {
   }
 
   if (!is_android) {
-    deps += [
-      "//chrome/browser/contextual_cueing/internals",
-      "//chrome/browser/safe_browsing/suspicious_site_warnings",
-    ]
+    deps += [ "//chrome/browser/contextual_cueing/internals" ]
   }
 
   # This target intentionally has no sources of its own and no
