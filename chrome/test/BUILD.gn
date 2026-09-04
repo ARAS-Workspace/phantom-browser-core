@@ -2153,7 +2153,6 @@ if (!is_android) {
       "//chrome/browser/renderer_host:browser_tests",
       "//chrome/browser/resource_coordinator:mojo_bindings",
       "//chrome/browser/safe_browsing:advanced_protection",
-      "//chrome/browser/safe_browsing:blocking_page_platform_test_support",
       "//chrome/browser/safe_browsing:verdict_cache_manager_factory",
       "//chrome/browser/screen_ai:browser_tests",
       "//chrome/browser/screen_ai:screen_ai_install_state",
@@ -2796,6 +2795,12 @@ if (!is_android) {
       "//ui/webui:test_support",
       "//ui/webui/resources/cr_components/history_clusters:mojo_bindings",
     ]
+
+    if (safe_browsing_mode != 0) {
+      deps += [
+        "//chrome/browser/safe_browsing:blocking_page_platform_test_support",
+      ]
+    }
 
     # TODO(crbug.com/428666921): Remove this dependency when
     # chrome/browser/ui/tab_ui_helper_browsertest.cc gets modularized.
@@ -6041,8 +6046,6 @@ test("unit_tests") {
       "//chrome/browser/renderer_host:history_swiper",
       "//chrome/browser/renderer_host:history_swiping_control",
       "//chrome/common/notifications",
-      "//chrome/common/safe_browsing:archive_analyzer_results",
-      "//chrome/common/safe_browsing:disk_image_type_sniffer_mac",
       "//chrome/services/mac_notifications:unit_tests",
       "//chrome/services/mac_notifications/public/mojom",
       "//chrome/utility/safe_browsing",
@@ -6052,6 +6055,13 @@ test("unit_tests") {
       "//media/capture:test_support",
       "//ui/events/devices:test_support",
     ]
+
+    if (safe_browsing_mode != 0) {
+      deps += [
+        "//chrome/common/safe_browsing:archive_analyzer_results",
+        "//chrome/common/safe_browsing:disk_image_type_sniffer_mac",
+      ]
+    }
 
     # The test fetches resources which means Mac need the app bundle to exist
     # on disk so it can pull from it.
@@ -6558,9 +6568,7 @@ test("unit_tests") {
     }
 
     if (is_linux || is_mac || is_win) {
-      deps += [
-        "//chrome/enterprise_companion:constants_prod",
-      ]
+      deps += [ "//chrome/enterprise_companion:constants_prod" ]
       if (is_mac) {
         deps += [ "//chrome/updater:browser_sources" ]
       }
@@ -7490,8 +7498,7 @@ test("unit_tests") {
   }
 
   if (enable_dice_support || is_chromeos) {
-    deps += [
-    ]
+    deps += []
   }
 
   if (is_mac) {
@@ -8719,7 +8726,6 @@ if (!is_android && !is_chromeos_device) {
       "//components/privacy_sandbox:privacy_sandbox_prefs",
       "//components/reading_list/core",
       "//components/resources",
-      "//components/safe_browsing/content/browser:client_side_detection",
       "//components/safe_browsing/core/common",
       "//components/safe_browsing/core/common:safe_browsing_policy_handler",
       "//components/search",
@@ -8779,6 +8785,11 @@ if (!is_android && !is_chromeos_device) {
       "//ui/views",
       "//ui/web_dialogs:test_support",
     ]
+
+    if (safe_browsing_mode != 0) {
+      deps +=
+          [ "//components/safe_browsing/content/browser:client_side_detection" ]
+    }
 
     if (is_linux) {
       deps += [ "//ui/linux:display_server_utils" ]
