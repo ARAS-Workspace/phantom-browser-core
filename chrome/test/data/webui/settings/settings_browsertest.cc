@@ -41,7 +41,6 @@
 #include "components/policy/policy_constants.h"
 #include "components/prefs/pref_service.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
-#include "components/safe_browsing/core/common/features.h"
 #include "components/signin/public/identity_manager/account_capabilities_test_mutator.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
 #include "components/subscription_eligibility/subscription_eligibility_prefs.h"
@@ -1588,7 +1587,6 @@ class SettingsPrivacyPageTest : public SettingsBrowserTest {
 #if BUILDFLAG(IS_CHROMEOS)
             blink::features::kWebPrinting,
 #endif
-            safe_browsing::kBundledSecuritySettings,
         },
         {});
     scoped_feature_list2_.InitAndEnableFeatureWithParameters(
@@ -1709,77 +1707,6 @@ IN_PROC_BROWSER_TEST_F(SettingsSafetyHubTest, NotificationPermissionsModule) {
 
 IN_PROC_BROWSER_TEST_F(SettingsSafetyHubTest, SafetyHubExtensions) {
   RunTest("settings/safety_hub_extensions_module_test.js", "mocha.run()");
-}
-
-using SettingsSecurityPageTest = SettingsBrowserTest;
-
-IN_PROC_BROWSER_TEST_F(SettingsSecurityPageTest, Main) {
-  RunTest("settings/security/security_page_test.js", "runMochaSuite('Main')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSecurityPageTest, FlagsDisabled) {
-  RunTest("settings/security/security_page_test.js",
-          "runMochaSuite('FlagsDisabled')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSecurityPageTest,
-                       SecurityPageHappinessTrackingSurveys) {
-  RunTest("settings/security/security_page_test.js",
-          "runMochaSuite('SecurityPageHappinessTrackingSurveys')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSecurityPageTest, JavascriptOptimizer) {
-  RunTest("settings/security/security_page_test.js",
-          "runMochaSuite('JavascriptOptimizer')");
-}
-
-// TODO(crbug/338155508): Enable this flaky test. This is flaky on Linux debug
-// build.
-// TODO(crbug.com/409069315): Re-enable this test on Mac.
-#if BUILDFLAG(IS_LINUX) && !defined(NDEBUG) || BUILDFLAG(IS_MAC)
-#define MAYBE_SafeBrowsing DISABLED_SafeBrowsing
-#else
-#define MAYBE_SafeBrowsing SafeBrowsing
-#endif
-IN_PROC_BROWSER_TEST_F(SettingsSecurityPageTest, MAYBE_SafeBrowsing) {
-  RunTest("settings/security/security_page_test.js",
-          "runMochaSuite('SafeBrowsing')");
-}
-
-using SettingsSecurityPageV2Test = SettingsBrowserTest;
-
-IN_PROC_BROWSER_TEST_F(SettingsSecurityPageV2Test, Main) {
-  RunTest("settings/security/security_page_v2_test.js",
-          "runMochaSuite('Main')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSecurityPageV2Test,
-                       SecurityKeysSubpageDisabled) {
-  RunTest("settings/security/security_page_v2_test.js",
-          "runMochaSuite('SecurityKeysSubpageDisabled')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSecurityPageV2Test,
-                       SecurityPageHappinessTrackingSurveys) {
-  RunTest("settings/security/security_page_v2_test.js",
-          "runMochaSuite('SecurityPageV2HappinessTrackingSurveys')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSecurityPageV2Test,
-                       SecurityPageHappinessTrackingSurveys_SecureDnsLegacy) {
-  RunTest("settings/security/security_page_v2_test.js",
-          "runMochaSuite('SecurityPageV2HappinessTrackingSurveys_"
-          "SecureDnsLegacy')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSecurityPageV2Test, ManagedEnvironment) {
-  RunTest("settings/security/security_page_v2_test.js",
-          "runMochaSuite('ManagedEnvironment')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSecurityPageV2Test, SecureDnsBundling) {
-  RunTest("settings/security/security_page_v2_test.js",
-          "runMochaSuite('SecureDnsBundling')");
 }
 
 #if !BUILDFLAG(IS_CHROMEOS)

@@ -170,29 +170,6 @@ export enum SafetyHubModuleType {
 // )
 
 /**
- * Contains all safe browsing interactions.
- *
- * These values are persisted to logs. Entries should not be renumbered and
- * numeric values should never be reused.
- *
- * Must be kept in sync with the UserAction in safe_browsing_settings_metrics.h.
- */
-// LINT.IfChange(SafeBrowsingInteractions)
-export enum SafeBrowsingInteractions {
-  SAFE_BROWSING_SHOWED = 0,
-  SAFE_BROWSING_ENHANCED_PROTECTION_CLICKED = 1,
-  SAFE_BROWSING_STANDARD_PROTECTION_CLICKED = 2,
-  SAFE_BROWSING_DISABLE_SAFE_BROWSING_CLICKED = 3,
-  SAFE_BROWSING_ENHANCED_PROTECTION_EXPAND_ARROW_CLICKED = 4,
-  SAFE_BROWSING_STANDARD_PROTECTION_EXPAND_ARROW_CLICKED = 5,
-  SAFE_BROWSING_DISABLE_SAFE_BROWSING_DIALOG_CONFIRMED = 6,
-  SAFE_BROWSING_DISABLE_SAFE_BROWSING_DIALOG_DENIED = 7,
-  // COUNT should be updated whenever new entries are added.
-  COUNT = 8,
-}
-// LINT.ThenChange(//components/safe_browsing/core/common/safe_browsing_settings_metrics.h:UserAction)
-
-/**
  * All Privacy guide interactions with metrics.
  *
  * These values are persisted to logs. Entries should not be renumbered and
@@ -637,13 +614,6 @@ export interface MetricsBrowserProxy {
   recordSettingsPageHistogram(interaction: PrivacyElementInteractions): void;
 
   /**
-   * Helper function that calls recordHistogram for the
-   * SafeBrowsing.Settings.UserAction histogram
-   */
-  recordSafeBrowsingInteractionHistogram(interaction: SafeBrowsingInteractions):
-      void;
-
-  /**
    * Records a click on the Suggestions from Gemini link across Your saved info
    * and category subpages with a corresponding metric and user action.
    */
@@ -873,17 +843,6 @@ export class MetricsBrowserProxyImpl implements MetricsBrowserProxy {
       'Settings.PrivacyElementInteractions',
       interaction,
       PrivacyElementInteractions.COUNT,
-    ]);
-  }
-
-  recordSafeBrowsingInteractionHistogram(
-      interaction: SafeBrowsingInteractions) {
-    // TODO(crbug.com/40717279): Set the correct suffix for
-    // SafeBrowsing.Settings.UserAction. Use the .Default suffix for now.
-    chrome.send('metricsHandler:recordInHistogram', [
-      'SafeBrowsing.Settings.UserAction.Default',
-      interaction,
-      SafeBrowsingInteractions.COUNT,
     ]);
   }
 

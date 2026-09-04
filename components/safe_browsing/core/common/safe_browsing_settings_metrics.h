@@ -36,7 +36,6 @@ enum class SettingsAccessPoint : int {
 // A Java counterpart will be generated for this enum.
 // GENERATED_JAVA_ENUM_PACKAGE: (
 //   org.chromium.chrome.browser.safe_browsing.metrics)
-// LINT.IfChange(UserAction)
 enum class UserAction : int {
   // The page is shown to the user.
   kShowed = 0,
@@ -66,7 +65,6 @@ enum class UserAction : int {
   kDisableSafeBrowsingDialogDenied = 7,
   kMaxValue = kDisableSafeBrowsingDialogDenied
 };
-// LINT.ThenChange(//chrome/browser/resources/settings/metrics_browser_proxy.ts:SafeBrowsingInteractions)
 
 // Records the user action when the user navigates to the Enhanced Protection
 // page.

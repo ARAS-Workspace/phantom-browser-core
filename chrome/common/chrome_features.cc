@@ -1252,21 +1252,6 @@ const base::FeatureParam<base::TimeDelta>
 // Enables or disables the Happiness Tracking System for SE Hijacking.
 BASE_FEATURE(kHappinessTrackingSurveysForDesktopSEHijacking,
              base::FEATURE_DISABLED_BY_DEFAULT);
-// Enables or disables the Happiness Tracking System for Chrome security page.
-BASE_FEATURE(kHappinessTrackingSurveysForSecurityPage,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<base::TimeDelta>
-    kHappinessTrackingSurveysForSecurityPageTime{
-        &kHappinessTrackingSurveysForSecurityPage, "security-page-time",
-        base::Seconds(15)};
-const base::FeatureParam<std::string>
-    kHappinessTrackingSurveysForSecurityPageTriggerId{
-        &kHappinessTrackingSurveysForSecurityPage, "security-page-trigger-id",
-        ""};
-const base::FeatureParam<bool>
-    kHappinessTrackingSurveysForSecurityPageRequireInteraction{
-        &kHappinessTrackingSurveysForSecurityPage,
-        "security-page-require-interaction", false};
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 // Enables HTTPS-First Mode in a balanced configuration that doesn't warn on

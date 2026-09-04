@@ -144,8 +144,6 @@ constexpr char kHatsSurveyTriggerRedWarning[] = "red-warning";
 constexpr char kHatsSurveyTriggerSettings[] = "settings";
 constexpr char kHatsSurveyTriggerSEHijacking[] = "search-engine-hijacking";
 constexpr char kHatsSurveyTriggerSettingsPrivacy[] = "settings-privacy";
-constexpr char kHatsSurveyTriggerSettingsSecurity[] = "settings-security";
-constexpr char kHatsSurveyTriggerSettingsSecurityV2[] = "settings-security-v2";
 constexpr char kHatsSurveyTriggerTrustSafetyPrivacySettings[] =
     "ts-privacy-settings";
 constexpr char kHatsSurveyTriggerTrustSafetyTrustedSurface[] =
@@ -293,31 +291,6 @@ std::vector<hats::SurveyConfig> GetAllSurveyConfigs() {
       kHatsSurveyTriggerSettingsPrivacy,
       /*presupplied_trigger_id=*/std::nullopt,
       std::vector<std::string>{"3P cookies blocked"});
-  survey_configs.emplace_back(
-      &features::kHappinessTrackingSurveysForSecurityPage,
-      kHatsSurveyTriggerSettingsSecurity,
-      /*presupplied_trigger_id=*/
-      features::kHappinessTrackingSurveysForSecurityPageTriggerId.Get(),
-      std::vector<std::string>{},
-      std::vector<std::string>{"Security Page User Action",
-                               "Safe Browsing Setting Before Trigger",
-                               "Safe Browsing Setting After Trigger",
-                               "Client Channel", "Time On Page"});
-  survey_configs.emplace_back(
-      &features::kHappinessTrackingSurveysForSecurityPage,
-      kHatsSurveyTriggerSettingsSecurityV2,
-      /*presupplied_trigger_id=*/
-      features::kHappinessTrackingSurveysForSecurityPageTriggerId.Get(),
-      std::vector<std::string>{},
-      std::vector<std::string>{
-          "Security page user actions",
-          "Safe browsing setting when security page opened",
-          "Security settings bundle setting when security "
-          "page opened",
-          "Safe browsing setting when security page closed",
-          "Security settings bundle setting when security "
-          "page closed",
-          "Client channel", "Time on page (bucketed seconds)"});
   survey_configs.emplace_back(
       &features::kHappinessTrackingSurveysForDesktopPrivacyGuide,
       kHatsSurveyTriggerPrivacyGuide);

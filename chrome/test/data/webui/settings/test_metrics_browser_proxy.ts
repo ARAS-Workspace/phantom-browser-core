@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import {SuggestionsFromGeminiAction, SuggestionsFromGeminiEntryPoint, YourSavedInfoDataCategory, YourSavedInfoDataChip, YourSavedInfoRelatedService} from 'chrome://settings/settings.js';
-import type {AiPageComposeInteractions, AiPageHistorySearchInteractions, AiPageInteractions, AiPageSuggestionsInteractions, AutofillSettingsReferrer, DeleteBrowsingDataAction, MetricsBrowserProxy, PrivacyElementInteractions, PrivacyGuideInteractions, PrivacyGuideSettingsStates, PrivacyGuideStepsEligibleAndReached, SafeBrowsingInteractions, SafetyCheckNotificationsModuleInteractions, SafetyCheckUnusedSitePermissionsModuleInteractions, SafetyHubCardState, SafetyHubEntryPoint, SafetyHubModuleType, SafetyHubSurfaces} from 'chrome://settings/settings.js';
+import type {AiPageComposeInteractions, AiPageHistorySearchInteractions, AiPageInteractions, AiPageSuggestionsInteractions, AutofillSettingsReferrer, DeleteBrowsingDataAction, MetricsBrowserProxy, PrivacyElementInteractions, PrivacyGuideInteractions, PrivacyGuideSettingsStates, PrivacyGuideStepsEligibleAndReached, SafetyCheckNotificationsModuleInteractions, SafetyCheckUnusedSitePermissionsModuleInteractions, SafetyHubCardState, SafetyHubEntryPoint, SafetyHubModuleType, SafetyHubSurfaces} from 'chrome://settings/settings.js';
 import {TestBrowserProxy} from 'chrome://webui-test/test_browser_proxy.js';
 
 export class TestMetricsBrowserProxy extends TestBrowserProxy implements
@@ -14,7 +14,6 @@ export class TestMetricsBrowserProxy extends TestBrowserProxy implements
       'recordBooleanHistogram',
       'recordSettingsPageHistogram',
       'recordPrivacyGuideFlowLengthHistogram',
-      'recordSafeBrowsingInteractionHistogram',
       'recordPrivacyGuideNextNavigationHistogram',
       'recordPrivacyGuideEntryExitHistogram',
       'recordPrivacyGuideSettingsStatesHistogram',
@@ -64,11 +63,6 @@ export class TestMetricsBrowserProxy extends TestBrowserProxy implements
 
   recordSettingsPageHistogram(interaction: PrivacyElementInteractions) {
     this.methodCalled('recordSettingsPageHistogram', interaction);
-  }
-
-  recordSafeBrowsingInteractionHistogram(
-      interaction: SafeBrowsingInteractions) {
-    this.methodCalled('recordSafeBrowsingInteractionHistogram', interaction);
   }
 
   recordPrivacyGuideNextNavigationHistogram(

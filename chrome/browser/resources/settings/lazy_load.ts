@@ -11,7 +11,6 @@ import './clear_browsing_data_dialog/clear_browsing_data_dialog.js';
 import './clear_browsing_data_dialog/clear_browsing_data_time_picker.js';
 import './privacy_page/cookies_page.js';
 import './privacy_page/security/security_page_v2.js';
-import './privacy_page/security/security_page.js';
 import './safety_hub/safety_hub_entry_point.js';
 import './safety_hub/safety_hub_page.js';
 import './search_page/search_engines_page.js';
@@ -177,9 +176,8 @@ export {SafeBrowsingSetting} from './privacy_page/security/safe_browsing_types.j
 export {SecureDnsResolverType, SettingsSecureDnsElement} from './privacy_page/security/secure_dns.js';
 export {SecureDnsInputElement} from './privacy_page/security/secure_dns_input.js';
 export {SecureDnsV2ResolverType, SettingsSecureDnsV2Element} from './privacy_page/security/secure_dns_v2.js';
-export {HttpsFirstModeSetting, SettingsSecurityPageElement} from './privacy_page/security/security_page.js';
 export {SecurityPageFeatureRowElement} from './privacy_page/security/security_page_feature_row.js';
-export {SecuritySettingsBundleSetting, SettingsSecurityPageV2Element} from './privacy_page/security/security_page_v2.js';
+export {HttpsFirstModeSetting, SettingsSecurityPageV2Element} from './privacy_page/security/security_page_v2.js';
 export {SettingsResetPageElement} from './reset_page/reset_page.js';
 export {SettingsResetProfileDialogElement} from './reset_page/reset_profile_dialog.js';
 export {SettingsSafetyHubExtensionsModuleElement} from './safety_hub/extensions_module.js';

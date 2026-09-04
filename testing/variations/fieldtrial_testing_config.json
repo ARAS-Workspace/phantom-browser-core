@@ -22510,29 +22510,6 @@
             ]
         }
     ],
-    "SecurityPageHats": [
-        {
-            "platforms": [
-                "chromeos",
-                "linux",
-                "mac",
-                "windows"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "params": {
-                        "probability": "1",
-                        "security-page-time": "15s",
-                        "security-page-trigger-id": "c4dvJ3Sz70ugnJ3q1cK0SkwJZodD"
-                    },
-                    "enable_features": [
-                        "HappinessTrackingSurveysForSecurityPage"
-                    ]
-                }
-            ]
-        }
-    ],
     "SegmentationPlatformURLVisitResumptionRanker": [
         {
             "platforms": [

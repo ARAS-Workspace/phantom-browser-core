@@ -423,7 +423,6 @@ enum class SafeBrowsingState {
 
 // Must be kept in sync with the SecuritySettingsBundle enum located in
 // chrome/browser/resources/settings/privacy_page/security/security_page_v2.js.
-// LINT.IfChange(SecuritySettingsBundleSetting)
 enum class SecuritySettingsBundleSetting {
   // Standard bundle with default settings.
   STANDARD = 0,
@@ -431,7 +430,6 @@ enum class SecuritySettingsBundleSetting {
   ENHANCED = 1,
   kMaxValue = ENHANCED,
 };
-// LINT.ThenChange(/chrome/browser/resources/settings/privacy_page/security/security_page_v2.ts:SecuritySettingsBundleSetting)
 
 // Returns the user's security-settings-bundle. The user may have changed the
 // settings controlled by the bundle from the bundle defaults.

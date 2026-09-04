@@ -43,7 +43,6 @@ enum class HttpsFirstModeSetting {
   kMaxValue = kEnabledBalanced,
 };
 // LINT.ThenChange(
-//      /chrome/browser/resources/settings/privacy_page/security/security_page.ts,
 //      /chrome/browser/resources/settings/privacy_page/security/security_page_v2.ts:HttpsFirstModeSetting,
 //      /tools/metrics/histograms/metadata/security/enums.xml
 // )

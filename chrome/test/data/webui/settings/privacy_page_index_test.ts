@@ -27,7 +27,6 @@ suite('PrivacyPageIndex', function() {
 
     loadTimeData.overrideValues(Object.assign(
         {
-          enableBundledSecuritySettings: false,
           enableCapturedSurfaceControl: false,
           enableExperimentalWebPlatformFeatures: false,
           enableFederatedIdentityApiContentSetting: false,
@@ -130,22 +129,8 @@ suite('PrivacyPageIndex', function() {
       await testViewsForRoute(routes.PRIVACY, ['privacy']);
     });
 
-    // TODO(crbug.com/417690232): Delete once kBundledSecuritySettings is
-    // launched.
-    test('RoutingSecurityV2', async function() {
-      assertFalse(loadTimeData.getBoolean('enableBundledSecuritySettings'));
-
-      // Case where old UI should exist.
-      await createPrivacyPageIndex();
+    test('RoutingSecurity', async function() {
       await testViewsForRoute(routes.SECURITY, ['security'], 'privacy');
-      assertTrue(!!index.shadowRoot!.querySelector('settings-security-page'));
-      assertFalse(
-          !!index.shadowRoot!.querySelector('settings-security-page-v2'));
-
-      // Case where new UI should exist.
-      await createPrivacyPageIndex({enableBundledSecuritySettings: true});
-      await testViewsForRoute(routes.SECURITY, ['security'], 'privacy');
-      assertFalse(!!index.shadowRoot!.querySelector('settings-security-page'));
       assertTrue(
           !!index.shadowRoot!.querySelector('settings-security-page-v2'));
     });
