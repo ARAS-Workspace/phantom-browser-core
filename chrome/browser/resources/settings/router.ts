@@ -36,7 +36,6 @@ export interface SettingsRoutes {
   FONTS: Route;
   GEMINI: Route;
   GEMINI_LOGIN: Route;
-  GLIC_SECTION: Route;
   HISTORY_SEARCH: Route;
   IDENTITY_DOCS: Route;
   INLINE_CUE_MENU: Route;

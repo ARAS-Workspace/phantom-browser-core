@@ -51,7 +51,6 @@ export {ControlledRadioButtonElement} from './controls/controlled_radio_button.j
 export {SettingsDropdownMenuElement} from './controls/settings_dropdown_menu.js';
 export {SettingsRadioGroupElement} from './controls/settings_radio_group.js';
 export {SettingsToggleButtonElement} from './controls/settings_toggle_button.js';
-export {ChromeSuggestionsSettingsValue, ModelExecutionEnterprisePolicyValue} from './ai_page/constants.js';
 export {AppearanceBrowserProxyImpl} from './appearance_page/appearance_browser_proxy.js';
 export type {AppearanceBrowserProxy} from './appearance_page/appearance_browser_proxy.js';
 export {SettingsAppearancePageElement, SystemTheme} from './appearance_page/appearance_page.js';
@@ -63,10 +62,6 @@ export {DefaultBrowserBrowserProxyImpl} from './default_browser_page/default_bro
 export type {DefaultBrowserBrowserProxy, DefaultBrowserInfo} from './default_browser_page/default_browser_browser_proxy.js';
 export {SettingsDefaultBrowserPageElement} from './default_browser_page/default_browser_page.js';
 // </if>
-export {GlicBrowserProxyImpl} from './glic_page/glic_browser_proxy.js';
-export type {GlicBrowserProxy, LoginPermission} from './glic_page/glic_browser_proxy.js';
-export {SettingsGlicPageElement} from './glic_page/glic_page.js';
-export {SettingsGlicPageFeaturePrefName, SettingsGlicSubpageElement} from './glic_page/glic_subpage.js';
 export {loadTimeData} from './i18n_setup.js';
 // <if expr="not is_chromeos">
 export {convertLanguageCodeForChrome, convertLanguageCodeForTranslate, getBaseLanguage, isTranslateBaseLanguage} from './languages_page/languages_util.js';

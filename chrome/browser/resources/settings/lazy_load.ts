@@ -9,7 +9,6 @@ import './clear_browsing_data_dialog/clear_browsing_data_account_indicator.js';
 // </if>
 import './clear_browsing_data_dialog/clear_browsing_data_dialog.js';
 import './clear_browsing_data_dialog/clear_browsing_data_time_picker.js';
-import './glic_page/glic_login_permissions_page.js';
 import './privacy_page/cookies_page.js';
 import './privacy_page/security/security_page_v2.js';
 import './privacy_page/security/security_page.js';
@@ -122,7 +121,6 @@ export type {IronListElement} from 'chrome://resources/polymer/v3_0/iron-list/ir
 // <if expr="not is_chromeos">
 // </if>
 
-export {AiEnterpriseFeaturePrefName, AiPageActions, FeatureOptInState, SettingsAiPageFeaturePrefName} from './ai_page/constants.js';
 // <if expr="_google_chrome">
 // </if>
 export {SettingsAppearanceFontsPageElement} from './appearance_page/appearance_fonts_page.js';
@@ -143,7 +141,6 @@ export {SettingsToggleButtonElement} from './controls/settings_toggle_button.js'
 export {DownloadsBrowserProxyImpl} from './downloads_page/downloads_browser_proxy.js';
 export type {DownloadsBrowserProxy} from './downloads_page/downloads_browser_proxy.js';
 export {SettingsDownloadsPageElement} from './downloads_page/downloads_page.js';
-export {SettingsGlicLoginPermissionsPageElement} from './glic_page/glic_login_permissions_page.js';
 // <if expr="not is_chromeos">
 export {SettingsAddLanguagesDialogElement} from './languages_page/add_languages_dialog.js';
 // <if expr="not is_macosx">

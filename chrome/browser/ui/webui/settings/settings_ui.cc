@@ -32,7 +32,6 @@
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/ssl/https_upgrades_util.h"
-#include "chrome/browser/subscription_eligibility/subscription_eligibility_service_factory.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/hats/hats_service.h"
 #include "chrome/browser/ui/hats/hats_service_factory.h"
@@ -113,7 +112,6 @@
 #include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/strings/grit/components_strings.h"
-#include "components/subscription_eligibility/subscription_eligibility_service.h"
 #include "components/sync/base/features.h"
 #include "content/public/browser/isolated_web_apps_policy.h"
 #include "content/public/browser/url_data_source.h"
@@ -347,22 +345,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
       compose_enabled && base::FeatureList::IsEnabled(
                              compose::features::kEnableComposeProactiveNudge));
 
-  auto* subscription_service = subscription_eligibility::
-      SubscriptionEligibilityServiceFactory::GetForProfile(profile);
-
-  const bool use_paid_tier =
-      subscription_service && subscription_service->GetAiSubscriptionTier() > 0;
-
-  html_source->AddBoolean(
-      "showGeminiPersonalContextLink",
-      base::FeatureList::IsEnabled(features::kGlicPersonalContext) &&
-          use_paid_tier);
-  html_source->AddBoolean(
-      "showInstructionLink",
-      (base::FeatureList::IsEnabled(features::kGlicPersonalContext) &&
-       !use_paid_tier) ||
-          (base::FeatureList::IsEnabled(features::kGlicGeminiInstructions) &&
-           !base::FeatureList::IsEnabled(features::kGlicPersonalContext)));
 
 #if BUILDFLAG(IS_CHROMEOS)
   const bool download_bubble_controlled_by_pref = false;

@@ -19,7 +19,6 @@ source_set("settings") {
     "dictation_handler.h",
     "downloads_handler.h",
     "font_handler.h",
-    "glic_handler.h",
     "hats_handler.h",
     "import_data_handler.h",
     "languages_handler.h",
@@ -137,7 +136,6 @@ source_set("impl") {
     "dictation_handler.cc",
     "downloads_handler.cc",
     "font_handler.cc",
-    "glic_handler.cc",
     "hats_handler.cc",
     "import_data_handler.cc",
     "languages_handler.cc",
@@ -400,7 +398,6 @@ source_set("browser_tests") {
 
   sources = [
     "appearance_handler_browsertest.cc",
-    "glic_handler_browsertest.cc",
     "people_handler_browsertest.cc",
     "performance_handler_browsertest.cc",
     "settings_clear_browsing_data_handler_browsertest.cc",
@@ -411,9 +408,6 @@ source_set("browser_tests") {
     ":impl",
     ":settings",
     "//chrome/browser:browser_process",
-    "//chrome/browser/background/glic",
-    "//chrome/browser/glic",
-    "//chrome/browser/glic/test_support",
     "//chrome/browser/net:test_support",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/signin",
