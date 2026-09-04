@@ -604,7 +604,6 @@ template("build_webui") {
         "//chrome/browser/resources/media_router/internals",
         "//chrome/browser/resources/memory_internals",
         "//chrome/browser/resources/omnibox",
-        "//chrome/browser/resources/password_manager",
         "//chrome/browser/resources/predictors",
         "//chrome/browser/resources/print_preview",
         "//chrome/browser/resources/profile_internals",

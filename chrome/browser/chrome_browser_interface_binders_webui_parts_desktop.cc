@@ -57,7 +57,6 @@
 #include "chrome/browser/ui/webui/omnibox_everywhere/debug/omnibox_everywhere_debug.mojom.h"
 #include "chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_ui.h"
 #include "chrome/browser/ui/webui/omnibox_popup/omnibox_popup_ui.h"
-#include "chrome/browser/ui/webui/password_manager/password_manager_ui.h"
 #include "chrome/browser/ui/webui/search_engine_choice/search_engine_choice.mojom.h"  // nogncheck crbug.com/40147906
 #include "chrome/browser/ui/webui/search_engine_choice/search_engine_choice_ui.h"
 #include "chrome/browser/ui/webui/settings/settings_ui.h"
@@ -339,9 +338,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       map);
 
   RegisterWebUIControllerInterfaceBinder<
-      password_manager::mojom::PageHandlerFactory, PasswordManagerUI>(map);
-
-  RegisterWebUIControllerInterfaceBinder<
       customize_color_scheme_mode::mojom::
           CustomizeColorSchemeModeHandlerFactory,
       CustomizeChromeUI>(map);
@@ -357,7 +353,7 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
 
   RegisterWebUIControllerInterfaceBinder<
       help_bubble::mojom::HelpBubbleHandlerFactory, UserEducationInternalsUI,
-      ReadingListUI, NewTabPageUI, CustomizeChromeUI, PasswordManagerUI,
+      ReadingListUI, NewTabPageUI, CustomizeChromeUI,
       HistoryUI, lens::LensOverlayUntrustedUI, lens::LensSidePanelUntrustedUI,
       ContextualTasksUI
 #if !BUILDFLAG(IS_CHROMEOS)

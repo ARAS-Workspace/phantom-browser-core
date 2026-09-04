@@ -4206,20 +4206,6 @@ void BrowserActions::InitializeSubmenuActions() {
               [](BrowserWindowInterface* bwi, actions::ActionItem* item,
                  actions::ActionInvocationContext context) {},
               bwi),
-          kActionMenuPasswordsAndAutofillSubmenu,
-          IDS_PASSWORDS_AND_AUTOFILL_MENU, IDS_PASSWORDS_AND_AUTOFILL_MENU,
-          features::IsRoundedIconsEnabled()
-              ? vector_icons::kPasswordManagerIcon
-              : vector_icons::kPasswordManagerOldIcon,
-          /*is_pinnable=*/false)
-          .Build());
-
-  root_action_item_->AddChild(
-      ChromeMenuAction(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {},
-              bwi),
           kActionMenuReadingListSubmenu, IDS_READING_LIST_MENU,
           IDS_READING_LIST_MENU,
           features::IsRoundedIconsEnabled() ? kListAltIcon

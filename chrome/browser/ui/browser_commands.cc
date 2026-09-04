@@ -2302,9 +2302,6 @@ void ManagePasswordsForPage(BrowserWindowInterface* browser) {
   user_education->NotifyFeaturePromoFeatureUsed(
       feature_engagement::kIPHPasswordsManagementBubbleDuringSigninFeature,
       FeaturePromoFeatureUsedAction::kClosePromoIfPresent);
-  user_education->NotifyFeaturePromoFeatureUsed(
-      feature_engagement::kIPHPasswordManagerShortcutFeature,
-      FeaturePromoFeatureUsedAction::kClosePromoIfPresent);
   WebContents* const web_contents =
       browser->GetTabStripModel()->GetActiveWebContents();
   ManagePasswordsUIController* controller =

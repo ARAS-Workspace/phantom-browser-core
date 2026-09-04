@@ -154,7 +154,6 @@
   E(kActionImportSettings, IDC_IMPORT_SETTINGS) \
   E(kActionOptions, IDC_OPTIONS) \
   E(kActionEditSearchEngines, IDC_EDIT_SEARCH_ENGINES) \
-  E(kActionViewPasswords, IDC_VIEW_PASSWORDS) \
   E(kActionAbout, IDC_ABOUT) \
   E(kActionHelpPageViaKeyboard, IDC_HELP_PAGE_VIA_KEYBOARD) \
   E(kActionHelpPageViaMenu, IDC_HELP_PAGE_VIA_MENU) \
@@ -549,7 +548,6 @@
 #define SUBMENU_ACTION_IDS                                                     \
   E(kActionAppMenuRoot)                                                        \
   E(kActionMenuBookmarksSubmenu, kBookmarksMenuId)                             \
-  E(kActionMenuPasswordsAndAutofillSubmenu, kPasswordsAndAutofillMenuId)       \
   E(kActionMenuReadingListSubmenu, kReadingListMenuId)                         \
   E(kActionMenuZoomSubmenu, kZoomMenuId)                                       \
   E(kActionMenuProfileSubmenu, kProfileMenuId)                                 \

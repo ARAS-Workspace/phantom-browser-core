@@ -127,7 +127,6 @@ source_set("impl") {
     "//chrome/browser/ui/webui:webui_util",
     "//chrome/browser/ui/webui/customize_buttons",
     "//chrome/browser/ui/webui/new_tab_page",
-    "//chrome/browser/ui/webui/password_manager:password_manager_ui",
     "//chrome/browser/ui/webui/settings",
     "//chrome/browser/ui/webui/side_panel/customize_chrome:customize_chrome_ui",
     "//chrome/browser/user_education",

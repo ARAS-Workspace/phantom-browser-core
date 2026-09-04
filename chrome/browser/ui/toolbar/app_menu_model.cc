@@ -94,9 +94,7 @@
 #include "chrome/browser/ui/webui/signin/signin_utils_desktop.h"
 #include "chrome/browser/ui/webui/whats_new/whats_new_util.h"
 #include "chrome/browser/upgrade_detector/upgrade_detector.h"
-#include "chrome/browser/user_education/tutorial_identifiers.h"
 #include "chrome/browser/user_education/user_education_service.h"
-#include "chrome/browser/user_education/user_education_service_factory.h"
 #include "chrome/browser/web_applications/mojom/user_display_mode.mojom.h"
 #include "chrome/browser/web_applications/proto/web_app_install_state.pb.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
@@ -124,7 +122,6 @@
 #include "components/omnibox/browser/vector_icons.h"
 #include "components/password_manager/content/common/web_ui_constants.h"
 #include "components/password_manager/core/common/password_manager_features.h"
-#include "components/password_manager/core/common/password_manager_pref_names.h"
 #include "components/prefs/pref_member.h"
 #include "components/prefs/pref_service.h"
 #include "components/profile_metrics/browser_profile_type.h"
@@ -1257,30 +1254,14 @@ void ExtensionsMenuModel::Build(BrowserWindowInterface* browser) {
 ////////////////////////////////////////////////////////////////////////////////
 // AppMenuModel
 
-// static
-AlertMenuItem AppMenuModel::GetAlertItemForRunningTutorial(
-    BrowserWindowInterface* browser) {
-  if (!browser || !browser->GetWindow()) {
-    return AlertMenuItem::kNone;
-  }
-  auto* const service =
-      UserEducationServiceFactory::GetForBrowserContext(browser->GetProfile());
-  return service && service->tutorial_service().IsRunningTutorial(
-                        kPasswordManagerTutorialId)
-             ? AlertMenuItem::kPasswordManager
-             : AlertMenuItem::kNone;
-}
-
 AppMenuModel::AppMenuModel(ui::AcceleratorProvider* provider,
                            BrowserWindowInterface* browser,
-                           AppMenuIconController* app_menu_icon_controller,
-                           AlertMenuItem alert_item)
+                           AppMenuIconController* app_menu_icon_controller)
     : ui::SimpleMenuModel(this),
       uma_action_recorded_(false),
       provider_(provider),
       browser_(browser),
-      app_menu_icon_controller_(app_menu_icon_controller),
-      alert_item_(alert_item) {
+      app_menu_icon_controller_(app_menu_icon_controller) {
   DCHECK(browser_);
 }
 
@@ -1313,11 +1294,6 @@ void AppMenuModel::ExecuteCommand(int command_id, int event_flags) {
   if (error) {
     error->ExecuteMenuItem(browser_);
     return;
-  }
-
-  if (command_id == IDC_VIEW_PASSWORDS) {
-    browser()->GetProfile()->GetPrefs()->SetBoolean(
-        password_manager::prefs::kPasswordsPrefWithNewLabelUsed, true);
   }
 
   LogMenuMetrics(command_id);
@@ -1815,13 +1791,6 @@ void AppMenuModel::LogMenuMetrics(int command_id) {
       }
       LogMenuAction(MENU_ACTION_APP_INFO);
       break;
-    case IDC_VIEW_PASSWORDS:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes("WrenchMenu.TimeToAction.PasswordManager",
-                                      delta);
-      }
-      LogMenuAction(MENU_ACTION_PASSWORD_MANAGER);
-      break;
 
       // Profile submenu.
 #if !BUILDFLAG(IS_CHROMEOS)
@@ -1913,14 +1882,6 @@ void AppMenuModel::LogMenuMetrics(int command_id) {
       LogMenuAction(MENU_ACTION_READING_LIST_SHOW_UI);
       break;
 
-    // Password autofill submenu.
-    case IDC_SHOW_PASSWORD_MANAGER:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes(
-            "WrenchMenu.TimeToAction.ShowPasswordManager", delta);
-      }
-      LogMenuAction(MENU_ACTION_SHOW_PASSWORD_MANAGER);
-      break;
     case IDC_SHOW_PAYMENT_METHODS:
       if (!uma_action_recorded_) {
         base::UmaHistogramMediumTimes(
@@ -2062,15 +2023,6 @@ bool AppMenuModel::IsCommandIdEnabled(int command_id) const {
     default:
       return chrome::IsCommandEnabled(browser_, command_id);
   }
-}
-
-bool AppMenuModel::IsCommandIdAlerted(int command_id) const {
-  if (command_id == IDC_VIEW_PASSWORDS ||
-      command_id == IDC_SHOW_PASSWORD_MANAGER) {
-    return alert_item_ == AlertMenuItem::kPasswordManager;
-  }
-
-  return false;
 }
 
 bool AppMenuModel::GetAcceleratorForCommandId(

@@ -16,10 +16,6 @@ inline constexpr char kTabGroupTutorialMetricPrefix[] = "TabGroup";
 inline constexpr char kSavedTabGroupTutorialId[] = "Saved Tab Group Tutorial";
 inline constexpr char kSavedTabGroupTutorialMetricPrefix[] = "SavedTabGroup";
 
-inline constexpr char kPasswordManagerTutorialId[] =
-    "Password Manager Tutorial";
-inline constexpr char kPasswordManagerTutorialMetricPrefix[] =
-    "PasswordManager";
 
 inline constexpr char kLensOverlayTutorialId[] = "Lens Overlay Tutorial";
 inline constexpr char kLensOverlayTutorialMetricPrefix[] = "LensOverlay";

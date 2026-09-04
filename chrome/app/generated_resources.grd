@@ -771,7 +771,6 @@ are declared in tools/grit/grit_args.gni.
             Open link in new <ph name="APP">$1<ex>Gmail App</ex></ph> tab
           </message>
 
-
           <message name="IDS_CONTENT_CONTEXT_SAVELINKAS" desc="The name of the Save Link As command in the content area context menu">
             Save lin&amp;k as...
           </message>
@@ -1115,7 +1114,6 @@ are declared in tools/grit/grit_args.gni.
             Open Link in new <ph name="APP">$1<ex>Gmail App</ex></ph> Tab
           </message>
 
-
           <message name="IDS_CONTENT_CONTEXT_SAVELINKAS" desc="In Title Case: The name of the Save Link As command in the content area context menu">
             Save Lin&amp;k As...
           </message>
@@ -1418,9 +1416,6 @@ are declared in tools/grit/grit_args.gni.
           <message name="IDS_YOUR_SAVED_INFO_CONTACT_INFO_SUBMENU_OPTION" desc="The text label of the contact info option for the Your saved info submenu that allows user to manage their list of saved addresses and Autofill preferences for addresses.">
             &amp;Contact info
           </message>
-          <message name="IDS_PASSWORDS_AND_AUTOFILL_MENU" desc="The text label of the passwords and autofill menu item">
-            Passwords and &amp;autofill
-          </message>
         <if expr="is_win or is_macosx or is_linux">
           <message name="IDS_RELAUNCH_TO_UPDATE_ALT" desc="Alternate text label of the relaunch to update Chrome menu item">
             Relaunch to update
@@ -1556,9 +1551,6 @@ are declared in tools/grit/grit_args.gni.
           </message>
           <message name="IDS_YOUR_SAVED_INFO_CONTACT_INFO_SUBMENU_OPTION" desc="In Title Case: The text label of the contact info option for the Your saved info submenu that allows user to manage their list of saved addresses and Autofill preferences for addresses.">
             &amp;Contact Info
-          </message>
-          <message name="IDS_PASSWORDS_AND_AUTOFILL_MENU" desc="In Title Case: The text label of the passwords and autofill menu item">
-            Passwords and &amp;Autofill
           </message>
           <if expr="is_win or is_macosx or is_linux">
               <message name="IDS_RELAUNCH_TO_UPDATE_ALT" desc="In Title Case: Alternate text label of the relaunch to update Chrome menu item">
@@ -6227,7 +6219,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
         Learn more about disabled extensions.
       </message>
 
-
       <!-- Begin Extension Settings Overridden Dialog strings. -->
       <message name="IDS_EXTENSION_SETTINGS_OVERRIDDEN_DIALOG_CHANGE_IT_BACK" desc="The text of the button to revert to old settings; displayed in the dialog describing settings overridden by an extension.">
         Change it back
@@ -7489,7 +7480,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
           Settings
         </message>
       </if>
-
 
       <!-- NTP -->
       <!-- Google Drive integration disclaimer for New Tab Page -->
@@ -11193,22 +11183,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
       </message>
 
       <!-- Password Manager Tutorial Strings -->
-      <if expr="use_titlecase">
-        <message name="IDS_TUTORIAL_PASSWORD_MANAGER_CLICK_PASSWORDS_MENU" desc="The description of the 'click passwords and autofill' step in password manager tutorial">
-          Click “Passwords and Autofill”
-        </message>
-      </if>
-      <if expr="not use_titlecase">
-        <message name="IDS_TUTORIAL_PASSWORD_MANAGER_CLICK_PASSWORDS_MENU" desc="The description of the 'click passwords and autofill' step in password manager tutorial">
-          Click “Passwords and autofill”
-        </message>
-      </if>
-      <message name="IDS_TUTORIAL_PASSWORD_MANAGER_ADD_SHORTCUT" desc="The description of the 'add shortcut' step in password manager tutorial">
-        Click “Add Shortcut”
-      </message>
-      <message name="IDS_TUTORIAL_PASSWORD_MANAGER_CLICK_INSTALL" desc="The description of the 'click install' step in password manager tutorial">
-        Click “Install”
-      </message>
 
       <!-- Lens Overlay Tutorial Strings -->
       <message name="IDS_TUTORIAL_LENS_OVERLAY_CLICK_ADDRESS_BAR" desc="The description of the 'click the address bar' step in Lens overlay tutorial">
@@ -11423,17 +11397,8 @@ Check your passwords anytime in <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google 
         <message name="IDS_PASSWORD_MANAGER_IPH_MANAGEMENT_BUBBLE_AFTER_SAVE_SCREENREADER" desc="Text announced with the in Product Help after saving a password informing the user about the password management bubble">
           To view your password or add a note about it, select manage your passwords in the search and address bar
         </message>
-        <message name="IDS_PASSWORD_MANAGER_IPH_SHARE_PASSWORD_BUTTON" desc="Body of the in Product Help for Share Password Button in Password Manager.">
-          You can securely share a copy of your password with someone in your family group
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_IPH_SHARE_PASSWORD_BUTTON_SCREENREADER" desc="Text announced with the in Product Help for Share Password Button in Password Manager.">
-          Use Share button at the bottom of the card to share a copy of your password with someone in your family group
-        </message>
         <message name="IDS_PASSWORD_MANAGER_IPH_ACCOUNT_STORAGE_TOGGLE" desc="Body of the in Product Help for account storage toggle in Password Manager.">
           You can turn off this setting to save your passwords only on this device
-        </message>
-        <message name="IDS_PASSWORD_MANAGER_IPH_CREATE_SHORTCUT_TITLE" desc="Body of the in Product Help shown after successfully logging into a website telling user about how to create a shortcut">
-          Get to your saved passwords quicker
         </message>
         <message name="IDS_PASSWORD_MANAGER_IPH_MANAGEMENT_BUBBLE_DURING_SIGNIN" desc="Body of the in Product Help shown during sign-in flows informing the user about the password management bubble">
           You saved a note for a password on this site. To view it, click the key icon.
@@ -11551,8 +11516,6 @@ Check your passwords anytime in <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google 
         <message name="IDS_IMPORT_FROM_BOOKMARKS_HTML_FILE" desc="browser combo box: Bookmarks HTML File">
           Bookmarks HTML File
         </message>
-
-
 
         <!-- Import progress popup -->
         <if expr="is_macosx">
@@ -12160,7 +12123,6 @@ Check your passwords anytime in <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google 
           Add Tab to New Comparison Table
         </message>
       </if>
-
 
       <!-- Side By Side -->
       <message name="IDS_ACCNAME_SPLIT_TABS_RESIZE" desc="Screen reader announcement when the side by side resize handle is focused.">
@@ -12906,7 +12868,6 @@ Check your passwords anytime in <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google 
             </message>
           <!-- /Delete Last Tab Dialog -->
 
-
           <!-- Recent Activity -->
             <message name="IDS_DATA_SHARING_RECENT_ACTIVITY_TITLE" desc="Title for the recent activity dialog.">
               Recent Activity
@@ -13642,7 +13603,6 @@ Check your passwords anytime in <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google 
           Extensions
         </message>
 
-
         <message name="IDS_CONTROLLED_SETTING_EXTENSION" desc="Text displayed in the controlled settings bubble when a setting's value is enforced by an extension.">
           This setting is enforced by the "<ph name="NAME">$1<ex>Google Cast</ex></ph>" extension.
         </message>
@@ -13991,7 +13951,6 @@ Check your passwords anytime in <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google 
           Call from <ph name="DEVICE_NAME">$1<ex>Jimmy's Pixel</ex></ph>
         </message>
       </if>
-
 
       <!-- Collected cookies window -->
       <message name="IDS_COLLECTED_COOKIES_DIALOG_TITLE" desc="The title of the collect cookies dialog">
@@ -15603,7 +15562,6 @@ Please help our engineers fix this problem. Tell us what happened right before y
         </message>
       </if>
 
-
       <!-- Mac AppleScript -->
       <if expr="is_macosx">
         <message name="IDS_GET_PROFILE_ERROR_APPLESCRIPT_MAC" desc="Error dialog title to be displayed when profile fails to load.  Mac-only.">
@@ -15646,7 +15604,6 @@ Please help our engineers fix this problem. Tell us what happened right before y
                 DevTools are not allowed for this URL.
         </message>
       </if> <!-- is_macosx -->
-
 
       <!-- Mac Menubar Menus -->
       <if expr="is_macosx">
@@ -16251,7 +16208,6 @@ Please help our engineers fix this problem. Tell us what happened right before y
         Can't access camera &amp; microphone
       </message>
 
-
       <!-- Protected media identifier permission infobar -->
       <message name="IDS_MANAGE_PASSWORDS_CONFIRM_GENERATED_TEXT" desc="A message that the browser shows after saving a password it has autogenerated for the user. This message appears in a bubble and contains a link to all the user's saved autogenerated passwords. The link text is a separate string in the translation console and appears here as placeholder text.">
         View and manage saved passwords in your <ph name="SAVED_PASSWORDS_STORE">$1<ex>Google Account</ex></ph>
@@ -16722,7 +16678,6 @@ Please help our engineers fix this problem. Tell us what happened right before y
       <message name="IDS_SHARE_THIS_TAB_AUDIO_SHARE" desc="Text for the audio toggle on the tab-sharing dialog. If the toggle is enabled, tab audio will be shared; otherwise only video.">
         Also allow tab audio
       </message>
-
 
       <message name="IDS_TAB_CAPTURE_TERMINATED_BY_POLICY_TITLE" desc="Title for a confirmation dialog shown on the captured tab when capture of that tab is terminated due to enterprise policy.">
         Screen sharing has ended
@@ -18611,7 +18566,6 @@ Please help our engineers fix this problem. Tell us what happened right before y
       <ph name="APP_NAME">$1<ex>Google Photos</ex></ph> and a few more apps are blocked on your <ph name="DEVICE_TYPE">$2<ex>Chromebook</ex></ph>
     </message>
 
-
     <message name="IDS_APP_LOCAL_BLOCK_HEADING" desc="Tells the child that parent can unblock the app in the settings.">
       Ask your parent to allow access in Settings
     </message>
@@ -19817,7 +19771,6 @@ Please help our engineers fix this problem. Tell us what happened right before y
     <message name="IDS_REPORT_UNSAFE_SITE_A11Y_IMAGE_TEXT" desc="Aria label for the screenshot image of the site to be reported to Google.">
       Screenshot
     </message>
-
 
     <!-- Chrome finds Notifications -->
     <message name="IDS_CHROME_FINDS_NOTIFICATIONS_HELPFUL_BUTTON_TEXT" desc="Text for the helpful button found on Chrome finds notifications.">

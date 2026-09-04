@@ -76,7 +76,6 @@
 #include "chrome/browser/ui/views/web_apps/web_app_install_dialog_delegate.h"
 #include "chrome/browser/ui/webui/customize_buttons/customize_buttons_handler.h"
 #include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
-#include "chrome/browser/ui/webui/password_manager/password_manager_ui.h"
 #include "chrome/browser/ui/webui/settings/settings_ui.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_ui.h"
 #include "chrome/browser/user_education/ntp_promo_identifiers.h"
@@ -946,16 +945,6 @@ void MaybeRegisterChromeFeaturePromos(
       IDS_PASSWORD_MANAGER_IPH_MANAGEMENT_BUBBLE_DURING_SIGNIN_SCREENREADER,
       FeaturePromoSpecification::AcceleratorInfo()));
 
-  // kIPHPasswordManagerShortcutFeature:
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForTutorialPromo(
-          feature_engagement::kIPHPasswordManagerShortcutFeature,
-          kPasswordsOmniboxKeyIconElementId,
-          IDS_PASSWORD_MANAGER_IPH_CREATE_SHORTCUT_BODY,
-          kPasswordManagerTutorialId)
-          .SetBubbleArrow(HelpBubbleArrow::kBottomRight)
-          .SetBubbleIcon(kLightbulbOutlineIcon)
-          .SetBubbleTitleText(IDS_PASSWORD_MANAGER_IPH_CREATE_SHORTCUT_TITLE)));
 
   // kIPHPdfGlicSummarizeFeature:
   registry.RegisterFeature(std::move(
@@ -1045,17 +1034,6 @@ void MaybeRegisterChromeFeaturePromos(
                        "Triggered by certain URLs to start the Lens Overlay "
                        "tutorial.")));
 
-  // kIPHPasswordSharingFeature:
-  registry.RegisterFeature(
-      std::move(FeaturePromoSpecification::CreateForToastPromo(
-                    feature_engagement::kIPHPasswordSharingFeature,
-                    PasswordManagerUI::kSharePasswordElementId,
-                    IDS_PASSWORD_MANAGER_IPH_SHARE_PASSWORD_BUTTON,
-                    IDS_PASSWORD_MANAGER_IPH_SHARE_PASSWORD_BUTTON_SCREENREADER,
-                    FeaturePromoSpecification::AcceleratorInfo())
-                    .SetInAnyContext(true)
-                    .SetBubbleIcon(kLightbulbOutlineIcon)
-                    .SetBubbleArrow(HelpBubbleArrow::kTopRight)));
 
   // kIPHPowerBookmarksSidePanelFeature:
   registry.RegisterFeature(
@@ -2167,71 +2145,6 @@ void MaybeRegisterChromeTutorials(
 
     tutorial_registry.AddTutorial(kSidePanelCustomizeChromeTutorialId,
                                   std::move(customize_chrome_tutorial));
-  }
-
-  {  // Password Manager tutorial
-    auto password_manager_tutorial =
-        TutorialDescription::Create<kPasswordManagerTutorialMetricPrefix>(
-            // Bubble step - Browser app menu
-            BubbleStep(kToolbarAppMenuButtonElementId)
-                .SetBubbleBodyText(IDS_TUTORIAL_PASSWORD_MANAGER_OPEN_APP_MENU)
-                .SetBubbleArrow(HelpBubbleArrow::kTopRight),
-
-            // Wait for one of the next elements so the If step can check
-            // for the optional element.
-            TutorialDescription::WaitForAnyOf(
-                AppMenuModel::kPasswordAndAutofillMenuItem)
-                .Or(AppMenuModel::kPasswordManagerMenuItem),
-
-            TutorialDescription::If(AppMenuModel::kPasswordAndAutofillMenuItem)
-                .Then(
-                    // Bubble step - Passwords and Autofill sub menu item
-                    BubbleStep(AppMenuModel::kPasswordAndAutofillMenuItem)
-                        .SetBubbleBodyText(
-                            IDS_TUTORIAL_PASSWORD_MANAGER_CLICK_PASSWORDS_MENU)
-                        .SetBubbleArrow(HelpBubbleArrow::kRightCenter)),
-
-            // Bubble step - "Password Manager" menu item
-            BubbleStep(AppMenuModel::kPasswordManagerMenuItem)
-                .SetBubbleBodyText(
-                    IDS_TUTORIAL_PASSWORD_MANAGER_CLICK_PASSWORD_MANAGER)
-                .SetBubbleArrow(HelpBubbleArrow::kRightCenter)
-                .AbortIfVisibilityLost(false),
-
-            // Bubble step - "Add shortcut" row
-            BubbleStep(PasswordManagerUI::kAddShortcutElementId)
-                .SetBubbleBodyText(IDS_TUTORIAL_PASSWORD_MANAGER_ADD_SHORTCUT)
-                .SetBubbleArrow(HelpBubbleArrow::kTopCenter)
-                .InAnyContext(),
-
-            // Event step - Click on "Add shortcut"
-            EventStep(PasswordManagerUI::kAddShortcutCustomEventId)
-                .InSameContext(),
-
-            // Bubble step - "Install" row
-            BubbleStep(web_app::WebAppInstallDialogDelegate::
-                           kPwaInstallDialogInstallButton)
-                .SetBubbleBodyText(IDS_TUTORIAL_PASSWORD_MANAGER_CLICK_INSTALL)
-                .SetBubbleArrow(HelpBubbleArrow::kTopRight),
-
-            // Event step - Click on "Install"
-            EventStep(
-                web_app::WebAppInstallDialogDelegate::kInstalledPWAEventId)
-                .InSameContext(),
-
-            // Completion of the tutorial.
-            BubbleStep(kTopContainerElementId)
-                .SetBubbleTitleText(IDS_TUTORIAL_GENERIC_SUCCESS_TITLE)
-                .SetBubbleBodyText(IDS_TUTORIAL_PASSWORD_MANAGER_SUCCESS_BODY)
-                .SetBubbleArrow(HelpBubbleArrow::kNone));
-
-    password_manager_tutorial.metadata.additional_description =
-        "Tutorial for installing password manager.";
-    password_manager_tutorial.metadata.launch_milestone = 116;
-    password_manager_tutorial.metadata.owners = "mickeyburks@chromium.org";
-
-    tutorial_registry.AddTutorial(kPasswordManagerTutorialId,
-                                  std::move(password_manager_tutorial));
   }
 
   {  // Lens Overlay tutorial

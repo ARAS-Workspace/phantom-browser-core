@@ -161,8 +161,7 @@ void WebUIAppMenuControl::HandleContextMenu(const gfx::Rect& anchor_bounds,
   // pointer to the destroyed model.
   menu_.reset();
   menu_model_ = std::make_unique<AppMenuModel>(
-      toolbar_view, browser, toolbar_view->app_menu_icon_controller(),
-      AppMenuModel::GetAlertItemForRunningTutorial(browser));
+      toolbar_view, browser, toolbar_view->app_menu_icon_controller());
   menu_model_->Init();
 
   int run_flags = views::MenuRunner::HAS_MNEMONICS;

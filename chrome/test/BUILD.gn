@@ -7339,8 +7339,6 @@ test("unit_tests") {
   if (!is_android) {
     deps += [
       "//chrome/browser/ui:chrome_pages",
-      "//chrome/browser/ui/webui/password_manager:unit_tests",
-      "//chrome/browser/ui/webui/password_manager/notification_cards:unit_tests",
       "//chrome/browser/ui/webui/side_panel/bookmarks:unit_tests",
       "//chrome/browser/ui/webui/side_panel/customize_chrome:unit_tests",
       "//chrome/browser/ui/webui/side_panel/customize_chrome/customize_toolbar:unit_tests",
@@ -7482,7 +7480,6 @@ test("unit_tests") {
       "../browser/enterprise/connectors/device_trust/key_management/core/persistence:unit_tests",
       "../browser/enterprise/connectors/device_trust/key_management/installer:unit_tests",
       "../browser/enterprise/connectors/device_trust/signals/decorators/browser:unit_tests",
-      "../browser/ui/webui/password_manager:mojo_bindings",
       "../browser/ui/webui/whats_new:mojo_bindings",
       "//chrome/browser/browser_switcher",
       "//chrome/browser/browser_switcher:unit_tests",

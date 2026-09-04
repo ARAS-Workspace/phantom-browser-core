@@ -232,7 +232,6 @@
 #define IDC_IMPORT_SETTINGS             40014
 #define IDC_OPTIONS                     40015
 #define IDC_EDIT_SEARCH_ENGINES         40016
-#define IDC_VIEW_PASSWORDS              40017
 #define IDC_ABOUT                       40018
 #define IDC_HELP_PAGE_VIA_KEYBOARD      40019
 #define IDC_HELP_PAGE_VIA_MENU          40020
@@ -578,7 +577,6 @@
 // App Menu submenus and containers
 constexpr int kEditMenuId = 57343;
 constexpr int kZoomMenuId = 57342;
-constexpr int kPasswordsAndAutofillMenuId = 57341;
 constexpr int kFindAndEditMenuId = 57340;
 constexpr int kSaveAndShareMenuId = 57339;
 constexpr int kRecentTabsMenuId = 57338;

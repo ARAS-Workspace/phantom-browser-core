@@ -101,14 +101,8 @@ void BrowserAppMenuButton::ShowMenu(int run_types) {
     return;
   }
 
-  // Allow highlighting menu items when the menu was opened while
-  // certain tutorials are running.
-  AlertMenuItem alert_item =
-      AppMenuModel::GetAlertItemForRunningTutorial(browser);
-
   RunMenu(std::make_unique<AppMenuModel>(
-              toolbar_view_, browser, toolbar_view_->app_menu_icon_controller(),
-              alert_item),
+              toolbar_view_, browser, toolbar_view_->app_menu_icon_controller()),
           browser, run_types);
 }
 

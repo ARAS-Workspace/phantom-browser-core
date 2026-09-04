@@ -44,9 +44,6 @@
 #include "chrome/browser/ui/user_education/show_promo_in_page.h"
 #include "chrome/browser/ui/webui/bookmarks/bookmarks_ui.h"
 #include "chrome/browser/ui/webui/settings/site_settings_helper.h"
-#include "chrome/browser/user_education/tutorial_identifiers.h"
-#include "chrome/browser/user_education/user_education_service.h"
-#include "chrome/browser/user_education/user_education_service_factory.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/common/webui_url_constants.h"
@@ -547,18 +544,6 @@ void ShowClearBrowsingDataDialog(BrowserWindowInterface* browser) {
 
 void ShowPasswordManager(BrowserWindowInterface* bwi) {
   base::RecordAction(UserMetricsAction("Options_ShowPasswordManager"));
-  // This code is necessary to fix a bug (crbug.com/40269361) during Password
-  // Manager Shortcut tutorial flow.
-  auto* service =
-      UserEducationServiceFactory::GetForBrowserContext(bwi->GetProfile());
-  if (service) {
-    auto* tutorial_service = &service->tutorial_service();
-    if (tutorial_service &&
-        tutorial_service->IsRunningTutorial(kPasswordManagerTutorialId)) {
-      ShowSingletonTab(bwi, GURL(kChromeUIPasswordManagerSettingsURL));
-      return;
-    }
-  }
   ShowSingletonTabIgnorePathOverwriteNTP(bwi,
                                          GURL(kChromeUIPasswordManagerURL));
 }

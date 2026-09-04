@@ -59,7 +59,6 @@
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/passwords/password_bubble_view_base.h"
-#include "chrome/browser/web_applications/web_app_utils.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
@@ -159,15 +158,6 @@ const password_manager::InteractionsStats* FindStatsByUsername(
   auto it = std::ranges::find(
       stats, username, &password_manager::InteractionsStats::username_value);
   return it == stats.end() ? nullptr : &*it;
-}
-
-void MaybeShowPasswordManagerShortcutIPH(BrowserWindowInterface* browser) {
-  // Don't show IPH if shortcut can't be created.
-  if (!web_app::AreWebAppsEnabled(browser->GetProfile())) {
-    return;
-  }
-  BrowserUserEducationInterface::From(browser)->MaybeShowFeaturePromo(
-      feature_engagement::kIPHPasswordManagerShortcutFeature);
 }
 
 std::optional<password_manager::BrowserSavePasswordProgressLogger>
@@ -489,7 +479,6 @@ void ManagePasswordsUIController::OnPasswordAutofilled(
     BrowserUserEducationInterface::From(browser)->MaybeShowFeaturePromo(
         feature_engagement::kIPHPasswordsManagementBubbleDuringSigninFeature);
   }
-  MaybeShowPasswordManagerShortcutIPH(browser);
 }
 
 void ManagePasswordsUIController::OnCredentialLeak(
@@ -1015,7 +1004,6 @@ void ManagePasswordsUIController::SavePassword(const std::u16string& username,
     // first.
     BrowserUserEducationInterface::From(browser)->MaybeShowFeaturePromo(
         feature_engagement::kIPHPasswordsManagementBubbleAfterSaveFeature);
-    MaybeShowPasswordManagerShortcutIPH(browser);
   }
 }
 

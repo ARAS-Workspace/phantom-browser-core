@@ -127,8 +127,6 @@ enum AppMenuAction {
 };
 // LINT.ThenChange(/tools/metrics/histograms/metadata/ui/enums.xml:WrenchMenuAction)
 
-enum class AlertMenuItem { kNone, kPasswordManager };
-
 // Function to record WrenchMenu.MenuAction histogram
 void LogWrenchMenuAction(AppMenuAction action_id);
 
@@ -219,8 +217,6 @@ class AppMenuModel : public ui::SimpleMenuModel,
   // Internal placeholder container command IDs.
   static constexpr int kEditMenuPlaceholder = kEditMenuId;
   static constexpr int kZoomMenuPlaceholder = kZoomMenuId;
-  static constexpr int kPasswordsAndAutofillMenuPlaceholder =
-      kPasswordsAndAutofillMenuId;
   static constexpr int kFindAndEditMenuPlaceholder = kFindAndEditMenuId;
   static constexpr int kSaveAndShareMenuPlaceholder = kSaveAndShareMenuId;
   static constexpr int kRecentTabsMenuPlaceholder = kRecentTabsMenuId;
@@ -252,19 +248,13 @@ class AppMenuModel : public ui::SimpleMenuModel,
 
   // TODO(mickeyburks): Highlight menu items dynamically through
   // TutorialDescription instead of hardcoding specific tutorials here.
-  // Returns the alert menu item that should be highlighted if a tutorial
-  // is currently running in the given browser.
-  static AlertMenuItem GetAlertItemForRunningTutorial(
-      BrowserWindowInterface* browser);
-
   // Creates an app menu model for the given browser. Init() must be called
   // before passing this to an AppMenu. |app_menu_icon_controller|, if provided,
   // is used to decide whether or not to include an item for opening the upgrade
   // dialog.
   AppMenuModel(ui::AcceleratorProvider* provider,
                BrowserWindowInterface* browser,
-               AppMenuIconController* app_menu_icon_controller = nullptr,
-               AlertMenuItem alert_item = AlertMenuItem::kNone);
+               AppMenuIconController* app_menu_icon_controller = nullptr);
 
   AppMenuModel(const AppMenuModel&) = delete;
   AppMenuModel& operator=(const AppMenuModel&) = delete;
@@ -281,7 +271,6 @@ class AppMenuModel : public ui::SimpleMenuModel,
   void ExecuteCommand(int command_id, int event_flags) override;
   bool IsCommandIdChecked(int command_id) const override;
   bool IsCommandIdEnabled(int command_id) const override;
-  bool IsCommandIdAlerted(int command_id) const override;
   bool GetAcceleratorForCommandId(int command_id,
                                   ui::Accelerator* accelerator) const override;
 
@@ -365,8 +354,6 @@ class AppMenuModel : public ui::SimpleMenuModel,
   const raw_ptr<AppMenuIconController> app_menu_icon_controller_;
 
   PrefChangeRegistrar local_state_pref_change_registrar_;
-
-  const AlertMenuItem alert_item_;
 };
 
 #endif  // CHROME_BROWSER_UI_TOOLBAR_APP_MENU_MODEL_H_

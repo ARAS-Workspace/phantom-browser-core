@@ -76,7 +76,6 @@
 #include "chrome/browser/ui/webui/history/history_ui.h"
 #include "chrome/browser/ui/webui/management/management_ui.h"
 #include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
-#include "chrome/browser/ui/webui/password_manager/password_manager_ui.h"
 #include "chrome/browser/ui/webui/settings/settings_utils.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
 #include "chrome/browser/web_applications/model/web_app_icon_types.h"
@@ -444,10 +443,6 @@ ChromeWebUIControllerFactory::GetFaviconResourceBytes(
     return WhatsNewUI::GetFaviconResourceBytes(scale_factor);
   }
 #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-  if (page_url.host() == password_manager::kChromeUIPasswordManagerHost) {
-    return PasswordManagerUI::GetFaviconResourceBytes(scale_factor);
-  }
 
   if (page_url.host() == chrome::kChromeUIManagementHost) {
     return ManagementUI::GetFaviconResourceBytes(scale_factor);

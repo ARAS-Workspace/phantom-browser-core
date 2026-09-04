@@ -673,10 +673,6 @@
     "META": {"sizes": {"includes": [10]}},
     "includes": [4515],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/password_manager/resources.grd": {
-    "META": {"sizes": {"includes": [200]}},
-    "includes": [4520],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/pdf/resources.grd": {
     "META": {"sizes": {"includes": [200]}},
     "includes": [4540],

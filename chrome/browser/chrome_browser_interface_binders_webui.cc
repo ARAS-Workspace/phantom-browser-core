@@ -43,7 +43,6 @@
 #include "chrome/browser/ui/webui/omnibox_popup/mojom/omnibox_popup_aim.mojom.h"
 #include "chrome/browser/ui/webui/omnibox_popup/omnibox_popup_ui.h"
 #include "chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_ui.h"
-#include "chrome/browser/ui/webui/password_manager/password_manager_ui.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_ui.h"
 #include "chrome/browser/ui/webui/side_panel/reading_list/reading_list_ui.h"
 #include "chrome/browser/ui/webui/user_education_internals/user_education_internals_ui.h"
@@ -134,7 +133,6 @@ void BindTrackedElementHandlerRestricted(
       controller->GetAs<UserEducationInternalsUI>() ||
       controller->GetAs<ReadingListUI>() ||
       controller->GetAs<CustomizeChromeUI>() ||
-      controller->GetAs<PasswordManagerUI>() ||
       controller->GetAs<HistoryUI>() ||
 #if !BUILDFLAG(IS_CHROMEOS)
       controller->GetAs<ProfilePickerUI>() ||
