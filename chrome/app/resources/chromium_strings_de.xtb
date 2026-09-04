@@ -723,7 +723,6 @@ Chromium kann deine Einstellungen nicht wiederherstellen.</translation>
 <translation id="8556420416730706394">Du kannst die Bildersuche anpinnen, um leichter darauf zuzugreifen. Klicke dazu oben in der Seitenleiste auf den Button „Anpinnen“.</translation>
 <translation id="856656450041460113">In Liste mit Sprachen suchen</translation>
 <translation id="8576826849825683917">Chromium wird von mehreren Organisationen verwaltet</translation>
-<translation id="8586442755830160949">Copyright <ph name="YEAR" /> Die Chromium-Autoren. Alle Rechte vorbehalten.</translation>
 <translation id="8601359445272098721">Neu! Du kannst sowohl Text als auch Bilder auf deinem Bildschirm übersetzen, indem du den Button „Bildschirm übersetzen“ auswählst</translation>
 <translation id="8619360774459241877">Chromium wird gestartet…</translation>
 <translation id="8624541899164515475">Einstellungen, werden in neuem Tab geöffnet.</translation>
@@ -789,7 +788,6 @@ Chromium kann deine Einstellungen nicht wiederherstellen.</translation>
 <translation id="967427899662692980">Höchste Sicherheit in Chromium erhalten</translation>
 <translation id="983803489796659991">Die Installation ist fehlgeschlagen, weil der Update-Server keine Hash-Daten für die Anwendung hat.</translation>
 <translation id="985498048907240953">Chromium ohne Konto verwenden</translation>
-<translation id="985602178874221306">Die Chromium-Autoren</translation>
 <translation id="989970834842471429">Wähle einen beliebigen Text oder ein beliebiges Bild aus, um mit der Bildersuche zu suchen</translation>
 <translation id="992780518932311116">Wenn du deinen Standort verwenden möchtest, erlaube Chromium über die <ph name="BEGIN_LINK" />Systemeinstellungen<ph name="END_LINK" /> den Zugriff darauf</translation>
 </translationbundle>

@@ -719,7 +719,6 @@
 <translation id="8556420416730706394">Для быстрого доступа к поиску по изображениям нажмите кнопку "Закрепить" в верхней части боковой панели</translation>
 <translation id="856656450041460113">Поиск по списку языков</translation>
 <translation id="8576826849825683917">Несколько организаций управляют Chromium</translation>
-<translation id="8586442755830160949">© The Chromium Authors, <ph name="YEAR" /> . Все права защищены.</translation>
 <translation id="8601359445272098721">Новая функция! Теперь, нажав кнопку "Перевести текст на экране", вы можете переводить и текст, и изображения на экране.</translation>
 <translation id="8619360774459241877">Запуск Chromium...</translation>
 <translation id="8624541899164515475">Настройки (страница откроется в новой вкладке).</translation>
@@ -785,7 +784,6 @@
 <translation id="967427899662692980">Обеспечьте максимальную защиту в Chromium</translation>
 <translation id="983803489796659991">Выполнить установку не удалось, так как на сервере нет никаких хешированных данных для приложения.</translation>
 <translation id="985498048907240953">Использовать Chromium без входа в аккаунт</translation>
-<translation id="985602178874221306">Авторы Chromium</translation>
 <translation id="989970834842471429">Выберите текст или картинку для поиска по изображениям.</translation>
 <translation id="992780518932311116">Чтобы использовать свои геоданные, предоставьте Chromium доступ к ним в <ph name="BEGIN_LINK" />системных настройках<ph name="END_LINK" /></translation>
 </translationbundle>

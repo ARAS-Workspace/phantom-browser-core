@@ -725,7 +725,6 @@ Chromium параметрлеріңізді қалпына келтіре алм
 <translation id="8556420416730706394">"Сурет іздеу" функциясына оңай кіру үшін оны бекітуге болады. Ол үшін бүйірлік панельдің жоғарғы жағындағы "Бекіту" түймесін басыңыз.</translation>
 <translation id="856656450041460113">Тілдер тізімін іздеу</translation>
 <translation id="8576826849825683917">Chromium-ді бірнеше ұйым басқарады</translation>
-<translation id="8586442755830160949">Copyright <ph name="YEAR" /> The Chromium Authors. Барлық құқықтар қорғалған.</translation>
 <translation id="8601359445272098721">Жаңалық! Енді "экранды аудару" түймесін басу арқылы экрандағы мәтін мен суреттерді де аудара аласыз.</translation>
 <translation id="8619360774459241877">Chromium іске қосылуда…</translation>
 <translation id="8624541899164515475">Параметрлер, жаңа қойындыда ашылады.</translation>
@@ -791,7 +790,6 @@ Chromium параметрлеріңізді қалпына келтіре алм
 <translation id="967427899662692980">Chromium браузерінің ең күшті қорғанысын қолданыңыз</translation>
 <translation id="983803489796659991">Орнатылмады, себебі жаңарту серверінде қолданбаға арналған хештеу деректері жоқ.</translation>
 <translation id="985498048907240953">Chromium-ді аккаунтсыз қолдану</translation>
-<translation id="985602178874221306">The Chromium Authors</translation>
 <translation id="989970834842471429">"Сурет іздеу" функциясымен іздеу керек кез келген мәтінді не суретті таңдаңыз.</translation>
 <translation id="992780518932311116">Локацияны пайдалану үшін <ph name="BEGIN_LINK" />жүйе параметрлерінде<ph name="END_LINK" /> Chromium-ге рұқсат беріңіз.</translation>
 </translationbundle>

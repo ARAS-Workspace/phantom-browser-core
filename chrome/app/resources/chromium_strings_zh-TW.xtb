@@ -721,7 +721,6 @@ Chromium 無法復原你的設定。</translation>
 <translation id="8556420416730706394">固定「圖片搜尋」可方便之後存取。點選側邊面板頂端的「固定」按鈕即可固定</translation>
 <translation id="856656450041460113">搜尋語言清單</translation>
 <translation id="8576826849825683917">Chromium 是由多個機構管理</translation>
-<translation id="8586442755830160949">Copyright <ph name="YEAR" /> The Chromium Authors. 保留所有權利。</translation>
 <translation id="8601359445272098721">新功能！點選「翻譯畫面」按鈕即可翻譯畫面上的文字和圖片</translation>
 <translation id="8619360774459241877">正在啟動 Chromium…</translation>
 <translation id="8624541899164515475">設定，在新分頁中開啟。</translation>
@@ -787,7 +786,6 @@ Chromium 無法復原你的設定。</translation>
 <translation id="967427899662692980">獲得 Chromium 最強大的安全防護</translation>
 <translation id="983803489796659991">更新伺服器沒有應用程式的任何雜湊資料，因此安裝失敗。</translation>
 <translation id="985498048907240953">使用 Chromium 但不登入帳戶</translation>
-<translation id="985602178874221306">The Chromium Authors</translation>
 <translation id="989970834842471429">選取要使用「圖片搜尋」尋找的文字或圖片</translation>
 <translation id="992780518932311116">如要使用位置資訊，請在<ph name="BEGIN_LINK" />系統設定<ph name="END_LINK" />中授予 Chromium 存取權</translation>
 </translationbundle>

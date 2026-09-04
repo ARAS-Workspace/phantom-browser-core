@@ -721,7 +721,6 @@
 <translation id="8556420416730706394">画像検索を固定して簡単にアクセスできます。固定するには、サイドパネルの上部にある [固定] ボタンをクリックします</translation>
 <translation id="856656450041460113">言語リストを検索</translation>
 <translation id="8576826849825683917">Chromium は複数の組織によって管理されています</translation>
-<translation id="8586442755830160949">Copyright <ph name="YEAR" /> The Chromium Authors. All rights reserved.</translation>
 <translation id="8601359445272098721">New! [画面を翻訳] ボタンを選択して、画面上のテキストや画像を翻訳できるようになりました</translation>
 <translation id="8619360774459241877">Chromium を起動しています...</translation>
 <translation id="8624541899164515475">設定、新しいタブで開きます。</translation>
@@ -787,7 +786,6 @@
 <translation id="967427899662692980">Chromium の最高のセキュリティ強度で保護</translation>
 <translation id="983803489796659991">更新サーバーにアプリケーションのハッシュデータがないため、インストールできませんでした。</translation>
 <translation id="985498048907240953">アカウントなしで Chromium を使用する</translation>
-<translation id="985602178874221306">Chromium 開発者</translation>
 <translation id="989970834842471429">画像検索で検索するテキストや画像を選択</translation>
 <translation id="992780518932311116">位置情報を使用するには、<ph name="BEGIN_LINK" />システム設定<ph name="END_LINK" />で Chromium にアクセスを許可してください</translation>
 </translationbundle>

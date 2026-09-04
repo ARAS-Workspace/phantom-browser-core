@@ -726,7 +726,6 @@ Chromium no puede recuperar tu configuración.</translation>
 <translation id="8556420416730706394">Puedes fijar la búsqueda por imágenes para acceder a ella fácilmente. Haz clic en el botón Fijar en la parte superior del panel lateral.</translation>
 <translation id="856656450041460113">Buscar en la lista de idiomas</translation>
 <translation id="8576826849825683917">Varias organizaciones gestionan Chromium</translation>
-<translation id="8586442755830160949">Copyright <ph name="YEAR" /> Los creadores de Chromium. Todos los derechos reservados.</translation>
 <translation id="8601359445272098721">¡Novedad! Puedes traducir tanto texto como imágenes en tu pantalla seleccionando el botón Traducir pantalla.</translation>
 <translation id="8619360774459241877">Iniciando Chromium...</translation>
 <translation id="8624541899164515475">Configuración, se abre en una pestaña nueva.</translation>
@@ -792,7 +791,6 @@ Chromium no puede recuperar tu configuración.</translation>
 <translation id="967427899662692980">Consigue la seguridad más potente de Chromium</translation>
 <translation id="983803489796659991">No se ha podido realizar la instalación porque el servidor de actualizaciones no tiene datos hash de la aplicación.</translation>
 <translation id="985498048907240953">Usar Chromium sin una cuenta</translation>
-<translation id="985602178874221306">Los creadores de Chromium</translation>
 <translation id="989970834842471429">Selecciona cualquier texto o imagen para buscar con la búsqueda por imágenes</translation>
 <translation id="992780518932311116">Para usar tu ubicación, da acceso a Chromium en la <ph name="BEGIN_LINK" />configuración del sistema<ph name="END_LINK" /></translation>
 </translationbundle>

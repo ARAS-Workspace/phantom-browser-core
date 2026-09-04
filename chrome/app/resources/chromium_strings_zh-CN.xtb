@@ -723,7 +723,6 @@ Chromium 无法恢复您的设置。</translation>
 <translation id="8556420416730706394">您可以固定图片搜索功能以方便访问，点击侧边栏顶部的“固定”按钮即可</translation>
 <translation id="856656450041460113">搜索语言列表</translation>
 <translation id="8576826849825683917">多个组织负责管理 Chromium</translation>
-<translation id="8586442755830160949">版权所有<ph name="YEAR" /> The Chromium Authors。保留所有权利。</translation>
 <translation id="8601359445272098721">新功能！您可以选择“翻译屏幕”按钮，翻译屏幕上的文字和图片</translation>
 <translation id="8619360774459241877">正在启动 Chromium…</translation>
 <translation id="8624541899164515475">“设置”页面，在新标签页中打开。</translation>
@@ -789,7 +788,6 @@ Chromium 无法恢复您的设置。</translation>
 <translation id="967427899662692980">获享 Chromium 的最强安全保护</translation>
 <translation id="983803489796659991">更新服务器没有应用的任何哈希数据，因此安装失败。</translation>
 <translation id="985498048907240953">在不登录账号的情况下使用 Chromium</translation>
-<translation id="985602178874221306">The Chromium Authors</translation>
 <translation id="989970834842471429">选择任何文字或图片即可使用图片搜索功能进行搜索</translation>
 <translation id="992780518932311116">如需使用位置信息，请在<ph name="BEGIN_LINK" />系统设置<ph name="END_LINK" />中授予 Chromium 访问权限</translation>
 </translationbundle>

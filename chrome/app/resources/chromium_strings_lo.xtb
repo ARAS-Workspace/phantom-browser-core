@@ -726,7 +726,6 @@ Chromium ບໍ່ສາມາດກູ້ການຕັ້ງຄ່າຂອ�
 <translation id="8556420416730706394">ທ່ານສາມາດປັກໝຸດການຊອກຫາຮູບເພື່ອໃຫ້ເຂົ້າເຖິງໄດ້ງ່າຍ; ໂດຍການຄລິກປຸ່ມປັກໝຸດຢູ່ເທິງສຸດຂອງແຜງຄວບຄຸມດ້ານຂ້າງ</translation>
 <translation id="856656450041460113">ຊອກຫາລາຍການພາສາ</translation>
 <translation id="8576826849825683917">ຫຼາຍອົງການຈັດການ Chromium</translation>
-<translation id="8586442755830160949">ລິຂະສິດ <ph name="YEAR" /> ຜູ້ຂຽນ Chromium. ສະຫງວນສິດທັງໝົດ.</translation>
 <translation id="8601359445272098721">ໃໝ່! ທ່ານສາມາດແປໄດ້ທັງຂໍ້ຄວາມ ແລະ ຮູບພາບຢູ່ໜ້າຈໍຂອງທ່ານໂດຍເລືອກປຸ່ມ "ແປໜ້າຈໍ"</translation>
 <translation id="8619360774459241877">ກຳລັງເປີດໃຊ້ Chromium...</translation>
 <translation id="8624541899164515475">ການຕັ້ງຄ່າ, ເປີດໃນແຖບໃໝ່.</translation>
@@ -792,7 +791,6 @@ Chromium ບໍ່ສາມາດກູ້ການຕັ້ງຄ່າຂອ�
 <translation id="967427899662692980">ໃຊ້ຄວາມປອດໄພຂັ້ນສູງສຸດຂອງ Chromium</translation>
 <translation id="983803489796659991">ການຕິດຕັ້ງບໍ່ສຳເລັດເນື່ອງຈາກເຊີບເວີອັບເດດບໍ່ມີຂໍ້ມູນ hash ໃດໆສຳລັບແອັບພລິເຄຊັນ.</translation>
 <translation id="985498048907240953">ໃຊ້ Chromium ໂດຍບໍ່ມີບັນຊີ</translation>
-<translation id="985602178874221306">ຜູ້ຂຽນ Chromium</translation>
 <translation id="989970834842471429">ເລືອກຂໍ້ຄວາມ ຫຼື ຮູບເພື່ອຊອກຫາດ້ວຍການຊອກຫາຮູບ</translation>
 <translation id="992780518932311116">ເພື່ອໃຊ້ສະຖານທີ່ຂອງທ່ານ, ກະລຸນາມອບສິດເຂົ້າເຖິງໃຫ້ Chromium ໃນ <ph name="BEGIN_LINK" />ການຕັ້ງຄ່າລະບົບ<ph name="END_LINK" /></translation>
 </translationbundle>

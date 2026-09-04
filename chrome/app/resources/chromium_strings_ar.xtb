@@ -724,7 +724,6 @@
 <translation id="8556420416730706394">يمكنك تثبيت ميزة "البحث بالصور" للوصول إليها بسهولة من خلال النقر على الزر "تثبيت" في أعلى اللوحة الجانبية</translation>
 <translation id="856656450041460113">البحث في قائمة اللغات</translation>
 <translation id="8576826849825683917">‏تدير مؤسسات متعدّدة متصفِّح Chromium</translation>
-<translation id="8586442755830160949">‏حقوق الطبع والنشر لعام <ph name="YEAR" /> لصالح The Chromium Authors. جميع الحقوق محفوظة.</translation>
 <translation id="8601359445272098721">ميزة جديدة: يمكنك ترجمة النص والصور على الشاشة من خلال النقر على زر "ترجمة محتوى الشاشة"</translation>
 <translation id="8619360774459241877">‏جارٍ إطلاق Chromium...</translation>
 <translation id="8624541899164515475">الإعدادات (يفتح الرابط في علامة تبويب جديدة)</translation>
@@ -790,7 +789,6 @@
 <translation id="967427899662692980">‏الحصول على أعلى مستوى من الأمان في متصفِّح Chromium</translation>
 <translation id="983803489796659991">تعذَّر تثبيت التطبيق لعدم وجود أي بيانات تجزئة للتطبيق في خادم التحديث.</translation>
 <translation id="985498048907240953">‏استخدام Chromium بدون حساب</translation>
-<translation id="985602178874221306">The Chromium Authors</translation>
 <translation id="989970834842471429">يُرجى اختيار أي نصوص أو صور للبحث عنها باستخدام ميزة "البحث بالصور"</translation>
 <translation id="992780518932311116">‏لاستخدام الموقع الجغرافي، يجب منح Chromium إذن الوصول في <ph name="BEGIN_LINK" />إعدادات النظام<ph name="END_LINK" /></translation>
 </translationbundle>

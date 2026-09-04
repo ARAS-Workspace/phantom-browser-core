@@ -724,7 +724,6 @@ Chromium ne peut pas récupérer vos paramètres.</translation>
 <translation id="8556420416730706394">Vous pouvez épingler la recherche dans des images pour y accéder facilement. Pour cela, cliquez sur le bouton "Épingler" en haut du panneau latéral.</translation>
 <translation id="856656450041460113">Rechercher dans la liste des langues</translation>
 <translation id="8576826849825683917">Plusieurs organisations gèrent Chromium</translation>
-<translation id="8586442755830160949">Copyright Auteurs de Chromium <ph name="YEAR" />. Tous droits réservés.</translation>
 <translation id="8601359445272098721">Nouveau ! Vous pouvez traduire du texte et des images sur votre écran en sélectionnant le bouton "Traduire l'écran".</translation>
 <translation id="8619360774459241877">Lancement de Chromium…</translation>
 <translation id="8624541899164515475">Paramètres, s'ouvre dans un nouvel onglet.</translation>
@@ -790,7 +789,6 @@ Chromium ne peut pas récupérer vos paramètres.</translation>
 <translation id="967427899662692980">Renforcer la sécurité de Chromium</translation>
 <translation id="983803489796659991">Échec de l'installation, car le serveur de mise à jour ne dispose d'aucune donnée de hachage pour l'application.</translation>
 <translation id="985498048907240953">Utiliser Chromium sans compte</translation>
-<translation id="985602178874221306">Auteurs de Chromium</translation>
 <translation id="989970834842471429">Sélectionnez le texte ou l'image à rechercher</translation>
 <translation id="992780518932311116">Pour que Chromium puisse utiliser votre position, autorisez-le à y accéder dans les <ph name="BEGIN_LINK" />paramètres système<ph name="END_LINK" /></translation>
 </translationbundle>

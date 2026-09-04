@@ -722,7 +722,6 @@ Chromium לא יכול לשחזר את ההגדרות שלך.</translation>
 <translation id="8556420416730706394">אפשר להצמיד את התכונה 'חיפוש תמונות' כדי לאפשר גישה נוחה: פשוט לוחצים על הכפתור 'הצמדה' בחלק העליון של החלונית הצדדית</translation>
 <translation id="856656450041460113">רשימת שפות לחיפוש</translation>
 <translation id="8576826849825683917">‏מספר ארגונים מנהלים את Chromium</translation>
-<translation id="8586442755830160949">‏Copyright <ph name="YEAR" /> The Chromium Authors. כל הזכויות שמורות.</translation>
 <translation id="8601359445272098721">חדש! אפשר לתרגם טקסט ותמונות במסך באמצעות לחיצה על הכפתור "תרגום המסך"</translation>
 <translation id="8619360774459241877">‏הפעלת Chromium מתבצעת...</translation>
 <translation id="8624541899164515475">הגדרות, ייפתחו בכרטיסייה חדשה.</translation>
@@ -788,7 +787,6 @@ Chromium לא יכול לשחזר את ההגדרות שלך.</translation>
 <translation id="967427899662692980">‏רוצה להשיג את רמת האבטחה הגבוהה ביותר של Chromium?</translation>
 <translation id="983803489796659991">‏ההתקנה נכשלה כי שרת העדכון לא מכיל נתוני גיבוב (hash) של האפליקציה.</translation>
 <translation id="985498048907240953">‏שימוש ב-Chromium ללא חשבון</translation>
-<translation id="985602178874221306">‏מחברי Chromium</translation>
 <translation id="989970834842471429">אפשר לבחור טקסט או תמונה לחיפוש באמצעות התכונה "חיפוש תמונות"</translation>
 <translation id="992780518932311116">‏כדי להשתמש בשירותי המיקום, צריך להיכנס אל <ph name="BEGIN_LINK" />הגדרות המערכת<ph name="END_LINK" /> ולתת ל-Chromium גישה</translation>
 </translationbundle>

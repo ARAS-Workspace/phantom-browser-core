@@ -718,7 +718,6 @@ No se pueden guardar nuevos favoritos en tu cuenta hasta que borres algunos. Si 
 <translation id="8556420416730706394">Puedes fijar la Búsqueda con imágenes para acceder fácilmente; haz clic en el botón Fijar en la parte superior del panel lateral</translation>
 <translation id="856656450041460113">Buscar en la lista de idiomas</translation>
 <translation id="8576826849825683917">Varias organizaciones administran Chromium</translation>
-<translation id="8586442755830160949">Copyright <ph name="YEAR" /> Los autores de Chromium. Todos los derechos reservados.</translation>
 <translation id="8601359445272098721">¡Novedad! Puedes traducir texto e imágenes en la pantalla seleccionando el botón “Traducir pantalla”</translation>
 <translation id="8619360774459241877">Iniciando Chromium…</translation>
 <translation id="8624541899164515475">Configuración, se abre en una pestaña nueva.</translation>
@@ -784,7 +783,6 @@ No se pueden guardar nuevos favoritos en tu cuenta hasta que borres algunos. Si 
 <translation id="967427899662692980">Obtén la seguridad más sólida de Chromium</translation>
 <translation id="983803489796659991">No se pudo completar la instalación porque el servidor de actualización no tiene ningún dato hash para la aplicación.</translation>
 <translation id="985498048907240953">Usar Chromium sin una cuenta</translation>
-<translation id="985602178874221306">Los creadores de Chromium</translation>
 <translation id="989970834842471429">Selecciona cualquier texto o imagen para realizar una Búsqueda con imágenes</translation>
 <translation id="992780518932311116">Para usar la ubicación, otorga acceso a Chromium en la <ph name="BEGIN_LINK" />configuración del sistema<ph name="END_LINK" /></translation>
 </translationbundle>

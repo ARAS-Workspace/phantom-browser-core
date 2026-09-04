@@ -724,7 +724,6 @@ Chromium ei voi palauttaa asetuksiasi.</translation>
 <translation id="8556420416730706394">Kiinnitä kuvahaku klikkaamalla sivupaneelin yläreunan Kiinnitä-painiketta, niin löydät sen helposti</translation>
 <translation id="856656450041460113">Hakukielilista</translation>
 <translation id="8576826849825683917">Useat organisaatiot ylläpitävät Chromiumia</translation>
-<translation id="8586442755830160949">Copyright <ph name="YEAR" /> The Chromium Authors. Kaikki oikeudet pidätetään.</translation>
 <translation id="8601359445272098721">Uutta! Voit kääntää näytöllä näkyvän tekstin ja kuvat valitsemalla "Käännä näyttö" ‑painikkeen</translation>
 <translation id="8619360774459241877">Käynnistetään Chromiumia…</translation>
 <translation id="8624541899164515475">Asetukset, avautuu uudelle välilehdelle.</translation>
@@ -790,7 +789,6 @@ Chromium ei voi palauttaa asetuksiasi.</translation>
 <translation id="967427899662692980">Ota Chromiumin tehokkain suojaus käyttöön</translation>
 <translation id="983803489796659991">Asennus epäonnistui, koska päivityspalvelimella ei ole tiivistedataa sovelluksesta.</translation>
 <translation id="985498048907240953">Käytä Chromiumia ilman tiliä</translation>
-<translation id="985602178874221306">The Chromium Authors</translation>
 <translation id="989970834842471429">Valitse teksti tai kuva, jota haluat hakea kuvahaulla</translation>
 <translation id="992780518932311116">Anna Chromiumille pääsyoikeus <ph name="BEGIN_LINK" />järjestelmäasetuksista<ph name="END_LINK" />, jotta voit käyttää sijaintia</translation>
 </translationbundle>

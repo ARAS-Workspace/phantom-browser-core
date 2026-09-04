@@ -718,7 +718,6 @@ Chromium no pot recuperar la configuració.</translation>
 <translation id="8556420416730706394">Pots fixar la cerca d'imatges per accedir-hi fàcilment. Fes clic al botó per fixar que hi ha a la part superior del tauler lateral.</translation>
 <translation id="856656450041460113">Cerca a la llista d'idiomes</translation>
 <translation id="8576826849825683917">Diverses organitzacions gestionen Chromium</translation>
-<translation id="8586442755830160949">Copyright <ph name="YEAR" /> Els autors de Chromium. Tots els drets reservats.</translation>
 <translation id="8601359445272098721">Novetat! Pots traduir tant el text com les imatges en pantalla seleccionant el botó Tradueix la pantalla.</translation>
 <translation id="8619360774459241877">S'està iniciant Chromium...</translation>
 <translation id="8624541899164515475">Configuració; s'obre en una pestanya nova.</translation>
@@ -784,7 +783,6 @@ Chromium no pot recuperar la configuració.</translation>
 <translation id="967427899662692980">Obtén la seguretat més efectiva de Chromium</translation>
 <translation id="983803489796659991">La instal·lació ha fallat perquè el servidor d'actualitzacions no disposa de dades de valor resum per a l'aplicació.</translation>
 <translation id="985498048907240953">Fes servir Chromium sense cap compte</translation>
-<translation id="985602178874221306">Els autors de Chromium</translation>
 <translation id="989970834842471429">Selecciona el text o la imatge que vulguis cercar amb la cerca d'imatges</translation>
 <translation id="992780518932311116">Per poder utilitzar la ubicació, dona accés a Chromium des de la <ph name="BEGIN_LINK" />configuració del sistema<ph name="END_LINK" /></translation>
 </translationbundle>

@@ -723,7 +723,6 @@ Chromium ไม่สามารถกู้คืนการตั้งค�
 <translation id="8556420416730706394">คุณสามารถปักหมุดการค้นหารูปภาพเพื่อให้เข้าถึงได้ง่าย โดยการคลิกปุ่ม "ปักหมุด" ที่ด้านบนของแผงด้านข้าง</translation>
 <translation id="856656450041460113">ค้นหารายการภาษา</translation>
 <translation id="8576826849825683917">องค์กรหลายแห่งจัดการ Chromium</translation>
-<translation id="8586442755830160949">ลิขสิทธิ์ <ph name="YEAR" /> The Chromium Authors สงวนลิขสิทธิ์</translation>
 <translation id="8601359445272098721">ใหม่! คุณแปลได้ทั้งข้อความและรูปภาพบนหน้าจอโดยเลือกปุ่ม "แปลหน้าจอ"</translation>
 <translation id="8619360774459241877">กำลังเปิด Chromium...</translation>
 <translation id="8624541899164515475">การตั้งค่า เปิดในแท็บใหม่</translation>
@@ -789,7 +788,6 @@ Chromium ไม่สามารถกู้คืนการตั้งค�
 <translation id="967427899662692980">รับการรักษาความปลอดภัยที่เข้มงวดที่สุดของ Chromium</translation>
 <translation id="983803489796659991">การติดตั้งไม่สำเร็จเนื่องจากเซิร์ฟเวอร์การอัปเดตไม่มีข้อมูลแฮชสำหรับแอปพลิเคชัน</translation>
 <translation id="985498048907240953">ใช้ Chromium โดยไม่มีบัญชี</translation>
-<translation id="985602178874221306">The Chromium Authors</translation>
 <translation id="989970834842471429">เลือกข้อความหรือรูปภาพเพื่อค้นหาด้วยการค้นหารูปภาพ</translation>
 <translation id="992780518932311116">หากต้องการใช้ตำแหน่ง โปรดให้สิทธิ์เข้าถึงแก่ Chromium ใน<ph name="BEGIN_LINK" />การตั้งค่าระบบ<ph name="END_LINK" /></translation>
 </translationbundle>
