@@ -1357,18 +1357,6 @@ IN_PROC_BROWSER_TEST_F(SettingsAiPageOfficialTest, AiPageOfficial) {
 }
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
-using SettingsAboutPageTest = SettingsBrowserTest;
-
-IN_PROC_BROWSER_TEST_F(SettingsAboutPageTest, AllBuilds) {
-  RunTest("settings/about_page_test.js", "runMochaSuite('AllBuilds')");
-}
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-IN_PROC_BROWSER_TEST_F(SettingsAboutPageTest, OfficialBuild) {
-  RunTest("settings/about_page_test.js", "runMochaSuite('OfficialBuild')");
-}
-#endif
-
 using SettingsAllSitesTest = SettingsBrowserTest;
 
 IN_PROC_BROWSER_TEST_F(SettingsAllSitesTest, EnableRelatedWebsiteSets) {

@@ -51,16 +51,6 @@ export {ControlledRadioButtonElement} from './controls/controlled_radio_button.j
 export {SettingsDropdownMenuElement} from './controls/settings_dropdown_menu.js';
 export {SettingsRadioGroupElement} from './controls/settings_radio_group.js';
 export {SettingsToggleButtonElement} from './controls/settings_toggle_button.js';
-// clang-format off
-// <if expr="_google_chrome">
-export {ABOUT_PAGE_PRIVACY_POLICY_URL} from './about_page/about_page.js';
-// </if>
-export {AboutPageBrowserProxyImpl, UpdateStatus} from './about_page/about_page_browser_proxy.js';
-export type {AboutPageBrowserProxy} from './about_page/about_page_browser_proxy.js';
-// <if expr="_google_chrome and is_macosx">
-export type {PromoteUpdaterStatus} from './about_page/about_page_browser_proxy.js';
-// </if>
-// clang-format on
 export {ChromeSuggestionsSettingsValue, ModelExecutionEnterprisePolicyValue} from './ai_page/constants.js';
 export {AppearanceBrowserProxyImpl} from './appearance_page/appearance_browser_proxy.js';
 export type {AppearanceBrowserProxy} from './appearance_page/appearance_browser_proxy.js';

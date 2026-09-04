@@ -410,11 +410,6 @@ void AboutHandler::RegisterMessages() {
       base::BindRepeating(&AboutHandler::HandleRecordExtendedUpdatesShown,
                           base::Unretained(this)));
 #endif  // BUILDFLAG(IS_CHROMEOS)
-#if BUILDFLAG(IS_MAC)
-  web_ui()->RegisterMessageCallback(
-      "promoteUpdater", base::BindRepeating(&AboutHandler::PromoteUpdater,
-                                            base::Unretained(this)));
-#endif
 
 #if BUILDFLAG(IS_CHROMEOS)
   // Handler for the product label image, which will be shown if available.
@@ -503,12 +498,6 @@ void AboutHandler::RefreshUpdateStatus() {
   RequestUpdate();
 #endif
 }
-
-#if BUILDFLAG(IS_MAC)
-void AboutHandler::PromoteUpdater(const base::ListValue& args) {
-  version_updater_->PromoteUpdater();
-}
-#endif
 
 void AboutHandler::HandleOpenFeedbackDialog(const base::ListValue& args) {
   DCHECK(args.empty());
@@ -874,12 +863,7 @@ void AboutHandler::RequestUpdate() {
   version_updater_->CheckForUpdate(
       base::BindRepeating(&AboutHandler::SetUpdateStatus,
                           weak_factory_.GetWeakPtr()),
-#if BUILDFLAG(IS_MAC)
-      base::BindRepeating(&AboutHandler::SetPromotionState,
-                          weak_factory_.GetWeakPtr()));
-#else
       VersionUpdater::PromoteCallback());
-#endif  // BUILDFLAG(IS_MAC)
 }
 
 void AboutHandler::SetUpdateStatus(VersionUpdater::Status status,
@@ -916,36 +900,6 @@ void AboutHandler::SetUpdateStatus(VersionUpdater::Status status,
 
   FireWebUIListener("update-status-changed", event);
 }
-
-#if BUILDFLAG(IS_MAC)
-void AboutHandler::SetPromotionState(VersionUpdater::PromotionState state) {
-  // Worth noting: PROMOTE_DISABLED indicates that promotion is possible,
-  // there's just something else going on right now (e.g. checking for update).
-  bool hidden = state == VersionUpdater::PROMOTE_HIDDEN;
-  bool disabled = state == VersionUpdater::PROMOTE_HIDDEN ||
-                  state == VersionUpdater::PROMOTE_DISABLED ||
-                  state == VersionUpdater::PROMOTED;
-  bool actionable = state == VersionUpdater::PROMOTE_DISABLED ||
-                    state == VersionUpdater::PROMOTE_ENABLED;
-
-  std::u16string text;
-  if (actionable) {
-    text = l10n_util::GetStringUTF16(IDS_ABOUT_CHROME_AUTOUPDATE_ALL);
-  } else if (state == VersionUpdater::PROMOTED) {
-    text = l10n_util::GetStringUTF16(IDS_ABOUT_CHROME_AUTOUPDATE_ALL_IS_ON);
-  }
-
-  base::DictValue promo_state;
-  promo_state.Set("hidden", hidden);
-  promo_state.Set("disabled", disabled);
-  promo_state.Set("actionable", actionable);
-  if (!text.empty()) {
-    promo_state.Set("text", text);
-  }
-
-  FireWebUIListener("promotion-state-changed", promo_state);
-}
-#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_CHROMEOS)
 void AboutHandler::OnRegulatoryLabelDirFound(

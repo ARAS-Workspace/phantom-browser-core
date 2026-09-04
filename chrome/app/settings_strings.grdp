@@ -43,9 +43,6 @@
     <message name="IDS_SETTINGS_ABOUT_PAGE_BROWSER_VERSION" desc="The text label describing the version of the browser, example: Version 57.0.2937.0-r123456 (Developer Build) unknown (64-bit). The suffix of the version (eg. '-r123456') exists only in limited cases.)">
       Version <ph name="PRODUCT_VERSION">$1<ex>15.0.865.0</ex></ph><ph name="PRODUCT_VERSION_SUFFIX">$2<ex>-r123456</ex></ph>  (<ph name="PRODUCT_CHANNEL">$3<ex>Developer Build</ex></ph>) <ph name="PRODUCT_MODIFIER">$4</ph> <ph name="PRODUCT_VERSION_BITS">$5</ph>
     </message>
-    <message name="IDS_SETTINGS_ABOUT_PAGE_LEARN_MORE_UPDATE_ERRORS" desc="The accessibility label for a 'Learn more' link next to an error message about how an update has failed.">
-      Learn more about fixing update errors
-    </message>
     <message name="IDS_SETTINGS_ABOUT_PAGE_LEARN_MORE_SYSTEM_REQUIREMENTS" desc="The accessibility label for a 'Learn more' link next to an error message about how the user's operating system is not supported.">
       Learn more about system requirements
     </message>
@@ -64,17 +61,6 @@
 
       <message name="IDS_SETTINGS_ABOUT_PAGE_SEND_FEEDBACK" desc="Text of the button which allows the user to send feedback with Chrome.">
         Send feedback
-      </message>
-    </if>
-    <if expr="is_macosx">
-      <message name="IDS_ABOUT_CHROME_AUTOUPDATE_ALL" desc="The 'Automatically update Chrome for all users.' button in the About window.  Mac-only.">
-        Automatically update Chrome for all users
-      </message>
-      <message name="IDS_ABOUT_CHROME_AUTOUPDATE_ALL_IS_ON" desc="The text in About Page to indicate automatic update is turned on.  Mac-only.">
-        Automatic updates are turned on.
-      </message>
-      <message name="IDS_SETTINGS_ABOUT_PAGE_LEARN_MORE_UPDATING" desc="The accessibility label for a 'Learn more' link next to a message saying automatic updates are turned on.  Mac-only">
-        Learn more about updating
       </message>
     </if>
 

@@ -163,13 +163,6 @@ inline constexpr char kChromeSearchScheme[] = "chrome-search";
 inline constexpr char kChromeUIUntrustedNewTabPageUrl[] =
     "chrome-untrusted://new-tab-page/";
 
-// The URL for the Chromium project used in the About dialog.
-inline constexpr char16_t kChromiumProjectURL[] = u"https://www.chromium.org/";
-#if BUILDFLAG(IS_CHROMEOS)
-static_assert(std::u16string_view(kChromiumProjectURL) ==
-              ash::chrome_external_urls::kChromiumProjectURL);
-#endif
-
 inline constexpr char16_t kContentSettingsExceptionsLearnMoreURL[] =
     u"https://support.google.com/chrome?p=settings_manage_exceptions";
 

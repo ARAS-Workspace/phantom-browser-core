@@ -187,10 +187,6 @@ void ShowHelpImpl(BrowserWindowInterface* browser,
     case HelpSource::kWebUIChromeOS:
       url = GURL(kChromeOsHelpViaWebUIURL);
       break;
-#else
-    case HelpSource::kWebUI:
-      url = GURL(kChromeHelpViaWebUIURL);
-      break;
 #endif  // BUILDFLAG(IS_CHROMEOS)
     case HelpSource::kWebUSD:
       url = GURL(kChooserUsbOverviewURL);

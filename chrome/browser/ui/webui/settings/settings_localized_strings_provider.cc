@@ -149,7 +149,6 @@
 #include "chrome/browser/ash/profiles/profile_helper.h"
 #include "chrome/common/webui_url_constants.h"
 #include "components/user_manager/user_manager.h"
-#include "ui/chromeos/devicetype_utils.h"
 #else  // !BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ui/webui/settings/system_handler.h"
 #endif
@@ -271,34 +270,15 @@ void AddAboutStrings(content::WebUIDataSource* html_source, Profile* profile) {
       {"aboutReportAnIssue", IDS_SETTINGS_ABOUT_PAGE_REPORT_AN_ISSUE},
       {"aboutPrivacyPolicy", IDS_SETTINGS_ABOUT_PAGE_PRIVACY_POLICY},
 #endif
-      {"aboutRelaunch", IDS_SETTINGS_ABOUT_PAGE_RELAUNCH},
-      {"aboutUpgradeCheckStarted", IDS_SETTINGS_ABOUT_UPGRADE_CHECK_STARTED},
-      {"aboutUpgradeRelaunch", IDS_SETTINGS_UPGRADE_SUCCESSFUL_RELAUNCH},
-      {"aboutUpgradeUpdating", IDS_SETTINGS_UPGRADE_UPDATING},
-      {"aboutUpgradeUpdatingPercent", IDS_SETTINGS_UPGRADE_UPDATING_PERCENT},
-      {"aboutGetHelpUsingChrome", IDS_SETTINGS_GET_HELP_USING_CHROME},
       {"aboutPageTitle", IDS_SETTINGS_ABOUT_PROGRAM},
       {"aboutProductTitle", IDS_PRODUCT_NAME},
-      {"aboutLearnMoreUpdatingErrors",
-       IDS_SETTINGS_ABOUT_PAGE_LEARN_MORE_UPDATE_ERRORS},
       {"aboutLearnMoreSystemRequirements",
        IDS_SETTINGS_ABOUT_PAGE_LEARN_MORE_SYSTEM_REQUIREMENTS},
-#if BUILDFLAG(IS_MAC)
-      {"aboutLearnMoreUpdating", IDS_SETTINGS_ABOUT_PAGE_LEARN_MORE_UPDATING},
-#endif
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
 
   html_source->AddString("managementPage",
                          GetDeviceManagedUiHelpLabel(profile));
-  html_source->AddString(
-      "aboutUpgradeUpToDate",
-#if BUILDFLAG(IS_CHROMEOS)
-      ui::SubstituteChromeOSDeviceType(IDS_SETTINGS_UPGRADE_UP_TO_DATE));
-#else
-      l10n_util::GetStringUTF16(IDS_SETTINGS_UPGRADE_UP_TO_DATE));
-#endif
-
   std::u16string browser_version = VersionUI::GetAnnotatedVersionStringForUi();
 
   html_source->AddString("aboutBrowserVersion", browser_version);
@@ -308,17 +288,8 @@ void AddAboutStrings(content::WebUIDataSource* html_source, Profile* profile) {
           l10n_util::GetStringUTF16(IDS_ABOUT_VERSION_COPYRIGHT),
           base::Time::Now()));
 
-  std::u16string license = l10n_util::GetStringFUTF16(
-      IDS_VERSION_UI_LICENSE, chrome::kChromiumProjectURL,
-      chrome::kChromeUICreditsURL16,
-      l10n_util::GetStringUTF16(IDS_SETTINGS_OPENS_IN_NEW_TAB));
-  html_source->AddString("aboutProductLicense", license);
-
   html_source->AddBoolean("aboutObsoleteNowOrSoon",
                           ObsoleteSystem::IsObsoleteNowOrSoon());
-  html_source->AddBoolean("aboutObsoleteEndOfTheLine",
-                          ObsoleteSystem::IsObsoleteNowOrSoon() &&
-                              ObsoleteSystem::IsEndOfTheLine());
   html_source->AddString("aboutObsoleteSystem",
                          ObsoleteSystem::LocalizedObsoleteString());
   html_source->AddString("aboutObsoleteSystemURL",

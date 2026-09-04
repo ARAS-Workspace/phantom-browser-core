@@ -31,26 +31,3 @@
 #productLogo {
   margin-inline-end: var(--about-page-image-space);
 }
-
-.icon-container {
-  margin-inline-end: var(--about-page-image-space);
-  min-width: 32px;  /* The width of the product-logo img. */
-  text-align: center;
-}
-
-cr-icon[icon='cr:check-circle'] {
-  fill: var(--cr-checked-color);
-}
-
-cr-icon[icon='cr:error-filled'] {
-  fill: var(--settings-error-color);
-}
-
-#throbber {
-  height: var(--cr-icon-size);
-  vertical-align: middle;
-}
-
-cr-button {
-  white-space: nowrap;
-}

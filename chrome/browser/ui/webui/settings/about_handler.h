@@ -69,10 +69,6 @@ class AboutHandler : public settings::SettingsPageUIHandler,
   void HandleRefreshUpdateStatus(const base::ListValue& args);
   void RefreshUpdateStatus();
 
-#if BUILDFLAG(IS_MAC)
-  // Promotes the updater for all users.
-  void PromoteUpdater(const base::ListValue& args);
-#endif
 
   // Opens the feedback dialog.
   // |args| must be empty.
@@ -154,10 +150,6 @@ class AboutHandler : public settings::SettingsPageUIHandler,
                        int64_t size,
                        const std::u16string& fail_message);
 
-#if BUILDFLAG(IS_MAC)
-  // Callback method which forwards promotion state to the page.
-  void SetPromotionState(VersionUpdater::PromotionState state);
-#endif
 
 #if BUILDFLAG(IS_CHROMEOS)
   void HandleOpenDiagnostics(const base::ListValue& args);

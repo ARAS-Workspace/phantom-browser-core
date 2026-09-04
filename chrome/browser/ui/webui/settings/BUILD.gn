@@ -11,7 +11,6 @@ assert(is_win || is_mac || is_linux || is_chromeos)
 
 source_set("settings") {
   sources = [
-    "about_handler.h",
     "accessibility_main_handler.h",
     "appearance_handler.h",
     "browser_lifetime_handler.h",
@@ -62,7 +61,6 @@ source_set("settings") {
     "//chrome/browser/themes",
     "//chrome/browser/ui/safety_hub",
     "//chrome/browser/ui/search_engines",
-    "//chrome/browser/ui/webui/help",
     "//chrome/browser/ui/webui/signin:login_ui_service",
     "//chrome/browser/upgrade_detector",
     "//chrome/browser/web_applications",
@@ -116,9 +114,11 @@ source_set("settings") {
   }
 
   if (is_chromeos) {
+    sources += [ "about_handler.h" ]
     public_deps += [
       "//chrome/browser/ash/accessibility",
       "//chrome/browser/ash/tpm",
+      "//chrome/browser/ui/webui/help",
     ]
   }
 
@@ -129,7 +129,6 @@ source_set("impl") {
   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
 
   sources = [
-    "about_handler.cc",
     "accessibility_main_handler.cc",
     "appearance_handler.cc",
     "browser_lifetime_handler.cc",
@@ -351,6 +350,7 @@ source_set("impl") {
   }
 
   if (is_chromeos) {
+    sources += [ "about_handler.cc" ]
     deps += [
       "//ash/webui/eche_app_ui",
       "//chrome/browser/ash/account_manager",
