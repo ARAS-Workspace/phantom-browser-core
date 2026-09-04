@@ -41,7 +41,6 @@ build_webui("build") {
     "controls/settings_radio_group.ts",
     "controls/settings_toggle_button.ts",
     "people_page/account_page.ts",
-    "people_page/google_services_page.ts",
     "people_page/people_page.ts",
     "people_page/people_page_index.ts",
     "people_page/signout_dialog.ts",

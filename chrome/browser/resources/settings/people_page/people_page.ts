@@ -386,10 +386,6 @@ export class SettingsPeoplePageElement extends SettingsPeoplePageElementBase {
     Router.getInstance().navigateTo(routes.ACCOUNT);
   }
 
-  private onGoogleServicesClick_() {
-    Router.getInstance().navigateTo(routes.GOOGLE_SERVICES);
-  }
-
   private shouldLinkToAccountSettingsPage_(): boolean {
     return this.replaceSyncPromosWithSignInPromos_ && !!this.syncStatus &&
         this.syncStatus.signedInState === SignedInState.SIGNED_IN;
@@ -498,9 +494,6 @@ export class SettingsPeoplePageElement extends SettingsPeoplePageElementBase {
     if (routes.ACCOUNT) {
       map.set(routes.ACCOUNT.path, '#account-subpage-row');
     }
-    if (routes.GOOGLE_SERVICES) {
-      map.set(routes.GOOGLE_SERVICES.path, '#google-services');
-    }
     // <if expr="not is_chromeos">
     if (routes.MANAGE_PROFILE) {
       map.set(
@@ -516,7 +509,7 @@ export class SettingsPeoplePageElement extends SettingsPeoplePageElementBase {
   // SettingsViewMixin implementation.
   override getAssociatedControlFor(childViewId: string): HTMLElement {
     const ids = [
-      'sync', 'syncControls', 'account', 'googleServices',
+      'sync', 'syncControls', 'account',
       // <if expr="not is_chromeos">
       'manageProfile',
       // </if>
@@ -532,10 +525,6 @@ export class SettingsPeoplePageElement extends SettingsPeoplePageElementBase {
       case 'account':
         assert(loadTimeData.getBoolean('replaceSyncPromosWithSignInPromos'));
         triggerId = 'account-subpage-row';
-        break;
-      case 'googleServices':
-        assert(loadTimeData.getBoolean('replaceSyncPromosWithSignInPromos'));
-        triggerId = 'google-services';
         break;
       // <if expr="not is_chromeos">
       case 'manageProfile':

@@ -152,7 +152,6 @@ function createRoutes(): SettingsRoutes {
         '/people', 'people', loadTimeData.getString('peoplePageTitle'));
     if (loadTimeData.getBoolean('replaceSyncPromosWithSignInPromos')) {
       r.ACCOUNT = r.PEOPLE.createChild('/account');
-      r.GOOGLE_SERVICES = r.PEOPLE.createChild('/googleServices');
     }
     // <if expr="not is_chromeos">
     r.SIGN_OUT = r.PEOPLE.createChild('/signOut');

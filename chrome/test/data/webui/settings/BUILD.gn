@@ -61,7 +61,6 @@ build_webui_tests("build") {
     "file_system_site_list_test.ts",
     "security/fingerprint_progress_arc_test.ts",
     "geolocation_page_test.ts",
-    "google_services_page_test.ts",
     "help_page_test.ts",
     "home_url_input_test.ts",
     "identity_docs_page_test.ts",

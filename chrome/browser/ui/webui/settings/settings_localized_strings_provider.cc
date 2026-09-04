@@ -1688,7 +1688,6 @@ void AddPeopleStrings(content::WebUIDataSource* html_source, Profile* profile) {
 #else
       {"accountDataTypesBody", IDS_SETTINGS_ACCOUNT_BODY},
 #endif
-      {"googleServicesPageTitle", IDS_SETTINGS_GOOGLE_SERVICES_PAGE_TITLE},
       {"syncDisabledUserInformation", IDS_SETTINGS_ACCOUNT_SYNC_DISABLED},
 #if BUILDFLAG(IS_CHROMEOS)
       {"manageDeviceAccounts", IDS_ACCOUNT_CHROMEOS_DEVICE_ACCOUNTS},

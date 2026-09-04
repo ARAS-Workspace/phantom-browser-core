@@ -120,7 +120,6 @@ export interface SettingsRoutes {
   TRAVEL: Route;
   TRIGGERED_RESET_DIALOG: Route;
   ACCOUNT: Route;
-  GOOGLE_SERVICES: Route;
 
   // <if expr="not is_chromeos">
   IMPORT_DATA: Route;

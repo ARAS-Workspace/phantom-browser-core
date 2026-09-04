@@ -94,10 +94,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, AccountPage) {
   RunTest("settings/account_page_test.js", "mocha.run()");
 }
 
-IN_PROC_BROWSER_TEST_F(SettingsTest, GoogleServicesPage) {
-  RunTest("settings/google_services_page_test.js", "mocha.run()");
-}
-
 IN_PROC_BROWSER_TEST_F(SettingsTest, AntiAbusePage) {
   RunTest("settings/anti_abuse_page_test.js", "mocha.run()");
 }

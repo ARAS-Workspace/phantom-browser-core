@@ -77,7 +77,6 @@ import './people_page/import_data_dialog.js';
 import './people_page/manage_profile.js';
 // </if>
 import './people_page/account_page.js';
-import './people_page/google_services_page.js';
 import './people_page/signout_dialog.js';
 import './people_page/sync_controls_page.js';
 import './people_page/sync_page.js';
@@ -158,7 +157,6 @@ export {SettingsSpellCheckPageElement} from './languages_page/spell_check_page.j
 // </if>
 
 export {SettingsAccountPageElement} from './people_page/account_page.js';
-export {SettingsGoogleServicesPageElement} from './people_page/google_services_page.js';
 // <if expr="not is_chromeos">
 export {ImportDataBrowserProxyImpl, ImportDataStatus} from './people_page/import_data_browser_proxy.js';
 export type {BrowserProfile, ImportDataBrowserProxy} from './people_page/import_data_browser_proxy.js';
