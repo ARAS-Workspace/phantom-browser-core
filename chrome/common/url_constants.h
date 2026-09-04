@@ -340,12 +340,10 @@ inline constexpr char16_t kMyActivityUrlInHistory[] =
     u"https://myactivity.google.com/myactivity/?utm_source=chrome_h";
 
 // The URL for the Gemini Personal Context page.
-inline constexpr char16_t kGeminiPersonalContextUrl[] =
-    u"https://gemini.google.com/personalization-settings";
+inline constexpr char16_t kGeminiPersonalContextUrl[] = u"";
 
 // The URL for "Your Gemini Apps Activity" page.
-inline constexpr char16_t kMyActivityGeminiAppsUrl[] =
-    u"https://myactivity.google.com/product/gemini";
+inline constexpr char16_t kMyActivityGeminiAppsUrl[] = u"";
 
 // The URL for Glic activity button.
 inline constexpr char kGlicActivityUrl[] = "";
