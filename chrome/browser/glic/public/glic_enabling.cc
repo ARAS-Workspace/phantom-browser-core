@@ -772,15 +772,7 @@ bool GlicGlobalEnabling::IsOsVersionSupported() {
 }
 
 bool GlicGlobalEnabling::IsEnabledByGlobalCriteria() const {
-  if (g_bypass_enablement_checks_for_testing) {
-    return true;
-  }
-  // It is important that this value not change at runtime in production. Any
-  // future updates to this function must maintain that property.
-  bool is_enabled = base::FeatureList::IsEnabled(features::kGlic) &&
-                    locale_enablement_.value_or(true);
-
-  return is_enabled && IsOsVersionSupported() && IsSystemRequirementMet();
+  return false;
 }
 
 bool GlicEnabling::IsOsVersionSupported() {
@@ -844,10 +836,7 @@ bool GlicEnabling::IsProfileEligible(Profile* profile) {
 // static
 bool GlicEnabling::IsAnchoredButIneligible(bool global_criteria_met,
                                            bool consented) {
-  return !global_criteria_met && consented && IsSystemRequirementMet() &&
-         base::FeatureList::IsEnabled(features::kGlic) &&
-         base::FeatureList::IsEnabled(
-             features::kGlicAnchorEntryPointForOnboardedUsers);
+  return false;
 }
 
 // static
