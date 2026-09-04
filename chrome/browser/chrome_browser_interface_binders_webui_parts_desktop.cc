@@ -181,12 +181,6 @@
 #endif  // defined(OFFICIAL_BUILD)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
-#include "chrome/browser/ui/webui/feature_showcase/default_browser.mojom.h"
-#include "chrome/browser/ui/webui/feature_showcase/feature_showcase.mojom.h"
-#include "chrome/browser/ui/webui/feature_showcase/feature_showcase_ui.h"
-#include "chrome/browser/ui/webui/feature_showcase/gemini.mojom.h"
-#include "chrome/browser/ui/webui/feature_showcase/google_lens.mojom.h"
-#include "chrome/browser/ui/webui/feature_showcase/password_manager.mojom.h"
 #include "chrome/browser/ui/webui/signin/signout_confirmation/signout_confirmation_ui.h"
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
@@ -331,26 +325,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
                                          WhatsNewUI>(map);
 #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  RegisterWebUIControllerInterfaceBinder<
-      feature_showcase::mojom::DefaultBrowserPageHandlerFactory,
-      FeatureShowcaseUI>(map);
-  RegisterWebUIControllerInterfaceBinder<
-      feature_showcase::mojom::FeatureShowcasePageHandlerFactory,
-      FeatureShowcaseUI>(map);
-  RegisterWebUIControllerInterfaceBinder<
-      feature_showcase::mojom::PasswordManagerPageHandlerFactory,
-      FeatureShowcaseUI>(map);
-  RegisterWebUIControllerInterfaceBinder<
-      feature_showcase::mojom::ThemesAndCustomizationPageHandlerFactory,
-      FeatureShowcaseUI>(map);
-  RegisterWebUIControllerInterfaceBinder<
-      feature_showcase::mojom::GeminiPageHandlerFactory, FeatureShowcaseUI>(
-      map);
-  RegisterWebUIControllerInterfaceBinder<
-      feature_showcase::mojom::GoogleLensPageHandlerFactory, FeatureShowcaseUI>(
-      map);
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
   RegisterWebUIControllerInterfaceBinder<
       browser_command::mojom::CommandHandlerFactory,
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -372,12 +346,7 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   RegisterWebUIControllerInterfaceBinder<
       customize_color_scheme_mode::mojom::
           CustomizeColorSchemeModeHandlerFactory,
-      CustomizeChromeUI
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-      ,
-      FeatureShowcaseUI
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-      >(map);
+      CustomizeChromeUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<
       theme_color_picker::mojom::ThemeColorPickerHandlerFactory,
@@ -386,10 +355,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       ,
       ProfileCustomizationUI
 #endif  // !BUILDFLAG(IS_CHROMEOS)
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-      ,
-      FeatureShowcaseUI
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
       >(map);
 
   RegisterWebUIControllerInterfaceBinder<
