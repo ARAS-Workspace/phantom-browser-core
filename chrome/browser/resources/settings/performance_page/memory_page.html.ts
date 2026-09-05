@@ -15,8 +15,7 @@ export function getHtml(this: SettingsMemoryPageElement) {
   <settings-toggle-button id="toggleButton" @change="${this.onMemorySaverModeChange_}"
       pref-key="performance_tuning.high_efficiency_mode.state"
       label="$i18n{memorySaverModeLabel}"
-      sub-label-with-link="$i18n{memorySaverModeDescription}"
-      @sub-label-link-clicked="${this.onMemorySaverSubLabelLinkClicked_}"
+      sub-label="$i18n{memorySaverModeDescription}"
       .numericUncheckedValues="${this.numericUncheckedValues_}"
       .numericCheckedValue="${this.numericCheckedValue_}">
   </settings-toggle-button>

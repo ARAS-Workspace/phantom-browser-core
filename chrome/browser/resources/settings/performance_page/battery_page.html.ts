@@ -26,8 +26,7 @@ export function getHtml(this: SettingsBatteryPageElement) {
     <settings-toggle-button id="toggleButton" @change="${this.onChange_}"
         pref-key="performance_tuning.battery_saver_mode.state"
         label="$i18n{batterySaverModeLabel}"
-        sub-label-with-link="$i18n{batterySaverModeDescription}"
-        @sub-label-link-clicked="${this.onBatterySaverSubLabelLinkClicked_}"
+        sub-label="$i18n{batterySaverModeDescription}"
         .numericUncheckedValues="${this.numericUncheckedValues_}"
         .numericCheckedValue="${BatterySaverModeState.ENABLED_BELOW_THRESHOLD}">
     </settings-toggle-button>

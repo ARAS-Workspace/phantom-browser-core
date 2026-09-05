@@ -4957,7 +4957,7 @@
 <translation id="4807098396393229769">ชื่อบนบัตร</translation>
 <translation id="4807122856660838973">เปิด Google Safe Browsing</translation>
 <translation id="4807514039636325497">รายละเอียด DBus</translation>
-<translation id="4808525520374557629">รับการแจ้งเตือนที่แนะนำวิธีปรับปรุงปัญหาด้านประสิทธิภาพที่ตรวจพบ <ph name="BEGIN_LINK" />ดูข้อมูลเพิ่มเติมเกี่ยวกับการแจ้งเตือนปัญหาด้านประสิทธิภาพ<ph name="END_LINK" /></translation>
+<translation id="5771930213953292472">รับการแจ้งเตือนที่แนะนำวิธีปรับปรุงปัญหาด้านประสิทธิภาพที่ตรวจพบ</translation>
 <translation id="4808667324955055115">บล็อกป๊อปอัปอยู่:</translation>
 <translation id="4809447465126035330">ลบ</translation>
 <translation id="480990236307250886">เปิดหน้าแรก</translation>
@@ -5523,7 +5523,7 @@
 <translation id="52254442782792731">ยังไม่ได้ตั้งค่าระดับการเข้าถึงปัจจุบัน</translation>
 <translation id="5225463052809312700">เปิดกล้อง</translation>
 <translation id="5226253862147382094">ตรวจสอบการอัปเดตโลโก้และ URL</translation>
-<translation id="5226514125747186">วงกลมจุดปรากฏรอบไอคอนเว็บไซต์ <ph name="BEGIN_LINK" />ดูข้อมูลเพิ่มเติมเกี่ยวกับแท็บที่ไม่ได้ใช้งาน<ph name="END_LINK" /></translation>
+<translation id="336916507624489577">วงกลมจุดปรากฏรอบไอคอนเว็บไซต์</translation>
 <translation id="5226731562812684363">เว็บไซต์ไม่ได้รับอนุญาตให้ใช้ตำแหน่ง</translation>
 <translation id="5227679487546032910">รูปโปรไฟล์เริ่มต้นสีน้ำเงินอมเขียว</translation>
 <translation id="5228245824943774148">เชื่อมต่ออุปกรณ์อยู่ <ph name="NUM_DEVICES_CONNECTED" /> เครื่อง</translation>

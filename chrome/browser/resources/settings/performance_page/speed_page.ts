@@ -13,7 +13,6 @@ import '../settings_page/settings_section.js';
 import {PrefService} from '/shared/settings/prefs2/pref_service.js';
 import {PrefServiceObserverMixinLit} from '/shared/settings/prefs2/pref_service_observer_mixin_lit.js';
 import {assert} from 'chrome://resources/js/assert.js';
-import {OpenWindowProxyImpl} from 'chrome://resources/js/open_window_proxy.js';
 import {PluralStringProxyImpl} from 'chrome://resources/js/plural_string_proxy.js';
 import {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 import type {PropertyValues} from 'chrome://resources/lit/v3_0/lit.rollup.js';
@@ -150,11 +149,6 @@ export class SpeedPageElement extends SpeedPageElementBase {
       this.$.preloadingExtended.updateCollapsed();
       this.$.preloadingStandard.updateCollapsed();
     });
-  }
-
-  protected onPreloadingSubLabelLinkClicked_() {
-    OpenWindowProxyImpl.getInstance().openUrl(
-        loadTimeData.getString('preloadingLearnMoreUrl'));
   }
 
   protected showSendFeedbackButton_(): boolean {

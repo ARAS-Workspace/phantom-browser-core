@@ -4956,7 +4956,7 @@ Oddálení provedete stisknutím kláves Ctrl + Alt + Snížit jas.</translation
 <translation id="4807098396393229769">Jméno na kartě</translation>
 <translation id="4807122856660838973">Zapnout Bezpečné prohlížení</translation>
 <translation id="4807514039636325497">Podrobnosti o technologii D-Bus</translation>
-<translation id="4808525520374557629">Dostávejte oznámení s návrhy k odstranění zjištěných problémů s výkonem. <ph name="BEGIN_LINK" />Další informace o upozorněních na problémy s výkonem<ph name="END_LINK" /></translation>
+<translation id="5771930213953292472">Dostávejte oznámení s návrhy k odstranění zjištěných problémů s výkonem.</translation>
 <translation id="4808667324955055115">Byla zablokována vyskakovací okna:</translation>
 <translation id="4809447465126035330">Smazat</translation>
 <translation id="480990236307250886">Otevřít domovskou stránku</translation>
@@ -5522,7 +5522,7 @@ Oddálení provedete stisknutím kláves Ctrl + Alt + Snížit jas.</translation
 <translation id="52254442782792731">Aktuální nastavení viditelnosti ještě není zadáno</translation>
 <translation id="5225463052809312700">Zapnout kameru</translation>
 <translation id="5226253862147382094">Zkontrolujte aktualizace loga a adresy URL</translation>
-<translation id="5226514125747186">Kolem ikon webu se zobrazí tečkovaný kruh. <ph name="BEGIN_LINK" />Další informace o neaktivních kartách<ph name="END_LINK" /></translation>
+<translation id="336916507624489577">Kolem ikon webu se zobrazí tečkovaný kruh.</translation>
 <translation id="5226731562812684363">Weby nemají povoleno používat vaši kameru</translation>
 <translation id="5227679487546032910">Výchozí šedozelený avatar</translation>
 <translation id="5228245824943774148">Připojená zařízení: <ph name="NUM_DEVICES_CONNECTED" /></translation>

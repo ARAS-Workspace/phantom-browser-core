@@ -4972,7 +4972,7 @@
 <translation id="4807098396393229769">কার্ডে থাকা নাম</translation>
 <translation id="4807122856660838973">Safe Browsing চালু করুন</translation>
 <translation id="4807514039636325497">DBus বিবরণ</translation>
-<translation id="4808525520374557629">পারফর্ম্যান্সের সমস্যা শনাক্তকরণের মাধ্যমে উন্নত করতে সাজেস্ট করে এমন বিজ্ঞপ্তি পান। <ph name="BEGIN_LINK" />পারফর্ম্যান্সের সমস্যা সংক্রান্ত সতর্কতা সম্পর্কে আরও জানুন<ph name="END_LINK" /></translation>
+<translation id="5771930213953292472">পারফর্ম্যান্সের সমস্যা শনাক্তকরণের মাধ্যমে উন্নত করতে সাজেস্ট করে এমন বিজ্ঞপ্তি পান।</translation>
 <translation id="4808667324955055115">পপ-আপগুলি ব্লক করা হয়েছে:</translation>
 <translation id="4809447465126035330">মুছুন</translation>
 <translation id="480990236307250886">হোম পৃষ্ঠাটি খুলুন</translation>
@@ -5539,7 +5539,7 @@
 <translation id="52254442782792731">বর্তমানে 'ডিভাইসের দৃশ্যমানতা' সেটিং এখনও সেট করা হয়নি</translation>
 <translation id="5225463052809312700">ক্যামেরা চালু করুন</translation>
 <translation id="5226253862147382094">লোগো এবং URL আপডেট পর্যালোচনা করুন</translation>
-<translation id="5226514125747186">সাইট আইকন ঘিরে ডট দেওয়া বৃত্ত দেখা যায়। <ph name="BEGIN_LINK" />ইনঅ্যাক্টিভ ট্যাব সম্পর্কে আরও জানুন<ph name="END_LINK" /></translation>
+<translation id="336916507624489577">সাইট আইকন ঘিরে ডট দেওয়া বৃত্ত দেখা যায়।</translation>
 <translation id="5226731562812684363">ওয়েবসাইটকে আপনার লোকেশন ব্যবহার করার অনুমতি দেওয়া হয়নি</translation>
 <translation id="5227679487546032910">ডিফল্ট টিল রঙের অবতার</translation>
 <translation id="5228245824943774148"><ph name="NUM_DEVICES_CONNECTED" />টি ডিভাইস কানেক্ট করা হয়েছে</translation>

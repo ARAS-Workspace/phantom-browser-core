@@ -53,10 +53,6 @@ inline constexpr char kAdvancedProtectionDownloadLearnMoreURL[] =
 inline constexpr char kBrowserSettingsSearchEngineURL[] =
     "chrome://settings/search";
 
-// "Learn more" URL for Battery Saver Mode.
-inline constexpr char16_t kBatterySaverModeLearnMoreUrl[] =
-    u"https://support.google.com/chrome?p=chrome_battery_saver";
-
 // The URL for providing help when the Bluetooth adapter is off.
 inline constexpr char kBluetoothAdapterOffHelpURL[] =
     "https://support.google.com/chrome?p=bluetooth";
@@ -186,10 +182,6 @@ inline constexpr char kCrashReasonFeedbackDisplayedURL[] =
     "https://support.google.com/chrome?p=e_awsnap_rl";
 #endif
 
-// "Learn more" URL for the inactive tabs appearance setting.
-inline constexpr char16_t kDiscardRingTreatmentLearnMoreUrl[] =
-    u"https://support.google.com/chrome?p=performance_personalization";
-
 // "Learn more" URL for the "Do not track" setting in the privacy section.
 inline constexpr char16_t kDoNotTrackLearnMoreURL[] =
 #if BUILDFLAG(IS_CHROMEOS)
@@ -281,15 +273,6 @@ inline constexpr char kGooglePasswordManagerURL[] = "";
 
 // URL of the Google Photos.
 inline constexpr char kGooglePhotosURL[] = "https://photos.google.com";
-
-// The URL for the "Learn more" link for the Memory Saver Mode.
-inline constexpr char16_t kMemorySaverModeLearnMoreUrl[] =
-    u"https://support.google.com/chrome?p=chrome_memory_saver";
-
-// The URL in the help text for the Memory Saver Mode tab discarding
-// exceptions add dialog.
-inline constexpr char16_t kMemorySaverModeTabDiscardingHelpUrl[] =
-    u"https://support.google.com/chrome?p=performance_site_exclusion";
 
 // The URL to the help center article of Incognito mode.
 inline constexpr char16_t kIncognitoHelpCenterURL[] =
@@ -430,14 +413,6 @@ inline constexpr char16_t kCardBenefitsLearnMoreURL[] =
 // "Learn more" URL for the Gmail OTP filling setting.
 inline constexpr char16_t kGmailOtpFillingLearnMoreURL[] =
     u"https://support.google.com/chrome?p=one_time_password";
-
-// "Learn more" URL for the performance intervention notification setting.
-inline constexpr char16_t kPerformanceInterventionLearnMoreUrl[] =
-    u"https://support.google.com/chrome?p=performance_personalization";
-
-// "Learn more" URL for the preloading section in Performance settings.
-inline constexpr char16_t kPreloadingLearnMoreUrl[] =
-    u"https://support.google.com/chrome/?p=performance_preload_pages";
 
 // "Learn more" URL for the Privacy section under Options.
 inline constexpr char kPrivacyLearnMoreURL[] =

@@ -4971,7 +4971,7 @@
 <translation id="4807098396393229769">ຊື່​ຢູ່ໃນ​ບັດ</translation>
 <translation id="4807122856660838973">ເປີດໃຊ້ Safe Browsing</translation>
 <translation id="4807514039636325497">ລາຍລະອຽດ DBus</translation>
-<translation id="4808525520374557629">ຮັບການແຈ້ງເຕືອນທີ່ແນະນຳວິທີປັບປຸງບັນຫາດ້ານປະສິດທິພາບທີ່ກວດພົບ. <ph name="BEGIN_LINK" />ສຶກສາເພີ່ມເຕີມກ່ຽວກັບແຈ້ງເຕືອນບັນຫາດ້ານປະສິດທິພາບ<ph name="END_LINK" /></translation>
+<translation id="5771930213953292472">ຮັບການແຈ້ງເຕືອນທີ່ແນະນຳວິທີປັບປຸງບັນຫາດ້ານປະສິດທິພາບທີ່ກວດພົບ.</translation>
 <translation id="4808667324955055115">ບລັອກປັອບອັບໄວ້ແລ້ວ:</translation>
 <translation id="4809447465126035330">ລຶບ</translation>
 <translation id="480990236307250886">ເປີດໜ້າຫຼັກ</translation>
@@ -5538,7 +5538,7 @@
 <translation id="52254442782792731">ການຕັ້ງຄ່າການສະແດງໃນປັດຈຸບັນແມ່ນບໍ່ທັນໄດ້ຕັ້ງຄ່າເທື່ອ</translation>
 <translation id="5225463052809312700">ເປີດກ້ອງຖ່າຍຮູບ</translation>
 <translation id="5226253862147382094">ກວດສອບການອັບເດດໂລໂກ້ ແລະ URL</translation>
-<translation id="5226514125747186">ວົງມົນຈຸດປາກົດຢູ່ອ້ອມຮອບໄອຄອນເວັບໄຊ. <ph name="BEGIN_LINK" />ສຶກສາເພີ່ມເຕີມກ່ຽວກັບແຖບທີ່ບໍ່ໄດ້ນຳໃຊ້<ph name="END_LINK" /></translation>
+<translation id="336916507624489577">ວົງມົນຈຸດປາກົດຢູ່ອ້ອມຮອບໄອຄອນເວັບໄຊ.</translation>
 <translation id="5226731562812684363">ເວັບໄຊບໍ່ໄດ້ຮັບອະນຸຍາດໃຫ້ໃຊ້ສະຖານທີ່ຂອງທ່ານ</translation>
 <translation id="5227679487546032910">ຮູບແທນຕົວສີຟ້າອົມຂຽວຕາມຄ່າເລີ່ມຕົ້ນ</translation>
 <translation id="5228245824943774148">ເຊື່ອມຕໍ່ <ph name="NUM_DEVICES_CONNECTED" /> ອຸປະກອນແລ້ວ</translation>

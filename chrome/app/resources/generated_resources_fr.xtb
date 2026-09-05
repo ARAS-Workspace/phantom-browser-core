@@ -4957,7 +4957,7 @@ Appuyez sur Ctrl+Alt+Baisser la luminosité pour faire un zoom arrière.</transl
 <translation id="4807098396393229769">Titulaire de la carte</translation>
 <translation id="4807122856660838973">Activer la navigation sécurisée</translation>
 <translation id="4807514039636325497">Détails DBus</translation>
-<translation id="4808525520374557629">Recevoir des notifications suggérant des solutions pour améliorer les problèmes de performances détectés. <ph name="BEGIN_LINK" />En savoir plus sur les alertes concernant les problèmes de performances<ph name="END_LINK" /></translation>
+<translation id="5771930213953292472">Recevoir des notifications suggérant des solutions pour améliorer les problèmes de performances détectés.</translation>
 <translation id="4808667324955055115">Pop-up bloqués :</translation>
 <translation id="4809447465126035330">Supprimer</translation>
 <translation id="480990236307250886">Ouvrir la page d'accueil</translation>
@@ -5523,7 +5523,7 @@ Appuyez sur Ctrl+Alt+Baisser la luminosité pour faire un zoom arrière.</transl
 <translation id="52254442782792731">Le paramètre actuel de visibilité n'est pas encore défini</translation>
 <translation id="5225463052809312700">Activer la caméra</translation>
 <translation id="5226253862147382094">Examiner les modifications apportées au logo et à l'URL</translation>
-<translation id="5226514125747186">Un cercle en pointillé apparaît autour des icônes de site. <ph name="BEGIN_LINK" />En savoir plus sur les onglets inactifs<ph name="END_LINK" /></translation>
+<translation id="336916507624489577">Un cercle en pointillé apparaît autour des icônes de site.</translation>
 <translation id="5226731562812684363">Les sites Web ne sont pas autorisés à utiliser votre position</translation>
 <translation id="5227679487546032910">Avatar turquoise par défaut</translation>
 <translation id="5228245824943774148"><ph name="NUM_DEVICES_CONNECTED" /> appareils connectés</translation>

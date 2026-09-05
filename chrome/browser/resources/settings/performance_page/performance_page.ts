@@ -12,12 +12,10 @@ import './tab_discard/exception_list.js';
 import {PrefService} from '/shared/settings/prefs2/pref_service.js';
 import {PrefServiceObserverMixinLit} from '/shared/settings/prefs2/pref_service_observer_mixin_lit.js';
 import {HelpBubbleMixinLit} from 'chrome://resources/cr_components/help_bubble/help_bubble_mixin_lit.js';
-import {OpenWindowProxyImpl} from 'chrome://resources/js/open_window_proxy.js';
 import {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 import type {PropertyValues} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 
 import type {SettingsToggleButtonElement} from '../controls/settings_toggle_button.js';
-import {loadTimeData} from '../i18n_setup.js';
 import {routes} from '../route.js';
 import {Router} from '../router.js';
 
@@ -73,16 +71,6 @@ export class SettingsPerformancePageElement extends
   protected onDiscardRingChange_() {
     this.metricsProxy_.recordDiscardRingTreatmentEnabledChanged(
         PrefService.getInstance().getPref<boolean>(DISCARD_RING_PREF).value);
-  }
-
-  protected onDiscardRingTreatmentSubLabelLinkClicked_() {
-    OpenWindowProxyImpl.getInstance().openUrl(
-        loadTimeData.getString('discardRingTreatmentLearnMoreUrl'));
-  }
-
-  protected onPerformanceInterventionSubLabelLinkClicked_() {
-    OpenWindowProxyImpl.getInstance().openUrl(
-        loadTimeData.getString('performanceInterventionLearnMoreUrl'));
   }
 
   protected onTabHoverPreviewCardLinkClick_(): void {

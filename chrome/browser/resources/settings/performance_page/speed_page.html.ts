@@ -16,8 +16,7 @@ export function getHtml(this: SpeedPageElement) {
   <settings-toggle-button id="preloadingToggle"
       pref-key="net.network_prediction_options"
       label="$i18n{preloadingPageTitle}"
-      sub-label-with-link="$i18n{preloadingToggleSummary}"
-      @sub-label-link-clicked="${this.onPreloadingSubLabelLinkClicked_}"
+      sub-label="$i18n{preloadingToggleSummary}"
       .numericUncheckedValues="${this.numericUncheckedValues_}"
       .numericCheckedValue="${NetworkPredictionOptions.STANDARD}"
       @change="${this.onPreloadingStateChange_}">

@@ -4954,7 +4954,7 @@ Fes servir Ctrl+Alt+disminueix la brillantor per reduir el zoom.</translation>
 <translation id="4807098396393229769">Titular de la targeta</translation>
 <translation id="4807122856660838973">Activa la funció Navegació segura</translation>
 <translation id="4807514039636325497">Detalls de DBus</translation>
-<translation id="4808525520374557629">Rep notificacions que suggereixen maneres de millorar els problemes de rendiment detectats. <ph name="BEGIN_LINK" />Més informació sobre les alertes de problemes de rendiment<ph name="END_LINK" /></translation>
+<translation id="5771930213953292472">Rep notificacions que suggereixen maneres de millorar els problemes de rendiment detectats.</translation>
 <translation id="4808667324955055115">S'han bloquejat les finestres emergents:</translation>
 <translation id="4809447465126035330">Suprimeix</translation>
 <translation id="480990236307250886">Obre la pàgina d'inici</translation>
@@ -5521,7 +5521,7 @@ Fes servir Ctrl+Alt+disminueix la brillantor per reduir el zoom.</translation>
 <translation id="52254442782792731">L'opció de configuració de visibilitat actual encara no s'ha definit</translation>
 <translation id="5225463052809312700">Activa la càmera</translation>
 <translation id="5226253862147382094">Revisa les actualitzacions del logotip i de l'URL</translation>
-<translation id="5226514125747186">Apareix un cercle de punts al voltant de les icones del lloc web. <ph name="BEGIN_LINK" />Més informació sobre les pestanyes inactives<ph name="END_LINK" /></translation>
+<translation id="336916507624489577">Apareix un cercle de punts al voltant de les icones del lloc web.</translation>
 <translation id="5226731562812684363">Els llocs web no poden utilitzar la teva ubicació</translation>
 <translation id="5227679487546032910">Avatar turquesa predeterminat</translation>
 <translation id="5228245824943774148"><ph name="NUM_DEVICES_CONNECTED" /> dispositius connectats</translation>

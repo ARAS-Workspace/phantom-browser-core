@@ -4960,7 +4960,7 @@
 <translation id="4807098396393229769">الاسم المكتوب على البطاقة</translation>
 <translation id="4807122856660838973">تفعيل ميزة "التصفُّح الآمن"</translation>
 <translation id="4807514039636325497">‏تفاصيل D-Bus</translation>
-<translation id="4808525520374557629">احصل على إشعارات تتضمّن اقتراحات لحلّ مشاكل الأداء التي يتم رصدها. <ph name="BEGIN_LINK" />مزيد من المعلومات حول التنبيهات بشأن مشاكل الأداء<ph name="END_LINK" /></translation>
+<translation id="5771930213953292472">احصل على إشعارات تتضمّن اقتراحات لحلّ مشاكل الأداء التي يتم رصدها.</translation>
 <translation id="4808667324955055115">تمّ حظر النوافذ المنبثقة:</translation>
 <translation id="4809447465126035330">حذف</translation>
 <translation id="480990236307250886">فتح الصفحة الرئيسية</translation>
@@ -5527,7 +5527,7 @@
 <translation id="52254442782792731">لم يتم ضبط الإعداد الحالي لمستوى ظهور الجهاز.</translation>
 <translation id="5225463052809312700">تفعيل الكاميرا</translation>
 <translation id="5226253862147382094">‏مراجعة التعديلات التي تم إجراؤها على الشعار وعنوان URL</translation>
-<translation id="5226514125747186">تظهر دائرة منقَّطة حول رموز الموقع الإلكتروني. <ph name="BEGIN_LINK" />مزيد من المعلومات عن علامات التبويب غير النشطة<ph name="END_LINK" /></translation>
+<translation id="336916507624489577">تظهر دائرة منقَّطة حول رموز الموقع الإلكتروني.</translation>
 <translation id="5226731562812684363">لا يُسمح للمواقع الإلكترونية باستخدام موقعك الجغرافي</translation>
 <translation id="5227679487546032910">الأفاتار التلقائي باللون الأزرق المخضر</translation>
 <translation id="5228245824943774148">هناك <ph name="NUM_DEVICES_CONNECTED" /> جهاز متصل.</translation>

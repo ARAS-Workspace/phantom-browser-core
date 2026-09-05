@@ -4956,7 +4956,7 @@
 <translation id="4807098396393229769">カード名義人（半角英文字）</translation>
 <translation id="4807122856660838973">セーフ ブラウジングをオンにする</translation>
 <translation id="4807514039636325497">DBus の詳細</translation>
-<translation id="4808525520374557629">検出されたパフォーマンスの問題について推奨される改善方法を通知する。<ph name="BEGIN_LINK" />パフォーマンスの問題に関するアラートの詳細<ph name="END_LINK" /></translation>
+<translation id="5771930213953292472">検出されたパフォーマンスの問題について推奨される改善方法を通知する。</translation>
 <translation id="4808667324955055115">ポップアップがブロックされました:</translation>
 <translation id="4809447465126035330">削除</translation>
 <translation id="480990236307250886">ホームページを開く</translation>
@@ -5521,7 +5521,7 @@
 <translation id="52254442782792731">公開設定はまだ設定されていません</translation>
 <translation id="5225463052809312700">カメラをオンにする</translation>
 <translation id="5226253862147382094">ロゴと URL の更新内容を確認</translation>
-<translation id="5226514125747186">サイトのアイコンの周囲に点線の円を表示する。<ph name="BEGIN_LINK" />アクティブでないタブの詳細<ph name="END_LINK" /></translation>
+<translation id="336916507624489577">サイトのアイコンの周囲に点線の円を表示する。</translation>
 <translation id="5226731562812684363">ウェブサイトでの位置情報の使用は許可されていません</translation>
 <translation id="5227679487546032910">デフォルトの青緑のアバター</translation>
 <translation id="5228245824943774148"><ph name="NUM_DEVICES_CONNECTED" /> 台のデバイスが接続されています</translation>

@@ -14,16 +14,13 @@ export function getHtml(this: PerformancePageElement) {
       @change="${this.onPerformanceInterventionToggleButtonChange_}"
       pref-key="performance_tuning.intervention_notification.enabled"
       label="$i18n{performanceInterventionEnabledLabel}"
-      sub-label-with-link="$i18n{performanceInterventionEnabledDescription}"
-      @sub-label-link-clicked="${this.onPerformanceInterventionSubLabelLinkClicked_}">
+      sub-label="$i18n{performanceInterventionEnabledDescription}">
   </settings-toggle-button>
   <settings-toggle-button id="discardRingTreatmentToggleButton"
       @change="${this.onDiscardRingChange_}"
       pref-key="performance_tuning.discard_ring_treatment.enabled"
       label="$i18n{discardRingTreatmentEnabledLabel}"
-      sub-label-with-link="
-            $i18n{discardRingTreatmentEnabledDescriptionWithLearnLink}"
-      @sub-label-link-clicked="${this.onDiscardRingTreatmentSubLabelLinkClicked_}">
+      sub-label="$i18n{discardRingTreatmentEnabledDescription}">
   </settings-toggle-button>
   <cr-link-row
       label="$i18n{tabHoverPreviewCardLinkTitle}"

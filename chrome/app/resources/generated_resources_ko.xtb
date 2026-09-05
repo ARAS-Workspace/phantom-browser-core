@@ -4971,7 +4971,7 @@
 <translation id="4807098396393229769">카드에 표기된 이름</translation>
 <translation id="4807122856660838973">세이프 브라우징 사용 설정</translation>
 <translation id="4807514039636325497">DBus 세부정보</translation>
-<translation id="4808525520374557629">감지된 성능 문제를 개선하는 방법을 제안하는 알림을 받습니다. <ph name="BEGIN_LINK" />성능 문제 알림 자세히 알아보기<ph name="END_LINK" /></translation>
+<translation id="5771930213953292472">감지된 성능 문제를 개선하는 방법을 제안하는 알림을 받습니다.</translation>
 <translation id="4808667324955055115">팝업 차단됨</translation>
 <translation id="4809447465126035330">삭제</translation>
 <translation id="480990236307250886">홈페이지 열기</translation>
@@ -5538,7 +5538,7 @@
 <translation id="52254442782792731">현재 공개 범위가 아직 설정되어 있지 않음</translation>
 <translation id="5225463052809312700">카메라 켜기</translation>
 <translation id="5226253862147382094">로고 및 URL 업데이트 검토</translation>
-<translation id="5226514125747186">사이트 아이콘 주위에 점선으로 된 원이 표시됩니다. <ph name="BEGIN_LINK" />비활성 탭에 대해 자세히 알아보기<ph name="END_LINK" /></translation>
+<translation id="336916507624489577">사이트 아이콘 주위에 점선으로 된 원이 표시됩니다.</translation>
 <translation id="5226731562812684363">웹사이트에서 내 위치를 사용할 수 없습니다.</translation>
 <translation id="5227679487546032910">기본 청록색 아바타</translation>
 <translation id="5228245824943774148">기기 <ph name="NUM_DEVICES_CONNECTED" />대 연결됨</translation>

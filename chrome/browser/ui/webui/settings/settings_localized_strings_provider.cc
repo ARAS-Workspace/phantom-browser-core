@@ -639,40 +639,18 @@ void AddPerformanceStrings(content::WebUIDataSource* html_source) {
       {"cpuPerformanceTierMid", IDS_SETTINGS_CPU_PERFORMANCE_TIER_MID},
       {"cpuPerformanceTierHigh", IDS_SETTINGS_CPU_PERFORMANCE_TIER_HIGH},
       {"cpuPerformanceTierUltra", IDS_SETTINGS_CPU_PERFORMANCE_TIER_ULTRA},
+      {"batterySaverModeDescription",
+       IDS_SETTINGS_PERFORMANCE_BATTERY_SAVER_MODE_SETTING_DESCRIPTION},
+      {"discardRingTreatmentEnabledDescription",
+       IDS_SETTINGS_PERFORMANCE_DISCARD_RING_TREATMENT_ENABLED_DESCRIPTION},
+      {"memorySaverModeDescription",
+       IDS_SETTINGS_PERFORMANCE_MEMORY_SAVER_MODE_SETTING_DESCRIPTION},
+      {"performanceInterventionEnabledDescription",
+       IDS_SETTINGS_PERFORMANCE_INTERVENTION_NOTIFICATION_ENABLED_DESCRIPTION},
+      {"preloadingToggleSummary",
+       IDS_SETTINGS_PERFORMANCE_PRELOAD_TOGGLE_SUMMARY},
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
-
-  static constexpr struct {
-    const char* id;
-    int message_id;
-    const char16_t* url;
-  } kLearnMoreStrings[] = {
-      {"batterySaverModeDescription",
-       IDS_SETTINGS_PERFORMANCE_BATTERY_SAVER_MODE_SETTING_DESCRIPTION,
-       chrome::kBatterySaverModeLearnMoreUrl},
-      {"discardRingTreatmentEnabledDescriptionWithLearnLink",
-       IDS_SETTINGS_PERFORMANCE_DISCARD_RING_TREATMENT_ENABLED_DESCRIPTION_WITH_LEARN_LINK,
-       chrome::kDiscardRingTreatmentLearnMoreUrl},
-      {"memorySaverModeDescription",
-       IDS_SETTINGS_PERFORMANCE_MEMORY_SAVER_MODE_SETTING_DESCRIPTION,
-       chrome::kMemorySaverModeLearnMoreUrl},
-      {"performanceInterventionEnabledDescription",
-       IDS_SETTINGS_PERFORMANCE_INTERVENTION_NOTIFICATION_ENABLED_DESCRIPTION,
-       chrome::kPerformanceInterventionLearnMoreUrl},
-      {"preloadingToggleSummary",
-       IDS_SETTINGS_PERFORMANCE_PRELOAD_TOGGLE_SUMMARY,
-       chrome::kPreloadingLearnMoreUrl}};
-
-  const std::u16string settings_opens_in_new_tab =
-      l10n_util::GetStringUTF16(IDS_SETTINGS_OPENS_IN_NEW_TAB);
-
-  for (const auto& learn_more_string : kLearnMoreStrings) {
-    html_source->AddString(
-        learn_more_string.id,
-        l10n_util::GetStringFUTF16(learn_more_string.message_id,
-                                   learn_more_string.url,
-                                   settings_opens_in_new_tab));
-  }
 
   html_source->AddString(
       "tabDiscardTimerFiveMinutes",
@@ -718,17 +696,6 @@ void AddPerformanceStrings(content::WebUIDataSource* html_source) {
           base::NumberToString16(
               performance_manager::user_tuning::BatterySaverModeManager::
                   kLowBatteryThresholdPercent)));
-
-  html_source->AddString("discardRingTreatmentLearnMoreUrl",
-                         chrome::kDiscardRingTreatmentLearnMoreUrl);
-  html_source->AddString("memorySaverLearnMoreUrl",
-                         chrome::kMemorySaverModeLearnMoreUrl);
-  html_source->AddString("batterySaverLearnMoreUrl",
-                         chrome::kBatterySaverModeLearnMoreUrl);
-  html_source->AddString("preloadingLearnMoreUrl",
-                         chrome::kPreloadingLearnMoreUrl);
-  html_source->AddString("performanceInterventionLearnMoreUrl",
-                         chrome::kPerformanceInterventionLearnMoreUrl);
 
 #if BUILDFLAG(IS_CHROMEOS)
   html_source->AddString("osPowerSettingsUrl",

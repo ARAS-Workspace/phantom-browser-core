@@ -4965,7 +4965,7 @@
 <translation id="4807098396393229769">በካርድ ላይ ያለ ስም</translation>
 <translation id="4807122856660838973">ደህንነቱ የተጠበቀ አስሳን ያብሩ</translation>
 <translation id="4807514039636325497">የDBus ዝርዝሮች</translation>
-<translation id="4808525520374557629">የተገኙ የአፈጻጸም ችግሮችን የሚያችሻሽሉባቸው መንገዶችን የሚጠቁሙ ማሳወቂያዎችን ያግኙ። <ph name="BEGIN_LINK" />ስለአፈጻጸም ችግር ማንቂያዎች የበለጠ ይረዱ<ph name="END_LINK" /></translation>
+<translation id="5771930213953292472">የተገኙ የአፈጻጸም ችግሮችን የሚያችሻሽሉባቸው መንገዶችን የሚጠቁሙ ማሳወቂያዎችን ያግኙ።</translation>
 <translation id="4808667324955055115">ብቅ-ባዮች ታግደዋል፦</translation>
 <translation id="4809447465126035330">ሰርዝ</translation>
 <translation id="480990236307250886">መነሻ ገጹን ክፈት</translation>
@@ -5532,7 +5532,7 @@
 <translation id="52254442782792731">አሁን ያለው የታይነት ቅንብር እስካሁን አልተቀናበረም</translation>
 <translation id="5225463052809312700">ካሜራን አብራ</translation>
 <translation id="5226253862147382094">የዓርማ እና ዩአርኤል ዝማኔዎችን ይገምግሙ</translation>
-<translation id="5226514125747186">ነጥብ ያለበት ክብ በጣቢያው አዶዎች ዙሪያ ይታያል። <ph name="BEGIN_LINK" />ስላልነቁ ትሮች የበለጠ ይረዱ<ph name="END_LINK" /></translation>
+<translation id="336916507624489577">ነጥብ ያለበት ክብ በጣቢያው አዶዎች ዙሪያ ይታያል።</translation>
 <translation id="5226731562812684363">ድር ጣቢያዎች የእርስዎን አካባቢ እንዲጠቀሙ አልተፈቀደላቸውም</translation>
 <translation id="5227679487546032910">ነባሪ ደማቅ አረንጓዴ አምሳያ</translation>
 <translation id="5228245824943774148"><ph name="NUM_DEVICES_CONNECTED" /> መሣሪያዎች ተገናኝተዋል</translation>

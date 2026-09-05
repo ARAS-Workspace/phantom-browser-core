@@ -4959,7 +4959,7 @@ Ak chcete zobrazenie oddialiť, stlačte Ctrl + Alt + zníženie jasu.</translat
 <translation id="4807098396393229769">Meno na karte</translation>
 <translation id="4807122856660838973">Zapnúť Bezpečné prehliadanie</translation>
 <translation id="4807514039636325497">Podrobnosti o mechanizme DBus</translation>
-<translation id="4808525520374557629">Dostávajte upozornenia s návrhmi, ako zlepšiť zistené výkonnostné problémy <ph name="BEGIN_LINK" />Ďalšie informácie o upozorneniach na výkonnostné problémy<ph name="END_LINK" /></translation>
+<translation id="5771930213953292472">Dostávajte upozornenia s návrhmi, ako zlepšiť zistené výkonnostné problémy</translation>
 <translation id="4808667324955055115">Boli zablokované kontextové okná:</translation>
 <translation id="4809447465126035330">Odstrániť</translation>
 <translation id="480990236307250886">Otvoriť domovskú stránku</translation>
@@ -5525,7 +5525,7 @@ Ak chcete zobrazenie oddialiť, stlačte Ctrl + Alt + zníženie jasu.</translat
 <translation id="52254442782792731">Aktuálne nastavenie viditeľnosti zatiaľ nie je nakonfigurované</translation>
 <translation id="5225463052809312700">Zapnúť kameru</translation>
 <translation id="5226253862147382094">Kontrola aktualizácií loga a webovej adresy</translation>
-<translation id="5226514125747186">Okolo ikon webov sa bude zobrazovať bodkovaný kruh. <ph name="BEGIN_LINK" />Ďalšie informácie o neaktívnych kartách<ph name="END_LINK" /></translation>
+<translation id="336916507624489577">Okolo ikon webov sa bude zobrazovať bodkovaný kruh.</translation>
 <translation id="5226731562812684363">Weby nemôžu používať vašu polohu</translation>
 <translation id="5227679487546032910">Predvolený modrozelený avatar</translation>
 <translation id="5228245824943774148">Pripojené zariadenia: <ph name="NUM_DEVICES_CONNECTED" /></translation>

@@ -4959,7 +4959,7 @@
 <translation id="4807098396393229769">Имя владельца</translation>
 <translation id="4807122856660838973">Включите Безопасный просмотр</translation>
 <translation id="4807514039636325497">Использование D-Bus</translation>
-<translation id="4808525520374557629">Получать рекомендации по устранению обнаруженных проблем производительности. <ph name="BEGIN_LINK" />Подробнее…<ph name="END_LINK" /></translation>
+<translation id="5771930213953292472">Получать рекомендации по устранению обнаруженных проблем производительности.</translation>
 <translation id="4808667324955055115">Всплывающие окна заблокированы</translation>
 <translation id="4809447465126035330">Удалить</translation>
 <translation id="480990236307250886">Перейти на главную страницу</translation>
@@ -5525,7 +5525,7 @@
 <translation id="52254442782792731">Вы пока не указали, кому разрешено обнаруживать ваше устройство</translation>
 <translation id="5225463052809312700">Включить камеру</translation>
 <translation id="5226253862147382094">Проверьте новый логотип и URL</translation>
-<translation id="5226514125747186">Значки сайтов будут обведены пунктирным кругом. Подробнее <ph name="BEGIN_LINK" />о неактивных вкладках<ph name="END_LINK" />…</translation>
+<translation id="336916507624489577">Значки сайтов будут обведены пунктирным кругом.</translation>
 <translation id="5226731562812684363">У сайтов нет доступа к данным о вашем местоположении.</translation>
 <translation id="5227679487546032910">Аватар по умолчанию (сине-зеленый)</translation>
 <translation id="5228245824943774148">Подключено несколько устройств (<ph name="NUM_DEVICES_CONNECTED" />)</translation>

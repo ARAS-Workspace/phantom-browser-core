@@ -10,11 +10,9 @@ import '../settings_page/settings_section.js';
 
 import {PrefService} from '/shared/settings/prefs2/pref_service.js';
 import {PrefServiceObserverMixinLit} from '/shared/settings/prefs2/pref_service_observer_mixin_lit.js';
-import {OpenWindowProxyImpl} from 'chrome://resources/js/open_window_proxy.js';
 import {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 
 import type {SettingsToggleButtonElement} from '../controls/settings_toggle_button.js';
-import {loadTimeData} from '../i18n_setup.js';
 
 import {getCss} from './memory_page.css.js';
 import {getHtml} from './memory_page.html.js';
@@ -91,11 +89,6 @@ export class SettingsMemoryPageElement extends SettingsMemoryPageElementBase {
       return false;
     }
     return this.memorySaverStatePref_.value !== MemorySaverModeState.DISABLED;
-  }
-
-  protected onMemorySaverSubLabelLinkClicked_() {
-    OpenWindowProxyImpl.getInstance().openUrl(
-        loadTimeData.getString('memorySaverLearnMoreUrl'));
   }
 
   protected showSendFeedbackButton_(): boolean {

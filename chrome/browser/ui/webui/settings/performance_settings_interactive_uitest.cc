@@ -266,29 +266,6 @@ IN_PROC_BROWSER_TEST_F(MemorySettingsInteractiveTest, MemorySaverPrefChanged) {
 }
 
 IN_PROC_BROWSER_TEST_F(MemorySettingsInteractiveTest,
-                       MemorySaverLearnMoreLinkNavigates) {
-  DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kLearnMorePage);
-  const DeepQuery memory_saver_learn_more = {"settings-ui",
-                                             "settings-main",
-                                             "settings-performance-page-index",
-                                             "settings-memory-page",
-                                             "settings-toggle-button",
-                                             "a#learn-more"};
-
-  RunTestSequence(
-      InstrumentTab(kPerformanceSettingsPage),
-      NavigateWebContents(
-          kPerformanceSettingsPage,
-          GURL(chrome::GetSettingsUrl(chrome::kPerformanceSubPage))),
-      InstrumentNextTab(kLearnMorePage),
-      ClickElement(kPerformanceSettingsPage, memory_saver_learn_more),
-      WaitForShow(kLearnMorePage),
-      CheckResult([&]() { return browser()->tab_strip_model()->count(); }, 2),
-      WaitForWebContentsReady(kLearnMorePage,
-                              GURL(chrome::kMemorySaverModeLearnMoreUrl)));
-}
-
-IN_PROC_BROWSER_TEST_F(MemorySettingsInteractiveTest,
                        MemorySaverMetricsShouldLogOnToggle) {
   base::HistogramTester histogram_tester;
 
@@ -506,30 +483,6 @@ class BatterySettingsInteractiveTest
     }));
   }
 };
-
-IN_PROC_BROWSER_TEST_F(BatterySettingsInteractiveTest,
-                       BatterySaverLearnMoreLink) {
-  DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kLearnMorePage);
-  const DeepQuery battery_saver_learn_more = {"settings-ui",
-                                              "settings-main",
-                                              "settings-performance-page-index",
-                                              "settings-battery-page",
-                                              "settings-toggle-button",
-                                              "a#learn-more"};
-
-  RunTestSequence(
-      InstrumentTab(kPerformanceSettingsPage),
-      NavigateWebContents(
-          kPerformanceSettingsPage,
-          GURL(chrome::GetSettingsUrl(chrome::kPerformanceSubPage))),
-      InstrumentNextTab(kLearnMorePage),
-      ScrollIntoView(kPerformanceSettingsPage, battery_saver_learn_more),
-      ClickElement(kPerformanceSettingsPage, battery_saver_learn_more),
-      WaitForShow(kLearnMorePage),
-      CheckResult([&]() { return browser()->tab_strip_model()->count(); }, 2),
-      WaitForWebContentsReady(kLearnMorePage,
-                              GURL(chrome::kBatterySaverModeLearnMoreUrl)));
-}
 
 IN_PROC_BROWSER_TEST_F(BatterySettingsInteractiveTest,
                        BatterySaverMetricsShouldLogOnToggle) {

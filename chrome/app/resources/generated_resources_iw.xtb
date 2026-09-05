@@ -4972,7 +4972,7 @@
 <translation id="4807098396393229769">שם על הכרטיס</translation>
 <translation id="4807122856660838973">הפעלת גלישה בטוחה</translation>
 <translation id="4807514039636325497">‏פרטי DBus</translation>
-<translation id="4808525520374557629">כשמתגלות בעיות בביצועים, מקבלים התראות עם הצעות לשיפור הביצועים. <ph name="BEGIN_LINK" />מידע נוסף על ההתראות לגבי בעיות בביצועים<ph name="END_LINK" /></translation>
+<translation id="5771930213953292472">כשמתגלות בעיות בביצועים, מקבלים התראות עם הצעות לשיפור הביצועים.</translation>
 <translation id="4808667324955055115">חלונות קופצים חסומים</translation>
 <translation id="4809447465126035330">מחיקה</translation>
 <translation id="480990236307250886">פתיחת דף הבית</translation>
@@ -5539,7 +5539,7 @@
 <translation id="52254442782792731">הרשאות הגישה הנוכחיות עוד לא הוגדרו</translation>
 <translation id="5225463052809312700">הפעלת המצלמה</translation>
 <translation id="5226253862147382094">‏בדיקת העדכונים של הלוגו וכתובת ה-URL</translation>
-<translation id="5226514125747186">יופיע עיגול מקווקו מסביב לסמלי אתרים. <ph name="BEGIN_LINK" />מידע נוסף על כרטיסיות לא פעילות<ph name="END_LINK" /></translation>
+<translation id="336916507624489577">יופיע עיגול מקווקו מסביב לסמלי אתרים.</translation>
 <translation id="5226731562812684363">לאתרים אין הרשאה להשתמש במיקום שלך</translation>
 <translation id="5227679487546032910">אווטאר ברירת מחדל כחלחל</translation>
 <translation id="5228245824943774148"><ph name="NUM_DEVICES_CONNECTED" /> מכשירים מחוברים</translation>

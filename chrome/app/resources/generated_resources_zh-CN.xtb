@@ -4956,7 +4956,7 @@
 <translation id="4807098396393229769">持卡人姓名</translation>
 <translation id="4807122856660838973">开启安全浏览</translation>
 <translation id="4807514039636325497">DBus 详情</translation>
-<translation id="4808525520374557629">系统检测到性能问题时显示改进建议通知。<ph name="BEGIN_LINK" />详细了解性能问题提醒<ph name="END_LINK" /></translation>
+<translation id="5771930213953292472">系统检测到性能问题时显示改进建议通知。</translation>
 <translation id="4808667324955055115">已拦截弹出式窗口：</translation>
 <translation id="4809447465126035330">删除</translation>
 <translation id="480990236307250886">打开主页</translation>
@@ -5522,7 +5522,7 @@
 <translation id="52254442782792731">当前尚未设置公开范围</translation>
 <translation id="5225463052809312700">开启摄像头</translation>
 <translation id="5226253862147382094">查看徽标和网址更新</translation>
-<translation id="5226514125747186">网站图标周围会显示一个虚线圆圈。<ph name="BEGIN_LINK" />详细了解闲置标签页<ph name="END_LINK" /></translation>
+<translation id="336916507624489577">网站图标周围会显示一个虚线圆圈。</translation>
 <translation id="5226731562812684363">不允许网站使用您的位置信息</translation>
 <translation id="5227679487546032910">默认的蓝绿色头像</translation>
 <translation id="5228245824943774148">已连接 <ph name="NUM_DEVICES_CONNECTED" /> 部设备</translation>

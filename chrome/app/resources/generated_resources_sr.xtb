@@ -4958,7 +4958,7 @@
 <translation id="4807098396393229769">Име и презиме на картици</translation>
 <translation id="4807122856660838973">Укључите Безбедно прегледање</translation>
 <translation id="4807514039636325497">DBus детаљи</translation>
-<translation id="4808525520374557629">Добијајте обавештења која предлажу начине за решавање откривених проблема са перформансама. <ph name="BEGIN_LINK" />Сазнајте више о упозорњима за проблеме са перформансама<ph name="END_LINK" /></translation>
+<translation id="5771930213953292472">Добијајте обавештења која предлажу начине за решавање откривених проблема са перформансама.</translation>
 <translation id="4808667324955055115">Искачући прозори су блокирани:</translation>
 <translation id="4809447465126035330">Избриши</translation>
 <translation id="480990236307250886">Отвори почетну страницу</translation>
@@ -5525,7 +5525,7 @@
 <translation id="52254442782792731">Актуелна видљивост још увек није подешена</translation>
 <translation id="5225463052809312700">Укључи камеру</translation>
 <translation id="5226253862147382094">Прегледајте ажурирања логотипа и URL-а</translation>
-<translation id="5226514125747186">Око икона сајта се приказује испрекидани круг. <ph name="BEGIN_LINK" />Сазнајте више о неактивним картицама<ph name="END_LINK" /></translation>
+<translation id="336916507624489577">Око икона сајта се приказује испрекидани круг.</translation>
 <translation id="5226731562812684363">Веб-сајтовима није дозвољено да користе вашу локацију</translation>
 <translation id="5227679487546032910">Подразумевани тиркизни аватар</translation>
 <translation id="5228245824943774148">Повезаних уређаја: <ph name="NUM_DEVICES_CONNECTED" /></translation>
