@@ -507,7 +507,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
   ui::TrackedElementHandlerDocumentSingleton::Register(
       this, std::vector<ui::ElementIdentifier>{
                 kEnhancedProtectionSettingElementId,
-                kAnonymizedUrlCollectionPersonalizationSettingId,
                 kInactiveTabSettingElementId,
                 kGlicOsToggleElementId,
                 kGlicOsWidgetKeyboardShortcutElementId,

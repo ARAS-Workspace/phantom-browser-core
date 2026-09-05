@@ -144,7 +144,6 @@
 #include "components/sync/service/sync_policy_handler.h"
 #include "components/themes/theme_color_policy_handler.h"
 #include "components/translate/core/browser/translate_pref_names.h"
-#include "components/unified_consent/pref_names.h"
 #include "components/variations/pref_names.h"
 #include "components/variations/service/variations_service.h"
 #include "components/version_info/channel.h"
@@ -2693,15 +2692,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       std::make_unique<URLAllowlistPolicyHandler>(key::kURLAllowlist));
   handlers->AddHandler(
       std::make_unique<URLBlocklistPolicyHandler>(key::kURLBlocklist));
-
-  handlers->AddHandler(std::make_unique<SimpleDeprecatingPolicyHandler>(
-      std::make_unique<SimplePolicyHandler>(
-          key::kUrlKeyedAnonymizedDataCollectionEnabled,
-          unified_consent::prefs::kUrlKeyedAnonymizedDataCollectionEnabled,
-          base::Value::Type::BOOLEAN),
-      std::make_unique<BooleanDisablingPolicyHandler>(
-          key::kUrlKeyedMetricsAllowed,
-          unified_consent::prefs::kUrlKeyedAnonymizedDataCollectionEnabled)));
 
   handlers->AddHandler(
       std::make_unique<

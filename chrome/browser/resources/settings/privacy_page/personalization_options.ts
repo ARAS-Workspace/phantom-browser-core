@@ -41,7 +41,6 @@ import {PrefService} from '/shared/settings/prefs2/pref_service.js';
 import {PrefServiceObserverMixinLit} from '/shared/settings/prefs2/pref_service_observer_mixin_lit.js';
 import type {MetricsReporting, PrivacyPageBrowserProxy} from '/shared/settings/privacy_page/privacy_page_browser_proxy.js';
 import {PrivacyPageBrowserProxyImpl} from '/shared/settings/privacy_page/privacy_page_browser_proxy.js';
-import {HelpBubbleMixinLit} from 'chrome://resources/cr_components/help_bubble/help_bubble_mixin_lit.js';
 // <if expr="is_chromeos">
 import {OpenWindowProxyImpl} from 'chrome://resources/js/open_window_proxy.js';
 
@@ -57,7 +56,6 @@ import {getHtml} from './personalization_options.html.js';
 
 export interface SettingsPersonalizationOptionsElement {
   $: {
-    urlCollectionToggle: SettingsToggleButtonElement,
     // <if expr="not is_chromeos">
     toast: CrToastElement,
     signinAllowedToggle: SettingsToggleButtonElement,
@@ -68,12 +66,8 @@ export interface SettingsPersonalizationOptionsElement {
 }
 
 const SettingsPersonalizationOptionsElementBase =
-    HelpBubbleMixinLit(RelaunchMixinLit(WebUiListenerMixinLit(
-        I18nMixinLit(PrefServiceObserverMixinLit(CrLitElement)))));
-
-// browser_element_identifiers constants
-const ANONYMIZED_URL_COLLECTION_ID =
-    'kAnonymizedUrlCollectionPersonalizationSettingId';
+    RelaunchMixinLit(WebUiListenerMixinLit(
+        I18nMixinLit(PrefServiceObserverMixinLit(CrLitElement))));
 
 export type PersonalizationOptionsElement =
     SettingsPersonalizationOptionsElement;
@@ -193,10 +187,6 @@ export class SettingsPersonalizationOptionsElement extends
         'chrome-signin-user-choice-info-change',
         this.setChromeSigninUserChoiceInfo_.bind(this));
     // </if>
-
-    this.registerHelpBubble(
-        ANONYMIZED_URL_COLLECTION_ID,
-        this.$.urlCollectionToggle.getBubbleAnchor(), {paddingTop: 10});
   }
 
   private computeSyncFirstSetupInProgress_(): boolean {
@@ -227,14 +217,6 @@ export class SettingsPersonalizationOptionsElement extends
   getSearchSuggestToggle(): SettingsToggleButtonElement|null {
     return this.shadowRoot.querySelector<SettingsToggleButtonElement>(
         '#searchSuggestToggle');
-  }
-
-  /**
-   * @return the anonymized URL collection CrToggleElement.
-   */
-  getUrlCollectionToggle(): SettingsToggleButtonElement|null {
-    return this.shadowRoot.querySelector<SettingsToggleButtonElement>(
-        '#urlCollectionToggle');
   }
   // </if>
 

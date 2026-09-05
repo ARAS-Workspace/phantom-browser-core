@@ -71,7 +71,6 @@
 #include "components/themes/pref_names.h"
 #include "components/translate/core/browser/translate_pref_names.h"
 #include "components/translate/core/browser/translate_prefs.h"
-#include "components/unified_consent/pref_names.h"
 #include "components/url_formatter/url_fixer.h"
 #include "extensions/browser/extension_pref_value_map.h"
 #include "extensions/browser/extension_pref_value_map_factory.h"
@@ -480,9 +479,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
   // Sync and personalization page.
   (*s_allowlist)[::prefs::kSearchSuggestEnabled] =
       settings_api::PrefType::kBoolean;
-  (*s_allowlist)
-      [::unified_consent::prefs::kUrlKeyedAnonymizedDataCollectionEnabled] =
-          settings_api::PrefType::kBoolean;
   (*s_allowlist)[::commerce::kPriceEmailNotificationsEnabled] =
       settings_api::PrefType::kBoolean;
 

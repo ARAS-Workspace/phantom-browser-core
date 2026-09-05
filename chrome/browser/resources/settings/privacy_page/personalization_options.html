@@ -88,12 +88,6 @@ import {RestartType} from '../relaunch_mixin_lit.js';
     ` : ''}
 </if><!-- not chromeos -->
 </if><!-- _google_chrome -->
-    <settings-toggle-button id="urlCollectionToggle"
-        class="hr"
-        pref-key="url_keyed_anonymized_data_collection.enabled"
-        label="$i18n{urlKeyedAnonymizedDataCollection}"
-        sub-label="$i18n{urlKeyedAnonymizedDataCollectionDesc}">
-    </settings-toggle-button>
 <if expr="_google_chrome">
 <if expr="not is_chromeos">
     <settings-toggle-button id="spellCheckControl"

@@ -1522,10 +1522,6 @@ void AddSyncAccountControlStrings(content::WebUIDataSource* html_source) {
 
 void AddPersonalizationOptionsStrings(content::WebUIDataSource* html_source) {
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
-      {"urlKeyedAnonymizedDataCollection",
-       IDS_SETTINGS_ENABLE_URL_KEYED_ANONYMIZED_DATA_COLLECTION},
-      {"urlKeyedAnonymizedDataCollectionDesc",
-       IDS_SETTINGS_ENABLE_URL_KEYED_ANONYMIZED_DATA_COLLECTION_DESC},
       {"spellingPref", IDS_SETTINGS_SPELLING_PREF},
 #if !BUILDFLAG(IS_CHROMEOS)
       {"signinAllowedTitle", IDS_SETTINGS_SIGNIN_ALLOWED},
@@ -1879,10 +1875,6 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
       {"titleAndCount", IDS_SETTINGS_TITLE_AND_COUNT},
       {"syncAndGoogleServicesPrivacyDescription",
        IDS_SETTINGS_SYNC_AND_GOOGLE_SERVICES_PRIVACY_DESC_UNIFIED_CONSENT},
-      {"urlKeyedAnonymizedDataCollection",
-       IDS_SETTINGS_ENABLE_URL_KEYED_ANONYMIZED_DATA_COLLECTION},
-      {"urlKeyedAnonymizedDataCollectionDesc",
-       IDS_SETTINGS_ENABLE_URL_KEYED_ANONYMIZED_DATA_COLLECTION_DESC},
       {"noRecentPermissions", IDS_SETTINGS_RECENT_PERMISSIONS_NO_CHANGES},
       {"recentPermissionAllowedOneItem",
        IDS_SETTINGS_RECENT_PERMISSIONS_ALLOWED_ONE_ITEM},
