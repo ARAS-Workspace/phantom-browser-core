@@ -220,7 +220,6 @@ source_set("impl") {
     "//chrome/browser/renderer_context_menu:bubble_models",
     "//chrome/browser/resources/settings:resources_grit",
     "//chrome/browser/resources/settings_shared:resources_grit",
-    "//chrome/browser/safe_browsing",
     "//chrome/browser/search_engines",
     "//chrome/browser/serial",
     "//chrome/browser/signin",
