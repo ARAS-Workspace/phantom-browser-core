@@ -449,9 +449,6 @@ void AddClearBrowsingDataStrings(content::WebUIDataSource* html_source,
       {"clearPeriod7Days", IDS_SETTINGS_CLEAR_PERIOD_7_DAYS},
       {"clearPeriod4Weeks", IDS_SETTINGS_CLEAR_PERIOD_FOUR_WEEKS},
       {"clearPeriodEverything", IDS_SETTINGS_CLEAR_PERIOD_EVERYTHING},
-      {"historyDeletionDialogTitle",
-       IDS_CLEAR_BROWSING_DATA_HISTORY_NOTICE_TITLE},
-      {"historyDeletionDialogOK", IDS_CLEAR_BROWSING_DATA_HISTORY_NOTICE_OK},
       {"passwordsDeletionDialogTitle",
        IDS_CLEAR_BROWSING_DATA_PASSWORDS_NOTICE_TITLE},
       {"passwordsDeletionDialogOK",
@@ -536,8 +533,6 @@ void AddResetStrings(content::WebUIDataSource* html_source, Profile* profile) {
       {"resetAutomatedDialogBody", IDS_SETTINGS_RESET_AUTOMATED_DIALOG_V2_BODY},
       {"resetPinnedTabs", IDS_SETTINGS_RESET_PINNED_TABS},
       {"gotIt", IDS_SETTINGS_GOT_IT},
-      {"resetLearnMoreAccessibilityText",
-       IDS_SETTINGS_RESET_LEARN_MORE_ACCESSIBILITY_TEXT},
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
 
@@ -1706,8 +1701,6 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
       {"doNotTrack", IDS_SETTINGS_ENABLE_DO_NOT_TRACK},
       {"doNotTrackDialogTitle", IDS_SETTINGS_ENABLE_DO_NOT_TRACK_DIALOG_TITLE},
       {"doNotTrackDialogMessage", IDS_SETTINGS_ENABLE_DO_NOT_TRACK_DIALOG_TEXT},
-      {"doNotTrackDialogLearnMoreA11yLabel",
-       IDS_SETTINGS_ENABLE_DO_NOT_TRACK_DIALOG_LEARN_MORE_ACCESSIBILITY_LABEL},
       {"siteSettingsSublabel", IDS_SETTINGS_PERMISSIONS_DESCRIPTION},
       {"securityPageTitle", IDS_SETTINGS_SECURITY},
       {"secureConnectionsSectionTitle",
@@ -1881,6 +1874,11 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
       "chromeOSPrivacyAndSecuritySectionPath",
       chromeos::settings::mojom::kPrivacyAndSecuritySectionPath);
 #endif
+
+#if BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
+  html_source->AddString("certManagementV2URL",
+                         chrome::kChromeUICertificateManagerDialogURL);
+#endif  // BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
 
   AddPersonalizationOptionsStrings(html_source);
   AddSecureDnsStrings(html_source);

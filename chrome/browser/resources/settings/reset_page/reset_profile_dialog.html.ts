@@ -17,9 +17,6 @@ export function getHtml(this: SettingsResetProfileDialogElement) {
   <div id="dialog-body" slot="body">
     <span .innerHTML="${this.getExplanationText_()}">
     </span>
-    <a href="$i18nRaw{resetPageLearnMoreUrl}"
-        aria-label="$i18n{resetLearnMoreAccessibilityText}"
-        target="_blank">$i18n{learnMore}</a>
   </div>
   <div slot="button-container">
     <div class="spinner" ?hidden="${!this.clearingInProgress_}"></div>

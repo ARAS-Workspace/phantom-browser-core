@@ -17,7 +17,6 @@ import '../settings_shared.css.js';
 import './clear_browsing_data_account_indicator.js';
 // </if>
 import './clear_browsing_data_time_picker.js';
-import './history_deletion_dialog.js';
 
 import type {SyncBrowserProxy, SyncStatus} from '/shared/settings/people_page/sync_browser_proxy.js';
 import {SyncBrowserProxyImpl} from '/shared/settings/people_page/sync_browser_proxy.js';
@@ -173,11 +172,6 @@ export class SettingsClearBrowsingDataDialogElement extends
         value: false,
       },
 
-      showHistoryDeletionDialog_: {
-        type: Boolean,
-        value: false,
-      },
-
       expandedBrowsingDataTypeOptionsList_: Array,
 
       moreBrowsingDataTypeOptionsList_: Array,
@@ -194,7 +188,6 @@ export class SettingsClearBrowsingDataDialogElement extends
   declare private deletingDataAlertString_: string;
   declare private isDeletionInProgress_: boolean;
   declare private isNoDatatypeSelected_: boolean;
-  declare private showHistoryDeletionDialog_: boolean;
   declare private expandedBrowsingDataTypeOptionsList_:
       BrowsingDataTypeOption[];
   declare private moreBrowsingDataTypeOptionsList_: BrowsingDataTypeOption[];
@@ -352,15 +345,13 @@ export class SettingsClearBrowsingDataDialogElement extends
             this.setPrefValue(checkbox.pref!.key, checkbox.checked));
     this.$.timePicker.sendPrefChange();
 
-    const {showHistoryNotice} =
-        await this.clearBrowsingDataBrowserProxy_.clearBrowsingData(
-            dataTypes, timePeriod);
+    await this.clearBrowsingDataBrowserProxy_.clearBrowsingData(
+        dataTypes, timePeriod);
     this.isDeletionInProgress_ = false;
-    this.showHistoryDeletionDialog_ = showHistoryNotice;
     this.showDeletionConfirmationToast_(timePeriod);
 
     if (this.$.deleteBrowsingDataDialog.open) {
-      closeDialog(this.$.deleteBrowsingDataDialog, !showHistoryNotice);
+      closeDialog(this.$.deleteBrowsingDataDialog, true);
     }
   }
 
@@ -419,10 +410,6 @@ export class SettingsClearBrowsingDataDialogElement extends
 
   private shouldDisableDeleteButton_(): boolean {
     return this.isDeletionInProgress_ || this.isNoDatatypeSelected_;
-  }
-
-  private onHistoryDeletionDialogClose_() {
-    this.showHistoryDeletionDialog_ = false;
   }
 
   private setFocusOutlineToVisible_() {

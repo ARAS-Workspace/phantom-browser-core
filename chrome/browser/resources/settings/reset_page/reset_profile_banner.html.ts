@@ -21,11 +21,6 @@ export function getHtml(this: SettingsResetProfileBannerElement) {
     </div>
   </div>
   <div slot="button-container">
-    <cr-button id="learnMore"
-        aria-label="$i18n{resetLearnMoreAccessibilityText}"
-        @click="${this.onLearnMoreClick_}">
-      $i18n{learnMore}
-    </cr-button>
     <cr-button class="action-button" id="confirm"
         @click="${this.onConfirmClick_}">
       $i18n{gotIt}

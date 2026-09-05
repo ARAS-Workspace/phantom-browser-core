@@ -23,9 +23,6 @@ export function getHtml(this: ExceptionTabbedAddDialogElement) {
           @submit-disabled-changed="${this.onListSubmitDisabledChanged_}">
       </tab-discard-exception-current-sites-list>
       <div id="inputPage">
-        <div id="helpText">
-          $i18nRaw{tabDiscardingExceptionsAddDialogHelp}
-        </div>
         <tab-discard-exception-add-input id="input"
             @submit-disabled-changed="${this.onInputSubmitDisabledChanged_}">
         </tab-discard-exception-add-input>

@@ -75,10 +75,6 @@ export class SettingsResetProfileBannerElement extends
     this.$.dialog.close();
     this.browserProxy_.onHideResetProfileBanner();
   }
-
-  protected onLearnMoreClick_() {
-    window.open(this.i18n('resetProfileBannerLearnMoreUrl'));
-  }
 }
 
 declare global {
