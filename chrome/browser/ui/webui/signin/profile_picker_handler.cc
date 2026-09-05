@@ -808,7 +808,7 @@ void ProfilePickerHandler::OnProfileStatisticsReceived(
   dict.Set("profilePath", base::FilePathToValue(profile_path));
   base::DictValue stats;
   // Categories are defined in |kProfileStatisticsCategories|
-  // {"BrowsingHistory", "Passwords", "Bookmarks", "Autofill"}.
+  // {"BrowsingHistory", "Bookmarks"}.
   for (const auto& item : result) {
     stats.Set(item.category, item.count);
   }

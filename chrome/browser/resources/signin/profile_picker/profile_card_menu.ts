@@ -26,9 +26,7 @@ import {createDummyProfileState} from './profile_picker_util.js';
 
 export interface Statistics {
   BrowsingHistory: number;
-  Passwords: number;
   Bookmarks: number;
-  Autofill: number;
 }
 
 /**
@@ -44,9 +42,7 @@ export interface StatisticsResult {
  */
 enum ProfileStatistics {
   BROWSING_HISTORY = 'BrowsingHistory',
-  PASSWORDS = 'Passwords',
   BOOKMARKS = 'Bookmarks',
-  AUTOFILL = 'Autofill',
 }
 
 export interface ProfileCardMenuElement {
@@ -97,16 +93,12 @@ export class ProfileCardMenuElement extends ProfileCardMenuElementBase {
   accessor profileState: ProfileState = createDummyProfileState();
   private accessor statistics_: Statistics = {
     BrowsingHistory: 0,
-    Passwords: 0,
     Bookmarks: 0,
-    Autofill: 0,
   };
   protected accessor moreActionsButtonAriaLabel_: string = '';
   protected accessor profileStatistics_: ProfileStatistics[] = [
     ProfileStatistics.BROWSING_HISTORY,
-    ProfileStatistics.PASSWORDS,
     ProfileStatistics.BOOKMARKS,
-    ProfileStatistics.AUTOFILL,
   ];
   protected accessor removeWarningText_: string = '';
   protected accessor removeWarningTitle_: string = '';
@@ -184,12 +176,8 @@ export class ProfileCardMenuElement extends ProfileCardMenuElementBase {
     switch (dataType) {
       case ProfileStatistics.BROWSING_HISTORY:
         return this.i18n('removeWarningHistory');
-      case ProfileStatistics.PASSWORDS:
-        return this.i18n('removeWarningPasswords');
       case ProfileStatistics.BOOKMARKS:
         return this.i18n('removeWarningBookmarks');
-      case ProfileStatistics.AUTOFILL:
-        return this.i18n('removeWarningAutofill');
       default:
         assertNotReached();
     }

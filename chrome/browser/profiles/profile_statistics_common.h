@@ -14,15 +14,13 @@
 namespace profiles {
 // Constants for the categories in ProfileCategoryStats.
 extern const char kProfileStatisticsBrowsingHistory[];
-extern const char kProfileStatisticsPasswords[];
 extern const char kProfileStatisticsBookmarks[];
-extern const char kProfileStatisticsAutofill[];
 
-extern const std::array<const char*, 4> kProfileStatisticsCategories;
+extern const std::array<const char*, 2> kProfileStatisticsCategories;
 
 // Definition of a single return value of |ProfileStatisticsCallback|.
 // The data look like these: {"BrowsingHistory", 912},
-// {"Passwords", 71}, {"Bookmarks", 120}, {"Autofill", 200}.
+// {"Bookmarks", 120}.
 struct ProfileCategoryStat {
   std::string category;
   int count;
