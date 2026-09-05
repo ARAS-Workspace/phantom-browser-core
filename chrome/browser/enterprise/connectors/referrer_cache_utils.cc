@@ -7,15 +7,19 @@
 #include <memory>
 
 #include "base/supports_user_data.h"
-#include "chrome/browser/safe_browsing/download_protection/download_protection_util.h"
-#include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
 #include "components/enterprise/connectors/core/reporting_utils.h"
-#include "components/safe_browsing/content/browser/safe_browsing_navigation_observer_manager.h"
+#include "components/safe_browsing/buildflags.h"
 #include "components/safe_browsing/core/common/proto/csd.pb.h"
 #include "components/sessions/content/session_tab_helper.h"
 #include "content/public/browser/download_item_utils.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/web_contents.h"
+
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
+#include "chrome/browser/safe_browsing/download_protection/download_protection_util.h"
+#include "chrome/browser/safe_browsing/safe_browsing_navigation_observer_manager_factory.h"
+#include "components/safe_browsing/content/browser/safe_browsing_navigation_observer_manager.h"
+#endif
 
 namespace enterprise_connectors {
 
@@ -44,6 +48,7 @@ safe_browsing::ReferrerChain GetSafeBrowsingReferrerChain(
     const GURL& url,
     content::WebContents& web_contents) {
   safe_browsing::ReferrerChain referrers;
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
   auto* observer_manager =
       safe_browsing::SafeBrowsingNavigationObserverManagerFactory::
           GetForBrowserContext(web_contents.GetBrowserContext());
@@ -52,6 +57,7 @@ safe_browsing::ReferrerChain GetSafeBrowsingReferrerChain(
         url, sessions::SessionTabHelper::IdForTab(&web_contents),
         kReferrerUserGestureLimit, &referrers);
   }
+#endif
   return referrers;
 }
 
