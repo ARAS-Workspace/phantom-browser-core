@@ -525,6 +525,7 @@ source_set("impl") {
     "//components/pdf/common:constants",
     "//components/pref_registry",
     "//components/prefs",
+    "//components/safe_browsing:buildflags",
     "//components/services/storage/public/mojom",
     "//components/sessions",
     "//components/skills:features",

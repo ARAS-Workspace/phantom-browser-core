@@ -67,7 +67,6 @@
 #include "chrome/browser/profiles/profile_attributes_entry.h"
 #include "chrome/browser/profiles/profile_attributes_storage.h"
 #include "chrome/browser/profiles/profile_manager.h"
-#include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/tab_list/tab_list_interface.h"
 #include "chrome/browser/ui/browser_window/public/browser_collection_observer.h"
@@ -83,9 +82,7 @@
 #include "components/policy/core/common/management/management_service.h"
 #include "components/prefs/pref_change_registrar.h"
 #include "components/prefs/pref_service.h"
-#include "components/safe_browsing/content/browser/ui_manager.h"
-#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
-#include "components/security_interstitials/core/unsafe_resource.h"
+#include "components/safe_browsing/buildflags.h"
 #include "content/public/browser/devtools_agent_host.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/web_contents.h"
@@ -105,6 +102,13 @@
 #include "chrome/browser/ui/tabs/tab_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "extensions/browser/guest_view/web_view/web_view_guest.h"
+#endif
+
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
+#include "chrome/browser/safe_browsing/safe_browsing_service.h"
+#include "components/safe_browsing/content/browser/ui_manager.h"
+#include "components/safe_browsing/core/common/safe_browsing_prefs.h"
+#include "components/security_interstitials/core/unsafe_resource.h"
 #endif
 
 namespace mojo {
@@ -1154,6 +1158,7 @@ class GlicWebClientHandler
   void ProcessCounterAbuseVerdict(
       int32_t tab_id,
       mojom::CounterAbuseVerdictPtr verdict) override {
+#if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
     if (!base::FeatureList::IsEnabled(
             features::kGlicProcessCounterAbuseVerdict)) {
       return;
@@ -1250,6 +1255,7 @@ class GlicWebClientHandler
         ui_manager->DisplayBlockingPage(resource);
       }
     }
+#endif
   }
 
   void OnOptinImpression() override {
