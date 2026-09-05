@@ -128,9 +128,6 @@ export class HistoryAppElement extends HistoryAppElementBase {
         type: Boolean,
         reflect: true,
       },
-      // <if expr="not is_chromeos">
-      // </if>
-      contentPage_: {type: String},
       tabsContentPage_: {type: String},
       // The id of the currently selected page.
       selectedPage_: {type: String},
@@ -177,8 +174,6 @@ export class HistoryAppElement extends HistoryAppElementBase {
   };
   protected accessor enableHistoryEmbeddings_: boolean =
       loadTimeData.getBoolean('enableHistoryEmbeddings');
-  // <if expr="not is_chromeos">
-  // </if>
   protected accessor hasDrawer_: boolean = false;
   protected accessor historyClustersEnabled_: boolean =
       loadTimeData.getBoolean('isHistoryClustersEnabled');
@@ -191,7 +186,6 @@ export class HistoryAppElement extends HistoryAppElementBase {
   };
   protected accessor lastSelectedTab_: number =
       loadTimeData.getInteger('lastSelectedTab');
-  protected accessor contentPage_: string = Page.HISTORY;
   protected accessor tabsContentPage_: string = Page.HISTORY;
   protected accessor pendingDelete_: boolean = false;
   protected accessor queryResult_: QueryResult = {
@@ -604,16 +598,6 @@ export class HistoryAppElement extends HistoryAppElementBase {
         this.queryState_.searchTerm !== '';
   }
 
-  private updateContentPage_() {
-    switch (this.selectedPage_) {
-      case Page.SYNCED_TABS:
-        this.contentPage_ = Page.SYNCED_TABS;
-        break;
-      default:
-        this.contentPage_ = Page.HISTORY;
-    }
-  }
-
   private updateTabsContentPage_() {
     this.tabsContentPage_ =
         (this.selectedPage_ === Page.HISTORY_CLUSTERS &&
@@ -623,7 +607,6 @@ export class HistoryAppElement extends HistoryAppElementBase {
   }
 
   private selectedPageChanged_(oldPage: string) {
-    this.updateContentPage_();
     this.updateTabsContentPage_();
     this.unselectAll();
     this.historyViewChanged_();

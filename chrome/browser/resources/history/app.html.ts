@@ -46,7 +46,7 @@ export function getHtml(this: HistoryAppElement) {
           ?hidden="${this.hasDrawer_}">
       </history-side-bar>
       <cr-page-selector id="content" attr-for-selected="path"
-          selected="${this.contentPage_}"
+          selected="history"
           @iron-select="${this.onContentIronSelect_}">
         <div id="tabsContainer" path="history">
           <div id="historyEmbeddingsDisclaimer" class="history-cards"
