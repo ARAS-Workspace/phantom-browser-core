@@ -34,12 +34,9 @@ import type {PropertyValues} from '//resources/lit/v3_0/lit.rollup.js';
 import type {SyncBrowserProxy, SyncPrefs, SyncStatus} from '/shared/settings/people_page/sync_browser_proxy.js';
 import {shouldShowSyncTogglesForStatusAction, PageStatus, SignedInState, StatusAction, SyncBrowserProxyImpl} from '/shared/settings/people_page/sync_browser_proxy.js';
 import {I18nMixinLit} from 'chrome://resources/cr_elements/i18n_mixin_lit.js';
-import {OpenWindowProxyImpl} from 'chrome://resources/js/open_window_proxy.js';
 
 import type {FocusConfig} from '../focus_config.js';
 import {loadTimeData} from '../i18n_setup.js';
-import type {MetricsBrowserProxy} from '../metrics_browser_proxy.js';
-import {MetricsBrowserProxyImpl} from '../metrics_browser_proxy.js';
 // <if expr="is_chromeos">
 import type {SettingsPersonalizationOptionsElement} from '../privacy_page/personalization_options.js';
 // </if>
@@ -129,9 +126,7 @@ export class SettingsSyncPageElement extends SettingsSyncPageElementBase {
 
       existingPassphraseLabel_: {type: String},
 
-      isEeaChoiceCountry_: {type: Boolean},
 
-      personalizationCollapseExpanded_: {type: Boolean},
     };
   }
 
@@ -148,9 +143,6 @@ export class SettingsSyncPageElement extends SettingsSyncPageElementBase {
   protected accessor signedIn_: boolean = true;
   protected accessor syncDisabledByAdmin_: boolean = false;
   protected accessor syncSectionDisabled_: boolean = false;
-  protected accessor isEeaChoiceCountry_: boolean =
-      loadTimeData.getBoolean('isEeaChoiceCountry');
-  protected accessor personalizationCollapseExpanded_: boolean = false;
 
   // <if expr="not is_chromeos">
   protected accessor showSetupCancelDialog_: boolean = false;
@@ -160,8 +152,6 @@ export class SettingsSyncPageElement extends SettingsSyncPageElementBase {
       window.trustedTypes!.emptyHTML;
   protected accessor existingPassphraseLabel_: string = '';
 
-  private metricsBrowserProxy_: MetricsBrowserProxy =
-      MetricsBrowserProxyImpl.getInstance();
   private syncBrowserProxy_: SyncBrowserProxy =
       SyncBrowserProxyImpl.getInstance();
   private collapsibleSectionsInitialized_: boolean;
@@ -473,18 +463,6 @@ export class SettingsSyncPageElement extends SettingsSyncPageElementBase {
     this.pageStatus_ = PageStatus.CONFIGURE;
   }
 
-  protected onActivityControlsClick_() {
-    chrome.metricsPrivate.recordUserAction('Sync_OpenActivityControlsPage');
-    this.syncBrowserProxy_.openActivityControlsUrl();
-    window.open(loadTimeData.getString('activityControlsUrl'));
-  }
-
-  protected onLinkedServicesClick_() {
-    this.metricsBrowserProxy_.recordAction('Sync_OpenLinkedServicesPage');
-    OpenWindowProxyImpl.getInstance().openUrl(
-        loadTimeData.getString('linkedServicesUrl'));
-  }
-
   protected onSyncDashboardLinkClick_() {
     window.open(loadTimeData.getString('syncDashboardUrl'));
   }
@@ -551,11 +529,6 @@ export class SettingsSyncPageElement extends SettingsSyncPageElementBase {
 
   protected onExistingPassphraseValueChanged_(e: CustomEvent<{value: string}>) {
     this.existingPassphrase_ = e.detail.value;
-  }
-
-  protected onPersonalizationCollapseExpandedChanged_(
-      e: CustomEvent<{value: boolean}>) {
-    this.personalizationCollapseExpanded_ = e.detail.value;
   }
 
   protected onEncryptionExpandedChanged_(e: CustomEvent<{value: boolean}>) {

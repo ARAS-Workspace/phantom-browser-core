@@ -265,8 +265,6 @@ void AddAboutStrings(content::WebUIDataSource* html_source, Profile* profile) {
 #endif
       {"aboutPageTitle", IDS_SETTINGS_ABOUT_PROGRAM},
       {"aboutProductTitle", IDS_PRODUCT_NAME},
-      {"aboutLearnMoreSystemRequirements",
-       IDS_SETTINGS_ABOUT_PAGE_LEARN_MORE_SYSTEM_REQUIREMENTS},
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
 
@@ -285,8 +283,6 @@ void AddAboutStrings(content::WebUIDataSource* html_source, Profile* profile) {
                           ObsoleteSystem::IsObsoleteNowOrSoon());
   html_source->AddString("aboutObsoleteSystem",
                          ObsoleteSystem::LocalizedObsoleteString());
-  html_source->AddString("aboutObsoleteSystemURL",
-                         ObsoleteSystem::GetLinkURL());
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING) || \
     BUILDFLAG(GOOGLE_CHROME_FOR_TESTING_BRANDING)
@@ -469,21 +465,6 @@ void AddClearBrowsingDataStrings(content::WebUIDataSource* html_source,
        IDS_SETTINGS_DELETION_CONFIRMATION_ALL_TIME_TOAST_LABEL}};
 
   html_source->AddString(
-      "clearGoogleSearchHistoryGoogleDse",
-      l10n_util::GetStringFUTF16(
-          IDS_SETTINGS_CLEAR_GOOGLE_SEARCH_HISTORY_GOOGLE_DSE,
-          chrome::kSearchHistoryUrlInClearBrowsingData,
-          chrome::kMyActivityUrlInClearBrowsingData));
-  html_source->AddString(
-      "clearGoogleSearchHistoryNonGoogleDse",
-      l10n_util::GetStringFUTF16(
-          IDS_SETTINGS_CLEAR_GOOGLE_SEARCH_HISTORY_NON_GOOGLE_DSE,
-          chrome::kMyActivityUrlInClearBrowsingData));
-  html_source->AddString("historyDeletionDialogBody",
-                         l10n_util::GetStringFUTF16(
-                             IDS_CLEAR_BROWSING_DATA_HISTORY_NOTICE,
-                             chrome::kMyActivityUrlInClearBrowsingDataNotice));
-  html_source->AddString(
       "passwordsDeletionDialogBody",
       l10n_util::GetStringFUTF16(
           IDS_CLEAR_BROWSING_DATA_PASSWORDS_NOTICE,
@@ -563,11 +544,6 @@ void AddResetStrings(content::WebUIDataSource* html_source, Profile* profile) {
   html_source->AddBoolean(
       "showResetProfileBanner",
       ResetSettingsHandler::ShouldShowResetProfileBanner(profile));
-
-  html_source->AddString("resetPageLearnMoreUrl",
-                         chrome::kResetProfileSettingsLearnMoreURL);
-  html_source->AddString("resetProfileBannerLearnMoreUrl",
-                         chrome::kAutomaticSettingsResetLearnMoreURL);
 }
 
 #if !BUILDFLAG(IS_CHROMEOS)
@@ -748,11 +724,6 @@ void AddPerformanceStrings(content::WebUIDataSource* html_source) {
           base::NumberToString16(
               performance_manager::user_tuning::BatterySaverModeManager::
                   kLowBatteryThresholdPercent)));
-  html_source->AddString(
-      "tabDiscardingExceptionsAddDialogHelp",
-      l10n_util::GetStringFUTF16(
-          IDS_SETTINGS_PERFORMANCE_TAB_DISCARDING_EXCEPTIONS_ADD_DIALOG_HELP,
-          chrome::kMemorySaverModeTabDiscardingHelpUrl));
 
   html_source->AddString("discardRingTreatmentLearnMoreUrl",
                          chrome::kDiscardRingTreatmentLearnMoreUrl);
@@ -1259,8 +1230,6 @@ void AddAutofillStrings(content::WebUIDataSource* html_source,
       {"personalContextAutofillSettingsManageConnectedAppsSummary",
        IDS_PERSONAL_CONTEXT_AUTOFILL_SETTINGS_MANAGE_CONNECTED_APPS_SUMMARY}};
 
-  html_source->AddString("manageAddressesUrl",
-                         autofill::payments::GetManageAddressesUrl().spec());
   html_source->AddString(
       "manageCreditCardsLabel",
       l10n_util::GetStringFUTF16(
@@ -1269,25 +1238,6 @@ void AddAutofillStrings(content::WebUIDataSource* html_source,
               autofill::payments::GetManageLoyaltyCardsUrl().spec()),
           base::UTF8ToUTF16(
               autofill::payments::GetManageInstrumentsUrl().spec())));
-  html_source->AddString("managePaymentMethodsUrl",
-                         autofill::payments::GetManageInstrumentsUrl().spec());
-  html_source->AddString("managePrivatePassesUrl",
-                         chrome::kWalletPrivatePassHelpCenterURL);
-  html_source->AddString("managePublicPassesUrl", chrome::kWalletPassesPageURL);
-  html_source->AddString("addressesAndPaymentMethodsLearnMoreURL",
-                         chrome::kAddressesAndPaymentMethodsLearnMoreURL);
-  html_source->AddString("cardBenefitsToggleLearnMoreUrl",
-                         chrome::kCardBenefitsLearnMoreURL);
-  html_source->AddString(
-      "signedOutUserLabel",
-      l10n_util::GetStringFUTF16(IDS_SETTINGS_SIGNED_OUT_USER_LABEL,
-                                 chrome::kSyncLearnMoreURL));
-  html_source->AddString("trustedVaultOptInUrl",
-                         chrome::kSyncTrustedVaultOptInURL);
-  html_source->AddString("trustedVaultLearnMoreUrl",
-                         chrome::kSyncTrustedVaultLearnMoreURL);
-  html_source->AddString("autofillPayOverTimeSettingsLearnMoreUrl",
-                         chrome::kPayOverTimeLearnMoreUrl);
 
   autofill::PaymentsDataManager& payments_data =
       autofill::PersonalDataManagerFactory::GetForBrowserContext(profile)
@@ -1312,16 +1262,6 @@ void AddAutofillStrings(content::WebUIDataSource* html_source,
 #endif
   html_source->AddBoolean("mandatoryReauthFeatureFlagEnabled",
                           is_mandatory_reauth_feature_flag_enabled);
-
-  html_source->AddString(
-      "cardBenefitsToggleSublabel",
-      l10n_util::GetStringFUTF16(
-          base::FeatureList::IsEnabled(
-              autofill::features::kAutofillEnableNewCardBenefitsToggleText)
-              ? IDS_AUTOFILL_SETTINGS_PAGE_CARD_BENEFITS_TOGGLE_SUBLABEL_WITH_ISSUER_TERMS_APPLY_TEXT_AND_LEARN_LINK
-              : IDS_AUTOFILL_SETTINGS_PAGE_CARD_BENEFITS_TOGGLE_SUBLABEL_WITH_LEARN_LINK,
-          chrome::kCardBenefitsLearnMoreURL,
-          l10n_util::GetStringUTF16(IDS_SETTINGS_OPENS_IN_NEW_TAB)));
 
   ui::Accelerator undo_accelerator(ui::VKEY_Z, ui::EF_PLATFORM_ACCELERATOR);
   html_source->AddString(
@@ -1360,14 +1300,6 @@ void AddAutofillStrings(content::WebUIDataSource* html_source,
   html_source->AddBoolean("autofillGmailOtpFillingEnabled",
                           base::FeatureList::IsEnabled(
                               features::kGlicActorAutofillOneTimePassword));
-  html_source->AddString(
-      "enableGmailOtpFillingDescription",
-      l10n_util::GetStringFUTF16(
-          IDS_AUTOFILL_GMAIL_OTP_FILLING_TOGGLE_DESCRIPTION,
-          chrome::kGmailOtpFillingLearnMoreURL,
-          l10n_util::GetStringUTF16(IDS_SETTINGS_OPENS_IN_NEW_TAB)));
-  html_source->AddString("gmailOtpFillingLearnMoreUrl",
-                         chrome::kGmailOtpFillingLearnMoreURL);
 
   auto* autofill_client =
       autofill::ContentAutofillClient::FromWebContents(web_contents);
@@ -1400,27 +1332,9 @@ void AddAutofillStrings(content::WebUIDataSource* html_source,
               wallet::GeoIpCountryCode(
                   autofill_client->GetVariationConfigCountryCode().value())));
 
-  html_source->AddString(
-      "autofillPayOverTimeSettingsSublabel",
-      l10n_util::GetStringFUTF16(
-          IDS_AUTOFILL_BNPL_SETTINGS_SUBLABEL, chrome::kPayOverTimeLearnMoreUrl,
-          l10n_util::GetStringUTF16(IDS_SETTINGS_OPENS_IN_NEW_TAB)));
-
-  html_source->AddString("googleWalletUrl", chrome::kWalletUrl);
-
-  html_source->AddString("googleAccountHomeAddressUrl",
-                         chrome::kGoogleAccountHomeAddressURL);
-  html_source->AddString("googleAccountWorkAddressUrl",
-                         chrome::kGoogleAccountWorkAddressURL);
-  html_source->AddString("googleAccountNameEmailAddressEditUrl",
-                         chrome::kGoogleAccountNameEmailAddressEditURL);
-
   html_source->AddBoolean("autofillAiReauthOnViewingSensitiveDataEnabled",
                           base::FeatureList::IsEnabled(
                               autofill::features::kAutofillAiReauthRequired));
-
-  html_source->AddString("personalContextConnectedAppsUrl",
-                         personal_context::kPersonalContextConnectedAppsURL);
 }
 
 void AddSignOutDialogStrings(content::WebUIDataSource* html_source,
@@ -1574,18 +1488,6 @@ void AddBrowserSyncPageStrings(content::WebUIDataSource* html_source) {
       {"syncSetupCancelDialogBody", IDS_SETTINGS_SYNC_SETUP_CANCEL_DIALOG_BODY},
       {"personalizeGoogleServicesTitle",
        IDS_SETTINGS_PERSONALIZE_GOOGLE_SERVICES_TITLE},
-      {"personalizeGoogleServicesTitleV2",
-       IDS_SETTINGS_PERSONALIZE_GOOGLE_SERVICES_TITLE_V2},
-      {"personalizeGoogleServicesDesc",
-       IDS_SETTINGS_PERSONALIZE_GOOGLE_SERVICES_DESC},
-      {"personalizeGoogleServicesDescWithLinkedServices",
-       IDS_SETTINGS_PERSONALIZE_GOOGLE_SERVICES_DESC_WITH_LINKED_SERVICES},
-      {"personalizeGoogleServicesWaaTitle",
-       IDS_SETTINGS_PERSONALIZE_GOOGLE_SERVICES_WAA_TITLE},
-      {"personalizeGoogleServicesLinkedServicesTitle",
-       IDS_SETTINGS_PERSONALIZE_GOOGLE_SERVICES_LINKED_SERVICES_TITLE},
-      {"personalizeGoogleServicesLinkedServicesDesc",
-       IDS_SETTINGS_PERSONALIZE_GOOGLE_SERVICES_LINKED_SERVICES_DESC},
       {"themeCheckboxLabel", IDS_SETTINGS_THEME_CHECKBOX_LABEL},
 #if BUILDFLAG(IS_CHROMEOS)
       {"browserSyncFeatureLabel", IDS_BROWSER_SETTINGS_SYNC_FEATURE_LABEL},
@@ -1605,15 +1507,6 @@ void AddBrowserSyncPageStrings(content::WebUIDataSource* html_source) {
           ? IDS_SETTINGS_PEOPLE_EXPLICIT_SIGN_IN_PROMPT_SECONDARY_WITH_NO_ACCOUNT_WITH_BOOKMARKS
           : IDS_SETTINGS_PEOPLE_EXPLICIT_SIGN_IN_PROMPT_SECONDARY_WITH_NO_ACCOUNT);
 #endif
-
-  html_source->AddString("activityControlsUrl",
-                         chrome::kGoogleAccountActivityControlsURL);
-  html_source->AddString(
-      "activityControlsUrlInPrivacyGuide",
-      chrome::kGoogleAccountActivityControlsURLInPrivacyGuide);
-
-  html_source->AddString("linkedServicesUrl",
-                         chrome::kGoogleAccountLinkedServicesURL);
 
   html_source->AddLocalizedString(
       "passwordsCheckboxLabel",
@@ -1670,7 +1563,6 @@ void AddPeopleStrings(content::WebUIDataSource* html_source, Profile* profile) {
       // Top level people strings:
       {"peoplePageTitle", IDS_SETTINGS_PEOPLE},
       {"syncSettingsSavedToast", IDS_SETTINGS_SYNC_SETTINGS_SAVED_TOAST_LABEL},
-      {"manageGoogleAccount", IDS_SETTINGS_MANAGE_GOOGLE_ACCOUNT},
       {"syncAndNonPersonalizedServices",
        IDS_SETTINGS_SYNC_SYNC_AND_NON_PERSONALIZED_SERVICES},
       {"syncUnavailableForNonGoogleAccount",
@@ -1762,13 +1654,6 @@ void AddPeopleStrings(content::WebUIDataSource* html_source, Profile* profile) {
       "historyEmbeddingsAnswersFeatureEnabled",
       history_embeddings::IsHistoryEmbeddingsAnswersSettingVisible(profile));
 
-  // Add Google Account URL and include UTM parameter to signal the source of
-  // the navigation.
-  html_source->AddString(
-      "googleAccountUrl",
-      net::AppendQueryParameter(GURL(chrome::kGoogleAccountURL), "utm_source",
-                                "chrome-settings")
-          .spec());
   html_source->AddBoolean("profileShortcutsEnabled",
                           ProfileShortcutManager::IsFeatureEnabled());
 
@@ -1985,18 +1870,6 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
        IDS_SETTINGS_SECURITY_JAVASCRIPT_GUARDRAILS_MANAGE_SITE_EXCEPTIONS_DESCRIPTION}};
   html_source->AddLocalizedStrings(kLocalizedStrings);
 
-  html_source->AddString("cookiesSettingsHelpCenterURL",
-                         chrome::kCookiesSettingsHelpCenterURL);
-
-  html_source->AddString("relatedWebsiteSetsLearnMoreURL",
-                         chrome::kRelatedWebsiteSetsLearnMoreURL);
-
-  html_source->AddString("syncAndGoogleServicesLearnMoreURL",
-                         chrome::kSyncAndGoogleServicesLearnMoreURL);
-  html_source->AddString("doNotTrackLearnMoreURL",
-                         chrome::kDoNotTrackLearnMoreURL);
-  html_source->AddString("exceptionsLearnMoreURL",
-                         chrome::kContentSettingsExceptionsLearnMoreURL);
   // TODO(crbug.com/349860796): Add a learn-more link for HTTPS-First Mode for
   // the new Settings UI, which can be used by the settings-toggle-button.
 
@@ -2009,42 +1882,8 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
       chromeos::settings::mojom::kPrivacyAndSecuritySectionPath);
 #endif
 
-#if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
-  html_source->AddString("chromeRootStoreHelpCenterURL",
-                         chrome::kChromeRootStoreSettingsHelpCenterURL);
-#endif  // BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
-
-#if BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
-  html_source->AddString("certManagementV2URL",
-                         chrome::kChromeUICertificateManagerDialogURL);
-#endif  // BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
-
   AddPersonalizationOptionsStrings(html_source);
   AddSecureDnsStrings(html_source);
-
-  html_source->AddString("bluetoothAdapterOffHelpURL",
-                         google_util::AppendGoogleLocaleParam(
-                             GURL(chrome::kBluetoothAdapterOffHelpURL),
-                             g_browser_process->GetApplicationLocale())
-                             .spec());
-
-  html_source->AddString("chooserHidOverviewUrl",
-                         google_util::AppendGoogleLocaleParam(
-                             GURL(chrome::kChooserHidOverviewUrl),
-                             g_browser_process->GetApplicationLocale())
-                             .spec());
-
-  html_source->AddString("chooserSerialOverviewUrl",
-                         google_util::AppendGoogleLocaleParam(
-                             GURL(chrome::kChooserSerialOverviewUrl),
-                             g_browser_process->GetApplicationLocale())
-                             .spec());
-
-  html_source->AddString("chooserUsbOverviewURL",
-                         google_util::AppendGoogleLocaleParam(
-                             GURL(chrome::kChooserUsbOverviewURL),
-                             g_browser_process->GetApplicationLocale())
-                             .spec());
 }
 
 void AddSearchInSettingsStrings(content::WebUIDataSource* html_source) {
@@ -2066,8 +1905,6 @@ void AddSearchStrings(content::WebUIDataSource* html_source, Profile* profile) {
       {"searchEnginesManageSiteSearch",
        IDS_SETTINGS_SEARCH_MANAGE_SEARCH_ENGINES_AND_SITE_SEARCH},
       {"searchPageTitle", IDS_SETTINGS_SEARCH},
-      {"searchExplanationLearnMoreA11yLabel",
-       IDS_SETTINGS_SEARCH_EXPLANATION_ACCESSIBILITY_LABEL},
       {"searchEngineChoiceEntryPointSubtitle",
        IDS_SEARCH_ENGINE_CHOICE_SETTINGS_ENTRY_POINT_SUBTITLE},
       {"searchEnginesChange",
@@ -2117,8 +1954,6 @@ void AddSearchStrings(content::WebUIDataSource* html_source, Profile* profile) {
        IDS_SETTINGS_CONTROLLED_BY_EXTENSION_WITH_MANAGE_OPTION},
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
-  html_source->AddString("searchExplanationLearnMoreURL",
-                         chrome::kOmniboxLearnMoreURL);
 
   regional_capabilities::RegionalCapabilitiesService* regional_capabilities =
       regional_capabilities::RegionalCapabilitiesServiceFactory::GetForProfile(
@@ -2518,8 +2353,6 @@ void AddSiteSettingsStrings(content::WebUIDataSource* html_source,
        IDS_SETTINGS_SITE_SETTINGS_DELETE_DISPLAYED_STORAGE_DIALOG_TITLE},
       {"siteSettingsRelatedWebsiteSetsLearnMore",
        IDS_SETTINGS_SITE_SETTINGS_RELATED_WEBSITE_SETS_LEARN_MORE},
-      {"siteSettingsRelatedWebsiteSetsLearnMoreAccessibility",
-       IDS_SETTINGS_SITE_SETTINGS_RELATED_WEBSITE_SETS_LEARN_MORE_ACCESSIBILITY},
       {"siteSettingsClearAllStorageDescription",
        IDS_SETTINGS_SITE_SETTINGS_CLEAR_ALL_STORAGE_DESCRIPTION},
       {"siteSettingsClearDisplayedStorageDescription",
@@ -3294,11 +3127,6 @@ void AddSystemStrings(content::WebUIDataSource* html_source) {
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
-
-#if BUILDFLAG(IS_WIN)
-  html_source->AddString("isolationStateLearnMoreUrl",
-                         chrome::kProcessIsolationLearnMoreUrl);
-#endif  // BUILDFLAG(IS_WIN)
 
   html_source->AddString(
       "proxySettingsExtensionLabel",

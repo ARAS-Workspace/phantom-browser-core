@@ -1174,9 +1174,6 @@
   <message name="IDS_AUTOFILL_BNPL_SETTINGS_LABEL" desc="Label for the Buy Now Pay Later preference in the payments settings page. When enabled, users can checkout with external BNPL issuers using a pay-over-time payment option." formatter_data="android_java">
     Pay later
   </message>
-  <message name="IDS_AUTOFILL_BNPL_SETTINGS_SUBLABEL" desc="Sublabel for the Buy Now Pay Later preference in the payments settings page, including a hyperlink to learn more about pay later options. When enabled, users can checkout with external BNPL issuers using a Buy Now Pay Later option.">
-    Show <ph name="PAY_LATER_OPTIONS_HELP_LINK_BEGIN">&lt;a href="$1" aria-description="$2"&gt;</ph>pay later<ph name="PAY_LATER_OPTIONS_HELP_LINK_END">&lt;/a&gt;</ph> options at checkout
-  </message>
   <message name="IDS_AUTOFILL_BNPL_AFFIRM" desc="Name of Buy Now Pay Later provider Affirm." formatter_data="android_java">
     Affirm
   </message>
@@ -1317,12 +1314,6 @@
     Compare card benefits using Gemini
   </message>
   <if expr="not is_android">
-    <message name="IDS_AUTOFILL_SETTINGS_PAGE_CARD_BENEFITS_TOGGLE_SUBLABEL_WITH_LEARN_LINK" desc="Sublabel for the payments settings page card benefits toggle, including a hyperlinked text to learn about card benefits.">
-      Show which rewards and benefits are available for your cards at checkout. <ph name="CARD_BENEFIT_HELP_LINK_BEGIN">&lt;a href="$1" aria-description="$2"&gt;</ph>Learn about card benefits<ph name="CARD_BENEFIT_HELP_LINK_END">&lt;/a&gt;</ph>
-    </message>
-    <message name="IDS_AUTOFILL_SETTINGS_PAGE_CARD_BENEFITS_TOGGLE_SUBLABEL_WITH_ISSUER_TERMS_APPLY_TEXT_AND_LEARN_LINK" desc="Sublabel for the payments settings page card benefits toggle that makes it clear to the user that issuer terms apply. Also includes a hyperlinked text to learn about card benefits.">
-      Show available card benefits and rewards at checkout. Issuer terms apply. <ph name="CARD_BENEFIT_HELP_LINK_BEGIN">&lt;a href="$1" aria-description="$2"&gt;</ph>Learn more<ph name="CARD_BENEFIT_HELP_LINK_END">&lt;/a&gt;</ph>
-    </message>
     <message name="IDS_AUTOFILL_SETTINGS_PAGE_BENEFITS_TERMS_TAG_FOR_CREDIT_CARD_LIST_ENTRY" desc="Tag present on each entry in the credit card list on the payments settings page if that entry has associated benefits and a product terms URL. It is also a hyperlink text which opens the product terms page.">
       See card benefit terms
     </message>

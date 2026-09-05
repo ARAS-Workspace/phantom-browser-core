@@ -34,8 +34,7 @@ export function getHtml(this: SettingsSystemPageElement) {
     <settings-toggle-button id="isolationState"
         pref-key="isolation_state.enabled"
         label="$i18n{isolationStateLabel}"
-        sub-label="$i18n{isolationStateSubLabel}"
-        learn-more-url="$i18n{isolationStateLearnMoreUrl}">
+        sub-label="$i18n{isolationStateSubLabel}">
       ${this.shouldShowIsolationRestart_() ? html`
         <cr-button @click="${this.onRestartClick_}" slot="more-actions">
           $i18n{restart}

@@ -299,12 +299,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
       "showSearchAggregatorSuggest",
       template_url_service->GetEnterpriseSearchAggregatorEngine());
 
-  regional_capabilities::RegionalCapabilitiesService* regional_capabilties =
-      regional_capabilities::RegionalCapabilitiesServiceFactory::GetForProfile(
-          profile);
-  html_source->AddBoolean("isEeaChoiceCountry",
-                          regional_capabilties->IsInEeaCountry());
-
 #if BUILDFLAG(IS_CHROMEOS)
   html_source->AddBoolean(
       "userCannotManuallyEnterPassword",

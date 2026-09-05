@@ -24,10 +24,6 @@ export function getHtml(this: SettingsAboutPageElement) {
       <span id="deprecationWarning"
           ?hidden="${!this.obsoleteSystemInfo_.obsolete}">
         $i18n{aboutObsoleteSystem}
-        <a href="$i18n{aboutObsoleteSystemURL}" target="_blank"
-            aria-label="$i18nPolymer{aboutLearnMoreSystemRequirements}">
-          $i18n{learnMore}
-        </a>
       </span>
 </if>
       <div class="secondary">$i18n{aboutBrowserVersion}</div>

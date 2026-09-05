@@ -167,13 +167,6 @@ export class SettingsPeoplePageElement extends SettingsPeoplePageElementBase {
       },
 
       // <if expr="not is_chromeos">
-      shouldShowGoogleAccount_: {
-        type: Boolean,
-        value: false,
-        computed:
-            'computeShouldShowGoogleAccount_(storedAccounts, syncStatus,' +
-            'storedAccounts.length, syncStatus.signedIn, syncStatus.hasError)',
-      },
 
       showImportDataDialog_: {
         type: Boolean,
@@ -205,7 +198,6 @@ export class SettingsPeoplePageElement extends SettingsPeoplePageElementBase {
 
   // <if expr="not is_chromeos">
   declare storedAccounts: StoredAccount[]|null;
-  declare private shouldShowGoogleAccount_: boolean;
   declare private showImportDataDialog_: boolean;
   declare private showSignoutDialog_: boolean;
   // </if>
@@ -335,25 +327,6 @@ export class SettingsPeoplePageElement extends SettingsPeoplePageElementBase {
     // </if>
   }
 
-  // <if expr="not is_chromeos">
-  private computeShouldShowGoogleAccount_(): boolean {
-    if (this.storedAccounts === undefined || this.syncStatus === undefined) {
-      return false;
-    }
-
-    if (this.syncStatus!.hasError &&
-        this.syncStatus!.statusAction !== StatusAction.UPGRADE_CLIENT &&
-        this.syncStatus!.statusAction !==
-            StatusAction.SHOW_BOOKMARKS_LIMIT_HELP_ARTICLE) {
-      return false;
-    }
-
-    return (!this.replaceSyncPromosWithSignInPromos_ &&
-            this.storedAccounts!.length > 0) ||
-        this.isSyncing_();
-  }
-  // </if>
-
   private onProfileClick_() {
     // <if expr="is_chromeos">
     if (loadTimeData.getBoolean('isAccountManagerEnabled')) {
@@ -428,15 +401,6 @@ export class SettingsPeoplePageElement extends SettingsPeoplePageElementBase {
     this.primaryAccountIconUrl_ = accounts[0].avatarImage!;
   }
   // </if>
-
-  /**
-   * Open URL for managing your Google Account.
-   */
-  private openGoogleAccount_() {
-    OpenWindowProxyImpl.getInstance().openUrl(
-        loadTimeData.getString('googleAccountUrl'));
-    chrome.metricsPrivate.recordUserAction('ManageGoogleAccount_Clicked');
-  }
 
   /**
    * @return A CSS image-set for multiple scale factors.

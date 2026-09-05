@@ -354,11 +354,6 @@ export interface SyncBrowserProxy {
   startSyncingWithEmail(email: string, isDefaultPromoAccount: boolean): void;
 
   /**
-   * Opens the Google Activity Controls url in a new tab.
-   */
-  openActivityControlsUrl(): void;
-
-  /**
    * Function to dispatch event sync-prefs-changed even without a change.
    * This is used to decide whether we should show the link to password
    * manager in passwords section on page load.
@@ -478,11 +473,6 @@ export class SyncBrowserProxyImpl implements SyncBrowserProxy {
   startSyncingWithEmail(email: string, isDefaultPromoAccount: boolean) {
     chrome.send(
         'SyncSetupStartSyncingWithEmail', [email, isDefaultPromoAccount]);
-  }
-
-  openActivityControlsUrl() {
-    chrome.metricsPrivate.recordUserAction(
-        'Signin_AccountSettings_GoogleActivityControlsClicked');
   }
 
   sendSyncPrefsChanged() {

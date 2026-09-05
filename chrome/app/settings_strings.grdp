@@ -43,9 +43,6 @@
     <message name="IDS_SETTINGS_ABOUT_PAGE_BROWSER_VERSION" desc="The text label describing the version of the browser, example: Version 57.0.2937.0-r123456 (Developer Build) unknown (64-bit). The suffix of the version (eg. '-r123456') exists only in limited cases.)">
       Version <ph name="PRODUCT_VERSION">$1<ex>15.0.865.0</ex></ph><ph name="PRODUCT_VERSION_SUFFIX">$2<ex>-r123456</ex></ph>  (<ph name="PRODUCT_CHANNEL">$3<ex>Developer Build</ex></ph>) <ph name="PRODUCT_MODIFIER">$4</ph> <ph name="PRODUCT_VERSION_BITS">$5</ph>
     </message>
-    <message name="IDS_SETTINGS_ABOUT_PAGE_LEARN_MORE_SYSTEM_REQUIREMENTS" desc="The accessibility label for a 'Learn more' link next to an error message about how the user's operating system is not supported.">
-      Learn more about system requirements
-    </message>
     <if expr="not is_chromeos">
       <message name="IDS_SETTINGS_ABOUT_PAGE_RELAUNCH" desc="The label for the relaunch button that relaunches the browser once update is complete">
         Relaunch
@@ -866,12 +863,6 @@
     <message name="IDS_SETTINGS_CLEAR_BROWSING_HISTORY_SUMMARY_SIGNED_IN_NO_LINK" desc="A description explaining from which devices history will be deleted.">
       Deletes history from all synced devices
     </message>
-    <message name="IDS_SETTINGS_CLEAR_GOOGLE_SEARCH_HISTORY_GOOGLE_DSE" desc="A description explaining that search history and other forms of activity can be cleared through the Google account.">
-      <ph name="BEGIN_LINK_SEARCH">&lt;a target="_blank" href="$1"&gt;</ph>Search history<ph name="END_LINK_SEARCH">&lt;/a&gt;</ph> and <ph name="BEGIN_LINK_GOOGLE">&lt;a target="_blank" href="$2"&gt;</ph>other forms of activity<ph name="END_LINK_GOOGLE">&lt;/a&gt;</ph> may be saved in your Google Account when you're signed in. You can delete them anytime.
-    </message>
-    <message name="IDS_SETTINGS_CLEAR_GOOGLE_SEARCH_HISTORY_NON_GOOGLE_DSE" desc="A description explaining that other forms of activity can be cleared through the Google account.">
-      <ph name="BEGIN_LINK_GOOGLE">&lt;a target="_blank" href="$1"&gt;</ph>Other forms of activity<ph name="END_LINK_GOOGLE">&lt;/a&gt;</ph> may be saved in your Google Account when you're signed in. You can delete them anytime.
-    </message>
     <message name="IDS_SETTINGS_CLEAR_DOWNLOAD_HISTORY" desc="Checkbox for deleting Download History">
       Download history
     </message>
@@ -1060,9 +1051,6 @@
     </message>
     <message name="IDS_SETTINGS_PERFORMANCE_TAB_DISCARDING_EXCEPTIONS_ACTIVE_SITE_ARIA_DESCRIPTION" desc="Accessibilty description which will be read by screen readers when focusing a currently opened site in the list under the first tab of the add exception dialog.">
       Active site
-    </message>
-    <message name="IDS_SETTINGS_PERFORMANCE_TAB_DISCARDING_EXCEPTIONS_ADD_DIALOG_HELP" desc="Help text shown on the second tab of the tab discarding exception list add dialog. Explains how to use the filter format to add an exclusion rule to the list.">
-      Sites you add will always stay active and memory won't be freed up from them. <ph name="BEGIN_LINK">&lt;a href="$1" target="_blank"&gt;</ph>Learn more about keeping specific sites active<ph name="END_LINK">&lt;/a&gt;</ph>
     </message>
     <message name="IDS_SETTINGS_PERFORMANCE_BATTERY_PAGE_TITLE" desc="Title of the power section in the performance settings page.">
       Power
@@ -1620,9 +1608,6 @@
     </message>
     <message name="IDS_SETTINGS_DEFAULT_SEARCH" desc="Title of the search settings page section which displays the default search engine.">
       Default search engine
-    </message>
-    <message name="IDS_SETTINGS_SEARCH_EXPLANATION_ACCESSIBILITY_LABEL" desc="Accessibility label for a 'learn more' link which links to an article about setting a default search engine.">
-      Learn more about default search engines
     </message>
     <message name="IDS_SETTINGS_SEARCH_MANAGE_SEARCH_ENGINES_AND_SITE_SEARCH" desc="Label for the Manage Search Engines and Site Search button.">
       Manage search engines and site search
@@ -2754,9 +2739,6 @@
     <message name="IDS_SETTINGS_SITE_SETTINGS_RELATED_WEBSITE_SETS_LEARN_MORE" desc="Label for related website sets explainer with a learn more link shown when sites are filtered by related website set owner">
        These sites are in a group defined by <ph name="RWS_OWNER">$1<ex>google.com</ex></ph>. Sites in a group can see your activity in the group.
     </message>
-    <message name="IDS_SETTINGS_SITE_SETTINGS_RELATED_WEBSITE_SETS_LEARN_MORE_ACCESSIBILITY" desc="Accessibility label learn more link about related website sets shown when user filters sites by related website set owner">
-       Learn more about related sites in a new tab
-    </message>
     <message name="IDS_SETTINGS_SITE_SETTINGS_CLEAR_ALL_STORAGE_DESCRIPTION" desc="Label describing how much total disk space chrome is using, next to the clear all button">
       Total storage used by sites: <ph name="TOTAL_USAGE">$1<ex>8 GB</ex></ph>
     </message>
@@ -3201,15 +3183,6 @@
     </message>
     <message name="IDS_SETTINGS_PERSONALIZE_GOOGLE_SERVICES_TITLE" desc="Title of the personalize Google services section. When clicked, takes the user to the Google Activity Controls.">
       Control how your browsing history is used to personalize Search and more
-    </message>
-    <message name="IDS_SETTINGS_PERSONALIZE_GOOGLE_SERVICES_TITLE_V2" desc="This is the title of a setting that directs users to other settings where they can control how Chrome history can be used to personalize other Google services. This title appears in Chrome's Advanced Sync settings, before the 'To get personalization and other features' string.">
-      Control how browsing history is used with your other data across Google services
-    </message>
-    <message name="IDS_SETTINGS_PERSONALIZE_GOOGLE_SERVICES_WAA_TITLE" desc="This string is found on a link in Chrome's Advanced Sync settings. When the user taps it, the link takes the user to 'Web &#38; App Activity' in the Google Account's Activity Controls. This text should match the branded term 'Web &#38; App Activity' in Glossary Manager: https://localization.google.com/glossary/termset?gid=27517723&#38;tsid=77d3b75.">
-      Web &#38; App Activity
-    </message>
-    <message name="IDS_SETTINGS_PERSONALIZE_GOOGLE_SERVICES_LINKED_SERVICES_TITLE" desc="This string is found on a link in Chrome's Advanced Sync settings. When the user taps it, the link takes the user to 'Linked Google services' in the Google Account's Data &#38; privacy settings. The link is on a setting that users see in Chrome's Advanced Sync settings. This text should match the branded term 'linked Google services' in Glossary Manager: https://localization.google.com/glossary/termset?gid=27517723&#38;tsid=517bace2.">
-      Linked Google services
     </message>
     <message name="IDS_SETTINGS_SIGNIN_CHROME_SIGNIN_OPTION_PLACEHOLDER" desc="Placeholder for the dropdown list of options for the setting 'Sign in to Chrome when you sign in to other Google services'. This choice is not selectable and only exist and shown if the user did not do any prior choice. It will be overriden by any choice made by the user.">
       Select an option

@@ -64,9 +64,7 @@ export class SettingsAccountPageElement extends SettingsAccountPageElementBase {
        */
       syncPrefs: {type: Object},
 
-      isEeaChoiceCountry_: {type: Boolean},
 
-      personalizationCollapseExpanded_: {type: Boolean},
 
       existingPassphraseLabel_: {type: String},
 
@@ -81,9 +79,6 @@ export class SettingsAccountPageElement extends SettingsAccountPageElementBase {
   protected accessor syncStatus_: SyncStatus|null = null;
   accessor syncPrefs: SyncPrefs|null = null;
 
-  protected accessor isEeaChoiceCountry_: boolean =
-      loadTimeData.getBoolean('isEeaChoiceCountry');
-  protected accessor personalizationCollapseExpanded_: boolean = false;
   protected accessor dataEncrypted_: boolean = false;
   protected accessor encryptionExpanded_: boolean = false;
   protected accessor existingPassphraseLabel_: string = '';
@@ -139,24 +134,8 @@ export class SettingsAccountPageElement extends SettingsAccountPageElementBase {
     this.syncPrefs = e.detail.value;
   }
 
-  protected onPersonalizationCollapseExpandedChanged_(
-      e: CustomEvent<{value: boolean}>) {
-    this.personalizationCollapseExpanded_ = e.detail.value;
-  }
-
   protected onEncryptionExpandedChanged_(e: CustomEvent<{value: boolean}>) {
     this.encryptionExpanded_ = e.detail.value;
-  }
-
-  protected onActivityControlsClick_() {
-    this.syncBrowserProxy_.openActivityControlsUrl();
-    OpenWindowProxyImpl.getInstance().openUrl(
-        loadTimeData.getString('activityControlsUrl'));
-  }
-
-  protected onLinkedServicesClick_() {
-    OpenWindowProxyImpl.getInstance().openUrl(
-        loadTimeData.getString('linkedServicesUrl'));
   }
 
   protected onSyncDashboardLinkClick_() {
@@ -170,11 +149,6 @@ export class SettingsAccountPageElement extends SettingsAccountPageElementBase {
       // prevents the default which will prevent the navigation to the link.
       event.stopPropagation();
     }
-  }
-
-  protected onManageGoogleAccountClick_() {
-    OpenWindowProxyImpl.getInstance().openUrl(
-        loadTimeData.getString('googleAccountUrl'));
   }
 
   // <if expr="is_chromeos">

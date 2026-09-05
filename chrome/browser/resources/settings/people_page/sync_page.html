@@ -3,7 +3,6 @@ import {ChromeSigninAccessPoint, PageStatus} from '/shared/settings/people_page/
 #html_wrapper_imports_end -->
 
   <settings-subpage page-title="$i18n{syncPageTitle}"
-      learn-more-url="$i18n{syncAndGoogleServicesLearnMoreURL}"
       route-path="${this.routePath}">
 <if expr="not is_chromeos">
     ${this.shouldShowSyncAccountControl_() ? html`
@@ -74,36 +73,6 @@ import {ChromeSigninAccessPoint, PageStatus} from '/shared/settings/people_page/
               role-description="$i18n{subpageArrowRoleDescription}"
               @click="${this.onSyncAdvancedClick_}">
           </cr-link-row>
-
-          ${!this.isEeaChoiceCountry_ ? html`
-            <cr-link-row class="hr" id="activityControlsLinkRowV2"
-                label="$i18n{personalizeGoogleServicesTitleV2}"
-                sub-label="$i18n{personalizeGoogleServicesDesc}"
-                @click="${this.onActivityControlsClick_}" external>
-            </cr-link-row>
-          ` : html`
-            <cr-expand-button class="hr" id="personalizationExpandButton"
-                ?expanded="${this.personalizationCollapseExpanded_}"
-                @expanded-changed="${
-                    this.onPersonalizationCollapseExpandedChanged_}">
-              $i18n{personalizeGoogleServicesTitleV2}
-              <div class="secondary">
-                $i18n{personalizeGoogleServicesDescWithLinkedServices}
-              </div>
-            </cr-expand-button>
-            <cr-collapse id="personalizationCollapse"
-                ?opened="${this.personalizationCollapseExpanded_}">
-              <cr-link-row external @click="${this.onActivityControlsClick_}"
-                  label="$i18n{personalizeGoogleServicesWaaTitle}">
-              </cr-link-row>
-              <cr-link-row external id="linkedServicesLinkRow"
-                  @click="${this.onLinkedServicesClick_}"
-                  label="$i18n{personalizeGoogleServicesLinkedServicesTitle}"
-                  sub-label=
-                      "$i18n{personalizeGoogleServicesLinkedServicesDesc}">
-              </cr-link-row>
-            </cr-collapse>
-          `}
 
           <cr-link-row id="syncDashboardLink" class="hr"
               label="$i18n{manageSyncedDataTitle}"

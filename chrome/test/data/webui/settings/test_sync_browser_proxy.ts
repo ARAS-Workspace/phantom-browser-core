@@ -171,7 +171,6 @@ export class TestSyncBrowserProxy extends TestBrowserProxy implements
     this.methodCalled('sendTrustedVaultBannerStateChanged');
   }
 
-  openActivityControlsUrl() {}
 
   startKeyRetrieval() {}
 
