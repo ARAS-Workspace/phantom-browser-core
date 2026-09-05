@@ -32,8 +32,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_context.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_manager.h"
-#include "chrome/browser/ui/safety_hub/abusive_notification_permissions_manager.h"
-#include "chrome/browser/ui/safety_hub/disruptive_notification_permissions_manager.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/grit/generated_resources.h"
@@ -75,6 +73,8 @@
 #include "chrome/browser/web_applications/web_app_registrar.h"
 #else
 #include "chrome/browser/safe_browsing/android/notification_content_detection_manager_android.h"
+#include "chrome/browser/ui/safety_hub/abusive_notification_permissions_manager.h"
+#include "chrome/browser/ui/safety_hub/disruptive_notification_permissions_manager.h"
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -302,6 +302,7 @@ void PlatformNotificationServiceImpl::DisplayNotification(
     service->RecordNotificationDisplayed(notification.origin_url());
   }
 
+#if BUILDFLAG(IS_ANDROID)
   // Logs metrics for proposed disruptive notification revocation when
   // displaying a non persistent notification. Disruptive are notifications
   // with high notification volume and low site engagement score.
@@ -310,6 +311,7 @@ void PlatformNotificationServiceImpl::DisplayNotification(
       notification.origin_url());
   DisruptiveNotificationPermissionsManager::LogMetrics(
       profile_, notification.origin_url(), source_id);
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void PlatformNotificationServiceImpl::DisplayPersistentNotification(
@@ -378,6 +380,7 @@ void PlatformNotificationServiceImpl::DisplayPersistentNotification(
   LogPersistentNotificationShownMetrics(notification_data, origin,
                                         notification.origin_url());
 
+#if BUILDFLAG(IS_ANDROID)
   // Logs metrics for proposed disruptive notification revocation when
   // displaying a persistent notification. Disruptive are notifications with
   // high notification volume and low site engagement score.
@@ -386,6 +389,7 @@ void PlatformNotificationServiceImpl::DisplayPersistentNotification(
       notification.origin_url());
   DisruptiveNotificationPermissionsManager::LogMetrics(
       profile_, notification.origin_url(), source_id);
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void PlatformNotificationServiceImpl::CloseNotification(

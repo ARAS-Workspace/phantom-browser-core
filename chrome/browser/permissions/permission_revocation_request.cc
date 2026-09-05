@@ -12,7 +12,6 @@
 #include "chrome/browser/permissions/notifications_permission_revocation_config.h"
 #include "chrome/browser/permissions/permission_manager_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/safety_hub/abusive_notification_permissions_manager.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/permissions/constants.h"
 #include "components/permissions/permission_manager.h"
@@ -24,6 +23,7 @@
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "chrome/browser/safe_browsing/v5_get_hash_protocol_manager_factory.h"
+#include "chrome/browser/ui/safety_hub/abusive_notification_permissions_manager.h"
 #include "components/safe_browsing/core/browser/db/database_manager.h"
 #include "components/safe_browsing/core/browser/db/v5_get_hash_protocol_manager.h"
 #include "components/safe_browsing/core/browser/safe_browsing_metrics_collector.h"

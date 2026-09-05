@@ -35,16 +35,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/extensions/cws_info_service_factory.h"
-#include "chrome/browser/password_manager/password_manager_test_util.h"
-#include "chrome/browser/ui/safety_hub/password_status_check_service.h"
-#include "chrome/browser/ui/safety_hub/password_status_check_service_factory.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_hats_service.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_hats_service_factory.h"
-#include "components/password_manager/core/browser/password_store/test_password_store.h"
-#endif  // BUILDFLAG(IS_ANDROID)
-
 using ::testing::_;
 
 class SafetyHubMenuNotificationServiceTest

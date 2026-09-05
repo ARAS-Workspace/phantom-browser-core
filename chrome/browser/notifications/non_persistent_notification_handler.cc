@@ -13,7 +13,6 @@
 #include "chrome/browser/notifications/notification_permission_context.h"
 #include "chrome/browser/permissions/notifications_engagement_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/safety_hub/disruptive_notification_permissions_manager.h"
 #include "components/permissions/features.h"
 #include "components/permissions/permission_uma_util.h"
 #include "components/permissions/permission_util.h"
@@ -28,6 +27,10 @@
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "ui/base/page_transition_types.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
+
+#if BUILDFLAG(IS_ANDROID)
+#include "chrome/browser/ui/safety_hub/disruptive_notification_permissions_manager.h"
+#endif  // BUILDFLAG(IS_ANDROID)
 
 NonPersistentNotificationHandler::NonPersistentNotificationHandler() = default;
 NonPersistentNotificationHandler::~NonPersistentNotificationHandler() = default;
@@ -76,6 +79,7 @@ void NonPersistentNotificationHandler::OnClick(
     service->RecordNotificationInteraction(origin);
   }
 
+#if BUILDFLAG(IS_ANDROID)
   // If there is a proposed disruptive notification revocation, report a false
   // positive due to user interacting with a notification. Disruptive are
   // notifications with high notification volume and low site engagement score.
@@ -86,6 +90,7 @@ void NonPersistentNotificationHandler::OnClick(
       DisruptiveNotificationPermissionsManager::FalsePositiveReason::
           kNonPersistentNotificationClick,
       source_id);
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void NonPersistentNotificationHandler::DidDispatchClickEvent(

@@ -39,12 +39,6 @@ class SafetyHubSafeBrowsingResult : public SafetyHubResult {
 
   static SafeBrowsingState GetState(const PrefService* pref_service);
 
-#if !BUILDFLAG(IS_ANDROID)
-  // Fetches data for the Safe Browsing card to return data to the desktop UI.
-  static base::DictValue GetSafeBrowsingCardData(
-      const PrefService* pref_service);
-#endif  // BUILDFLAG(IS_ANDROID)
-
   // SafetyHubResult implementation
 
   std::unique_ptr<SafetyHubResult> Clone() const override;

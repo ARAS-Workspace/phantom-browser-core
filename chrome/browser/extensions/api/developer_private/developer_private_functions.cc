@@ -42,7 +42,6 @@
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/supervised_user/supervised_user_browser_utils.h"
 #include "chrome/browser/ui/extensions/extensions_dialogs.h"
-#include "chrome/browser/ui/safety_hub/menu_notification_service_factory.h"
 #include "chrome/browser/ui/select_file_policy/chrome_select_file_policy.h"
 #include "chrome/browser/ui/toolbar/toolbar_actions_model.h"
 #include "chrome/common/pref_names.h"
@@ -100,7 +99,6 @@
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/browser_window/public/profile_browser_collection.h"
 #include "chrome/browser/ui/extensions/application_launch.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_constants.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/common/extensions/manifest_handlers/app_launch_info.h"
 #include "chrome/common/url_constants.h"
@@ -1756,27 +1754,6 @@ void DeveloperPrivateRemoveMultipleExtensionsFunction::OnDialogAccepted() {
   SCOPED_CRASH_KEY_BOOL("ext", "EF_DP_dialog_resp_cb_null",
                         response_callback_is_null());
   Respond(NoArguments());
-}
-
-DeveloperPrivateDismissSafetyHubExtensionsMenuNotificationFunction::
-    DeveloperPrivateDismissSafetyHubExtensionsMenuNotificationFunction() =
-        default;
-DeveloperPrivateDismissSafetyHubExtensionsMenuNotificationFunction::
-    ~DeveloperPrivateDismissSafetyHubExtensionsMenuNotificationFunction() =
-        default;
-
-ExtensionFunction::ResponseAction
-DeveloperPrivateDismissSafetyHubExtensionsMenuNotificationFunction::Run() {
-  content::WebContents* web_contents = GetSenderWebContents();
-  if (!web_contents) {
-    return RespondNow(Error(kCouldNotFindWebContentsError));
-  }
-
-  Profile* profile = Profile::FromBrowserContext(browser_context());
-  SafetyHubMenuNotificationServiceFactory::GetForProfile(profile)
-      ->DismissActiveNotificationOfModule(
-          safety_hub::SafetyHubModuleType::EXTENSIONS);
-  return RespondNow(NoArguments());
 }
 
 void DeveloperPrivatePackDirectoryFunction::OnPackSuccess(

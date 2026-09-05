@@ -43,11 +43,6 @@ base::Value GetRevokedAbusiveNotificationPermissionsSettingValue(
 bool IsAbusiveNotificationRevocationIgnored(HostContentSettingsMap* hcsm,
                                             GURL setting_url);
 
-#if !BUILDFLAG(IS_ANDROID)
-// Fetches data for the version card to return data to the desktop UI.
-base::DictValue GetVersionCardData();
-#endif  // BUILDFLAG(IS_ANDROID)
-
 }  // namespace safety_hub_util
 
 #endif  // CHROME_BROWSER_UI_SAFETY_HUB_SAFETY_HUB_UTIL_H_

@@ -93,8 +93,6 @@
 #include "chrome/browser/ui/passwords/manage_passwords_ui_controller.h"
 #include "chrome/browser/ui/prefs/prefs_tab_helper.h"
 #include "chrome/browser/ui/recently_audible_helper.h"
-#include "chrome/browser/ui/safety_hub/revoked_permissions_service.h"
-#include "chrome/browser/ui/safety_hub/revoked_permissions_service_factory.h"
 #include "chrome/browser/ui/search_engines/search_engine_tab_helper.h"
 #include "chrome/browser/ui/tab_contents/core_tab_helper.h"
 #include "chrome/browser/ui/tab_dialogs.h"
@@ -181,6 +179,8 @@
 #include "chrome/browser/plugins/plugin_observer_android.h"
 #include "chrome/browser/ui/android/context_menu_helper.h"
 #include "chrome/browser/ui/javascript_dialogs/javascript_tab_modal_dialog_manager_delegate_android.h"
+#include "chrome/browser/ui/safety_hub/revoked_permissions_service.h"
+#include "chrome/browser/ui/safety_hub/revoked_permissions_service_factory.h"
 #include "components/content_capture/common/content_capture_features.h"
 #include "components/facilitated_payments/core/features/features.h"
 #include "components/page_load_metrics/browser/features.h"
@@ -652,11 +652,13 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
   TabCaptureContentsBorderHelper::CreateForWebContents(web_contents);
 #endif  // BUILDFLAG(IS_ANDROID)
   TrustedVaultEncryptionKeysTabHelper::CreateForWebContents(web_contents);
+#if BUILDFLAG(IS_ANDROID)
   auto* service = RevokedPermissionsServiceFactory::GetForProfile(profile);
   if (service) {
     RevokedPermissionsService::TabHelper::CreateForWebContents(web_contents,
                                                                service);
   }
+#endif  // BUILDFLAG(IS_ANDROID)
   ukm::InitializeSourceUrlRecorderForWebContents(web_contents);
   v8_compile_hints::V8CompileHintsTabHelper::MaybeCreateForWebContents(
       web_contents);

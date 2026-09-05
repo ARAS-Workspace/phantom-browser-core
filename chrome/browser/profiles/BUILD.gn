@@ -845,7 +845,6 @@ source_set("profiles_extra_parts_impl") {
     "//chrome/browser/ui/hats",
     "//chrome/browser/ui/omnibox",
     "//chrome/browser/ui/prefs",
-    "//chrome/browser/ui/safety_hub",
     "//chrome/browser/ui/startup",
     "//chrome/browser/ui/toolbar",
     "//chrome/browser/ui/toolbar/pinned_toolbar",
@@ -900,6 +899,7 @@ source_set("profiles_extra_parts_impl") {
       "//chrome/browser/readaloud",
       "//chrome/browser/tab",
       "//chrome/browser/ui/android",
+      "//chrome/browser/ui/safety_hub",
       "//components/commerce/core:merchant_signal_db_proto",
     ]
     if (enable_webui_ntp) {

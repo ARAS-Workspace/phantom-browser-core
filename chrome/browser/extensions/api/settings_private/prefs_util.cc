@@ -29,7 +29,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/safe_browsing/generated_safe_browsing_pref.h"
 #include "chrome/browser/ssl/generated_https_first_mode_pref.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_prefs.h"
 #include "chrome/browser/ui/tabs/tab_strip_prefs.h"
 #include "chrome/browser/ui/toolbar/toolbar_pref_names.h"
 #include "chrome/common/chrome_features.h"
@@ -579,8 +578,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
   (*s_allowlist)[::prefs::kProtectedContentDefault] =
       settings_api::PrefType::kNumber;
   (*s_allowlist)[::prefs::kEnableQuietNotificationPermissionUi] =
-      settings_api::PrefType::kBoolean;
-  (*s_allowlist)[safety_hub_prefs::kUnusedSitePermissionsRevocationEnabled] =
       settings_api::PrefType::kBoolean;
 
 #if BUILDFLAG(ENABLE_COMPOSE)

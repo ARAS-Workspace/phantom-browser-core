@@ -25,7 +25,6 @@
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/permissions/notifications_engagement_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/safety_hub/disruptive_notification_permissions_manager.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/content_settings.h"
 #include "components/content_settings/core/common/content_settings_pattern.h"
@@ -63,6 +62,7 @@
 
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/safe_browsing/android/notification_content_detection_manager_android.h"
+#include "chrome/browser/ui/safety_hub/disruptive_notification_permissions_manager.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
 using content::BrowserThread;
@@ -231,6 +231,7 @@ void PersistentNotificationHandler::OnClick(
                          weak_ptr_factory_.GetWeakPtr(), profile,
                          notification_id, std::move(completed_closure)));
 
+#if BUILDFLAG(IS_ANDROID)
   // If there is a proposed disruptive notification revocation, report a false
   // positive due to user interacting with a notification. Disruptive are
   // notifications with high notification volume and low site engagement score.
@@ -241,6 +242,7 @@ void PersistentNotificationHandler::OnClick(
       DisruptiveNotificationPermissionsManager::FalsePositiveReason::
           kPersistentNotificationClick,
       source_id);
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void PersistentNotificationHandler::OnClickCompleted(

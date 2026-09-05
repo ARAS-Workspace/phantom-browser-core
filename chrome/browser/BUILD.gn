@@ -2303,8 +2303,6 @@ source_set("browser") {
     "//chrome/browser/ui/prefs",
     "//chrome/browser/ui/prefs:impl",
     "//chrome/browser/ui/profiles",
-    "//chrome/browser/ui/safety_hub",
-    "//chrome/browser/ui/safety_hub:impl",
     "//chrome/browser/ui/search:impl",
     "//chrome/browser/ui/startup",
     "//chrome/browser/ui/startup:impl",
@@ -2735,6 +2733,8 @@ source_set("browser") {
       "//chrome/browser/translate/android:android_impl",
       "//chrome/browser/ui/android:context_menu_helper",
       "//chrome/browser/ui/android/tab_model:impl",
+      "//chrome/browser/ui/safety_hub",
+      "//chrome/browser/ui/safety_hub:impl",
       "//chrome/browser/ui/webui/notifications_internals:impl",
       "//chrome/browser/webapps/installable:impl",
     ]

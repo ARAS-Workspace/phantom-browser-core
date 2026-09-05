@@ -37,23 +37,6 @@ base::ListValue NotificationPermissionsReviewResult::GetSortedListValueForUI() {
   base::ListValue result;
 
 // Setting up the list for UI is done on the Android side.
-#if !BUILDFLAG(IS_ANDROID)
-  const auto sorted_notification_permissions =
-      GetSortedNotificationPermissions();
-
-  // Each entry is a dictionary with origin as key and notification count as
-  // value.
-  for (const auto& notification_permission : sorted_notification_permissions) {
-    base::DictValue permission;
-    permission.Set(kSafetyHubOriginKey,
-                   notification_permission.primary_pattern.ToString());
-    std::string notification_info_string = l10n_util::GetPluralStringFUTF8(
-        IDS_SETTINGS_SAFETY_CHECK_REVIEW_NOTIFICATION_PERMISSIONS_COUNT_LABEL,
-        notification_permission.notification_count);
-    permission.Set(kSafetyHubNotificationInfoString, notification_info_string);
-    result.Append(std::move(permission));
-  }
-#endif
   return result;
 }
 

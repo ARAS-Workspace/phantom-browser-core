@@ -61,11 +61,6 @@ class MockTrustSafetySentimentService : public TrustSafetySentimentService {
               (PasswordProtectionUIType, PasswordProtectionUIAction),
               (override));
   MOCK_METHOD(void, PhishedPasswordUpdateFinished, (), (override));
-  MOCK_METHOD(void,
-              TriggerSafetyHubSurvey,
-              (TrustSafetySentimentService::FeatureArea,
-               (std::map<std::string, bool>)),
-              (override));
 };
 
 std::unique_ptr<KeyedService> BuildMockTrustSafetySentimentService(

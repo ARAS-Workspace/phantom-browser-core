@@ -25,8 +25,6 @@
 
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/safety_hub/password_status_check_result_android.h"
-#else  // BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/safety_hub/extensions_result.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
 namespace {
@@ -108,17 +106,7 @@ SafetyHubMenuNotificationService::SafetyHubMenuNotificationService(
                                      base::Unretained(pref_service)),
                  stored_notifications);
 
-// Extensions are not available on Android, so we cannot fetch any information
-// about them. Passwords are handled by GMS Core on Android.
-#if !BUILDFLAG(IS_ANDROID)
-  pref_dict_key_map_.emplace(safety_hub::SafetyHubModuleType::EXTENSIONS,
-                             "extensions");
-  SetInfoElement(
-      safety_hub::SafetyHubModuleType::EXTENSIONS,
-      MenuNotificationPriority::LOW, base::Days(10),
-      base::BindRepeating(&SafetyHubExtensionsResult::GetResult, profile, true),
-      stored_notifications);
-#else   // !BUILDFLAG(IS_ANDROID)
+  // Passwords are handled by GMS Core on Android.
   pref_dict_key_map_.emplace(safety_hub::SafetyHubModuleType::PASSWORDS,
                              "passwords");
   SetInfoElement(
@@ -127,7 +115,6 @@ SafetyHubMenuNotificationService::SafetyHubMenuNotificationService(
       base::BindRepeating(&PasswordStatusCheckResultAndroid::GetResult,
                           base::Unretained(pref_service)),
       stored_notifications);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   // Listen for changes to the Safe Browsing pref to accommodate the trigger
   // logic.

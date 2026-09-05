@@ -91,7 +91,6 @@
 #include "chrome/browser/ui/network_profile_bubble.h"
 #include "chrome/browser/ui/performance_controls/performance_controls_metrics.h"
 #include "chrome/browser/ui/prefs/prefs_tab_helper.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_prefs.h"
 #include "chrome/browser/ui/tabs/organizer/organizer_prefs.h"
 #include "chrome/browser/ui/tabs/tab_strip_prefs.h"
 #include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_prefs.h"
@@ -288,6 +287,7 @@
 #include "chrome/browser/partnerbookmarks/partner_bookmarks_shim.h"
 #include "chrome/browser/readaloud/android/prefs.h"
 #include "chrome/browser/ssl/known_interception_disclosure_infobar_delegate.h"
+#include "chrome/browser/ui/safety_hub/safety_hub_prefs.h"
 #include "components/cdm/browser/media_drm_storage_impl.h"  // nogncheck crbug.com/40147906
 #include "components/feed/core/common/pref_names.h"        // nogncheck
 #include "components/feed/core/shared_prefs/pref_names.h"  // nogncheck
@@ -1858,7 +1858,9 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   indigo::prefs::RegisterProfilePrefs(registry);
 #endif
   RegisterPrefersDefaultScrollbarStylesPrefs(registry);
+#if BUILDFLAG(IS_ANDROID)
   RegisterSafetyHubProfilePrefs(registry);
+#endif  // BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(IS_CHROMEOS)
   settings::ResetSettingsHandler::RegisterProfilePrefs(registry);
 #endif  // BUILDFLAG(IS_CHROMEOS)

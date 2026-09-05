@@ -208,7 +208,6 @@ source_set("impl") {
     "//chrome/browser/safe_browsing",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/exclusive_access",
-    "//chrome/browser/ui/safety_hub",
     "//chrome/browser/updates/announcement_notification",
     "//components/content_settings/browser",
     "//components/content_settings/core/browser",
@@ -243,6 +242,7 @@ source_set("impl") {
       "//chrome/browser/notifications/scheduler/public",
       "//chrome/browser/segmentation_platform",
       "//chrome/browser/tips/core",
+      "//chrome/browser/ui/safety_hub",
       "//chrome/browser/webapps/installable:android",
       "//components/browser_ui/notifications/android",
     ]

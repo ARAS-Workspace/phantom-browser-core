@@ -16,12 +16,6 @@
 #include "chrome/browser/ui/safety_hub/revoked_permissions_service_factory.h"
 #include "chrome/browser/ui/safety_hub/safety_hub_service.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-#include "extensions/browser/extension_prefs.h"          // nogncheck
-#include "extensions/browser/extension_prefs_factory.h"  // nogncheck
-#include "extensions/browser/extension_registry.h"       // nogncheck
-#endif  // BUILDFLAG(IS_ANDROID)
-
 // static
 SafetyHubMenuNotificationServiceFactory*
 SafetyHubMenuNotificationServiceFactory::GetInstance() {
@@ -48,9 +42,6 @@ SafetyHubMenuNotificationServiceFactory::
               .Build()) {
   DependsOn(RevokedPermissionsServiceFactory::GetInstance());
   DependsOn(NotificationPermissionsReviewServiceFactory::GetInstance());
-#if !BUILDFLAG(IS_ANDROID)
-  DependsOn(extensions::ExtensionPrefsFactory::GetInstance());
-#endif  // BUIDFLAG(IS_ANDROID)
 }
 
 SafetyHubMenuNotificationServiceFactory::

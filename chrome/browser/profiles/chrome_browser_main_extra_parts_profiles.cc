@@ -260,10 +260,6 @@
 #include "chrome/browser/ui/find_bar/find_bar_state_factory.h"
 #include "chrome/browser/ui/hats/hats_service_factory.h"
 #include "chrome/browser/ui/prefs/prefs_tab_helper.h"
-#include "chrome/browser/ui/safety_hub/menu_notification_service_factory.h"
-#include "chrome/browser/ui/safety_hub/notification_permission_review_service_factory.h"
-#include "chrome/browser/ui/safety_hub/revoked_permissions_os_notification_display_manager_factory.h"
-#include "chrome/browser/ui/safety_hub/revoked_permissions_service_factory.h"
 #include "chrome/browser/ui/signin/dice_migration_service_factory.h"
 #include "chrome/browser/ui/tabs/pinned_tab_service_factory.h"
 #include "chrome/browser/ui/toolbar/pinned_toolbar/pinned_toolbar_actions_model_factory.h"
@@ -356,6 +352,10 @@
 #include "chrome/browser/signin/android/signin_bridge_factory.h"
 #include "chrome/browser/signin/signin_manager_android_factory.h"
 #include "chrome/browser/ui/android/android_profile_browser_collection_service_factory.h"
+#include "chrome/browser/ui/safety_hub/menu_notification_service_factory.h"
+#include "chrome/browser/ui/safety_hub/notification_permission_review_service_factory.h"
+#include "chrome/browser/ui/safety_hub/revoked_permissions_os_notification_display_manager_factory.h"
+#include "chrome/browser/ui/safety_hub/revoked_permissions_service_factory.h"
 #include "components/commerce/core/commerce_feature_list.h"
 #include "components/commerce/core/proto/discount_infos_db_content.pb.h"  // nogncheck
 #include "components/commerce/core/proto/merchant_signal_db_content.pb.h"
@@ -407,7 +407,6 @@
 #include "chrome/browser/ui/media_router/media_router_ui_service_factory.h"
 #include "chrome/browser/ui/performance_controls/performance_controls_hats_service_factory.h"
 #include "chrome/browser/ui/read_anything/read_anything_service_factory.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_hats_service_factory.h"
 #include "chrome/browser/ui/views/profiles/avatar_toolbar_button_state_manager.h"
 #include "chrome/browser/ui/waap/initial_webui_profile_service_factory.h"
 #include "chrome/browser/ui/waap/waap_ui_metrics_service_factory.h"
@@ -1197,7 +1196,9 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   NotificationDisplayServiceFactory::GetInstance();
   NotificationMetricsLoggerFactory::GetInstance();
+#if BUILDFLAG(IS_ANDROID)
   NotificationPermissionsReviewServiceFactory::GetInstance();
+#endif  // BUILDFLAG(IS_ANDROID)
   NotificationsEngagementServiceFactory::GetInstance();
   NotifierStateTrackerFactory::GetInstance();
 #if BUILDFLAG(USE_NSS_CERTS)
@@ -1380,7 +1381,9 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
   reporting::ManualTestHeartbeatEventFactory::GetInstance();
 #endif
+#if BUILDFLAG(IS_ANDROID)
   RevokedPermissionsOSNotificationDisplayManagerFactory::GetInstance();
+#endif  // BUILDFLAG(IS_ANDROID)
 #if !BUILDFLAG(IS_ANDROID)
   ResetReportUploaderFactory::GetInstance();
 #endif
@@ -1417,9 +1420,10 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   safe_browsing::VerdictCacheManagerFactory::GetInstance();
   SafeSearchFactory::GetInstance();
+#if BUILDFLAG(IS_ANDROID)
   SafetyHubMenuNotificationServiceFactory::GetInstance();
+#endif  // BUILDFLAG(IS_ANDROID)
 #if !BUILDFLAG(IS_ANDROID)
-  SafetyHubHatsServiceFactory::GetInstance();
   if (features::IsMainNodeAnnotationsEnabled()) {
     screen_ai::AXMainNodeAnnotatorControllerFactory::GetInstance();
   }
@@ -1559,7 +1563,9 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   UnifiedConsentServiceFactory::GetInstance();
   universal_optout::UniversalOptOutServiceFactory::GetInstance();
+#if BUILDFLAG(IS_ANDROID)
   RevokedPermissionsServiceFactory::GetInstance();
+#endif  // BUILDFLAG(IS_ANDROID)
   UrlLanguageHistogramFactory::GetInstance();
   UsbChooserContextFactory::GetInstance();
 #if !BUILDFLAG(IS_ANDROID)

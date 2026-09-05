@@ -34,7 +34,6 @@ export interface ServiceInterface extends ActivityLogDelegate,
   getProfileConfiguration(): Promise<chrome.developerPrivate.ProfileInfo>;
   getExtensionsInfo(): Promise<chrome.developerPrivate.ExtensionInfo[]>;
   getExtensionSize(id: string): Promise<string>;
-  dismissSafetyHubExtensionsMenuNotification(): void;
   dismissMv2DeprecationNotice(): void;
   shouldIgnoreUpdate(
       extensionId: string,
@@ -600,10 +599,6 @@ export class Service implements ServiceInterface {
       updates: chrome.developerPrivate.ExtensionSiteAccessUpdate[]):
       Promise<void> {
     return chrome.developerPrivate.updateSiteAccess(site, updates);
-  }
-
-  dismissSafetyHubExtensionsMenuNotification() {
-    chrome.developerPrivate.dismissSafetyHubExtensionsMenuNotification();
   }
 
   dismissMv2DeprecationNotice(): void {

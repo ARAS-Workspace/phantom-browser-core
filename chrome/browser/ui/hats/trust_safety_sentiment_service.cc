@@ -15,8 +15,6 @@
 #include "chrome/browser/ui/hats/hats_service.h"
 #include "chrome/browser/ui/hats/hats_service_factory.h"
 #include "chrome/browser/ui/hats/survey_config.h"
-#include "chrome/browser/ui/safety_hub/menu_notification_service_factory.h"
-#include "chrome/browser/ui/safety_hub/safety_hub_constants.h"
 #include "chrome/browser/ui/webui/settings/site_settings_helper.h"
 #include "chrome/common/channel_info.h"
 #include "chrome/common/chrome_features.h"
@@ -683,23 +681,6 @@ void TrustSafetySentimentService::MaybeTriggerPasswordProtectionSurvey(
     phished_password_change_state_.reset();
   }
   TriggerOccurred(FeatureArea::kPasswordProtectionUI, product_specific_data);
-}
-
-void TrustSafetySentimentService::TriggerSafetyHubSurvey(
-    TrustSafetySentimentService::FeatureArea feature_area,
-    std::map<std::string, bool> product_specific_data) {
-  if (!base::FeatureList::IsEnabled(
-          features::kSafetyHubTrustSafetySentimentSurvey)) {
-    return;
-  }
-  // Delay the trigger to determine whether the user interacted with Safety Hub
-  // soon after the trigger occurred.
-  base::SequencedTaskRunner::GetCurrentDefault()->PostDelayedTask(
-      FROM_HERE,
-      base::BindOnce(&TrustSafetySentimentService::TriggerOccurred,
-                     weak_ptr_factory_.GetWeakPtr(), feature_area,
-                     product_specific_data),
-      kSafetyHubSurveyDelay);
 }
 
 // static
