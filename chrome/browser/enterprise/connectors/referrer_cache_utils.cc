@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "base/supports_user_data.h"
+#include "components/download/public/common/download_item.h"
 #include "components/enterprise/connectors/core/reporting_utils.h"
 #include "components/safe_browsing/buildflags.h"
 #include "components/safe_browsing/core/common/proto/csd.pb.h"
