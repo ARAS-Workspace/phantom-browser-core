@@ -3933,6 +3933,7 @@ const FeatureEntry::FeatureVariation kDiskCacheBackendExperimentVariations[] = {
     {"experimental sql backend", kDiskCacheBackendExperimentVariations_Sql,
      nullptr}};
 
+#if BUILDFLAG(IS_ANDROID)
 const FeatureEntry::FeatureParam
     kSafetyHubDisruptiveNotificationRevocationVariations_RevokeAll[] = {
         {"shadow_run", "false"},
@@ -3956,6 +3957,7 @@ const FeatureEntry::FeatureVariation
          kSafetyHubDisruptiveNotificationRevocationVariations_Moderate,
          nullptr},
 };
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_ANDROID)
 const FeatureEntry::FeatureParam kCCTResetTimeoutParams_1min[] = {
@@ -11879,14 +11881,16 @@ const FeatureEntry kFeatureEntries[] = {
 
 #endif
 
+#if BUILDFLAG(IS_ANDROID)
     {"safety-hub-disruptive-notification-revocation",
      flag_descriptions::kSafetyHubDisruptiveNotificationRevocationName,
      flag_descriptions::kSafetyHubDisruptiveNotificationRevocationDescription,
-     kOsAll,
+     kOsAndroid,
      FEATURE_WITH_PARAMS_VALUE_TYPE(
          features::kSafetyHubDisruptiveNotificationRevocation,
          kSafetyHubDisruptiveNotificationRevocationVariations,
          "SafetyHubDisruptiveNotificationRevocation")},
+#endif  // BUILDFLAG(IS_ANDROID)
 
     {"safety-hub-unused-permission-revocation-for-all-surfaces",
      flag_descriptions::kSafetyHubUnusedPermissionRevocationForAllSurfacesName,

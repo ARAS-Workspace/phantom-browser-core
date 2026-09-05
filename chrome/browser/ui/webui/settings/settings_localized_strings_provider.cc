@@ -2055,25 +2055,6 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
                              .spec());
 }
 
-void AddSafetyHubStrings(content::WebUIDataSource* html_source) {
-  static constexpr webui::LocalizedString kLocalizedStrings[] = {
-      {"safetyHubUnusedSitePermissionsSettingLabel",
-       IDS_SETTINGS_SAFETY_CHECK_UNUSED_SITE_PERMISSIONS_SETTING_LABEL},
-  };
-  html_source->AddLocalizedStrings(kLocalizedStrings);
-
-  const bool is_disruptive_notification_revocation_enabled =
-      base::FeatureList::IsEnabled(
-          features::kSafetyHubDisruptiveNotificationRevocation) &&
-      !features::kSafetyHubDisruptiveNotificationRevocationShadowRun.Get();
-  html_source->AddString(
-      "safetyHubUnusedSitePermissionsSettingSublabel",
-      l10n_util::GetStringUTF16(
-          is_disruptive_notification_revocation_enabled
-              ? IDS_SETTINGS_SAFETY_CHECK_UNUSED_SITE_PERMISSIONS_AND_NOTIFICATIONS_SETTING_SUBLABEL
-              : IDS_SETTINGS_SAFETY_CHECK_UNUSED_SITE_PERMISSIONS_SETTING_SUBLABEL));
-}
-
 void AddSearchInSettingsStrings(content::WebUIDataSource* html_source) {
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
       {"searchPrompt", IDS_SETTINGS_SEARCH_PROMPT},
@@ -3403,7 +3384,6 @@ void AddLocalizedStrings(content::WebUIDataSource* html_source,
   AddPeopleStrings(html_source, profile);
   AddPrivacySandboxStrings(html_source, profile);
   AddPrivacyStrings(html_source, profile);
-  AddSafetyHubStrings(html_source);
   AddShortcutInputStrings(html_source);
   AddResetStrings(html_source, profile);
   AddSearchEnginesStrings(html_source);

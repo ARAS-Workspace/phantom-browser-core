@@ -1307,16 +1307,8 @@
     <!-- Privacy Guide -->
 
     <!-- Safety check -->
-    <message name="IDS_SETTINGS_SAFETY_CHECK_UNUSED_SITE_PERMISSIONS_SETTING_LABEL" desc="By default Chrome auto-revokes (disables) permissions (e.g. Camera, Location, etc.) for websites that were not visited for a while. This label is for the toggle that allows users to switch off/on this functionality.">
-      Automatically remove permissions from unused sites
-    </message>
     <message name="IDS_SETTINGS_SAFETY_CHECK_PASSWORDS_PRIMARY_LABEL" desc="'Passwords' is an element in safety check that allows users to check for their passwords being compromised.">
       Passwords
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_CHECK_REVIEW_NOTIFICATION_PERMISSIONS_COUNT_LABEL" desc="'Review Notification Permissions' shows the websites that send a lot of notifications. This label holds the details of the item and shows how many notifications are sent.">
-      {NUM_NOTIFICATION, plural,
-       =1 {About 1 notification a day}
-       other {About {NUM_NOTIFICATION} notifications a day}}
     </message>
     <message name="IDS_SETTINGS_NETWORK_PREDICTION_ENABLED_DESC" desc="In the advanced options tab, the secondary text next to the checkbox that enables prediction of network actions.">
       Uses cookies to remember your preferences, even if you don’t visit those pages
@@ -3415,65 +3407,6 @@
     </message>
     <message name="IDS_SETTINGS_EXTENSION_OR_APP_DISPLAY_NAME" desc="The title of a page containing site settings for an extension or Isolated Web App (IWA). The display name contains a human-readable extension/IWA name followed by the extension/IWA ID.">
       <ph name="EXTENSION_OR_APP_NAME">$1<ex>Google Docs Offline</ex></ph> (ID: <ph name="EXTENSION_OR_APP_ID">$2<ex>ghbmnnjooekpmoecnnnilnnbdlolhkhi</ex></ph>)
-    </message>
-
-    <!-- Safety Hub -->
-    <message name="IDS_SETTINGS_SAFETY_HUB_SB_ON_ENHANCED_HEADER" desc="Safety Hub settings page (chrome://settings/safetyHub) gives users an overview over their safety status. Safe browsing card in this page shows the current state of Safe browsing setting (chrome://settings/security). This string is the headline of the Safe Browsing card when the current state is Enhanced protection.">
-      Enhanced Safe Browsing is on
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_SB_ON_ENHANCED_SUBHEADER" desc="Safety Hub settings page (chrome://settings/safetyHub) gives users an overview over their safety status. Safe browsing card in this page shows the current state of Safe browsing setting (chrome://settings/security). This string is the body text of the Safe Browsing card when the current state is Enhanced protection.">
-      You have Chrome's strongest security
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_SB_ON_STANDARD_HEADER" desc="Safety Hub settings page (chrome://settings/safetyHub) gives users an overview over their safety status. Safe browsing card in this page shows the current state of Safe browsing setting (chrome://settings/security). This string is the headline of the Safe Browsing card when the current state is Standard protection.">
-      Safe Browsing is on
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_SB_ON_STANDARD_SUBHEADER" desc="Safety Hub settings page (chrome://settings/safetyHub) gives users an overview over their safety status. Safe browsing card in this page shows the current state of Safe browsing setting (chrome://settings/security). This string is the body text of the Safe Browsing card when the current state is Standard protection.">
-      You're getting standard protection
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_SB_OFF_HEADER" desc="Safety Hub settings page(chrome://settings/safetyHub) gives users an overview over their safety status. Safe browsing card in this page shows the current state of Safe browsing setting(chrome://settings/security). This string is the headline of the Safe Browsing card when the current state is No protection.">
-      Safe Browsing is off
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_SB_OFF_MANAGED_SUBHEADER" desc="Safety Hub settings page (chrome://settings/safetyHub) gives users an overview over their safety status. Safe browsing card in this page shows the current state of Safe browsing setting (chrome://settings/security). This string is the body text of the Safe Browsing card when the current state is No protection because the user's organization (e.g. employer, university, etc.) has turned it off.">
-      Your organization turned off Safe Browsing
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_SB_OFF_EXTENSION_SUBHEADER" desc="Safety Hub settings page (chrome://settings/safetyHub) gives users an overview over their safety status. Safe browsing card in this page shows the current state of Safe browsing setting (chrome://settings/security). This string is the body text of the Safe Browsing card when the current state is No protection because one of the extensions installed on the user's browser has turned it off.">
-      An extension turned off Safe Browsing
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_SB_OFF_USER_SUBHEADER" desc="Safety Hub settings page (chrome://settings/safetyHub) gives users an overview over their safety status. Safe browsing card in this page shows the current state of Safe browsing setting (chrome://settings/security). This string is the body text of the Safe Browsing card when the current state is No protection because the user has turned it off.">
-      Turn on Safe Browsing to get protection against dangerous sites
-    </message>
-    <if expr="not is_chromeos">
-      <message name="IDS_SETTINGS_SAFETY_HUB_VERSION_CARD_SUBHEADER_RESTART" desc="Safety Hub settings page (chrome://settings/safetyHub) gives users an overview over their safety status. The version card, which this text is a part of, informs the user whether their Chrome is up to date. This text is shown when Chrome is not up to date but there is an update available and the user needs to restart their browser to finish the update. Shown below the title 'Chrome is out of date'.">
-        Relaunch to finish update. Your tabs will reopen.
-      </message>
-    </if>
-    <if expr="is_chromeos">
-      <message name="IDS_SETTINGS_SAFETY_HUB_VERSION_CARD_SUBHEADER_RESTART" desc="Safety Hub settings page (chrome://settings/safetyHub) gives users an overview over their safety status. The version card, which this text is a part of, informs the user whether their Chrome is up to date. This text is shown when Chrome is not up to date but there is an update available and the user needs to restart their browser to finish the update. Shown below the title 'Chrome is out of date'.">
-        Restart your device to finish updating
-      </message>
-    </if>
-    <message name="IDS_SETTINGS_SAFETY_HUB_REVOKED_PERMISSIONS_MENU_NOTIFICATION" desc="The revoked permissions module of Safety Hub revokes permissions of sites that the user hasn't visited in a while or that send abusive notifications. This label is for the notification in Chrome's three-dot menu indicating for how many sites the permission was revoked.">
-      {NUM_SITES, plural,
-        =1 {Removed permissions for 1 site}
-        other {Removed permissions for {NUM_SITES} sites}}
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_REVIEW_NOTIFICATION_PERMISSIONS_MENU_NOTIFICATION" desc="The review notification permissions module of Safety Hub marks sites that send a lot of notifications for review by the user. This label is for the notification in Chrome's three-dot menu indicating how many sites should be reviewed.">
-      {NUM_SITES, plural,
-        =1 {Found 1 site with lots of notifications}
-        other {Found {NUM_SITES} sites with lots of notifications}}
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_COMPROMISED_PASSWORDS_MENU_NOTIFICATION" desc="The password check module of Safety Hub warns users if there is any insecure credential. This label is for the notification in Chrome's three-dot menu indicating how many passwords are compromised.">
-      {NUM_SITES, plural,
-        =1 {Found 1 compromised password}
-        other {Found {NUM_SITES} compromised passwords}}
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_EXTENSIONS_MENU_NOTIFICATION" desc="The extension module of Safety Hub warns users if any downloaded extension is malware or policy violated. This label is for the notification in Chrome's three-dot menu indicating how many extension are marked as unsafe.">
-      {NUM_SITES, plural,
-        =1 {Turned off 1 unsafe extension}
-        other {Turned off {NUM_SITES} unsafe extensions}}
-    </message>
-    <message name="IDS_SETTINGS_SAFETY_HUB_SAFE_BROWSING_MENU_NOTIFICATION" desc="When Safe Browsing is disabled, the proactive Safety Hub feature encourages users to turn on the feature. This label is for the notification in Chrome's three-dot menu.">
-      Safe Browsing is off
     </message>
 
 

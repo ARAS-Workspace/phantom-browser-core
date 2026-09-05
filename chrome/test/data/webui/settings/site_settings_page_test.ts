@@ -6,7 +6,7 @@
 import {flush} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 import type {CrExpandButtonElement, SettingsSiteSettingsPageElement} from 'chrome://settings/lazy_load.js';
 import {ContentSetting, CookieControlsMode, ContentSettingsTypes, defaultSettingLabel, SettingsState, SiteSettingsBrowserProxyImpl} from 'chrome://settings/lazy_load.js';
-import type {CrLinkRowElement, Route, SettingsPrefsElement, SettingsToggleButtonElement} from 'chrome://settings/settings.js';
+import type {CrLinkRowElement, Route, SettingsPrefsElement} from 'chrome://settings/settings.js';
 import {CrSettingsPrefs, loadTimeData, Router, routes} from 'chrome://settings/settings.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {isChildVisible} from 'chrome://webui-test/test_util.js';
@@ -60,14 +60,6 @@ suite('SiteSettingsPage', function() {
         cookie_controls_mode: {
           type: chrome.settingsPrivate.PrefType.NUMBER,
           value: CookieControlsMode.OFF,
-        },
-      },
-      safety_hub: {
-        unused_site_permissions_revocation: {
-          enabled: {
-            type: chrome.settingsPrivate.PrefType.BOOLEAN,
-            value: true,
-          },
         },
       },
       compose: {
@@ -242,22 +234,6 @@ suite('SiteSettingsPage', function() {
       '#automatic-fullscreen'));
   });
 
-  test('UnusedSitePermissionsControlToggleUpdatesPrefs', function() {
-    const unusedSitePermissionsRevocationToggle =
-        page.shadowRoot!.querySelector<SettingsToggleButtonElement>(
-            '#unusedSitePermissionsRevocationToggle');
-    assertTrue(!!unusedSitePermissionsRevocationToggle);
-
-    unusedSitePermissionsRevocationToggle.click();
-    flush();
-    assertFalse(Boolean(page.get(
-        'prefs.safety_hub.unused_site_permissions_revocation.enabled.value')));
-
-    unusedSitePermissionsRevocationToggle.click();
-    flush();
-    assertTrue(Boolean(page.get(
-        'prefs.safety_hub.unused_site_permissions_revocation.enabled.value')));
-  });
 });
 
 // Isolated ContentSettingsVisibility test suite due to significantly higher
