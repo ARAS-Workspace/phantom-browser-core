@@ -47,7 +47,7 @@ source_set("unit_tests") {
   ]
 
   if ((enterprise_data_controls || enterprise_screenshot_protection) &&
-      !is_android) {
+      !is_android && enterprise_cloud_content_analysis) {
     sources += [ "paste_allowed_request_unittest.cc" ]
     deps += [ "//components/enterprise/connectors/core:cloud_content_scanning" ]
   }
