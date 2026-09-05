@@ -81,17 +81,6 @@ export function getHtml(this: HistoryAppElement) {
           ` : ''}
           <div id="tabsScrollContainer" class="cr-scrollable">
             <div class="cr-scrollable-top-shadow" ?hidden="${this.showTabs_}"></div>
-            <if expr="not is_chromeos">
-              ${this.shouldShowHistoryPageHistorySyncPromo_() ? html`
-                <div class="history-cards">
-                  <history-sync-promo></history-sync-promo>
-                </div>` : ''}
-              <div class="history-cards" ?hidden="${!this.shouldShowHistoryCrossDeviceSigninPromo_}">
-                <history-cross-device-signin-promo id="historyCrossDeviceSigninPromo"
-                    @should-show-history-cross-device-signin-promo="${this.onShouldShowHistoryCrossDeviceSigninPromo_}">
-                </history-cross-device-signin-promo>
-              </div>
-            </if>
             ${this.enableHistoryEmbeddings_ ? html`
               <div id="historyEmbeddingsContainer" class="history-cards">
                 <history-embeddings-promo></history-embeddings-promo>
@@ -140,14 +129,6 @@ export function getHtml(this: HistoryAppElement) {
             </cr-page-selector>
           </div>
         </div>
-        ${this.syncedTabsSelected_() ? html`
-          <div id="syncedDevicesScroll" class="cr-scrollable" path="syncedTabs">
-            <div class="cr-scrollable-top-shadow"></div>
-            <history-synced-device-manager id="synced-devices"
-                .sessionList="${this.sessionList_}"
-                .searchTerm="${this.queryState_.searchTerm}">
-            </history-synced-device-manager>
-          </div>` : ''}
       </cr-page-selector>
     </div>
 

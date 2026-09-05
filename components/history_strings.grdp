@@ -160,21 +160,6 @@
     Unknown device
   </message>
 
-  <message name="IDS_HISTORY_SYNC_PROMO_TITLE" desc="The title of the history sync promo.">
-    See your history on other devices
-  </message>
-  <message name="IDS_HISTORY_SYNC_PROMO_BODY_SIGNED_OUT" desc="The promo body text for signed out users.">
-    To get your history from your other devices, sign in and sync history. You’ll also get your passwords and more on all your devices. You can stop syncing anytime in settings. Google may personalize Search and other services based on your history.
-  </message>
-  <message name="IDS_HISTORY_SYNC_PROMO_BODY_SIGN_IN_PENDING" desc="The promo body text for pending sign in users with sync history off.">
-    To get your history from your other devices, verify it’s you and sync your history and tabs. You can stop syncing anytime in settings. Google may personalize Search and other services based on your history.
-  </message>
-  <message name="IDS_HISTORY_SYNC_PROMO_BODY_SIGN_IN_PENDING_SYNC_HISTORY_ON" desc="The promo body text for pending sign in users with sync history on.">
-    To get your history from your other devices, verify it’s you. You can stop syncing anytime in settings. Google may personalize Search and other services based on your history.
-  </message>
-  <message name="IDS_HISTORY_SYNC_PROMO_BODY_SIGNED_IN" desc="The promo body text for signed in users with sync history off.">
-    To get your history from your other devices, sync your history and tabs to <ph name="ACCOUNT_EMAIL">$1<ex>john@google.com</ex></ph>. You can stop syncing anytime in settings. Google may personalize Search and other services based on your history.
-  </message>
 
   <message name="IDS_HISTORY_EMBEDDINGS_DISCLAIMER" desc="On the history page, the persistent disclaimer text shown below the search box indicating what content is sent to Google for the history search feature.">
     Your searches, best matches, and their page contents are sent to Google and may be seen by human reviewers to improve this feature.
@@ -286,27 +271,6 @@
   </message>
 
   <!-- For Compare -->
-  <message name="IDS_COMPARE_HISTORY_EMPTY" desc="Text shown for comparison tables tab when no sets are present.">
-    No comparison tables
-  </message>
-  <message name="IDS_COMPARE_HISTORY_HEADER" desc="Header text for comparison tables tab in history.">
-    Comparison tables
-  </message>
-  <message name="IDS_COMPARE_HISTORY_INFO" desc="Info disclaimer text for comparison tables tab in history.">
-    Tabs you delete from your Chrome history will still show up in your comparison tables
-  </message>
-  <message name="IDS_COMPARE_HISTORY_MENU_ARIA_LABEL" desc="Aria label for menu button for a row in tab compare history">
-    More actions for comparison table <ph name="COMPARE_SET_NAME"><ex>e-bikes</ex>$1</ph>
-  </message>
-  <message name="IDS_COMPARE_HISTORY_MENU_ITEM" desc="The title of the link in the history UI that navigates the user to a page showing the tables being maintained by the tab compare feature.">
-    Comparison tables
-  </message>
-  <message name="IDS_COMPARE_HISTORY_REMOVE" desc="Text for deleting a single row in tab compare history">
-    Remove from tables
-  </message>
-  <message name="IDS_COMPARE_HISTORY_ROW" desc="Text for a single row in tab compare history">
-    Compare <ph name="COMPARE_SET_NAME"><ex>e-bikes</ex>$1</ph> &#183; <ph name="ITEMS"><ex>3</ex>$2</ph> items
-  </message>
 
   <!-- Critical actions -->
   <!-- TODO(b/538113758): Make translatable when strings are finalized. -->

@@ -246,21 +246,12 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
     RegisterWebUIControllerInterfaceBinder<history::mojom::PageHandler,
                                            HistoryUI>(map);
   }
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  RegisterWebUIControllerInterfaceBinder<
-      history_cross_device_signin_promo::mojom::
-          HistoryCrossDeviceSigninPromoHandler,
-      HistoryUI>(map);
-#endif
   if (TabsFromOtherDevicesSidePanelCoordinator::IsSupported(
           Profile::FromBrowserContext(
               render_frame_host->GetBrowserContext()))) {
     RegisterWebUIControllerInterfaceBinder<
-        history::mojom::ForeignSessionPageHandlerFactory, HistoryUI,
+        history::mojom::ForeignSessionPageHandlerFactory,
         TabsFromOtherDevicesSidePanelUI>(map);
-  } else {
-    RegisterWebUIControllerInterfaceBinder<
-        history::mojom::ForeignSessionPageHandlerFactory, HistoryUI>(map);
   }
 
   RegisterWebUIControllerInterfaceBinder<

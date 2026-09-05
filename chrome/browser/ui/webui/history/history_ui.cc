@@ -27,11 +27,6 @@
 #include "chrome/browser/history_embeddings/history_embeddings_utils.h"
 #include "chrome/browser/page_image_service/image_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/profiles/profile_avatar_icon_util.h"
-#include "chrome/browser/sessions/session_restore.h"
-#include "chrome/browser/signin/account_preview_data_service_factory.h"
-#include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/browser/signin/signin_ui_util.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/ui_features.h"
@@ -40,7 +35,6 @@
 #include "chrome/browser/ui/webui/cr_components/history_embeddings/history_embeddings_handler.h"
 #include "chrome/browser/ui/webui/favicon_source.h"
 #include "chrome/browser/ui/webui/history/browsing_history_handler.h"
-#include "chrome/browser/ui/webui/history/foreign_session_handler.h"
 #include "chrome/browser/ui/webui/history/history_identity_state_watcher.h"
 #include "chrome/browser/ui/webui/history/history_login_handler.h"
 #include "chrome/browser/ui/webui/history/navigation_handler.h"
@@ -64,13 +58,7 @@
 #include "components/page_image_service/image_service.h"
 #include "components/page_image_service/image_service_handler.h"
 #include "components/prefs/pref_service.h"
-#include "components/sessions/core/session_types.h"
-#include "components/signin/public/base/signin_buildflags.h"
-#include "components/signin/public/base/signin_pref_names.h"
-#include "components/signin/public/base/signin_switches.h"
-#include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/strings/grit/components_strings.h"
-#include "components/sync/base/features.h"
 #include "content/public/browser/web_ui.h"
 #include "content/public/browser/web_ui_data_source.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -79,56 +67,13 @@
 #include "ui/webui/tracked_element/tracked_element_handler_document_singleton.h"
 #include "ui/webui/webui_util.h"
 
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-#include "chrome/browser/ui/webui/history/history_cross_device_signin_promo_handler.h"
-#endif
-
 namespace {
 
 content::WebUIDataSource* CreateAndAddHistoryUIHTMLSource(Profile* profile) {
   content::WebUIDataSource* source = content::WebUIDataSource::CreateAndAdd(
       profile, chrome::kChromeUIHistoryHost);
 
-  source->AddBoolean("replaceSyncPromosWithSignInPromos",
-                     syncer::IsReplaceSyncPromosWithSignInPromosEnabled());
-
-#if !BUILDFLAG(IS_CHROMEOS)
-  source->AddBoolean("unoPhase2FollowUp",
-                     base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp));
-#endif  // BUILDFLAG!(IS_CHROMEOS)
-
   HistoryUtil::PopulateCommonSourceForHistory(source, profile);
-
-  static constexpr webui::LocalizedString kStrings[] = {
-      // Localized strings (alphabetical order).
-      {"compareHistoryEmpty", IDS_COMPARE_HISTORY_EMPTY},
-      {"compareHistoryRemove", IDS_COMPARE_HISTORY_REMOVE},
-      {"compareHistoryHeader", IDS_COMPARE_HISTORY_HEADER},
-      {"compareHistoryInfo", IDS_COMPARE_HISTORY_INFO},
-      {"compareHistoryListsMenuItem", IDS_COMPARE_HISTORY_MENU_ITEM},
-      {"compareHistoryRow", IDS_COMPARE_HISTORY_ROW},
-      {"compareHistoryMenuAriaLabel", IDS_COMPARE_HISTORY_MENU_ARIA_LABEL},
-      {"noSyncedResults", IDS_HISTORY_NO_SYNCED_RESULTS},
-      {"signinOnPhonePromoButton", IDS_HISTORY_SIGNIN_ON_PHONE_PROMO_BUTTON},
-      {"signinOnPhonePromoSubtitle",
-       IDS_HISTORY_SIGNIN_ON_PHONE_PROMO_SUBTITLE},
-      {"signinOnPhonePromoTitle", IDS_HISTORY_SIGNIN_ON_PHONE_PROMO_TITLE},
-      {"turnOnSyncPromo", IDS_HISTORY_TURN_ON_SYNC_PROMO},
-      {"turnOnSyncPromoDesc", IDS_HISTORY_TURN_ON_SYNC_PROMO_DESC},
-      {"turnOnSyncHistoryPromo", IDS_HISTORY_SYNC_HISTORY_PROMO},
-      {"syncHistoryPromoBodySignedOut",
-       IDS_RECENT_TABS_SYNC_HISTORY_PROMO_BODY_SIGNED_OUT},
-      {"syncHistoryPromoBodyPendingSignIn",
-       IDS_RECENT_TABS_SYNC_HISTORY_PROMO_BODY_PENDING_SIGN_IN},
-      {"syncHistoryPromoBodyPendingSignInSyncHistoryOn",
-       IDS_RECENT_TABS_SYNC_HISTORY_PROMO_BODY_PENDING_SIGN_IN_SYNC_HISTORY_ON},
-      {"verifyItsYou", IDS_VERIFY_IT_IS_YOU}};
-  source->AddLocalizedStrings(kStrings);
-
-  source->AddLocalizedString("turnOnSyncHistoryButton",
-                             IDS_HISTORY_SYNC_HISTORY_BUTTON);
-  source->AddString("accountPictureUrl",
-                    profiles::GetPlaceholderAvatarIconUrl());
 
   const bool is_critical_actions_enabled = base::FeatureList::IsEnabled(
       critical_actions::features::kCriticalActionHistory);
@@ -166,51 +111,6 @@ content::WebUIDataSource* CreateAndAddHistoryUIHTMLSource(Profile* profile) {
   source->AddBoolean("isGlicEnabled", is_glic_enabled);
   source->AddBoolean("isGlicWebActuationAvailable",
                      is_glic_web_actuation_available);
-
-#if BUILDFLAG(IS_CHROMEOS)
-  source->AddLocalizedString("turnOnSyncButton",
-                             IDS_HISTORY_TURN_ON_SYNC_BUTTON);
-#else
-  signin::IdentityManager* identity_manager =
-      IdentityManagerFactory::GetForProfile(profile);
-  bool has_primary_account =
-      identity_manager->HasPrimaryAccount(signin::ConsentLevel::kSignin);
-  AccountInfo account_info = signin_ui_util::GetSingleAccountForPromos(
-      identity_manager,
-      AccountPreviewDataServiceFactory::GetForProfile(profile));
-  source->AddString(
-      "historySyncPromoBodySignedIn",
-      l10n_util::GetStringFUTF16(IDS_HISTORY_SYNC_PROMO_BODY_SIGNED_IN,
-                                 base::UTF8ToUTF16(account_info.GetEmail())));
-  source->AddString(
-      "turnOnSignedInSyncHistoryPromoBodySignInSyncOff",
-      l10n_util::GetStringFUTF16(
-          IDS_RECENT_TABS_SYNC_HISTORY_PROMO_BODY_SIGNED_IN_SYNC_OFF,
-          base::UTF8ToUTF16(account_info.GetEmail())));
-  source->AddString("accountName", account_info.GetFullName().value_or(""));
-  source->AddString("accountEmail", account_info.GetEmail());
-  if (!has_primary_account && !account_info.IsEmpty()) {
-    source->AddString(
-        "turnOnSyncButton",
-        l10n_util::GetStringFUTF16(
-            IDS_PROFILES_DICE_WEB_ONLY_SIGNIN_BUTTON,
-            base::UTF8ToUTF16(account_info.GetGivenName().value_or(
-                account_info.GetEmail()))));
-  } else {
-    source->AddLocalizedString("turnOnSyncButton",
-                               IDS_HISTORY_TURN_ON_SYNC_BUTTON);
-  }
-
-  static constexpr webui::LocalizedString kHistorySyncStrings[] = {
-      {"historySyncPromoTitle", IDS_HISTORY_SYNC_PROMO_TITLE},
-      {"historySyncPromoBodySignedOut", IDS_HISTORY_SYNC_PROMO_BODY_SIGNED_OUT},
-      {"historySyncPromoBodySignInPending",
-       IDS_HISTORY_SYNC_PROMO_BODY_SIGN_IN_PENDING},
-      {"historySyncPromoBodySignInPendingSyncHistoryOn",
-       IDS_HISTORY_SYNC_PROMO_BODY_SIGN_IN_PENDING_SYNC_HISTORY_ON},
-  };
-  source->AddLocalizedStrings(kHistorySyncStrings);
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
   bool enable_history_embeddings =
       history_embeddings::IsHistoryEmbeddingsEnabledForProfile(profile);
@@ -323,47 +223,6 @@ void HistoryUI::BindInterface(
   browsing_history_handler_ = std::make_unique<BrowsingHistoryHandler>(
       std::move(pending_page_handler), Profile::FromWebUI(web_ui()),
       web_ui()->GetWebContents());
-}
-
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-void HistoryUI::BindInterface(
-    mojo::PendingReceiver<history_cross_device_signin_promo::mojom::
-                              HistoryCrossDeviceSigninPromoHandler>
-        pending_receiver) {
-  history_cross_device_signin_promo_handler_ =
-      std::make_unique<HistoryCrossDeviceSigninPromoHandler>(
-          std::move(pending_receiver), web_ui()->GetWebContents());
-}
-#endif
-
-void HistoryUI::BindInterface(
-    mojo::PendingReceiver<history::mojom::ForeignSessionPageHandlerFactory>
-        pending_receiver) {
-  foreign_session_page_handler_factory_receiver_.reset();
-  foreign_session_page_handler_factory_receiver_.Bind(
-      std::move(pending_receiver));
-}
-
-void HistoryUI::CreateForeignSessionPageHandler(
-    mojo::PendingRemote<history::mojom::ForeignSessionPage> page,
-    mojo::PendingReceiver<history::mojom::ForeignSessionPageHandler> receiver) {
-  foreign_session_handler_ =
-      std::make_unique<browser_sync::ForeignSessionHandler>(
-          std::move(receiver), std::move(page), Profile::FromWebUI(web_ui()),
-          web_ui()->GetWebContents(),
-          base::BindRepeating([](content::WebContents* source_web_contents,
-                                 const ::sessions::SessionTab& tab,
-                                 WindowOpenDisposition disposition) {
-            SessionRestore::RestoreForeignSessionTab(source_web_contents, tab,
-                                                     disposition);
-          }),
-          base::BindRepeating(
-              [](Profile* profile,
-                 const std::vector<const ::sessions::SessionWindow*>& windows) {
-                SessionRestore::RestoreForeignSessionWindows(
-                    profile, windows.begin(), windows.end(), base::DoNothing());
-              }),
-          /*side_panel_ui=*/nullptr);
 }
 
 void HistoryUI::BindInterface(

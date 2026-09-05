@@ -17,9 +17,7 @@
 #include "ui/base/resource/resource_scale_factor.h"
 #include "ui/webui/mojo_web_ui_controller.h"
 #include "ui/webui/resources/cr_components/help_bubble/help_bubble.mojom.h"
-#include "ui/webui/resources/cr_components/history/foreign_sessions.mojom.h"
 #include "ui/webui/resources/cr_components/history/history.mojom-forward.h"
-#include "ui/webui/resources/cr_components/history/history_cross_device_signin_promo.mojom.h"
 #include "ui/webui/resources/cr_components/history_clusters/history_clusters.mojom.h"
 #include "ui/webui/resources/cr_components/history_embeddings/history_embeddings.mojom.h"
 
@@ -28,11 +26,6 @@ class RefCountedMemory;
 }
 
 class BrowsingHistoryHandler;
-class HistoryCrossDeviceSigninPromoHandler;
-
-namespace browser_sync {
-class ForeignSessionHandler;
-}
 
 namespace history_clusters {
 class HistoryClustersHandler;
@@ -58,7 +51,6 @@ class HistoryUIConfig : public content::WebUIConfig {
 class HistoryUI : public ui::MojoWebUIController,
                   public help_bubble::mojom::HelpBubbleHandlerFactory,
                   public history_embeddings::mojom::PageHandlerFactory,
-                  public history::mojom::ForeignSessionPageHandlerFactory,
                   public history_clusters::mojom::PageHandlerFactory {
  public:
   explicit HistoryUI(content::WebUI* web_ui);
@@ -75,24 +67,10 @@ class HistoryUI : public ui::MojoWebUIController,
           pending_page_handler_factory);
   void BindInterface(
       mojo::PendingReceiver<history::mojom::PageHandler> pending_page_handler);
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  void BindInterface(
-      mojo::PendingReceiver<history_cross_device_signin_promo::mojom::
-                                HistoryCrossDeviceSigninPromoHandler>
-          pending_receiver);
-#endif
-  void BindInterface(
-      mojo::PendingReceiver<history::mojom::ForeignSessionPageHandlerFactory>
-          pending_receiver);
   void BindInterface(
       mojo::PendingReceiver<history_clusters::mojom::PageHandlerFactory>
           pending_page_handler_factory);
 
-  // history::mojom::ForeignSessionPageHandlerFactory:
-  void CreateForeignSessionPageHandler(
-      mojo::PendingRemote<history::mojom::ForeignSessionPage> page,
-      mojo::PendingReceiver<history::mojom::ForeignSessionPageHandler> receiver)
-      override;
   void BindInterface(
       mojo::PendingReceiver<page_image_service::mojom::PageImageServiceHandler>
           pending_page_handler);
@@ -131,11 +109,6 @@ class HistoryUI : public ui::MojoWebUIController,
   std::unique_ptr<history_clusters::HistoryClustersHandler>
       history_clusters_handler_;
   std::unique_ptr<BrowsingHistoryHandler> browsing_history_handler_;
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  std::unique_ptr<HistoryCrossDeviceSigninPromoHandler>
-      history_cross_device_signin_promo_handler_;
-#endif
-  std::unique_ptr<browser_sync::ForeignSessionHandler> foreign_session_handler_;
   std::unique_ptr<page_image_service::ImageServiceHandler>
       image_service_handler_;
   PrefChangeRegistrar pref_change_registrar_;
@@ -144,8 +117,6 @@ class HistoryUI : public ui::MojoWebUIController,
       help_bubble_handler_factory_receiver_{this};
   mojo::Receiver<history_embeddings::mojom::PageHandlerFactory>
       history_embeddings_handler_factory_receiver_{this};
-  mojo::Receiver<history::mojom::ForeignSessionPageHandlerFactory>
-      foreign_session_page_handler_factory_receiver_{this};
   mojo::Receiver<history_clusters::mojom::PageHandlerFactory>
       history_clusters_handler_factory_receiver_{this};
 
