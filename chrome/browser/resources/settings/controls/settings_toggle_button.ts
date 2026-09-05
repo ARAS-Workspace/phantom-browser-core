@@ -19,7 +19,6 @@ import {PolymerElement} from '//resources/polymer/v3_0/polymer/polymer_bundled.m
 import {SettingsBooleanControlMixin} from '/shared/settings/controls/settings_boolean_control_mixin.js';
 import {PrefService} from '/shared/settings/prefs2/pref_service.js';
 import {assert} from 'chrome://resources/js/assert.js';
-import {sanitizeInnerHtml} from 'chrome://resources/js/parse_html_subset.js';
 
 import {PrefKeyObserverMixin} from './pref_key_observer_mixin.js';
 import {getTemplate} from './settings_toggle_button.html.js';
@@ -71,21 +70,6 @@ export class SettingsToggleButtonElement extends
         reflectToAttribute: true,
       },
 
-      learnMoreUrl: {
-        type: String,
-        reflectToAttribute: true,
-      },
-
-      subLabelWithLink: {
-        type: String,
-        reflectToAttribute: true,
-      },
-
-      learnMoreAriaLabel: {
-        type: String,
-        value: '',
-      },
-
       icon: String,
 
       subLabelIcon: String,
@@ -115,9 +99,6 @@ export class SettingsToggleButtonElement extends
   declare ariaShowSublabel: boolean;
   declare elideLabel: boolean;
   declare icon: string;
-  declare learnMoreAriaLabel: string;
-  declare learnMoreUrl: string;
-  declare subLabelWithLink: string;
   declare subLabelIcon: string;
   declare noToggleOnHostClick: boolean;
 
@@ -156,11 +137,6 @@ export class SettingsToggleButtonElement extends
     return this.ariaLabel || this.label;
   }
 
-  private getLearnMoreAriaLabelledBy_(): string {
-    return this.learnMoreAriaLabel ? 'learn-more-aria-label' :
-                                     'sub-label-text learn-more';
-  }
-
   getBubbleAnchor() {
     const anchor = this.shadowRoot!.querySelector<HTMLElement>('#control');
     assert(anchor);
@@ -182,37 +158,6 @@ export class SettingsToggleButtonElement extends
       return;
     }
     this.updateCheckedAndNotify_(!this.checked);
-  }
-
-  private onLearnMoreClick_(e: CustomEvent<boolean>) {
-    e.stopPropagation();
-    this.fire_('learn-more-clicked');
-  }
-
-  /**
-   * Set up the contents of sub label with link.
-   */
-  private getSubLabelWithLinkContent_(): TrustedHTML {
-    return sanitizeInnerHtml(this.subLabelWithLink, {
-      attrs: [
-        'id',
-        'is',
-        'aria-description',
-        'aria-hidden',
-        'aria-label',
-        'aria-labelledby',
-        'tabindex',
-      ],
-    });
-  }
-
-  private onSubLabelTextWithLinkClick_(e: Event) {
-    const target = e.target as HTMLElement;
-    if (target.tagName === 'A') {
-      this.fire_('sub-label-link-clicked', target.id);
-      e.preventDefault();
-      e.stopPropagation();
-    }
   }
 
   private onChange_(e: CustomEvent<boolean>) {

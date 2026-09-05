@@ -43,17 +43,6 @@
   padding-top: 8px;
 }
 
-#learnMore {
-  align-items: center;
-  display: flex;
-  height: var(--cr-icon-ripple-size);
-  justify-content: center;
-  margin-inline-end: var(--cr-icon-ripple-margin);
-  margin-inline-start: var(--cr-icon-button-margin-start);
-  position: relative;  /* Needed for cr-ripple. */
-  width: var(--cr-icon-ripple-size);
-}
-
 #title-icon {
   height: 36px;
   width: 36px;

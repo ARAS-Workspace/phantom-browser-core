@@ -7,7 +7,7 @@ import 'chrome://settings/settings.js';
 
 import {flush} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 import type {SettingsToggleButtonElement} from 'chrome://settings/settings.js';
-import {DEFAULT_CHECKED_VALUE, DEFAULT_UNCHECKED_VALUE, loadTimeData, PrefService, PrefsBrowserProxy} from 'chrome://settings/settings.js';
+import {DEFAULT_CHECKED_VALUE, DEFAULT_UNCHECKED_VALUE, PrefService, PrefsBrowserProxy} from 'chrome://settings/settings.js';
 
 import {TestPrefsBrowserProxy} from './test_prefs_browser_proxy.js';
 
@@ -338,35 +338,6 @@ suite('SettingsToggleButton', () => {
     assertTrue(testElement.$.control.disabled);
   });
 
-  test('click on learn more link should not toggle the button', () => {
-    let learnMoreLink =
-        testElement.shadowRoot!.querySelector<HTMLElement>('#learn-more');
-    assertFalse(!!learnMoreLink);
-    testElement.set('learnMoreUrl', 'www.google.com');
-    flush();
-
-    learnMoreLink =
-        testElement.shadowRoot!.querySelector<HTMLElement>('#learn-more');
-    assertTrue(!!learnMoreLink);
-
-    assertTrue(testElement.checked);
-    flush();
-
-    learnMoreLink.click();
-    assertTrue(testElement.checked);
-  });
-
-  test('learn more link should indicate it opens in new tab', () => {
-    testElement.set('learnMoreUrl', 'www.google.com');
-    flush();
-    const learnMoreLink =
-        testElement.shadowRoot!.querySelector<HTMLElement>('#learn-more');
-    assertTrue(!!learnMoreLink);
-    assertEquals(
-        learnMoreLink.getAttribute('aria-description'),
-        loadTimeData.getString('opensInNewTab'));
-  });
-
   test('set label text should update aria-label of toggle', () => {
     const testLabelText = 'test label text';
     testElement.setAttribute('label', testLabelText);
@@ -393,34 +364,6 @@ suite('SettingsToggleButton', () => {
     assertEquals(crToggle.getAttribute('aria-label'), testAriaLabel);
   });
 
-  test('sub label with action link should have proper role', () => {
-    testElement.subLabelWithLink = `<a is="action-link"></a>`;
-    flush();
-
-    const subLabelTextWithLink =
-        testElement.shadowRoot!.querySelector<HTMLElement>(
-            '#sub-label-text-with-link');
-    assertTrue(!!subLabelTextWithLink);
-
-    const actionLink = subLabelTextWithLink.querySelector('a');
-    assertTrue(!!actionLink);
-    assertEquals(actionLink.getAttribute('role'), 'link');
-  });
-
-  test('sub label should be able to have aria-label', () => {
-    testElement.subLabelWithLink = `<a aria-label="Label"></a>`;
-    flush();
-
-    const subLabelTextWithLink =
-        testElement.shadowRoot!.querySelector<HTMLElement>(
-            '#sub-label-text-with-link');
-    assertTrue(!!subLabelTextWithLink);
-
-    const actionLink = subLabelTextWithLink.querySelector('a');
-    assertTrue(!!actionLink);
-    assertEquals(actionLink.getAttribute('aria-label'), 'Label');
-  });
-
   test('shows more-actions-after slot content', () => {
     const slottedContent = document.createElement('div');
     slottedContent.setAttribute('slot', 'more-actions-after');
@@ -436,47 +379,6 @@ suite('SettingsToggleButton', () => {
     assertEquals(slottedContent, assignedNodes[0]);
     assertEquals('Slotted content', assignedNodes[0]!.textContent!.trim());
   });
-
-  // <if expr="is_chromeos">
-  test('click on sub label link should not toggle the button', () => {
-    let subLabelTextWithLink =
-        testElement.shadowRoot!.querySelector('#sub-label-text-with-link');
-    assertFalse(!!subLabelTextWithLink);
-    testElement.set('subLabelWithLink', `<a href="#"></a>`);
-    flush();
-
-    subLabelTextWithLink =
-        testElement.shadowRoot!.querySelector('#sub-label-text-with-link');
-    assertTrue(!!subLabelTextWithLink);
-    const link = subLabelTextWithLink.querySelector('a');
-    assertTrue(!!link);
-
-    assertTrue(testElement.checked);
-    flush();
-
-    link.click();
-    assertTrue(testElement.checked);
-  });
-
-  test('click on sub label with link text should toggle the button', () => {
-    let subLabelTextWithLink =
-        testElement.shadowRoot!.querySelector<HTMLElement>(
-            '#sub-label-text-with-link');
-    assertFalse(!!subLabelTextWithLink);
-    testElement.set('subLabelWithLink', `<a href="#"></a>`);
-    flush();
-
-    subLabelTextWithLink = testElement.shadowRoot!.querySelector<HTMLElement>(
-        '#sub-label-text-with-link');
-    assertTrue(!!subLabelTextWithLink);
-
-    assertTrue(testElement.checked);
-    flush();
-
-    subLabelTextWithLink.click();
-    assertFalse(testElement.checked);
-  });
-  // </if>
 });
 
 suite('SettingsToggleButtonPrefKey', () => {

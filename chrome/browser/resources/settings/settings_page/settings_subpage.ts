@@ -63,8 +63,6 @@ export class SettingsSubpageElement extends SettingsSubpageElementBase {
       // Setting this will display the favicon of the website.
       faviconSiteUrl: {type: String},
 
-      learnMoreUrl: {type: String},
-
       // Setting a |searchLabel| will enable search.
       searchLabel: {type: String},
 
@@ -86,7 +84,6 @@ export class SettingsSubpageElement extends SettingsSubpageElementBase {
   accessor pageTitle: string = '';
   accessor titleIcon: string = '';
   accessor faviconSiteUrl: string = '';
-  accessor learnMoreUrl: string = '';
   accessor searchLabel: string = '';
   accessor searchIcon: string = '';
   accessor searchTerm: string = '';
@@ -223,10 +220,6 @@ export class SettingsSubpageElement extends SettingsSubpageElementBase {
     Router.getInstance().navigateToPreviousRoute();
   }
 
-  protected onHelpClick_() {
-    window.open(this.learnMoreUrl);
-  }
-
   protected onSearchChanged_(e: CustomEvent<string>) {
     if (this.searchTerm === e.detail) {
       return;
@@ -244,10 +237,6 @@ export class SettingsSubpageElement extends SettingsSubpageElementBase {
 
   protected getBackButtonAriaRoleDescription_(): string {
     return this.i18n('subpageBackButtonAriaRoleDescription', this.pageTitle);
-  }
-
-  protected getLearnMoreAriaLabel_(): string {
-    return this.i18n('subpageLearnMoreAriaLabel', this.pageTitle);
   }
 
   // Override FindShortcutMixin methods.
