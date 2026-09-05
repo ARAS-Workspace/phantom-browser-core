@@ -11,14 +11,11 @@
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "build/build_config.h"
-#include "chrome/browser/profile_resetter/profile_reset_report.pb.h"
 #include "chrome/browser/profile_resetter/profile_resetter.h"
-#include "chrome/browser/profile_resetter/resettable_settings_snapshot.h"
 #include "chrome/browser/ui/webui/settings/settings_page_ui_handler.h"
 #include "components/prefs/pref_registry_simple.h"
 
 class Profile;
-class ResettableSettingsSnapshot;
 
 namespace settings {
 
@@ -60,18 +57,6 @@ class ResetSettingsHandler : public SettingsPageUIHandler {
   void HandleResetProfileSettings(const base::ListValue& args);
 
  private:
-  // Retrieves the settings that will be reported, called from Javascript.
-  void HandleGetReportedSettings(const base::ListValue& args);
-
-  // Called once the settings that will be reported have been retrieved.
-  void OnGetReportedSettingsDone(std::string callback_id);
-
-  // Called when the reset profile dialog is shown.
-  void OnShowResetProfileDialog(const base::ListValue& args);
-
-  // Called when the reset profile dialog is hidden.
-  void OnHideResetProfileDialog(const base::ListValue& args);
-
   // Called when the reset profile banner is shown.
   void OnHideResetProfileBanner(const base::ListValue& args);
 
@@ -85,18 +70,11 @@ class ResetSettingsHandler : public SettingsPageUIHandler {
   void ResetSettings(ProfileResetter::ResettableFlags resettable_flags,
                      base::OnceClosure callback);
 
-  // Resets all profile settings to default values. |send_settings| is true if
-  // user gave their consent to upload broken settings to Google for analysis.
-  void ResetProfile(
-      const std::string& callback_id,
-      bool send_settings,
-      reset_report::ChromeResetReport::ResetRequestOrigin request_origin);
+  // Resets all profile settings to default values.
+  void ResetProfile(const std::string& callback_id);
 
   // Closes the dialog once all requested settings has been reset.
-  void OnResetProfileSettingsDone(
-      std::string callback_id,
-      bool send_feedback,
-      reset_report::ChromeResetReport::ResetRequestOrigin request_origin);
+  void OnResetProfileSettingsDone(std::string callback_id);
 
 #if BUILDFLAG(IS_CHROMEOS)
   void OnShowSanitizeDialog(const base::ListValue& args);
@@ -105,9 +83,6 @@ class ResetSettingsHandler : public SettingsPageUIHandler {
   const raw_ptr<Profile> profile_;
 
   std::unique_ptr<ProfileResetter> resetter_;
-
-  // Snapshot of settings before profile was reseted.
-  std::unique_ptr<ResettableSettingsSnapshot> setting_snapshot_;
 
   // Used to cancel callbacks when JavaScript becomes disallowed.
   base::WeakPtrFactory<ResetSettingsHandler> callback_weak_ptr_factory_{this};

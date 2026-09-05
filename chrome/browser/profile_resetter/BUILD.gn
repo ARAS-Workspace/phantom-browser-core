@@ -2,21 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//third_party/protobuf/proto_library.gni")
-
-proto_library("profile_reset_report_proto") {
-  sources = [ "profile_reset_report.proto" ]
-}
-
 if (!is_android) {
   source_set("profile_resetter") {
     sources = [
       "brandcode_config_fetcher.h",
       "brandcoded_default_settings.h",
       "profile_resetter.h",
-      "reset_report_uploader.h",
-      "reset_report_uploader_factory.h",
-      "resettable_settings_snapshot.h",
       "triggered_profile_resetter.h",
       "triggered_profile_resetter_factory.h",
     ]
@@ -41,15 +32,11 @@ if (!is_android) {
       "brandcode_config_fetcher.cc",
       "brandcoded_default_settings.cc",
       "profile_resetter.cc",
-      "reset_report_uploader.cc",
-      "reset_report_uploader_factory.cc",
-      "resettable_settings_snapshot.cc",
       "triggered_profile_resetter.cc",
       "triggered_profile_resetter_factory.cc",
     ]
 
     deps = [
-      ":profile_reset_report_proto",
       ":profile_resetter",
       "//base",
       "//build:branding_buildflags",
@@ -88,10 +75,8 @@ if (!is_android) {
       "//components/strings",
       "//components/version_info",
       "//content/public/browser",
-      "//crypto",
       "//extensions/browser",
       "//extensions/common",
-      "//google_apis",
       "//net",
       "//services/network/public/cpp",
       "//services/network/public/mojom",
@@ -189,16 +174,12 @@ if (!is_android) {
 
   source_set("unit_tests") {
     testonly = true
-    sources = [
-      "profile_resetter_unittest.cc",
-      "reset_report_uploader_unittest.cc",
-    ]
+    sources = [ "profile_resetter_unittest.cc" ]
     if (is_win) {
       sources += [ "triggered_profile_resetter_win_unittest.cc" ]
     }
     deps = [
       ":impl",
-      ":profile_reset_report_proto",
       ":profile_resetter",
       ":profile_resetter_test_base",
       "//base",

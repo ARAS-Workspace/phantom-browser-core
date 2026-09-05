@@ -8,34 +8,14 @@ import {sendWithPromise} from 'chrome://resources/js/cr.js';
 
 export interface ResetBrowserProxy {
   /**
-   * @param sendSettings Whether the user gave consent to upload broken settings
-   *     to Google for analysis.
-   * @param requestOrigin The origin of the reset request.
    * @return A promise firing once resetting has completed.
    */
-  performResetProfileSettings(sendSettings: boolean, requestOrigin: string):
-      Promise<void>;
-
-  /**
-   * A method to be called when the reset profile dialog is hidden.
-   */
-  onHideResetProfileDialog(): void;
+  performResetProfileSettings(): Promise<void>;
 
   /**
    * A method to be called when the reset profile banner is hidden.
    */
   onHideResetProfileBanner(): void;
-
-  /**
-   * A method to be called when the reset profile dialog is shown.
-   */
-  onShowResetProfileDialog(): void;
-
-  /**
-   * Shows the settings that are about to be reset and which will be reported
-   * to Google for analysis, in a new tab.
-   */
-  showReportedSettings(): void;
 
   /**
    * Retrieves the triggered reset tool name.
@@ -50,35 +30,12 @@ export interface ResetBrowserProxy {
 }
 
 export class ResetBrowserProxyImpl implements ResetBrowserProxy {
-  performResetProfileSettings(sendSettings: boolean, requestOrigin: string) {
-    return sendWithPromise<void>(
-        'performResetProfileSettings', sendSettings, requestOrigin);
-  }
-
-  onHideResetProfileDialog() {
-    chrome.send('onHideResetProfileDialog');
+  performResetProfileSettings() {
+    return sendWithPromise<void>('performResetProfileSettings');
   }
 
   onHideResetProfileBanner() {
     chrome.send('onHideResetProfileBanner');
-  }
-
-  onShowResetProfileDialog() {
-    chrome.send('onShowResetProfileDialog');
-  }
-
-  showReportedSettings() {
-    sendWithPromise<Array<{key: string, value: string}>>('getReportedSettings')
-        .then(function(settings: Array<{key: string, value: string}>) {
-          const output = settings.map(function(entry) {
-            return entry.key + ': ' + entry.value.replace(/\n/g, ', ');
-          });
-          const win = window.open('about:blank')!;
-          const div = win.document.createElement('div');
-          div.textContent = output.join('\n');
-          div.style.whiteSpace = 'pre';
-          win.document.body.appendChild(div);
-        });
   }
 
   getTriggeredResetToolName(): Promise<string> {

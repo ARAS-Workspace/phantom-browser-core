@@ -16,7 +16,6 @@ import 'chrome://resources/cr_elements/cr_dialog/cr_dialog.js';
 import 'chrome://resources/js/action_link.js';
 
 import type {CrButtonElement} from 'chrome://resources/cr_elements/cr_button/cr_button.js';
-import type {CrCheckboxElement} from 'chrome://resources/cr_elements/cr_checkbox/cr_checkbox.js';
 import type {CrDialogElement} from 'chrome://resources/cr_elements/cr_dialog/cr_dialog.js';
 import {I18nMixinLit} from 'chrome://resources/cr_elements/i18n_mixin_lit.js';
 import {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
@@ -35,7 +34,6 @@ export interface SettingsResetProfileDialogElement {
     cancel: CrButtonElement,
     dialog: CrDialogElement,
     reset: CrButtonElement,
-    sendSettings: CrCheckboxElement,
   };
 }
 
@@ -74,15 +72,6 @@ export class SettingsResetProfileDialogElement extends
   private browserProxy_: ResetBrowserProxy =
       ResetBrowserProxyImpl.getInstance();
 
-  override firstUpdated() {
-    this.addEventListener('cancel', () => {
-      this.browserProxy_.onHideResetProfileDialog();
-    });
-
-    this.shadowRoot.querySelector('cr-checkbox a')!.addEventListener(
-        'click', this.onShowReportedSettingsClick_.bind(this));
-  }
-
   protected getExplanationText_(): TrustedHTML {
     if (this.isTriggered_) {
       return this.i18nAdvanced(
@@ -107,7 +96,6 @@ export class SettingsResetProfileDialogElement extends
     if (!this.$.dialog.open) {
       this.$.dialog.showModal();
     }
-    this.browserProxy_.onShowResetProfileDialog();
   }
 
   show() {
@@ -138,24 +126,13 @@ export class SettingsResetProfileDialogElement extends
 
   protected onResetClick_() {
     this.clearingInProgress_ = true;
-    this.browserProxy_
-        .performResetProfileSettings(
-            this.$.sendSettings.checked, this.resetRequestOrigin_)
-        .then(() => {
-          this.clearingInProgress_ = false;
-          if (this.$.dialog.open) {
-            this.$.dialog.close();
-          }
-          this.fire('reset-done');
-        });
-  }
-
-  /**
-   * Displays the settings that will be reported in a new tab.
-   */
-  private onShowReportedSettingsClick_(e: Event) {
-    this.browserProxy_.showReportedSettings();
-    e.stopPropagation();
+    this.browserProxy_.performResetProfileSettings().then(() => {
+      this.clearingInProgress_ = false;
+      if (this.$.dialog.open) {
+        this.$.dialog.close();
+      }
+      this.fire('reset-done');
+    });
   }
 }
 

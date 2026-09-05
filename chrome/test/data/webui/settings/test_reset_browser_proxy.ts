@@ -14,10 +14,7 @@ export class TestResetBrowserProxy extends TestBrowserProxy implements
   constructor() {
     super([
       'performResetProfileSettings',
-      'onHideResetProfileDialog',
       'onHideResetProfileBanner',
-      'onShowResetProfileDialog',
-      'showReportedSettings',
       'getTriggeredResetToolName',
       'getTamperedPreferencePaths',
     ]);
@@ -32,8 +29,8 @@ export class TestResetBrowserProxy extends TestBrowserProxy implements
     this.tamperedPreferencePaths_ = paths;
   }
 
-  performResetProfileSettings(_sendSettings: boolean, requestOrigin: string) {
-    this.methodCalled('performResetProfileSettings', requestOrigin);
+  performResetProfileSettings() {
+    this.methodCalled('performResetProfileSettings');
     if (this.performResetProfileSettingsPromise_) {
       return this.performResetProfileSettingsPromise_;
     }
@@ -54,20 +51,8 @@ export class TestResetBrowserProxy extends TestBrowserProxy implements
     }
   }
 
-  onHideResetProfileDialog() {
-    this.methodCalled('onHideResetProfileDialog');
-  }
-
   onHideResetProfileBanner() {
     this.methodCalled('onHideResetProfileBanner');
-  }
-
-  onShowResetProfileDialog() {
-    this.methodCalled('onShowResetProfileDialog');
-  }
-
-  showReportedSettings() {
-    this.methodCalled('showReportedSettings');
   }
 
   getTriggeredResetToolName() {

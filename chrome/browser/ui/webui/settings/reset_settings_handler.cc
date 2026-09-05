@@ -47,29 +47,6 @@
 
 namespace settings {
 
-namespace {
-
-reset_report::ChromeResetReport::ResetRequestOrigin
-ResetRequestOriginFromString(const std::string& request_origin) {
-  static const char kOriginUserClick[] = "userclick";
-  static const char kOriginTriggeredReset[] = "triggeredreset";
-
-  if (request_origin == kOriginUserClick) {
-    return reset_report::ChromeResetReport::RESET_REQUEST_ORIGIN_USER_CLICK;
-  }
-  if (request_origin == kOriginTriggeredReset) {
-    return reset_report::ChromeResetReport::
-        RESET_REQUEST_ORIGIN_TRIGGERED_RESET;
-  }
-  if (!request_origin.empty()) {
-    NOTREACHED();
-  }
-
-  return reset_report::ChromeResetReport::RESET_REQUEST_ORIGIN_UNKNOWN;
-}
-
-}  // namespace
-
 #if BUILDFLAG(IS_CHROMEOS)
 // static
 const char ResetSettingsHandler::kCctResetSettingsHash[] = "cct";
@@ -113,22 +90,10 @@ void ResetSettingsHandler::RegisterMessages() {
       base::BindRepeating(&ResetSettingsHandler::HandleResetProfileSettings,
                           base::Unretained(this)));
   web_ui()->RegisterMessageCallback(
-      "onShowResetProfileDialog",
-      base::BindRepeating(&ResetSettingsHandler::OnShowResetProfileDialog,
-                          base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "getReportedSettings",
-      base::BindRepeating(&ResetSettingsHandler::HandleGetReportedSettings,
-                          base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
       "getTamperedPreferencePaths",
       base::BindRepeating(
           &ResetSettingsHandler::HandleGetTamperedPreferencePaths,
           base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "onHideResetProfileDialog",
-      base::BindRepeating(&ResetSettingsHandler::OnHideResetProfileDialog,
-                          base::Unretained(this)));
   web_ui()->RegisterMessageCallback(
       "onHideResetProfileBanner",
       base::BindRepeating(&ResetSettingsHandler::OnHideResetProfileBanner,
@@ -150,47 +115,14 @@ void ResetSettingsHandler::HandleResetProfileSettings(
     const base::ListValue& args) {
   AllowJavascript();
 
-  CHECK_EQ(3U, args.size());
-  const std::string& callback_id = args[0].GetString();
-  const bool& send_settings = args[1].GetBool();
-  const std::string& request_origin_string = args[2].GetString();
-  reset_report::ChromeResetReport::ResetRequestOrigin request_origin =
-      ResetRequestOriginFromString(request_origin_string);
-
-  ResetProfile(callback_id, send_settings, request_origin);
-}
-
-void ResetSettingsHandler::OnResetProfileSettingsDone(
-    std::string callback_id,
-    bool send_feedback,
-    reset_report::ChromeResetReport::ResetRequestOrigin request_origin) {
-  ResolveJavascriptCallback(base::Value(callback_id), base::Value());
-  if (send_feedback && setting_snapshot_) {
-    ResettableSettingsSnapshot current_snapshot(profile_);
-    int difference = setting_snapshot_->FindDifferentFields(current_snapshot);
-    if (difference) {
-      setting_snapshot_->Subtract(current_snapshot);
-      std::unique_ptr<reset_report::ChromeResetReport> report_proto =
-          SerializeSettingsReportToProto(*setting_snapshot_, difference);
-      if (report_proto) {
-        report_proto->set_reset_request_origin(request_origin);
-        SendSettingsFeedbackProto(*report_proto, profile_);
-      }
-    }
-  }
-  setting_snapshot_.reset();
-}
-
-void ResetSettingsHandler::HandleGetReportedSettings(
-    const base::ListValue& args) {
-  AllowJavascript();
-
   CHECK_EQ(1U, args.size());
   const std::string& callback_id = args[0].GetString();
 
-  setting_snapshot_->RequestShortcuts(
-      base::BindOnce(&ResetSettingsHandler::OnGetReportedSettingsDone,
-                     callback_weak_ptr_factory_.GetWeakPtr(), callback_id));
+  ResetProfile(callback_id);
+}
+
+void ResetSettingsHandler::OnResetProfileSettingsDone(std::string callback_id) {
+  ResolveJavascriptCallback(base::Value(callback_id), base::Value());
 }
 
 void ResetSettingsHandler::HandleGetTamperedPreferencePaths(
@@ -250,41 +182,17 @@ void ResetSettingsHandler::HandleGetTamperedPreferencePaths(
   ResolveJavascriptCallback(callback_id, result);
 }
 
-void ResetSettingsHandler::OnGetReportedSettingsDone(std::string callback_id) {
-  base::ListValue list =
-      GetReadableFeedbackForSnapshot(profile_, *setting_snapshot_);
-  ResolveJavascriptCallback(base::Value(callback_id), list);
-}
-
-void ResetSettingsHandler::OnShowResetProfileDialog(
-    const base::ListValue& args) {
-  if (!GetResetter()->IsActive()) {
-    setting_snapshot_ = std::make_unique<ResettableSettingsSnapshot>(profile_);
-  }
-}
-
-void ResetSettingsHandler::OnHideResetProfileDialog(
-    const base::ListValue& args) {
-  if (!GetResetter()->IsActive()) {
-    setting_snapshot_.reset();
-  }
-}
-
 void ResetSettingsHandler::OnHideResetProfileBanner(
     const base::ListValue& args) {
   chrome_prefs::ClearResetTime(profile_);
   chrome_prefs::ClearTamperedPrefList(profile_);
 }
 
-void ResetSettingsHandler::ResetProfile(
-    const std::string& callback_id,
-    bool send_settings,
-    reset_report::ChromeResetReport::ResetRequestOrigin request_origin) {
+void ResetSettingsHandler::ResetProfile(const std::string& callback_id) {
   GetResetter()->ResetSettings(
       ProfileResetter::PROFILE_RESETS, nullptr,
       base::BindOnce(&ResetSettingsHandler::OnResetProfileSettingsDone,
-                     callback_weak_ptr_factory_.GetWeakPtr(), callback_id,
-                     send_settings, request_origin));
+                     callback_weak_ptr_factory_.GetWeakPtr(), callback_id));
 
   base::RecordAction(base::UserMetricsAction("ResetProfile"));
 }

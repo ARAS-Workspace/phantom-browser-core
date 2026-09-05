@@ -4079,7 +4079,6 @@ group("browser_generated_files") {
       "//chrome/browser/new_tab_page/modules/v2/calendar:mojo_bindings",
       "//chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption:mojo_bindings",
       "//chrome/browser/new_tab_page/modules/v2/tab_groups:mojo_bindings",
-      "//chrome/browser/profile_resetter:profile_reset_report_proto",
       "//chrome/browser/share/proto",
       "//chrome/browser/support_tool:support_tool_proto",
       "//chrome/browser/sync_file_system/drive_backend:sync_file_system_drive_proto",

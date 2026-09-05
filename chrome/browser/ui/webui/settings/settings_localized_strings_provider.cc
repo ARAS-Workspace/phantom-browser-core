@@ -525,7 +525,6 @@ void AddResetStrings(content::WebUIDataSource* html_source, Profile* profile) {
       {"triggeredResetPageTitle", IDS_TRIGGERED_RESET_PROFILE_SETTINGS_TITLE},
       {"resetDialogTitle", IDS_SETTINGS_RESET_PROMPT_TITLE},
       {"resetDialogCommit", IDS_SETTINGS_RESET},
-      {"resetPageFeedback", IDS_SETTINGS_RESET_PROFILE_FEEDBACK},
 
       // Automatic reset banner (now a dialog).
       {"resetAutomatedDialogTitle",

@@ -7,7 +7,6 @@
 #include "base/value_iterators.h"
 #include "chrome/browser/apps/app_service/app_icon_source.h"
 #include "chrome/browser/extensions/extension_util.h"
-#include "chrome/browser/profile_resetter/resettable_settings_snapshot.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/web_applications/web_app_browsertest_base.h"

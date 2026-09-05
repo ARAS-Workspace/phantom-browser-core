@@ -29,11 +29,6 @@ export function getHtml(this: SettingsResetProfileDialogElement) {
       $i18n{resetDialogCommit}
     </cr-button>
   </div>
-  <div slot="footer">
-    <cr-checkbox id="sendSettings" checked>
-      $i18nRaw{resetPageFeedback}
-    </cr-checkbox>
-  </div>
 </cr-dialog>
 <!--_html_template_end_-->`;
   // clang-format on

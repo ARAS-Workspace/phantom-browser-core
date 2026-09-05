@@ -62,7 +62,6 @@ export class SettingsResetProfileBannerElement extends
         this.tamperedPrefs = prefs;
         this.showTamperedPrefsList = true;
         this.$.dialog.showModal();
-        this.browserProxy_.onShowResetProfileDialog();
       }
     });
   }
