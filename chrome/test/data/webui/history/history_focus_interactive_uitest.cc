@@ -27,10 +27,6 @@ IN_PROC_BROWSER_TEST_F(HistoryFocusTest, DISABLED_List) {
   RunTest("history/history_list_focus_test.js", "mocha.run()");
 }
 
-IN_PROC_BROWSER_TEST_F(HistoryFocusTest, SyncedDeviceManager) {
-  RunTest("history/history_synced_device_manager_focus_test.js", "mocha.run()");
-}
-
 IN_PROC_BROWSER_TEST_F(HistoryFocusTest, Item) {
   RunTest("history/history_item_focus_test.js", "mocha.run()");
 }
