@@ -2057,67 +2057,8 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
 
 void AddSafetyHubStrings(content::WebUIDataSource* html_source) {
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
-      {"safetyHub", IDS_SETTINGS_SAFETY_HUB},
-      {"safetyHubPageCardSectionHeader",
-       IDS_SETTINGS_SAFETY_HUB_PAGE_CARD_SECTION_HEADER},
-      {"safetyHubPageModuleSectionHeader",
-       IDS_SETTINGS_SAFETY_HUB_PAGE_MODULE_SECTION_HEADER},
-      {"safetyHubEmptyStateModuleHeader",
-       IDS_SETTINGS_SAFETY_HUB_EMPTY_STATE_MODULE_HEADER},
-      {"safetyHubEmptyStateModuleSubheader",
-       IDS_SETTINGS_SAFETY_HUB_EMPTY_STATE_MODULE_SUBHEADER},
-      {"safetyHubGoSiteSettingsItem",
-       IDS_SETTINGS_SAFETY_HUB_GO_SITE_SETTINGS_ITEM},
-      {"safetyHubGoNotificationSettingsItem",
-       IDS_SETTINGS_SAFETY_HUB_GO_NOTIFICATION_SETTINGS_ITEM},
-      {"safetyHubSBNavigationAriaLabel",
-       IDS_SETTINGS_SAFETY_HUB_SB_NAVIGATION_ARIA_LABEL},
-      {"safetyHubReview", IDS_SETTINGS_SAFETY_CHECK_REVIEW},
-      {"safetyHubNotificationPermissionReviewIgnoredToastLabel",
-       IDS_SETTINGS_SAFETY_CHECK_NOTIFICATION_PERMISSION_REVIEW_IGNORED_TOAST_LABEL},
-      {"safetyHubNotificationPermissionReviewBlockedToastLabel",
-       IDS_SETTINGS_SAFETY_CHECK_NOTIFICATION_PERMISSION_REVIEW_BLOCKED_TOAST_LABEL},
-      {"safetyHubNotificationPermissionReviewResetToastLabel",
-       IDS_SETTINGS_SAFETY_CHECK_NOTIFICATION_PERMISSION_REVIEW_RESET_TOAST_LABEL},
-      {"safetyHubNotificationPermissionReviewDontAllowLabel",
-       IDS_SETTINGS_SAFETY_CHECK_REVIEW_NOTIFICATION_PERMISSIONS_DONT_ALLOW_LABEL},
-      {"safetyHubNotificationPermissionReviewDontAllowAriaLabel",
-       IDS_SETTINGS_SAFETY_CHECK_REVIEW_NOTIFICATION_PERMISSIONS_DONT_ALLOW_ARIA_LABEL},
-      {"safetyHubNotificationPermissionReviewIgnoreLabel",
-       IDS_SETTINGS_SAFETY_CHECK_REVIEW_NOTIFICATION_PERMISSIONS_IGNORE_LABEL},
-      {"safetyHubNotificationPermissionReviewIgnoreAriaLabel",
-       IDS_SETTINGS_SAFETY_CHECK_REVIEW_NOTIFICATION_PERMISSIONS_IGNORE_ARIA_LABEL},
-      {"safetyHubNotificationPermissionReviewResetLabel",
-       IDS_SETTINGS_SAFETY_CHECK_REVIEW_NOTIFICATION_PERMISSIONS_RESET_LABEL},
-      {"safetyHubNotificationPermissionReviewResetAriaLabel",
-       IDS_SETTINGS_SAFETY_CHECK_REVIEW_NOTIFICATION_PERMISSIONS_RESET_ARIA_LABEL},
-      {"safetyHubNotificationPermissionReviewMoreActionsAriaLabel",
-       IDS_SETTINGS_SAFETY_CHECK_REVIEW_NOTIFICATION_PERMISSIONS_MORE_ACTIONS_ARIA_LABEL},
-      {"safetyHubNotificationPermissionReviewUndo",
-       IDS_SETTINGS_SAFETY_CHECK_TOAST_UNDO_BUTTON_LABEL},
-      {"safetyHubNotificationPermissionReviewBlockAllLabel",
-       IDS_SETTINGS_SAFETY_CHECK_NOTIFICATION_PERMISSION_REVIEW_BLOCK_ALL_LABEL},
-      {"safetyHubUnusedSitePermissionsAllowAgainAriaLabel",
-       IDS_SETTINGS_SAFETY_CHECK_UNUSED_SITE_PERMISSIONS_ALLOW_AGAIN_ARIA_LABEL},
-      {"safetyHubUnusedSitePermissionsAllowAgainLabel",
-       IDS_SETTINGS_SAFETY_CHECK_UNUSED_SITE_PERMISSIONS_ALLOW_AGAIN_LABEL},
-      {"safetyHubUnusedSitePermissionsGotItLabel", IDS_SETTINGS_GOT_IT},
-      {"safetyHubUnusedSitePermissionsRemovedOnePermissionLabel",
-       IDS_SETTINGS_SAFETY_HUB_UNUSED_SITE_PERMISSIONS_REMOVED_ONE_PERMISSION_LABEL},
-      {"safetyHubUnusedSitePermissionsRemovedTwoPermissionsLabel",
-       IDS_SETTINGS_SAFETY_HUB_UNUSED_SITE_PERMISSIONS_REMOVED_TWO_PERMISSIONS_LABEL},
-      {"safetyHubUnusedSitePermissionsRemovedThreePermissionsLabel",
-       IDS_SETTINGS_SAFETY_HUB_UNUSED_SITE_PERMISSIONS_REMOVED_THREE_PERMISSIONS_LABEL},
-      {"safetyHubUnusedSitePermissionsRemovedFourOrMorePermissionsLabel",
-       IDS_SETTINGS_SAFETY_HUB_UNUSED_SITE_PERMISSIONS_REMOVED_FOUR_OR_MORE_PERMISSIONS_LABEL},
-      {"safetyHubUnusedSitePermissionsToastLabel",
-       IDS_SETTINGS_SAFETY_CHECK_UNUSED_SITE_PERMISSIONS_TOAST_LABEL},
-      {"safetyHubUnusedSitePermissionsUndoLabel",
-       IDS_SETTINGS_SAFETY_CHECK_TOAST_UNDO_BUTTON_LABEL},
       {"safetyHubUnusedSitePermissionsSettingLabel",
        IDS_SETTINGS_SAFETY_CHECK_UNUSED_SITE_PERMISSIONS_SETTING_LABEL},
-      {"safetyHubAbusiveNotificationPermissionsSettingSublabel",
-       IDS_SETTINGS_SAFETY_HUB_ABUSIVE_NOTIFICATION_PERMISSIONS_SETTING_SUBLABEL},
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
 
@@ -2131,9 +2072,6 @@ void AddSafetyHubStrings(content::WebUIDataSource* html_source) {
           is_disruptive_notification_revocation_enabled
               ? IDS_SETTINGS_SAFETY_CHECK_UNUSED_SITE_PERMISSIONS_AND_NOTIFICATIONS_SETTING_SUBLABEL
               : IDS_SETTINGS_SAFETY_CHECK_UNUSED_SITE_PERMISSIONS_SETTING_SUBLABEL));
-
-  html_source->AddString("safetyHubHelpCenterURL",
-                         chrome::kSafetyHubHelpCenterURL);
 }
 
 void AddSearchInSettingsStrings(content::WebUIDataSource* html_source) {

@@ -20,9 +20,6 @@ function addPrivacyChildRoutes(r: Partial<SettingsRoutes>) {
 
   const visibility = pageVisibility || {};
 
-  if (visibility.safetyHub !== false) {
-    r.SAFETY_HUB = r.PRIVACY.createChild('/safetyCheck');
-  }
   r.SITE_SETTINGS = r.PRIVACY.createChild('/content');
   r.SECURITY = r.PRIVACY.createChild('/security');
 

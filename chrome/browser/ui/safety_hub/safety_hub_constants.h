@@ -68,7 +68,6 @@ extern const char kBlocklistCheckCountHistogramName[];
 
 // State that a top card in the Safety Hub page can be in. This enum should
 // remain sorted from the "worst" state (warning) to the "best" state (safe).
-// LINT.IfChange(SafetyHubCardState)
 enum class SafetyHubCardState {
   kWarning = 0,
   kWeak = 1,
@@ -76,10 +75,6 @@ enum class SafetyHubCardState {
   kSafe = 3,
   kMaxValue = kSafe,
 };
-// LINT.ThenChange(
-//   //chrome/browser/resources/settings/safety_hub/safety_hub_browser_proxy.ts:CardState,
-//   //chrome/browser/resources/settings/metrics_browser_proxy.ts:SafetyHubCardState
-// )
 
 // Smallest time duration between two subsequent password checks.
 extern const base::TimeDelta kMinTimeBetweenPasswordChecks;
@@ -101,7 +96,6 @@ enum class SafetyHubModuleType {
   kMaxValue = VERSION,
 };
 // LINT.ThenChange(
-//   //chrome/browser/resources/settings/metrics_browser_proxy.ts:SafetyHubModuleType,
 //   //tools/metrics/histograms/metadata/settings/enums.xml:SafetyHubModuleType
 // )
 
@@ -125,7 +119,6 @@ enum class SafetyHubSurfaces {
   kMaxValue = kSafetyHubPage,
 };
 // LINT.ThenChange(
-//   //chrome/browser/resources/settings/metrics_browser_proxy.ts:SafetyHubSurfaces,
 //   //tools/metrics/histograms/metadata/settings/enums.xml:SafetyHubSurfaces
 // )
 

@@ -103,11 +103,6 @@ suite('PrivacyPageIndex', function() {
         {route: routes.CLEAR_BROWSER_DATA, viewId: 'privacy'},
         {route: routes.COOKIES, viewId: 'cookies', parentViewId: 'privacy'},
         {
-          route: routes.SAFETY_HUB,
-          viewId: 'safetyHub',
-          parentViewId: 'privacy',
-        },
-        {
           route: routes.SECURITY,
           viewId: 'security',
           parentViewId: 'privacy',

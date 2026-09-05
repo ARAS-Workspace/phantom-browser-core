@@ -60,7 +60,6 @@
 #include "chrome/browser/ui/webui/settings/profile_info_handler.h"
 #include "chrome/browser/ui/webui/settings/protocol_handlers_handler.h"
 #include "chrome/browser/ui/webui/settings/reset_settings_handler.h"
-#include "chrome/browser/ui/webui/settings/safety_hub_handler.h"
 #include "chrome/browser/ui/webui/settings/search_engines_handler.h"
 #include "chrome/browser/ui/webui/settings/security_settings_provider.h"
 #include "chrome/browser/ui/webui/settings/settings_clear_browsing_data_handler.h"
@@ -223,7 +222,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
   AddSettingsPageUIHandler(std::make_unique<BrowserLifetimeHandler>());
   AddSettingsPageUIHandler(
       std::make_unique<ClearBrowsingDataHandler>(web_ui, profile));
-  AddSettingsPageUIHandler(std::make_unique<SafetyHubHandler>(profile));
   AddSettingsPageUIHandler(std::make_unique<DictationHandler>());
   AddSettingsPageUIHandler(std::make_unique<DownloadsHandler>(profile));
   AddSettingsPageUIHandler(std::make_unique<ExtensionControlHandler>());
@@ -375,30 +373,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
 
   // Add a handler to provide pluralized strings.
   auto plural_string_handler = std::make_unique<PluralStringHandler>();
-  plural_string_handler->AddLocalizedString(
-      "safetyHubExtensionsReviewLabel",
-      IDS_SETTINGS_SAFETY_CHECK_REVIEW_EXTENSIONS);
-  plural_string_handler->AddLocalizedString(
-      "safetyHubNotificationPermissionReviewBlockAllToastLabel",
-      IDS_SETTINGS_SAFETY_CHECK_NOTIFICATION_PERMISSION_REVIEW_BLOCK_ALL_TOAST_LABEL);
-  plural_string_handler->AddLocalizedString(
-      "safetyHubUnusedSitePermissionsPrimaryLabel",
-      IDS_SETTINGS_SAFETY_CHECK_UNUSED_SITE_PERMISSIONS_PRIMARY_LABEL);
-  plural_string_handler->AddLocalizedString(
-      "safetyHubUnusedSitePermissionsSecondaryLabel",
-      IDS_SETTINGS_SAFETY_CHECK_UNUSED_SITE_PERMISSIONS_SECONDARY_LABEL);
-  plural_string_handler->AddLocalizedString(
-      "safetyHubRevokedPermissionsSecondaryLabel",
-      IDS_SETTINGS_SAFETY_HUB_REVOKED_PERMISSIONS_SECONDARY_LABEL);
-  plural_string_handler->AddLocalizedString(
-      "safetyHubUnusedSitePermissionsToastBulkLabel",
-      IDS_SETTINGS_SAFETY_CHECK_UNUSED_SITE_PERMISSIONS_TOAST_BULK_LABEL);
-  plural_string_handler->AddLocalizedString(
-      "safetyHubNotificationPermissionsPrimaryLabel",
-      IDS_SETTINGS_SAFETY_HUB_NOTIFICATION_PERMISSIONS_PRIMARY_LABEL);
-  plural_string_handler->AddLocalizedString(
-      "safetyHubNotificationPermissionsSecondaryLabel",
-      IDS_SETTINGS_SAFETY_HUB_NOTIFICATION_PERMISSIONS_SECONDARY_LABEL);
   plural_string_handler->AddLocalizedString("cpuPerformanceCores",
                                             IDS_SETTINGS_CPU_PERFORMANCE_CORES);
   web_ui->AddMessageHandler(std::move(plural_string_handler));

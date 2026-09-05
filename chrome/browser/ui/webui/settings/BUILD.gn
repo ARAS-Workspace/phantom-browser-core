@@ -30,7 +30,6 @@ source_set("settings") {
     "protocol_handlers_handler.h",
     "recent_site_settings_helper.h",
     "reset_settings_handler.h",
-    "safety_hub_handler.h",
     "search_engines_handler.h",
     "security_settings_provider.h",
     "settings_clear_browsing_data_handler.h",
@@ -120,8 +119,6 @@ source_set("settings") {
       "//chrome/browser/ui/webui/help",
     ]
   }
-
-  allow_circular_includes_from = [ "//chrome/browser/ui/safety_hub" ]
 }
 
 source_set("impl") {
@@ -147,7 +144,6 @@ source_set("impl") {
     "protocol_handlers_handler.cc",
     "recent_site_settings_helper.cc",
     "reset_settings_handler.cc",
-    "safety_hub_handler.cc",
     "search_engines_handler.cc",
     "security_settings_provider.cc",
     "settings_clear_browsing_data_handler.cc",
@@ -482,7 +478,6 @@ if (!is_android) {
       "profile_info_handler_unittest.cc",
       "recent_site_settings_helper_unittest.cc",
       "reset_settings_handler_unittest.cc",
-      "safety_hub_handler_unittest.cc",
       "search_engines_handler_unittest.cc",
       "settings_media_devices_selection_handler_unittest.cc",
       "settings_utils_unittest.cc",

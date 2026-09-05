@@ -25,7 +25,6 @@ struct ContentSettingEntry {
 
 // A Java counterpart will be generated for this enum.
 // GENERATED_JAVA_ENUM_PACKAGE: org.chromium.chrome.browser.safety_hub
-// LINT.IfChange(PermissionsRevocationType)
 enum class PermissionsRevocationType {
   kUnusedPermissions,
   kAbusiveNotificationPermissions,
@@ -35,7 +34,6 @@ enum class PermissionsRevocationType {
   kSuspiciousNotificationPermissions,
   kUnusedPermissionsAndSuspiciousNotifications,
 };
-// LINT.ThenChange(//chrome/browser/resources/settings/safety_hub/safety_hub_browser_proxy.ts:PermissionsRevocationType)
 
 // Class to store data about unused permissions for a given origin.
 struct PermissionsData {

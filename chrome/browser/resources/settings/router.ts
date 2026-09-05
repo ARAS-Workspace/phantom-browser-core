@@ -52,7 +52,6 @@ export interface SettingsRoutes {
   PRIVACY_GUIDE: Route;
   RESET: Route;
   RESET_DIALOG: Route;
-  SAFETY_HUB: Route;
   SEARCH: Route;
   SEARCH_ENGINES: Route;
   SECURITY: Route;

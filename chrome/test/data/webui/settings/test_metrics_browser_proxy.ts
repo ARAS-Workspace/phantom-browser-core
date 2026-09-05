@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import {SuggestionsFromGeminiAction, SuggestionsFromGeminiEntryPoint, YourSavedInfoDataCategory, YourSavedInfoDataChip, YourSavedInfoRelatedService} from 'chrome://settings/settings.js';
-import type {AiPageComposeInteractions, AiPageHistorySearchInteractions, AiPageInteractions, AiPageSuggestionsInteractions, AutofillSettingsReferrer, DeleteBrowsingDataAction, MetricsBrowserProxy, PrivacyElementInteractions, PrivacyGuideInteractions, PrivacyGuideSettingsStates, PrivacyGuideStepsEligibleAndReached, SafetyCheckNotificationsModuleInteractions, SafetyCheckUnusedSitePermissionsModuleInteractions, SafetyHubCardState, SafetyHubModuleType, SafetyHubSurfaces} from 'chrome://settings/settings.js';
+import type {AiPageComposeInteractions, AiPageHistorySearchInteractions, AiPageInteractions, AiPageSuggestionsInteractions, AutofillSettingsReferrer, DeleteBrowsingDataAction, MetricsBrowserProxy, PrivacyElementInteractions, PrivacyGuideInteractions, PrivacyGuideSettingsStates, PrivacyGuideStepsEligibleAndReached} from 'chrome://settings/settings.js';
 import {TestBrowserProxy} from 'chrome://webui-test/test_browser_proxy.js';
 
 export class TestMetricsBrowserProxy extends TestBrowserProxy implements
@@ -19,16 +19,6 @@ export class TestMetricsBrowserProxy extends TestBrowserProxy implements
       'recordPrivacyGuideSettingsStatesHistogram',
       'recordPrivacyGuideStepsEligibleAndReachedHistogram',
       'recordDeleteBrowsingDataAction',
-      'recordSafetyHubAbusiveNotificationPermissionRevocationInteractionsHistogram',
-      'recordSafetyHubCardStateClicked',
-      'recordSafetyHubDashboardAnyWarning',
-      'recordSafetyHubImpression',
-      'recordSafetyHubInteraction',
-      'recordSafetyHubModuleWarningImpression',
-      'recordSafetyHubNotificationPermissionsModuleInteractionsHistogram',
-      'recordSafetyHubNotificationPermissionsModuleListCountHistogram',
-      'recordSafetyHubUnusedSitePermissionsModuleInteractionsHistogram',
-      'recordSafetyHubUnusedSitePermissionsModuleListCountHistogram',
       // <if expr="_google_chrome and is_win">
       'recordFeatureNotificationsChange',
       // </if>
@@ -88,63 +78,6 @@ export class TestMetricsBrowserProxy extends TestBrowserProxy implements
 
   recordDeleteBrowsingDataAction(action: DeleteBrowsingDataAction) {
     this.methodCalled('recordDeleteBrowsingDataAction', action);
-  }
-
-  recordSafetyHubAbusiveNotificationPermissionRevocationInteractionsHistogram(
-      interaction: SafetyCheckUnusedSitePermissionsModuleInteractions) {
-    this.methodCalled(
-        'recordSafetyHubAbusiveNotificationPermissionRevocationInteractionsHistogram',
-        interaction);
-  }
-
-  recordSafetyHubCardStateClicked(
-      histogramName: string, state: SafetyHubCardState) {
-    this.methodCalled(
-        'recordSafetyHubCardStateClicked', [histogramName, state]);
-  }
-
-  recordSafetyHubDashboardAnyWarning(visible: boolean) {
-    this.methodCalled('recordSafetyHubDashboardAnyWarning', visible);
-  }
-
-  recordSafetyHubImpression(surface: SafetyHubSurfaces) {
-    this.methodCalled('recordSafetyHubImpression', surface);
-  }
-
-  recordSafetyHubInteraction(surface: SafetyHubSurfaces) {
-    this.methodCalled('recordSafetyHubInteraction', surface);
-  }
-
-  recordSafetyHubModuleWarningImpression(module: SafetyHubModuleType) {
-    this.methodCalled('recordSafetyHubModuleWarningImpression', module);
-  }
-
-  recordSafetyHubNotificationPermissionsModuleInteractionsHistogram(
-      interaction: SafetyCheckNotificationsModuleInteractions) {
-    this.methodCalled(
-        'recordSafetyHubNotificationPermissionsModuleInteractionsHistogram',
-        interaction);
-  }
-
-  recordSafetyHubNotificationPermissionsModuleListCountHistogram(
-      suggestions: number) {
-    this.methodCalled(
-        'recordSafetyHubNotificationPermissionsModuleListCountHistogram',
-        suggestions);
-  }
-
-  recordSafetyHubUnusedSitePermissionsModuleInteractionsHistogram(
-      interaction: SafetyCheckUnusedSitePermissionsModuleInteractions) {
-    this.methodCalled(
-        'recordSafetyHubUnusedSitePermissionsModuleInteractionsHistogram',
-        interaction);
-  }
-
-  recordSafetyHubUnusedSitePermissionsModuleListCountHistogram(
-      suggestions: number) {
-    this.methodCalled(
-        'recordSafetyHubUnusedSitePermissionsModuleListCountHistogram',
-        suggestions);
   }
 
   // <if expr="_google_chrome and is_win">

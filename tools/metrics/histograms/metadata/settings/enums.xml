@@ -216,8 +216,6 @@ chromium-metrics-reviews@google.com.
   <int value="2" label="Extended preloading"/>
 </enum>
 
-<!-- LINT.IfChange(SafetyCheckNotificationsModuleInteractions) -->
-
 <enum name="SafetyCheckNotificationsModuleInteractions">
   <int value="0" label="Block"/>
   <int value="1" label="Block all"/>
@@ -231,8 +229,6 @@ chromium-metrics-reviews@google.com.
   <int value="9" label="Undo block all"/>
   <int value="10" label="Go to settings"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/resources/settings/metrics_browser_proxy.ts:SafetyCheckNotificationsModuleInteractions) -->
 
 <enum name="SafetyCheckPasswordsStatus">
   <int value="0" label="CHECKING"/>
@@ -260,8 +256,6 @@ chromium-metrics-reviews@google.com.
   <int value="7" label="ENABLED_STANDARD_AVAILABLE_ENHANCED"/>
 </enum>
 
-<!-- LINT.IfChange(SafetyCheckUnusedSitePermissionsModuleInteractions) -->
-
 <enum name="SafetyCheckUnusedSitePermissionsModuleInteractions">
   <int value="0" label="Open review UI"/>
   <int value="1" label="Allow again"/>
@@ -271,8 +265,6 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="Minimize review UI"/>
   <int value="6" label="Go to settings"/>
 </enum>
-
-<!-- LINT.ThenChange(//chrome/browser/resources/settings/metrics_browser_proxy.ts:SafetyCheckUnusedSitePermissionsModuleInteractions) -->
 
 <enum name="SafetyCheckUpdateStatus">
   <int value="0" label="CHECKING"/>
@@ -286,20 +278,12 @@ chromium-metrics-reviews@google.com.
   <int value="8" label="OUTDATED"/>
 </enum>
 
-<!-- LINT.IfChange(SafetyHubCardState) -->
-
 <enum name="SafetyHubCardState">
   <int value="0" label="WARNING"/>
   <int value="1" label="WEAK"/>
   <int value="2" label="INFO"/>
   <int value="3" label="SAFE"/>
 </enum>
-
-<!-- LINT.ThenChange(
-  //chrome/browser/resources/settings/metrics_browser_proxy.ts:SafetyHubCardState,
-  //chrome/browser/ui/safety_hub/safety_hub_constants.h:SafetyHubCardState,
-  //chrome/browser/resources/settings/safety_hub/safety_hub_browser_proxy.ts:CardState
-) -->
 
 <enum name="SafetyHubDashboardInteractions">
   <int value="0" label="Open play store"/>
@@ -323,7 +307,6 @@ chromium-metrics-reviews@google.com.
 </enum>
 
 <!-- LINT.ThenChange(
-  //chrome/browser/resources/settings/metrics_browser_proxy.ts:SafetyHubEntryPoint,
   //chrome/browser/ui/safety_hub/safety_hub_constants.h:SafetyHubEntryPoint
 ) -->
 
@@ -354,7 +337,6 @@ chromium-metrics-reviews@google.com.
 </enum>
 
 <!-- LINT.ThenChange(
-  //chrome/browser/resources/settings/metrics_browser_proxy.ts:SafetyHubModuleType,
   //chrome/browser/ui/safety_hub/safety_hub_constants.h:SafetyHubModuleType
 ) -->
 
@@ -366,7 +348,6 @@ chromium-metrics-reviews@google.com.
 </enum>
 
 <!-- LINT.ThenChange(
-  //chrome/browser/resources/settings/metrics_browser_proxy.ts:SafetyHubSurfaces,
   //chrome/browser/ui/safety_hub/safety_hub_constants.h:SafetyHubSurfaces
 ) -->
 

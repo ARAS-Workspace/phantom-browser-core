@@ -1656,10 +1656,6 @@ IN_PROC_BROWSER_TEST_F(SettingsRouteTest, DynamicParameters) {
   RunTest("settings/route_test.js", "runMochaSuite('DynamicParameters')");
 }
 
-IN_PROC_BROWSER_TEST_F(SettingsRouteTest, SafetyHub) {
-  RunTest("settings/route_test.js", "runMochaSuite('SafetyHub')");
-}
-
 // Copied from Polymer 2 test:
 // Failing on ChromiumOS dbg. https://crbug.com/263415119
 #if (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)) && !defined(NDEBUG)
@@ -1669,34 +1665,6 @@ IN_PROC_BROWSER_TEST_F(SettingsRouteTest, SafetyHub) {
 #endif
 IN_PROC_BROWSER_TEST_F(SettingsRouteTest, MAYBE_NonExistentRoute) {
   RunTest("settings/route_test.js", "runMochaSuite('NonExistentRoute')");
-}
-
-using SettingsSafetyHubTest = SettingsBrowserTest;
-
-IN_PROC_BROWSER_TEST_F(SettingsSafetyHubTest, SafetyHubCard) {
-  RunTest("settings/safety_hub_card_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSafetyHubTest, SafetyHubModule) {
-  RunTest("settings/safety_hub_module_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSafetyHubTest, SafetyHubPage) {
-  RunTest("settings/safety_hub_page_test.js", "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSafetyHubTest, UnusedSitePermissionsModule) {
-  RunTest("settings/safety_hub_unused_site_permissions_module_test.js",
-          "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSafetyHubTest, NotificationPermissionsModule) {
-  RunTest("settings/safety_hub_notification_permissions_module_test.js",
-          "mocha.run()");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSafetyHubTest, SafetyHubExtensions) {
-  RunTest("settings/safety_hub_extensions_module_test.js", "mocha.run()");
 }
 
 #if !BUILDFLAG(IS_CHROMEOS)

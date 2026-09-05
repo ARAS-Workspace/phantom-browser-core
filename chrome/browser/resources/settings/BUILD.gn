@@ -59,12 +59,6 @@ build_webui("build") {
     "privacy_page/security/secure_dns_v2.ts",
     "privacy_page/security/security_page_feature_row.ts",
     "privacy_page/security/security_page_v2.ts",
-    "safety_hub/extensions_module.ts",
-    "safety_hub/notification_permissions_module.ts",
-    "safety_hub/safety_hub_card.ts",
-    "safety_hub/safety_hub_module.ts",
-    "safety_hub/safety_hub_page.ts",
-    "safety_hub/unused_site_permissions_module.ts",
     "settings_main/settings_main.ts",
     "settings_menu/settings_menu.ts",
     "settings_ui/settings_ui.ts",
@@ -253,7 +247,6 @@ build_webui("build") {
     "reset_page/reset_profile_dialog.ts",
     "route.ts",
     "router.ts",
-    "safety_hub/safety_hub_browser_proxy.ts",
     "scrollable_mixin.ts",
     "search_page/extension_controlled_message.html.ts",
     "search_page/extension_controlled_message.ts",
@@ -322,16 +315,6 @@ build_webui("build") {
       "system_page/system_page.html.ts",
       "system_page/system_page.ts",
       "system_page/system_page_browser_proxy.ts",
-    ]
-  }
-
-  if (is_linux) {
-    ts_files += [
-    ]
-  }
-
-  if (is_win || is_mac || is_linux) {
-    ts_files += [
     ]
   }
 

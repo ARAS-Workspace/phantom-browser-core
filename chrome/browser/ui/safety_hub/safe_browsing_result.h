@@ -9,7 +9,6 @@
 
 #include "base/values.h"
 #include "chrome/browser/ui/safety_hub/safety_hub_result.h"
-#include "chrome/browser/ui/webui/settings/safety_hub_handler.h"
 
 class PrefService;
 
