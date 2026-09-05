@@ -14,16 +14,23 @@
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/task/thread_pool.h"
+#include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/connectors/reporting/realtime_reporting_client.h"
-#include "chrome/browser/enterprise/connectors/reporting/realtime_reporting_client_factory.h"
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/channel_info.h"
+#include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/connectors/core/connectors_prefs.h"
 #include "components/enterprise/connectors/core/reporting_service_settings.h"
 #include "components/prefs/pref_service.h"
+#include "components/safe_browsing/buildflags.h"
 #include "components/version_info/version_info.h"
+
+#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(FULL_SAFE_BROWSING)
+#include "chrome/browser/enterprise/connectors/reporting/realtime_reporting_client_factory.h"
+#endif
 
 namespace enterprise_connectors {
 
@@ -178,6 +185,8 @@ TelomereReportingContext* TelomereReportingContext::GetInstance() {
 }
 
 RealtimeReportingClient* TelomereReportingContext::GetReportingClient() const {
+#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(FULL_SAFE_BROWSING)
   for (auto& it : active_profiles_) {
     Profile* profile = it.second;
     RealtimeReportingClient* reporting_client =
@@ -191,6 +200,7 @@ RealtimeReportingClient* TelomereReportingContext::GetReportingClient() const {
       return reporting_client;
     }
   }
+#endif
   return nullptr;
 }
 

@@ -8,13 +8,20 @@
 #include <string_view>
 
 #include "base/functional/callback.h"
+#include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/connectors/reporting/realtime_reporting_client_factory.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "components/enterprise/browser/reporting/common_pref_names.h"
+#include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/connectors/core/realtime_reporting_client_base.h"
 #include "components/policy/core/common/cloud/realtime_reporting_job_configuration.h"
 #include "components/policy/core/common/policy_logger.h"
+#include "components/safe_browsing/buildflags.h"
+
+#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(FULL_SAFE_BROWSING)
+#include "chrome/browser/enterprise/connectors/reporting/realtime_reporting_client_factory.h"
+#endif
 
 namespace enterprise_reporting {
 
@@ -100,6 +107,8 @@ void BrowserLaunchEventUploaderDesktop::DeferUpload(
 }
 
 void BrowserLaunchEventUploaderDesktop::OnProfileAdded(Profile* profile) {
+#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(FULL_SAFE_BROWSING)
   if (!enterprise_connectors::RealtimeReportingClientFactory::GetForProfile(
           profile)) {
     return;
@@ -114,6 +123,7 @@ void BrowserLaunchEventUploaderDesktop::OnProfileAdded(Profile* profile) {
 
   profile_manager_observation_.Reset();
   DoUpload(*context, event_, std::move(upload_callback_));
+#endif
 }
 
 void BrowserLaunchEventUploaderDesktop::OnProfileManagerDestroying() {

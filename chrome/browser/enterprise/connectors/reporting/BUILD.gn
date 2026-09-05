@@ -105,7 +105,9 @@ source_set("impl") {
     "//components/device_signals/core/common",
     "//components/enterprise",
     "//components/enterprise/browser/identifiers",
+    "//components/enterprise/buildflags",
     "//components/enterprise/common/proto:chrome_reporting_entity",
+    "//components/safe_browsing:buildflags",
     "//components/safe_browsing/content/browser/web_ui",
     "//components/safe_browsing/core/common:features",
   ]

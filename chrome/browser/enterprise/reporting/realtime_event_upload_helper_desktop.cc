@@ -10,15 +10,22 @@
 
 #include "base/check.h"
 #include "base/feature_list.h"
+#include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/connectors/reporting/realtime_reporting_client.h"
-#include "chrome/browser/enterprise/connectors/reporting/realtime_reporting_client_factory.h"
 #include "chrome/browser/policy/dm_token_utils.h"
 #include "chrome/browser/profiles/profile_manager.h"
 #include "chrome/browser/profiles/reporting_util.h"
 #include "components/enterprise/browser/controller/browser_dm_token_storage.h"
+#include "components/enterprise/buildflags/buildflags.h"
 #include "components/policy/core/common/cloud/realtime_reporting_job_configuration.h"
 #include "components/policy/core/common/policy_logger.h"
+#include "components/safe_browsing/buildflags.h"
+
+#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(FULL_SAFE_BROWSING)
+#include "chrome/browser/enterprise/connectors/reporting/realtime_reporting_client_factory.h"
+#endif
 
 namespace enterprise_reporting {
 
@@ -88,6 +95,8 @@ std::optional<std::string> RealtimeEventUploadHelper::GetDMToken(
 
 enterprise_connectors::RealtimeReportingClientBase*
 RealtimeEventUploadHelper::GetRealTimeReportingClient() const {
+#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(FULL_SAFE_BROWSING)
   if (profile_) {
     return enterprise_connectors::RealtimeReportingClientFactory::GetForProfile(
         profile_);
@@ -114,6 +123,7 @@ RealtimeEventUploadHelper::GetRealTimeReportingClient() const {
       return client;
     }
   }
+#endif
   return nullptr;
 }
 

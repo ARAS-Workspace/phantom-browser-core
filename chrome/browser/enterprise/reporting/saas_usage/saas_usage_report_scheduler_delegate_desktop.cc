@@ -4,11 +4,18 @@
 
 #include "chrome/browser/enterprise/reporting/saas_usage/saas_usage_report_scheduler_delegate_desktop.h"
 
+#include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/connectors/reporting/realtime_reporting_client_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_manager.h"
+#include "components/enterprise/buildflags/buildflags.h"
 #include "components/policy/core/common/policy_logger.h"
+#include "components/safe_browsing/buildflags.h"
+
+#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(FULL_SAFE_BROWSING)
+#include "chrome/browser/enterprise/connectors/reporting/realtime_reporting_client_factory.h"
+#endif
 
 namespace enterprise_reporting {
 
@@ -36,6 +43,8 @@ bool SaasUsageReportSchedulerDelegateDesktop::IsReady() {
 }
 
 void SaasUsageReportSchedulerDelegateDesktop::OnProfileAdded(Profile* profile) {
+#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(FULL_SAFE_BROWSING)
   // If browser is managed, any profile with a RealtimeReportingClient will be
   // able to upload reports using browser DM token.
   if (!enterprise_connectors::RealtimeReportingClientFactory::GetForProfile(
@@ -51,6 +60,7 @@ void SaasUsageReportSchedulerDelegateDesktop::OnProfileAdded(Profile* profile) {
            "profile has been added.";
     ready_state_changed_callback_.Run();
   }
+#endif
 }
 
 void SaasUsageReportSchedulerDelegateDesktop::OnProfileManagerDestroying() {

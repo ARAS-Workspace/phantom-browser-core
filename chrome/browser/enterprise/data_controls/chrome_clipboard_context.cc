@@ -4,11 +4,18 @@
 
 #include "chrome/browser/enterprise/data_controls/chrome_clipboard_context.h"
 
-#include "chrome/browser/enterprise/connectors/analysis/content_analysis_info.h"
+#include "build/build_config.h"
 #include "chrome/browser/profiles/profile.h"
+#include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/data_controls/core/browser/prefs.h"
 #include "components/policy/core/common/policy_types.h"
 #include "components/prefs/pref_service.h"
+#include "components/safe_browsing/buildflags.h"
+
+#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(FULL_SAFE_BROWSING)
+#include "chrome/browser/enterprise/connectors/analysis/content_analysis_info.h"
+#endif
 
 namespace data_controls {
 
@@ -216,6 +223,8 @@ std::string ChromeClipboardContext::destination_active_user() const {
   if (!destination_) {
     return "";
   }
+#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(FULL_SAFE_BROWSING)
   auto* profile = Profile::FromBrowserContext(destination_->browser_context());
   if (!profile) {
     return "";
@@ -223,6 +232,9 @@ std::string ChromeClipboardContext::destination_active_user() const {
 
   return enterprise_connectors::ContentAreaUserProvider::GetUser(
       profile, destination_->web_contents(), destination_url());
+#else
+  return "";
+#endif
 }
 
 }  // namespace data_controls

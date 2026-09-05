@@ -265,7 +265,12 @@ std::string ConnectorsService::GetManagementDomain() {
 }
 
 bool ConnectorsService::IsProfileAffiliated() const {
+#if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(FULL_SAFE_BROWSING)
   return IsAffiliated(Profile::FromBrowserContext(context_));
+#else
+  return false;
+#endif
 }
 
 std::string ConnectorsService::GetProfileEmail() const {
