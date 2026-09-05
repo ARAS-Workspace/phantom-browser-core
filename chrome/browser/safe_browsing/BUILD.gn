@@ -11,14 +11,12 @@ static_library("safe_browsing") {
     "chrome_controller_client.h",
     "metrics/bundled_settings_metrics_provider.h",
     "metrics/safe_browsing_metrics_provider.h",
-    "url_checker_delegate_impl.h",
   ]
 
   sources = [
     "chrome_controller_client.cc",
     "metrics/bundled_settings_metrics_provider.cc",
     "metrics/safe_browsing_metrics_provider.cc",
-    "url_checker_delegate_impl.cc",
   ]
 
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
@@ -86,7 +84,6 @@ static_library("safe_browsing") {
     "//components/safe_browsing/core/browser:referrer_chain_provider",
     "//components/safe_browsing/core/browser:safe_browsing_metrics_collector",
     "//components/safe_browsing/core/browser/db:database_manager",
-    "//components/safe_browsing/core/browser/db:sb_local_database_manager",
     "//components/safe_browsing/core/browser/password_protection:password_protection_metrics_util",
     "//components/safe_browsing/core/browser/sync",
     "//components/safe_browsing/core/browser/web_ui:local_state_delegate",
@@ -154,14 +151,16 @@ static_library("safe_browsing") {
       "//chrome/browser/ui/browser_window",
       "//chrome/browser/ui/toasts",
       "//chrome/browser/ui/toasts/api:toasts",
-
-      # Shows the safe_browsing views dialogs (toolkit_views only), which in
-      # turn include this target's chrome_password_protection_service.h.
-      "//chrome/browser/ui/views/safe_browsing",
     ]
 
-    allow_circular_includes_from +=
-        [ "//chrome/browser/ui/views/safe_browsing" ]
+    if (safe_browsing_mode != 0) {
+      # Shows the safe_browsing views dialogs (toolkit_views only), which in
+      # turn include this target's chrome_password_protection_service.h.
+      deps += [ "//chrome/browser/ui/views/safe_browsing" ]
+
+      allow_circular_includes_from +=
+          [ "//chrome/browser/ui/views/safe_browsing" ]
+    }
   }
 
   if (safe_browsing_mode != 0) {
@@ -226,6 +225,7 @@ static_library("safe_browsing") {
       "telemetry/telemetry_service.h",
       "test_safe_browsing_blocking_page_quiet.h",
       "trigger_creator.h",
+      "url_checker_delegate_impl.h",
       "url_lookup_service_factory.h",
       "user_interaction_observer.h",
       "v5_get_hash_protocol_manager_factory.h",
@@ -290,6 +290,7 @@ static_library("safe_browsing") {
       "telemetry/telemetry_service.cc",
       "test_safe_browsing_blocking_page_quiet.cc",
       "trigger_creator.cc",
+      "url_checker_delegate_impl.cc",
       "url_lookup_service_factory.cc",
       "user_interaction_observer.cc",
       "v5_get_hash_protocol_manager_factory.cc",
@@ -356,6 +357,7 @@ static_library("safe_browsing") {
       "//components/safe_browsing/core/browser:token_fetcher",
       "//components/safe_browsing/core/browser:verdict_cache_manager",
       "//components/safe_browsing/core/browser/db:allowlist_checker_client",
+      "//components/safe_browsing/core/browser/db:sb_local_database_manager",
       "//components/safe_browsing/core/browser/db:v5_get_hash_protocol_manager",
       "//components/safe_browsing/core/browser/db:v5_search_hashes_cache",
       "//components/safe_browsing/core/browser/password_protection",
