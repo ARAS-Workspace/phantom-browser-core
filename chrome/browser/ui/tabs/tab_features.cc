@@ -17,7 +17,6 @@
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/contextual_cueing/contextual_cueing_controller.h"
 #include "chrome/browser/enterprise/data_protection/data_protection_navigation_controller.h"
-#include "chrome/browser/enterprise/reporting/saas_usage/saas_usage_navigation_observer.h"
 #include "chrome/browser/glic/host/context/glic_page_features_manager.h"
 #include "chrome/browser/glic/suggestions/contextual_cueing_helper.h"
 #include "chrome/browser/image_fetcher/image_fetcher_service_factory.h"
@@ -556,15 +555,6 @@ void TabFeatures::Init(TabInterface& tab, Profile* profile) {
   page_context_eligibility_helper_ =
       GetUserDataFactory().CreateInstance<tabs::PageContextEligibilityHelper>(
           tab, tab);
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_CHROMEOS)
-  if (base::FeatureList::IsEnabled(enterprise_reporting::kSaasUsageReporting)) {
-    saas_usage_navigation_observer_ =
-        std::make_unique<enterprise_reporting::SaasUsageNavigationObserver>(
-            tab.GetContents());
-  }
-#endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || \
     BUILDFLAG(IS_CHROMEOS)

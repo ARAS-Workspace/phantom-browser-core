@@ -9278,12 +9278,6 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_VALUE_TYPE(
          blink::features::kBrowserInitiatedAutomaticPictureInPicture)},
 
-    {"browser-launch-metadata-reporting",
-     flag_descriptions::kBrowserLaunchMetadataReportingName,
-     flag_descriptions::kBrowserLaunchMetadataReportingDescription,
-     kOsLinux | kOsMac | kOsWin,
-     FEATURE_VALUE_TYPE(enterprise_reporting::kBrowserLaunchMetadataReporting)},
-
     {"picture-in-picture-mute-control",
      flag_descriptions::kPictureInPictureMuteControlName,
      flag_descriptions::kPictureInPictureMuteControlDescription, kOsDesktop,
@@ -12820,11 +12814,9 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_VALUE_TYPE(chrome::android::kAndroidXrImmersivePlayer)},
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
     {"saas-usage-reporting", flag_descriptions::kSaasUsageReportingName,
-     flag_descriptions::kSaasUsageReportingDescription,
-     kOsLinux | kOsMac | kOsWin | kOsCrOS,
+     flag_descriptions::kSaasUsageReportingDescription, kOsCrOS,
      FEATURE_VALUE_TYPE(enterprise_reporting::kSaasUsageReporting)},
 #endif
 

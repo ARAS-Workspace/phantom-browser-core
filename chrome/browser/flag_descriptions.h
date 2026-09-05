@@ -1301,12 +1301,6 @@ inline constexpr char kSessionEncryptionName[] = "Session Encryption";
 inline constexpr char kSessionEncryptionDescription[] =
     "Enable encryption for sessions";
 
-inline constexpr char kBrowserLaunchMetadataReportingName[] =
-    "Browser launch metadata reporting";
-inline constexpr char kBrowserLaunchMetadataReportingDescription[] =
-    "Enables the collection and reporting of browser launch-related metadata "
-    "for Chrome Enterprise, including CLI switches and launch timestamp";
-
 inline constexpr char kBorealisBigGlName[] = "Borealis Big GL";
 inline constexpr char kBorealisBigGlDescription[] =
     "Enable Big GL when running Borealis.";

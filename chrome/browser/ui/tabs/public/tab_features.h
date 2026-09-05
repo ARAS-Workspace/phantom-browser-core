@@ -92,10 +92,6 @@ namespace enterprise_data_protection {
 class DataProtectionNavigationController;
 }  // namespace enterprise_data_protection
 
-namespace enterprise_reporting {
-class SaasUsageNavigationObserver;
-}  // namespace enterprise_reporting
-
 namespace content {
 class WebContents;
 }  // namespace content
@@ -579,12 +575,6 @@ class TabFeatures {
 
   std::unique_ptr<contextual_tasks::ContextualTasksTabVisitTracker>
       contextual_tasks_tab_visit_tracker_;
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_CHROMEOS)
-  std::unique_ptr<enterprise_reporting::SaasUsageNavigationObserver>
-      saas_usage_navigation_observer_;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_WIN)
   std::unique_ptr<SearchPromotionNavigationObserver>

@@ -75,8 +75,6 @@
 #include "chrome/browser/enterprise/client_certificates/cert_utils.h"
 #include "chrome/browser/enterprise/connectors/device_trust/key_management/browser/device_trust_key_manager_impl.h"
 #include "chrome/browser/enterprise/connectors/device_trust/key_management/browser/key_rotation_launcher.h"
-#include "chrome/browser/enterprise/reporting/browser_launch/browser_launch_event_controller_factory_desktop.h"
-#include "chrome/browser/enterprise/reporting/saas_usage/saas_usage_reporting_delegate_factory_desktop.h"
 #include "components/enterprise/browser/reporting/saas_usage/saas_usage_reporting_delegate_factory.h"
 #include "components/enterprise/client_certificates/core/browser_cloud_management_delegate.h"
 #include "components/enterprise/client_certificates/core/certificate_provisioning_service.h"
@@ -267,19 +265,13 @@ ChromeBrowserCloudManagementControllerDesktop::GetReportingDelegateFactory() {
 std::unique_ptr<enterprise_reporting::SaasUsageReportingDelegateFactory>
 ChromeBrowserCloudManagementControllerDesktop::
     GetSaasUsageReportingDelegateFactory() {
-#if BUILDFLAG(IS_CHROMEOS)
   return nullptr;
-#else
-  return enterprise_reporting::SaasUsageReportingDelegateFactoryDesktop::
-      CreateForBrowser();
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
 std::unique_ptr<enterprise_reporting::BrowserLaunchEventController>
 ChromeBrowserCloudManagementControllerDesktop::
     CreateBrowserLaunchEventController() {
-  return enterprise_reporting::BrowserLaunchEventControllerFactoryDesktop::
-      CreateForBrowser();
+  return nullptr;
 }
 
 void ChromeBrowserCloudManagementControllerDesktop::SetGaiaURLLoaderFactory(

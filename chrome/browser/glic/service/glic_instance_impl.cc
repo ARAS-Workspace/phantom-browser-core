@@ -83,7 +83,6 @@
 
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
     BUILDFLAG(IS_CHROMEOS)
-#include "chrome/browser/enterprise/reporting/saas_usage/saas_usage_reporting_controller_factory.h"
 #endif
 
 #if BUILDFLAG(IS_ANDROID)
@@ -157,16 +156,6 @@ constexpr auto kImplicitInvocationSources =
         mojom::InvocationSource::kDetachAttachButton,
     });
 
-enterprise_reporting::SaasUsageReportingController*
-GetSaasUsageReportingController(Profile* profile) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
-  return enterprise_reporting::SaasUsageReportingControllerFactory::
-      GetForProfile(profile);
-#else
-  return nullptr;
-#endif
-}
 }  // namespace
 
 void GlicInstanceImpl::MaybeDaisyChainToTab(tabs::TabInterface* source_tab,
@@ -293,7 +282,6 @@ GlicInstanceImpl::GlicInstanceImpl(
       sharing_manager_coordinator_(profile, this, metrics),
       instance_metrics_(ProfileMetricsServiceFactory::GetForProfile(profile),
                         &sharing_manager_coordinator_.GetActiveSharingManager(),
-                        GetSaasUsageReportingController(profile),
                         profile),
       zero_state_suggestions_manager_(
           std::make_unique<GlicZeroStateSuggestionsManager>(

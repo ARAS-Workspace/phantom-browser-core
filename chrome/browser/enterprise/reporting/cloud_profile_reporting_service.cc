@@ -36,13 +36,6 @@
 #include "chrome/browser/enterprise/reporting/reporting_delegate_factory_desktop.h"
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/enterprise/reporting/browser_launch/browser_launch_event_controller_factory_desktop.h"
-#include "chrome/browser/enterprise/reporting/saas_usage/saas_usage_reporting_delegate_factory_desktop.h"
-#include "components/enterprise/browser/reporting/reporting_features.h"
-#include "components/enterprise/browser/reporting/saas_usage/saas_usage_report_scheduler.h"
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
-
 namespace enterprise_reporting {
 
 namespace {
@@ -118,23 +111,6 @@ void CloudProfileReportingService::CreateReportScheduler() {
       base::BindRepeating(&CanUploadExtensionInfo, profile_));
 #endif
   report_scheduler_ = std::make_unique<ReportScheduler>(std::move(params));
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
-  if (base::FeatureList::IsEnabled(kSaasUsageReporting)) {
-    auto saas_usage_reporting_delegate_factory =
-        SaasUsageReportingDelegateFactoryDesktop::CreateForProfile(profile_);
-    saas_usage_report_scheduler_ = SaasUsageReportScheduler::Create(
-        "profile", saas_usage_reporting_delegate_factory.get());
-  }
-
-  if (base::FeatureList::IsEnabled(kBrowserLaunchMetadataReporting)) {
-    browser_launch_controller_ =
-        BrowserLaunchEventControllerFactoryDesktop::CreateForProfile(profile_);
-    if (browser_launch_controller_) {
-      browser_launch_controller_->CollectAndUpload();
-    }
-  }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
 }
 
 void CloudProfileReportingService::OnCoreConnected(

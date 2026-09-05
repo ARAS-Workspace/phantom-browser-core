@@ -5899,7 +5899,6 @@ test("unit_tests") {
 
   if (is_win || is_mac || is_linux) {
     deps += [
-      "//chrome/browser/enterprise:browser_launch_reporting",
       "//chrome/browser/ui/views/session_restore_infobar:unit_tests",
       "//chrome/browser/ui/webui/intro:unit_tests",
     ]

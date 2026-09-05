@@ -288,15 +288,12 @@ source_set("enterprise") {
         [ "//components/enterprise/connectors/core:cloud_content_scanning" ]
   }
 
-  if (is_linux || is_win || is_mac || is_chromeos) {
+  if (is_chromeos) {
     public += [
       "reporting/realtime_event_upload_helper_desktop.h",
-      "reporting/saas_usage/navigation_handle_data_delegate.h",
-      "reporting/saas_usage/saas_usage_navigation_observer.h",
       "reporting/saas_usage/saas_usage_report_factory_desktop.h",
       "reporting/saas_usage/saas_usage_report_scheduler_delegate_desktop.h",
       "reporting/saas_usage/saas_usage_report_uploader_desktop.h",
-      "reporting/saas_usage/saas_usage_reporting_controller_factory.h",
       "reporting/saas_usage/saas_usage_reporting_delegate_factory_desktop.h",
     ]
   }
@@ -311,7 +308,6 @@ source_set("enterprise") {
       "profile_management/profile_management_navigation_throttle.h",
       "remote_commands/extension_update_check_job.h",
       "remote_commands/rotate_attestation_credential_job.h",
-      "reporting/browser_launch/browser_launch_event_uploader_desktop.h",
       "signals/system_signals_service_host_factory.h",
       "signin/enterprise_signin_prefs.h",
       "signin/enterprise_signin_service.h",
@@ -391,28 +387,10 @@ static_library("browser_launch_reporting") {
   deps = []
   if (is_linux || is_win || is_mac) {
     sources += [
-      "reporting/browser_launch/browser_launch_data_collector_desktop.cc",
-      "reporting/browser_launch/browser_launch_data_collector_desktop.h",
-      "reporting/browser_launch/browser_launch_event_controller_factory_desktop.cc",
-      "reporting/browser_launch/browser_launch_event_controller_factory_desktop.h",
-      "reporting/browser_launch/browser_launch_event_uploader_desktop.cc",
-      "reporting/browser_launch/browser_launch_event_uploader_desktop.h",
       "reporting/browser_launch/scoped_initial_command_line.cc",
       "reporting/browser_launch/scoped_initial_command_line.h",
     ]
-    deps += [
-      ":enterprise",
-      "//base",
-      "//chrome/browser:browser_process",
-      "//chrome/browser/enterprise/connectors/reporting",
-      "//chrome/browser/profiles:profile",
-      "//components/enterprise",
-      "//components/enterprise/buildflags",
-      "//components/enterprise/common/proto:browser_events_proto",
-      "//components/enterprise/connectors/core",
-      "//components/policy/core/common",
-      "//components/safe_browsing:buildflags",
-    ]
+    deps += [ "//base" ]
   }
 }
 
@@ -473,7 +451,6 @@ source_set("impl") {
   ]
 
   deps = [
-    ":browser_launch_reporting",
     "//chrome/app:command_ids",
     "//chrome/browser:browser_process",
     "//chrome/browser:browser_process_platform_part",
@@ -796,15 +773,12 @@ source_set("impl") {
         [ "//chrome/browser/enterprise/connectors/analysis:sdk_manager" ]
   }
 
-  if (is_linux || is_win || is_mac || is_chromeos) {
+  if (is_chromeos) {
     sources += [
       "reporting/realtime_event_upload_helper_desktop.cc",
-      "reporting/saas_usage/navigation_handle_data_delegate.cc",
-      "reporting/saas_usage/saas_usage_navigation_observer.cc",
       "reporting/saas_usage/saas_usage_report_factory_desktop.cc",
       "reporting/saas_usage/saas_usage_report_scheduler_delegate_desktop.cc",
       "reporting/saas_usage/saas_usage_report_uploader_desktop.cc",
-      "reporting/saas_usage/saas_usage_reporting_controller_factory.cc",
       "reporting/saas_usage/saas_usage_reporting_delegate_factory_desktop.cc",
     ]
 
@@ -820,7 +794,6 @@ source_set("impl") {
       "profile_management/profile_management_features.cc",
       "profile_management/profile_management_navigation_throttle.cc",
       "remote_commands/rotate_attestation_credential_job.cc",
-      "reporting/browser_launch/browser_launch_event_uploader_desktop.cc",
       "signals/system_signals_service_host_factory.cc",
       "signin/enterprise_signin_prefs.cc",
       "signin/enterprise_signin_service.cc",
@@ -899,10 +872,7 @@ if (!is_android) {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
-    sources = [
-      "reporting/saas_usage/saas_usage_browsertest.cc",
-      "util/managed_browser_utils_browsertest.cc",
-    ]
+    sources = [ "util/managed_browser_utils_browsertest.cc" ]
 
     deps = [
       ":impl",
