@@ -308,7 +308,6 @@ void CheckDownloadUrlDone(
   }
   std::move(callback).Run(danger_type);
 }
-#endif  // SAFE_BROWSING_DOWNLOAD_PROTECTION
 
 // Returns true if the danger type is either FORCE_SAVE_TO_ONEDRIVE or
 // FORCE_SAVE_TO_GDrive.
@@ -316,6 +315,8 @@ bool IsForceSaveToCloud(download::DownloadDangerType danger_type) {
   return danger_type == download::DOWNLOAD_DANGER_TYPE_FORCE_SAVE_TO_ONEDRIVE ||
          danger_type == download::DOWNLOAD_DANGER_TYPE_FORCE_SAVE_TO_GDRIVE;
 }
+#endif  // SAFE_BROWSING_DOWNLOAD_PROTECTION
+
 // Called asynchronously to determine the MIME type for |path|.
 std::string GetMimeType(const base::FilePath& path) {
 #if BUILDFLAG(IS_ANDROID)
