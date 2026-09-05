@@ -92,9 +92,6 @@ import './system_page/system_page.js';
 
 // </if>
 
-// <if expr="not is_chromeos">
-// </if>
-
 export {FontsBrowserProxyImpl} from '/shared/settings/appearance_page/fonts_browser_proxy.js';
 export type {FontsBrowserProxy, FontsData} from '/shared/settings/appearance_page/fonts_browser_proxy.js';
 export {CrShortcutInputElement} from 'chrome://resources/cr_components/cr_shortcut_input/cr_shortcut_input.js';
@@ -112,13 +109,6 @@ export {CrToastElement} from 'chrome://resources/cr_elements/cr_toast/cr_toast.j
 export {getToastManager} from 'chrome://resources/cr_elements/cr_toast/cr_toast_manager.js';
 export {CrTooltipElement} from 'chrome://resources/cr_elements/cr_tooltip/cr_tooltip.js';
 export type {IronListElement} from 'chrome://resources/polymer/v3_0/iron-list/iron-list.js';
-// <if expr="is_win or is_linux or is_macosx">
-// </if>
-// <if expr="not is_chromeos">
-// </if>
-
-// <if expr="_google_chrome">
-// </if>
 export {SettingsAppearanceFontsPageElement} from './appearance_page/appearance_fonts_page.js';
 // <if expr="not is_chromeos">
 export {SettingsClearBrowsingDataAccountIndicator} from './clear_browsing_data_dialog/clear_browsing_data_account_indicator.js';
