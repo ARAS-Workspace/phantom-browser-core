@@ -11,7 +11,7 @@
 -->
 
 <grit-part>
-  <if expr="not is_ios">
+  <if expr="is_chromeos or is_android">
     <!-- Title of the page -->
     <message name="IDS_MANAGEMENT_TITLE" desc="Title of management page.">
       Settings - Management
@@ -62,7 +62,7 @@
     </message>
   </if>
 
-  <if expr="not is_ios">
+  <if expr="is_chromeos or is_android">
     <!-- Browser managed status section -->
     <if expr="not is_chromeos">
       <if expr="_google_chrome">
@@ -271,7 +271,7 @@
     </message>
   </if>
 
-  <if expr="not is_ios">
+  <if expr="is_chromeos or is_android">
     <!-- Strings related to extension reporting section of the management page -->
     <message name="IDS_MANAGEMENT_EXTENSION_REPORTING" desc="Title of the force installed extensions section of the page">
       Extensions
@@ -398,9 +398,11 @@
   </if>
 
   <!-- Strings related to browser reporting section of the management page -->
+  <if expr="is_chromeos or is_android or is_ios">
   <message name="IDS_MANAGEMENT_BROWSER_REPORTING" desc="Title of the types of browser reporting section of the page" formatter_data="android_java">
     Browser
   </message>
+  </if>
   <if expr="is_ios">
     <message name="IDS_MANAGEMENT_BROWSER_REPORTING_EXPLANATION" desc="Message explaining to users what browser information is being reported that admins can access">
       Profile, browser, and device information is accessible to your administrator. They can see:
@@ -430,6 +432,7 @@
 
 
   <!-- Profile reporting management message-->
+  <if expr="is_chromeos or is_android or is_ios">
   <message name="IDS_MANAGEMENT_PROFILE_REPORTING_EXPLANATION" desc="Message explaining browser reporting" formatter_data="android_java">
     Managed profile, browser, and some device information is accessible to your administrator. They can see information such as the following:
   </message>
@@ -448,7 +451,8 @@
   <message name="IDS_MANAGEMENT_PROFILE_REPORTING_LEARN_MORE" desc="Learn more link for profile reporting management information to provide additional informaiton">
     <ph name="BEGIN_LINK">&lt;a target="_blank" href="https://support.google.com/chrome/a/?p=browser_profile_details" &gt;</ph>Learn more<ph name="END_LINK">&lt;/a&gt;</ph>
   </message>
-  <if expr="not is_ios">
+  </if>
+  <if expr="is_chromeos or is_android">
     <message name="IDS_MANAGEMENT_PROFILE_REPORTING_EXTENSION" desc="Item in a list of information viewable by the enterprise admin, indicating that the admin can view user's work profile extensions. A work profile is a managed profile in an enterprise environment, such as a business, government organization, or other workplace.">
       Installed apps &amp; extensions in your work profile
     </message>
@@ -469,13 +473,14 @@
   </if>
 
   <!-- Strings related to Chrome Enterprise Device Signals Sharing -->
-  <if expr="is_win or is_linux or is_macosx or is_android">
+  <if expr="is_android">
     <message name="IDS_MANAGEMENT_DEVICE_SIGNALS_DISCLOSURE" desc="Disclosure message explaining that device signals can be shared.">
       Information about your browser, OS, device, installed software, files, and IP addresses
     </message>
   </if>
 
   <!-- Strings related to Chrome Enterprise Connectors -->
+  <if expr="is_chromeos or is_android or is_ios">
   <message name="IDS_MANAGEMENT_THREAT_PROTECTION" desc="Title of the Chrome Enterprise Connectors section of the page" formatter_data="android_java">
     Chrome Enterprise Connectors
   </message>
@@ -517,12 +522,15 @@
   <message name="IDS_MANAGEMENT_DIALOG_DEVICE_SIGNALS" desc="Disclosure that device information can be visible to the admin for device safety. The OS, browser info and and installed software may be visible to the admin to assess the device safety.">
     To help ensure security, it can also see the device’s OS, browser version, and what software is installed
   </message>
+  </if>
   <message name="IDS_MANAGEMENT_DIALOG_PROFILE_MANAGED_BY" desc="Disclosure that a known organization is managing the profile.">
     <ph name="MANAGER">$1<ex>The Company</ex></ph> manages your profile
   </message>
+  <if expr="is_chromeos or is_android or is_ios">
   <message name="IDS_MANAGEMENT_DIALOG_THINGS_TO_CONSIDER_SUBTITLE" desc="Subtitle of a section of things to consider regarding that an admin can do an see while managing the browser and profile.">
     What this means
   </message>
+  </if>
 
   <!-- Managed profile required interstitial -->
   <message name="IDS_MANAGED_PROFILE_INTERSTITIAL_TAB_TITLE" desc="The title of the tab of the interstitial that tells the user that their organization requires them to sign in to Chrome with their managed account in order to access it.">
@@ -530,6 +538,7 @@
   </message>
 
   <!-- Promotion banner -->
+  <if expr="is_chromeos or is_android or is_ios">
   <message name="IDS_MANAGEMENT_BANNER_PROMOTION_TITLE" desc="The title of the promotion banner on chrome://management page.">
     Easily manage how your employees browse the web
   </message>
@@ -548,4 +557,5 @@
   <message name="IDS_MANAGEMENT_BANNER_DISMISS_ARIA_LABEL" desc="The aria-label of the dismiss/close button on the promotion banner on chrome://management page.">
     Dismiss banner
   </message>
+  </if>
 </grit-part>
