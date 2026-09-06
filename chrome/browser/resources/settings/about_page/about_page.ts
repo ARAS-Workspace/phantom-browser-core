@@ -20,7 +20,6 @@ import {getHtml} from './about_page.html.js';
 
 export interface SettingsAboutPageElement {
   $: {
-    productLogo: HTMLImageElement,
     // <if expr="not is_chromeos">
     deprecationWarning: HTMLElement,
     // </if>
@@ -64,17 +63,6 @@ export class SettingsAboutPageElement extends CrLitElement implements
 
   protected onManagementPageClick_() {
     window.location.href = loadTimeData.getString('managementPageUrl');
-  }
-
-  protected onProductLogoClick_() {
-    this.$.productLogo.animate(
-        {
-          transform: ['none', 'rotate(-10turn)'],
-        },
-        {
-          duration: 500,
-          easing: 'cubic-bezier(1, 0, 0, 1)',
-        });
   }
 
   // SettingsPlugin implementation

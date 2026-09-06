@@ -11,7 +11,7 @@ export function getHtml(this: SettingsAboutPageElement) {
   return html`<!--_html_template_start_-->
 <settings-section page-title="$i18n{aboutPageTitle}">
   <div class="cr-row two-line first">
-    <img id="productLogo" @click="${this.onProductLogoClick_}"
+    <img id="productLogo"
         srcset="chrome://theme/current-channel-logo@1x 1x,
                 chrome://theme/current-channel-logo@2x 2x"
         alt="$i18n{aboutProductLogoAlt}"

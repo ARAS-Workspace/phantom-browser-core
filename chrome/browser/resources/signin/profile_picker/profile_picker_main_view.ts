@@ -40,7 +40,6 @@ export interface ProfilePickerMainViewElement {
   $: {
     addProfile: CrButtonElement,
     askOnStartup: CrCheckboxElement|CrToggleElement,
-    pickerLogo: HTMLElement,
     browseAsGuestButton: HTMLElement,
     profilesContainer: HTMLElement,
     profilesWrapper: HTMLElement,
@@ -201,22 +200,6 @@ export class ProfilePickerMainViewElement extends
           profilesContainer.scrollHeight > profilesContainer.clientHeight);
     });
     this.resizeObserver_.observe(profilesContainer);
-  }
-
-  protected onProductLogoClick_() {
-    // No animation for Glic logo version.
-    if (this.isGlic_) {
-      return;
-    }
-
-    this.$.pickerLogo.animate(
-        {
-          transform: ['none', 'rotate(-10turn)'],
-        },
-        {
-          duration: 500,
-          easing: 'cubic-bezier(1, 0, 0, 1)',
-        });
   }
 
   /**
