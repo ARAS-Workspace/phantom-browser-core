@@ -79,8 +79,12 @@
 #include "chrome/browser/search_engine_choice/search_engine_choice_service_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
+#include "components/spellcheck/spellcheck_buildflags.h"
+
+#if BUILDFLAG(ENABLE_SPELLCHECK)
 #include "chrome/browser/spellchecker/spellcheck_factory.h"
 #include "chrome/browser/spellchecker/spellcheck_service.h"
+#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 #include "chrome/browser/strike_database/strike_database_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/translate/chrome_translate_client.h"
@@ -812,6 +816,7 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
 
   //////////////////////////////////////////////////////////////////////////////
   // DATA_TYPE_LOCAL_CUSTOM_DICTIONARY
+#if BUILDFLAG(ENABLE_SPELLCHECK)
   if (remove_mask & constants::DATA_TYPE_LOCAL_CUSTOM_DICTIONARY) {
     auto* spellcheck = SpellcheckServiceFactory::GetForContext(profile_);
     if (spellcheck) {
@@ -820,6 +825,7 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
         dict->Clear();
     }
   }
+#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
   //////////////////////////////////////////////////////////////////////////////
   // DATA_TYPE_READING_LIST

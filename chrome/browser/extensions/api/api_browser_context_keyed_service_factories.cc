@@ -24,6 +24,7 @@
 #include "chrome/browser/extensions/api/web_navigation/web_navigation_api.h"
 #include "chrome/browser/extensions/commands/command_service.h"
 #include "chrome/common/buildflags.h"
+#include "components/spellcheck/spellcheck_buildflags.h"
 #include "extensions/buildflags/buildflags.h"
 #include "printing/buildflags/buildflags.h"
 
@@ -38,7 +39,6 @@
 #include "chrome/browser/extensions/api/braille_display_private/braille_display_private_api.h"
 #include "chrome/browser/extensions/api/enterprise_reporting_private/enterprise_reporting_private_event_router.h"
 #include "chrome/browser/extensions/api/image_writer_private/operation_manager.h"
-#include "chrome/browser/extensions/api/language_settings_private/language_settings_private_delegate_factory.h"
 #include "chrome/browser/extensions/api/networking_private/networking_private_ui_delegate_factory_impl.h"
 #include "chrome/browser/extensions/api/passwords_private/passwords_private_delegate_factory.h"
 #include "chrome/browser/extensions/api/passwords_private/passwords_private_event_router_factory.h"
@@ -75,6 +75,10 @@
 
 #if BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(USE_CUPS)
 #include "chrome/browser/extensions/api/printing/printing_api_handler.h"
+#endif
+
+#if BUILDFLAG(ENABLE_SPELLCHECK)
+#include "chrome/browser/extensions/api/language_settings_private/language_settings_private_delegate_factory.h"
 #endif
 
 namespace chrome_extensions {
@@ -122,7 +126,9 @@ void EnsureApiBrowserContextKeyedServiceFactoriesBuilt() {
   extensions::InputImeAPI::GetFactoryInstance();
 #endif
   extensions::image_writer::OperationManager::GetFactoryInstance();
+#if BUILDFLAG(ENABLE_SPELLCHECK)
   extensions::LanguageSettingsPrivateDelegateFactory::GetInstance();
+#endif
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
   auto networking_private_ui_delegate_factory =
       std::make_unique<extensions::NetworkingPrivateUIDelegateFactoryImpl>();

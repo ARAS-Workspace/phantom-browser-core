@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//components/signin/features.gni")
+import("//components/spellcheck/spellcheck_build_features.gni")
 
 source_set("unified_consent") {
   public = [ "unified_consent_service_factory.h" ]
@@ -24,10 +25,14 @@ source_set("impl") {
     "//components/embedder_support",
     "//components/prefs",
     "//components/safe_browsing/core/common:safe_browsing_prefs",
-    "//components/spellcheck/browser",
+    "//components/spellcheck:buildflags",
     "//components/sync_preferences",
     "//components/unified_consent",
   ]
+
+  if (enable_spellcheck) {
+    deps += [ "//components/spellcheck/browser" ]
+  }
 }
 
 source_set("browser_tests") {

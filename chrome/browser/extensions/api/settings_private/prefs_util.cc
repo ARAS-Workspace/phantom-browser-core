@@ -66,7 +66,11 @@
 #include "components/search_engines/search_engines_pref_names.h"
 #include "components/signin/public/base/signin_pref_names.h"
 #include "components/skills/public/skills_prefs.h"
+#include "components/spellcheck/spellcheck_buildflags.h"
+
+#if BUILDFLAG(ENABLE_SPELLCHECK)
 #include "components/spellcheck/browser/pref_names.h"
+#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 #include "components/supervised_user/core/common/pref_names.h"
 #include "components/themes/pref_names.h"
 #include "components/translate/core/browser/translate_pref_names.h"
@@ -483,6 +487,7 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kBoolean;
 
   // Languages page
+#if BUILDFLAG(ENABLE_SPELLCHECK)
   (*s_allowlist)[spellcheck::prefs::kSpellCheckEnable] =
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[spellcheck::prefs::kSpellCheckDictionaries] =
@@ -493,6 +498,7 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kList;
   (*s_allowlist)[spellcheck::prefs::kSpellCheckUseSpellingService] =
       settings_api::PrefType::kBoolean;
+#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
   (*s_allowlist)[translate::prefs::kOfferTranslateEnabled] =
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[translate::prefs::kBlockedLanguages] =

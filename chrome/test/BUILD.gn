@@ -367,7 +367,6 @@ static_library("test_support") {
     "//components/segmentation_platform/public",
     "//components/segmentation_platform/public:test_support",
     "//components/signin/core/browser",
-    "//components/spellcheck/renderer",
     "//components/subresource_filter/core/browser:test_support",
     "//components/subresource_filter/core/common:test_support",
     "//components/ukm:test_support",
@@ -379,6 +378,10 @@ static_library("test_support") {
     "//ui/menus",
     "//ui/webui",
   ]
+
+  if (enable_spellcheck) {
+    deps += [ "//components/spellcheck/renderer" ]
+  }
 
   # New deps should go in the non-iOS section below.
   public_deps += [
@@ -2658,11 +2661,6 @@ if (!is_android) {
       "//components/soda",
       "//components/soda:constants",
       "//components/spellcheck:buildflags",
-      "//components/spellcheck/browser",
-      "//components/spellcheck/common",
-      "//components/spellcheck/common:interfaces",
-      "//components/spellcheck/common:spellcheck_result",
-      "//components/spellcheck/renderer",
       "//components/strings",
       "//components/subresource_filter/core/browser",
       "//components/subresource_filter/core/browser:test_support",
@@ -2974,7 +2972,6 @@ if (!is_android) {
       "../browser/renderer_host/javascript_optimizer_feature_browsertest.cc",
       "../browser/safe_browsing/download_protection/download_protection_service_browsertest.cc",
       "../browser/signin/e2e_tests/live_sign_in_test.cc",
-      "../browser/ui/ask_google_for_suggestions_dialog_browsertest.cc",
       "../browser/ui/breadcrumb_manager_browser_agent_browsertest.cc",
       "../browser/ui/browser_actions_browsertest.cc",
       "../browser/ui/browser_browsertest.cc",
@@ -5691,10 +5688,6 @@ test("unit_tests") {
     "//components/site_isolation",
     "//components/skills:features",
     "//components/spellcheck:buildflags",
-    "//components/spellcheck/browser",
-    "//components/spellcheck/common",
-    "//components/spellcheck/common:spellcheck_result",
-    "//components/spellcheck/renderer",
     "//components/sqlite_proto",
     "//components/strings",
     "//components/subresource_filter/core/browser",
@@ -9549,7 +9542,6 @@ if (!is_android) {
       "//chrome/test/base:chrome_test_launcher",
       "//components/bookmarks/browser",
       "//components/password_manager/core/browser",
-      "//components/spellcheck/common",
       "//components/sync",
       "//testing/gmock",
       "//testing/gtest",

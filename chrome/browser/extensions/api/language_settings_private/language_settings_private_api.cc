@@ -23,12 +23,8 @@
 #include "base/values.h"
 #include "build/build_config.h"
 #include "build/chromeos_buildflags.h"
-#include "chrome/browser/extensions/api/language_settings_private/language_settings_private_delegate.h"
-#include "chrome/browser/extensions/api/language_settings_private/language_settings_private_delegate_factory.h"
 #include "chrome/browser/language/language_model_manager_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/spellchecker/spellcheck_factory.h"
-#include "chrome/browser/spellchecker/spellcheck_service.h"
 #include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/translate/translate_service.h"
 #include "chrome/common/extensions/api/language_settings_private.h"
@@ -36,9 +32,6 @@
 #include "components/language/core/browser/pref_names.h"
 #include "components/language/core/common/language_util.h"
 #include "components/language/core/common/locale_util.h"
-#include "components/spellcheck/browser/spellcheck_platform.h"
-#include "components/spellcheck/common/spellcheck_common.h"
-#include "components/spellcheck/common/spellcheck_features.h"
 #include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/translate/core/browser/translate_download_manager.h"
 #include "components/translate/core/browser/translate_prefs.h"
@@ -46,6 +39,16 @@
 #include "third_party/icu/source/i18n/unicode/coll.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/l10n/l10n_util_collator.h"
+
+#if BUILDFLAG(ENABLE_SPELLCHECK)
+#include "chrome/browser/extensions/api/language_settings_private/language_settings_private_delegate.h"
+#include "chrome/browser/extensions/api/language_settings_private/language_settings_private_delegate_factory.h"
+#include "chrome/browser/spellchecker/spellcheck_factory.h"
+#include "chrome/browser/spellchecker/spellcheck_service.h"
+#include "components/spellcheck/browser/spellcheck_platform.h"
+#include "components/spellcheck/common/spellcheck_common.h"
+#include "components/spellcheck/common/spellcheck_features.h"
+#endif
 
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ash/constants/ash_features.h"
@@ -222,8 +225,12 @@ LanguageSettingsPrivateGetLanguageListFunction::Run() {
       app_locale, translate_prefs->IsTranslateAllowedByPolicy(), &languages);
 
   // Get the list of spell check languages and convert to a set.
+#if BUILDFLAG(ENABLE_SPELLCHECK)
   std::vector<std::string> spellcheck_languages =
       spellcheck::SpellCheckLanguages();
+#else
+  std::vector<std::string> spellcheck_languages;
+#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
   const base::flat_set<std::string> spellcheck_language_set(
       std::move(spellcheck_languages));
 
@@ -524,6 +531,7 @@ LanguageSettingsPrivateGetSpellcheckDictionaryStatusesFunction::
 
 ExtensionFunction::ResponseAction
 LanguageSettingsPrivateGetSpellcheckDictionaryStatusesFunction::Run() {
+#if BUILDFLAG(ENABLE_SPELLCHECK)
   LanguageSettingsPrivateDelegate* delegate =
       LanguageSettingsPrivateDelegateFactory::GetForBrowserContext(
           browser_context());
@@ -531,6 +539,9 @@ LanguageSettingsPrivateGetSpellcheckDictionaryStatusesFunction::Run() {
   return RespondNow(ArgumentList(
       language_settings_private::GetSpellcheckDictionaryStatuses::Results::
           Create(delegate->GetHunspellDictionaryStatuses())));
+#else
+  return RespondNow(Error("Spell check is not available in this build."));
+#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 }
 
 LanguageSettingsPrivateGetSpellcheckWordsFunction::
@@ -541,6 +552,7 @@ LanguageSettingsPrivateGetSpellcheckWordsFunction::
 
 ExtensionFunction::ResponseAction
 LanguageSettingsPrivateGetSpellcheckWordsFunction::Run() {
+#if BUILDFLAG(ENABLE_SPELLCHECK)
   SpellcheckService* service =
       SpellcheckServiceFactory::GetForContext(browser_context());
   SpellcheckCustomDictionary* dictionary = service->GetCustomDictionary();
@@ -552,8 +564,12 @@ LanguageSettingsPrivateGetSpellcheckWordsFunction::Run() {
   dictionary->AddObserver(this);
   AddRef();  // Balanced in OnCustomDictionaryLoaded().
   return RespondLater();
+#else
+  return RespondNow(Error("Spell check is not available in this build."));
+#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 }
 
+#if BUILDFLAG(ENABLE_SPELLCHECK)
 void LanguageSettingsPrivateGetSpellcheckWordsFunction::
     OnCustomDictionaryLoaded() {
   SpellcheckService* service =
@@ -587,6 +603,7 @@ LanguageSettingsPrivateGetSpellcheckWordsFunction::GetSpellcheckWords() const {
   }
   return word_list;
 }
+#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 
 LanguageSettingsPrivateAddSpellcheckWordFunction::
     LanguageSettingsPrivateAddSpellcheckWordFunction() = default;
@@ -596,6 +613,7 @@ LanguageSettingsPrivateAddSpellcheckWordFunction::
 
 ExtensionFunction::ResponseAction
 LanguageSettingsPrivateAddSpellcheckWordFunction::Run() {
+#if BUILDFLAG(ENABLE_SPELLCHECK)
   const auto params =
       language_settings_private::AddSpellcheckWord::Params::Create(args());
   EXTENSION_FUNCTION_VALIDATE(params);
@@ -612,6 +630,9 @@ LanguageSettingsPrivateAddSpellcheckWordFunction::Run() {
 #endif
 
   return RespondNow(WithArguments(success));
+#else
+  return RespondNow(Error("Spell check is not available in this build."));
+#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 }
 
 LanguageSettingsPrivateRemoveSpellcheckWordFunction::
@@ -622,6 +643,7 @@ LanguageSettingsPrivateRemoveSpellcheckWordFunction::
 
 ExtensionFunction::ResponseAction
 LanguageSettingsPrivateRemoveSpellcheckWordFunction::Run() {
+#if BUILDFLAG(ENABLE_SPELLCHECK)
   const auto params =
       language_settings_private::RemoveSpellcheckWord::Params::Create(args());
   EXTENSION_FUNCTION_VALIDATE(params);
@@ -638,6 +660,9 @@ LanguageSettingsPrivateRemoveSpellcheckWordFunction::Run() {
 #endif
 
   return RespondNow(WithArguments(success));
+#else
+  return RespondNow(Error("Spell check is not available in this build."));
+#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 }
 
 LanguageSettingsPrivateGetTranslateTargetLanguageFunction::
@@ -899,6 +924,7 @@ LanguageSettingsPrivateRetryDownloadDictionaryFunction::
 
 ExtensionFunction::ResponseAction
 LanguageSettingsPrivateRetryDownloadDictionaryFunction::Run() {
+#if BUILDFLAG(ENABLE_SPELLCHECK)
   const auto parameters =
       language_settings_private::RetryDownloadDictionary::Params::Create(
           args());
@@ -909,6 +935,9 @@ LanguageSettingsPrivateRetryDownloadDictionaryFunction::Run() {
           browser_context());
   delegate->RetryDownloadHunspellDictionary(parameters->language_code);
   return RespondNow(NoArguments());
+#else
+  return RespondNow(Error("Spell check is not available in this build."));
+#endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 }
 
 }  // namespace extensions

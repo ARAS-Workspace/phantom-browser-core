@@ -604,7 +604,7 @@ source_set("extensions") {
     "//components/saved_tab_groups/public",
     "//components/services/patch/content",
     "//components/services/unzip/content",
-    "//components/spellcheck/browser",
+    "//components/spellcheck:buildflags",
     "//components/supervised_user/core/browser",
     "//components/tabs:public",
     "//components/update_client",
@@ -658,7 +658,16 @@ source_set("extensions") {
     deps += [ "//chrome/browser/mac" ]
   }
   if (enable_spellcheck) {
-    deps += [ "//chrome/browser/spellchecker" ]
+    sources += [
+      "api/language_settings_private/language_settings_private_delegate.cc",
+      "api/language_settings_private/language_settings_private_delegate.h",
+      "api/language_settings_private/language_settings_private_delegate_factory.cc",
+      "api/language_settings_private/language_settings_private_delegate_factory.h",
+    ]
+    deps += [
+      "//chrome/browser/spellchecker",
+      "//components/spellcheck/browser",
+    ]
   }
   if (is_android) {
     sources += [
@@ -796,10 +805,6 @@ source_set("extensions") {
       "api/image_writer_private/zip_extractor.h",
       "api/language_settings_private/language_settings_private_api.cc",
       "api/language_settings_private/language_settings_private_api.h",
-      "api/language_settings_private/language_settings_private_delegate.cc",
-      "api/language_settings_private/language_settings_private_delegate.h",
-      "api/language_settings_private/language_settings_private_delegate_factory.cc",
-      "api/language_settings_private/language_settings_private_delegate_factory.h",
       "api/management/chrome_management_api_delegate_non_android.cc",
       "api/mime_handlers/dispatch_mime_handler_event.cc",
       "api/mime_handlers/dispatch_mime_handler_event.h",
@@ -2116,6 +2121,14 @@ source_set("unit_tests") {
     sources += [ "preinstalled_extensions_unittest.cc" ]
   }
 
+  if (enable_spellcheck) {
+    sources += [
+      "api/language_settings_private/language_settings_private_api_unittest.cc",
+      "api/language_settings_private/language_settings_private_delegate_unittest.cc",
+    ]
+    deps += [ "//chrome/browser/spellchecker" ]
+  }
+
   if (enable_extensions) {
     sources += [
       "api/device_permissions_manager_unittest.cc",
@@ -2133,8 +2146,6 @@ source_set("unit_tests") {
       "api/image_writer_private/write_from_file_operation_unittest.cc",
       "api/image_writer_private/write_from_url_operation_unittest.cc",
       "api/image_writer_private/xz_extractor_unittest.cc",
-      "api/language_settings_private/language_settings_private_api_unittest.cc",
-      "api/language_settings_private/language_settings_private_delegate_unittest.cc",
       "api/passwords_private/password_access_auth_timeout_handler_unittest.cc",
       "api/passwords_private/password_check_delegate_unittest.cc",
       "api/passwords_private/passwords_private_delegate_impl_unittest.cc",
@@ -2166,7 +2177,6 @@ source_set("unit_tests") {
       "//chrome/browser/custom_handlers",
       "//chrome/browser/password_manager",
       "//chrome/browser/password_manager:test_support",
-      "//chrome/browser/spellchecker",
       "//chrome/browser/ui/global_error:test_support",
       "//chrome/browser/ui/passwords/settings:test_support",
       "//chrome/browser/web_applications:web_app_test",

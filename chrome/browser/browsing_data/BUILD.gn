@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//components/spellcheck/spellcheck_build_features.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//ui/webui/webui_features.gni")
 
@@ -135,7 +136,6 @@ source_set("impl") {
     "//chrome/browser/sessions",
     "//chrome/browser/share",
     "//chrome/browser/signin",
-    "//chrome/browser/spellchecker",
     "//chrome/browser/strike_database",
     "//chrome/browser/sync",
     "//chrome/browser/sync:factories",
@@ -165,6 +165,7 @@ source_set("impl") {
     "//components/privacy_sandbox:privacy_sandbox_settings_headers",
     "//components/safe_browsing/core/browser:verdict_cache_manager",
     "//components/search_engines",
+    "//components/spellcheck:buildflags",
     "//components/strings",
     "//components/url_matcher",
     "//components/web_cache/browser",
@@ -172,6 +173,10 @@ source_set("impl") {
     "//services/tracing/public/cpp/background_tracing",
     "//ui/strings:ui_strings__strings_grit",
   ]
+
+  if (enable_spellcheck) {
+    deps += [ "//chrome/browser/spellchecker" ]
+  }
 
   if (is_chromeos) {
     deps += [
@@ -272,7 +277,6 @@ source_set("unit_tests") {
     "//chrome/browser/safe_browsing:verdict_cache_manager_factory",
     "//chrome/browser/segmentation_platform",
     "//chrome/browser/segmentation_platform:test_utils",
-    "//chrome/browser/spellchecker",
     "//chrome/browser/ssl",
     "//chrome/browser/storage",
     "//chrome/browser/strike_database",
@@ -306,6 +310,10 @@ source_set("unit_tests") {
     "//testing/gmock",
     "//testing/gtest",
   ]
+
+  if (enable_spellcheck) {
+    deps += [ "//chrome/browser/spellchecker" ]
+  }
 
   if (enable_extensions) {
     sources += [ "counters/hosted_apps_counter_unittest.cc" ]

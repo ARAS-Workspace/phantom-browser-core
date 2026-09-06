@@ -1035,7 +1035,6 @@ source_set("core") {
     "//chrome/browser/site_protection",
     "//chrome/browser/site_protection:utils",
     "//chrome/browser/speech",
-    "//chrome/browser/spellchecker",
     "//chrome/browser/ssl",
     "//chrome/browser/status_icons",
     "//chrome/browser/supervised_user",
@@ -1217,9 +1216,6 @@ source_set("core") {
     "//components/site_isolation",
     "//components/skills:features",
     "//components/spellcheck:buildflags",
-    "//components/spellcheck/browser",
-    "//components/spellcheck/common",
-    "//components/spellcheck/common:interfaces",
     "//components/startup_metric_utils",
     "//components/strike_database:features",
     "//components/subresource_filter/content/browser",
@@ -1257,6 +1253,15 @@ source_set("core") {
     "//ui/webui:buildflags",
     "//ui/webui/tracked_element",
   ]
+
+  if (enable_spellcheck) {
+    deps += [
+      "//chrome/browser/spellchecker",
+      "//components/spellcheck/browser",
+      "//components/spellcheck/common",
+      "//components/spellcheck/common:interfaces",
+    ]
+  }
 
   if (!is_android) {
     public_deps = [

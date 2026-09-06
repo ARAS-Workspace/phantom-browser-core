@@ -2,6 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//components/spellcheck/spellcheck_build_features.gni")
+
 if (is_android) {
   import("//build/config/android/rules.gni")
   import("//third_party/jni_zero/jni_zero.gni")
@@ -189,8 +191,12 @@ source_set("privacy") {
     "//chrome/common:constants",
     "//components/content_settings/core/browser",
     "//components/prefs",
-    "//components/spellcheck/browser",
+    "//components/spellcheck:buildflags",
   ]
+
+  if (enable_spellcheck) {
+    deps += [ "//components/spellcheck/browser" ]
+  }
 }
 
 if (is_android) {

@@ -2,6 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//components/spellcheck/spellcheck_build_features.gni")
+
 if (!is_android) {
   source_set("profile_resetter") {
     sources = [
@@ -71,7 +73,7 @@ if (!is_android) {
       "//components/prefs",
       "//components/proxy_config",
       "//components/search_engines",
-      "//components/spellcheck/browser",
+      "//components/spellcheck:buildflags",
       "//components/strings",
       "//components/version_info",
       "//content/public/browser",
@@ -83,6 +85,10 @@ if (!is_android) {
       "//ui/base",
       "//url",
     ]
+
+    if (enable_spellcheck) {
+      deps += [ "//components/spellcheck/browser" ]
+    }
 
     if (is_win) {
       sources += [ "triggered_profile_resetter_win.cc" ]

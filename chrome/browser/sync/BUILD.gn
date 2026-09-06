@@ -160,7 +160,6 @@ source_set("sync") {
     "//components/sharing_message",
     "//components/skills/public",
     "//components/spellcheck:buildflags",
-    "//components/spellcheck/browser",
     "//components/strings:components_strings_grit",
     "//components/sync_bookmarks",
     "//components/sync_preferences:features",
@@ -177,6 +176,10 @@ source_set("sync") {
     "//chrome/browser/android/webapk/proto",
     "//components/webapps/browser",
   ]
+
+  if (enable_spellcheck) {
+    deps += [ "//components/spellcheck/browser" ]
+  }
 
   allow_circular_includes_from = []
 
@@ -325,7 +328,6 @@ source_set("unit_tests") {
     "//chrome/browser/favicon",
     "//chrome/browser/history",
     "//chrome/browser/search_engines",
-    "//chrome/browser/spellchecker",
     "//chrome/browser/trusted_vault",
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/sync",
@@ -349,6 +351,10 @@ source_set("unit_tests") {
     "//ui/webui:buildflags",
     "//url",
   ]
+
+  if (enable_spellcheck) {
+    deps += [ "//chrome/browser/spellchecker" ]
+  }
 
   if (is_chromeos) {
     deps += [

@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//components/spellcheck/spellcheck_build_features.gni")
 import("//extensions/buildflags/buildflags.gni")
 
 source_set("renderer_host") {
@@ -83,8 +84,11 @@ if (is_mac) {
       "//chrome/browser/devtools",
       "//chrome/browser/glic",
       "//chrome/browser/ui",
-      "//components/spellcheck/browser",
     ]
+
+    if (enable_spellcheck) {
+      deps += [ "//components/spellcheck/browser" ]
+    }
   }
 }
 

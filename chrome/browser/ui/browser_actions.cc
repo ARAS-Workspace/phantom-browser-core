@@ -70,7 +70,6 @@
 #include "chrome/browser/shell_integration.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/signin/signin_ui_util.h"
-#include "chrome/browser/spellchecker/spellcheck_service.h"
 #include "chrome/browser/sync/sync_ui_util.h"
 #include "chrome/browser/tab_list/tab_list_interface.h"
 #include "chrome/browser/ui/actions/actions_util.h"
@@ -191,7 +190,6 @@
 #include "components/search_engines/template_url_service.h"
 #include "components/signin/public/base/signin_metrics.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
-#include "components/spellcheck/browser/pref_names.h"
 #include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/split_tabs/split_tab_visual_data.h"
 #include "components/strings/grit/components_strings.h"
@@ -224,6 +222,11 @@
 #include "chrome/common/pref_names.h"
 #include "components/prefs/pref_service.h"
 #endif
+
+#if BUILDFLAG(ENABLE_SPELLCHECK) && !BUILDFLAG(IS_MAC)
+#include "chrome/browser/spellchecker/spellcheck_service.h"
+#include "components/spellcheck/browser/pref_names.h"
+#endif  // BUILDFLAG(ENABLE_SPELLCHECK) && !BUILDFLAG(IS_MAC)
 
 namespace {
 
