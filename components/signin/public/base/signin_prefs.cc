@@ -132,17 +132,6 @@ constexpr char kExtensionsExplicitBrowserSigninEnabled[] =
 constexpr char kBookmarksExplicitBrowserSigninEnabled[] =
     "BookmarksExplicitBrowserSigninEnabled";
 
-// Sync promo on the avatar button.
-//
-// Number of times the sync promo was shown in the identity pill (avatar toolbar
-// button).
-constexpr std::string_view kSyncPromoIdentityPillShownCount =
-    "SyncPromoIdentityPillShownCount";
-// Number of times the sync promo was used (clicked) in the identity pill
-// (avatar toolbar button).
-constexpr std::string_view kSyncPromoIdentityPillUsedCount =
-    "SyncPromoIdentityPillUsedCount";
-
 // Number of times the Bookmark Batch Upload promo was dismissed.
 constexpr std::string_view kBookmarkBatchUploadPromoDismissCount =
     "BookmarkBatchUploadPromoDismissCount";
@@ -521,26 +510,6 @@ std::optional<base::Time>
 SigninPrefs::GetPolicyDisclaimerLastRegistrationFailureTime(
     const GaiaId& gaia_id) const {
   return GetTimePref(gaia_id, kPolicyDisclaimerLastRegistrationFailureTime);
-}
-
-void SigninPrefs::IncrementSyncPromoIdentityPillShownCount(
-    const GaiaId& gaia_id) {
-  IncrementIntPrefForAccount(gaia_id, kSyncPromoIdentityPillShownCount);
-}
-
-int SigninPrefs::GetSyncPromoIdentityPillShownCount(
-    const GaiaId& gaia_id) const {
-  return GetIntPrefForAccount(gaia_id, kSyncPromoIdentityPillShownCount);
-}
-
-void SigninPrefs::IncrementSyncPromoIdentityPillUsedCount(
-    const GaiaId& gaia_id) {
-  IncrementIntPrefForAccount(gaia_id, kSyncPromoIdentityPillUsedCount);
-}
-
-int SigninPrefs::GetSyncPromoIdentityPillUsedCount(
-    const GaiaId& gaia_id) const {
-  return GetIntPrefForAccount(gaia_id, kSyncPromoIdentityPillUsedCount);
 }
 
 int SigninPrefs::GetHistoryPageHistorySyncPromoShownCount(
