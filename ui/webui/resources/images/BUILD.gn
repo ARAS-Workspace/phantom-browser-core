@@ -112,8 +112,6 @@ generate_grd("build_grdp") {
       "icon_history_old.svg",
       "icon_journeys.svg",
       "icon_journeys_old.svg",
-      "promotion_banner_light.svg",
-      "dark/promotion_banner_dark.svg",
       "promotion_policy_banner_close.svg",
     ]
   }

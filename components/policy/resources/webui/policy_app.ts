@@ -10,9 +10,6 @@ import 'chrome://resources/js/ios/web_ui.js';
 
 import './status_box.js';
 import './policy_table.js';
-// <if expr="not is_ios and not is_android">
-import './promotion_banner_section_container.js';
-// </if>
 import 'chrome://resources/cr_elements/cr_button/cr_button.js';
 import 'chrome://resources/cr_elements/cr_checkbox/cr_checkbox.js';
 import 'chrome://resources/cr_elements/cr_toolbar/cr_toolbar.js';
@@ -74,7 +71,6 @@ export class PolicyAppElement extends CrLitElement {
       showUnset_: {type: Boolean},
       status_: {type: Object},
       policyGroups_: {type: Array},
-      shouldShowPromo_: {type: Boolean},
       shouldShowCommandLineArgumentsWarning_: {type: Boolean},
       commandLineArguments_: {type: String},
       toastText_: {type: String},
@@ -90,7 +86,6 @@ export class PolicyAppElement extends CrLitElement {
   protected accessor showUnset_: boolean = false;
   protected accessor status_: Record<string, Status> = {};
   protected accessor policyGroups_: PolicyTableModel[] = [];
-  protected accessor shouldShowPromo_: boolean = false;
   protected accessor shouldShowCommandLineArgumentsWarning_: boolean = false;
   protected accessor commandLineArguments_: string = '';
   protected accessor toastText_: string = '';
@@ -122,10 +117,6 @@ export class PolicyAppElement extends CrLitElement {
 
     FocusOutlineManager.forDocument(document);
 
-    // <if expr="not is_ios and not is_android">
-    this.shouldShowPromo_ = await BrowserProxy.checkPromotionEligibility();
-    // </if>
-
     // <if expr="not is_ios and not is_android and not is_chromeos">
     this.shouldShowCommandLineArgumentsWarning_ =
         loadTimeData.getBoolean('hasCustomCommandLineArguments');
@@ -152,22 +143,6 @@ export class PolicyAppElement extends CrLitElement {
   override disconnectedCallback() {
     super.disconnectedCallback();
   }
-
-  // <if expr="not is_ios and not is_android">
-  protected onPromoDismiss_() {
-    BrowserProxy.setBannerDismissed();
-    this.shouldShowPromo_ = false;
-  }
-
-  protected onPromoRedirect_() {
-    BrowserProxy.recordBannerRedirected();
-    window.open(
-        'https://admin.google.com/ac/chrome/guides/' +
-            '?ref=browser&utm_source=chrome_policy_cec',
-        '_blank',
-    );
-  }
-  // </if>
 
   private onPoliciesReceived_(
       policyNames: PolicyNamesResponse,

@@ -26,15 +26,7 @@
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "mojo/public/cpp/bindings/remote.h"
 
-#if !BUILDFLAG(IS_ANDROID)
-#include "components/enterprise/browser/promotion/promotion_eligibility_checker.h"
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 class PrefChangeRegistrar;
-
-namespace enterprise_management {
-class GetUserEligiblePromotionsResponse;
-}  // namespace enterprise_management
 
 // The JavaScript message handler for the chrome://policy page.
 class PolicyUIHandler : public content::WebUIMessageHandler,
@@ -83,13 +75,6 @@ class PolicyUIHandler : public content::WebUIMessageHandler,
       SetLocalTestPoliciesCallback callback) override;
   void GetPolicyLogs(GetPolicyLogsCallback callback) override;
 
-#if !BUILDFLAG(IS_ANDROID)
-  void CheckPromotionEligibility(
-      CheckPromotionEligibilityCallback callback) override;
-  void SetBannerDismissed() override;
-  void RecordBannerRedirected() override;
-#endif
-
   void GetPoliciesJson(policy::mojom::GetPoliciesReason reason,
                        GetPoliciesJsonCallback callback) override;
 
@@ -101,11 +86,6 @@ class PolicyUIHandler : public content::WebUIMessageHandler,
   void HandleRestartBrowser(const base::ListValue& args);
   void HandleSetUserAffiliated(const base::ListValue& args);
   void HandleGetAppliedTestPolicies(const base::ListValue& args);
-#if !BUILDFLAG(IS_ANDROID)
-  void HandleShouldShowPromotion(const base::ListValue& args);
-  void HandleSetBannerDismissed(const base::ListValue& args);
-  void HandleRecordBannerRedirected(const base::ListValue& args);
-#endif
   void HandleGetPoliciesJson(const base::ListValue& args);
 #if !BUILDFLAG(IS_CHROMEOS)
   void HandleUploadReport(const base::ListValue& args);
@@ -152,18 +132,6 @@ class PolicyUIHandler : public content::WebUIMessageHandler,
 #if !BUILDFLAG(IS_CHROMEOS)
   // Called when report has been uploaded, successfully or not.
   void OnReportUploaded(const std::string& callback_id);
-#endif
-
-#if !BUILDFLAG(IS_ANDROID)
-  void OnPromotionEligibilityFetchedWebUiWrapper(base::Value callback_id,
-                                                 bool response);
-
-  void OnPromotionEligibilityFetched(
-      CheckPromotionEligibilityCallback callback,
-      enterprise_management::GetUserEligiblePromotionsResponse response);
-
-  std::unique_ptr<enterprise_promotion::PromotionEligibilityChecker>
-      promotion_eligibility_checker_;
 #endif
 
   // Builds a raw JSON string representation of all the policies.

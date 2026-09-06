@@ -74,14 +74,6 @@ export function getHtml(this: PolicyAppElement) {
         </div>
       ` : ''}
 </if>
-<if expr="not is_ios and not is_android">
-      ${this.shouldShowPromo_ ? html`
-        <promotion-banner-section-container
-            @dismiss="${this.onPromoDismiss_}"
-            @redirect="${this.onPromoRedirect_}">
-        </promotion-banner-section-container>
-      ` : ''}
-</if>
       <section id="status-section" class="status-box-section"
           ?hidden="${!this.hasStatus_()}">
         <h2>$i18n{status}</h2>

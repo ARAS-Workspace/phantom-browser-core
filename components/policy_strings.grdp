@@ -876,15 +876,6 @@ Additional details:
   <message name="IDS_POLICY_TABLE_COLUMN_SORT_DESCENDING" desc="Part of the label for policy table sorting arrows denoting descending sort order.">
     in descending order
   </message>
-  <message name="IDS_POLICY_BANNER_PROMOTION_TITLE" desc="Title for Chrome Enterprise Core (CEC) promotion banner">
-    Streamline how your organization manages policies
-  </message>
-  <message name="IDS_POLICY_BANNER_PROMOTION_DESC" desc="Description for Chrome Enterprise Core (CEC) promotion banner">
-    Chrome Enterprise Core gives you a centralized tool for configuring browser policies from the cloud
-  </message>
-  <message name="IDS_POLICY_BANNER_PROMOTION_BTN" desc="Button for Chrome Enterprise Core (CEC) promotion banner">
-    Try Chrome Enterprise Core
-  </message>
   <message name="IDS_POLICY_COMMAND_LINE_FLAGS_WARNING" desc="Warning shown on chrome://policy when custom command line flags are explicitly specified by the user upon launching Chrome.">
     This instance of Chrome is running with command line flags manually set. Note that command line flags may change at any time and are not supported.
   </message>

@@ -9,7 +9,6 @@
 #include "chrome/browser/enterprise/util/affiliation.h"
 #include "chrome/browser/extensions/extension_allowlist_factory.h"
 #include "chrome/browser/extensions/install_tracker_factory.h"
-#include "chrome/browser/policy/policy_ui_utils.h"
 #include "chrome/browser/policy/profile_policy_connector.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
@@ -124,9 +123,7 @@ ChromeWebstorePrivateAPIDelegate::CreatePromotionEligibilityChecker(
     content::BrowserContext* context,
     bool dismissed_banner_pref,
     bool feature_enabled) {
-  return policy::CreatePromotionEligibilityChecker(
-      Profile::FromBrowserContext(context), dismissed_banner_pref,
-      feature_enabled);
+  return nullptr;
 }
 
 }  // namespace extensions

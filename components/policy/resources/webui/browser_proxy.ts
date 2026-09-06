@@ -38,33 +38,6 @@ export class BrowserProxy {
         result => result.message);
   }
 
-  // <if expr="not is_ios and not is_android">
-  static checkPromotionEligibility(): Promise<boolean> {
-    if (policyPageMojoMigrationEnabled) {
-      return this.getInstance().handler.checkPromotionEligibility().then(
-          response => response.shouldShowPromotion);
-    } else {
-      return sendWithPromise('shouldShowPromotion');
-    }
-  }
-
-  static setBannerDismissed() {
-    if (policyPageMojoMigrationEnabled) {
-      this.getInstance().handler.setBannerDismissed();
-    } else {
-      sendWithPromise('setBannerDismissed');
-    }
-  }
-
-  static recordBannerRedirected() {
-    if (policyPageMojoMigrationEnabled) {
-      this.getInstance().handler.recordBannerRedirected();
-    } else {
-      chrome.send('recordBannerRedirected');
-    }
-  }
-  // </if>
-
   static getPolicies(reason: GetPoliciesReason): Promise<string> {
     if (policyPageMojoMigrationEnabled) {
       return this.getInstance().handler.getPoliciesJson(reason).then(

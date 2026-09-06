@@ -194,9 +194,6 @@ void CreateAndAddPolicyUIHtmlSource(Profile* profile) {
       {"viewLogs", IDS_VIEW_POLICY_LOGS},
 #if !BUILDFLAG(IS_ANDROID)
       {"commandLineFlagsWarning", IDS_POLICY_COMMAND_LINE_FLAGS_WARNING},
-      {"promotionBannerTitle", IDS_POLICY_BANNER_PROMOTION_TITLE},
-      {"promotionBannerDesc", IDS_POLICY_BANNER_PROMOTION_DESC},
-      {"promotionBannerBtn", IDS_POLICY_BANNER_PROMOTION_BTN},
 #endif
   };
   source->AddLocalizedStrings(kStrings);
@@ -335,8 +332,6 @@ WEB_UI_CONTROLLER_TYPE_IMPL(PolicyUI)
 void PolicyUI::RegisterProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterBooleanPref(policy::policy_prefs::kPolicyTestPageEnabled,
                                 true);
-  registry->RegisterBooleanPref(
-      policy::policy_prefs::kHasDismissedPolicyPagePromotionBanner, false);
 }
 
 // static

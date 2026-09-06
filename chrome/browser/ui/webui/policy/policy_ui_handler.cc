@@ -25,7 +25,6 @@
 #include "base/json/json_writer.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
-#include "base/metrics/histogram_functions.h"
 #include "base/notreached.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/task/task_traits.h"
@@ -66,7 +65,6 @@
 #include "components/policy/core/common/cloud/cloud_policy_manager.h"
 #include "components/policy/core/common/cloud/cloud_policy_refresh_scheduler.h"
 #include "components/policy/core/common/cloud/cloud_policy_util.h"
-#include "components/policy/core/common/cloud/enterprise_metrics.h"
 #include "components/policy/core/common/local_test_policy_loader.h"
 #include "components/policy/core/common/local_test_policy_provider.h"
 #include "components/policy/core/common/policy_details.h"
@@ -254,21 +252,6 @@ void PolicyUIHandler::RegisterMessages() {
       "getAppliedTestPolicies",
       base::BindRepeating(&PolicyUIHandler::HandleGetAppliedTestPolicies,
                           base::Unretained(this)));
-
-#if !BUILDFLAG(IS_ANDROID)
-  web_ui()->RegisterMessageCallback(
-      "shouldShowPromotion",
-      base::BindRepeating(&PolicyUIHandler::HandleShouldShowPromotion,
-                          base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "setBannerDismissed",
-      base::BindRepeating(&PolicyUIHandler::HandleSetBannerDismissed,
-                          base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "recordBannerRedirected",
-      base::BindRepeating(&PolicyUIHandler::HandleRecordBannerRedirected,
-                          base::Unretained(this)));
-#endif
 
   web_ui()->RegisterMessageCallback(
       "getPoliciesJson",
@@ -543,63 +526,6 @@ void PolicyUIHandler::SendStatus() {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID)
-void PolicyUIHandler::OnPromotionEligibilityFetchedWebUiWrapper(
-    base::Value callback_id,
-    bool response) {
-  AllowJavascript();
-  ResolveJavascriptCallback(callback_id, response);
-}
-
-void PolicyUIHandler::HandleShouldShowPromotion(const base::ListValue& args) {
-  CheckPromotionEligibility(base::BindOnce(
-      &PolicyUIHandler::OnPromotionEligibilityFetchedWebUiWrapper,
-      weak_factory_.GetWeakPtr(), args[0].Clone()));
-}
-
-void PolicyUIHandler::CheckPromotionEligibility(
-    CheckPromotionEligibilityCallback callback) {
-  bool dismissed_banner_pref = profile_->GetPrefs()->GetBoolean(
-      policy::policy_prefs::kHasDismissedPolicyPagePromotionBanner);
-
-  promotion_eligibility_checker_ = policy::CreatePromotionEligibilityChecker(
-      &profile_.get(), dismissed_banner_pref, /*feature_enabled=*/true);
-  if (!promotion_eligibility_checker_) {
-    OnPromotionEligibilityFetched(
-        std::move(callback),
-        enterprise_management::GetUserEligiblePromotionsResponse());
-    return;
-  }
-  promotion_eligibility_checker_->MaybeCheckPromotionEligibility(
-      base::BindOnce(&PolicyUIHandler::OnPromotionEligibilityFetched,
-                     weak_factory_.GetWeakPtr(), std::move(callback)));
-  return;
-}
-
-void PolicyUIHandler::HandleSetBannerDismissed(const base::ListValue& args) {
-  SetBannerDismissed();
-}
-
-void PolicyUIHandler::SetBannerDismissed() {
-  base::UmaHistogramEnumeration(
-      "Enterprise.PolicyPromotionBannerAction",
-      policy::PolicyPromotionBannerAction::kBannerDismissed);
-  profile_->GetPrefs()->SetBoolean(
-      policy::policy_prefs::kHasDismissedPolicyPagePromotionBanner, true);
-}
-
-void PolicyUIHandler::HandleRecordBannerRedirected(
-    const base::ListValue& args) {
-  RecordBannerRedirected();
-}
-
-void PolicyUIHandler::RecordBannerRedirected() {
-  base::UmaHistogramEnumeration(
-      "Enterprise.PolicyPromotionBannerAction",
-      policy::PolicyPromotionBannerAction::kBannerRedirected);
-}
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 #if !BUILDFLAG(IS_CHROMEOS)
 void PolicyUIHandler::OnReportUploaded(const std::string& callback_id) {
   if (!IsJavascriptAllowed()) {
@@ -610,19 +536,6 @@ void PolicyUIHandler::OnReportUploaded(const std::string& callback_id) {
   SendStatus();
 }
 #endif  // !BUILDFLAG(IS_CHROMEOS)
-
-#if !BUILDFLAG(IS_ANDROID)
-void PolicyUIHandler::OnPromotionEligibilityFetched(
-    CheckPromotionEligibilityCallback callback,
-    enterprise_management::GetUserEligiblePromotionsResponse response) {
-  bool should_show_promotion = response.promotions().policy_page_promotion() ==
-                               enterprise_management::CHROME_ENTERPRISE_CORE;
-  // Log the UMA metric for the promotion banner displayed.
-  base::UmaHistogramBoolean("Enterprise.PolicyPromotionBannerDisplayed",
-                            should_show_promotion);
-  std::move(callback).Run(should_show_promotion);
-}
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 std::string PolicyUIHandler::GetPoliciesJsonImpl(
     policy::mojom::GetPoliciesReason reason) {

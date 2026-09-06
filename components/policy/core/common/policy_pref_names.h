@@ -181,13 +181,6 @@ inline constexpr char kStandardizedBrowserZoomEnabled[] =
 inline constexpr char kPolicyTestPageEnabled[] = "policy_test_page_enabled";
 
 // Boolean indicating if the user has permanently dismissed the promotion
-// banner on the chrome://policy page. If it's true, it means the user
-// has clicked the "dismiss" button and has the banner turned off, if the
-// value is false, the user has taken no action to turn off the banner.
-inline constexpr char kHasDismissedPolicyPagePromotionBanner[] =
-    "has_dismissed_policy_page_promotion_banner";
-
-// Boolean indicating if the user has permanently dismissed the promotion
 // banner on the chrome://management page. If it's true, it means the user
 // has clicked the "dismiss" button and has the banner turned off, if the
 // value is false, the user has taken no action to turn off the banner.
