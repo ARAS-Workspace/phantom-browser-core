@@ -195,7 +195,7 @@ BASE_FEATURE(kCorsNonWildcardRequestHeadersSupport,
 
 // Do not send TLS client certificates in CORS preflight. Omit all client certs
 // and continue the handshake without sending one if requested.
-BASE_FEATURE(kOmitCorsClientCert, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kOmitCorsClientCert, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Enforces that frame-type destinations require kNavigate mode.
 BASE_FEATURE(kRestrictFrameDestinationsToNavigate,

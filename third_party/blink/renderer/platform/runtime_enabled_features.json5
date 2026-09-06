@@ -3395,18 +3395,8 @@
     },
     {
       name: "GlobalPrivacyControl",
-      implied_by: [
-        "GlobalPrivacyControlForce",
-        "GlobalPrivacyControlTest"
-      ],
+      status: "stable",
       base_feature: "none",
-    },
-    {
-      name: "GlobalPrivacyControlForce",
-    },
-    {
-      name: "GlobalPrivacyControlTest",
-      status: "experimental",
     },
     {
       name: "GraphemeClusterBoundsCheck",

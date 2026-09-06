@@ -2425,11 +2425,6 @@ BASE_FEATURE(kWebFontsCacheAwareTimeoutAdaption,
 #endif
 );
 
-// Causes WebRTC to replace host ICE candidate IP addresses with generated
-// names ending in ".local" and resolve them using mDNS.
-// http://crbug.com/878465
-BASE_FEATURE(kWebRtcHideLocalIpsWithMdns, base::FEATURE_ENABLED_BY_DEFAULT);
-
 // Causes WebRTC to not set the color space of video frames on the receive side
 // in case it's unspecified. Otherwise we will guess that the color space is
 // BT709. http://crbug.com/1129243

@@ -7,11 +7,9 @@
 #include <optional>
 #include <utility>
 
-#include "base/feature_list.h"
 #include "base/location.h"
 #include "components/webrtc/net_address_utils.h"
 #include "net/base/address_family.h"
-#include "third_party/blink/public/common/features.h"
 #include "third_party/blink/renderer/platform/p2p/socket_dispatcher.h"
 #include "third_party/blink/renderer/platform/wtf/functional.h"
 #include "third_party/blink/renderer/platform/wtf/text/wtf_string.h"
@@ -35,8 +33,6 @@ void P2PAsyncAddressResolver::Start(const webrtc::SocketAddress& host_name,
 
   state_ = kStateSent;
   done_callback_ = std::move(done_callback);
-  bool enable_mdns = base::FeatureList::IsEnabled(
-      blink::features::kWebRtcHideLocalIpsWithMdns);
   auto callback = blink::BindOnce(&P2PAsyncAddressResolver::OnResponse,
                                   scoped_refptr<P2PAsyncAddressResolver>(this));
 
@@ -46,7 +42,8 @@ void P2PAsyncAddressResolver::Start(const webrtc::SocketAddress& host_name,
   }
 
   dispatcher_->GetP2PSocketManager()->GetHostAddress(
-      String(host_name.hostname()), family, enable_mdns, std::move(callback));
+      String(host_name.hostname()), family, /*enable_mdns=*/true,
+      std::move(callback));
   dispatcher_ = nullptr;
 }
 

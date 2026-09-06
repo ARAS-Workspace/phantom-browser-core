@@ -788,13 +788,9 @@ void PeerConnectionDependencyFactory::CreatePeerConnectionFactory() {
       base::WaitableEvent::InitialState::NOT_SIGNALED);
   std::unique_ptr<MdnsResponderAdapter> mdns_responder;
 #if BUILDFLAG(ENABLE_MDNS)
-  if (base::FeatureList::IsEnabled(
-          blink::features::kWebRtcHideLocalIpsWithMdns)) {
-    // Note that MdnsResponderAdapter is created on the main thread to have
-    // access to the connector to the service manager.
-    mdns_responder =
-        std::make_unique<MdnsResponderAdapter>(*GetSupplementable());
-  }
+  // Note that MdnsResponderAdapter is created on the main thread to have
+  // access to the connector to the service manager.
+  mdns_responder = std::make_unique<MdnsResponderAdapter>(*GetSupplementable());
 #endif  // BUILDFLAG(ENABLE_MDNS)
   PostCrossThreadTask(
       *GetWebRtcNetworkTaskRunner(), FROM_HERE,

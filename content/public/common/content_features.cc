@@ -842,7 +842,7 @@ BASE_FEATURE(kProcessSelectionDeferringConditions,
 // Origin-Agent-Cluster: ?0. This feature only takes effect if the Blink feature
 // OriginAgentClusterDefaultEnable is enabled, since origin-keyed processes
 // require origin-agent-clusters.
-BASE_FEATURE(kOriginKeyedProcessesByDefault, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kOriginKeyedProcessesByDefault, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // When enabled, ads will not be eligible for origin-keyed processes by default.
 // Ads can still opt into origin-keyed processes by using the
@@ -1147,7 +1147,7 @@ BASE_FEATURE(kSpareRendererForSitePerProcess, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Controls whether site isolation should use origins instead of scheme and
 // eTLD+1.
-BASE_FEATURE(kStrictOriginIsolation, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kStrictOriginIsolation, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Disallows window.{alert, prompt, confirm} if triggered inside a subframe that
 // is not same origin with the main frame.

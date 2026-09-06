@@ -389,11 +389,11 @@ BASE_FEATURE(kAddressTrackerLinuxIsProxied, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_LINUX)
 
 // Enables binding of cookies to the port that originally set them by default.
-BASE_FEATURE(kEnablePortBoundCookies, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kEnablePortBoundCookies, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Enables binding of cookies to the scheme that originally set them.
 NET_EXPORT BASE_DECLARE_FEATURE(kEnableSchemeBoundCookies);
-BASE_FEATURE(kEnableSchemeBoundCookies, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kEnableSchemeBoundCookies, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Disallows cookies to have non ascii values in their name or value.
 NET_EXPORT BASE_DECLARE_FEATURE(kDisallowNonAsciiCookies);
