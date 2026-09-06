@@ -7419,10 +7419,11 @@ test("unit_tests") {
   }
 
   if (is_win || is_mac || is_linux || is_chromeos || is_android) {
-    deps += [
-      "//chrome/browser/ui/webui/management:unit_tests",
-      "//components/enterprise/device_trust/core:test_support",
-    ]
+    deps += [ "//components/enterprise/device_trust/core:test_support" ]
+  }
+
+  if (is_chromeos || is_android) {
+    deps += [ "//chrome/browser/ui/webui/management:unit_tests" ]
   }
 
   if (enterprise_client_certificates) {
