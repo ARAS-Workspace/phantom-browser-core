@@ -111,9 +111,6 @@ class RenderViewContextMenuProxy {
   // Removes separator (if any) before the specified context menu item.
   virtual void RemoveSeparatorBeforeMenuItem(int command_id) = 0;
 
-  // Add spell check service item to the context menu.
-  virtual void AddSpellCheckServiceItem(bool is_checked) = 0;
-
   // Add accessibility labels service item to the context menu.
   virtual void AddAccessibilityLabelsServiceItem(bool is_checked) = 0;
 

@@ -1772,9 +1772,6 @@ Chromium is unable to recover your settings.
         <message name="IDS_CONTENT_CONTEXT_ACCESSIBILITY_LABELS_BUBBLE_TEXT_ONCE" desc="The text of a bubble that confirms users allows integrating the accessibility labels service of Google to Chromium just once.">
           If an image doesn’t have a useful description, Chromium will try to provide one for you. To create descriptions, images are sent to Google.
         </message>
-        <message name="IDS_CONTENT_CONTEXT_SPELLING_BUBBLE_TEXT" desc="The text of a bubble that confirms users allows integrating the spelling service of Google to Chrome.">
-          This uses the same spell checker that's used in Google search. Text you type in the browser is sent to Google. You can always change this behavior in settings.
-        </message>
         <if expr="not use_titlecase">
           <message name="IDS_CONTENT_CONTEXT_OPENLINKNEWTAB_INAPP" desc="The name of the command to open a link in a newly created browser tab when the user is in an app window">
             Open link in new Chromium &amp;tab

@@ -864,14 +864,6 @@ are declared in tools/grit/grit_args.gni.
           <message name="IDS_CONTENT_CONTEXT_PASTE_AND_MATCH_STYLE" desc="The name of the 'Paste as plain text' command in the content area context menu">
             Paste as plain text
           </message>
-          <message name="IDS_CONTENT_CONTEXT_ADD_TO_DICTIONARY" desc="The name of the Add to dictionary command in the content area context menu">
-            &amp;Add to dictionary
-          </message>
-          <if expr="is_macosx">
-            <message name="IDS_CONTENT_CONTEXT_REMOVE_FROM_DICTIONARY" desc="The name of the Remove from Dictionary command in the content area context menu">
-              &amp;Remove from dictionary
-            </message>
-          </if>
           <message name="IDS_CONTENT_CONTEXT_ACCESSIBILITY_LABELS_MENU_OPTION" desc="The context-menu item that asks whether to integrate the accessibility image labeling service of Google to Chrome.">
             Get image descriptions from Google
           </message>
@@ -883,24 +875,6 @@ are declared in tools/grit/grit_args.gni.
           </message>
           <message name="IDS_CONTENT_CONTEXT_RUN_LAYOUT_EXTRACTION" desc="The context-menu item that runs a local machine intelligence model to extract visual layout semantics.">
            Recognize visual layout semantics
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_SPELLING_ASK_GOOGLE" desc="The context-menu item that asks whether to integrate the spelling service of Google to Chrome.">
-            Use enhanced spell check
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_SPELLING_BUBBLE_TITLE" desc="The title of the confirmation modal that pops up when the user turns on 'Use enhanced spell check'">
-            Turn on enhanced spell check
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_SPELLING_BUBBLE_ENABLE" desc="The button text that allows integrating the spelling service of Google.">
-            Turn on
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_SPELLING_BUBBLE_DISABLE" desc="The button text that disallows integrating the spelling service of Google.">
-            Cancel
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_SPELLING_CHECKING" desc="The place-holder message shown while the Spelling service is checking text">
-            Loading suggestion
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_SPELLING_NO_SUGGESTIONS_FROM_GOOGLE" desc="The message shown when we cannot get any more suggestions from the Spelling service">
-            No more suggestions from Google
           </message>
           <message name="IDS_CONTENT_CONTEXT_SELECTALL" desc="The name of the Select All command in the content area context menu">
             Select &amp;all
@@ -1219,14 +1193,6 @@ are declared in tools/grit/grit_args.gni.
               Paste As Plain Text
             </message>
           </if>
-          <message name="IDS_CONTENT_CONTEXT_ADD_TO_DICTIONARY" desc="In Title Case: The name of the Add to dictionary command in the content area context menu">
-            &amp;Add to Dictionary
-          </message>
-          <if expr="is_macosx">
-            <message name="IDS_CONTENT_CONTEXT_REMOVE_FROM_DICTIONARY" desc="In Title Case: The name of the Remove from Dictionary command in the content area context menu">
-              &amp;Remove from Dictionary
-            </message>
-          </if>
           <message name="IDS_CONTENT_CONTEXT_ACCESSIBILITY_LABELS_MENU_OPTION" desc="The context-menu item that asks whether to integrate the accessibility image labeling service of Google to Chrome.">
             Get Image Descriptions from Google
           </message>
@@ -1241,24 +1207,6 @@ are declared in tools/grit/grit_args.gni.
           </message>
           <message name="IDS_CONTENT_CONTEXT_RUN_LAYOUT_EXTRACTION" desc="In Title Case: The context-menu item that runs a local machine intelligence model to extract visual layout semantics.">
            Recognize Visual Layout Semantics
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_SPELLING_ASK_GOOGLE" desc="In Title Case: The context-menu item that asks whether to integrate the spelling service of Google to Chrome.">
-            Use Enhanced Spell Check
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_SPELLING_BUBBLE_TITLE" desc="The title of the confirmation modal that pops up when the user turns on 'Use enhanced spell check'">
-            Turn On Enhanced Spell Check
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_SPELLING_BUBBLE_ENABLE" desc="In Title Case: The button text that allows integrating the spelling service of Google.">
-            Turn On
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_SPELLING_BUBBLE_DISABLE" desc="In Title Case: The button text that disallows integrating the spelling service of Google.">
-            Cancel
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_SPELLING_CHECKING" desc="The place-holder message shown while the Spelling service is checking text">
-            Loading suggestion
-          </message>
-          <message name="IDS_CONTENT_CONTEXT_SPELLING_NO_SUGGESTIONS_FROM_GOOGLE" desc="The message shown when we cannot get any more suggestions from the Spelling service">
-            No more suggestions from Google
           </message>
           <message name="IDS_CONTENT_CONTEXT_SELECTALL" desc="In Title Case: The name of the Select All command in the content area context menu">
             Select &amp;All
@@ -15683,22 +15631,6 @@ Please help our engineers fix this problem. Tell us what happened right before y
         </message>
         <message name="IDS_EDIT_JUMP_TO_SELECTION_MAC" desc="In Title Case: The Mac menu item for jump to selection in the edit menu.">
           Jump to Selection
-        </message>
-        <!-- Edit::Spelling and Grammar submenu -->
-        <message name="IDS_EDIT_SPELLING_GRAMMAR_MAC" desc="In Title Case: The Mac menu item for spelling and grammar submenu in the edit menu.">
-          Spelling and Grammar
-        </message>
-        <message name="IDS_EDIT_SHOW_SPELLING_GRAMMAR_MAC" desc="In Title Case: The Mac menu item for show spelling and grammar in the edit menu.">
-          Show Spelling and Grammar
-        </message>
-        <message name="IDS_EDIT_CHECK_DOCUMENT_MAC" desc="In Title Case: The Mac menu item for check document in the edit menu.">
-          Check Document Now
-        </message>
-        <message name="IDS_EDIT_CHECK_SPELLING_TYPING_MAC" desc="In Title Case: The Mac menu item for check spelling while typing in the edit menu.">
-          Check Spelling While Typing
-        </message>
-        <message name="IDS_EDIT_CHECK_GRAMMAR_MAC" desc="In Title Case: The Mac menu item for check grammar with spelling in the edit menu.">
-          Check Grammar With Spelling
         </message>
         <!-- Edit::Substitutions submenu -->
         <message name="IDS_EDIT_SUBSTITUTIONS_MAC" desc="In Title Case: The Mac menu item for the substitutions submenu in the edit menu.">

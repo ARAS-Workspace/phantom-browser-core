@@ -90,12 +90,10 @@
 #include "chrome/browser/renderer_context_menu/context_menu_content_type_factory.h"
 #include "chrome/browser/renderer_context_menu/dictation_menu_observer.h"
 #include "chrome/browser/renderer_context_menu/link_to_text_menu_observer.h"
-#include "chrome/browser/renderer_context_menu/spelling_menu_observer.h"
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/send_tab_to_self/send_tab_to_self_util.h"
 #include "chrome/browser/sharing_hub/sharing_hub_features.h"
-#include "chrome/browser/spellchecker/spellcheck_service.h"
 #include "chrome/browser/supervised_user/supervised_user_url_filtering_service_factory.h"
 #include "chrome/browser/sync/send_tab_to_self_sync_service_factory.h"
 #include "chrome/browser/translate/chrome_translate_client.h"
@@ -197,10 +195,6 @@
 #include "components/services/app_service/public/cpp/app_launch_params.h"
 #include "components/services/app_service/public/cpp/app_launch_util.h"
 #include "components/sharing_message/features.h"
-#include "components/spellcheck/browser/pref_names.h"
-#include "components/spellcheck/browser/spellcheck_host_metrics.h"
-#include "components/spellcheck/common/spellcheck_common.h"
-#include "components/spellcheck/spellcheck_buildflags.h"
 #include "components/split_tabs/split_tab_visual_data.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/supervised_user/core/browser/supervised_user_preferences.h"
@@ -282,10 +276,6 @@
 #include "components/webapps/isolated_web_apps/scheme.h"
 #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
         // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(USE_RENDERER_SPELLCHECKER)
-#include "chrome/browser/renderer_context_menu/spelling_options_submenu_observer.h"
-#endif
 
 #if BUILDFLAG(ENABLE_COMPOSE)
 #include "chrome/browser/compose/chrome_compose_client.h"
@@ -999,18 +989,6 @@ std::pair<int, const gfx::VectorIcon*> GetOpenLinkInSplitStringAndIcon(
 // static
 bool RenderViewContextMenu::IsDevToolsURL(const GURL& url) {
   return url.SchemeIs(content::kChromeDevToolsScheme);
-}
-
-// static
-void RenderViewContextMenu::AddSpellCheckServiceItem(ui::SimpleMenuModel* menu,
-                                                     bool is_checked) {
-  if (is_checked) {
-    menu->AddCheckItemWithStringId(IDC_CONTENT_CONTEXT_SPELLING_TOGGLE,
-                                   IDS_CONTENT_CONTEXT_SPELLING_ASK_GOOGLE);
-  } else {
-    menu->AddItemWithStringId(IDC_CONTENT_CONTEXT_SPELLING_TOGGLE,
-                              IDS_CONTENT_CONTEXT_SPELLING_ASK_GOOGLE);
-  }
 }
 
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(RenderViewContextMenu,
@@ -2849,11 +2827,6 @@ void RenderViewContextMenu::AppendSearchProvider() {
 }
 
 void RenderViewContextMenu::AppendSpellingAndSearchSuggestionItems() {
-  const bool use_spelling = !IsRunningInForcedAppMode();
-  if (use_spelling) {
-    AppendSpellingSuggestionItems();
-  }
-
   if (!params_.misspelled_word.empty() &&
       !features::IsMenuSimplificationEnabled()) {
     bool show_glic =
@@ -3002,33 +2975,8 @@ void RenderViewContextMenu::AppendLanguageSettings() {
     return;
   }
 
-#if BUILDFLAG(IS_MAC)
   menu_model_.AddItemWithStringId(IDC_CONTENT_CONTEXT_LANGUAGE_SETTINGS,
                                   IDS_CONTENT_CONTEXT_LANGUAGE_SETTINGS);
-#else
-  if (!spelling_options_submenu_observer_) {
-    const int kLanguageRadioGroup = 1;
-    spelling_options_submenu_observer_ =
-        std::make_unique<SpellingOptionsSubMenuObserver>(this, this,
-                                                         kLanguageRadioGroup);
-  }
-
-  spelling_options_submenu_observer_->InitMenu(params_);
-  observers_.AddObserver(spelling_options_submenu_observer_.get());
-#endif
-}
-
-void RenderViewContextMenu::AppendSpellingSuggestionItems() {
-  if (features::IsMenuSimplificationEnabled() && IsPasswordField()) {
-    return;
-  }
-
-  if (!spelling_suggestions_menu_observer_) {
-    spelling_suggestions_menu_observer_ =
-        std::make_unique<SpellingMenuObserver>(this);
-  }
-  observers_.AddObserver(spelling_suggestions_menu_observer_.get());
-  spelling_suggestions_menu_observer_->InitMenu(params_);
 }
 
 bool RenderViewContextMenu::AppendAccessibilityLabelsItems() {
@@ -3218,14 +3166,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
   if (id == IDC_SAVE_PAGE &&
       (content_restrictions & CONTENT_RESTRICTION_SAVE)) {
     return false;
-  }
-
-  PrefService* prefs = GetPrefs(browser_context_);
-
-  // Allow Spell Check language items on sub menu for text area context menu.
-  if ((id >= IDC_SPELLCHECK_LANGUAGES_FIRST) &&
-      (id <= IDC_SPELLCHECK_LANGUAGES_LAST)) {
-    return prefs->GetBoolean(spellcheck::prefs::kSpellCheckEnable);
   }
 
   // Extension items.
@@ -3440,9 +3380,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
     case IDC_CONTENT_CONTEXT_SHARING_SUBMENU:
       return true;
 
-    case IDC_CHECK_SPELLING_WHILE_TYPING:
-      return prefs->GetBoolean(spellcheck::prefs::kSpellCheckEnable);
-
 #if !BUILDFLAG(IS_MAC) && BUILDFLAG(IS_POSIX)
     // TODO(suzhe): this should not be enabled for password fields.
     case kLinuxInputMethodsMenuId:
@@ -3450,7 +3387,6 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
 #endif
 
     case IDC_CONTENT_CONTEXT_VIDEO_FRAME:
-    case kSpellcheckMenuId:
     case kOpenLinkWithMenuId:
     case IDC_CONTENT_CONTEXT_PROTOCOL_HANDLER_SETTINGS:
     case IDC_CONTENT_CONTEXT_GENERATEPASSWORD:
@@ -4064,10 +4000,6 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
       DUMP_WILL_BE_NOTREACHED() << "Unhandled id: " << id;
       break;
   }
-}
-
-void RenderViewContextMenu::AddSpellCheckServiceItem(bool is_checked) {
-  AddSpellCheckServiceItem(&menu_model_, is_checked);
 }
 
 void RenderViewContextMenu::AddAccessibilityLabelsServiceItem(bool is_checked) {

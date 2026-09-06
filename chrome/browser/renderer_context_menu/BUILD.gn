@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//components/compose/features.gni")
-import("//components/spellcheck/spellcheck_build_features.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
@@ -14,10 +13,7 @@ import("//printing/buildflags/buildflags.gni")
 # //chrome/browser/ui:ui (e.g. from //chrome/browser/ui/webui/settings).
 source_set("bubble_models") {
   if (!is_android) {
-    public = [
-      "accessibility_labels_bubble_model.h",
-      "spelling_bubble_model.h",
-    ]
+    public = [ "accessibility_labels_bubble_model.h" ]
 
     public_deps = [
       "//base",
@@ -95,7 +91,6 @@ source_set("impl") {
       "accessibility_labels_menu_observer.h",
       "dictation_menu_observer.h",
       "link_to_text_menu_observer.h",
-      "spelling_menu_observer.h",
     ]
 
     sources += [
@@ -106,8 +101,6 @@ source_set("impl") {
       "dictation_menu_observer.cc",
       "link_to_text_menu_observer.cc",
       "render_view_context_menu.cc",
-      "spelling_bubble_model.cc",
-      "spelling_menu_observer.cc",
     ]
 
     deps += [
@@ -143,7 +136,6 @@ source_set("impl") {
       "//chrome/browser/search_engines",
       "//chrome/browser/send_tab_to_self",
       "//chrome/browser/sharing_hub",
-      "//chrome/browser/spellchecker",
       "//chrome/browser/sync",
       "//chrome/browser/translate",
       "//chrome/browser/ui",
@@ -175,7 +167,6 @@ source_set("impl") {
       "//components/pdf/common:util",
       "//components/prefs",
       "//components/shared_highlighting/core/common",
-      "//components/spellcheck/browser",
       "//components/user_prefs",
       "//mojo/public/cpp/bindings",
       "//pdf:features",
@@ -213,11 +204,6 @@ source_set("impl") {
       "//chromeos/ash/experiences/system_web_apps/types",
       "//components/session_manager/core",
     ]
-  }
-
-  if (is_linux || is_chromeos || is_win) {
-    public += [ "spelling_options_submenu_observer.h" ]
-    sources += [ "spelling_options_submenu_observer.cc" ]
   }
 
   if (enable_extensions_core) {
@@ -369,8 +355,6 @@ if (!is_android) {
       "accessibility_labels_bubble_model_browsertest.cc",
       "accessibility_labels_menu_observer_browsertest.cc",
       "render_view_context_menu_browsertest.cc",
-      "spelling_bubble_model_browsertest.cc",
-      "spelling_menu_observer_browsertest.cc",
     ]
 
     deps = [
@@ -387,7 +371,6 @@ if (!is_android) {
       "//chrome/browser/profiles:misc",
       "//chrome/browser/search_engines",
       "//chrome/browser/send_tab_to_self",
-      "//chrome/browser/spellchecker",
       "//chrome/browser/sync",
       "//chrome/browser/ui:ui_features",
       "//chrome/browser/ui/browser_web_contents_delegate",
@@ -405,7 +388,6 @@ if (!is_android) {
       "//components/send_tab_to_self",
       "//components/send_tab_to_self:features",
       "//components/send_tab_to_self:test_support",
-      "//components/spellcheck/browser",
       "//content/public/browser",
       "//content/test:test_support",
       "//pdf:features",
@@ -416,14 +398,6 @@ if (!is_android) {
     ]
     if (enable_compose) {
       deps += [ "//chrome/browser/compose:test_support" ]
-    }
-
-    if (is_linux || is_chromeos || is_win) {
-      sources += [
-        # This test is for the spelling options submenu that's only for
-        # Windows, ChromeOS, and Linux.
-        "spelling_options_submenu_observer_browsertest.cc",
-      ]
     }
 
     if (is_chromeos) {

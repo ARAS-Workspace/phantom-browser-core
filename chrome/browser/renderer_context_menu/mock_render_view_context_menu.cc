@@ -206,12 +206,6 @@ void MockRenderViewContextMenu::RemoveSeparatorBeforeMenuItem(int command_id) {
   items_.erase(iter - 1);
 }
 
-void MockRenderViewContextMenu::AddSpellCheckServiceItem(bool is_checked) {
-  AddCheckItem(
-      IDC_CONTENT_CONTEXT_SPELLING_TOGGLE,
-      l10n_util::GetStringUTF16(IDS_CONTENT_CONTEXT_SPELLING_ASK_GOOGLE));
-}
-
 void MockRenderViewContextMenu::AddAccessibilityLabelsServiceItem(
     bool is_checked) {
   // TODO(katie): Is there a way not to repeat this logic from

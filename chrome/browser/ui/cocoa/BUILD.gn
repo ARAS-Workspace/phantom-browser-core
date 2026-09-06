@@ -145,7 +145,6 @@ source_set("cocoa") {
     "//chrome/browser/profiles:profile_util",
     "//chrome/browser/profiles/keep_alive",
     "//chrome/browser/search_engines",
-    "//chrome/browser/spellchecker",
     "//chrome/browser/status_icons",
     "//chrome/browser/themes",
     "//chrome/browser/ui:accelerator_utils_headers",
