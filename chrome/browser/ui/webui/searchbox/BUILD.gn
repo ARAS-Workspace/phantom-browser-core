@@ -183,9 +183,6 @@ if (!is_android) {
       "//ui/display",
       "//ui/gfx",
     ]
-    if (enable_dice_support) {
-      deps += [ "//chrome/browser/ui/views/search_ai_mode" ]
-    }
   }
 }
 

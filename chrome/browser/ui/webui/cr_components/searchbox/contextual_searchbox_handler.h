@@ -35,7 +35,6 @@
 #include "components/lens/contextual_input.h"
 #include "components/omnibox/browser/searchbox.mojom.h"
 #include "components/omnibox/composebox/composebox_query.mojom.h"
-#include "components/signin/public/base/signin_buildflags.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/web_contents.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
@@ -65,10 +64,6 @@ class ContextualSearchboxTabFaviconHelper;
 class SkBitmap;
 class DrivePickerHostController;
 class OmniboxPopupDeactivationBlocker;
-
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-class ComposeboxDriveSignInPromoController;
-#endif
 
 namespace contextual_tasks {
 class ActiveTaskContextProvider;
@@ -538,9 +533,6 @@ class ContextualSearchboxHandler
   virtual void CleanupDrivePicker();
 
 #if !BUILDFLAG(IS_ANDROID)
-  // Returns true if the user is signed in to the primary account with a valid
-  // refresh token that is not in a persistent error state.
-  bool IsSignedInWithValidCredentials() const;
   void OnDrivePickerDisconnected();
   void UpdateDriveConsentPref(
       drive_picker::DriveDisclaimerController::DisclaimerStatus status);
@@ -582,11 +574,6 @@ class ContextualSearchboxHandler
   std::unique_ptr<content::desktop_capture::ScreenshotCaptureRequest>
       active_screenshot_request_;
   bool is_capturing_ = false;
-
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  std::unique_ptr<ComposeboxDriveSignInPromoController>
-      composebox_drive_signin_promo_controller_;
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 #endif  // !BUILDFLAG(IS_ANDROID)
 

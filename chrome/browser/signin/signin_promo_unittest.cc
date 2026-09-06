@@ -331,19 +331,12 @@ TEST(SigninPromoTest, GetSignInPromoTypeFromAccessPoint) {
   EXPECT_EQ(SignInPromoType::kBookmark,
             GetSignInPromoTypeFromAccessPoint(
                 signin_metrics::AccessPoint::kBookmarkBubble));
-  EXPECT_EQ(SignInPromoType::kSearchAIMode,
-            GetSignInPromoTypeFromAccessPoint(
-                signin_metrics::AccessPoint::kSearchAIModeBubble));
   EXPECT_EQ(SignInPromoType::kExtension,
             GetSignInPromoTypeFromAccessPoint(
                 signin_metrics::AccessPoint::kExtensionInstallBubble));
   EXPECT_EQ(SignInPromoType::kSendTabToSelf,
             GetSignInPromoTypeFromAccessPoint(
                 signin_metrics::AccessPoint::kSendTabToSelfPromo));
-  EXPECT_EQ(SignInPromoType::kComposeboxDriveContextMenuOption,
-            GetSignInPromoTypeFromAccessPoint(
-                signin_metrics::AccessPoint::
-                    kComposeboxDriveContextMenuOptionBubble));
 }
 
 class ShowPromoTest : public testing::Test {
@@ -611,17 +604,6 @@ TEST_F(ShowSigninPromoTestWithFeatureFlags,
 }
 
 TEST_F(ShowSigninPromoTestWithFeatureFlags,
-       DoNotShowSearchAIModePromoAfterFiveTimesShown) {
-  ASSERT_TRUE(ShouldShowSearchAIModeSignInPromo(*profile()));
-
-  profile()->GetPrefs()->SetInteger(
-      prefs::kSearchAIModeSignInPromoShownCountPerProfile, 5);
-
-  EXPECT_FALSE(ShouldShowSearchAIModeSignInPromo(*profile()));
-  EXPECT_TRUE(ShouldShowPasswordSignInPromo(*profile()));
-}
-
-TEST_F(ShowSigninPromoTestWithFeatureFlags,
        DoNotShowPromoAfterTwoTimesDismissed) {
   ASSERT_TRUE(ShouldShowAddressSignInPromo(*profile(), CreateAddress()));
 
@@ -631,47 +613,6 @@ TEST_F(ShowSigninPromoTestWithFeatureFlags,
   EXPECT_FALSE(ShouldShowPasswordSignInPromo(*profile()));
   EXPECT_FALSE(ShouldShowAddressSignInPromo(*profile(), CreateAddress()));
   EXPECT_FALSE(ShouldShowBookmarkSignInPromo(*profile()));
-}
-
-TEST_F(ShowSigninPromoTestWithFeatureFlags,
-       DoNotShowSearchAIModePromoAfterTwoTimesDismissed) {
-  ASSERT_TRUE(ShouldShowSearchAIModeSignInPromo(*profile()));
-
-  profile()->GetPrefs()->SetInteger(
-      prefs::kSearchAIModeSignInPromoDismissCountPerProfile, 2);
-
-  EXPECT_FALSE(ShouldShowSearchAIModeSignInPromo(*profile()));
-  // Other promos are not affected by Search AI Mode dismissal as they use
-  // kAutofillSignInPromoDismissCountPerProfile.
-  EXPECT_TRUE(ShouldShowPasswordSignInPromo(*profile()));
-}
-
-TEST_F(ShowSigninPromoTestWithFeatureFlags,
-       DoNotShowSearchAIModePromoShownTooRecently) {
-  ASSERT_TRUE(ShouldShowSearchAIModeSignInPromo(*profile()));
-
-  profile()->GetPrefs()->SetTime(
-      prefs::kSearchAIModeSignInPromoLastImpressionTimestampPerProfile,
-      base::Time::Now());
-
-  EXPECT_FALSE(ShouldShowSearchAIModeSignInPromo(*profile()));
-}
-
-TEST_F(ShowSigninPromoTestWithFeatureFlags, ShowSearchAIModePromoAfterTimeGap) {
-  // Start without any impressions.
-  ASSERT_TRUE(ShouldShowSearchAIModeSignInPromo(*profile()));
-  // There should be a 14-day gap between impressions.
-  profile()->GetPrefs()->SetTime(
-      prefs::kSearchAIModeSignInPromoLastImpressionTimestampPerProfile,
-      base::Time::Now() - base::Days(14) - base::Minutes(1));
-
-  EXPECT_TRUE(ShouldShowSearchAIModeSignInPromo(*profile()));
-}
-
-TEST_F(ShowSigninPromoTestWithFeatureFlags,
-       ShowSearchAIModePromoOnFirstAttempt) {
-  // A clean profile with no recorded impressions should show the promo.
-  EXPECT_TRUE(ShouldShowSearchAIModeSignInPromo(*profile()));
 }
 
 TEST_F(ShowSigninPromoTestWithFeatureFlags,
@@ -745,23 +686,6 @@ TEST_F(ShowSigninPromoTestWithFeatureFlags,
   EXPECT_TRUE(ShouldShowPasswordSignInPromo(*profile()));
   EXPECT_TRUE(ShouldShowAddressSignInPromo(*profile(), CreateAddress()));
   EXPECT_TRUE(ShouldShowBookmarkSignInPromo(*profile()));
-}
-
-TEST_F(ShowSigninPromoTestWithFeatureFlags,
-       RecordSearchAIModeSignInPromoShownWithoutAccount) {
-  RecordSignInPromoShown(signin_metrics::AccessPoint::kSearchAIModeBubble,
-                         profile());
-
-  EXPECT_EQ(1, profile()->GetPrefs()->GetInteger(
-                   prefs::kSearchAIModeSignInPromoShownCountPerProfile));
-  EXPECT_FALSE(
-      profile()
-          ->GetPrefs()
-          ->GetTime(
-              prefs::kSearchAIModeSignInPromoLastImpressionTimestampPerProfile)
-          .is_null());
-
-  EXPECT_FALSE(ShouldShowSearchAIModeSignInPromo(*profile()));
 }
 
 TEST_F(ShowSigninPromoTestWithFeatureFlags,
@@ -1217,46 +1141,6 @@ TEST_F(ShowSigninPromoTestWithFeatureFlagsPromoLimitsExperiment,
       switches::kContextualSigninPromoDismissedThreshold.Get());
 
   EXPECT_FALSE(ShouldShowBookmarkSignInPromo(*profile()));
-}
-
-TEST_F(ShowSigninPromoTestWithFeatureFlagsPromoLimitsExperiment,
-       SearchAIModePromoIgnoresOtherExperimentThresholds) {
-  ASSERT_TRUE(ShouldShowSearchAIModeSignInPromo(*profile()));
-  ASSERT_TRUE(ShouldShowBookmarkSignInPromo(*profile()));
-
-  // Set the bookmark promo shown limit to max (6 times).
-  profile()->GetPrefs()->SetInteger(
-      prefs::kBookmarkSignInPromoShownCountPerProfileForLimitsExperiment, 6);
-  EXPECT_FALSE(ShouldShowBookmarkSignInPromo(*profile()));
-  EXPECT_TRUE(ShouldShowSearchAIModeSignInPromo(*profile()));
-
-  // Set the bookmark promo impression and dismissal limit to max (2 times).
-  profile()->GetPrefs()->SetInteger(
-      prefs::kBookmarkSignInPromoShownCountPerProfileForLimitsExperiment, 2);
-  profile()->GetPrefs()->SetInteger(
-      prefs::kBookmarkSignInPromoDismissCountPerProfileForLimitsExperiment, 2);
-  EXPECT_FALSE(ShouldShowBookmarkSignInPromo(*profile()));
-  EXPECT_TRUE(ShouldShowSearchAIModeSignInPromo(*profile()));
-}
-
-TEST_F(ShowSigninPromoTestWithFeatureFlagsPromoLimitsExperiment,
-       SearchAIModePromoLimitsDoNotAffectOtherPromos) {
-  ASSERT_TRUE(ShouldShowSearchAIModeSignInPromo(*profile()));
-  ASSERT_TRUE(ShouldShowBookmarkSignInPromo(*profile()));
-
-  // Set the Search AIM max impression limit (5 times)
-  profile()->GetPrefs()->SetInteger(
-      prefs::kSearchAIModeSignInPromoShownCountPerProfile, 5);
-  EXPECT_FALSE(ShouldShowSearchAIModeSignInPromo(*profile()));
-  EXPECT_TRUE(ShouldShowBookmarkSignInPromo(*profile()));
-
-  // Set the Search AIM max dismissal limit (2 times)
-  profile()->GetPrefs()->SetInteger(
-      prefs::kSearchAIModeSignInPromoShownCountPerProfile, 2);
-  profile()->GetPrefs()->SetInteger(
-      prefs::kSearchAIModeSignInPromoDismissCountPerProfile, 2);
-  EXPECT_FALSE(ShouldShowSearchAIModeSignInPromo(*profile()));
-  EXPECT_TRUE(ShouldShowBookmarkSignInPromo(*profile()));
 }
 
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)

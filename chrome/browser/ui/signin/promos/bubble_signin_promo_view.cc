@@ -89,19 +89,6 @@ int GetSubtitleID(bool is_signin_promo,
             break;
         }
       } break;
-      case signin::SignInPromoType::kSearchAIMode: {
-        switch (signed_in_state) {
-          case SignedInState::kSignedOut:
-          case SignedInState::kWebOnlySignedIn:
-            return IDS_AI_SIGNIN_PROMO_SUBTITLE;
-          case SignedInState::kSignInPending:
-            return IDS_AI_VERIFY_PROMO_SUBTITLE;
-          case SignedInState::kSignedIn:
-          case SignedInState::kSyncing:
-          case SignedInState::kSyncPaused:
-            break;
-        }
-      } break;
       case signin::SignInPromoType::kBookmark: {
         if (!is_signin_promo) {
           return IDS_BOOKMARK_DICE_PROMO_SYNC_MESSAGE;
@@ -151,20 +138,6 @@ int GetSubtitleID(bool is_signin_promo,
             return IDS_SEND_TAB_TO_SELF_VERIFY_ITS_YOU_PROMO_LABEL;
           case SignedInState::kSignedIn:
           case SignedInState::kSyncing:
-            break;
-        }
-      } break;
-      case signin::SignInPromoType::kComposeboxDriveContextMenuOption: {
-        switch (signed_in_state) {
-          case SignedInState::kSignedOut:
-          case SignedInState::kWebOnlySignedIn:
-          case SignedInState::kSignInPending:
-            // TODO(crbug.com/545561312): Verify whether the pending state needs
-            // a different string.
-            return IDS_COMPOSEBOX_DRIVE_CONTEXT_MENU_OPTION_SIGNIN_PROMO_SUBTITLE;
-          case SignedInState::kSignedIn:
-          case SignedInState::kSyncing:
-          case SignedInState::kSyncPaused:
             break;
         }
       } break;
@@ -265,12 +238,6 @@ void IncrementContextualPromoDismissCountPerSignedOutProfile(
               prefs::
                   kAddressSignInPromoDismissCountPerProfileForLimitsExperiment) +
               1);
-    case signin::SignInPromoType::kSearchAIMode:
-      return profile->GetPrefs()->SetInteger(
-          prefs::kSearchAIModeSignInPromoDismissCountPerProfile,
-          profile->GetPrefs()->GetInteger(
-              prefs::kSearchAIModeSignInPromoDismissCountPerProfile) +
-              1);
     case signin::SignInPromoType::kBookmark:
       CHECK(base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp));
       return profile->GetPrefs()->SetInteger(
@@ -279,10 +246,6 @@ void IncrementContextualPromoDismissCountPerSignedOutProfile(
               prefs::
                   kBookmarkSignInPromoDismissCountPerProfileForLimitsExperiment) +
               1);
-    case signin::SignInPromoType::kComposeboxDriveContextMenuOption:
-      // Composebox Drive signin promo does not track dismiss counts as it is
-      // explicitly triggered by the user from the context menu.
-      return;
     case signin::SignInPromoType::kExtension:
     case signin::SignInPromoType::kSendTabToSelf:
       NOTREACHED();
@@ -314,14 +277,6 @@ void IncrementContextualPromoDismissCountPerAccount(
       CHECK(base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp));
       SigninPrefs(*profile->GetPrefs())
           .IncrementBookmarkSigninPromoDismissCount(account.gaia);
-      break;
-    case signin::SignInPromoType::kSearchAIMode:
-      SigninPrefs(*profile->GetPrefs())
-          .IncrementSearchAIModeSigninPromoDismissCount(account.gaia);
-      break;
-    case signin::SignInPromoType::kComposeboxDriveContextMenuOption:
-      // Composebox Drive signin promo does not track dismiss counts as it is
-      // explicitly triggered by the user from the context menu.
       break;
     case signin::SignInPromoType::kExtension:
     case signin::SignInPromoType::kSendTabToSelf:

@@ -116,7 +116,4 @@ source_set("searchbox_impl") {
       "//components/contextual_search/footprints/internal",
     ]
   }
-  if (enable_dice_support) {
-    deps += [ "//chrome/browser/ui/views/search_ai_mode" ]
-  }
 }

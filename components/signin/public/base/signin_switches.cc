@@ -565,21 +565,6 @@ constexpr base::FeatureParam<SeamlessSigninStringType>
         SeamlessSigninStringType::kContinueButton, &kSeamlessSigninStringTypes};
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-BASE_FEATURE(kEnableSearchAIModeSigninPromo, base::FEATURE_DISABLED_BY_DEFAULT);
-// The delay we allow for the AIM search result to load before we display the
-// sign-in promo bubble.
-const base::FeatureParam<base::TimeDelta> kSearchAIModePromoPageLoadDelay{
-    &kEnableSearchAIModeSigninPromo, "SearchAIModePromoPageLoadDelay",
-    base::Seconds(4)};
-// The gap between impressions of the Signin AI Search Mode promo.
-const base::FeatureParam<base::TimeDelta> kSearchAIModePromoFrequency{
-    &kEnableSearchAIModeSigninPromo, "SearchAIModePromoFrequency",
-    base::Days(14)};
-BASE_FEATURE(kSearchAIModeSignInPromoSelfDismissal,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-
 #if BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kEnableWebSigninLoadingDialog, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_ANDROID)

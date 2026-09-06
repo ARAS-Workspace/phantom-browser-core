@@ -51,15 +51,8 @@ bool ShouldShowPasswordSignInPromo(Profile& profile);
 bool ShouldShowAddressSignInPromo(Profile& profile,
                                   const autofill::AutofillProfile& address);
 
-// Returns true if the Search AI Mode sign in promo should be shown.
-bool ShouldShowSearchAIModeSignInPromo(Profile& profile);
-
 // Whether we should show the sign in promo after a bookmark was saved.
 bool ShouldShowBookmarkSignInPromo(Profile& profile);
-
-// Returns true if the Composebox Drive context menu option sign in promo
-// should be shown.
-bool ShouldShowComposeboxDriveContextMenuOptionSignInPromo(Profile& profile);
 
 // Returns whether `access_point` has an equivalent signin promo which is its
 // own bubble, rather than a footnote.

@@ -17,7 +17,6 @@
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/testing_pref_service.h"
-#include "components/signin/public/base/signin_buildflags.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/omnibox_proto/rule_set.pb.h"
@@ -140,63 +139,6 @@ TEST_F(InputStateModelTest, RemovesDriveInputWhenNotSignedIn) {
                                             omnibox::INPUT_TYPE_LENS_FILE,
                                             omnibox::INPUT_TYPE_BROWSER_TAB));
 }
-
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-TEST_F(InputStateModelTest,
-       DoesNotRemoveDriveInputWhenNotSignedInAndPromoFlagEnabled) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitWithFeatures(
-      {omnibox::kComposeboxDriveContextMenuOption,
-       omnibox::kComposeboxDriveContextMenuOptionSigninPromo},
-      {});
-
-  omnibox::SearchboxConfig config;
-  config.add_input_type_configs()->set_input_type(
-      omnibox::InputType::INPUT_TYPE_LENS_IMAGE);
-  config.add_input_type_configs()->set_input_type(
-      omnibox::InputType::INPUT_TYPE_LENS_FILE);
-
-  input_state_model_ = std::make_unique<InputStateModel>(
-      session_handle_, config, active_url_, /*is_off_the_record=*/false,
-      /*is_signed_in=*/false,
-      /*browser_identity_matches_aim_identity=*/false);
-  const auto& state = input_state_model_->get_state_for_testing();
-
-  EXPECT_THAT(state.allowed_input_types,
-              testing::UnorderedElementsAre(
-                  omnibox::INPUT_TYPE_LENS_IMAGE, omnibox::INPUT_TYPE_LENS_FILE,
-                  omnibox::INPUT_TYPE_BROWSER_TAB, omnibox::INPUT_TYPE_DRIVE));
-}
-
-TEST_F(InputStateModelTest,
-       RemovesDriveInputWhenSignedInWithIdentityMismatchAndPromoFlagEnabled) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitWithFeatures(
-      {omnibox::kComposeboxDriveContextMenuOption,
-       omnibox::kComposeboxDriveContextMenuOptionSigninPromo},
-      {});
-
-  omnibox::SearchboxConfig config;
-  config.add_input_type_configs()->set_input_type(
-      omnibox::InputType::INPUT_TYPE_LENS_IMAGE);
-  config.add_input_type_configs()->set_input_type(
-      omnibox::InputType::INPUT_TYPE_LENS_FILE);
-  config.add_input_type_configs()->set_input_type(
-      omnibox::InputType::INPUT_TYPE_DRIVE);
-
-  input_state_model_ = std::make_unique<InputStateModel>(
-      session_handle_, config, active_url_, /*is_off_the_record=*/false,
-      /*is_signed_in=*/true,
-      /*browser_identity_matches_aim_identity=*/false);
-  const auto& state = input_state_model_->get_state_for_testing();
-
-  EXPECT_THAT(state.allowed_input_types,
-              testing::UnorderedElementsAre(omnibox::INPUT_TYPE_LENS_IMAGE,
-                                            omnibox::INPUT_TYPE_LENS_FILE,
-                                            omnibox::INPUT_TYPE_BROWSER_TAB));
-}
-
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 TEST_F(InputStateModelTest, TestInitialization) {
   EXPECT_TRUE(input_state_model_);

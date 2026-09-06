@@ -3606,8 +3606,6 @@ if (!is_android) {
         # from profiles:impl, due to a circular dependency.
         "//chrome/browser/ui/profiles:impl",
       ]
-
-      deps += [ "//chrome/browser/ui/views/search_ai_mode:browser_tests" ]
     }
 
     if (is_win || is_linux) {

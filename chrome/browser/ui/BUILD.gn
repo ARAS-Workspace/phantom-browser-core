@@ -1322,20 +1322,6 @@ static_library("ui") {
       "views/search_engine_choice/search_engine_choice_dialog_view.h",
     ]
 
-    if (enable_dice_support) {
-      deps += [
-        "//chrome/browser/ui/views/search_ai_mode",
-        "//chrome/browser/ui/views/search_ai_mode:impl",
-      ]
-      allow_circular_includes_from += [
-        # TODO(crbug.com/364667551): Remove this circular dependency when
-        # the following headers get modularized:
-        # - c/b/ui/browser.h
-        # - c/b/ui/views/frame/browser_view.h
-        "//chrome/browser/ui/views/search_ai_mode:impl",
-      ]
-    }
-
     # Non-android deps for "ui" target.
     deps += [
       ":accelerator_table",

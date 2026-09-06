@@ -9,7 +9,6 @@
 
 #include "base/functional/bind.h"
 #include "base/notreached.h"
-#include "base/time/time.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/account_preview_data_service_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
@@ -46,7 +45,6 @@
 #include "chrome/browser/signin/signin_util.h"
 #include "components/autofill/core/browser/data_manager/personal_data_manager.h"
 #include "components/autofill/core/browser/data_quality/addresses/address_import_requirement_utils.h"
-#include "components/omnibox/common/omnibox_features.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/user_selectable_type.h"
@@ -66,39 +64,6 @@ using signin_util::SignedInState;
 constexpr int kSigninPromoShownThreshold = 5;
 constexpr int kSigninPromoDismissedThreshold = 2;
 
-bool IsAllowedByPromoFrequency(Profile& profile,
-                               SignInPromoType type,
-                               const GaiaId& gaia_id) {
-  switch (type) {
-    case SignInPromoType::kPassword:
-    case SignInPromoType::kAddress:
-    case SignInPromoType::kBookmark:
-    case SignInPromoType::kExtension:
-    case SignInPromoType::kSendTabToSelf:
-    case SignInPromoType::kComposeboxDriveContextMenuOption:
-      // No specific frequency exists for this promo type.
-      return true;
-    case SignInPromoType::kSearchAIMode:
-      break;
-  }
-  // For the Search AI Mode there should be a gap between impressions,
-  // configured in `kSearchAIModePromoFrequency`.
-  std::optional<base::Time> last_impression_time;
-  if (gaia_id.empty()) {
-    last_impression_time = profile.GetPrefs()->GetTime(
-        prefs::kSearchAIModeSignInPromoLastImpressionTimestampPerProfile);
-  } else {
-    SigninPrefs signin_prefs(*profile.GetPrefs());
-    last_impression_time =
-        signin_prefs.GetSearchAIModeSigninPromoLastImpressionTime(gaia_id);
-  }
-  if (!last_impression_time.has_value()) {
-    return true;
-  }
-  base::TimeDelta gap = base::Time::Now() - last_impression_time.value();
-  return (gap >= switches::kSearchAIModePromoFrequency.Get());
-}
-
 syncer::DataType GetDataTypeFromSignInPromoType(SignInPromoType type) {
   switch (type) {
     case SignInPromoType::kPassword:
@@ -109,13 +74,6 @@ syncer::DataType GetDataTypeFromSignInPromoType(SignInPromoType type) {
       return syncer::BOOKMARKS;
     case SignInPromoType::kExtension:
       return syncer::EXTENSIONS;
-    case SignInPromoType::kSearchAIMode:
-      // Search AI Mode sign-in promo is not related to any synced data type.
-      NOTREACHED();
-    case SignInPromoType::kComposeboxDriveContextMenuOption:
-      // Composebox Drive context menu option sign-in promo is not related to
-      // any synced data type.
-      NOTREACHED();
     case SignInPromoType::kSendTabToSelf:
       return syncer::SEND_TAB_TO_SELF;
   }
@@ -129,13 +87,6 @@ bool PromoTypeHasSyncableData(SignInPromoType type) {
     case SignInPromoType::kExtension:
     case SignInPromoType::kSendTabToSelf:
       return true;
-    case SignInPromoType::kSearchAIMode:
-      // Search AI Mode sign-in promo is not related to any synced data type.
-      return false;
-    case SignInPromoType::kComposeboxDriveContextMenuOption:
-      // Composebox Drive context menu option sign-in promo is not related to
-      // any synced data type.
-      return false;
   }
   NOTREACHED();
 }
@@ -162,16 +113,6 @@ int GetPasswordPromoShownCount(Profile& profile, const GaiaId& gaia_id) {
       base::FeatureList::IsEnabled(switches::kSigninPromoLimitsExperiment)
           ? prefs::kPasswordSignInPromoShownCountPerProfileForLimitsExperiment
           : prefs::kPasswordSignInPromoShownCountPerProfile);
-}
-
-int GetSearchAIModePromoShownCount(Profile& profile, const GaiaId& gaia_id) {
-  if (!gaia_id.empty()) {
-    return SigninPrefs(*profile.GetPrefs())
-        .GetSearchAIModeSigninPromoImpressionCount(gaia_id);
-  }
-
-  return profile.GetPrefs()->GetInteger(
-      prefs::kSearchAIModeSignInPromoShownCountPerProfile);
 }
 
 int GetBookmarkPromoShownCount(Profile& profile, const GaiaId& gaia_id) {
@@ -205,11 +146,7 @@ int GetContextualPromoDismissCountPerSignedOutProfile(Profile& profile,
           prefs::kBookmarkSignInPromoDismissCountPerProfileForLimitsExperiment);
     case SignInPromoType::kExtension:
     case SignInPromoType::kSendTabToSelf:
-    case SignInPromoType::kComposeboxDriveContextMenuOption:
       NOTREACHED();
-    case SignInPromoType::kSearchAIMode:
-      return profile.GetPrefs()->GetInteger(
-          prefs::kSearchAIModeSignInPromoDismissCountPerProfile);
   }
 }
 
@@ -228,16 +165,11 @@ int GetContextualPromoDismissCountPerAccount(Profile& profile,
     case SignInPromoType::kPassword:
       return SigninPrefs(*profile.GetPrefs())
           .GetPasswordSigninPromoDismissCount(gaia_id);
-    case SignInPromoType::kSearchAIMode:
-      return SigninPrefs(*profile.GetPrefs())
-          .GetSearchAIModeSigninPromoDismissCount(gaia_id);
-      NOTREACHED();
     case SignInPromoType::kBookmark:
       return SigninPrefs(*profile.GetPrefs())
           .GetBookmarkSigninPromoDismissCount(gaia_id);
     case SignInPromoType::kExtension:
     case SignInPromoType::kSendTabToSelf:
-    case SignInPromoType::kComposeboxDriveContextMenuOption:
       NOTREACHED();
   }
 }
@@ -247,7 +179,6 @@ bool ShouldShowPromoBasedOnImpressionOrDismissalCount(Profile& profile,
   // Footer sign in promos are always shown.
   if (type == signin::SignInPromoType::kExtension ||
       type == signin::SignInPromoType::kSendTabToSelf ||
-      type == signin::SignInPromoType::kComposeboxDriveContextMenuOption ||
       (type == signin::SignInPromoType::kBookmark &&
        !base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp))) {
     return true;
@@ -265,9 +196,6 @@ bool ShouldShowPromoBasedOnImpressionOrDismissalCount(Profile& profile,
     case SignInPromoType::kPassword:
       show_count = GetPasswordPromoShownCount(profile, account.gaia);
       break;
-    case SignInPromoType::kSearchAIMode:
-      show_count = GetSearchAIModePromoShownCount(profile, account.gaia);
-      break;
     case SignInPromoType::kBookmark:
       if (!base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp)) {
         NOTREACHED();
@@ -276,7 +204,6 @@ bool ShouldShowPromoBasedOnImpressionOrDismissalCount(Profile& profile,
       break;
     case SignInPromoType::kExtension:
     case SignInPromoType::kSendTabToSelf:
-    case SignInPromoType::kComposeboxDriveContextMenuOption:
       NOTREACHED();
   }
 
@@ -286,8 +213,7 @@ bool ShouldShowPromoBasedOnImpressionOrDismissalCount(Profile& profile,
           : GetContextualPromoDismissCountPerAccount(profile, type,
                                                      account.gaia);
 
-  if (base::FeatureList::IsEnabled(switches::kSigninPromoLimitsExperiment) &&
-      type != SignInPromoType::kSearchAIMode) {
+  if (base::FeatureList::IsEnabled(switches::kSigninPromoLimitsExperiment)) {
     return show_count < switches::kContextualSigninPromoShownThreshold.Get() &&
            dismiss_count <
                switches::kContextualSigninPromoDismissedThreshold.Get();
@@ -298,11 +224,8 @@ bool ShouldShowPromoBasedOnImpressionOrDismissalCount(Profile& profile,
   // autofill bubble promo type.
   // - it has already been dismissed `kSigninPromoDismissedThreshold` times,
   // regardless of autofill bubble promo type.
-  // - the promo type has a minimum required frequency between impressions
-  // which is currently not met.
   return show_count < kSigninPromoShownThreshold &&
-         dismiss_count < kSigninPromoDismissedThreshold &&
-         IsAllowedByPromoFrequency(profile, type, account.gaia);
+         dismiss_count < kSigninPromoDismissedThreshold;
 }
 
 bool IsDataTypeManagedByPolicy(const syncer::SyncService* sync_service,
@@ -469,14 +392,6 @@ bool ShouldShowAddressSignInPromo(Profile& profile,
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 }
 
-bool ShouldShowSearchAIModeSignInPromo(Profile& profile) {
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  return ShouldShowSignInPromoCommon(profile, SignInPromoType::kSearchAIMode);
-#else
-  return false;
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-}
-
 bool ShouldShowBookmarkSignInPromo(Profile& profile) {
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   if (!ShouldShowSignInPromoCommon(profile, SignInPromoType::kBookmark)) {
@@ -504,26 +419,10 @@ bool ShouldShowBookmarkSignInPromo(Profile& profile) {
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 }
 
-bool ShouldShowComposeboxDriveContextMenuOptionSignInPromo(Profile& profile) {
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  return ShouldShowSignInPromoCommon(
-      profile, SignInPromoType::kComposeboxDriveContextMenuOption);
-#else
-  return false;
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-}
-
 bool IsBubbleSigninPromo(signin_metrics::AccessPoint access_point) {
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   return access_point == signin_metrics::AccessPoint::kPasswordBubble ||
          access_point == signin_metrics::AccessPoint::kAddressBubble ||
-         (base::FeatureList::IsEnabled(
-              switches::kEnableSearchAIModeSigninPromo) &&
-          access_point == signin_metrics::AccessPoint::kSearchAIModeBubble) ||
-         (base::FeatureList::IsEnabled(
-              omnibox::kComposeboxDriveContextMenuOptionSigninPromo) &&
-          access_point == signin_metrics::AccessPoint::
-                              kComposeboxDriveContextMenuOptionBubble) ||
          (base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp) &&
           access_point == signin_metrics::AccessPoint::kBookmarkBubble);
 #else
@@ -569,14 +468,10 @@ SignInPromoType GetSignInPromoTypeFromAccessPoint(
       return SignInPromoType::kAddress;
     case signin_metrics::AccessPoint::kBookmarkBubble:
       return SignInPromoType::kBookmark;
-    case signin_metrics::AccessPoint::kSearchAIModeBubble:
-      return SignInPromoType::kSearchAIMode;
     case signin_metrics::AccessPoint::kExtensionInstallBubble:
       return SignInPromoType::kExtension;
     case signin_metrics::AccessPoint::kSendTabToSelfPromo:
       return SignInPromoType::kSendTabToSelf;
-    case signin_metrics::AccessPoint::kComposeboxDriveContextMenuOptionBubble:
-      return SignInPromoType::kComposeboxDriveContextMenuOption;
     default:
       NOTREACHED();
   }
@@ -611,12 +506,6 @@ void RecordSignInPromoShown(signin_metrics::AccessPoint access_point,
                       kAddressSignInPromoShownCountPerProfileForLimitsExperiment
                 : prefs::kAddressSignInPromoShownCountPerProfile;
         break;
-      case SignInPromoType::kSearchAIMode:
-        pref_name = prefs::kSearchAIModeSignInPromoShownCountPerProfile;
-        profile->GetPrefs()->SetTime(
-            prefs::kSearchAIModeSignInPromoLastImpressionTimestampPerProfile,
-            base::Time::Now());
-        break;
       case SignInPromoType::kBookmark:
         if (!base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp)) {
           return;
@@ -629,7 +518,6 @@ void RecordSignInPromoShown(signin_metrics::AccessPoint access_point,
         break;
       case SignInPromoType::kExtension:
       case SignInPromoType::kSendTabToSelf:
-      case SignInPromoType::kComposeboxDriveContextMenuOption:
         return;
     }
 
@@ -649,13 +537,6 @@ void RecordSignInPromoShown(signin_metrics::AccessPoint access_point,
       SigninPrefs(*profile->GetPrefs())
           .IncrementAddressSigninPromoImpressionCount(account.gaia);
       return;
-    case SignInPromoType::kSearchAIMode:
-      SigninPrefs(*profile->GetPrefs())
-          .IncrementSearchAIModeSigninPromoImpressionCount(account.gaia);
-      SigninPrefs(*profile->GetPrefs())
-          .SetSearchAIModeSigninPromoLastImpressionTime(account.gaia,
-                                                        base::Time::Now());
-      return;
     case SignInPromoType::kBookmark:
       if (base::FeatureList::IsEnabled(syncer::kUnoPhase2FollowUp)) {
         SigninPrefs(*profile->GetPrefs())
@@ -664,16 +545,12 @@ void RecordSignInPromoShown(signin_metrics::AccessPoint access_point,
       return;
     case SignInPromoType::kExtension:
     case SignInPromoType::kSendTabToSelf:
-    case SignInPromoType::kComposeboxDriveContextMenuOption:
       return;
   }
 }
 
 bool ShouldUseAutofillSignInPromoLimits(signin::SignInPromoType promo_type) {
-  return promo_type != signin::SignInPromoType::kSearchAIMode &&
-         promo_type !=
-             signin::SignInPromoType::kComposeboxDriveContextMenuOption &&
-         !base::FeatureList::IsEnabled(switches::kSigninPromoLimitsExperiment);
+  return !base::FeatureList::IsEnabled(switches::kSigninPromoLimitsExperiment);
 }
 
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)

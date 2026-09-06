@@ -247,13 +247,6 @@ source_set("ui") {
     ]
   }
 
-  if (enable_dice_support) {
-    sources += [
-      "search_ai_mode_promo_tab_helper.h",
-      "search_ai_mode_signin_promo_controller_observer.h",
-    ]
-  }
-
   public_deps = [
     ":contextual_tasks",
     ":mojo_bindings",
@@ -459,11 +452,6 @@ source_set("ui_impl") {
     ]
   }
 
-  if (enable_dice_support) {
-    sources += [ "search_ai_mode_promo_tab_helper.cc" ]
-    deps += [ "//chrome/browser/ui/views/search_ai_mode" ]
-  }
-
   if (enable_webui_contextual_tasks_composebox) {
     # FaviconSource is only used under #if
     # ENABLE_WEBUI_CONTEXTUAL_TASKS_COMPOSEBOX.
@@ -585,11 +573,6 @@ if (!is_android) {
       "//testing/gmock",
       "//testing/gtest",
     ]
-
-    if (enable_dice_support) {
-      sources += [ "search_ai_mode_promo_tab_helper_browsertest.cc" ]
-      deps += [ "//chrome/browser/ui/views/search_ai_mode" ]
-    }
 
     if (enable_pdf) {
       deps += [ "//chrome/browser/pdf:pdf_extension_test_base" ]
@@ -734,15 +717,6 @@ source_set("interactive_ui_tests") {
   ]
 
   public_deps = [ "//components/omnibox/common:features" ]
-
-  if (enable_dice_support) {
-    sources += [ "search_ai_mode_promo_tab_helper_interactive_uitest.cc" ]
-    deps += [
-      ":test_support",
-      "//chrome/browser/ui/signin",
-      "//chrome/browser/ui/views/search_ai_mode",
-    ]
-  }
 
   if (!is_android) {
     deps += [

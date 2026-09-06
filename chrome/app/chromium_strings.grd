@@ -1257,14 +1257,6 @@ Chromium is unable to recover your settings.
         Your organization requires you to sign into Chromium
       </message>
 
-      <!-- Signin Search AI Mode promo -->
-      <message name="IDS_AI_SIGNIN_PROMO_SUBTITLE" desc="The message shown in a sign-in promo bubble that is shown to users not signed-in to the browser when they click in an AI Mode Search result link.">
-        You can keep chatting with AI Mode without switching tabs. To get started, sign in to Chromium. You'll also get your passwords and more on all your devices.
-      </message>
-      <message name="IDS_AI_SIGNIN_PROMO_AVATAR_PILL_TEXT" translateable="false" meaning="Text shown on the expanded avatar pill when the Signin Search AI Bubble promo is shown to the user">
-        Sign in to Chromium?
-      </message>
-
       <if expr="toolkit_views">
         <message name="IDS_ENTERPRISE_SIGNIN_TITLE" desc="The title of the dialog to confirm linking the browser profile with the signed-in enterprise account">
           Link your Chromium data to this account?

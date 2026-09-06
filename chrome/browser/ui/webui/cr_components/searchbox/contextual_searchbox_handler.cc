@@ -131,10 +131,6 @@
 #include "ui/views/widget/widget.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-#include "chrome/browser/ui/views/search_ai_mode/signin_promo_controller.h"
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-
 namespace {
 
 constexpr int kThumbnailWidth = 125;
@@ -1293,9 +1289,6 @@ void ContextualSearchboxHandler::CleanupDrivePicker() {
   drive_picker_controller_.reset();
   drive_disclaimer_controller_.reset();
   drive_picker_deactivation_blocker_.reset();
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  composebox_drive_signin_promo_controller_.reset();
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 #endif  // !BUILDFLAG(IS_ANDROID)
 }
 
@@ -1339,27 +1332,6 @@ void ContextualSearchboxHandler::OnDriveUploadClicked(
     std::move(callback).Run(searchbox::mojom::DriveUploadResponse::New());
     return;
   }
-
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  // Show the sign-in promo if the user is not signed in with valid credentials.
-  if (base::FeatureList::IsEnabled(
-          omnibox::kComposeboxDriveContextMenuOptionSigninPromo) &&
-      !IsSignedInWithValidCredentials()) {
-    std::move(callback).Run(searchbox::mojom::DriveUploadResponse::New());
-    // TODO(crbug.com/545561312): Handle visibility of the Drive option when
-    // `browser_window_interface` is null (e.g., with `kOmniboxEverywhere`).
-    if (browser_window_interface) {
-      if (!composebox_drive_signin_promo_controller_) {
-        composebox_drive_signin_promo_controller_ =
-            std::make_unique<ComposeboxDriveSignInPromoController>(
-                web_contents_);
-      }
-      composebox_drive_signin_promo_controller_->MaybeShowPromo(
-          browser_window_interface);
-    }
-    return;
-  }
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
   drive_upload_click_callback_ = std::move(callback);
 
@@ -1881,19 +1853,6 @@ void ContextualSearchboxHandler::GetDriveDisclaimerStatus(
 #if BUILDFLAG(IS_ANDROID)
   std::move(callback).Run(searchbox::mojom::DriveDisclaimerStatus::kRestricted);
 #else
-
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  // Bypass backend disclaimer check when not signed in with valid credentials
-  // so WebUI allows the click to proceed to `OnDriveUploadClicked` to show
-  // promo.
-  if (base::FeatureList::IsEnabled(
-          omnibox::kComposeboxDriveContextMenuOptionSigninPromo) &&
-      !IsSignedInWithValidCredentials()) {
-    std::move(callback).Run(
-        searchbox::mojom::DriveDisclaimerStatus::kNotAccepted);
-    return;
-  }
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
   if (base::FeatureList::IsEnabled(omnibox::kForceDriveDisclaimerAccepted)) {
     std::move(callback).Run(searchbox::mojom::DriveDisclaimerStatus::kAccepted);
@@ -2469,12 +2428,6 @@ void ContextualSearchboxHandler::UpdateDriveConsentPref(
   }
   prefs->SetInteger(contextual_search::kDriveConsentState,
                     static_cast<int>(consent_state));
-}
-
-bool ContextualSearchboxHandler::IsSignedInWithValidCredentials() const {
-  auto* identity_manager = IdentityManagerFactory::GetForProfile(profile_);
-  return contextual_tasks::IsSignedInToBrowserWithValidCredentials(
-      identity_manager);
 }
 
 drive_picker::DriveDisclaimerController*
