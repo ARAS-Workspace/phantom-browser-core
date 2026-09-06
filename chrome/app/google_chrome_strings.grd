@@ -992,11 +992,6 @@ Google Chrome is unable to recover your settings.
         </message>
       </if>
 
-      <!-- Google API keys info bar -->
-      <message name="IDS_MISSING_GOOGLE_API_KEYS" desc="Message shown when Google API keys are missing. This message is followed by a 'Learn more' link.">
-        Google API keys are missing. Some functionality of Google Chrome will be disabled.
-      </message>
-
       <!-- Extension/App install prompt -->
       <if expr="enable_extensions_core">
         <!-- Extension installed bubble -->

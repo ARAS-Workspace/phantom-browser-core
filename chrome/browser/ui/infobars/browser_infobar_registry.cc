@@ -20,7 +20,6 @@
 #include "chrome/browser/ssl/known_interception_disclosure_infobar_delegate.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/page_info/chrome_page_info_delegate.h"
-#include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/infobars/core/infobar_delegate.h"
 #include "components/strings/grit/components_strings.h"
@@ -28,7 +27,6 @@
 #include "components/version_info/version_info.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/web_contents.h"
-#include "google_apis/google_api_keys.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/ui_base_features.h"
 #include "url/gurl.h"
@@ -64,18 +62,6 @@ void RegisterInfoBars() {
                   web_contents->GetController().Reload(
                       content::ReloadType::NORMAL, true);
                 }))
-            .Build();
-    browser_infobar_manager->Register(std::move(spec));
-  }
-
-  if (IsInfoBarMigrated(InfoBarDelegate::GOOGLE_API_KEYS_INFOBAR_DELEGATE)) {
-    auto spec =
-        InfoBarSpec::Builder(InfoBarDelegate::GOOGLE_API_KEYS_INFOBAR_DELEGATE)
-            .SetMessageText(
-                l10n_util::GetStringUTF16(IDS_MISSING_GOOGLE_API_KEYS))
-            .SetLinkText(l10n_util::GetStringUTF16(IDS_LEARN_MORE))
-            .SetLinkNavigationUrl(GURL(google_apis::kAPIKeysDevelopersHowToURL))
-            .SetScope(InfoBarScope::kTab)
             .Build();
     browser_infobar_manager->Register(std::move(spec));
   }
