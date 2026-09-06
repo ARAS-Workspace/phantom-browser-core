@@ -138,11 +138,6 @@ export class SettingsAccountPageElement extends SettingsAccountPageElementBase {
     this.encryptionExpanded_ = e.detail.value;
   }
 
-  protected onSyncDashboardLinkClick_() {
-    OpenWindowProxyImpl.getInstance().openUrl(
-        loadTimeData.getString('syncDashboardUrl'));
-  }
-
   protected onResetSyncClick_(event: Event) {
     if ((event.target as HTMLElement).tagName === 'A') {
       // Stop the propagation of events as the |cr-expand-button|

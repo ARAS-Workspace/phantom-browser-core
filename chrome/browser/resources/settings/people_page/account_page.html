@@ -24,13 +24,6 @@ import {ChromeSigninAccessPoint} from '/shared/settings/people_page/sync_browser
 
       <div id="other-sync-items" class="list-frame">
 
-        <!-- Chrome data in your account -->
-        <cr-link-row id="syncDashboardLink" class="hr"
-            label="$i18n{manageSyncedDataTitle}"
-            @click="${this.onSyncDashboardLinkClick_}"
-            ?hidden="${!!this.syncStatus_?.supervisedUser}" external>
-        </cr-link-row>
-
         <if expr="is_chromeos">
           <!-- Manage accounts on this device -->
           <cr-link-row id="manage-device-accounts" class="hr"

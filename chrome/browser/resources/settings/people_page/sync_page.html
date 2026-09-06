@@ -74,12 +74,6 @@ import {ChromeSigninAccessPoint, PageStatus} from '/shared/settings/people_page/
               @click="${this.onSyncAdvancedClick_}">
           </cr-link-row>
 
-          <cr-link-row id="syncDashboardLink" class="hr"
-              label="$i18n{manageSyncedDataTitle}"
-              @click="${this.onSyncDashboardLinkClick_}"
-              ?hidden="${!!this.syncStatus_?.supervisedUser}" external>
-          </cr-link-row>
-
           <cr-expand-button id="encryptionDescription"
               ?hidden="${!!this.syncPrefs?.passphraseRequired}"
               ?expanded="${this.encryptionExpanded_}"

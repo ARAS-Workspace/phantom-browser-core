@@ -191,7 +191,6 @@ suite('SyncSettings', function() {
     assertTrue(isChildVisible(syncPage, '#sync-advanced-row'));
     assertTrue(isChildVisible(syncPage, '#activityControlsLinkRowV2'));
     assertFalse(isChildVisible(syncPage, '#personalizationExpandButton'));
-    assertTrue(isChildVisible(syncPage, '#syncDashboardLink'));
 
     // Test sync paused state.
     webUIListenerCallback('sync-status-changed', {
@@ -537,32 +536,6 @@ suite('SyncSettings', function() {
 
     assertEquals(
         routes.SYNC_ADVANCED.path, Router.getInstance().getCurrentRoute().path);
-  });
-
-  // The sync dashboard is not accessible by supervised
-  // users, so it should remain hidden.
-  test('SyncDashboardHiddenFromSupervisedUsers', async function() {
-    const dashboardLink =
-        syncPage.shadowRoot.querySelector<HTMLElement>('#syncDashboardLink')!;
-
-    const prefs = getSyncAllPrefs();
-    webUIListenerCallback('sync-prefs-changed', prefs);
-
-    // Normal user
-    webUIListenerCallback('sync-status-changed', {
-      supervisedUser: false,
-      statusAction: StatusAction.NO_ACTION,
-    });
-    await microtasksFinished();
-    assertFalse(dashboardLink.hidden);
-
-    // Supervised user
-    webUIListenerCallback('sync-status-changed', {
-      supervisedUser: true,
-      statusAction: StatusAction.NO_ACTION,
-    });
-    await microtasksFinished();
-    assertTrue(dashboardLink.hidden);
   });
 
   // ##################################

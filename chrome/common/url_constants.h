@@ -472,10 +472,6 @@ inline constexpr char16_t kSearchHistoryUrlInClearBrowsingData[] =
 inline constexpr char kSeeMoreSecurityTipsURL[] =
     "https://support.google.com/accounts/answer/32040";
 
-// Help URL for the settings page's search feature.
-inline constexpr char16_t kSettingsSearchHelpURL[] =
-    u"https://support.google.com/chrome?p=settings_search_help";
-
 // The URL for the Learn More page about Sync and Google services.
 inline constexpr char kSyncAndGoogleServicesLearnMoreURL[] =
     "https://support.google.com/chrome?p=syncgoogleservices";
@@ -492,9 +488,11 @@ inline constexpr char16_t kSyncEncryptionHelpURL[] =
     u"https://support.google.com/chrome?p=settings_encryption";
 #endif
 
+#if BUILDFLAG(IS_CHROMEOS)
 // The URL for the "Learn more" link when there is a sync error.
 inline constexpr char kSyncErrorsHelpURL[] =
     "https://support.google.com/chrome?p=settings_sync_error";
+#endif
 
 // Legacy URL to the sync google dashboard.
 inline constexpr char kLegacySyncGoogleDashboardURL[] =

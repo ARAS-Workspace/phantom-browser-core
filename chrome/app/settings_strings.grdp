@@ -336,9 +336,6 @@
     <message name="IDS_SETTINGS_SEARCH_PROMPT" desc="Label for input field to search within settings.">
       Search settings
     </message>
-    <message name="IDS_SETTINGS_SEARCH_NO_RESULTS_HELP" desc="Help text for a search that has no results.">
-      Go to <ph name="BEGIN_LINK_CHROMIUM">&lt;a target="_blank" href="$1"&gt;</ph>Google Chrome help<ph name="END_LINK_CHROMIUM">&lt;/a&gt;</ph> if you can't find what you're looking for
-    </message>
     <message name="IDS_SETTINGS_SETTINGS" desc="The settings page title.">
       Settings
     </message>
@@ -528,9 +525,6 @@
     <message name="IDS_AUTOFILL_VIRTUAL_CARD_UNENROLL_DIALOG_TITLE" desc="The text shown as the title of the virtual card unenroll dialog.">
       Remove your virtual card
     </message>
-    <message name="IDS_AUTOFILL_VIRTUAL_CARD_UNENROLL_DIALOG_LABEL" desc="The text shown inside the virtual card unenroll dialog. Has a link.">
-      You will no longer be able to use your virtual card with Google Pay. <ph name="BEGIN_LINK">&lt;a target='_blank' href='$1'&gt;</ph>Learn about virtual cards<ph name="END_LINK">&lt;/a&gt;</ph>
-    </message>
     <message name="IDS_AUTOFILL_VIRTUAL_CARD_UNENROLL_DIALOG_CONFIRM_BUTTON_LABEL" desc="The text shown in the confirm button of the virtual card unenroll dialog.">
       Remove
     </message>
@@ -563,9 +557,6 @@
     </message>
     <message name="IDS_SETTINGS_GOOGLE_WALLET" desc="Label used to differentiate when an Autofill AI entity (such as vehicle information) is stored in Google Wallet.">
       Google Wallet
-    </message>
-    <message name="IDS_SETTINGS_PAYMENTS_MANAGE_LOYALTY_CARDS_AND_PAYMENT_METHODS" desc="Shown in the payments section of settings. Descriptive text to inform the user that payment methods and loyalty cards can be accessed via link. Google Wallet should not be translated because it is the product name. Has two links that opens different pages on Google Wallet.">
-     Visit Google Wallet to add or manage <ph name="BEGIN_LINK_LOYALTY_CARDS">&lt;a href="$1" target="_blank"&gt;</ph>loyalty cards<ph name="END_LINK_LOYALTY_CARDS">&lt;/a&gt;</ph> or Google Pay <ph name="BEGIN_LINK_PAYMENT_METHODS">&lt;a href="$2" target="_blank"&gt;</ph>payment methods<ph name="END_LINK_PAYMENT_METHODS">&lt;/a&gt;</ph>
     </message>
     <message name="IDS_SETTINGS_REMOTE_WALLET_PASSES_LINK_LABEL" desc="The title and ARIA (accessibility) label for a link in Chrome settings that opens the payment methods settings on https://wallet.google.com/wallet/passes. Note that the ARIA role and the link icon already convey that this is a link that will be opened when you click on it. Therefore, the message does not contain a verb.">
       Your Google Wallet passes
@@ -797,15 +788,6 @@
     <message name="IDS_SETTINGS_NAME_EMAIL_ADDRESS_REMOVE_CONFIRMATION_DIALOG_TITLE" desc="Title for the dialog that asks for confirmation to remove the selected name and email address from Chrome.">
       Remove this info from Chrome autofill?
     </message>
-    <message name="IDS_SETTINGS_HOME_ADDRESS_REMOVE_CONFIRMATION_DIALOG_NOTICE" desc="Body for the dialog that asks for confirmation to remove the selected home address from Chrome.">
-      Your home address can help you get things done across Google services, like more relevant Search results and directions in Google Maps. You can edit or delete your address in your <ph name="BEGIN_LINK">&lt;a href="$1" target=&quot;_blank&quot;&gt;</ph>Google Account<ph name="END_LINK">&lt;/a&gt;</ph> <ph name="USERNAME">$2<ex>example@gmail.com</ex></ph>.
-    </message>
-    <message name="IDS_SETTINGS_WORK_ADDRESS_REMOVE_CONFIRMATION_DIALOG_NOTICE" desc="Body for the dialog that asks for confirmation to remove the selected work address from Chrome.">
-      Your work address can help you get things done across Google services, like more relevant Search results and directions in Google Maps. You can edit or delete your address in your <ph name="BEGIN_LINK">&lt;a href="$1" target=&quot;_blank&quot;&gt;</ph>Google Account<ph name="END_LINK">&lt;/a&gt;</ph> <ph name="USERNAME">$2<ex>example@gmail.com</ex></ph>.
-    </message>
-    <message name="IDS_SETTINGS_NAME_EMAIL_ADDRESS_REMOVE_CONFIRMATION_DIALOG_NOTICE" desc="Body for the dialog that asks for confirmation to remove the selected name and email address from Chrome.">
-      You can edit your name in your <ph name="BEGIN_LINK">&lt;a href="$1" target=&quot;_blank&quot;&gt;</ph>Google Account<ph name="END_LINK">&lt;/a&gt;</ph> <ph name="USERNAME">$2<ex>example@gmail.com</ex></ph>
-    </message>
     <message name="IDS_SETTINGS_HOME_AND_WORK_ADDRESS_REMOVE_CONFIRMATION_DIALOG_ACTION_OK" desc="Okay action for the dialog that asks for confirmation to remove the selected home and work address from Chrome.">
       Remove
     </message>
@@ -829,18 +811,6 @@
     <!-- Delete Browsing Data -->
     <message name="IDS_SETTINGS_CLEAR_PERIOD_TITLE" desc="Label of the dropdown that selects the time range for which browsing data will be deleted.">
       Time range
-    </message>
-    <message name="IDS_SETTINGS_CLEAR_BROWSING_DATA_WITH_SYNC" desc="Description in the footer of the Delete Browsing Data dialog when the user is syncing.">
-      To delete browsing data from this device only, while keeping it in your Google Account, <ph name="BEGIN_LINK">&lt;a href="#" target=&quot;_blank&quot;&gt;</ph>sign out<ph name="END_LINK">&lt;/a&gt;</ph>.
-    </message>
-    <message name="IDS_SETTINGS_CLEAR_BROWSING_DATA_WITH_SYNC_ERROR" desc="Description in the footer of the Delete Browsing Data dialog when there is a sync error.">
-      To delete browsing data from all of your synced devices and your Google Account, <ph name="BEGIN_LINK">&lt;a href="#" target=&quot;_blank&quot;&gt;</ph>visit sync settings<ph name="END_LINK">&lt;/a&gt;</ph>.
-    </message>
-    <message name="IDS_SETTINGS_CLEAR_BROWSING_DATA_WITH_SYNC_PASSPHRASE_ERROR" desc="Description in the footer of the Delete Browsing Data dialog when there is a sync passphrase error.">
-      To delete browsing data from all of your synced devices and your Google Account, <ph name="BEGIN_LINK">&lt;a href="#" target=&quot;_blank&quot;&gt;</ph>enter your passphrase<ph name="END_LINK">&lt;/a&gt;</ph>.
-    </message>
-    <message name="IDS_SETTINGS_CLEAR_BROWSING_DATA_WITH_SYNC_PAUSED" desc="Description in the footer of the Delete Browsing Data dialog when sync is paused.">
-      To delete browsing data from all of your synced devices and your Google Account, <ph name="BEGIN_LINK">&lt;a href="#" target=&quot;_blank&quot;&gt;</ph>sign in<ph name="END_LINK">&lt;/a&gt;</ph>.
     </message>
     <message name="IDS_SETTINGS_CLEAR_BROWSING_HISTORY" desc="Checkbox for deleting Browsing History">
       Browsing history

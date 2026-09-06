@@ -196,8 +196,10 @@ void AddSharedSyncPageStrings(content::WebUIDataSource* html_source) {
       {"syncAdvancedBrowserPageTitle",
        IDS_SETTINGS_NEW_SYNC_ADVANCED_BROWSER_PAGE_TITLE},
       {"enterPassphraseLabel", IDS_SYNC_ENTER_PASSPHRASE_BODY},
+#if BUILDFLAG(IS_CHROMEOS)
       {"enterPassphraseLabelWithDate",
        IDS_SYNC_ENTER_PASSPHRASE_BODY_WITH_DATE},
+#endif
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
 
@@ -214,8 +216,10 @@ void AddSharedSyncPageStrings(content::WebUIDataSource* html_source) {
       "passphraseRecover",
       l10n_util::GetStringFUTF8(IDS_SETTINGS_PASSPHRASE_RECOVER,
                                 base::ASCIIToUTF16(sync_dashboard_url)));
+#if BUILDFLAG(IS_CHROMEOS)
   html_source->AddString("syncDashboardUrl", sync_dashboard_url);
   html_source->AddString("syncErrorsHelpUrl", chrome::kSyncErrorsHelpURL);
+#endif
 
   const bool updateAccountSettingsStrings =
       syncer::IsReplaceSyncPromosWithSignInPromosEnabled();
@@ -235,11 +239,13 @@ void AddSharedSyncPageStrings(content::WebUIDataSource* html_source) {
       updateAccountSettingsStrings
           ? IDS_SYNC_FULL_ACCOUNT_DATA_ENCRYPTION_BODY_CUSTOM
           : IDS_SYNC_FULL_ENCRYPTION_BODY_CUSTOM);
+#if BUILDFLAG(IS_CHROMEOS)
   html_source->AddLocalizedString(
       "manageSyncedDataTitle",
       updateAccountSettingsStrings
           ? IDS_SETTINGS_ACCOUNT_DATA_DASHBOARD
           : IDS_SETTINGS_NEW_MANAGE_SYNCED_DATA_TITLE_UNIFIED_CONSENT);
+#endif
 
   html_source->AddString(
       "passphraseResetHintEncryption",

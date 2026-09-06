@@ -67,7 +67,6 @@
 #include "components/autofill/core/browser/data_manager/personal_data_manager.h"
 #include "components/autofill/core/browser/foundations/browser_autofill_manager.h"
 #include "components/autofill/core/browser/payments/credit_card_access_manager.h"
-#include "components/autofill/core/browser/payments/payments_service_url.h"
 #include "components/autofill/core/browser/payments/payments_util.h"
 #include "components/autofill/core/browser/permissions/autofill_ai/autofill_ai_permission_utils.h"
 #include "components/autofill/core/browser/studies/autofill_experiments.h"
@@ -423,14 +422,6 @@ void AddClearBrowsingDataStrings(content::WebUIDataSource* html_source,
   // TODO(crbug.com/397187800): Rename strings from "clear" to "delete".
   static constexpr webui::LocalizedString kLocalizedStrings[] = {
       {"clearTimeRange", IDS_SETTINGS_CLEAR_PERIOD_TITLE},
-      {"clearBrowsingDataSignedIn", IDS_SETTINGS_CLEAR_BROWSING_DATA_SIGNED_IN},
-      {"clearBrowsingDataWithSync", IDS_SETTINGS_CLEAR_BROWSING_DATA_WITH_SYNC},
-      {"clearBrowsingDataWithSyncError",
-       IDS_SETTINGS_CLEAR_BROWSING_DATA_WITH_SYNC_ERROR},
-      {"clearBrowsingDataWithSyncPassphraseError",
-       IDS_SETTINGS_CLEAR_BROWSING_DATA_WITH_SYNC_PASSPHRASE_ERROR},
-      {"clearBrowsingDataWithSyncPaused",
-       IDS_SETTINGS_CLEAR_BROWSING_DATA_WITH_SYNC_PAUSED},
       {"clearBrowsingHistory", IDS_SETTINGS_CLEAR_BROWSING_HISTORY},
       {"clearBrowsingHistorySummary",
        IDS_SETTINGS_CLEAR_BROWSING_HISTORY_SUMMARY},
@@ -447,10 +438,6 @@ void AddClearBrowsingDataStrings(content::WebUIDataSource* html_source,
       {"clearPeriod7Days", IDS_SETTINGS_CLEAR_PERIOD_7_DAYS},
       {"clearPeriod4Weeks", IDS_SETTINGS_CLEAR_PERIOD_FOUR_WEEKS},
       {"clearPeriodEverything", IDS_SETTINGS_CLEAR_PERIOD_EVERYTHING},
-      {"passwordsDeletionDialogTitle",
-       IDS_CLEAR_BROWSING_DATA_PASSWORDS_NOTICE_TITLE},
-      {"passwordsDeletionDialogOK",
-       IDS_CLEAR_BROWSING_DATA_PASSWORDS_NOTICE_OK},
       {"notificationWarning", IDS_SETTINGS_NOTIFICATION_WARNING},
       {"clearBrowsingDataShowMore", IDS_SETTINGS_CLEAR_BROWSING_DATA_SHOW_MORE},
       {"clearBrowsingDataMore", IDS_SETTINGS_CLEAR_BROWSING_DATA_MORE},
@@ -458,12 +445,6 @@ void AddClearBrowsingDataStrings(content::WebUIDataSource* html_source,
        IDS_SETTINGS_DELETION_CONFIRMATION_TOAST_LABEL},
       {"deletionConfirmationAllTimeToast",
        IDS_SETTINGS_DELETION_CONFIRMATION_ALL_TIME_TOAST_LABEL}};
-
-  html_source->AddString(
-      "passwordsDeletionDialogBody",
-      l10n_util::GetStringFUTF16(
-          IDS_CLEAR_BROWSING_DATA_PASSWORDS_NOTICE,
-          l10n_util::GetStringUTF16(IDS_PASSWORDS_WEB_LINK)));
 
 #if !BUILDFLAG(IS_CHROMEOS)
   html_source->AddBoolean("isClearPrimaryAccountAllowed",
@@ -911,8 +892,6 @@ void AddAutofillStrings(content::WebUIDataSource* html_source,
        IDS_AUTOFILL_SETTINGS_PAGE_ENABLE_CVC_STORAGE_ARIA_LABEL_FOR_NO_CVC_SAVED},
       {"enableCvcStorageSublabel",
        IDS_AUTOFILL_SETTINGS_PAGE_ENABLE_CVC_STORAGE_SUBLABEL},
-      {"enableCvcStorageDeleteDataSublabel",
-       IDS_AUTOFILL_SETTINGS_PAGE_ENABLE_CVC_STORAGE_WITH_DELETE_LINK_SUBLABEL},
       {"enableMandatoryAuthToggleLabel",
        IDS_AUTOFILL_SETTINGS_PAGE_ENABLE_PAYMENT_METHOD_MANDATORY_REAUTH_LABEL},
       {"enableMandatoryAuthToggleSublabel",
@@ -1125,8 +1104,6 @@ void AddAutofillStrings(content::WebUIDataSource* html_source,
        IDS_AUTOFILL_AI_ADD_OR_EDIT_DIALOG_REQUIRED_FIELD_ERROR},
       {"saveInfoToWalletAccountNotice",
        IDS_AUTOFILL_AI_SAVE_ENTITY_TO_WALLET_DIALOG_SUBTITLE},
-      {"saveInfoToWalletSettingsAccountNotice",
-       IDS_AUTOFILL_AI_SAVE_ENTITY_TO_WALLET_DIALOG_SUBTITLE_NEW},
       {"autofillAiSubpageSublabelLoggingManagedDisabled",
        IDS_SETTINGS_AUTOFILL_AI_ENTERPRISE_LOGGING_MANAGED_DISABLED},
       {"autofillPayOverTimeSettingsLabel", IDS_AUTOFILL_BNPL_SETTINGS_LABEL},
@@ -1142,12 +1119,6 @@ void AddAutofillStrings(content::WebUIDataSource* html_source,
        IDS_SETTINGS_WORK_ADDRESS_REMOVE_CONFIRMATION_DIALOG_TITLE},
       {"removeNameEmailAddressConfirmationTitle",
        IDS_SETTINGS_NAME_EMAIL_ADDRESS_REMOVE_CONFIRMATION_DIALOG_TITLE},
-      {"deleteHomeAddressNotice",
-       IDS_SETTINGS_HOME_ADDRESS_REMOVE_CONFIRMATION_DIALOG_NOTICE},
-      {"deleteWorkAddressNotice",
-       IDS_SETTINGS_WORK_ADDRESS_REMOVE_CONFIRMATION_DIALOG_NOTICE},
-      {"deleteNameEmailAddressNotice",
-       IDS_SETTINGS_NAME_EMAIL_ADDRESS_REMOVE_CONFIRMATION_DIALOG_NOTICE},
       {"moreOptionsForHomeAddress",
        IDS_SETTINGS_AUTOFILL_MORE_ACTIONS_FOR_HOME_ADDRESS},
       {"moreOptionsForWorkAddress",
@@ -1189,15 +1160,6 @@ void AddAutofillStrings(content::WebUIDataSource* html_source,
       {"personalContextAutofillSettingsManageConnectedAppsSummary",
        IDS_PERSONAL_CONTEXT_AUTOFILL_SETTINGS_MANAGE_CONNECTED_APPS_SUMMARY}};
 
-  html_source->AddString(
-      "manageCreditCardsLabel",
-      l10n_util::GetStringFUTF16(
-          IDS_SETTINGS_PAYMENTS_MANAGE_LOYALTY_CARDS_AND_PAYMENT_METHODS,
-          base::UTF8ToUTF16(
-              autofill::payments::GetManageLoyaltyCardsUrl().spec()),
-          base::UTF8ToUTF16(
-              autofill::payments::GetManageInstrumentsUrl().spec())));
-
   autofill::PaymentsDataManager& payments_data =
       autofill::PersonalDataManagerFactory::GetForBrowserContext(profile)
           ->payments_data_manager();
@@ -1227,14 +1189,6 @@ void AddAutofillStrings(content::WebUIDataSource* html_source,
       "undoDescription",
       l10n_util::GetStringFUTF16(IDS_UNDO_DESCRIPTION,
                                  undo_accelerator.GetShortcutText()));
-  html_source->AddString(
-      "unenrollVirtualCardDialogLabel",
-      l10n_util::GetStringFUTF16(
-          IDS_AUTOFILL_VIRTUAL_CARD_UNENROLL_DIALOG_LABEL,
-          base::UTF8ToUTF16(
-              autofill::payments::GetVirtualCardEnrollmentSupportUrl()
-                  .spec())));
-
   html_source->AddLocalizedStrings(kLocalizedStrings);
   html_source->AddLocalizedString(
       "autofillAiPageTitle",
@@ -1856,10 +1810,6 @@ void AddSearchInSettingsStrings(content::WebUIDataSource* html_source) {
       {"clearSearch", IDS_CLEAR_SEARCH},
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
-
-  std::u16string help_text = l10n_util::GetStringFUTF16(
-      IDS_SETTINGS_SEARCH_NO_RESULTS_HELP, chrome::kSettingsSearchHelpURL);
-  html_source->AddString("searchNoResultsHelp", help_text);
 }
 
 void AddSearchStrings(content::WebUIDataSource* html_source, Profile* profile) {

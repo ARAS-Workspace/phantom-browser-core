@@ -11,7 +11,7 @@ import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_as
 import {TestOpenWindowProxy} from 'chrome://webui-test/test_open_window_proxy.js';
 import {isChildVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
-import {getSyncAllPrefs, simulateStoredAccounts, simulateSyncStatus} from './sync_test_util.js';
+import {getSyncAllPrefs, simulateStoredAccounts} from './sync_test_util.js';
 import {TestSyncBrowserProxy} from './test_sync_browser_proxy.js';
 
 
@@ -81,7 +81,6 @@ suite('AccountPage', function() {
     assertTrue(
         isChildVisible(accountSettingsPage, 'settings-sync-account-control'));
     assertTrue(isChildVisible(accountSettingsPage, 'settings-sync-controls'));
-    assertTrue(isChildVisible(accountSettingsPage, '#syncDashboardLink'));
     assertTrue(isChildVisible(accountSettingsPage, '#manage-google-account'));
     // <if expr="is_chromeos">
     assertTrue(isChildVisible(accountSettingsPage, '#manage-device-accounts'));
@@ -108,7 +107,6 @@ suite('AccountPage', function() {
   });
 
   test('RowsLinkToCorrectUrls', async function() {
-    await assertElementLinksToUrl('#syncDashboardLink', 'syncDashboardUrl');
     await assertElementLinksToUrl('#manage-google-account', 'googleAccountUrl');
     // <if expr="is_chromeos">
     await assertElementLinksToUrl(
@@ -227,29 +225,5 @@ suite('AccountPage', function() {
     linkedServicesLinkRow.click();
     const url = await openWindowProxy.whenCalled('openUrl');
     assertEquals(loadTimeData.getString('linkedServicesUrl'), url);
-  });
-
-  // The sync dashboard is not accessible by supervised
-  // users, so it should remain hidden.
-  test('SyncDashboardHiddenFromSupervisedUsers', async function() {
-    const dashboardLink =
-        accountSettingsPage.shadowRoot.querySelector<HTMLElement>(
-            '#syncDashboardLink')!;
-
-    const prefs = getSyncAllPrefs();
-    webUIListenerCallback('sync-prefs-changed', prefs);
-
-    // Normal user
-    assertFalse(dashboardLink.hidden);
-
-    // Supervised user
-    await testSyncBrowserProxy.whenCalled('getSyncStatus');
-    simulateSyncStatus({
-      signedInState: SignedInState.SIGNED_IN,
-      supervisedUser: true,
-      statusAction: StatusAction.NO_ACTION,
-    });
-    await microtasksFinished();
-    assertTrue(dashboardLink.hidden);
   });
 });

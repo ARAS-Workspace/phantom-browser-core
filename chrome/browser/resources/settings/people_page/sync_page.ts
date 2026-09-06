@@ -463,10 +463,6 @@ export class SettingsSyncPageElement extends SettingsSyncPageElementBase {
     this.pageStatus_ = PageStatus.CONFIGURE;
   }
 
-  protected onSyncDashboardLinkClick_() {
-    window.open(loadTimeData.getString('syncDashboardUrl'));
-  }
-
   private computeDataEncrypted_(): boolean {
     return !!this.syncPrefs && this.syncPrefs.encryptAllData;
   }
@@ -476,19 +472,7 @@ export class SettingsSyncPageElement extends SettingsSyncPageElementBase {
       return window.trustedTypes!.emptyHTML;
     }
 
-    if (!this.syncPrefs.explicitPassphraseTime) {
-      // TODO(crbug.com/40765539): There's no reason why this dateless label
-      // shouldn't link to 'syncErrorsHelpUrl' like the other one.
-      return this.i18nAdvanced('enterPassphraseLabel');
-    }
-
-    return this.i18nAdvanced('enterPassphraseLabelWithDate', {
-      tags: ['a'],
-      substitutions: [
-        loadTimeData.getString('syncErrorsHelpUrl'),
-        this.syncPrefs.explicitPassphraseTime,
-      ],
-    });
+    return this.i18nAdvanced('enterPassphraseLabel');
   }
 
   private computeExistingPassphraseLabel_(): string {

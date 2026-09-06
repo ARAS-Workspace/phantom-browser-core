@@ -36,7 +36,6 @@ url::Origin GetGooglePayScriptOrigin();
 // page for a particular instrument given the `instrument_id`.
 GURL GetManageInstrumentsUrl();
 GURL GetManageInstrumentUrl(int64_t instrument_id);
-GURL GetManageLoyaltyCardsUrl();
 GURL GetManageAddressesUrl();
 
 // Returns the support URL for users to learn more about virtual cards during

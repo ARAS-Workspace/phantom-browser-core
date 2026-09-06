@@ -383,9 +383,11 @@
   <message name="IDS_SETTINGS_INCORRECT_PASSPHRASE_ERROR" desc="Message when the passphrase is incorrect.">
     The passphrase you entered is incorrect
   </message>
-  <message name="IDS_SETTINGS_NEW_MANAGE_SYNCED_DATA_TITLE_UNIFIED_CONSENT" desc="Title for the link to manage Chrome Sync data via Google Dashboard when unified consent is enabled.">
-    Review your synced data
-  </message>
+  <if expr="is_chromeos">
+    <message name="IDS_SETTINGS_NEW_MANAGE_SYNCED_DATA_TITLE_UNIFIED_CONSENT" desc="Title for the link to manage Chrome Sync data via Google Dashboard when unified consent is enabled.">
+      Review your synced data
+    </message>
+  </if>
   <message name="IDS_SETTINGS_NEW_SYNC_ADVANCED_BROWSER_PAGE_TITLE" desc="Name of the settings page which manages browser data used by sync when lacros is enabled." >
     Manage browser sync
   </message>
