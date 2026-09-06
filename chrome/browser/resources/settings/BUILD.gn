@@ -139,7 +139,6 @@ build_webui("build") {
       "clear_browsing_data_dialog/clear_browsing_data_account_indicator.ts",
       "languages_page/languages_page.ts",
       "languages_page/languages_page_index.ts",
-      "languages_page/spell_check_page.ts",
       "people_page/import_data_dialog.ts",
       "people_page/manage_profile.ts",
       "relaunch_confirmation_dialog.ts",
@@ -149,10 +148,6 @@ build_webui("build") {
       "languages_page/languages_page_index_cros.ts",
       "site_settings/smart_card_readers_page.ts",
     ]
-  }
-
-  if (!is_chromeos && !is_mac) {
-    web_component_files += [ "languages_page/edit_dictionary_page.ts" ]
   }
 
   # -----------------web_component_files end ----------------------------------

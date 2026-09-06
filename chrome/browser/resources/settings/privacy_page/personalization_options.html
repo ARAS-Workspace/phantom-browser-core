@@ -89,17 +89,6 @@ import {RestartType} from '../relaunch_mixin_lit.js';
 </if><!-- not chromeos -->
 </if><!-- _google_chrome -->
 <if expr="_google_chrome">
-<if expr="not is_chromeos">
-    <settings-toggle-button id="spellCheckControl"
-        class="hr"
-        pref-key="spellcheck.use_spelling_service"
-        @settings-boolean-control-change="${
-            this.onUseSpellingServiceSettingsBooleanControlChange_}"
-        label="$i18n{spellingPref}"
-        sub-label="$i18n{spellingDescription}"
-        ?hidden="${!this.showSpellCheckControlToggle_()}">
-    </settings-toggle-button>
-</if>
 <if expr="is_chromeos">
     <!-- On ChromeOS the toggle for spellcheck is shown in the OS settings,
          and Ash Browser settings show a link to the OS settings instead. -->

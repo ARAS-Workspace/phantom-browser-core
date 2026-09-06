@@ -18,13 +18,8 @@ import {PrefServiceObserverMixin} from '/shared/settings/prefs2/pref_service_obs
 
 import type {LanguagesBrowserProxy} from './languages_browser_proxy.js';
 import {LanguagesBrowserProxyImpl} from './languages_browser_proxy.js';
-import type {LanguageHelper, LanguagesModel, LanguageState, SpellCheckLanguageState} from './languages_types.js';
+import type {LanguageHelper, LanguagesModel, LanguageState} from './languages_types.js';
 import {convertLanguageCodeForChrome, convertLanguageCodeForTranslate, getBaseLanguage} from './languages_util.js';
-
-interface SpellCheckLanguages {
-  on: SpellCheckLanguageState[];
-  off: SpellCheckLanguageState[];
-}
 
 const MoveType = chrome.languageSettingsPrivate.MoveType;
 
@@ -74,9 +69,6 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
       intlAcceptLanguagesPref_: Object,
       intlAppLocalePref_: Object,
       intlForcedLanguagesPref_: Object,
-      spellcheckBlockedDictionariesPref_: Object,
-      spellcheckDictionariesPref_: Object,
-      spellcheckForcedDictionariesPref_: Object,
       translateAllowlistsPref_: Object,
       translateBlockedLanguagesPref_: Object,
       translateRecentTargetPref_: Object,
@@ -96,10 +88,6 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
       // </if>
       'preferredLanguagesPrefChanged_(' +
           'intlAcceptLanguagesPref_, intlForcedLanguagesPref_, languages)',
-      'spellCheckDictionariesPrefChanged_(' +
-          'spellcheckDictionariesPref_, ' +
-          'spellcheckForcedDictionariesPref_, ' +
-          'spellcheckBlockedDictionariesPref_, languages)',
       'translateLanguagesPrefChanged_(' +
           'translateBlockedLanguagesPref_, languages)',
       'translateTargetPrefChanged_(translateRecentTargetPref_, languages)',
@@ -116,12 +104,6 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
   declare private intlAppLocalePref_: chrome.settingsPrivate.PrefObject<string>|
       undefined;
   declare private intlForcedLanguagesPref_:
-      chrome.settingsPrivate.PrefObject<string[]>|undefined;
-  declare private spellcheckBlockedDictionariesPref_:
-      chrome.settingsPrivate.PrefObject<string[]>|undefined;
-  declare private spellcheckDictionariesPref_:
-      chrome.settingsPrivate.PrefObject<string[]>|undefined;
-  declare private spellcheckForcedDictionariesPref_:
       chrome.settingsPrivate.PrefObject<string[]>|undefined;
   declare private translateAllowlistsPref_:
       chrome.settingsPrivate.PrefObject<Record<string, string>>|undefined;
@@ -140,12 +122,6 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
   // <if expr="is_win">
   /** Prospective UI language when the page was loaded. */
   private originalProspectiveUILanguage_: string;
-  // </if>
-
-  // <if expr="not is_macosx">
-  private boundOnSpellcheckDictionariesChanged_:
-      ((statuses: chrome.languageSettingsPrivate
-            .SpellcheckDictionaryStatus[]) => void)|null = null;
   // </if>
 
   private browserProxy_: LanguagesBrowserProxy =
@@ -169,9 +145,6 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
       'intl.accept_languages': 'intlAcceptLanguagesPref_',
       'intl.app_locale': 'intlAppLocalePref_',
       'intl.forced_languages': 'intlForcedLanguagesPref_',
-      'spellcheck.blocked_dictionaries': 'spellcheckBlockedDictionariesPref_',
-      'spellcheck.dictionaries': 'spellcheckDictionariesPref_',
-      'spellcheck.forced_dictionaries': 'spellcheckForcedDictionariesPref_',
       'translate_allowlists': 'translateAllowlistsPref_',
       'translate_blocked_languages': 'translateBlockedLanguagesPref_',
       'translate_recent_target': 'translateRecentTargetPref_',
@@ -247,15 +220,6 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
 
       this.createModel_(args);
 
-      // <if expr="not is_macosx">
-      this.boundOnSpellcheckDictionariesChanged_ =
-          this.onSpellcheckDictionariesChanged_.bind(this);
-      this.languageSettingsPrivate_.onSpellcheckDictionariesChanged.addListener(
-          this.boundOnSpellcheckDictionariesChanged_);
-      this.languageSettingsPrivate_.getSpellcheckDictionaryStatuses().then(
-          this.boundOnSpellcheckDictionariesChanged_);
-      // </if>
-
       this.resolver_.resolve();
     });
   }
@@ -265,14 +229,6 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
 
     instance = null;
     this.resolver_ = new PromiseResolver();
-
-    // <if expr="not is_macosx">
-    if (this.boundOnSpellcheckDictionariesChanged_) {
-      this.languageSettingsPrivate_.onSpellcheckDictionariesChanged
-          .removeListener(this.boundOnSpellcheckDictionariesChanged_);
-      this.boundOnSpellcheckDictionariesChanged_ = null;
-    }
-    // </if>
   }
 
   // <if expr="is_win">
@@ -310,140 +266,10 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
 
     this.set('languages.enabled', enabledLanguageStates);
 
-    // <if expr="not is_macosx">
-    if (this.boundOnSpellcheckDictionariesChanged_) {
-      this.languageSettingsPrivate_.getSpellcheckDictionaryStatuses().then(
-          this.boundOnSpellcheckDictionariesChanged_);
-    }
-    // </if>
-
     // Update translate target language.
     this.languageSettingsPrivate_.getTranslateTargetLanguage().then(result => {
       this.set('languages.translateTarget', result);
     });
-  }
-
-  /**
-   * Updates the spellCheckEnabled state of each enabled language.
-   */
-  private spellCheckDictionariesPrefChanged_() {
-    if (this.spellcheckDictionariesPref_ === undefined ||
-        this.spellcheckForcedDictionariesPref_ === undefined ||
-        this.spellcheckBlockedDictionariesPref_ === undefined ||
-        this.languages === undefined) {
-      return;
-    }
-
-    const spellCheckSet =
-        this.makeSetFromArray_(this.spellcheckDictionariesPref_.value);
-    const spellCheckForcedSet =
-        this.makeSetFromArray_(this.spellcheckForcedDictionariesPref_.value);
-    const spellCheckBlockedSet =
-        this.makeSetFromArray_(this.spellcheckBlockedDictionariesPref_.value);
-
-    for (let i = 0; i < this.languages.enabled.length; i++) {
-      const languageState = this.languages.enabled[i];
-      const isUser = spellCheckSet.has(languageState.language.code);
-      const isForced = spellCheckForcedSet.has(languageState.language.code);
-      const isBlocked = spellCheckBlockedSet.has(languageState.language.code);
-      this.set(
-          `languages.enabled.${i}.spellCheckEnabled`,
-          (isUser && !isBlocked) || isForced);
-      this.set(`languages.enabled.${i}.isManaged`, isForced || isBlocked);
-    }
-
-    const {on: spellCheckOnLanguages, off: spellCheckOffLanguages} =
-        this.getSpellCheckLanguages_(this.languages.supported);
-    this.set('languages.spellCheckOnLanguages', spellCheckOnLanguages);
-    this.set('languages.spellCheckOffLanguages', spellCheckOffLanguages);
-  }
-
-  /**
-   * Returns two arrays of SpellCheckLanguageStates for spell check languages:
-   * one for spell check on, one for spell check off.
-   * @param supportedLanguages The list of supported languages, normally
-   *     this.languages.supported.
-   */
-  private getSpellCheckLanguages_(
-      supportedLanguages: chrome.languageSettingsPrivate.Language[]):
-      SpellCheckLanguages {
-    // The spell check preferences are prioritised in this order:
-    // forced_dictionaries, blocked_dictionaries, dictionaries.
-
-    // The set of all language codes seen thus far.
-    const seenCodes = new Set<string>();
-
-    /**
-     * Gets the list of language codes indicated by the preference name, and
-     * de-duplicates it with all other language codes.
-     */
-    const getPrefAndDedupe =
-        (pref: chrome.settingsPrivate.PrefObject<string[]>): string[] => {
-          const result = pref.value.filter(x => !seenCodes.has(x));
-          result.forEach((code: string) => seenCodes.add(code));
-          return result;
-        };
-
-    assert(this.spellcheckForcedDictionariesPref_);
-    const forcedCodes =
-        getPrefAndDedupe(this.spellcheckForcedDictionariesPref_);
-    const forcedCodesSet = new Set(forcedCodes);
-    assert(this.spellcheckBlockedDictionariesPref_);
-    const blockedCodes =
-        getPrefAndDedupe(this.spellcheckBlockedDictionariesPref_);
-    const blockedCodesSet = new Set(blockedCodes);
-    assert(this.spellcheckDictionariesPref_);
-    const enabledCodes = getPrefAndDedupe(this.spellcheckDictionariesPref_);
-
-    const on: SpellCheckLanguageState[] = [];
-    // We want to add newly enabled languages to the end of the "on" list, so we
-    // should explicitly move the forced languages to the front of the list.
-    for (const code of [...forcedCodes, ...enabledCodes]) {
-      const language = this.supportedLanguageMap_.get(code);
-      // language could be undefined if code is not in supportedLanguageMap_.
-      // This should be rare, but could happen if supportedLanguageMap_ is
-      // missing languages or the prefs are manually modified. We want to fail
-      // gracefully if this happens - throwing an error here would cause
-      // language settings to not load.
-      if (language) {
-        on.push({
-          language,
-          isManaged: forcedCodesSet.has(code),
-          spellCheckEnabled: true,
-          downloadDictionaryStatus: null,
-          downloadDictionaryFailureCount: 0,
-        });
-      }
-    }
-
-    // Because the list of "spell check supported" languages is only exposed
-    // through "supported languages", we need to filter that list along with
-    // whether we've seen the language before.
-    // We don't want to split this list in "forced" / "not-forced" like the
-    // spell check on list above, as we don't want to explicitly surface / hide
-    // blocked languages to the user.
-    const off: SpellCheckLanguageState[] = [];
-
-    for (const language of supportedLanguages) {
-      // If spell check is off for this language, it must either not be in any
-      // spell check pref, or be in the blocked dictionaries pref.
-      if (language.supportsSpellcheck &&
-          (!seenCodes.has(language.code) ||
-           blockedCodesSet.has(language.code))) {
-        off.push({
-          language,
-          isManaged: blockedCodesSet.has(language.code),
-          spellCheckEnabled: false,
-          downloadDictionaryStatus: null,
-          downloadDictionaryFailureCount: 0,
-        });
-      }
-    }
-
-    return {
-      on,
-      off,
-    };
   }
 
   /**
@@ -547,9 +373,6 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
       this.enabledLanguageSet_.add(enabledLanguageStates[l].language.code);
     }
 
-    const {on: spellCheckOnLanguages, off: spellCheckOffLanguages} =
-        this.getSpellCheckLanguages_(args.supportedLanguages);
-
     const alwaysTranslateLanguages =
         args.alwaysTranslateCodes.map(code => this.getLanguage(code)!);
 
@@ -563,8 +386,6 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
       alwaysTranslate: alwaysTranslateLanguages,
       neverTranslate: neverTranslateLanguages,
       neverTranslateSites: args.neverTranslateSites,
-      spellCheckOnLanguages,
-      spellCheckOffLanguages,
       // <if expr="is_win">
       prospectiveUILanguage: prospectiveUILanguage,
       // </if>
@@ -589,14 +410,6 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
         (this.intlAcceptLanguagesPref_?.value || '').split(',');
     const languageForcedSet =
         this.makeSetFromArray_(this.intlForcedLanguagesPref_?.value || []);
-    const spellCheckSet = this.makeSetFromArray_(
-        (this.spellcheckDictionariesPref_?.value ||
-         []).concat(this.spellcheckForcedDictionariesPref_?.value || []));
-    const spellCheckForcedSet = this.makeSetFromArray_(
-        this.spellcheckForcedDictionariesPref_?.value || []);
-    const spellCheckBlockedSet = this.makeSetFromArray_(
-        this.spellcheckBlockedDictionariesPref_?.value || []);
-
     const translateBlockedPrefValue =
         this.translateBlockedLanguagesPref_?.value || [];
     const translateBlockedSet =
@@ -613,18 +426,12 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
       }
       const languageState: LanguageState = {
         language: language,
-        spellCheckEnabled:
-            spellCheckSet.has(code) && !spellCheckBlockedSet.has(code) ||
-            spellCheckForcedSet.has(code),
         translateEnabled: this.isTranslateEnabled_(
             code, !!language.supportsTranslate, translateBlockedSet,
             translateTarget, prospectiveUILanguage),
-        isManaged:
-            spellCheckForcedSet.has(code) || spellCheckBlockedSet.has(code),
+        isManaged: false,
         isForced: languageForcedSet.has(code),
-        downloadDictionaryFailureCount: 0,
         removable: false,
-        downloadDictionaryStatus: null,
       };
       enabledLanguageStates.push(languageState);
     }
@@ -651,46 +458,6 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
         translateCode !== translateTarget &&
         (!prospectiveUILanguage || code !== prospectiveUILanguage);
   }
-
-  // <if expr="not is_macosx">
-  /**
-   * Updates the dictionary download status for spell check languages in order
-   * to track the number of times a spell check dictionary download has failed.
-   */
-  private onSpellcheckDictionariesChanged_(
-      statuses: chrome.languageSettingsPrivate.SpellcheckDictionaryStatus[]) {
-    const statusMap = new Map();
-    statuses.forEach(status => {
-      statusMap.set(status.languageCode, status);
-    });
-
-    const collectionNames:
-        Array<'enabled'|'spellCheckOnLanguages'|'spellCheckOffLanguages'> =
-            ['enabled', 'spellCheckOnLanguages', 'spellCheckOffLanguages'];
-    collectionNames.forEach(collectionName => {
-      this.languages![collectionName].forEach((languageState, index) => {
-        const status = statusMap.get(languageState.language.code);
-        if (!status) {
-          return;
-        }
-
-        const previousStatus = languageState.downloadDictionaryStatus;
-        const keyPrefix = `languages.${collectionName}.${index}`;
-        this.set(`${keyPrefix}.downloadDictionaryStatus`, status);
-
-        const failureCountKey = `${keyPrefix}.downloadDictionaryFailureCount`;
-        if (status.downloadFailed &&
-            !(previousStatus && previousStatus.downloadFailed)) {
-          const failureCount = languageState.downloadDictionaryFailureCount + 1;
-          this.set(failureCountKey, failureCount);
-        } else if (
-            status.isReady && !(previousStatus && previousStatus.isReady)) {
-          this.set(failureCountKey, 0);
-        }
-      });
-    });
-  }
-  // </if>
 
   /**
    * Updates the |removable| property of the enabled language states based
@@ -756,7 +523,7 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
   }
 
   /**
-   * Enables the language, making it available for spell check and input.
+   * Enables the language, making it available for input.
    */
   enableLanguage(languageCode: string) {
     this.languageSettingsPrivate_.enableLanguage(languageCode);
@@ -766,16 +533,6 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
    * Disables the language.
    */
   disableLanguage(languageCode: string) {
-    // Remove the language from spell check.
-    const pref = this.spellcheckDictionariesPref_!;
-    const index = pref.value.indexOf(languageCode);
-    if (index !== -1) {
-      const updated = [...pref.value];
-      updated.splice(index, 1);
-      PrefService.getInstance().setPrefValue<string[]>(
-          'spellcheck.dictionaries', updated);
-    }
-
     // Remove the language from preferred languages.
     this.languageSettingsPrivate_.disableLanguage(languageCode);
   }
@@ -860,29 +617,6 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
     this.languageSettingsPrivate_.setTranslateTargetLanguage(languageCode);
   }
 
-  /**
-   * Enables or disables spell check for the given language.
-   */
-  toggleSpellCheck(languageCode: string, enable: boolean) {
-    if (!this.languages) {
-      return;
-    }
-
-    const pref = this.spellcheckDictionariesPref_!;
-    if (enable) {
-      PrefService.getInstance().appendPrefListItem<string>(
-          'spellcheck.dictionaries', languageCode);
-    } else {
-      const index = pref.value.indexOf(languageCode);
-      if (index !== -1) {
-        const updated = [...pref.value];
-        updated.splice(index, 1);
-        PrefService.getInstance().setPrefValue<string[]>(
-            'spellcheck.dictionaries', updated);
-      }
-    }
-  }
-
   getLanguage(languageCode: string): chrome.languageSettingsPrivate.Language
       |undefined {
     if (this.supportedLanguageMap_.has(languageCode)) {
@@ -893,13 +627,6 @@ class SettingsLanguagesElement extends SettingsLanguagesElementBase implements
     const chromeLanguage =
         convertLanguageCodeForChrome(getBaseLanguage(languageCode));
     return this.supportedLanguageMap_.get(chromeLanguage);
-  }
-
-  /**
-   * Retries downloading the dictionary for |languageCode|.
-   */
-  retryDownloadDictionary(languageCode: string) {
-    this.languageSettingsPrivate_.retryDownloadDictionary(languageCode);
   }
 }
 

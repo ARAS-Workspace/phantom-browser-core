@@ -112,7 +112,9 @@ export class SettingsPersonalizationOptionsElement extends
       chromeSigninUserChoiceInfo_: {type: Object},
       // </if>
 
+      // <if expr="_google_chrome and is_chromeos">
       spellCheckDictionariesPref_: {type: Object},
+      // </if>
     };
   }
 
@@ -147,8 +149,10 @@ export class SettingsPersonalizationOptionsElement extends
       undefined;
   // </if>
 
+  // <if expr="_google_chrome and is_chromeos">
   protected accessor spellCheckDictionariesPref_:
       chrome.settingsPrivate.PrefObject<string[]>|undefined;
+  // </if>
 
   private browserProxy_: PrivacyPageBrowserProxy =
       PrivacyPageBrowserProxyImpl.getInstance();
@@ -159,7 +163,9 @@ export class SettingsPersonalizationOptionsElement extends
   override connectedCallback() {
     super.connectedCallback();
 
+    // <if expr="_google_chrome and is_chromeos">
     this.mirrorPref('spellcheck.dictionaries', 'spellCheckDictionariesPref_');
+    // </if>
   }
 
   override willUpdate(changedProperties: PropertyValues<this>) {
@@ -248,24 +254,7 @@ export class SettingsPersonalizationOptionsElement extends
   }
   // </if>
 
-  // <if expr="_google_chrome">
-  protected onUseSpellingServiceSettingsBooleanControlChange_(event: Event) {
-    // If turning on using the spelling service, automatically turn on
-    // spellcheck so that the spelling service can run.
-    if ((event.target as SettingsToggleButtonElement).checked) {
-      PrefService.getInstance().setPrefValue(
-          'browser.enable_spellchecking', true);
-    }
-  }
-
-  // <if expr="not is_chromeos">
-  protected showSpellCheckControlToggle_(): boolean {
-    return !!this.spellCheckDictionariesPref_ &&
-        this.spellCheckDictionariesPref_.value.length > 0;
-  }
-  // </if><!-- not chromeos -->
-
-  // <if expr="is_chromeos">
+  // <if expr="_google_chrome and is_chromeos">
   protected showSpellCheckControlLink_(): boolean {
     return !!this.spellCheckDictionariesPref_ &&
         this.spellCheckDictionariesPref_.value.length > 0;
@@ -275,8 +264,7 @@ export class SettingsPersonalizationOptionsElement extends
     OpenWindowProxyImpl.getInstance().openUrl(
         loadTimeData.getString('osSyncSetupSettingsUrl'));
   }
-  // </if><!-- chromeos -->
-  // </if><!-- _google_chrome -->
+  // </if><!-- _google_chrome and chromeos -->
 
   protected onSignoutDialogClose_() {
     if (this.shadowRoot

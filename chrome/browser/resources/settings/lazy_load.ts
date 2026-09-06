@@ -128,10 +128,6 @@ export type {DownloadsBrowserProxy} from './downloads_page/downloads_browser_pro
 export {SettingsDownloadsPageElement} from './downloads_page/downloads_page.js';
 // <if expr="not is_chromeos">
 export {SettingsAddLanguagesDialogElement} from './languages_page/add_languages_dialog.js';
-// <if expr="not is_macosx">
-export {SettingsEditDictionaryPageElement} from './languages_page/edit_dictionary_page.js';
-// </if>
-
 export {getLanguageHelperInstance} from './languages_page/languages.js';
 export {LanguagesBrowserProxyImpl} from './languages_page/languages_browser_proxy.js';
 export type {LanguagesBrowserProxy} from './languages_page/languages_browser_proxy.js';
@@ -139,7 +135,6 @@ export {kMenuCloseDelay, SettingsLanguagesPageElement} from './languages_page/la
 export {LanguageSettingsActionType, LanguageSettingsMetricsProxyImpl, LanguageSettingsPageImpressionType} from './languages_page/languages_settings_metrics_proxy.js';
 export type {LanguageSettingsMetricsProxy} from './languages_page/languages_settings_metrics_proxy.js';
 export type {LanguageHelper, LanguagesModel} from './languages_page/languages_types.js';
-export {SettingsSpellCheckPageElement} from './languages_page/spell_check_page.js';
 // </if>
 
 export {SettingsAccountPageElement} from './people_page/account_page.js';

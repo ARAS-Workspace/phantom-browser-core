@@ -13,25 +13,9 @@
 export interface LanguageState {
   language: chrome.languageSettingsPrivate.Language;
   removable: boolean;
-  spellCheckEnabled: boolean;
   translateEnabled: boolean;
   isManaged: boolean;
   isForced: boolean;
-  downloadDictionaryFailureCount: number;
-  downloadDictionaryStatus:
-      (chrome.languageSettingsPrivate.SpellcheckDictionaryStatus|null);
-}
-
-/**
- * Settings and state for spellcheck languages.
- */
-export interface SpellCheckLanguageState {
-  language: chrome.languageSettingsPrivate.Language;
-  spellCheckEnabled: boolean;
-  isManaged: boolean;
-  downloadDictionaryFailureCount: number;
-  downloadDictionaryStatus:
-      (chrome.languageSettingsPrivate.SpellcheckDictionaryStatus|null);
 }
 
 /**
@@ -45,10 +29,6 @@ export interface SpellCheckLanguageState {
  *     the user has chosen a different language without restarting. May differ
  *     from the actually used language (navigator.language). Chrome OS and
  *     Windows only.
- * spellCheckOnLanguages: an array of spell check languages that are currently
- *     in use, including the languages force-enabled by policy.
- * spellCheckOffLanguages: an array of spell check languages that are currently
- *     not in use, including the languages force-disabled by policy.
  */
 export interface LanguagesModel {
   supported: chrome.languageSettingsPrivate.Language[];
@@ -57,8 +37,6 @@ export interface LanguagesModel {
   alwaysTranslate: chrome.languageSettingsPrivate.Language[];
   neverTranslate: chrome.languageSettingsPrivate.Language[];
   neverTranslateSites: string[];
-  spellCheckOnLanguages: SpellCheckLanguageState[];
-  spellCheckOffLanguages: SpellCheckLanguageState[];
   // TODO(dpapad): Wrap prospectiveUILanguage with if expr "is_win" block.
   prospectiveUILanguage?: string;
 }
@@ -88,7 +66,7 @@ export interface LanguageHelper {
   isLanguageEnabled(languageCode: string): boolean;
 
   /**
-   * Enables the language, making it available for spell check and input.
+   * Enables the language, making it available for input.
    */
   enableLanguage(languageCode: string): void;
 
@@ -136,13 +114,7 @@ export interface LanguageHelper {
   setLanguageAlwaysTranslateState(
       languageCode: string, alwaysTranslate: boolean): void;
 
-  /**
-   * Enables or disables spell check for the given language.
-   */
-  toggleSpellCheck(languageCode: string, enable: boolean): void;
 
   getLanguage(languageCode: string): chrome.languageSettingsPrivate.Language
       |undefined;
-
-  retryDownloadDictionary(languageCode: string): void;
 }

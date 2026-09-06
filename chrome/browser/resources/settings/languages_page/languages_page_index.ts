@@ -5,11 +5,6 @@
 import 'chrome://resources/cr_elements/cr_view_manager/cr_view_manager.js';
 import '../settings_shared.css.js';
 import './languages_page.js';
-import './spell_check_page.js';
-// <if expr="not is_macosx">
-import './edit_dictionary_page.js';
-
-// </if>
 
 import type {CrViewManagerElement} from 'chrome://resources/cr_elements/cr_view_manager/cr_view_manager.js';
 import {PolymerElement} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
@@ -59,8 +54,7 @@ export class SettingsLanguagesPageIndexElement extends
 
   private showDefaultViews_() {
     this.$.viewManager.switchViews(
-        ['languages', 'spellCheck'], 'no-animation',
-        'no-animation');
+        ['languages'], 'no-animation', 'no-animation');
   }
 
   override currentRouteChanged(newRoute: Route, oldRoute?: Route) {
@@ -73,12 +67,6 @@ export class SettingsLanguagesPageIndexElement extends
         case routes.LANGUAGES:
           this.showDefaultViews_();
           break;
-        // <if expr="not is_macosx">
-        case routes.EDIT_DICTIONARY:
-          this.$.viewManager.switchViews(
-              ['editDictionary'], 'no-animation', 'no-animation');
-          break;
-        // </if>
         case routes.BASIC:
           // Switch back to the default views in case they are part of search
           // results.

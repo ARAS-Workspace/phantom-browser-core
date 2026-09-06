@@ -194,13 +194,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, DropdownMenu) {
   RunTest("settings/dropdown_menu_test.js", "mocha.run()");
 }
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CHROMEOS)
-IN_PROC_BROWSER_TEST_F(SettingsTest, EditDictionaryPage) {
-  RunTest("settings/edit_dictionary_page_test.js",
-          "runMochaSuite('EditDictionaryPage')");
-}
-#endif
-
 // TODO(crbug.com/448517054): Flaky on Linux debug builds.
 #if (BUILDFLAG(IS_LINUX) && !defined(NDEBUG))
 #define MAYBE_AiPageIndex DISABLED_AiPageIndex
@@ -1666,39 +1659,6 @@ IN_PROC_BROWSER_TEST_F(SettingsRouteTest, DynamicParameters) {
 IN_PROC_BROWSER_TEST_F(SettingsRouteTest, MAYBE_NonExistentRoute) {
   RunTest("settings/route_test.js", "runMochaSuite('NonExistentRoute')");
 }
-
-#if !BUILDFLAG(IS_CHROMEOS)
-using SettingsSpellCheckPageTest = SettingsBrowserTest;
-
-IN_PROC_BROWSER_TEST_F(SettingsSpellCheckPageTest, AllBuilds) {
-  RunTest("settings/spell_check_page_test.js",
-          "runMochaSuite('SpellCheck AllBuilds')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSpellCheckPageTest, Metrics) {
-  RunTest("settings/spell_check_page_metrics_test_browser.js",
-          "runMochaSuite('SpellCheckPageMetricsBrowser Metrics')");
-}
-
-#if !BUILDFLAG(IS_MAC)
-IN_PROC_BROWSER_TEST_F(SettingsSpellCheckPageTest, MetricsNotMacOS) {
-  RunTest("settings/spell_check_page_metrics_test_browser.js",
-          "runMochaSuite('SpellCheckPageMetricsBrowser MetricsNotMacOS')");
-}
-#endif
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-IN_PROC_BROWSER_TEST_F(SettingsSpellCheckPageTest, MetricsOfficialBuild) {
-  RunTest("settings/spell_check_page_metrics_test_browser.js",
-          "runMochaSuite('SpellCheckPageMetricsBrowser MetricsOfficialBuild')");
-}
-
-IN_PROC_BROWSER_TEST_F(SettingsSpellCheckPageTest, OfficialBuild) {
-  RunTest("settings/spell_check_page_test.js",
-          "runMochaSuite('SpellCheck OfficialBuild')");
-}
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class SettingsSiteDetailsTest : public SettingsBrowserTest {};
 
