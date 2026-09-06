@@ -83,7 +83,6 @@ source_set("configs") {
     "//chrome/browser/ui/webui/interstitials",
     "//chrome/browser/ui/webui/local_state",
     "//chrome/browser/ui/webui/location_internals",
-    "//chrome/browser/ui/webui/management",
     "//chrome/browser/ui/webui/media",
     "//chrome/browser/ui/webui/metrics_internals",
     "//chrome/browser/ui/webui/net_internals",
@@ -114,6 +113,10 @@ source_set("configs") {
 
   if (is_win || is_chromeos) {
     deps += [ "//chrome/browser/ui/webui/signin:inline_login" ]
+  }
+
+  if (is_chromeos || is_android) {
+    deps += [ "//chrome/browser/ui/webui/management" ]
   }
 
   if (!is_android) {
@@ -657,7 +660,7 @@ source_set("chrome_web_ui_controller_factory") {
     deps += [ "//chrome/browser/ui/webui/new_tab_page" ]
   }
 
-  if (!is_android || is_desktop_android) {
+  if (is_chromeos) {
     deps += [ "//chrome/browser/ui/webui/management" ]
   }
 

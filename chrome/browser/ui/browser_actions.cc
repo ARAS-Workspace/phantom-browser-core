@@ -3343,17 +3343,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           base::BindRepeating(
               [](BrowserWindowInterface* bwi, actions::ActionItem* item,
                  actions::ActionInvocationContext context) {
-                chrome::ShowEnterpriseManagementPageInTabbedBrowser(bwi);
-              },
-              bwi))
-          .SetActionId(kActionShowManagementPage)
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
                 Profile* profile = bwi->GetProfile();
                 signin::IdentityManager* identity_manager =
                     IdentityManagerFactory::GetForProfileIfExists(profile);

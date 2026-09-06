@@ -138,10 +138,11 @@ group("resources") {
   }
 
   if (is_win || is_mac || is_linux || is_chromeos || is_desktop_android) {
-    public_deps += [
-      "discards:resources",
-      "management:resources",
-    ]
+    public_deps += [ "discards:resources" ]
+  }
+
+  if (is_chromeos || is_desktop_android) {
+    public_deps += [ "management:resources" ]
   }
 
   if (is_win || is_mac || is_linux || is_chromeos) {

@@ -26,7 +26,6 @@
 #include "chrome/app/vector_icons/vector_icons.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/defaults.h"
-#include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/extensions/extension_ui_util.h"
 #include "chrome/browser/feedback/show_feedback_page.h"
 #include "chrome/browser/glic/browser_ui/glic_vector_icon_manager.h"
@@ -65,7 +64,6 @@
 #include "chrome/browser/ui/lens/lens_overlay_controller.h"
 #include "chrome/browser/ui/lens/lens_overlay_entry_point_controller.h"
 #include "chrome/browser/ui/lens/lens_string_utils.h"
-#include "chrome/browser/ui/managed_ui.h"
 #include "chrome/browser/ui/profiles/profile_colors_util.h"
 #include "chrome/browser/ui/profiles/profile_view_utils.h"
 #include "chrome/browser/ui/send_tab_to_self/send_tab_to_self_context_menu_delegate.h"
@@ -2272,30 +2270,6 @@ void AppMenuModel::Build() {
         this, IDC_EXIT, IDS_EXIT,
         features::IsRoundedIconsEnabled() ? kExitToAppIcon : kExitMenuOldIcon);
   }
-
-  // On Chrome OS, similar UI is displayed in the system tray menu, instead of
-  // this menu.
-#if !BUILDFLAG(IS_CHROMEOS)
-  if (ShouldDisplayManagedUi(browser_->GetProfile())) {
-    AddSeparator(ui::NORMAL_SEPARATOR);
-    AddItemWithIcon(
-        IDC_SHOW_MANAGEMENT_PAGE,
-        GetManagedUiMenuItemLabel(browser_->GetProfile()),
-        ui::ImageModel::FromVectorIcon(GetManagedUiIcon(browser_->GetProfile()),
-                                       ui::kColorMenuIcon, kDefaultIconSize));
-
-    SetAccessibleNameAt(GetIndexOfCommandId(IDC_SHOW_MANAGEMENT_PAGE).value(),
-                        GetManagedUiMenuItemTooltip(browser_->GetProfile()));
-#if BUILDFLAG(IS_LINUX)
-    if (enterprise_util::IsBrowserManaged(browser_->GetProfile()) &&
-        base::FeatureList::IsEnabled(features::kEnterpriseReleaseNotes)) {
-      AddItemWithStringIdAndVectorIcon(
-          this, IDC_CHROME_ENTERPRISE_RELEASE_NOTES,
-          IDS_CHROME_ENTERPRISE_RELEASE_NOTES, omnibox::kChromeProductIcon);
-    }
-#endif  // BUILDFLAG(IS_LINUX)
-  }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
   uma_action_recorded_ = false;
 }

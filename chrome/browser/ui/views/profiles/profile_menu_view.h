@@ -78,7 +78,6 @@ class ProfileMenuView : public ProfileMenuViewBase {
   void OnClose();
 
   // Button/link actions.
-  void OnProfileManagementButtonClicked();
   void OnManageGoogleAccountButtonClicked();
   void OnGuestProfileButtonClicked();
   void OnExitProfileButtonClicked();

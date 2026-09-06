@@ -69,7 +69,6 @@
 #include "chrome/browser/ui/dialogs/browser_dialogs.h"
 #include "chrome/browser/ui/fullscreen/browser_window_fullscreen_controller.h"
 #include "chrome/browser/ui/lens/lens_overlay_controller.h"
-#include "chrome/browser/ui/managed_ui.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/page_info/page_info_dialog.h"
 #include "chrome/browser/ui/profiles/profile_picker.h"
@@ -1398,10 +1397,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
     case IDC_WINDOW_CLOSE_OTHER_TABS:
       CloseOtherTabs(browser_);
       break;
-    case IDC_SHOW_MANAGEMENT_PAGE: {
-      ShowSingletonTab(browser_, GetManagedUiUrl(profile()));
-      break;
-    }
     case IDC_MUTE_TARGET_SITE:
       MuteSiteForKeyboardFocusedTab(browser_);
       break;
@@ -2385,7 +2380,6 @@ void BrowserCommandController::UpdateCommandsForFullscreenMode() {
   command_updater_->UpdateCommandEnabled(IDC_SHARING_HUB_SCREENSHOT,
                                          show_main_ui);
   command_updater_->UpdateCommandEnabled(IDC_SHOW_APP_MENU, show_main_ui);
-  command_updater_->UpdateCommandEnabled(IDC_SHOW_MANAGEMENT_PAGE, true);
 
   if (base::debug::IsProfilingSupported()) {
     command_updater_->UpdateCommandEnabled(IDC_PROFILING_ENABLED, show_main_ui);

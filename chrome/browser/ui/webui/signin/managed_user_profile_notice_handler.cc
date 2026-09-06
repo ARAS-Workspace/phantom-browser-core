@@ -30,7 +30,6 @@
 #include "chrome/browser/ui/managed_ui.h"
 #include "chrome/browser/ui/signin/signin_view_controller.h"
 #include "chrome/browser/ui/ui_features.h"
-#include "chrome/browser/ui/webui/management/management_ui_handler.h"
 #include "chrome/browser/ui/webui/signin/signin_utils.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/common/pref_names.h"

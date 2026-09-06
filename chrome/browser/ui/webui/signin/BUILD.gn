@@ -446,7 +446,6 @@ if (!is_chromeos) {
       "//chrome/browser/ui/webui:profile_helper",
       "//chrome/browser/ui/webui:theme_source",
       "//chrome/browser/ui/webui/cr_components/theme_color_picker:impl",
-      "//chrome/browser/ui/webui/management",
       "//chrome/browser/ui/webui/top_chrome",
       "//chrome/common",
       "//components/policy/core/browser",

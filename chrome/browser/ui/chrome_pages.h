@@ -156,9 +156,11 @@ void ShowAllSitesSettingsFilteredByRwsOwner(
 // Shows all recent shared tab group activities.
 void ShowSharedTabGroupActivity(Profile* profile);
 
+#if BUILDFLAG(IS_CHROMEOS)
 // Shows the enterprise management info page in a browser tab.
 void ShowEnterpriseManagementPageInTabbedBrowser(
     BrowserWindowInterface* browser);
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_ANDROID)
 // Show chrome://app-settings/<app-id> page on desktop, or OS Settings on

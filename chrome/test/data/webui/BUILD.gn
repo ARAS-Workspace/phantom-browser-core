@@ -88,7 +88,6 @@ source_set("browser_tests") {
       "key_value_pair_viewer/key_value_pair_viewer_browsertest.cc",
       "lens/lens_overlay_webui_browsertest.cc",
       "lens/lens_side_panel_webui_browsertest.cc",
-      "management/management_browsertest.cc",
       "media/media_engagement_browsertest.cc",
       "media_internals/media_internals_browsertest.cc",
       "metrics_internals/metrics_internals_browsertest.cc",
@@ -224,6 +223,7 @@ source_set("browser_tests") {
       "chromeos/shimless_rma/shimless_rma_browsertest.cc",
       "chromeos/shortcut_customization/shortcut_customization_browsertest.cc",
       "chromeos/vc_background_ui/vc_background_ui_browsertest.cc",
+      "management/management_browsertest.cc",
     ]
     deps += [ "//chrome/browser/prefs:util" ]
     if (is_chrome_branded) {
@@ -655,7 +655,6 @@ generate_grd("build_grd") {
       "iwa_dev:build_grdp",
       "key_value_pair_viewer:build_grdp",
       "lens:build_grdp",
-      "management:build_grdp",
       "media:build_grdp",
       "media_internals:build_grdp",
       "metrics_internals:build_grdp",
@@ -721,7 +720,6 @@ generate_grd("build_grd") {
       "$target_gen_dir/mojo/resources.grdp",
       "$target_gen_dir/multistep_filter_internals/resources.grdp",
       "$target_gen_dir/lens/resources.grdp",
-      "$target_gen_dir/management/resources.grdp",
       "$target_gen_dir/net_internals/resources.grdp",
       "$target_gen_dir/new_tab_footer/resources.grdp",
       "$target_gen_dir/new_tab_shared/resources.grdp",
@@ -875,6 +873,7 @@ generate_grd("build_grd") {
       "chromeos/sys_internals:build_grdp",
       "chromeos/traffic_counters:build_grdp",
       "chromeos/vc_background_ui:build_grdp",
+      "management:build_grdp",
       "signin:build_grdp",
       "//ui/file_manager:build_tests_gen_grdp",
       "//ui/file_manager:build_tests_grdp",
@@ -913,6 +912,7 @@ generate_grd("build_grd") {
       "$target_gen_dir/chromeos/parent_access/resources.grdp",
       "$target_gen_dir/chromeos/personalization_app/resources.grdp",
       "$target_gen_dir/chromeos/print_management/resources.grdp",
+      "$target_gen_dir/management/resources.grdp",
       "$target_gen_dir/chromeos/print_preview/resources.grdp",
       "$target_gen_dir/chromeos/resources.grdp",
       "$target_gen_dir/chromeos/vc_background_ui/resources.grdp",

@@ -489,7 +489,7 @@ template("chrome_extra_paks") {
       ]
     }
 
-    if (is_win || is_mac || is_linux || is_chromeos || is_android) {
+    if (is_chromeos || is_android) {
       sources += [ "$root_gen_dir/chrome/management_resources.pak" ]
       deps += [ "//chrome/browser/resources/management:resources" ]
     }

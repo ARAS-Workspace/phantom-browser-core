@@ -247,14 +247,6 @@ std::u16string ProfileMenuView::GetAccessibleWindowTitle() const {
   return title;
 }
 
-void ProfileMenuView::OnProfileManagementButtonClicked() {
-  OnActionableItemClicked(ActionableItem::kProfileManagementLabel);
-  if (!perform_menu_actions()) {
-    return;
-  }
-  chrome::ExecuteCommand(&browser(), IDC_SHOW_MANAGEMENT_PAGE);
-}
-
 void ProfileMenuView::OnManageGoogleAccountButtonClicked() {
   OnActionableItemClicked(ActionableItem::kManageGoogleAccountButton);
   if (!perform_menu_actions()) {
@@ -629,9 +621,6 @@ ProfileMenuView::GetIdentitySectionParams(const ProfileAttributesEntry& entry) {
               ->GetManagementIconForProfile();
     }
 
-    params.header_action =
-        base::BindRepeating(&ProfileMenuView::OnProfileManagementButtonClicked,
-                            base::Unretained(this));
     if (custom_management_image) {
       params.header_image = *custom_management_image;
     } else {

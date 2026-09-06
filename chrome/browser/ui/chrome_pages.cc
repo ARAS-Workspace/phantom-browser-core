@@ -672,12 +672,14 @@ void ShowAllSitesSettingsFilteredByRwsOwner(
   ShowSingletonTabIgnorePathOverwriteNTP(browser, url);
 }
 
+#if BUILDFLAG(IS_CHROMEOS)
 void ShowEnterpriseManagementPageInTabbedBrowser(
     BrowserWindowInterface* browser) {
   // Management shows in a tab because it has a "back" arrow that takes the
   // user to the Chrome browser about page, which is part of browser settings.
   ShowSingletonTabIgnorePathOverwriteNTP(browser, GURL(kChromeUIManagementURL));
 }
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void ShowSharedTabGroupActivity(Profile* profile) {
   auto* browser = GetOrCreateBrowserForProfile(profile);
