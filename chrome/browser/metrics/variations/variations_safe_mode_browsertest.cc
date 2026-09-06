@@ -21,7 +21,7 @@ namespace variations {
 
 class VariationsSafeModeBrowserTest : public InProcessBrowserTest {
  public:
-  VariationsSafeModeBrowserTest() { DisableTestingConfig(); }
+  VariationsSafeModeBrowserTest() = default;
   ~VariationsSafeModeBrowserTest() override = default;
 
  protected:

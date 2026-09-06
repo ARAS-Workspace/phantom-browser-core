@@ -75,7 +75,6 @@ group("perf_without_chrome") {
 
     # Field trial config
     "//tools/variations/",
-    "//testing/variations/",
 
     # Field trial dependencies
     "//tools/json_comment_eater/",

@@ -32,10 +32,6 @@ if (should_strip_binary) {
   import("//build/linux/strip_binary.gni")
 }
 
-# If supported, field trials need to be enabled by --enable-field-trial-config
-# switch.
-headless_support_field_trials = headless_use_prefs
-
 # Headless defines config applied to every target below.
 config("headless_defines_config") {
   defines = []
@@ -46,10 +42,6 @@ config("headless_defines_config") {
 
   if (headless_use_prefs) {
     defines += [ "HEADLESS_USE_PREFS" ]
-  }
-
-  if (headless_support_field_trials) {
-    defines += [ "HEADLESS_SUPPORT_FIELD_TRIALS" ]
   }
 }
 
@@ -433,18 +425,6 @@ source_set("headless_browser") {
       "lib/browser/headless_window_parenting_client.cc",
       "lib/browser/headless_window_parenting_client.h",
       "lib/browser/headless_window_tree_host.cc",
-    ]
-  }
-
-  if (headless_support_field_trials) {
-    sources += [
-      "lib/browser/headless_field_trials.cc",
-      "lib/browser/headless_field_trials.h",
-    ]
-    deps += [
-      "//components/metrics",
-      "//components/variations",
-      "//components/variations/service",
     ]
   }
 

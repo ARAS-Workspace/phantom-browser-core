@@ -1016,12 +1016,6 @@ class PasswordSiteIsolationFieldTrialTest : public BaseSiteIsolationTest {
       const PasswordSiteIsolationFieldTrialTest&) = delete;
 
   void SetUp() override {
-    // This test creates and tests its own field trial group, so it needs to
-    // disable the field trial testing config, which might define an
-    // incompatible trial name/group.
-    base::CommandLine::ForCurrentProcess()->AppendSwitch(
-        variations::switches::kDisableFieldTrialTestingConfig);
-
     // This way the test always sees the same amount of physical memory
     // (kLowMemoryDeviceThresholdMB = 512MB), regardless of how much memory is
     // available in the testing environment.
@@ -1247,12 +1241,6 @@ class StrictOriginIsolationFieldTrialTest : public BaseSiteIsolationTest {
       const StrictOriginIsolationFieldTrialTest&) = delete;
 
   void SetUp() override {
-    // This test creates and tests its own field trial group, so it needs to
-    // disable the field trial testing config, which might define an
-    // incompatible trial name/group.
-    base::CommandLine::ForCurrentProcess()->AppendSwitch(
-        variations::switches::kDisableFieldTrialTestingConfig);
-
     // This way the test always sees the same amount of physical memory
     // (kLowMemoryDeviceThresholdMB = 512MB), regardless of how much memory is
     // available in the testing environment.

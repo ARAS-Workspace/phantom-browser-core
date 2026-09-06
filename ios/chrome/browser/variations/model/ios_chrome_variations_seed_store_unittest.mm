@@ -15,7 +15,6 @@
 #import "components/variations/scoped_variations_ids_provider.h"
 #import "components/variations/seed_response.h"
 #import "components/variations/service/variations_service.h"
-#import "components/variations/variations_switches.h"
 #import "components/variations/variations_test_utils.h"
 #import "ios/chrome/browser/flags/ios_chrome_field_trials.h"
 #import "ios/chrome/browser/shared/model/application_context/application_context.h"
@@ -63,9 +62,6 @@ class IOSChromeVariationsSeedStoreTest : public PlatformTest {
       : enabled_state_provider_(
             new metrics::TestEnabledStateProvider(false, false)) {
     original_feature_list_ = base::FeatureList::ClearInstanceForTesting();
-    // Disable field trial testing to enable test seed.
-    base::CommandLine::ForCurrentProcess()->AppendSwitch(
-        variations::switches::kDisableFieldTrialTestingConfig);
   }
 
   void TearDown() override {

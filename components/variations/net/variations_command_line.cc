@@ -188,8 +188,6 @@ std::string VariationsCommandLine::ToString() const {
       GenerateParam(switches::kForceFieldTrialParams, field_trial_params));
   output.append(GenerateParam(::switches::kEnableFeatures, enable_features));
   output.append(GenerateParam(::switches::kDisableFeatures, disable_features));
-  output.append(" --");
-  output.append(switches::kDisableFieldTrialTestingConfig);
   return output;
 }
 
@@ -211,7 +209,6 @@ void VariationsCommandLine::ApplyToCommandLine(
     command_line.AppendSwitchASCII(::switches::kDisableFeatures,
                                    disable_features);
   }
-  command_line.AppendSwitch(switches::kDisableFieldTrialTestingConfig);
 }
 
 void VariationsCommandLine::ApplyToFeatureAndFieldTrialList(

@@ -68,7 +68,7 @@ void WriteSeedFile(const base::FilePath& path,
 class VariationsSafeModeEndToEndBrowserTestHelper
     : public InProcessBrowserTest {
  public:
-  VariationsSafeModeEndToEndBrowserTestHelper() { DisableTestingConfig(); }
+  VariationsSafeModeEndToEndBrowserTestHelper() = default;
   ~VariationsSafeModeEndToEndBrowserTestHelper() override = default;
 };
 

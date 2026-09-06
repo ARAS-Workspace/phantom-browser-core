@@ -7,9 +7,6 @@
 namespace variations {
 namespace switches {
 
-// Disable field trial tests configured in fieldtrial_testing_config.json.
-const char kDisableFieldTrialTestingConfig[] = "disable-field-trial-config";
-
 // Disable variations safe mode.
 const char kDisableVariationsSafeMode[] = "disable-variations-safe-mode";
 
@@ -22,19 +19,6 @@ const char kDisableVariationsSeedFetchThrottling[] =
 
 // Enables the benchmarking JavaScript API.
 const char kEnableBenchmarkingApi[] = "enable-benchmarking-api";
-
-// Enable field trial tests configured in fieldtrial_testing_config.json. If the
-// "disable_fieldtrial_testing_config" GN flag is set to true, then this switch
-// is a no-op. Otherwise, for non-Chrome branded builds, the testing config is
-// already applied by default, unless the "--disable-field-trial-config",
-// "--force-fieldtrials", and/or "--variations-server-url" switches are passed.
-// It is however possible to apply the testing config as well as specify
-// additional field trials (using "--force-fieldtrials") by using this switch.
-// For Chrome-branded builds, the testing config is not enabled by default, so
-// this switch is required to enable it.
-// If this switch is set to "benchmarking", it enables variations benchmarking
-// mode, which skips experiments that are disabled for benchmarking.
-const char kEnableFieldTrialTestingConfig[] = "enable-field-trial-config";
 
 // Fakes the channel of the browser for purposes of Variations filtering. This
 // is to be used for testing only. Possible values are "stable", "beta", "dev"

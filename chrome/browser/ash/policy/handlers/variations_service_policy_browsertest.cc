@@ -81,10 +81,6 @@ class DeviceChromeVariationsPolicyTest : public DevicePolicyCrosBrowserTest {
 
   void SetUpCommandLine(base::CommandLine* command_line) override {
     DevicePolicyCrosBrowserTest::SetUpCommandLine(command_line);
-    // This makes sure that the the field trials are not initialized from a
-    // testing config, taking into account the restrictions.
-    command_line->AppendSwitch(
-        variations::switches::kDisableFieldTrialTestingConfig);
   }
 
   base::HistogramTester histogram_tester_;

@@ -81,11 +81,6 @@
 #include "components/prefs/pref_service.h"  // nogncheck
 #endif
 
-#if defined(HEADLESS_SUPPORT_FIELD_TRIALS)
-#include "content/public/app/initialize_mojo_core.h"
-#include "headless/lib/browser/headless_field_trials.h"
-#endif
-
 namespace headless {
 
 const base::FilePath::CharType kDefaultProfileName[] =
@@ -572,26 +567,6 @@ std::optional<int> HeadlessContentMainDelegate::PostEarlyInitialization(
   browser_->CreatePrefService();
 #endif
 
-#if defined(HEADLESS_SUPPORT_FIELD_TRIALS)
-  // Check if we're telling content to not to create the feature list and do it
-  // here if so. Content can create default feature list on its own however here
-  // we want the feature list to be created by field trial machinery.
-  if (!ShouldCreateFeatureList(invoked_in)) {
-    SetUpFieldTrials(browser()->GetPrefs(),
-                     browser()->options()->user_data_dir);
-    // Schedule a Local State write since the above function may have resulted
-    // in some prefs being updated. Headless shell runs are typically short and
-    // often end in crashes, so it helps to commit early.
-    browser_->GetPrefs()->CommitPendingWrite();
-  }
-
-  // Check if we're telling content to not to initialize Mojo and do it here
-  // since we want it do be done after the feature list is created.
-  if (!ShouldInitializeMojo(invoked_in)) {
-    content::InitializeMojoCore();
-  }
-#endif  // defined(HEADLESS_SUPPORT_FIELD_TRIALS)
-
   if (base::FeatureList::IsEnabled(features::kVirtualTime)) {
     AddSwitchesForVirtualTime();
   }
@@ -604,28 +579,5 @@ std::optional<int> HeadlessContentMainDelegate::PostEarlyInitialization(
 
   return std::nullopt;
 }
-
-#if defined(HEADLESS_SUPPORT_FIELD_TRIALS)
-bool HeadlessContentMainDelegate::ShouldCreateFeatureList(
-    InvokedIn invoked_in) {
-  // The content layer is always responsible for creating the FeatureList in
-  // child processes.
-  if (std::holds_alternative<InvokedInChildProcess>(invoked_in)) {
-    return true;
-  }
-
-  // VariationsFieldTrialCreator::SetUpFieldTrials() instantiates its own
-  // feature list so prevent content from instantiating a default one if we're
-  // going to set up field trials.
-  return !ShouldEnableFieldTrials();
-}
-
-bool HeadlessContentMainDelegate::ShouldInitializeMojo(InvokedIn invoked_in) {
-  // Mojo cannot be initialized without a feature list instance available so
-  // postpone its initialization until after feature list is instantiated by
-  // field trials setup if field trials are enabled.
-  return ShouldCreateFeatureList(invoked_in);
-}
-#endif  // defined(HEADLESS_SUPPORT_FIELD_TRIALS)
 
 }  // namespace headless

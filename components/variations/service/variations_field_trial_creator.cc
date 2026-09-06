@@ -44,11 +44,9 @@
 #include "components/prefs/scoped_user_pref_update.h"
 #include "components/variations/active_field_trials.h"
 #include "components/variations/entropy_provider.h"
-#include "components/variations/field_trial_config/field_trial_util.h"
 #include "components/variations/platform_field_trials.h"
 #include "components/variations/pref_names.h"
 #include "components/variations/proto/variations_seed.pb.h"
-#include "components/variations/service/buildflags.h"
 #include "components/variations/service/limited_entropy_randomization.h"
 #include "components/variations/service/safe_seed_manager.h"
 #include "components/variations/service/variations_service_client.h"
@@ -128,32 +126,6 @@ Study::CpuArchitecture GetCurrentCpuArchitecture() {
   return Study::X86_64;
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 }
-
-#if BUILDFLAG(FIELDTRIAL_TESTING_ENABLED)
-// Determines whether the field trial testing config defined in
-// testing/variations/fieldtrial_testing_config.json should be applied. If the
-// "disable_fieldtrial_testing_config" GN flag is set to true, then the testing
-// config should never be applied. Otherwise, if the build is a Chrome-branded
-// build, then the testing config should only be applied if either the
-// "--enable-field-trial-config" or
-// "--enable-benchmarking=enable-field-trial-config" switch is passed. For
-// non-Chrome branded builds, by default, the testing config is applied, unless
-// the "--disable-field-trial-config" and/or "--variations-server-url" switches
-// are passed and no enabling switches are set.
-bool ShouldUseFieldTrialTestingConfig(const base::CommandLine* command_line) {
-  bool is_enable_switch_set =
-      command_line->HasSwitch(switches::kEnableFieldTrialTestingConfig) ||
-      command_line->GetSwitchValueASCII(::switches::kEnableBenchmarking) ==
-          switches::kEnableFieldTrialTestingConfig;
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  return is_enable_switch_set;
-#else
-  return is_enable_switch_set ||
-         (!command_line->HasSwitch(switches::kDisableFieldTrialTestingConfig) &&
-          !command_line->HasSwitch(switches::kVariationsServerURL));
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-}
-#endif  // BUILDFLAG(FIELDTRIAL_TESTING_ENABLED)
 
 // Causes Chrome to start watching for browser crashes if the following
 // conditions are met:
@@ -325,21 +297,6 @@ bool VariationsFieldTrialCreator::SetUpFieldTrials(
     variations_source_.forced_via_command_line_or_about_flags = true;
   }
 
-  bool used_testing_config = false;
-#if BUILDFLAG(FIELDTRIAL_TESTING_ENABLED)
-  if (ShouldUseFieldTrialTestingConfig(command_line)) {
-    ApplyFieldTrialTestingConfig(feature_list.get());
-    used_testing_config = true;
-    variations_source_.type = VariationsSourceType::kFieldTrialConfig;
-  }
-#else
-  if (command_line->HasSwitch(switches::kEnableFieldTrialTestingConfig)) {
-    client_->ExitWithMessage(
-        base::StringPrintf("--%s was passed, but the field trial testing "
-                           "config was excluded from the build.",
-                           switches::kEnableFieldTrialTestingConfig));
-  }
-#endif  // BUILDFLAG(FIELDTRIAL_TESTING_ENABLED)
   if (command_line->HasSwitch(switches::kVariationsTestSeedJsonPath)) {
     LoadSeedFromJsonFile(command_line->GetSwitchValuePath(
         switches::kVariationsTestSeedJsonPath));
@@ -355,7 +312,7 @@ bool VariationsFieldTrialCreator::SetUpFieldTrials(
   }
 
   CreateTrialsResult create_trials_result = {.applied_seed = false};
-  if (!used_testing_config && client_filterable_state) {
+  if (client_filterable_state) {
     create_trials_result = CreateTrialsFromSeed(
         entropy_providers, feature_list.get(), safe_seed_manager,
         std::move(client_filterable_state));
@@ -605,15 +562,6 @@ Study::Platform VariationsFieldTrialCreator::GetPlatform() {
 Study::FormFactor VariationsFieldTrialCreator::GetCurrentFormFactor() {
   return client_->GetCurrentFormFactor();
 }
-
-#if BUILDFLAG(FIELDTRIAL_TESTING_ENABLED)
-void VariationsFieldTrialCreator::ApplyFieldTrialTestingConfig(
-    base::FeatureList* feature_list) {
-  VLOG(1) << "Applying FieldTrialTestingConfig";
-  AssociateDefaultFieldTrialConfig(
-      GetPlatform(), GetCurrentFormFactor(), feature_list);
-}
-#endif  // BUILDFLAG(FIELDTRIAL_TESTING_ENABLED)
 
 bool VariationsFieldTrialCreator::HasSeedExpired() {
   const base::Time fetch_time = GetSeedFetchTime();

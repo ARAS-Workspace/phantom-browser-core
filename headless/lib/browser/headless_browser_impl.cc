@@ -51,12 +51,8 @@
 #include "components/pref_registry/pref_registry_syncable.h"  // nogncheck
 #include "components/prefs/in_memory_pref_store.h"            // nogncheck
 #include "components/prefs/json_pref_store.h"                 // nogncheck
+#include "components/prefs/pref_service.h"                    // nogncheck
 #include "components/prefs/pref_service_factory.h"            // nogncheck
-#endif
-
-#if defined(HEADLESS_SUPPORT_FIELD_TRIALS)
-#include "components/metrics/metrics_service.h"                // nogncheck
-#include "components/variations/service/variations_service.h"  // nogncheck
 #endif
 
 namespace headless {
@@ -323,11 +319,6 @@ void HeadlessBrowserImpl::CreatePrefService() {
   auto pref_registry = base::MakeRefCounted<user_prefs::PrefRegistrySyncable>();
 #if BUILDFLAG(IS_WIN)
   os_crypt_async::RegisterLocalPrefs(pref_registry.get());
-#endif
-
-#if defined(HEADLESS_SUPPORT_FIELD_TRIALS)
-  metrics::MetricsService::RegisterPrefs(pref_registry.get());
-  variations::VariationsService::RegisterPrefs(pref_registry.get());
 #endif
 
   PrefServiceFactory factory;

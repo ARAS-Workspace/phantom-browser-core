@@ -230,7 +230,6 @@ void DeriveCommandLine(const GURL& start_url,
       chromeos::switches::kSystemInDevMode,
       switches::kTouchscreenUsableWhileScreenOff,
       policy::switches::kDeviceManagementUrl,
-      variations::switches::kEnableFieldTrialTestingConfig,
       wm::switches::kWindowAnimationsDisabled,
   };
   command_line->CopySwitchesFrom(base_command_line, kForwardSwitches);

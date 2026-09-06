@@ -13,8 +13,6 @@ namespace variations::switches {
 // each in the .cc file.
 
 COMPONENT_EXPORT(VARIATIONS)
-extern const char kDisableFieldTrialTestingConfig[];
-COMPONENT_EXPORT(VARIATIONS)
 extern const char kDisableVariationsSafeMode[];
 COMPONENT_EXPORT(VARIATIONS)
 extern const char kDisableVariationsSeedFetch[];
@@ -22,8 +20,6 @@ COMPONENT_EXPORT(VARIATIONS)
 extern const char kDisableVariationsSeedFetchThrottling[];
 COMPONENT_EXPORT(VARIATIONS)
 extern const char kEnableBenchmarkingApi[];
-COMPONENT_EXPORT(VARIATIONS)
-extern const char kEnableFieldTrialTestingConfig[];
 COMPONENT_EXPORT(VARIATIONS)
 extern const char kFakeVariationsChannel[];
 COMPONENT_EXPORT(VARIATIONS)

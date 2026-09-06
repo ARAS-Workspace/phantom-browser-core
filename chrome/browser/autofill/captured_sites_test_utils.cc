@@ -1035,10 +1035,6 @@ void TestRecipeReplayer::SetUpCommandLine(base::CommandLine* command_line) {
       network::switches::kIgnoreCertificateErrorsSPKIList,
       kWebPageReplayCertSPKI);
   command_line->AppendSwitch(switches::kStartMaximized);
-  // Since we are adding via ScopedFeatureList for test features required, we
-  // need to explicitly also enable field trials.
-  command_line->AppendSwitch(
-      variations::switches::kEnableFieldTrialTestingConfig);
 }
 
 TestRecipeReplayChromeFeatureActionExecutor*

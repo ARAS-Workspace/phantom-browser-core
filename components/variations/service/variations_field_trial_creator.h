@@ -25,7 +25,6 @@
 #include "components/variations/metrics.h"
 #include "components/variations/proto/study.pb.h"
 #include "components/variations/seed_response.h"
-#include "components/variations/service/buildflags.h"
 #include "components/variations/service/safe_seed_manager.h"
 #include "components/variations/service/variations_service_client.h"
 #include "components/variations/sticky_activation_manager.h"
@@ -266,13 +265,6 @@ class VariationsFieldTrialCreator {
 
   // Get the client's current form factor. Protected for testing.
   Study::FormFactor GetCurrentFormFactor();
-
-#if BUILDFLAG(FIELDTRIAL_TESTING_ENABLED)
-  // Applies the field trial testing config defined in
-  // testing/variations/fieldtrial_testing_config.json to the current session.
-  // Protected and virtual for testing.
-  virtual void ApplyFieldTrialTestingConfig(base::FeatureList* feature_list);
-#endif  // BUILDFLAG(FIELDTRIAL_TESTING_ENABLED)
 
   // Read the google group memberships from local-state prefs.
   // Protected for testing.

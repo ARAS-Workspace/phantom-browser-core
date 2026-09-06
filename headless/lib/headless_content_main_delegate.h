@@ -63,11 +63,6 @@ class HEADLESS_EXPORT HeadlessContentMainDelegate
 
   std::optional<int> PostEarlyInitialization(InvokedIn invoked_in) override;
 
-#if defined(HEADLESS_SUPPORT_FIELD_TRIALS)
-  bool ShouldCreateFeatureList(InvokedIn invoked_in) override;
-  bool ShouldInitializeMojo(InvokedIn invoked_in) override;
-#endif
-
 #if BUILDFLAG(IS_MAC)
   void PlatformPreBrowserMain();
 #endif

@@ -778,7 +778,6 @@ if (!is_android) {
       "ukm_background_recorder_browsertest.cc",
       "ukm_browsertest.cc",
       "usage_scenario/tab_usage_scenario_tracker_browsertest.cc",
-      "variations/field_trials_on_off_browsertest.cc",
       "variations/force_field_trials_browsertest.cc",
       "variations/variations_safe_mode_browsertest.cc",
       "variations/variations_safe_mode_end_to_end_browsertest.cc",

@@ -39,7 +39,6 @@
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/ui/webui/util/webui_util_desktop.h"
 #include "components/metrics/content/subprocess_metrics_provider.h"
-#include "components/variations/variations_test_utils.h"
 #include "content/public/common/content_features.h"
 #include "ui/webui/resources/grit/webui_code_cache_resources_map.h"
 #endif  // BUILDFLAG(ENABLE_WEBUI_GENERATE_CODE_CACHE)
@@ -210,16 +209,9 @@ IN_PROC_BROWSER_TEST_F(TabSearchUIBrowserTest,
 #if BUILDFLAG(ENABLE_WEBUI_GENERATE_CODE_CACHE)
 class TabSearchUIBundledCodeCacheBrowserTest
     : public InProcessBrowserTest,
-      public testing::WithParamInterface<std::tuple<bool, bool>> {
+      public testing::WithParamInterface<bool> {
  public:
   TabSearchUIBundledCodeCacheBrowserTest() {
-    // Bundled code caching should be resillient to fieldtrial variations.
-    if (ShouldEnableFieldTrialTestingConfig()) {
-      variations::EnableTestingConfig();
-    } else {
-      variations::DisableTestingConfig();
-    }
-
     std::vector<base::test::FeatureRefAndParams> enabled_features;
     std::vector<base::test::FeatureRef> disabled_features;
 
@@ -259,10 +251,7 @@ class TabSearchUIBundledCodeCacheBrowserTest
                                                        disabled_features);
   }
 
-  bool WebUIBundledCodeCacheEnabled() const { return std::get<0>(GetParam()); }
-  bool ShouldEnableFieldTrialTestingConfig() const {
-    return std::get<1>(GetParam());
-  }
+  bool WebUIBundledCodeCacheEnabled() const { return GetParam(); }
 
  protected:
   void FetchAndMergeHistograms() {
@@ -278,12 +267,6 @@ class TabSearchUIBundledCodeCacheBrowserTest
 
 IN_PROC_BROWSER_TEST_P(TabSearchUIBundledCodeCacheBrowserTest,
                        SuccessfullyLoadsCodeCache) {
-  if (base::FeatureList::IsEnabled(features::kInitialWebUI) &&
-      ShouldEnableFieldTrialTestingConfig()) {
-    GTEST_SKIP() << "Skipping test because it fails with InitialWebUI enabled. "
-                    "See crbug.com/464087732.";
-  }
-
   // Assert the bundled code-cache map is non-empty.
   EXPECT_FALSE(webui::GetWebUIResourceUrlToCodeCacheMap().empty());
 
@@ -325,14 +308,11 @@ IN_PROC_BROWSER_TEST_P(TabSearchUIBundledCodeCacheBrowserTest,
 INSTANTIATE_TEST_SUITE_P(
     ,
     TabSearchUIBundledCodeCacheBrowserTest,
-    testing::Combine(testing::Bool(), testing::Bool()),
+    testing::Bool(),
     [](const ::testing::TestParamInfo<
         TabSearchUIBundledCodeCacheBrowserTest::ParamType>& info) {
-      return base::StringPrintf(
-          "%s_%s",
-          std::get<0>(info.param) ? "BundledCodeCacheEnabled"
-                                  : "BundledCodeCacheDisabled",
-          std::get<1>(info.param) ? "WithFieldTrials" : "WithoutFieldTrials");
+      return info.param ? "BundledCodeCacheEnabled"
+                        : "BundledCodeCacheDisabled";
     });
 #endif  // BUILDFLAG(ENABLE_WEBUI_GENERATE_CODE_CACHE)
 

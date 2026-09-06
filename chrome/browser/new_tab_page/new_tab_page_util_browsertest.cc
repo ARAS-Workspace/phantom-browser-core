@@ -92,9 +92,6 @@ class NewTabPageUtilBrowserTest : public SigninBrowserTestBase,
   }
 
   void SetUpCommandLine(base::CommandLine* cmd) override {
-    // Disable the field trial testing config as the tests in this file care
-    // about whether features are overridden or not.
-    cmd->AppendSwitch(variations::switches::kDisableFieldTrialTestingConfig);
     cmd->AppendSwitch(optimization_guide::switches::kDebugLoggingEnabled);
   }
 

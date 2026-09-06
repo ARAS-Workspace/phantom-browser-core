@@ -705,7 +705,6 @@ class VariationsHttpHeadersBrowserTestWithLimitedLayerBase
   // BrowserTestBase:
   void SetUpCommandLine(base::CommandLine* command_line) override {
     command_line->AppendSwitch(switches::kAcceptEmptySeedSignatureForTesting);
-    DisableTestingConfig();
     VariationsHttpHeadersBrowserTest::SetUpCommandLine(command_line);
   }
 

@@ -5,7 +5,6 @@
 #include "components/variations/variations_test_utils.h"
 
 #include "base/base64.h"
-#include "base/command_line.h"
 #include "base/feature_list.h"
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
@@ -18,7 +17,6 @@
 #include "components/prefs/pref_service.h"
 #include "components/variations/active_field_trials.h"
 #include "components/variations/client_filterable_state.h"
-#include "components/variations/field_trial_config/fieldtrial_testing_config.h"
 #include "components/variations/hashing.h"
 #include "components/variations/pref_names.h"
 #include "components/variations/proto/client_variations.pb.h"
@@ -26,80 +24,10 @@
 #include "components/variations/seed_reader_writer.h"
 #include "components/variations/synthetic_trial_registry.h"
 #include "components/variations/variations_associated_data.h"
-#include "components/variations/variations_switches.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/zlib/google/compression_utils.h"
 
 namespace variations {
-namespace {
-
-// Create mock testing config equivalent to:
-// {
-//   "UnitTest": [
-//       {
-//           "platforms": [
-//               "android",
-//               "android_webview",
-//               "chromeos",
-//               "fuchsia",
-//               "ios",
-//               "linux",
-//               "mac",
-//               "windows"
-//           ],
-//           "experiments": [
-//               {
-//                   "name": "Enabled",
-//                   "params": {
-//                       "x": "1"
-//                   },
-//                   "enable_features": [
-//                       "UnitTestEnabled"
-//                   ]
-//               }
-//           ]
-//       }
-//   ]
-// }
-
-const Study::Platform array_kFieldTrialConfig_platforms_0[] = {
-    Study::PLATFORM_ANDROID,
-    Study::PLATFORM_ANDROID_WEBVIEW,
-    Study::PLATFORM_CHROMEOS,
-    Study::PLATFORM_FUCHSIA,
-    Study::PLATFORM_IOS,
-    Study::PLATFORM_LINUX,
-    Study::PLATFORM_MAC,
-    Study::PLATFORM_WINDOWS,
-};
-
-const char* enable_features_0[] = {"UnitTestEnabled"};
-const FieldTrialTestingExperimentParams array_kFieldTrialConfig_params_0[] = {
-    {
-        "x",
-        "1",
-    },
-};
-
-const FieldTrialTestingExperiment array_kFieldTrialConfig_experiments_0[] = {
-    {/*name=*/"Enabled",
-     /*platforms=*/array_kFieldTrialConfig_platforms_0,
-     /*form_factors=*/{},
-     /*is_low_end_device=*/std::nullopt,
-     /*disable_benchmarking=*/std::nullopt,
-     /*min_os_version=*/nullptr,
-     /*params=*/array_kFieldTrialConfig_params_0,
-     /*enable_features=*/enable_features_0,
-     /*disable_features=*/{},
-     /*forcing_flag=*/nullptr},
-};
-
-const FieldTrialTestingStudy array_kFieldTrialConfig_studies[] = {
-    {/*name=*/"UnitTest",
-     /*experiments=*/array_kFieldTrialConfig_experiments_0},
-};
-
-}  // namespace
 
 // TestSeedData() is a simple VariationsSeed containing:
 // serial_number: "test"
@@ -222,16 +150,6 @@ SignedSeedData::SignedSeedData(SignedSeedData&&) = default;
 SignedSeedData& SignedSeedData::operator=(const SignedSeedData&) = default;
 SignedSeedData& SignedSeedData::operator=(SignedSeedData&&) = default;
 
-void DisableTestingConfig() {
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(
-      switches::kDisableFieldTrialTestingConfig);
-}
-
-void EnableTestingConfig() {
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(
-      switches::kEnableFieldTrialTestingConfig);
-}
-
 bool ExtractVariationIds(const std::string& variations,
                          std::set<VariationID>* variation_ids,
                          std::set<VariationID>* trigger_ids) {
@@ -337,9 +255,6 @@ void ResetVariations() {
   test::ClearAllVariationIDs();
   test::ClearAllVariationParams();
 }
-
-const FieldTrialTestingConfig kTestingConfig = {
-    array_kFieldTrialConfig_studies};
 
 std::unique_ptr<ClientFilterableState> CreateDummyClientFilterableState() {
   auto client_state = std::make_unique<ClientFilterableState>();

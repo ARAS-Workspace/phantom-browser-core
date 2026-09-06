@@ -303,10 +303,7 @@ class FirstRunMasterPrefsVariationsSeedTest
     : public FirstRunMasterPrefsBrowserTestT<kWithVariationsPrefs>,
       public testing::WithParamInterface<bool> {
  public:
-  FirstRunMasterPrefsVariationsSeedTest() : metrics_consent_(GetParam()) {
-    base::CommandLine::ForCurrentProcess()->AppendSwitch(
-        variations::switches::kDisableFieldTrialTestingConfig);
-  }
+  FirstRunMasterPrefsVariationsSeedTest() : metrics_consent_(GetParam()) {}
 
   FirstRunMasterPrefsVariationsSeedTest(
       const FirstRunMasterPrefsVariationsSeedTest&) = delete;

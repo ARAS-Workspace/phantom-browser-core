@@ -90,12 +90,6 @@ class PolicyPrefsTest : public PlatformBrowserTest {
 
  protected:
   void SetUpInProcessBrowserTestFixture() override {
-    // Some policies default value might depend on features, enforce use of
-    // field trial testing config to avoid having unexpected results based on
-    // new feature flags coming from the server (e.g. on Chrome-branded CI
-    // bots).
-    variations::EnableTestingConfig();
-
     GetMockPolicyProvider()->SetDefaultReturns(
         true /* is_initialization_complete_return */,
         true /* is_first_policy_load_complete_return */);
