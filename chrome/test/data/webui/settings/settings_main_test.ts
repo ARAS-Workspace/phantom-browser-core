@@ -61,40 +61,6 @@ suite('MainPageTests', function() {
     assertEquals(expectedQuery3, query);
   });
 
-  function showingManagedHeader(): boolean {
-    return !!settingsMain.shadowRoot!.querySelector('managed-footnote');
-  }
-
-  test('managed header hides when searching', async function() {
-    flush();
-
-    assertTrue(showingManagedHeader());
-
-    searchManager.setMatchesFound(false);
-    await settingsMain.searchContents('Query1');
-    assertFalse(showingManagedHeader());
-
-    searchManager.setMatchesFound(true);
-    await settingsMain.searchContents('Query2');
-    assertFalse(showingManagedHeader());
-  });
-
-  test('managed header hides when showing subpage', function() {
-    flush();
-    assertTrue(showingManagedHeader());
-    Router.getInstance().navigateTo(routes.SEARCH_ENGINES);
-    flush();
-    assertFalse(showingManagedHeader());
-  });
-
-  test('managed header hides when showing about page', function() {
-    flush();
-    assertTrue(showingManagedHeader());
-    Router.getInstance().navigateTo(routes.ABOUT);
-    flush();
-    assertFalse(showingManagedHeader());
-  });
-
   test('no results page shows and hides', async function() {
     flush();
     const noSearchResults = settingsMain.$.noSearchResults;

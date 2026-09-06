@@ -24,7 +24,6 @@
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/webui/downloads/downloads.mojom.h"
 #include "chrome/browser/ui/webui/downloads/downloads_dom_handler.h"
-#include "chrome/browser/ui/webui/managed_ui_handler.h"
 #include "chrome/browser/ui/webui/metrics_handler.h"
 #include "chrome/browser/ui/webui/theme_source.h"
 #include "chrome/common/buildflags.h"
@@ -274,8 +273,7 @@ DownloadsUI::DownloadsUI(content::WebUI* web_ui)
   web_ui->AddMessageHandler(std::make_unique<MetricsHandler>());
 
   // Set up the chrome://downloads/ source.
-  content::WebUIDataSource* source = CreateAndAddDownloadsUIHTMLSource(profile);
-  ManagedUIHandler::Initialize(web_ui, source);
+  CreateAndAddDownloadsUIHTMLSource(profile);
   content::URLDataSource::Add(profile, std::make_unique<ThemeSource>(profile));
 
   base::UmaHistogramEnumeration(

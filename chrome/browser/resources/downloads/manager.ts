@@ -6,7 +6,6 @@ import '/strings.m.js';
 import './bypass_warning_confirmation_dialog.js';
 import './item.js';
 import './toolbar.js';
-import 'chrome://resources/cr_components/managed_footnote/managed_footnote.js';
 import 'chrome://resources/cr_elements/cr_button/cr_button.js';
 import 'chrome://resources/cr_elements/cr_infinite_list/cr_infinite_list.js';
 

@@ -14,7 +14,6 @@
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/webui/bookmarks/bookmarks_message_handler.h"
 #include "chrome/browser/ui/webui/favicon_source.h"
-#include "chrome/browser/ui/webui/managed_ui_handler.h"
 #include "chrome/browser/ui/webui/metrics_handler.h"
 #include "chrome/browser/ui/webui/page_not_available_for_guest/page_not_available_for_guest_ui.h"
 #include "chrome/browser/ui/webui/plural_string_handler.h"
@@ -172,8 +171,7 @@ BookmarksUI::BookmarksUI(content::WebUI* web_ui)
     : ui::MojoWebUIController(web_ui, /*enable_chrome_send=*/true) {
   // Set up the chrome://bookmarks/ source.
   Profile* profile = Profile::FromWebUI(web_ui);
-  auto* source = CreateAndAddBookmarksUIHTMLSource(profile);
-  ManagedUIHandler::Initialize(web_ui, source);
+  CreateAndAddBookmarksUIHTMLSource(profile);
 
   content::URLDataSource::Add(
       profile, std::make_unique<FaviconSource>(

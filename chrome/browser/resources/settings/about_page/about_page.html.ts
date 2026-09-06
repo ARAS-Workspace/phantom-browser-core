@@ -30,10 +30,6 @@ export function getHtml(this: SettingsAboutPageElement) {
       <div class="secondary">$i18n{aboutBrowserVersion}</div>
     </div>
   </div>
-  <cr-link-row class="hr" @click="${this.onManagementPageClick_}"
-      start-icon="${this.managedByIcon_}" label="$i18n{managementPage}"
-      role-description="$i18n{subpageArrowRoleDescription}"
-      ?hidden="${!this.isManaged_}"></cr-link-row>
 </settings-section>
 
 <settings-section>

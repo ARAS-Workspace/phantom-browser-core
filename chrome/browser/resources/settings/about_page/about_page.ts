@@ -42,28 +42,17 @@ export class SettingsAboutPageElement extends CrLitElement implements
 
   static override get properties() {
     return {
-      isManaged_: {type: Boolean},
-      managedByIcon_: {type: String},
-
       // <if expr="not is_chromeos">
       obsoleteSystemInfo_: {type: Object},
       // </if>
     };
   }
 
-  protected accessor isManaged_: boolean = loadTimeData.getBoolean('isManaged');
-  protected accessor managedByIcon_: string =
-      loadTimeData.getString('managedByIcon');
-
   // <if expr="not is_chromeos">
   protected accessor obsoleteSystemInfo_: {obsolete: boolean} = {
     obsolete: loadTimeData.getBoolean('aboutObsoleteNowOrSoon'),
   };
   // </if>
-
-  protected onManagementPageClick_() {
-    window.location.href = loadTimeData.getString('managementPageUrl');
-  }
 
   // SettingsPlugin implementation
   searchContents(query: string) {

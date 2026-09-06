@@ -39,7 +39,6 @@
 #include "chrome/browser/ui/webui/history/history_login_handler.h"
 #include "chrome/browser/ui/webui/history/navigation_handler.h"
 #include "chrome/browser/ui/webui/history_clusters/history_clusters_handler.h"
-#include "chrome/browser/ui/webui/managed_ui_handler.h"
 #include "chrome/browser/ui/webui/metrics_handler.h"
 #include "chrome/browser/ui/webui/page_not_available_for_guest/page_not_available_for_guest_ui.h"
 #include "chrome/browser/ui/webui/theme_source.h"
@@ -168,9 +167,7 @@ HistoryUIConfig::CreateWebUIController(content::WebUI* web_ui,
 HistoryUI::HistoryUI(content::WebUI* web_ui)
     : ui::MojoWebUIController(web_ui, /*enable_chrome_send=*/true) {
   Profile* profile = Profile::FromWebUI(web_ui);
-  content::WebUIDataSource* data_source =
-      CreateAndAddHistoryUIHTMLSource(profile);
-  ManagedUIHandler::Initialize(web_ui, data_source);
+  CreateAndAddHistoryUIHTMLSource(profile);
 
   content::URLDataSource::Add(profile, std::make_unique<ThemeSource>(profile));
 

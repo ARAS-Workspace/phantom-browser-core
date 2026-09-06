@@ -6,7 +6,6 @@
  * @fileoverview
  * 'settings-main' displays the selected settings page.
  */
-import 'chrome://resources/cr_components/managed_footnote/managed_footnote.js';
 import 'chrome://resources/cr_elements/cr_shared_style.css.js';
 import 'chrome://resources/cr_elements/cr_view_manager/cr_view_manager.js';
 import 'chrome://resources/cr_elements/icons.html.js';
@@ -270,11 +269,6 @@ export class SettingsMainElement extends SettingsMainElementBase {
 
   private showPage_(visibility?: boolean): boolean {
     return visibility !== false;
-  }
-
-  private showManagedHeader_(): boolean {
-    return !this.inSearchMode_ && !!this.lastRoute_ &&
-        this.lastRoute_ !== routes.ABOUT && !this.lastRoute_.isSubpage();
   }
 
   private shouldShowAll_(): boolean {

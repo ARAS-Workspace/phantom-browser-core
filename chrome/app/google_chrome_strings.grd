@@ -1258,17 +1258,6 @@ Google Chrome is unable to recover your settings.
         </message>
       </if>
 
-      <!-- Management bubble -->
-      <message name="IDS_MANAGEMENT_DIALOG_BROWSER_MANAGED" desc="Disclosure that an unnamed organization is managing the browser.">
-        Your organization manages Chrome
-      </message>
-      <message name="IDS_MANAGEMENT_DIALOG_BROWSER_MANAGED_BY" desc="Disclosure that a known organization is managing the browser.">
-        <ph name="MANAGER">$1<ex>The Company</ex></ph> manages Chrome
-      </message>
-      <message name="IDS_MANAGEMENT_DIALOG_BROWSER_MANAGED_BY_MULTIPLE_ORGANIZATIONS" desc="Disclosure that multiple organization are managing the browser and profile.">
-        Multiple organizations manage Chrome
-      </message>
-
       <!-- Managed profile required interstitial -->
       <message name="IDS_MANAGED_PROFILE_INTERSTITIAL_PRIMARY_PARAGRAPH" desc="The main text of the interstitial that tells the user that their organization requires them to sign in to Chrome with their managed account in order to access it.">
         To continue, sign in to Chrome as <ph name="EMAIL">$1<ex>user@example.com</ex></ph>. This makes sure that you've got your organization's policies.

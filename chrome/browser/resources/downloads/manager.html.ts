@@ -24,7 +24,6 @@ export function getHtml(this: DownloadsManagerElement) {
 <div id="mainContainer" class="cr-scrollable" @scroll="${this.onScroll_}"
     @save-dangerous-click="${this.onSaveDangerousClick_}">
   <div class="cr-scrollable-top-shadow"></div>
-  <managed-footnote ?hidden="${this.inSearchMode_}"></managed-footnote>
   <cr-infinite-list id="downloadsList" .items="${this.items_}" role="grid"
       aria-rowcount="${this.items_.length}" ?hidden="${!this.hasDownloads_}"
       .scrollTarget="${this.listScrollTarget_}"

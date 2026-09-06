@@ -9,21 +9,6 @@
     margin-bottom: 10px;
   }
 
-  managed-footnote {
-    border-top: none;
-    /* margin-bottom is needed to compensate for the next element's 21px
-     * margin at the top and 8px padding at the top. This leaves a 12px
-     * padding between this element's content and the top of the next
-     * element's text. */
-    margin-bottom: calc(-21px - 8px);
-    padding-bottom: 16px;
-    padding-top: 12px;
-    /* The next element spills over this element. This ensures the link
-     * is clickable. */
-    position: relative;
-    z-index: 1;
-  }
-
   cr-view-manager {
     display: block;
     position: relative;
@@ -36,11 +21,6 @@
 <div id="noSearchResults" hidden$="[[!showNoResultsFound_]]">
   <div>$i18n{searchNoResults}</div>
 </div>
-<template is="dom-if" if="[[showManagedHeader_(inSearchMode_, lastRoute_)]]"
-    restamp>
-  <managed-footnote></managed-footnote>
-</template>
-
 <if expr="not is_chromeos">
   <template is="dom-if" if="[[showPage_(pageVisibility_.languages)]]">
     <settings-languages languages="{{languages_}}"></settings-languages>

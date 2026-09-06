@@ -168,7 +168,6 @@ export class HistoryAppElement extends HistoryAppElementBase {
   }
 
   accessor footerInfo: FooterInfo = {
-    managed: loadTimeData.getBoolean('isManaged'),
     otherFormsOfHistory: false,
     geminiAppsActivity: loadTimeData.getBoolean('isGlicEnabled'),
   };

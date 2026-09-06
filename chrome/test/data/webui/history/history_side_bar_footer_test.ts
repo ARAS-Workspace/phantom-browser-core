@@ -105,7 +105,6 @@ suite('GoogleAccountFooter', function() {
 
   test('Only Gemini Apps Activity visible', async () => {
     loadTimeData.overrideValues({
-      isManaged: false,
       isGlicEnabled: true,
     });
     await createApp();
@@ -128,7 +127,6 @@ suite('GoogleAccountFooter', function() {
 
   test('Both My Activity and Gemini Apps Activity visible', async () => {
     loadTimeData.overrideValues({
-      isManaged: false,
       isGlicEnabled: true,
     });
     await createApp();
@@ -165,7 +163,6 @@ suite('GoogleAccountFooter', function() {
 
   test('Gemini Apps Activity hidden when glic disabled', async () => {
     loadTimeData.overrideValues({
-      isManaged: false,
       isGlicEnabled: false,
     });
     await createApp();

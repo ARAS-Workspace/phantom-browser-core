@@ -37,7 +37,6 @@ export function getHtml(this: HistorySideBarElement) {
 <div id="spacer"></div>
 <div id="footer" ?hidden="${!this.showFooter_}">
   <div class="separator"></div>
-  <managed-footnote></managed-footnote>
   <div id="google-account-footer"
       ?hidden="${!this.showGoogleAccountFooter_}"
       @click="${this.onGoogleAccountFooterClick_}">

@@ -52,10 +52,6 @@ if (!is_android) {
       "//ui/base",
       "//ui/webui",
     ]
-
-    if (enable_extensions_core) {
-      deps += [ "//chrome/browser/ui/webui:managed_ui_handler" ]
-    }
   }
 
   source_set("browser_tests") {

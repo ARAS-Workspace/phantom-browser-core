@@ -679,7 +679,7 @@ source_set("chrome_web_ui_controller_factory") {
   }
 }
 
-if (enable_extensions_core) {
+if (is_chromeos) {
   source_set("managed_ui_handler") {
     sources = [ "managed_ui_handler.cc" ]
     public = [ "managed_ui_handler.h" ]
@@ -1101,13 +1101,11 @@ source_set("unit_tests") {
   if (!is_android) {
     sources += [
       "constrained_web_dialog_ui_unittest.cc",
-      "managed_ui_handler_unittest.cc",
       "theme_colors_source_manager_unittest.cc",
       "webui_allowlist_provider_unittest.cc",
       "webui_embedding_context_unittest.cc",
     ]
     deps += [
-      ":managed_ui_handler",
       ":theme_colors_source_manager",
       ":webui",
       ":webui_util",
@@ -1130,9 +1128,13 @@ source_set("unit_tests") {
   }
 
   if (is_chromeos) {
-    sources += [ "certificate_provisioning_ui_handler_unittest.cc" ]
+    sources += [
+      "certificate_provisioning_ui_handler_unittest.cc",
+      "managed_ui_handler_unittest.cc",
+    ]
     deps += [
       ":certificate_provisioning_ui_handler",
+      ":managed_ui_handler",
       "//chrome/browser/ash/cert_provisioning",
       "//chromeos/ash/components/browser_context_helper",
       "//components/policy/core/browser",

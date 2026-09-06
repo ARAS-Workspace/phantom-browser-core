@@ -81,12 +81,6 @@ IN_PROC_BROWSER_TEST_F(CrComponentsHistoryEmbeddingsTest,
 IN_PROC_BROWSER_TEST_F(CrComponentsTest, ManagedDialog) {
   RunTest("cr_components/managed_dialog_test.js", "mocha.run()");
 }
-
-IN_PROC_BROWSER_TEST_F(CrComponentsTest, ManagedFootnote) {
-  // Loaded from chrome://settings because it needs access to chrome.send().
-  set_test_loader_host(chrome::kChromeUISettingsHost);
-  RunTest("cr_components/managed_footnote_test.js", "mocha.run()");
-}
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_F(CrComponentsTest, LocalizedLink) {

@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'chrome://resources/cr_components/managed_footnote/managed_footnote.js';
 import 'chrome://resources/cr_elements/cr_icon/cr_icon.js';
 import 'chrome://resources/cr_elements/cr_menu_selector/cr_menu_selector.js';
 import 'chrome://resources/cr_elements/cr_ripple/cr_ripple.js';
@@ -22,7 +21,6 @@ import {getCss} from './side_bar.css.js';
 import {getHtml} from './side_bar.html.js';
 
 export interface FooterInfo {
-  managed: boolean;
   otherFormsOfHistory: boolean;
   geminiAppsActivity: boolean;
 }
@@ -102,7 +100,6 @@ export class HistorySideBarElement extends CrLitElement {
   }
 
   accessor footerInfo: FooterInfo = {
-    managed: false,
     otherFormsOfHistory: false,
     geminiAppsActivity: false,
   };
@@ -153,7 +150,7 @@ export class HistorySideBarElement extends CrLitElement {
 
     this.showGoogleAccountFooter_ =
         this.showGMAAndGAA_ || this.showGMAOnly_ || this.showGAAOnly_;
-    this.showFooter_ = this.footerInfo.managed || this.showGoogleAccountFooter_;
+    this.showFooter_ = this.showGoogleAccountFooter_;
   }
 
   protected onGoogleAccountFooterClick_(e: Event) {

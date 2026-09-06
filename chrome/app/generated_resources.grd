@@ -1758,17 +1758,8 @@ are declared in tools/grit/grit_args.gni.
       <message name="IDS_MANAGED" desc="The text label of the 'Managed by' UI in the app menu, for enterprise users">
         Managed by your organization
       </message>
-      <message name="IDS_MANAGED_BY" desc="The text label of the 'Managed by' UI in the app menu, for enterprise users. MANAGER can be a domain or an email address.">
-        Managed by <ph name="MANAGER">$1<ex>example.com</ex></ph>
-      </message>
       <message name="IDS_MANAGED_BY_PARENT" desc="The text label shown in the app menu for users subject to parental controls.">
         Managed by your parent
-      </message>
-      <message name="IDS_PROFILE_MANAGED_BY" desc="The text label of the 'Managed by' UI in the app menu, for enterprise users where only the profile is managed as opposed to the whole browser. MANAGER can be a domain or an email address.">
-        Profile managed by <ph name="MANAGER">$1<ex>example.com</ex></ph>
-      </message>
-      <message name="IDS_BROWSER_PROFILE_MANAGED" desc="The text label of the 'Managed by' UI in the app menu, for enterprise users where the profile is managed by a different entity from the browser.">
-        Your browser and profile are managed
       </message>
       <message name="IDS_CHROME_ENTERPRISE_RELEASE_NOTES" desc="Menu item to open the Chrome Enterprise and Education release notes.">
         Chrome Enterprise release notes
@@ -13456,11 +13447,6 @@ Check your passwords anytime in <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google 
           </message>
         </if>
       </if> <!-- not is_android -->
-      <if expr="(not is_android or enable_extensions_core) and not is_chromeos">
-        <message name="IDS_HELP_MANAGED_BY_YOUR_PARENT" desc="The text label shown in chrome://settings/help for users subject to parental controls.">
-          Your browser is managed by your parent
-        </message>
-      </if>
 
       <if expr="is_chromeos">
         <message name="IDS_ARC_LABEL" desc="Label for ARC">
@@ -14064,7 +14050,7 @@ Check your passwords anytime in <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google 
           </message>
         </if>
       </if>
-      <if expr="not is_android or enable_extensions_core">
+      <if expr="is_chromeos">
         <message name="IDS_MANAGED_WITH_HYPERLINK" desc="Message to end users in Enterprise/EDU, with a link for more info (non-ChromeOS)">
           Your <ph name="BEGIN_LINK">&lt;a href="$1"&gt;</ph>browser is managed<ph name="END_LINK">&lt;/a&gt;</ph> by your organization
         </message>
@@ -14085,12 +14071,6 @@ Check your passwords anytime in <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google 
         </message>
         <message name="IDS_MANAGED_BY_PARENT_WITH_HYPERLINK" desc="Message to supervised end users, with a link for more info.">
           Your <ph name="BEGIN_LINK">&lt;a href="$1"&gt;</ph>browser is managed<ph name="END_LINK">&lt;/a&gt;</ph> by your parent
-        </message>
-        <message name="IDS_BROWSER_MANAGED_AND_PROFILE_MANAGED_BY_TOOLTIP" desc="Text displayed in a tooltip to inform that the browser is managed by BROWSER_DOMAIN and the profile by PROFILE_DOMAIN.">
-          Browser managed by an organization, profile managed by <ph name="PROFILE_DOMAIN">$1<ex>bar.com</ex></ph>
-        </message>
-        <message name="IDS_BROWSER_AND_PROFILE_DIFFERENT_MANAGED_BY_TOOLTIP" desc="Text displayed in a tooltip to inform that the browser is managed by BROWSER_DOMAIN and the profile by PROFILE_DOMAIN.">
-         Browser managed by <ph name="BROWSER_DOMAIN">$1<ex>foo.com</ex></ph>, profile managed by <ph name="PROFILE_DOMAIN">$2<ex>bar.com</ex></ph>
         </message>
       </if>
 

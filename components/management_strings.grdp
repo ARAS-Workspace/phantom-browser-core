@@ -38,7 +38,7 @@
   </if>
 
   <!-- Subtitles of the browser version of the management page -->
-  <if expr="not is_chromeos">
+  <if expr="is_android or is_ios">
     <message name="IDS_MANAGEMENT_SUBTITLE_MANAGED_BY" desc="Title of chrome://management page, which shows the administrator's capabilities in a managed environment. MANAGER can be a domain or an email address.">
       Your browser is managed by <ph name="MANAGER">$1<ex>example.com</ex></ph>
     </message>
@@ -523,9 +523,6 @@
     To help ensure security, it can also see the device’s OS, browser version, and what software is installed
   </message>
   </if>
-  <message name="IDS_MANAGEMENT_DIALOG_PROFILE_MANAGED_BY" desc="Disclosure that a known organization is managing the profile.">
-    <ph name="MANAGER">$1<ex>The Company</ex></ph> manages your profile
-  </message>
   <if expr="is_chromeos or is_android or is_ios">
   <message name="IDS_MANAGEMENT_DIALOG_THINGS_TO_CONSIDER_SUBTITLE" desc="Subtitle of a section of things to consider regarding that an admin can do an see while managing the browser and profile.">
     What this means

@@ -155,12 +155,6 @@ suite('ExtensionItemListTest', function() {
     boundTestVisible('#no-items', true);
   });
 
-  test('LoadTimeData', function() {
-    // Check that loadTimeData contains these values.
-    loadTimeData.getBoolean('isManaged');
-    loadTimeData.getString('browserManagedByOrg');
-  });
-
   test('SafetyCheckPanel_EnabledSafetyCheck', async () => {
     // Panel is hidden if there are no unsafe extensions and panel wasn't
     // previously shown.

@@ -41,7 +41,6 @@
 #include "chrome/browser/ui/webui/cr_components/customize_color_scheme_mode/customize_color_scheme_mode_handler.h"
 #include "chrome/browser/ui/webui/extension_control_handler.h"
 #include "chrome/browser/ui/webui/favicon_source.h"
-#include "chrome/browser/ui/webui/managed_ui_handler.h"
 #include "chrome/browser/ui/webui/metrics_handler.h"
 #include "chrome/browser/ui/webui/plural_string_handler.h"
 #include "chrome/browser/ui/webui/sanitized_image/sanitized_image_source.h"
@@ -383,8 +382,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
 
   AddLocalizedStrings(html_source, profile, web_ui->GetWebContents());
   AddSecurityData(html_source);
-
-  ManagedUIHandler::Initialize(web_ui, html_source);
 
   content::URLDataSource::Add(
       profile, std::make_unique<FaviconSource>(

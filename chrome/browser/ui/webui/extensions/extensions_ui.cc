@@ -20,7 +20,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/webui/favicon_source.h"
-#include "chrome/browser/ui/webui/managed_ui_handler.h"
 #include "chrome/browser/ui/webui/metrics_handler.h"
 #include "chrome/browser/ui/webui/page_not_available_for_guest/page_not_available_for_guest_ui.h"
 #include "chrome/browser/ui/webui/plural_string_handler.h"
@@ -548,7 +547,6 @@ ExtensionsUI::ExtensionsUI(content::WebUI* web_ui)
                                         base::Unretained(this)));
 
   source = CreateAndAddExtensionsSource(profile, *in_dev_mode_);
-  ManagedUIHandler::Initialize(web_ui, source);
 
   // Need to allow <object> elements so that the <extensionoptions> browser
   // plugin can be loaded within chrome://extensions.

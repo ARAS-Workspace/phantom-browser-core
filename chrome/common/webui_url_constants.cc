@@ -144,7 +144,7 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUIIwaDevHost,
 #endif
       kChromeUILocalStateHost,
-#if !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_CHROMEOS)
       kChromeUIManagementHost,
 #endif
       kChromeUIMediaEngagementHost,

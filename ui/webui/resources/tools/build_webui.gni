@@ -634,7 +634,6 @@ template("build_webui") {
         "//content/browser/resources/gpu",
         "//content/browser/resources/histograms",
         "//content/browser/resources/service_worker",
-        "//ui/webui/resources/cr_components/managed_footnote",
         "//ui/webui/resources/cr_elements",
         "//ui/webui/resources/js",
       ]
