@@ -6,8 +6,6 @@
 
 #include "base/metrics/histogram_functions.h"
 #include "base/time/time.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/ui/views/frame/contents_container_view.h"
 #include "chrome/browser/ui/views/frame/contents_web_view.h"
 #include "chrome/browser/ui/views/new_tab_footer/footer_controller_observer.h"
@@ -46,31 +44,12 @@ NewTabFooterController::NewTabFooterController(
       base::BindRepeating(&NewTabFooterController::UpdateFooterVisibilities,
                           weak_factory_.GetWeakPtr(),
                           /*log_on_load_metric=*/false));
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  local_state_pref_change_registrar_.Init(g_browser_process->local_state());
-  local_state_pref_change_registrar_.Add(
-      prefs::kNTPFooterManagementNoticeEnabled,
-      base::BindRepeating(&NewTabFooterController::UpdateFooterVisibilities,
-                          weak_factory_.GetWeakPtr(),
-                          /*log_on_load_metric=*/false));
-  local_state_pref_change_registrar_.Add(
-      prefs::kEnterpriseCustomLabelForBrowser,
-      base::BindRepeating(&NewTabFooterController::UpdateFooterVisibilities,
-                          weak_factory_.GetWeakPtr(),
-                          /*log_on_load_metric=*/false));
-  local_state_pref_change_registrar_.Add(
-      prefs::kEnterpriseLogoUrlForBrowser,
-      base::BindRepeating(&NewTabFooterController::UpdateFooterVisibilities,
-                          weak_factory_.GetWeakPtr(),
-                          /*log_on_load_metric=*/false));
-#endif
 }
 
 NewTabFooterController::~NewTabFooterController() = default;
 
 void NewTabFooterController::TearDown() {
   pref_change_registrar_.Reset();
-  local_state_pref_change_registrar_.Reset();
   profile_ = nullptr;
   footer_controllers_.clear();
 }
@@ -142,9 +121,8 @@ void NewTabFooterController::ContentsViewFooterCotroller::
     url = web_contents()->GetController().GetVisibleEntry()->GetURL();
   }
 
-  const bool show_managed = ShouldShowManagedFooter(url);
   const bool show_extension = ShouldShowExtensionFooter(url);
-  const bool show = show_managed || show_extension;
+  const bool show = show_extension;
   if (show) {
     footer_->ShowUI(load_start_timestamp, url, web_contents()->GetWeakPtr());
   } else {
@@ -159,10 +137,6 @@ void NewTabFooterController::ContentsViewFooterCotroller::
 
   if (ntp_footer::IsNtp(url, web_contents(), owner_->profile_)) {
     base::UmaHistogramBoolean("NewTabPage.Footer.VisibleOnLoad", show);
-  }
-  if (show_managed) {
-    base::UmaHistogramEnumeration("NewTabPage.Footer.NoticeItem",
-                                  FooterNoticeItem::kManagementNotice);
   }
   if (show_extension) {
     base::UmaHistogramEnumeration("NewTabPage.Footer.NoticeItem",
@@ -181,24 +155,6 @@ bool NewTabFooterController::ContentsViewFooterCotroller::
   }
   return web_contents()->GetSiteInstance()->GetSecurityPrincipal().SchemeIs(
       content::kChromeErrorScheme);
-}
-
-bool NewTabFooterController::ContentsViewFooterCotroller::
-    ShouldShowManagedFooter(const GURL& url) {
-  if (ShouldSkipForErrorPage()) {
-    return false;
-  }
-
-  enterprise_util::BrowserManagementNoticeState state =
-      enterprise_util::GetManagementNoticeStateForNTPFooter(owner_->profile_);
-  switch (state) {
-    case enterprise_util::BrowserManagementNoticeState::kNotApplicable:
-    case enterprise_util::BrowserManagementNoticeState::kDisabled:
-      return false;
-    case enterprise_util::BrowserManagementNoticeState::kEnabled:
-    case enterprise_util::BrowserManagementNoticeState::kEnabledByPolicy:
-      return ntp_footer::IsNtp(url, web_contents(), owner_->profile_);
-  }
 }
 
 bool NewTabFooterController::ContentsViewFooterCotroller::

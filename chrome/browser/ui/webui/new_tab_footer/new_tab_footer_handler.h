@@ -10,7 +10,6 @@
 #include "chrome/browser/search/background/ntp_custom_background_service.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer.mojom.h"
 #include "chrome/browser/ui/webui/top_chrome/top_chrome_web_ui_controller.h"
-#include "components/policy/core/common/management/management_service.h"
 #include "components/prefs/pref_change_registrar.h"
 #include "components/themes/ntp_custom_background_service_observer.h"
 #include "content/public/browser/web_contents.h"
@@ -28,7 +27,6 @@ class ThemeProvider;
 
 class NewTabFooterHandler : public new_tab_footer::mojom::NewTabFooterHandler,
                             public extensions::ExtensionRegistryObserver,
-                            public policy::ManagementService::Observer,
                             public NtpCustomBackgroundServiceObserver {
  public:
   NewTabFooterHandler(
@@ -47,30 +45,19 @@ class NewTabFooterHandler : public new_tab_footer::mojom::NewTabFooterHandler,
 
   // new_tab_footer::mojom::NewTabFooterHandler:
   void UpdateNtpExtensionName() override;
-  void UpdateManagementNotice() override;
   void UpdateAttachedTabState() override;
   void UpdateBackgroundAttribution() override;
   void OpenExtensionOptionsPageWithFallback() override;
-  void OpenManagementPage() override;
   void OpenUrlInCurrentTab(const GURL& url) override;
   void ShowContextMenu(const gfx::Point& point) override;
   void NotifyCustomizationButtonVisible() override;
 
-  // Returns the bitmap representation of the management logo.
-  // Exposed for testing only.
-  SkBitmap GetManagementNoticeIconBitmap();
   // Passes `AttachedTabStateUpdated` calls to the `document_`.
   void AttachedTabStateUpdated(const GURL& url);
-
-  // ManagementService::Observer
-  void OnEnterpriseLogoUpdatedForBrowser() override;
 
   void SetThemeProviderForTesting(ui::ThemeProvider* theme_provider);
 
  private:
-  std::string GetManagementNoticeText();
-  std::string GetManagementNoticeIconDataUrl();
-
   void OpenUrlInCurrentTabInternal(const GURL& url);
 
   // extensions::ExtensionRegistryObserver.
@@ -92,15 +79,11 @@ class NewTabFooterHandler : public new_tab_footer::mojom::NewTabFooterHandler,
   raw_ptr<const ui::ThemeProvider> theme_provider_;
   std::unique_ptr<NewTabPageFeaturePromoHelper> feature_promo_helper_;
   PrefChangeRegistrar profile_pref_change_registrar_;
-  PrefChangeRegistrar local_state_pref_change_registrar_;
   GURL last_source_url_;
 
   base::ScopedObservation<extensions::ExtensionRegistry,
                           extensions::ExtensionRegistryObserver>
       extension_registry_observation_{this};
-  base::ScopedObservation<policy::ManagementService,
-                          policy::ManagementService::Observer>
-      management_observation_{this};
   base::ScopedObservation<NtpCustomBackgroundService,
                           NtpCustomBackgroundServiceObserver>
       ntp_custom_background_service_observation_{this};

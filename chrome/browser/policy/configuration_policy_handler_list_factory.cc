@@ -2536,11 +2536,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     policy_prefs::kBuiltInAIAPIsEnabled,
     base::Value::Type::BOOLEAN },
 #endif  // BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
-  { key::kNTPFooterManagementNoticeEnabled,
-    prefs::kNTPFooterManagementNoticeEnabled,
-    base::Value::Type::BOOLEAN },
-#endif // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
   { key::kAIModeSettings,
     omnibox::kAIModeSettings,
     base::Value::Type::INTEGER },

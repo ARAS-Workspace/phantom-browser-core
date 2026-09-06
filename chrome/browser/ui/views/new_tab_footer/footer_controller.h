@@ -71,7 +71,6 @@ class NewTabFooterController {
     bool GetFooterVisible();
     bool ShouldSkipForErrorPage() const;
     bool ShouldShowExtensionFooter(const GURL& url);
-    bool ShouldShowManagedFooter(const GURL& url);
 
    private:
     raw_ptr<NewTabFooterController> owner_;
@@ -91,7 +90,6 @@ class NewTabFooterController {
   bool skip_error_page_check_for_testing_ = false;
   std::vector<std::unique_ptr<ContentsViewFooterCotroller>> footer_controllers_;
   PrefChangeRegistrar pref_change_registrar_;
-  PrefChangeRegistrar local_state_pref_change_registrar_;
   raw_ptr<Profile> profile_;
 
   // TODO(crbug.com/484371187): Investigate if reentrancy can be removed.

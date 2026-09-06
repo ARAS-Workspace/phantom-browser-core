@@ -287,11 +287,6 @@ BASE_FEATURE(kUseDefaultDeadlineWhenAnimatingBounds,
 BASE_FEATURE(kEnterpriseProfileBadgingForMenu,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-// Enables the management notice in the NTP footer if the custom policies are
-// set. This acts as a kill switch for "EnterpriseCustomLabelForBrowser" and
-// "EnterpriseLogoUrlForBrowser".
-BASE_FEATURE(kNTPFooterBadgingPolicies, base::FEATURE_ENABLED_BY_DEFAULT);
-
 // Enables showing the EnterpriseCustomLabel` instead of the cloud policy
 // manager in the managed disclaimer "Managed by..." in the profile and app
 // menus.

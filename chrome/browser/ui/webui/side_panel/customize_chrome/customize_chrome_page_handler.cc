@@ -17,7 +17,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/extensions/settings_api_helpers.h"
 #include "chrome/browser/new_tab_page/modules/modules_constants.h"
 #include "chrome/browser/new_tab_page/new_tab_page_util.h"
@@ -565,32 +564,10 @@ void CustomizeChromePageHandler::SetFooterVisible(bool visible) {
 }
 
 void CustomizeChromePageHandler::UpdateFooterSettings() {
-  auto management_notice_state =
-      side_panel::mojom::ManagementNoticeState::New();
-  management_notice_state->can_be_shown = false;
-  management_notice_state->enabled_by_policy = false;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  enterprise_util::BrowserManagementNoticeState state =
-      enterprise_util::GetManagementNoticeStateForNTPFooter(profile_);
-  switch (state) {
-    case enterprise_util::BrowserManagementNoticeState::kNotApplicable:
-      break;
-    case enterprise_util::BrowserManagementNoticeState::kEnabled:
-    case enterprise_util::BrowserManagementNoticeState::kDisabled:
-      management_notice_state->can_be_shown = true;
-      break;
-    case enterprise_util::BrowserManagementNoticeState::kEnabledByPolicy:
-      management_notice_state->can_be_shown = true;
-      management_notice_state->enabled_by_policy = true;
-      break;
-  }
-#endif
-
   page_->SetFooterSettings(
       profile_->GetPrefs()->GetBoolean(prefs::kNtpFooterVisible),
       profile_->GetPrefs()->GetBoolean(
-          prefs::kNTPFooterExtensionAttributionEnabled),
-      std::move(management_notice_state));
+          prefs::kNTPFooterExtensionAttributionEnabled));
 }
 
 void CustomizeChromePageHandler::SetModulesVisible(bool visible) {

@@ -3,14 +3,12 @@
 // found in the LICENSE file.
 
 import 'chrome://resources/cr_elements/cr_toggle/cr_toggle.js';
-import 'chrome://resources/cr_elements/policy/cr_policy_indicator.js';
 
 import type {CrToggleElement} from 'chrome://resources/cr_elements/cr_toggle/cr_toggle.js';
 import {assert} from 'chrome://resources/js/assert.js';
 import {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 
 import {CustomizeChromeAction, recordCustomizeChromeAction} from './common.js';
-import type {ManagementNoticeState} from './customize_chrome.mojom-webui.js';
 import {CustomizeChromeApiProxy} from './customize_chrome_api_proxy.js';
 import {getCss} from './footer.css.js';
 import {getHtml} from './footer.html.js';
@@ -38,18 +36,10 @@ export class FooterElement extends CrLitElement {
     return {
       /** Whether the footer is shown. */
       checked_: {type: Boolean},
-
-      /**
-         Whether the footer is managed by enterprise custom label or logo
-         policy.
-       */
-      managedByPolicy_: {type: Boolean},
     };
   }
 
-  protected accessor managedByPolicy_: boolean = false;
   protected accessor checked_: boolean = false;
-  protected canShowManagement_: boolean = false;
 
   private apiProxy_: CustomizeChromeApiProxy =
       CustomizeChromeApiProxy.getInstance();
@@ -59,12 +49,8 @@ export class FooterElement extends CrLitElement {
     super.connectedCallback();
     this.setFooterSettingsListenerId_ =
         this.apiProxy_.callbackRouter.setFooterSettings.addListener(
-            (visible: boolean, _: boolean,
-             managementNoticeState: ManagementNoticeState) => {
-              // Checked if the footer is visible by user choice  or if it is enabled by policy.
-              this.checked_ = visible || managementNoticeState.enabledByPolicy;
-              this.managedByPolicy_ = managementNoticeState.enabledByPolicy;
-              this.canShowManagement_ = managementNoticeState.canBeShown;
+            (visible: boolean, _: boolean) => {
+              this.checked_ = visible;
             });
     this.apiProxy_.handler.updateFooterSettings();
   }
@@ -81,13 +67,8 @@ export class FooterElement extends CrLitElement {
         CustomizeChromeAction.SHOW_FOOTER_TOGGLE_CLICKED);
     chrome.metricsPrivate.recordBoolean(
         'NewTabPage.Footer.ToggledVisibility', checked);
-    if (this.canShowManagement_) {
-      chrome.metricsPrivate.recordBoolean(
-          'NewTabPage.Footer.ToggledVisibility.Enterprise', checked);
-    } else {
-      chrome.metricsPrivate.recordBoolean(
-          'NewTabPage.Footer.ToggledVisibility.Consumer', checked);
-    }
+    chrome.metricsPrivate.recordBoolean(
+        'NewTabPage.Footer.ToggledVisibility.Consumer', checked);
     this.checked_ = checked;
     this.setFooterVisible_();
   }
@@ -97,9 +78,6 @@ export class FooterElement extends CrLitElement {
   }
 
   protected onShowToggleClick_() {
-    if (this.managedByPolicy_) {
-      return;
-    }
     this.setChecked_(!this.checked_);
   }
 

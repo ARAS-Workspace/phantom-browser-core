@@ -7,11 +7,6 @@
 #include <utility>
 
 #include "base/strings/utf_string_conversions.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/browser_management/browser_management_service.h"
-#include "chrome/browser/enterprise/browser_management/management_identity.h"
-#include "chrome/browser/enterprise/browser_management/management_service_factory.h"
-#include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/extensions/settings_api_helpers.h"
 #include "chrome/browser/new_tab_page/feature_promo_helper/new_tab_page_feature_promo_helper.h"
 #include "chrome/browser/profiles/profile.h"
@@ -19,7 +14,6 @@
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
-#include "chrome/browser/ui/managed_ui.h"
 #include "chrome/browser/ui/webui/new_tab_footer/footer_context_menu.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer.mojom.h"
 #include "chrome/browser/ui/webui/new_tab_footer/new_tab_footer_helper.h"
@@ -31,16 +25,13 @@
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/generated_resources.h"
 #include "chrome/grit/theme_resources.h"
-#include "components/policy/core/common/cloud/machine_level_user_cloud_policy_manager.h"
 #include "components/prefs/pref_service.h"
-#include "components/strings/grit/components_strings.h"
 #include "content/public/browser/web_contents.h"
 #include "mojo/public/cpp/bindings/message.h"
 #include "net/base/url_util.h"
 #include "ui/base/interaction/element_identifier.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/page_transition_types.h"
-#include "ui/base/webui/web_ui_util.h"
 #include "ui/base/window_open_disposition.h"
 #include "ui/color/color_provider.h"
 #include "ui/gfx/image/image_skia_rep_default.h"
@@ -65,8 +56,6 @@ NewTabFooterHandler::NewTabFooterHandler(
       handler_{this, std::move(pending_handler)} {
   extension_registry_observation_.Observe(
       extensions::ExtensionRegistry::Get(profile_));
-  management_observation_.Observe(
-      policy::ManagementServiceFactory::GetForProfile(profile_));
   if (ntp_custom_background_service_) {
     ntp_custom_background_service_observation_.Observe(
         ntp_custom_background_service_);
@@ -76,19 +65,6 @@ NewTabFooterHandler::NewTabFooterHandler(
       prefs::kNTPFooterExtensionAttributionEnabled,
       base::BindRepeating(&NewTabFooterHandler::UpdateNtpExtensionName,
                           base::Unretained(this)));
-
-  auto* local_state = g_browser_process->local_state();
-  if (local_state) {
-    local_state_pref_change_registrar_.Init(local_state);
-    local_state_pref_change_registrar_.Add(
-        prefs::kNTPFooterManagementNoticeEnabled,
-        base::BindRepeating(&NewTabFooterHandler::UpdateManagementNotice,
-                            base::Unretained(this)));
-    local_state_pref_change_registrar_.Add(
-        prefs::kEnterpriseCustomLabelForBrowser,
-        base::BindRepeating(&NewTabFooterHandler::UpdateManagementNotice,
-                            base::Unretained(this)));
-  }
 }
 
 NewTabFooterHandler::~NewTabFooterHandler() = default;
@@ -127,10 +103,6 @@ void NewTabFooterHandler::OpenExtensionOptionsPageWithFallback() {
   OpenUrlInCurrentTabInternal(options_url);
 }
 
-void NewTabFooterHandler::OpenManagementPage() {
-  OpenUrlInCurrentTabInternal(GURL(chrome::kChromeUIManagementURL));
-}
-
 void NewTabFooterHandler::ShowContextMenu(const gfx::Point& point) {
   if (!embedder_) {
     return;
@@ -146,23 +118,6 @@ void NewTabFooterHandler::ShowContextMenu(const gfx::Point& point) {
 void NewTabFooterHandler::NotifyCustomizationButtonVisible() {
   feature_promo_helper_->MaybeTriggerAutomaticCustomizeChromePromo(
       web_contents_);
-}
-
-void NewTabFooterHandler::UpdateManagementNotice() {
-  if (!enterprise_util::CanShowEnterpriseBadgingForNTPFooter(profile_)) {
-    document_->SetManagementNotice(nullptr);
-    return;
-  }
-
-  auto notice = new_tab_footer::mojom::ManagementNotice::New();
-  notice->text = GetManagementNoticeText();
-
-  SkBitmap bitmap = GetManagementNoticeIconBitmap();
-  if (!bitmap.empty()) {
-    notice->custom_bitmap_data_url = GURL(webui::GetBitmapDataUrl(bitmap));
-  }
-
-  document_->SetManagementNotice(std::move(notice));
 }
 
 void NewTabFooterHandler::OpenUrlInCurrentTab(const GURL& url) {
@@ -185,40 +140,6 @@ void NewTabFooterHandler::OpenUrlInCurrentTabInternal(const GURL& url) {
                                 WindowOpenDisposition::CURRENT_TAB,
                                 ui::PAGE_TRANSITION_LINK, false);
   web_contents_->OpenURL(params, /*navigation_handle_callback=*/{});
-}
-
-std::string NewTabFooterHandler::GetManagementNoticeText() {
-  CHECK(enterprise_util::CanShowEnterpriseBadgingForNTPFooter(profile_));
-
-  // Return "Managed by <label>" if custom label is set.
-  std::string custom_label = g_browser_process->local_state()->GetString(
-      prefs::kEnterpriseCustomLabelForBrowser);
-  if (!custom_label.empty()) {
-    return l10n_util::GetStringFUTF8(IDS_MANAGED_BY,
-                                     base::UTF8ToUTF16(custom_label));
-  }
-
-  // Return "Managed by <management domain>" if a cloud manager is known.
-  // Otherwise return the generic "Managed by your organization" message.
-  std::optional<std::string> cloud_policy_manager = GetDeviceManagerIdentity();
-  return cloud_policy_manager && !cloud_policy_manager->empty()
-             ? l10n_util::GetStringFUTF8(
-                   IDS_MANAGED_BY, base::UTF8ToUTF16(*cloud_policy_manager))
-             : l10n_util::GetStringUTF8(IDS_MANAGED);
-}
-
-SkBitmap NewTabFooterHandler::GetManagementNoticeIconBitmap() {
-  CHECK(enterprise_util::CanShowEnterpriseBadgingForNTPFooter(profile_));
-
-  // Return custom icon if set by policy.
-  gfx::Image* custom_icon =
-      policy::ManagementServiceFactory::GetForProfile(profile_)
-          ->GetManagementIconForBrowser();
-  if (custom_icon && !custom_icon->IsEmpty()) {
-    return custom_icon->AsBitmap();
-  }
-
-  return SkBitmap();
 }
 
 void NewTabFooterHandler::OnExtensionReady(
@@ -286,8 +207,4 @@ void NewTabFooterHandler::OnCustomBackgroundImageUpdated() {
   attribution->url =
       custom_background->custom_background_attribution_action_url;
   document_->SetBackgroundAttribution(std::move(attribution));
-}
-
-void NewTabFooterHandler::OnEnterpriseLogoUpdatedForBrowser() {
-  UpdateManagementNotice();
 }

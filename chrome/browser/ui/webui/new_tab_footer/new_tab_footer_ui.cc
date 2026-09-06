@@ -70,7 +70,6 @@ NewTabFooterUI::NewTabFooterUI(content::WebUI* web_ui)
       // TODO(crbug.com/394902303): alphabetically order the following strings.
       {"backgroundAttributionDesc",
        IDS_NEW_TAB_FOOTER_BACKGROUND_ATTRIBUTION_ARIA_DESC},
-      {"managementLinkDesc", IDS_OPENS_MANAGEMENT_PAGE},
   };
   source->AddLocalizedStrings(kLocalizedStrings);
 

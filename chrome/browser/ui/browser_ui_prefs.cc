@@ -102,7 +102,6 @@ void RegisterBrowserPrefs(PrefRegistrySimple* registry) {
                                std::string());
   registry->RegisterStringPref(prefs::kEnterpriseLogoUrlForBrowser,
                                std::string());
-  registry->RegisterBooleanPref(prefs::kNTPFooterManagementNoticeEnabled, true);
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
 #if !BUILDFLAG(IS_ANDROID)
   registry->RegisterIntegerPref(prefs::kSplitViewDragAndDropNudgeShownCount, 0);

@@ -259,7 +259,6 @@ BASE_DECLARE_FEATURE(kUseDefaultDeadlineWhenAnimatingBounds);
 
 // TODO(crbug.com/460764864): Cleanup all the enterprise badging feature flags.
 BASE_DECLARE_FEATURE(kEnterpriseProfileBadgingForMenu);
-BASE_DECLARE_FEATURE(kNTPFooterBadgingPolicies);
 
 BASE_DECLARE_FEATURE(kEnterpriseManagementDisclaimerUsesCustomLabel);
 BASE_DECLARE_FEATURE(kEnterpriseReleaseNotes);

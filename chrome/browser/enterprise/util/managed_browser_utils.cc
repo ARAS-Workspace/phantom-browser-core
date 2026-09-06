@@ -409,59 +409,6 @@ bool CanShowEnterpriseProfileUI(Profile* profile) {
   return true;
 }
 
-bool CanShowEnterpriseBadgingForNTPFooter(Profile* profile) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  BrowserManagementNoticeState management_notice_state =
-      GetManagementNoticeStateForNTPFooter(profile);
-  switch (management_notice_state) {
-    case BrowserManagementNoticeState::kNotApplicable:
-      return false;
-    case BrowserManagementNoticeState::kEnabled:
-    case BrowserManagementNoticeState::kDisabled:
-    case BrowserManagementNoticeState::kEnabledByPolicy:
-      return true;
-  }
-#else
-  return false;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-}
-
-BrowserManagementNoticeState GetManagementNoticeStateForNTPFooter(
-    Profile* profile) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  auto* management_service =
-      policy::ManagementServiceFactory::GetForProfile(profile);
-  if (!management_service->IsBrowserManaged() ||
-      !g_browser_process->local_state()->GetBoolean(
-          prefs::kNTPFooterManagementNoticeEnabled)) {
-    return BrowserManagementNoticeState::kNotApplicable;
-  }
-
-  bool has_custom_badging =
-      !g_browser_process->local_state()
-           ->GetString(prefs::kEnterpriseCustomLabelForBrowser)
-           .empty() ||
-      !g_browser_process->local_state()
-           ->GetString(prefs::kEnterpriseLogoUrlForBrowser)
-           .empty();
-  if (has_custom_badging &&
-      base::FeatureList::IsEnabled(features::kNTPFooterBadgingPolicies)) {
-    return BrowserManagementNoticeState::kEnabledByPolicy;
-  }
-
-  const bool is_low_trust =
-      management_service->GetManagementAuthorityTrustworthiness() <=
-      policy::ManagementAuthorityTrustworthiness::LOW;
-
-  if (!is_low_trust) {
-    return profile->GetPrefs()->GetBoolean(prefs::kNtpFooterVisible)
-               ? BrowserManagementNoticeState::kEnabled
-               : BrowserManagementNoticeState::kDisabled;
-  }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  return BrowserManagementNoticeState::kNotApplicable;
-}
-
 bool IsKnownConsumerDomain(const std::string& email_domain) {
   return !signin::AccountManagedStatusFinder::MayBeEnterpriseDomain(
       email_domain);

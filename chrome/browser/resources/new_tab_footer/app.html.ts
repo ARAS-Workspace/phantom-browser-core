@@ -16,24 +16,6 @@ separated from each other by a divider.
 <div id="container" @contextmenu="${this.onContextmenu_}">
   <div id="spacer"></div>
   <div id="infoContainer">
-  ${this.managementNotice_ ?
-      html`<div id="managementNoticeContainer" class="notice-item"
-        title="${this.managementNotice_.text}">
-        <div id="managementNoticeLogoContainer"
-             class="${this.managementNotice_.customBitmapDataUrl ?
-             'custom_logo' : ''}">
-          ${this.managementNotice_.customBitmapDataUrl ? html`
-            <img id="managementNoticeLogo" alt=""
-                src="${this.managementNotice_.customBitmapDataUrl}">`: html`
-            <cr-icon icon="cr:domain" alt="" id="managementNoticeLogo" >
-            </cr-icon>`}
-        </div>
-        <button @click="${this.onManagementNoticeClick_}" role="link"
-            aria-label="${this.managementNotice_.text}"
-            aria-description="$i18n{managementLinkDesc}">
-            ${this.managementNotice_.text}
-        </button>
-      </div>` : ''}
     ${this.showExtension_ ? html`
       <div id="extensionNameContainer" title="${this.extensionName_}"
           class="notice-item">
@@ -61,8 +43,7 @@ separated from each other by a divider.
   ${!this.showCustomizeButtons_ ? html`<div id="spacer"></div>` : ''}
   ${this.showCustomizeButtons_ ? html`
     <ntp-customize-buttons id="customizeButtons"
-        ?info-shown-to-user="${!!this.managementNotice_ ||
-                               !!this.extensionName_}"
+        ?info-shown-to-user="${!!this.extensionName_}"
         ?show-customize="${this.isCustomizeActive_}"
         ?show-customize-chrome-text="${this.showCustomizeText_}"
         @customize-click="${this.onCustomizeClick_}">

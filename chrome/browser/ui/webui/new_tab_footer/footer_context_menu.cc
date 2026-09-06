@@ -6,7 +6,6 @@
 
 #include "base/metrics/histogram_functions.h"
 #include "chrome/app/chrome_command_ids.h"
-#include "chrome/browser/enterprise/util/managed_browser_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/browser_actions.h"
@@ -64,18 +63,6 @@ FooterContextMenu::FooterContextMenu(BrowserWindowInterface* browser)
 }
 
 FooterContextMenu::~FooterContextMenu() = default;
-
-bool FooterContextMenu::IsCommandIdVisible(int command_id) const {
-  switch (command_id) {
-    case COMMAND_CLOSE_FOOTER: {
-      bool is_controlled_by_policy =
-          enterprise_util::GetManagementNoticeStateForNTPFooter(profile_) ==
-          enterprise_util::BrowserManagementNoticeState::kEnabledByPolicy;
-      return !is_controlled_by_policy;
-    };
-  }
-  return true;
-}
 
 void FooterContextMenu::ExecuteCommand(int command_id, int event_flags) {
   switch (command_id) {

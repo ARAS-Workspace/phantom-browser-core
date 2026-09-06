@@ -95,12 +95,6 @@ struct ModuleSettings {
   bool visible;
 };
 
-// The state of the management notice in the NTP footer.
-struct ManagementNoticeState {
-  bool can_be_shown;
-  bool enabled_by_policy;
-};
-
 enum CustomizeChromeSection {
   kUnspecified,
   kAppearance,
@@ -250,9 +244,7 @@ interface CustomizeChromePage {
   // Sets the tools visibility settings of the NTP tool chips.
   SetToolsSettings(bool visible);
   // Sets the visibility and disabled state of the NTP Footer.
-  SetFooterSettings(bool visible,
-                    bool extension_policy_enabled,
-                    ManagementNoticeState management_notice_state);
+  SetFooterSettings(bool visible, bool extension_policy_enabled);
 
   // Sets the current theme.
   SetTheme(Theme theme);

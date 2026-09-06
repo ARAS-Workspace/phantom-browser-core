@@ -15,16 +15,6 @@ enum NewTabPageType {
   kOther,
 };
 
-// Enterprise browser management notice
-struct ManagementNotice {
-  // Human readable string for notice text. This will indicate that the browser
-  // is managed and the entity managing the browser, which is  customizable via
-  // the `EnterpriseCustomLabel` policy.
-  string text;
-  // Url to a custom management icon set by policy.
-  url.mojom.Url? custom_bitmap_data_url;
-};
-
 struct BackgroundAttribution {
   // Human readable attributions of the background image.
   string name;
@@ -45,9 +35,6 @@ interface NewTabFooterHandler {
   // Updates name of the extension overriding the new tab page.
   // Triggers a call to |SetExtensionName|.
   UpdateNtpExtensionName();
-  // Updates the enterprise management notice for a managed
-  // browser. Triggers a call to |SetManagementNotice|.
-  UpdateManagementNotice();
   // Updates the current tab state. Triggers a call to
   // |AttachedTabStateUpdated|.
   UpdateAttachedTabState();
@@ -59,8 +46,6 @@ interface NewTabFooterHandler {
   // to |UpdateNtpExtensionName|. If that call did not determine a valid ID,
   // this opens the extension settings page.
   OpenExtensionOptionsPageWithFallback();
-  // Opens the chrome://management page.
-  OpenManagementPage();
   // Opens url in the current tab.
   OpenUrlInCurrentTab(url.mojom.Url url);
   // Shows context menu.
@@ -73,8 +58,6 @@ interface NewTabFooterHandler {
 interface NewTabFooterDocument {
   // Sets the name of the extension overriding the new tab page.
   SetNtpExtensionName(string name);
-  // Sets the enterprise management notice for a managed browser.
-  SetManagementNotice(ManagementNotice? notice);
   // Sets information about the tab that is attached to the
   // NewTabFooterDocument.
   AttachedTabStateUpdated(NewTabPageType ntp_type, bool can_customize_chrome);

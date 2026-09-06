@@ -38,14 +38,6 @@ enum EnterpriseProfileBadgingTemporarySetting : int {
 // Represents which type of managed environment we have.
 enum class ManagementEnvironment { kNone, kSchool, kWork };
 
-// Represents the state of the browser management notice in the NTP footer.
-enum class BrowserManagementNoticeState {
-  kEnabled,
-  kDisabled,
-  kEnabledByPolicy,
-  kNotApplicable,
-};
-
 // Represents the management scope for which the enterprise logo applies.
 enum class EnterpriseLogoUrlScope {
   kBrowser,
@@ -107,13 +99,6 @@ bool CanShowEnterpriseBadgingForAvatar(Profile* profile);
 bool CanShowEnterpriseBadgingForMenu(Profile* profile);
 
 bool CanShowEnterpriseProfileUI(Profile* profile);
-
-// Returns true if the enterprise badging can be shown inside the NTP footer,
-// irrespective of whether the footer itself can show.
-bool CanShowEnterpriseBadgingForNTPFooter(Profile* profile);
-
-BrowserManagementNoticeState GetManagementNoticeStateForNTPFooter(
-    Profile* profile);
 
 // Sets the enterprise label if an `EnterpriseCustomLabel` has been set which
 // will replace the profile name where it is used.

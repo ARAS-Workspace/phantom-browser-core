@@ -35,7 +35,6 @@ class FooterContextMenu : public ui::SimpleMenuModel,
   FooterContextMenu& operator=(const FooterContextMenu&) = delete;
 
   // ui::SimpleMenuModel::Delegate:
-  bool IsCommandIdVisible(int command_id) const override;
   void ExecuteCommand(int command_id, int event_flags) override;
 
  private:

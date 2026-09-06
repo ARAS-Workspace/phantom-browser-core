@@ -23,9 +23,6 @@ class MockNewTabFooterDocument
 
   MOCK_METHOD(void, SetNtpExtensionName, (const std::string&));
   MOCK_METHOD(void,
-              SetManagementNotice,
-              (new_tab_footer::mojom::ManagementNoticePtr));
-  MOCK_METHOD(void,
               AttachedTabStateUpdated,
               (new_tab_footer::mojom::NewTabPageType ntp_type,
                bool can_customize_chrome));

@@ -30,7 +30,7 @@ import {getCss} from './app.css.js';
 import {getHtml} from './app.html.js';
 import type {AppearanceElement} from './appearance.js';
 import type {CategoriesElement} from './categories.js';
-import type {BackgroundCollection, ManagementNoticeState} from './customize_chrome.mojom-webui.js';
+import type {BackgroundCollection} from './customize_chrome.mojom-webui.js';
 import {ChromeWebStoreCategory, ChromeWebStoreCollection, CustomizeChromeSection, NewTabPageType} from './customize_chrome.mojom-webui.js';
 import {CustomizeChromeApiProxy} from './customize_chrome_api_proxy.js';
 import type {ThemesElement} from './themes.js';
@@ -93,7 +93,6 @@ export class AppElement extends AppElementBase {
       newTabPageType_: {type: Number},
       showEditTheme_: {type: Boolean},
       showFooter_: {type: Boolean},
-      showFooterForManagedBrowser_: {type: Boolean},
     };
   }
 
@@ -118,7 +117,6 @@ export class AppElement extends AppElementBase {
       NewTabPageType.kFirstPartyWebUI;
   protected accessor showEditTheme_: boolean = true;
   protected accessor showFooter_: boolean = false;
-  protected accessor showFooterForManagedBrowser_: boolean = false;
 
   private listenerIds_: number[] = [];
   private apiProxy_: CustomizeChromeApiProxy =
@@ -181,7 +179,6 @@ export class AppElement extends AppElementBase {
         changedProperties as Map<PropertyKey, unknown>;
     if (changedPrivateProperties.has('footerEnabled_') ||
         changedPrivateProperties.has('newTabPageType_') ||
-        changedPrivateProperties.has('showFooterForManagedBrowser_') ||
         changedPrivateProperties.has('extensionPolicyEnabled_')) {
       this.showFooter_ = this.computeShowFooter_();
     }
@@ -238,22 +235,14 @@ export class AppElement extends AppElementBase {
     this.showEditTheme_ = isThemeEditable;
   }
 
-  private onSetFooterSettings_(
-      _: boolean, extensionPolicyEnabled: boolean,
-      managementNoticeState: ManagementNoticeState) {
-    // The footer section should be shown for managed browsers if
-    // the management notice is shown or if it is disabled by
-    // the user and can be toggled back on.
-    this.showFooterForManagedBrowser_ = managementNoticeState.canBeShown;
+  private onSetFooterSettings_(_: boolean, extensionPolicyEnabled: boolean) {
     this.extensionPolicyEnabled_ = extensionPolicyEnabled;
   }
 
 
   protected computeShowFooter_(): boolean {
-    return this.footerEnabled_ &&
-        ((this.extensionPolicyEnabled_ &&
-          this.newTabPageType_ === NewTabPageType.kExtension) ||
-         this.showFooterForManagedBrowser_);
+    return this.footerEnabled_ && this.extensionPolicyEnabled_ &&
+        this.newTabPageType_ === NewTabPageType.kExtension;
   }
 
   protected isSourceTabFirstPartyNtp_(): boolean {

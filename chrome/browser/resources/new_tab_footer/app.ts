@@ -19,7 +19,7 @@ import {getHtml} from './app.html.js';
 import type {BrowserProxy as CustomizeButtonsBrowserProxy} from './customize_buttons.mojom-webui.js';
 import {browserProxyFactory as customizeButtonsProxyFactory, SidePanelOpenTrigger} from './customize_buttons.mojom-webui.js';
 import {CustomizeChromeSection} from './customize_chrome.mojom-webui.js';
-import type {BrowserProxy as NewTabFooterBrowserProxy, ManagementNotice} from './new_tab_footer.mojom-webui.js';
+import type {BrowserProxy as NewTabFooterBrowserProxy} from './new_tab_footer.mojom-webui.js';
 import {browserProxyFactory as newTabFooterProxyFactory, NewTabPageType} from './new_tab_footer.mojom-webui.js';
 import {WindowProxy} from './window_proxy.js';
 
@@ -93,7 +93,6 @@ export class NewTabFooterAppElement extends NewTabFooterAppElementBase {
     return {
       extensionName_: {type: String},
       isCustomizeActive_: {type: Boolean},
-      managementNotice_: {type: Object},
       showCustomizeButtons_: {type: Boolean},
       showCustomizeText_: {type: Boolean},
       showExtension_: {type: Boolean},
@@ -106,7 +105,6 @@ export class NewTabFooterAppElement extends NewTabFooterAppElementBase {
 
   protected accessor extensionName_: string|null = null;
   protected accessor isCustomizeActive_: boolean = false;
-  protected accessor managementNotice_: ManagementNotice|null = null;
   protected accessor showCustomizeButtons_: boolean = false;
   protected accessor showCustomizeText_: boolean = true;
   protected accessor showExtension_: boolean = false;
@@ -122,7 +120,6 @@ export class NewTabFooterAppElement extends NewTabFooterAppElementBase {
   private setCustomizeChromeSidePanelVisibilityListener_: number|null = null;
   private setNtpExtensionNameListenerId_: number|null = null;
   private setBackgroundAttributionListener_: number|null = null;
-  private setManagementNoticeListener_: number|null = null;
   private setAttachedTabStateUpdatedListener_: number|null = null;
 
   constructor() {
@@ -145,12 +142,6 @@ export class NewTabFooterAppElement extends NewTabFooterAppElementBase {
               this.extensionName_ = name;
             });
     this.browserProxy_.handler.updateNtpExtensionName();
-    this.setManagementNoticeListener_ =
-        this.browserProxy_.callbackRouter.setManagementNotice.addListener(
-            notice => {
-              this.managementNotice_ = notice;
-            });
-    this.browserProxy_.handler.updateManagementNotice();
     this.setCustomizeChromeSidePanelVisibilityListener_ =
         this.customizeButtonsBrowserProxy_.callbackRouter
             .setCustomizeChromeSidePanelVisibility.addListener(visible => {
@@ -187,9 +178,6 @@ export class NewTabFooterAppElement extends NewTabFooterAppElementBase {
     assert(this.setNtpExtensionNameListenerId_);
     this.browserProxy_.callbackRouter.removeListener(
         this.setNtpExtensionNameListenerId_);
-    assert(this.setManagementNoticeListener_);
-    this.browserProxy_.callbackRouter.removeListener(
-        this.setManagementNoticeListener_);
     assert(this.setAttachedTabStateUpdatedListener_);
     this.browserProxy_.callbackRouter.removeListener(
         this.setAttachedTabStateUpdatedListener_);
@@ -272,12 +260,6 @@ export class NewTabFooterAppElement extends NewTabFooterAppElementBase {
     e.preventDefault();
     recordClick(FooterElement.EXTENSION_NAME);
     this.browserProxy_.handler.openExtensionOptionsPageWithFallback();
-  }
-
-  protected onManagementNoticeClick_(e: Event) {
-    e.preventDefault();
-    recordClick(FooterElement.MANAGEMENT_NOTICE);
-    this.browserProxy_.handler.openManagementPage();
   }
 
   protected onBackgroundAttributionClick_(e: Event) {
