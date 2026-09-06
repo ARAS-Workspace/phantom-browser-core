@@ -11,7 +11,6 @@
 #include "base/rand_util.h"
 #include "chrome/browser/about_flags.h"
 #include "chrome/browser/browser_process.h"
-#include "chrome/browser/flag_descriptions.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_prefs.h"
 #include "chrome/browser/ui/ui_features.h"

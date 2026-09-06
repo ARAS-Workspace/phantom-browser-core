@@ -11,7 +11,6 @@
 #include "base/memory/raw_ref.h"
 #include "build/build_config.h"
 #include "chrome/browser/feedback/show_feedback_page.h"
-#include "chrome/browser/flag_descriptions.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_model.h"
 #include "chrome/browser/ui/views/chrome_layout_provider.h"

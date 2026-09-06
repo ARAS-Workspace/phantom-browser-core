@@ -158,10 +158,7 @@ source_set("global_features") {
 }
 
 source_set("flags") {
-  sources = [
-    "about_flags.h",
-    "flag_descriptions.h",
-  ]
+  sources = [ "about_flags.h" ]
   public_deps = [
     "//base",
     "//base:debugging_buildflags",

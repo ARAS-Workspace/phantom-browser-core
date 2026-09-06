@@ -11,7 +11,6 @@
 #include "build/build_config.h"
 #include "build/buildflag.h"
 #include "chrome/browser/about_flags.h"
-#include "chrome/browser/flag_descriptions.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_model.h"
