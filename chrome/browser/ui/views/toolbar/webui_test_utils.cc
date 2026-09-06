@@ -72,12 +72,6 @@ namespace {
       return ::AvatarToolbarButtonState::kSyncError;
     case toolbar_ui_api::mojom::AvatarToolbarButtonState::kPasskeysLockedError:
       return ::AvatarToolbarButtonState::kPasskeysLockedError;
-    case toolbar_ui_api::mojom::AvatarToolbarButtonState::kPromo:
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-      return ::AvatarToolbarButtonState::kPromo;
-#else
-      NOTREACHED();
-#endif
     case toolbar_ui_api::mojom::AvatarToolbarButtonState::kManagement:
       return ::AvatarToolbarButtonState::kManagement;
     case toolbar_ui_api::mojom::AvatarToolbarButtonState::kNormal:

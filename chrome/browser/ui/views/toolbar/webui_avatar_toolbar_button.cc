@@ -16,7 +16,6 @@
 #include "chrome/browser/ui/views/profiles/profile_menu_coordinator.h"
 #include "chrome/browser/ui/views/toolbar/webui_toolbar_web_view.h"
 #include "components/browser_apis/ui_controllers/toolbar/toolbar_ui_api_data_model.mojom.h"
-#include "components/signin/public/base/signin_buildflags.h"
 #include "components/user_education/common/user_education_class_properties.h"
 #include "ui/base/models/image_model.h"
 #include "ui/base/models/image_model_utils.h"
@@ -58,10 +57,6 @@ toolbar_ui_api::mojom::AvatarToolbarButtonState MapAvatarState(
     case ::AvatarToolbarButtonState::kPasskeysLockedError:
       return toolbar_ui_api::mojom::AvatarToolbarButtonState::
           kPasskeysLockedError;
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-    case ::AvatarToolbarButtonState::kPromo:
-      return toolbar_ui_api::mojom::AvatarToolbarButtonState::kPromo;
-#endif
     case ::AvatarToolbarButtonState::kManagement:
       return toolbar_ui_api::mojom::AvatarToolbarButtonState::kManagement;
     case ::AvatarToolbarButtonState::kNormal:
@@ -240,20 +235,6 @@ void WebUIAvatarToolbarButton::ClearActiveStateForTesting() {
   CHECK(state_provider);
   state_provider->ClearForTesting();  // IN-TEST
 }
-
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-void WebUIAvatarToolbarButton::ForceShowingPromoForTesting() {
-  CHECK(state_manager_);
-  state_manager_->ForceShowingPromoForTesting();  // IN-TEST
-}
-
-bool WebUIAvatarToolbarButton::
-    GetStateAndFireSignedOutTriggerDelayTimerForTesting() {
-  CHECK(state_manager_);
-  return state_manager_
-      ->GetStateAndFireSignedOutTriggerDelayTimerForTesting();  // IN-TEST
-}
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 void WebUIAvatarToolbarButton::NotifyIPHPromoChanged(bool has_promo) {
   if (is_showing_iph_promo_ == has_promo) {

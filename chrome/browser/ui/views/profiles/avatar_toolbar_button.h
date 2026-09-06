@@ -13,7 +13,6 @@
 #include "chrome/browser/ui/views/profiles/avatar_toolbar_button_types.h"
 #include "chrome/browser/ui/views/toolbar/avatar_toolbar_button_interface.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_button.h"
-#include "components/signin/public/base/signin_buildflags.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "ui/base/metadata/metadata_header_macros.h"
 #include "ui/events/event.h"
@@ -71,10 +70,6 @@ class AvatarToolbarButton : public ToolbarButton,
   void MaybeShowSignInBenefitsIPH() override;
 #endif
   void ClearActiveStateForTesting() override;
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  void ForceShowingPromoForTesting() override;
-  bool GetStateAndFireSignedOutTriggerDelayTimerForTesting() override;
-#endif
 
   // ToolbarButton:
   void OnMouseExited(const ui::MouseEvent& event) override;

@@ -7,7 +7,6 @@
 #include "base/check_deref.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/browser/signin/signin_promo_util.h"
 #include "chrome/browser/signin/signin_ui_util.h"
 #include "chrome/browser/signin/signin_util.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
@@ -38,40 +37,13 @@ ProfileMenuCoordinator::~ProfileMenuCoordinator() {
   }
 }
 
-void ProfileMenuCoordinator::Show(bool is_source_accelerator,
-                                  bool from_avatar_promo) {
+void ProfileMenuCoordinator::Show(bool is_source_accelerator) {
   // TODO(crbug.com/425953501): Update this code.
   auto avatar_toolbar_button = GetAvatarToolbarButton();
 
   // Do not show avatar bubble if there is no avatar menu button or if the
   // bubble is already showing.
   if (avatar_toolbar_button.IsNull() || IsShowing()) {
-    return;
-  }
-
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  signin::ComputeProfileMenuAvatarButtonPromoInfo(
-      *GetProfile(),
-      base::BindOnce(&ProfileMenuCoordinator::ShowWithPromoResults,
-                     weak_pointer_factory_.GetWeakPtr(), is_source_accelerator,
-                     from_avatar_promo));
-#else
-  ShowWithPromoResults(is_source_accelerator, from_avatar_promo);
-#endif
-}
-
-void ProfileMenuCoordinator::ShowWithPromoResults(
-    bool is_source_accelerator,
-    bool from_avatar_promo
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-    ,
-    signin::ProfileMenuAvatarButtonPromoInfo promo_info
-#endif
-) {
-  // Results are asynchronous, which can cause the menu to be already shown
-  // before receiving them. If this happens, ignore the second request as the
-  // menu is already shown.
-  if (IsShowing()) {
     return;
   }
 
@@ -88,7 +60,6 @@ void ProfileMenuCoordinator::ShowWithPromoResults(
           FeaturePromoFeatureUsedAction::kClosePromoIfPresent);
 #endif
 
-  auto avatar_toolbar_button = GetAvatarToolbarButton();
   std::unique_ptr<ProfileMenuViewBase> bubble;
   const bool is_incognito = GetProfile()->IsIncognitoProfile();
   if (is_incognito) {
@@ -99,8 +70,8 @@ void ProfileMenuCoordinator::ShowWithPromoResults(
     // Note: on Ash, only incognito windows have a profile menu.
     NOTREACHED() << "The profile menu is not implemented on Ash.";
 #else
-    bubble = std::make_unique<ProfileMenuView>(
-        avatar_toolbar_button, &browser_.get(), promo_info, from_avatar_promo);
+    bubble = std::make_unique<ProfileMenuView>(avatar_toolbar_button,
+                                               &browser_.get());
 #endif  // BUILDFLAG(IS_CHROMEOS)
   }
   bubble->SetProperty(views::kElementIdentifierKey,

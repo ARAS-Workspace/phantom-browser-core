@@ -100,17 +100,6 @@ class AvatarToolbarButtonInterface {
   // Clears the active state (makes it inactive).
   virtual void ClearActiveStateForTesting() = 0;
 
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  // WARNING: Do not use this method to test the Promo flows. Only used when
-  // necessary to bypass resetting the profile - e.g. when attempting to reach
-  // the limit counts.
-  virtual void ForceShowingPromoForTesting() = 0;
-
-  // Returns whether the delay timer was running or not.
-  // Stops the timer if it is running.
-  virtual bool GetStateAndFireSignedOutTriggerDelayTimerForTesting() = 0;
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
-
   // Can be used in tests to reduce or remove the delay before showing the IPH.
   [[nodiscard]] static base::AutoReset<base::TimeDelta>
   SetScopedIPHMinDelayAfterCreationForTesting(base::TimeDelta delay);

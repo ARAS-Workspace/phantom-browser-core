@@ -153,11 +153,6 @@ constexpr std::string_view kBookmarkBatchUploadPromoLastDismissTime =
 constexpr std::string_view kPolicyDisclaimerLastRegistrationFailureTime =
     "PolicyDisclaimerLastRegistrationFailureTime";
 
-// Dictionary pref that contains all the values related to the avatar button
-// promo counts.
-constexpr std::string_view kAvatarButtonPromoCountDictionary =
-    "AvatarButtonPromoCountDictionary";
-
 // DEPRECATED(10/25): Check `SigninPrefs::SigninPrefs()`.
 // Testing deprecating pref:
 constexpr std::string_view kDeprecatingTestingPref = "DeprecatingTestingPref";
@@ -598,15 +593,6 @@ SigninPrefs::GetBookmarkBatchUploadPromoDismissCountWithLastTime(
     const GaiaId& gaia_id) {
   return {GetIntPrefForAccount(gaia_id, kBookmarkBatchUploadPromoDismissCount),
           GetTimePref(gaia_id, kBookmarkBatchUploadPromoLastDismissTime)};
-}
-
-base::DictValue& SigninPrefs::GetOrCreateAvatarButtonPromoCountDictionary(
-    const GaiaId& gaia_id) {
-  CHECK(!gaia_id.empty());
-  ScopedDictPrefUpdate scoped_update(&pref_service_.get(), kSigninAccountPrefs);
-  // `EnsureDict` gets or create the dictionary.
-  return *scoped_update->EnsureDict(gaia_id.ToString())
-              ->EnsureDict(kAvatarButtonPromoCountDictionary);
 }
 
 base::DictValue& SigninPrefs::GetOrCreateCrossDevicePromoPrefs(

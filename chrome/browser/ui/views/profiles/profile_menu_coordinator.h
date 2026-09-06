@@ -8,8 +8,6 @@
 #include <optional>
 
 #include "base/memory/raw_ref.h"
-#include "base/memory/weak_ptr.h"
-#include "chrome/browser/signin/signin_promo_util.h"
 #include "ui/views/bubble/bubble_anchor.h"
 #include "ui/views/view_tracker.h"
 
@@ -31,10 +29,7 @@ class ProfileMenuCoordinator {
   ~ProfileMenuCoordinator();
 
   // Shows the the profile bubble for this browser.
-  //
-  // If `from_avatar_promo` is set, then trigger of the menu originated from a
-  // promo that was shown on the AvatarButton.
-  void Show(bool is_source_accelerator, bool from_avatar_promo = false);
+  void Show(bool is_source_accelerator);
 
   // Returns true if the bubble is currently showing for the owning browser.
   bool IsShowing() const;
@@ -47,22 +42,12 @@ class ProfileMenuCoordinator {
 
   views::BubbleAnchor GetAvatarToolbarButton();
 
-  void ShowWithPromoResults(bool is_source_accelerator,
-                            bool from_avatar_promo
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-                            ,
-                            signin::ProfileMenuAvatarButtonPromoInfo promo_info
-#endif
-  );
-
   // TODO(crbug.com/425953501): Replace with `ToolbarButtonProvider` once this
   // bug is fixed.
   const raw_ref<BrowserWindowInterface> browser_;
 
   const raw_ref<Profile> profile_;
   views::ViewTracker bubble_tracker_;
-
-  base::WeakPtrFactory<ProfileMenuCoordinator> weak_pointer_factory_{this};
 };
 
 #endif  // CHROME_BROWSER_UI_VIEWS_PROFILES_PROFILE_MENU_COORDINATOR_H_

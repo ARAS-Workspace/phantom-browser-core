@@ -12,11 +12,11 @@
 #include <vector>
 
 #include "base/functional/callback_forward.h"
+#include "base/memory/raw_ref.h"
 #include "build/build_config.h"
 #include "chrome/browser/password_manager/web_app_profile_switcher.h"
 #include "chrome/browser/profiles/avatar_menu.h"
 #include "chrome/browser/profiles/avatar_menu_observer.h"
-#include "chrome/browser/signin/signin_promo_util.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/views/profiles/profile_menu_view_base.h"
 #include "components/signin/core/browser/signin_header_helper.h"
@@ -47,9 +47,7 @@ class ProfileMenuView : public ProfileMenuViewBase {
  public:
   // `browser` must not be nullptr.
   ProfileMenuView(views::BubbleAnchor anchor_element,
-                  BrowserWindowInterface* browser,
-                  signin::ProfileMenuAvatarButtonPromoInfo promo_info,
-                  bool from_avatar_promo);
+                  BrowserWindowInterface* browser);
   ~ProfileMenuView() override;
 
   ProfileMenuView(const ProfileMenuView&) = delete;
@@ -134,9 +132,6 @@ class ProfileMenuView : public ProfileMenuViewBase {
   void BuildProfileManagementFeatureButtons();
 
   const raw_ref<BrowserWindowInterface> browser_;
-  signin::ProfileMenuAvatarButtonPromoInfo promo_info_;
-  // If the profile menu opening originated from a Promo on the AvatarButton.
-  bool from_avatar_promo_;
 
   std::u16string menu_title_;
   std::u16string menu_subtitle_;

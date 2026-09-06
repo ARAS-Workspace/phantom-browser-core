@@ -37,7 +37,6 @@
 #include "chrome/browser/signin/chrome_signin_client_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/signin/signin_hats_util.h"
-#include "chrome/browser/signin/signin_promo_util.h"
 #include "chrome/browser/signin/signin_ui_util.h"
 #include "chrome/browser/signin/signin_util.h"
 #include "chrome/browser/subscription_eligibility/subscription_eligibility_service_factory.h"
@@ -156,15 +155,10 @@ std::u16string GetProfileIdentifier(const ProfileAttributesEntry& entry) {
 // static
 bool ProfileMenuView::close_on_deactivate_for_testing_ = true;
 
-ProfileMenuView::ProfileMenuView(
-    views::BubbleAnchor anchor_element,
-    BrowserWindowInterface* browser,
-    signin::ProfileMenuAvatarButtonPromoInfo promo_info,
-    bool from_avatar_promo)
+ProfileMenuView::ProfileMenuView(views::BubbleAnchor anchor_element,
+                                 BrowserWindowInterface* browser)
     : ProfileMenuViewBase(anchor_element, browser),
-      browser_(raw_ref<BrowserWindowInterface>::from_ptr(browser)),
-      promo_info_(promo_info),
-      from_avatar_promo_(from_avatar_promo) {
+      browser_(raw_ref<BrowserWindowInterface>::from_ptr(browser)) {
   set_close_on_deactivate(close_on_deactivate_for_testing_);
 
   // Set the callback to launch a HaTS survey upon menu dismissal.
@@ -687,8 +681,7 @@ ProfileMenuView::GetIdentitySectionParams(const ProfileAttributesEntry& entry) {
 
   ActionableItem button_type = ActionableItem::kSigninAccountButton;
   signin_metrics::AccessPoint access_point =
-      from_avatar_promo_ ? signin::kHistoryOptinAvatarPromoAccessPoint
-                         : signin_metrics::AccessPoint::kAvatarBubbleSignIn;
+      signin_metrics::AccessPoint::kAvatarBubbleSignIn;
   switch (signin_util::GetSignedInState(identity_manager)) {
     case signin_util::SignedInState::kSignedOut:
     case signin_util::SignedInState::kWebOnlySignedIn: {
@@ -706,13 +699,6 @@ ProfileMenuView::GetIdentitySectionParams(const ProfileAttributesEntry& entry) {
 
       access_point =
           signin_metrics::AccessPoint::kAvatarBubbleSignInWithSyncPromo;
-      if (from_avatar_promo_) {
-        CHECK(promo_info_.type.has_value());
-        CHECK_EQ(promo_info_.type.value(),
-                 signin::ProfileMenuAvatarButtonPromoInfo::Type::kSigninPromo);
-        access_point = access_point =
-            signin_metrics::AccessPoint::kAvatarPillExpandPromo;
-      }
       signin_metrics::LogSignInOffered(
           access_point,
           account_info_for_promos.IsEmpty()
@@ -786,48 +772,15 @@ ProfileMenuView::GetIdentitySectionParams(const ProfileAttributesEntry& entry) {
       break;
     }
     case signin_util::SignedInState::kSignedIn:
-      if (promo_info_.type.has_value()) {
-        switch (promo_info_.type.value()) {
-          case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-              kHistorySyncPromo:
-            params.subtitle = l10n_util::GetStringFUTF16(
-                IDS_PROFILE_MENU_SYNC_PROMO_SYNC_HISTORY_DESCRIPTION,
-                base::UTF8ToUTF16(primary_account_info.email));
-            params.button_text = l10n_util::GetStringUTF16(
-                IDS_PROFILE_MENU_SYNC_PROMO_BUTTON_LABEL);
-            button_type = ActionableItem::kHistorySyncButton;
-            signin_metrics::LogHistorySyncOptInOffered(access_point);
-            break;
-          case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-              kBatchUploadPromo:
-            NOTREACHED();
-          case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-              kBatchUploadBookmarksPromo:
-            NOTREACHED();
-          case signin::ProfileMenuAvatarButtonPromoInfo::Type::
-              kBatchUploadWindows10DepreciationPromo:
-            NOTREACHED();
-          case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSyncPromo:
-            CHECK(switches::IsAvatarSyncPromoFeatureEnabled());
-            params.subtitle = l10n_util::GetStringUTF16(
-                IDS_PROFILE_MENU_DESCRIPTION_WITH_SYNC_PROMO);
-            params.button_text = l10n_util::GetStringUTF16(
-                IDS_PROFILE_MENU_BUTTON_LABEL_WITH_SYNC_PROMO);
-            break;
-          case signin::ProfileMenuAvatarButtonPromoInfo::Type::kSigninPromo:
-            NOTREACHED() << "This promo type is not possible when signed in.";
-        }
+      if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
+        // No button.
+        params.email_subtitle = base::UTF8ToUTF16(primary_account_info.email);
       } else {
-        if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
-          // No button.
-          params.email_subtitle = base::UTF8ToUTF16(primary_account_info.email);
-        } else {
-          params.subtitle =
-              l10n_util::GetStringUTF16(IDS_PROFILES_DICE_SYNC_PROMO);
-          params.button_text =
-              l10n_util::GetStringUTF16(IDS_PROFILES_DICE_SIGNIN_BUTTON);
-          signin_metrics::LogSyncOptInOffered(access_point);
-        }
+        params.subtitle =
+            l10n_util::GetStringUTF16(IDS_PROFILES_DICE_SYNC_PROMO);
+        params.button_text =
+            l10n_util::GetStringUTF16(IDS_PROFILES_DICE_SIGNIN_BUTTON);
+        signin_metrics::LogSyncOptInOffered(access_point);
       }
       break;
     case signin_util::SignedInState::kSyncing:

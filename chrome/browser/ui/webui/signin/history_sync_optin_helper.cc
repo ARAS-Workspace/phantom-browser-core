@@ -13,6 +13,7 @@
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/user_metrics.h"
 #include "base/notreached.h"
+#include "base/scoped_observation.h"
 #include "base/sequence_checker_impl.h"
 #include "base/strings/strcat.h"
 #include "base/task/single_thread_task_runner.h"
@@ -24,7 +25,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/regional_capabilities/regional_capabilities_service_factory.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
-#include "chrome/browser/signin/signin_promo_util.h"
 #include "chrome/browser/signin/signin_util.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/ui/signin/signin_view_controller.h"
@@ -33,7 +33,6 @@
 #include "chrome/browser/ui/webui/signin/history_sync_optin_service_factory.h"
 #include "chrome/browser/ui/webui/signin/turn_sync_on_helper_policy_fetch_tracker.h"
 #include "components/regional_capabilities/regional_capabilities_service.h"
-#include "components/signin/public/base/consent_level.h"
 #include "components/signin/public/base/signin_metrics.h"
 #include "components/signin/public/base/signin_switches.h"
 #include "components/signin/public/identity_manager/account_info.h"
@@ -128,19 +127,6 @@ void RecordMetricsForHistorySyncUserChoice(
 
   base::RecordAction(base::UserMetricsAction(action_name.c_str()));
   base::UmaHistogramEnumeration(histogram_name, access_point);
-
-  // Record successfully enabling history sync when originating from the
-  // AvatarPill promo.
-  if (user_choice == HistorySyncOptinHelper::ScreenChoiceResult::kAccepted &&
-      access_point == signin_metrics::AccessPoint::
-                          kHistorySyncOptinExpansionPillOnStartup) {
-    signin::RecordAvatarButtonPromoAcceptedAtPromoShownCount(
-        signin::ProfileMenuAvatarButtonPromoInfo::Type::kHistorySyncPromo,
-        IdentityManagerFactory::GetForProfile(profile)
-            ->GetPrimaryAccountInfo(signin::ConsentLevel::kSignin)
-            .gaia,
-        *profile->GetPrefs());
-  }
 }
 
 void RecordMetricsForSkippedHistoryScreen(

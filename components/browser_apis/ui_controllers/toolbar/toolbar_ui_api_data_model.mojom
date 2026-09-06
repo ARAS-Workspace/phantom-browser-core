@@ -279,7 +279,6 @@ enum AvatarToolbarButtonState {
   kBookmarksLimitExceeded,
   kSyncError,
   kPasskeysLockedError,
-  kPromo,
   kManagement,
   kNormal,
 };

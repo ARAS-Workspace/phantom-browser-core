@@ -50,11 +50,6 @@ enum class AvatarToolbarButtonState {
   // (this includes Trusted Vault locked Sync error).
   kSyncError,
   kPasskeysLockedError,
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  // Any promo presented through expanding the button. This includes any promo
-  // listed in `signin::ProfileMenuAvatarButtonPromoInfo::Type`.
-  kPromo,
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
   // Includes Work and School.
   kManagement,
   kNormal
@@ -295,14 +290,6 @@ class AvatarToolbarButtonStateManager
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
   [[nodiscard]] static base::AutoReset<std::optional<base::TimeDelta>>
   CreateScopedZeroDelayOverrideSigninPendingTextForTesting();
-
-  // WARNING: Check `AvatarToolbarButton::ForceShowingPromoForTesting()` before
-  // using.
-  void ForceShowingPromoForTesting();
-
-  // Returns whether the delay timer was running or not.
-  // Stops the timer if it is running.
-  bool GetStateAndFireSignedOutTriggerDelayTimerForTesting();
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
  private:

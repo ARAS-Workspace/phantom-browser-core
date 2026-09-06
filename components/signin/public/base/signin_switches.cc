@@ -24,12 +24,6 @@ namespace switches {
 const char kClearTokenService[] = "clear-token-service";
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
-// Disables the sign-in promo on the avatar pill for tests by default, as it has
-// impact on the startup behavior. Tests that need to test this specific
-// behavior needs to explicitly enable it.
-const char kDisableSigninPromoOnAvatarPillForTesting[] =
-    "disable-signin-promo-on-avatar-pill-for-testing";
-
 // Force enable the default browser step in the first run experience on Desktop.
 const char kForceFreDefaultBrowserStep[] = "force-fre-default-browser-step";
 
@@ -840,20 +834,6 @@ const base::FeatureParam<int> kContextualSigninPromoDismissedThreshold(
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 BASE_FEATURE(kSignInPromoMaterialNextUI, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-BASE_FEATURE(kSigninPromoOnAvatarPill, base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE_PARAM(base::TimeDelta,
-                   kSigninPromoOnAvatarPillStartupDelayForPromoShow,
-                   &kSigninPromoOnAvatarPill,
-                   "startup_delay_for_promo_show",
-                   base::Seconds(0));
-BASE_FEATURE_PARAM(base::TimeDelta,
-                   kSigninPromoOnAvatarPillDelayForNextPromoAllowed,
-                   &kSigninPromoOnAvatarPill,
-                   "delay_for_next_promo_allowed",
-                   base::Days(7));
-#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 BASE_FEATURE(kSigninWindows10DepreciationStateForTesting,
              base::FEATURE_DISABLED_BY_DEFAULT);
