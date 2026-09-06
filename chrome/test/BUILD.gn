@@ -9287,11 +9287,14 @@ if (!is_android && !is_chromeos_device) {
         "//chrome/browser/apps/app_shim",
         "//chrome/browser/apps/platform_apps:browser_test_support",
         "//chrome/browser/lifetime:termination_notification",
-        "//chrome/browser/spellchecker:interactive_ui_tests",
         "//chrome/browser/web_applications/extensions",
         "//components/remote_cocoa/app_shim",
         "//components/spellcheck:buildflags",
       ]
+
+      if (enable_spellcheck) {
+        deps += [ "//chrome/browser/spellchecker:interactive_ui_tests" ]
+      }
     }
 
     if (enable_downgrade_processing) {
