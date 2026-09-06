@@ -29,5 +29,7 @@
 }
 
 #productLogo {
+  height: 32px;
   margin-inline-end: var(--about-page-image-space);
+  width: 32px;
 }

@@ -16,9 +16,7 @@ export function getHtml(this: CrDrawerElement) {
         <picture>
           <source media="(prefers-color-scheme: dark)"
               srcset="//resources/images/chrome_logo_dark.svg">
-          <img id="product-logo"
-              srcset="chrome://theme/current-channel-logo@1x 1x,
-                      chrome://theme/current-channel-logo@2x 2x"
+          <img id="product-logo" src="//resources/images/chrome_logo.svg"
               role="presentation">
         </picture>
       </slot>
