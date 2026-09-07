@@ -292,21 +292,6 @@ std::unique_ptr<views::View> DeviceChooserContentView::CreateExtraView() {
   container->SetLayoutManager(std::move(layout))
       ->set_cross_axis_alignment(views::BoxLayout::CrossAxisAlignment::kCenter);
 
-  if (chooser_controller_->ShouldShowHelpButton()) {
-    std::unique_ptr<views::ImageButton> help_button;
-    help_button = views::ImageButton::CreateIconButton(
-        base::BindRepeating(&permissions::ChooserController::OpenHelpCenterUrl,
-                            base::Unretained(chooser_controller_.get())),
-        features::IsRoundedIconsEnabled() ? vector_icons::kHelpIcon
-                                          : vector_icons::kHelpOutlineOldIcon,
-        l10n_util::GetStringUTF16(IDS_LEARN_MORE),
-        views::ImageButton::MaterialIconStyle::kLarge,
-        views::LayoutProvider::Get()->GetInsetsMetric(
-            views::INSETS_VECTOR_IMAGE_BUTTON));
-    help_button->SetTooltipText(l10n_util::GetStringUTF16(IDS_LEARN_MORE));
-    container->AddChildView(std::move(help_button));
-  }
-
   auto* throbber_container =
       container->AddChildView(std::make_unique<views::View>());
   auto* throbber_layout =

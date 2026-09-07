@@ -13,7 +13,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/scoped_tabbed_browser_displayer.h"
 #include "chrome/common/url_constants.h"
-#include "components/permissions/constants.h"
 #include "components/strings/grit/components_strings.h"
 #include "content/public/browser/page_navigator.h"
 #include "content/public/browser/render_frame_host.h"
@@ -82,12 +81,4 @@ void ChromeBluetoothChooserController::OpenPermissionPreferences() const {
 #endif
 }
 
-void ChromeBluetoothChooserController::OpenHelpCenterUrl() const {
-  GetBrowser()->OpenURL(
-      content::OpenURLParams(GURL(permissions::kChooserBluetoothOverviewURL),
-                             content::Referrer(),
-                             WindowOpenDisposition::NEW_FOREGROUND_TAB,
-                             ui::PAGE_TRANSITION_AUTO_TOPLEVEL,
-                             false /* is_renderer_initialized */),
-      /*navigation_handle_callback=*/{});
-}
+void ChromeBluetoothChooserController::OpenHelpCenterUrl() const {}

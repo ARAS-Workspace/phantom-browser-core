@@ -14,7 +14,6 @@
 #include "base/strings/utf_string_conversions.h"
 #include "build/build_config.h"
 #include "chrome/browser/chooser_controller/title_util.h"
-#include "chrome/browser/net/referrer.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/usb/usb_blocklist.h"
 #include "chrome/browser/usb/usb_chooser_context_factory.h"
@@ -31,7 +30,6 @@
 #include "services/network/public/mojom/permissions_policy/permissions_policy_feature.mojom-shared.h"
 #include "third_party/blink/public/common/features_generated.h"
 #include "ui/base/l10n/l10n_util.h"
-#include "url/gurl.h"
 
 using content::RenderFrameHost;
 using content::WebContents;
@@ -196,23 +194,7 @@ void UsbChooserController::Cancel() {
 
 void UsbChooserController::Close() {}
 
-void UsbChooserController::OpenHelpCenterUrl() const {
-  content::RenderFrameHost* render_frame_host =
-      content::RenderFrameHost::FromID(render_frame_host_id_);
-  if (!render_frame_host) {
-    // When |render_frame_host| is not valid anymore we don't want to open help
-    // center url.
-    return;
-  }
-
-  WebContents::FromRenderFrameHost(render_frame_host)
-      ->OpenURL(content::OpenURLParams(
-                    GURL(chrome::kChooserUsbOverviewURL), content::Referrer(),
-                    WindowOpenDisposition::NEW_FOREGROUND_TAB,
-                    ui::PAGE_TRANSITION_AUTO_TOPLEVEL,
-                    false /* is_renderer_initialized */),
-                /*navigation_handle_callback=*/{});
-}
+void UsbChooserController::OpenHelpCenterUrl() const {}
 
 void UsbChooserController::OnDeviceAdded(
     const device::mojom::UsbDeviceInfo& device_info) {

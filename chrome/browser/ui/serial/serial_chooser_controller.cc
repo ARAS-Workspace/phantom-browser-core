@@ -297,22 +297,7 @@ void SerialChooserController::OpenBluetoothPermissionHelpUrl() const {
   OpenBluetoothHelpUrl();
 }
 
-void SerialChooserController::OpenHelpCenterUrl() const {
-  auto* rfh = initiator_document_.AsRenderFrameHostIfValid();
-  auto* web_contents = rfh && rfh->IsActive()
-                           ? content::WebContents::FromRenderFrameHost(rfh)
-                           : nullptr;
-  if (!web_contents) {
-    return;
-  }
-
-  web_contents->OpenURL(
-      content::OpenURLParams(
-          GURL(chrome::kChooserSerialOverviewUrl), content::Referrer(),
-          WindowOpenDisposition::NEW_FOREGROUND_TAB,
-          ui::PAGE_TRANSITION_AUTO_TOPLEVEL, /*is_renderer_initiated=*/false),
-      /*navigation_handle_callback=*/{});
-}
+void SerialChooserController::OpenHelpCenterUrl() const {}
 
 void SerialChooserController::OpenPermissionPreferences() const {
 #if BUILDFLAG(IS_MAC)

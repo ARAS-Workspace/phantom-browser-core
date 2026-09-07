@@ -45,17 +45,15 @@ inline constexpr char kBluetoothAdapterOffHelpURL[] =
 inline constexpr char kCastNoDestinationFoundURL[] =
     "https://support.google.com/chromecast/?p=no_cast_destination";
 
+#if BUILDFLAG(IS_CHROMEOS)
 // The URL for the WebHID API help center article.
 inline constexpr char kChooserHidOverviewUrl[] =
     "https://support.google.com/chrome?p=webhid";
 
-// The URL for the Web Serial API help center article.
-inline constexpr char kChooserSerialOverviewUrl[] =
-    "https://support.google.com/chrome?p=webserial";
-
 // The URL for the WebUsb help center article.
 inline constexpr char kChooserUsbOverviewURL[] =
     "https://support.google.com/chrome?p=webusb";
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // General help links for Chrome, opened using various actions.
 #if BUILDFLAG(IS_CHROMEOS)

@@ -16,7 +16,6 @@
 #include "chrome/browser/hid/hid_chooser_context_factory.h"
 #include "chrome/browser/hid/web_hid_histograms.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/strings/grit/components_strings.h"
 #include "content/public/browser/web_contents.h"
@@ -214,22 +213,7 @@ void HidChooserController::Close() {
   RecordWebHidChooserClosure(WebHidChooserClosed::kLostFocus);
 }
 
-void HidChooserController::OpenHelpCenterUrl() const {
-  auto* rfh = initiator_document_.AsRenderFrameHostIfValid();
-  auto* web_contents = rfh && rfh->IsActive()
-                           ? content::WebContents::FromRenderFrameHost(rfh)
-                           : nullptr;
-  if (!web_contents) {
-    return;
-  }
-
-  web_contents->OpenURL(
-      content::OpenURLParams(
-          GURL(chrome::kChooserHidOverviewUrl), content::Referrer(),
-          WindowOpenDisposition::NEW_FOREGROUND_TAB,
-          ui::PAGE_TRANSITION_AUTO_TOPLEVEL, /*is_renderer_initiated=*/false),
-      /*navigation_handle_callback=*/{});
-}
+void HidChooserController::OpenHelpCenterUrl() const {}
 
 void HidChooserController::OnDeviceAdded(
     const device::mojom::HidDeviceInfo& device) {
