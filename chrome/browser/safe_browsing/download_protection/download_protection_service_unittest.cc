@@ -111,14 +111,12 @@
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/download_item_utils.h"
 #include "content/public/browser/global_routing_id.h"
-#include "content/public/browser/page_navigator.h"
 #include "content/public/test/browser_task_environment.h"
 #include "content/public/test/mock_download_manager.h"
 #include "content/public/test/navigation_simulator.h"
 #include "content/public/test/test_utils.h"
 #include "content/public/test/web_contents_tester.h"
 #include "net/base/net_errors.h"
-#include "net/base/url_util.h"
 #include "net/cert/x509_certificate.h"
 #include "net/cert/x509_util.h"
 #include "net/http/http_status_code.h"
@@ -3065,42 +3063,6 @@ TEST_F(DownloadProtectionServiceTest,
 
   EXPECT_TRUE(has_result_);
   EXPECT_FALSE(HasClientDownloadRequest());
-}
-
-namespace {
-
-class MockPageNavigator : public content::PageNavigator {
- public:
-  MOCK_METHOD2(OpenURL,
-               content::WebContents*(
-                   const content::OpenURLParams&,
-                   base::OnceCallback<void(content::NavigationHandle&)>));
-};
-
-// A custom matcher that matches a OpenURLParams value with a url with a query
-// parameter patching |value|.
-MATCHER_P(OpenURLParamsWithContextValue, value, "") {
-  std::string query_value;
-  return net::GetValueForKeyInQuery(arg.url, "ctx", &query_value) &&
-         query_value == value;
-}
-
-}  // namespace
-
-// ShowDetailsForDownload() should open a URL showing more information about why
-// a download was flagged by SafeBrowsing. The URL should have a &ctx= parameter
-// whose value is the DownloadDangerType.
-TEST_F(DownloadProtectionServiceTest, ShowDetailsForDownloadHasContext) {
-  StrictMock<MockPageNavigator> mock_page_navigator;
-  StrictMock<download::MockDownloadItem> mock_download_item;
-
-  EXPECT_CALL(mock_download_item, GetDangerType())
-      .WillOnce(Return(download::DOWNLOAD_DANGER_TYPE_DANGEROUS_HOST));
-  EXPECT_CALL(mock_page_navigator,
-              OpenURL(OpenURLParamsWithContextValue("7"), _));
-
-  download_service_->ShowDetailsForDownload(&mock_download_item,
-                                            &mock_page_navigator);
 }
 
 TEST_F(DownloadProtectionServiceTest, GetAndSetDownloadProtectionData) {

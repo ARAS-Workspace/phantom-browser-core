@@ -25,7 +25,6 @@
 #include "chrome/browser/enterprise/connectors/reporting/reporting_event_router_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/safe_browsing/advanced_protection_status_manager.h"
-#include "chrome/browser/safe_browsing/advanced_protection_status_manager_factory.h"
 #include "chrome/browser/safe_browsing/download_protection/check_client_download_request.h"
 #include "chrome/browser/safe_browsing/download_protection/check_file_system_access_write_request.h"
 #include "chrome/browser/safe_browsing/download_protection/download_item_metadata.h"
@@ -38,14 +37,12 @@
 #include "chrome/browser/safe_browsing/v5_get_hash_protocol_manager_factory.h"
 #include "chrome/common/safe_browsing/binary_feature_extractor.h"
 #include "chrome/common/safe_browsing/download_type_util.h"
-#include "chrome/common/url_constants.h"
 #include "components/download/public/common/download_danger_type.h"
 #include "components/download/public/common/download_item.h"
 #include "components/enterprise/connectors/core/cloud_content_scanning/binary_upload_service.h"
 #include "components/enterprise/connectors/core/reporting_constants.h"
 #include "components/enterprise/connectors/core/reporting_event_router.h"
 #include "components/enterprise/connectors/core/reporting_utils.h"
-#include "components/google/core/common/google_util.h"
 #include "components/prefs/pref_service.h"
 #include "components/safe_browsing/content/browser/ui_manager.h"
 #include "components/safe_browsing/content/browser/web_ui/safe_browsing_ui.h"
@@ -60,7 +57,6 @@
 #include "content/public/browser/download_item_utils.h"
 #include "content/public/browser/global_routing_id.h"
 #include "content/public/browser/web_contents.h"
-#include "net/base/url_util.h"
 #include "net/cert/x509_util.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
@@ -375,35 +371,6 @@ void DownloadProtectionService::RequestFinished(
   DCHECK(context_download_requests_.contains(browser_context));
   DCHECK(context_download_requests_[browser_context].contains(request));
   context_download_requests_[browser_context].erase(request);
-}
-
-void DownloadProtectionService::ShowDetailsForDownload(
-    const download::DownloadItem* item,
-    content::PageNavigator* navigator) {
-  GURL learn_more_url(chrome::kDownloadScanningLearnMoreURL);
-  learn_more_url = google_util::AppendGoogleLocaleParam(
-      learn_more_url, g_browser_process->GetApplicationLocale());
-  learn_more_url = net::AppendQueryParameter(
-      learn_more_url, "ctx",
-      base::NumberToString(static_cast<int>(item->GetDangerType())));
-
-  Profile* profile = Profile::FromBrowserContext(
-      content::DownloadItemUtils::GetBrowserContext(item));
-  if (profile &&
-      AdvancedProtectionStatusManagerFactory::GetForProfile(profile)
-          ->IsUnderAdvancedProtection() &&
-      item->GetDangerType() ==
-          download::DOWNLOAD_DANGER_TYPE_UNCOMMON_CONTENT) {
-    learn_more_url = GURL(chrome::kAdvancedProtectionDownloadLearnMoreURL);
-    learn_more_url = google_util::AppendGoogleLocaleParam(
-        learn_more_url, g_browser_process->GetApplicationLocale());
-  }
-
-  navigator->OpenURL(
-      content::OpenURLParams(learn_more_url, content::Referrer(),
-                             WindowOpenDisposition::NEW_FOREGROUND_TAB,
-                             ui::PAGE_TRANSITION_LINK, false),
-      /*navigation_handle_callback=*/{});
 }
 
 double DownloadProtectionService::allowlist_sample_rate() const {

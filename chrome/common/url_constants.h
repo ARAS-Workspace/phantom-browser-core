@@ -37,10 +37,6 @@ inline constexpr char kAccessCodeCastLearnMoreURL[] =
 inline constexpr char kAccessibilityLabelsLearnMoreURL[] =
     "https://support.google.com/chrome?p=image_descriptions";
 
-// "Learn more" URL for Advanced Protection download warnings.
-inline constexpr char kAdvancedProtectionDownloadLearnMoreURL[] =
-    "https://support.google.com/accounts/accounts?p=safe-browsing";
-
 // "Chrome Settings" URL for the appearance page.
 inline constexpr char kBrowserSettingsSearchEngineURL[] =
     "chrome://settings/search";
@@ -154,10 +150,6 @@ inline constexpr char kCrashReasonFeedbackDisplayedURL[] =
 // The URL for the "Learn more" page for interrupted downloads.
 inline constexpr char kDownloadInterruptedLearnMoreURL[] =
     "https://support.google.com/chrome?p=ui_download_errors";
-
-// The URL for the "Learn more" page for download scanning.
-inline constexpr char kDownloadScanningLearnMoreURL[] =
-    "https://support.google.com/chrome?p=ib_download_blocked";
 
 // The URL for the "Learn more" page for blocked downloads.
 // Note: This is the same as the above URL. This is done to decouple the URLs,

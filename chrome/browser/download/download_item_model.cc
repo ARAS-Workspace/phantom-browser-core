@@ -831,23 +831,9 @@ void DownloadItemModel::ExecuteCommand(DownloadCommands* download_commands,
 #endif
       DownloadUIModel::ExecuteCommand(download_commands, command);
       break;
-    case DownloadCommands::LEARN_MORE_SCANNING: {
-#if BUILDFLAG(SAFE_BROWSING_DOWNLOAD_PROTECTION)
-      using safe_browsing::DownloadProtectionService;
-
-      safe_browsing::SafeBrowsingService* sb_service =
-          g_browser_process->safe_browsing_service();
-      DownloadProtectionService* protection_service =
-          (sb_service ? sb_service->download_protection_service() : nullptr);
-      if (protection_service)
-        protection_service->ShowDetailsForDownload(
-            download_, download_commands->GetBrowser());
-      break;
-#else
+    case DownloadCommands::LEARN_MORE_SCANNING:
       // Should only be getting invoked if we are using safe browsing.
       NOTREACHED();
-#endif
-    }
     case DownloadCommands::PLATFORM_OPEN:
     case DownloadCommands::CANCEL:
     case DownloadCommands::LEARN_MORE_INTERRUPTED:

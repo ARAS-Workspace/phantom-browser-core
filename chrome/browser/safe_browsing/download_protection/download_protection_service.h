@@ -154,12 +154,6 @@ class DownloadProtectionService {
       std::unique_ptr<content::FileSystemAccessWriteItem> item,
       CheckDownloadCallback callback);
 
-  // Display more information to the user regarding the download specified by
-  // |info|. This method is invoked when the user requests more information
-  // about a download that was marked as malicious.
-  void ShowDetailsForDownload(const download::DownloadItem* item,
-                              content::PageNavigator* navigator);
-
   // Enables or disables the service.  This is usually called by the
   // SafeBrowsingServiceImpl, which tracks whether any profile uses these
   // services at all.  Disabling causes any pending and future requests to have
