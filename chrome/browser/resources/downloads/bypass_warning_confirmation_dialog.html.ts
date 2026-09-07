@@ -22,14 +22,6 @@ export function getHtml(this: DownloadsBypassWarningConfirmationDialogElement) {
     <div id="body-text">
       <div id="file-name">${this.fileName}</div>
       <div id="danger-description">$i18n{warningBypassPromptDescription}</div>
-      <div id="learn-more-link">
-        <!-- noopener cuts off the script connection between chrome://downloads,
-          which has sensitive capabilities, and the newly opened web renderer,
-          which may be more readily compromised. -->
-        <a href="$i18n{blockedLearnMoreUrl}" target="_blank" rel="noopener">
-          $i18n{warningBypassPromptLearnMoreLink}
-        </a>
-      </div>
     </div>
   </div>
   <div slot="button-container">

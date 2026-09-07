@@ -120,12 +120,6 @@ inline constexpr char kChromeSearchScheme[] = "chrome-search";
 inline constexpr char kChromeUIUntrustedNewTabPageUrl[] =
     "chrome-untrusted://new-tab-page/";
 
-// The URL for the "Learn more" page for blocked downloads.
-// Note: This is the same as the above URL. This is done to decouple the URLs,
-// in case the support page is split apart into separate pages in the future.
-inline constexpr char kDownloadBlockedLearnMoreURL[] =
-    "https://support.google.com/chrome?p=ib_download_blocked";
-
 // URL of the Google Account.
 inline constexpr char kGoogleAccountURL[] = "https://myaccount.google.com";
 

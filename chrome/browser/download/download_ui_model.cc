@@ -25,12 +25,10 @@
 #include "chrome/browser/safe_browsing/advanced_protection_status_manager_factory.h"
 #include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/download/public/common/download_danger_type.h"
 #include "components/enterprise/common/proto/connectors.pb.h"
-#include "components/google/core/common/google_util.h"
 #include "components/safe_browsing/buildflags.h"
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/safe_browsing/core/common/safebrowsing_referral_methods.h"
@@ -705,17 +703,8 @@ void DownloadUIModel::ExecuteCommand(DownloadCommands* download_commands,
       NOTREACHED();
     case DownloadCommands::LEARN_MORE_INTERRUPTED:
     case DownloadCommands::LEARN_MORE_INSECURE_DOWNLOAD:
-      NOTREACHED();
     case DownloadCommands::LEARN_MORE_DOWNLOAD_BLOCKED:
-      download_commands->GetBrowser()->OpenURL(
-          content::OpenURLParams(google_util::AppendGoogleLocaleParam(
-                                     GURL(chrome::kDownloadBlockedLearnMoreURL),
-                                     g_browser_process->GetApplicationLocale()),
-                                 content::Referrer(),
-                                 WindowOpenDisposition::NEW_FOREGROUND_TAB,
-                                 ui::PAGE_TRANSITION_LINK, false),
-          /*navigation_handle_callback=*/{});
-      break;
+      NOTREACHED();
     case DownloadCommands::OPEN_SAFE_BROWSING_SETTING:
       chrome::ShowSafeBrowsingEnhancedProtectionWithIph(
           download_commands->GetBrowser(),

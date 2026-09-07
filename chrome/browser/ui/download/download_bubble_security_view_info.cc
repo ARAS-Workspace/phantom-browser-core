@@ -141,10 +141,6 @@ void DownloadBubbleSecurityViewInfo::PopulateForDownload(
 void DownloadBubbleSecurityViewInfo::PopulateForDangerousUi(
     const std::u16string& subpage_summary) {
   warning_summary_ = subpage_summary;
-  PopulateLearnMoreLink(
-      l10n_util::GetStringUTF16(
-          IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_WARNING_BLOCKED_LEARN_MORE_LINK),
-      DownloadCommands::Command::LEARN_MORE_DOWNLOAD_BLOCKED);
   PopulatePrimarySubpageButton(
       l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_DELETE_FROM_HISTORY),
       DownloadCommands::Command::DISCARD);
@@ -154,10 +150,6 @@ void DownloadBubbleSecurityViewInfo::PopulateForSuspiciousUi(
     const std::u16string& subpage_summary,
     const std::u16string& secondary_subpage_button_label) {
   warning_summary_ = subpage_summary;
-  PopulateLearnMoreLink(
-      l10n_util::GetStringUTF16(
-          IDS_DOWNLOAD_BUBBLE_SUBPAGE_SUMMARY_WARNING_BLOCKED_LEARN_MORE_LINK),
-      DownloadCommands::Command::LEARN_MORE_DOWNLOAD_BLOCKED);
   PopulatePrimarySubpageButton(
       l10n_util::GetStringUTF16(IDS_DOWNLOAD_BUBBLE_DELETE_FROM_HISTORY),
       DownloadCommands::Command::DISCARD);

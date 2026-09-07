@@ -35,7 +35,6 @@
 #include "chrome/grit/generated_resources.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/feature_engagement/public/feature_list.h"
-#include "components/google/core/common/google_util.h"
 #include "components/history/core/common/pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/profile_metrics/browser_profile_type.h"
@@ -162,14 +161,8 @@ content::WebUIDataSource* CreateAndAddDownloadsUIHTMLSource(Profile* profile) {
       {"screenreaderCanceled", IDS_DOWNLOAD_SCREENREADER_CANCELED},
 
       // Warning bypass prompt dialog.
-      {"warningBypassPromptLearnMoreLink",
-       IDS_DOWNLOAD_WARNING_BYPASS_PROMPT_LEARN_MORE_LINK},
       {"warningBypassPromptDescription",
        IDS_DOWNLOAD_WARNING_BYPASS_PROMPT_DESCRIPTION},
-
-      // Warning bypass prompt accessibility text.
-      {"warningBypassPromptLearnMoreLinkAccessible",
-       IDS_DOWNLOAD_WARNING_BYPASS_PROMPT_LEARN_MORE_LINK_ACCESSIBLE},
 
       // Warning bypass dialog.
       {"warningBypassDialogTitle", IDS_DOWNLOAD_WARNING_BYPASS_DIALOG_TITLE},
@@ -228,14 +221,6 @@ content::WebUIDataSource* CreateAndAddDownloadsUIHTMLSource(Profile* profile) {
   source->AddBoolean("allowDeletingHistory",
                      prefs->GetBoolean(prefs::kAllowDeletingBrowserHistory) &&
                          !profile->IsChild());
-
-  // The URL to open when the user clicks on "Learn more" for a blocked
-  // dangerous file.
-  source->AddString("blockedLearnMoreUrl",
-                    google_util::AppendGoogleLocaleParam(
-                        GURL(chrome::kDownloadBlockedLearnMoreURL),
-                        g_browser_process->GetApplicationLocale())
-                        .spec());
 
   source->AddString("webuiRefresh2026", features::IsWebuiRefresh2026Enabled()
                                             ? "webui-refresh-2026"
