@@ -259,8 +259,6 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
       {"itemCorruptInstall", IDS_EXTENSIONS_CORRUPTED_EXTENSION},
       {"itemAllowlistWarning",
        IDS_EXTENSIONS_SAFE_BROWSING_CRX_ALLOWLIST_WARNING},
-      {"itemAllowlistWarningLearnMoreLabel",
-       IDS_EXTENSIONS_SAFE_BROWSING_CRX_ALLOWLIST_WARNING_LEARN_MORE},
       {"itemRepair", IDS_EXTENSIONS_REPAIR_CORRUPTED},
       {"itemReload", IDS_EXTENSIONS_RELOAD_TERMINATED},
       {"itemUpload", IDS_EXTENSIONS_MOVE_TO_ACCOUNT_ICON_TOOLTIP},
@@ -382,8 +380,6 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
       {"shortcutTooManyModifiers", IDS_SHORTCUT_TOO_MANY_MODIFIERS},
       {"shortcutNeedCharacter", IDS_SHORTCUT_NEED_CHARACTER},
       {"subpageArrowRoleDescription", IDS_EXTENSIONS_SUBPAGE_BUTTON},
-      {"itemSuspiciousInstallLearnMore",
-       IDS_EXTENSIONS_ADDED_WITHOUT_KNOWLEDGE_LEARN_MORE},
       {"toolbarDevMode", IDS_EXTENSIONS_DEVELOPER_MODE},
       {"toolbarLoadUnpacked", IDS_EXTENSIONS_TOOLBAR_LOAD_UNPACKED},
       {"toolbarLoadUnpackedDone", IDS_EXTENSIONS_TOOLBAR_LOAD_UNPACKED_DONE},
@@ -441,14 +437,6 @@ content::WebUIDataSource* CreateAndAddExtensionsSource(Profile* profile,
       l10n_util::GetStringFUTF16(
           IDS_EXTENSIONS_ADDED_WITHOUT_KNOWLEDGE,
           l10n_util::GetStringUTF16(IDS_EXTENSION_WEB_STORE_TITLE)));
-  source->AddString(
-      "suspiciousInstallHelpUrl",
-      base::ASCIIToUTF16(google_util::AppendGoogleLocaleParam(
-                             GURL(chrome::kRemoveNonCWSExtensionURL),
-                             g_browser_process->GetApplicationLocale())
-                             .spec()));
-  source->AddString("enhancedSafeBrowsingWarningHelpUrl",
-                    chrome::kCwsEnhancedSafeBrowsingLearnMoreURL);
   source->AddString(
       "getMoreExtensionsUrl",
       base::ASCIIToUTF16(

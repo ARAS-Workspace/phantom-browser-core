@@ -155,10 +155,6 @@ this text can be found by Ctrl + F because it isn't hidden. -->
           <cr-icon class="warning-icon" icon="cr:warning-filled"></cr-icon>
           <span>
             $i18n{itemSuspiciousInstall}
-            <a target="_blank" href="$i18n{suspiciousInstallHelpUrl}"
-                aria-label="$i18n{itemSuspiciousInstallLearnMore}">
-              $i18n{learnMore}
-            </a>
           </span>
         </div>
         <div class="cr-row continuation warning control-line"
@@ -203,10 +199,6 @@ this text can be found by Ctrl + F because it isn't hidden. -->
         </cr-icon>
         <span class="cr-secondary-text">
           $i18n{itemAllowlistWarning}
-          <a href="$i18n{enhancedSafeBrowsingWarningHelpUrl}" target="_blank"
-              aria-label="$i18n{itemAllowlistWarningLearnMoreLabel}">
-            $i18n{learnMore}
-          </a>
         </span>
       </div>
     ` : ''}
