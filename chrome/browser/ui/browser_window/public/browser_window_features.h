@@ -63,7 +63,6 @@ class BrowserWindowModalDialogDelegate;
 class BrowserWindowThemeObserver;
 class BrowserWindowZoomObserver;
 class CallToActionLock;
-class ChromeLabsCoordinator;
 class ColorProviderBrowserHelper;
 class CommentsSidePanelCoordinator;
 class ContentsBorderController;
@@ -584,7 +583,6 @@ class BrowserWindowFeatures {
   std::unique_ptr<BrowserWindowThemeObserver> browser_window_theme_observer_;
   std::unique_ptr<BrowserWindowZoomObserver> browser_window_zoom_observer_;
   std::unique_ptr<CallToActionLock> call_to_action_lock_;
-  std::unique_ptr<ChromeLabsCoordinator> chrome_labs_coordinator_;
   std::unique_ptr<CommentsSidePanelCoordinator>
       comments_side_panel_coordinator_;
 

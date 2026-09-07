@@ -729,7 +729,7 @@ chromium-metrics-reviews@google.com.
   <int value="100297" label="HttpsFirstBalancedMode"/>
   <int value="100298" label="kAccessibilityFlashNotificationsEnabled"/>
   <int value="100299" label="kAccessibilityFlashNotificationsColor"/>
-  <int value="100300" label="PinnedChromeLabsMigrationComplete"/>
+  <int value="100300" label="(obsolete) PinnedChromeLabsMigrationComplete"/>
   <int value="100301" label="AccessibilityFaceGazeGesturesToKeyCombos"/>
   <int value="100302" label="FocusModeYTMDisplayOAuthConsent"/>
   <int value="100303" label="FocusModeYTMDisplayFreeTrial"/>

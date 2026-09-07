@@ -132,7 +132,6 @@
 #include "chrome/browser/ui/tabs/vertical_tab_strip_metrics.h"
 #include "chrome/browser/ui/tabs/vertical_tab_strip_state_controller.h"
 #include "chrome/browser/ui/toolbar/app_menu_model.h"
-#include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_utils.h"
 #include "chrome/browser/ui/toolbar/toolbar_pref_names.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/unload_controller.h"
@@ -219,7 +218,6 @@
 #include "chrome/browser/ui/views/toolbar/app_menu_control.h"
 #include "chrome/browser/ui/views/toolbar/avatar_toolbar_button_interface.h"
 #include "chrome/browser/ui/views/toolbar/browser_app_menu_button.h"
-#include "chrome/browser/ui/views/toolbar/chrome_labs/chrome_labs_coordinator.h"
 #include "chrome/browser/ui/views/toolbar/pinned_toolbar_actions_container.h"
 #include "chrome/browser/ui/views/toolbar/reload_control.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
@@ -2778,11 +2776,6 @@ bool BrowserView::WidgetOwnedByAnchorContainsPoint(
 
 bool BrowserView::IsUnframedModeEnabled() const {
   return unframed_mode_enabled_ && window_management_permission_granted_;
-}
-
-void BrowserView::ShowChromeLabs() {
-  CHECK(IsChromeLabsEnabled());
-  ChromeLabsCoordinator::From(browser_)->ShowOrHide();
 }
 
 views::WebView* BrowserView::GetActiveContentsWebView() {

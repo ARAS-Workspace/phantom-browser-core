@@ -124,7 +124,6 @@ source_set("impl") {
     "//chrome/browser/ui/startup",
     "//chrome/browser/ui/startup:startup_tab",
     "//chrome/browser/ui/toolbar",
-    "//chrome/browser/ui/toolbar/chrome_labs",
     "//chrome/browser/ui/webui/accessibility",
     "//chrome/browser/ui/webui/flags",
     "//chrome/browser/ui/webui/policy",

@@ -49,7 +49,6 @@ class AccountChooserDialogView;
 class AppDialogView;
 class AnnouncementView;
 class BruschettaUninstallerView;
-class ChromeLabsBubbleView;
 class ColorPickerViewTest;
 class ContentSettingBubbleContents;
 class CriticalNotificationBubbleView;
@@ -839,7 +838,6 @@ class VIEWS_EXPORT BubbleDialogDelegateView : public View,
   friend class ::AnnouncementView;
   friend class ::AppDialogView;
   friend class ::BruschettaUninstallerView;
-  friend class ::ChromeLabsBubbleView;
   friend class ::ColorPickerViewTest;
   friend class ::ContentSettingBubbleContents;
   friend class ::CriticalNotificationBubbleView;

@@ -914,10 +914,5 @@ void PinnedToolbarActionsContainer::GetBubbleAnchorAsync(
   }
 }
 
-PinnedActionToolbarButton*
-PinnedToolbarActionsContainer::GetChromeLabsButton() {
-  return GetButtonFor(kActionShowChromeLabs);
-}
-
 BEGIN_METADATA(PinnedToolbarActionsContainer)
 END_METADATA

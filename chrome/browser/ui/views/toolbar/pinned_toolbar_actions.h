@@ -64,10 +64,6 @@ class PinnedToolbarActions : public ToolbarController::PinnedActionsDelegate {
       actions::ActionId action_id,
       base::OnceCallback<void(BubbleAnchorResult)> callback) = 0;
 
-  // Returns the ChromeLabs button, or nullptr if ChromeLabs is not supported by
-  // the PinnedToolbarActions implementation being used.
-  virtual PinnedActionToolbarButton* GetChromeLabsButton() = 0;
-
   // Set |id|'s pinned state to |pin| and announce it.
   virtual void UpdatePinnedStateAndAnnounce(actions::ActionId id, bool pin) = 0;
 

@@ -67,9 +67,6 @@ class PinnedToolbarActionsContainerBrowserTest : public InProcessBrowserTest {
   PinnedToolbarActionsContainerBrowserTest() = default;
 
   void SetUpOnMainThread() override {
-    PinnedToolbarActionsModel* const actions_model =
-        PinnedToolbarActionsModel::Get(browser()->GetProfile());
-    actions_model->UpdatePinnedState(kActionShowChromeLabs, false);
     views::test::WaitForAnimatingLayoutManager(container());
     // OS integration is needed to be able to launch web applications. This
     // override ensures OS integration doesn't leave any traces.
@@ -394,7 +391,6 @@ class PinnedToolbarActionsContainerTest
     PinnedToolbarActionsContainerBrowserTest::SetUpOnMainThread();
     model_ = PinnedToolbarActionsModel::Get(browser()->GetProfile());
     ASSERT_TRUE(model_);
-    model_->UpdatePinnedState(kActionShowChromeLabs, false);
     WaitForAnimations();
   }
 

@@ -335,10 +335,6 @@ void WebUIPinnedToolbarActions::OnElementShown(actions::ActionId action_id,
   }
 }
 
-PinnedActionToolbarButton* WebUIPinnedToolbarActions::GetChromeLabsButton() {
-  return nullptr;
-}
-
 void WebUIPinnedToolbarActions::UpdatePinnedStateAndAnnounce(
     actions::ActionId id,
     bool pin) {

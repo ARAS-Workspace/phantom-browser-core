@@ -138,7 +138,6 @@ void SetCommandIcon(ui::SimpleMenuModel* model,
 class ToolsMenuModel : public ui::SimpleMenuModel {
  public:
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kPerformanceMenuItem);
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kChromeLabsMenuItem);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kReadingModeMenuItem);
 
   ToolsMenuModel(ui::SimpleMenuModel::Delegate* delegate,

@@ -291,7 +291,6 @@ class PinnedSidePanelInteractiveTest : public InteractiveFeaturePromoTest {
     InteractiveFeaturePromoTest::SetUpOnMainThread();
     PinnedToolbarActionsModel* const actions_model =
         PinnedToolbarActionsModel::Get(browser()->GetProfile());
-    actions_model->UpdatePinnedState(kActionShowChromeLabs, false);
     actions_model->UpdatePinnedState(kActionTabSearch, false);
     auto* const layout_manager = views::test::GetAnimatingLayoutManager(
         GetPinnedToolbarActionsContainer());

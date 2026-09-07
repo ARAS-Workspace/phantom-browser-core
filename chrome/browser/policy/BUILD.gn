@@ -1245,7 +1245,6 @@ source_set("impl") {
     "//chrome/browser/search",
     "//chrome/browser/ssl",
     "//chrome/browser/ui/side_search",
-    "//chrome/browser/ui/toolbar/chrome_labs",
     "//chrome/browser/ui/webui/version",
     "//chrome/browser/webauthn",
     "//components/autofill/core/browser/at_memory/policy",

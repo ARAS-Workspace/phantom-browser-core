@@ -550,7 +550,6 @@ class BrowserView : public BrowserWindow,
   bool IsToolbarShowing() const override;
   bool IsLocationBarVisible() const override;
   bool IsUnframedModeEnabled() const override;
-  void ShowChromeLabs() override;
   BrowserView* AsBrowserView() override;
   void ShowUpdateChromeDialog() override;
   void ShowIntentPickerBubble(

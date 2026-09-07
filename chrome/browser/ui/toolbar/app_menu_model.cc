@@ -77,8 +77,6 @@
 #include "chrome/browser/ui/tabs/vertical_tab_strip_state_controller.h"
 #include "chrome/browser/ui/toolbar/app_menu_icon_controller.h"
 #include "chrome/browser/ui/toolbar/bookmark_sub_menu_model.h"
-#include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_prefs.h"
-#include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_utils.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/web_applications/web_app_dialog_utils.h"
@@ -115,7 +113,6 @@
 #include "components/omnibox/browser/vector_icons.h"
 #include "components/password_manager/content/common/web_ui_constants.h"
 #include "components/password_manager/core/common/password_manager_features.h"
-#include "components/prefs/pref_member.h"
 #include "components/prefs/pref_service.h"
 #include "components/profile_metrics/browser_profile_type.h"
 #include "components/saved_tab_groups/public/features.h"
@@ -204,7 +201,6 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel,
                                       kSetBrowserAsDefaultMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(AppMenuModel, kHelpMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ToolsMenuModel, kPerformanceMenuItem);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ToolsMenuModel, kChromeLabsMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ToolsMenuModel, kReadingModeMenuItem);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ExtensionsMenuModel,
                                       kManageExtensionsMenuItem);
@@ -1173,26 +1169,6 @@ void ToolsMenuModel::Build(BrowserWindowInterface* browser) {
     AddSeparator(ui::NORMAL_SEPARATOR);
     AddCheckItemWithStringId(IDC_PROFILING_ENABLED, IDS_PROFILING_ENABLED);
   }
-  if (IsChromeLabsEnabled()) {
-    auto* profile = browser->GetProfile();
-    UpdateChromeLabsNewBadgePrefs(profile);
-    if (ShouldShowChromeLabsUI(profile)) {
-      BooleanPrefMember show_chrome_labs_item;
-      show_chrome_labs_item.Init(
-          chrome_labs_prefs::kBrowserLabsEnabledEnterprisePolicy,
-          profile->GetPrefs());
-      if (show_chrome_labs_item.GetValue()) {
-        AddSeparator(ui::NORMAL_SEPARATOR);
-        AddItemWithStringIdAndVectorIcon(
-            this, IDC_SHOW_CHROME_LABS, IDS_CHROMELABS,
-            features::IsRoundedIconsEnabled() ? vector_icons::kScienceIcon
-                                              : vector_icons::kScienceOldIcon);
-        SetElementIdentifierAt(
-            GetIndexOfCommandId(IDC_SHOW_CHROME_LABS).value(),
-            kChromeLabsMenuItem);
-      }
-    }
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1596,13 +1572,6 @@ void AppMenuModel::LogMenuMetrics(int command_id) {
             "WrenchMenu.TimeToAction.ProfilingEnabled", delta);
       }
       LogMenuAction(MENU_ACTION_PROFILING_ENABLED);
-      break;
-    case IDC_SHOW_CHROME_LABS:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes("WrenchMenu.TimeToAction.ShowChromeLabs",
-                                      delta);
-      }
-      LogMenuAction(MENU_ACTION_SHOW_CHROME_LABS);
       break;
     case IDC_SHOW_HISTORY_CLUSTERS_SIDE_PANEL:
       if (!uma_action_recorded_) {

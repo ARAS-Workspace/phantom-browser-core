@@ -497,9 +497,6 @@ class BrowserWindow : public ui::BaseWindow {
 
   virtual ui::mojom::WindowShowState GetWindowShowState() const = 0;
 
-  // Shows the Chrome Labs bubble if enabled.
-  virtual void ShowChromeLabs() = 0;
-
   // In production code BrowserView is the only subclass for BrowserWindow. The
   // fact that this is not true in some tests is a problem with the tests. See
   // https://crbug.com/360163254.

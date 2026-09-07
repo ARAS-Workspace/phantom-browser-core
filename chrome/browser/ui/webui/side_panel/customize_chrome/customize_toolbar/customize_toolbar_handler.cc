@@ -85,8 +85,6 @@ MojoActionForChromeAction(actions::ActionId action_id) {
       return side_panel::customize_chrome::mojom::ActionId::kTaskManager;
     case kActionDevTools:
       return side_panel::customize_chrome::mojom::ActionId::kDevTools;
-    case kActionShowChromeLabs:
-      return side_panel::customize_chrome::mojom::ActionId::kShowChromeLabs;
     case kActionCopyUrl:
       return side_panel::customize_chrome::mojom::ActionId::kCopyLink;
     case kActionTabSearch:
@@ -151,8 +149,6 @@ std::optional<actions::ActionId> ChromeActionForMojoAction(
       return kActionTaskManager;
     case side_panel::customize_chrome::mojom::ActionId::kDevTools:
       return kActionDevTools;
-    case side_panel::customize_chrome::mojom::ActionId::kShowChromeLabs:
-      return kActionShowChromeLabs;
     case side_panel::customize_chrome::mojom::ActionId::kCopyLink:
       return kActionCopyUrl;
     case side_panel::customize_chrome::mojom::ActionId::kTabSearch:
@@ -351,8 +347,6 @@ void CustomizeToolbarHandler::ListActions(ListActionsCallback callback) {
   add_action(kActionTaskManager,
              side_panel::customize_chrome::mojom::CategoryId::kTools);
   add_action(kActionDevTools,
-             side_panel::customize_chrome::mojom::CategoryId::kTools);
-  add_action(kActionShowChromeLabs,
              side_panel::customize_chrome::mojom::CategoryId::kTools);
 
   std::move(callback).Run(std::move(actions));

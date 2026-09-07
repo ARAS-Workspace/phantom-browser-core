@@ -1162,10 +1162,6 @@ ui::mojom::WindowShowState WebUIBrowserWindow::GetWindowShowState() const {
   }
 }
 
-void WebUIBrowserWindow::ShowChromeLabs() {
-  NOTIMPLEMENTED_LOG_ONCE();
-}
-
 BrowserView* WebUIBrowserWindow::AsBrowserView() {
   NOTIMPLEMENTED_LOG_ONCE();
   return nullptr;

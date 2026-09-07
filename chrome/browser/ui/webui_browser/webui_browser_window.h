@@ -170,7 +170,6 @@ class WebUIBrowserWindow : public BrowserWindow,
   bool IsUnframedModeEnabled() const override;
   bool GetCanResize() override;
   ui::mojom::WindowShowState GetWindowShowState() const override;
-  void ShowChromeLabs() override;
   BrowserView* AsBrowserView() override;
 
   // ui::BaseWindow:

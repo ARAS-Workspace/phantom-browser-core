@@ -148,11 +148,10 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsModelBrowserTest, PinActions) {
   const base::ListValue& list =
       browser()->GetProfile()->GetPrefs()->GetList(prefs::kPinnedActions);
 
-  ASSERT_EQ(4u, list.size());
-  ASSERT_EQ("kActionShowChromeLabs", list[0].GetString());
-  EXPECT_EQ("kActionSidePanelShowBookmarks", list[1].GetString());
-  EXPECT_EQ("kActionSidePanelShowReadingList", list[2].GetString());
-  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list[3].GetString());
+  ASSERT_EQ(3u, list.size());
+  EXPECT_EQ("kActionSidePanelShowBookmarks", list[0].GetString());
+  EXPECT_EQ("kActionSidePanelShowReadingList", list[1].GetString());
+  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list[2].GetString());
 }
 
 // Verify that we are able to remove pinned actions from the model and that
@@ -176,10 +175,9 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsModelBrowserTest, UnpinActions) {
   // Verify only the reading list ActionId was removed.
   const base::ListValue& list =
       browser()->GetProfile()->GetPrefs()->GetList(prefs::kPinnedActions);
-  ASSERT_EQ(3u, list.size());
-  ASSERT_EQ("kActionShowChromeLabs", list[0].GetString());
-  EXPECT_EQ("kActionSidePanelShowBookmarks", list[1].GetString());
-  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list[2].GetString());
+  ASSERT_EQ(2u, list.size());
+  EXPECT_EQ("kActionSidePanelShowBookmarks", list[0].GetString());
+  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list[1].GetString());
 }
 
 // Verify that we are able to move pinned actions in the model and that
@@ -195,51 +193,48 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsModelBrowserTest,
                              /*should_pin=*/true);
 
   // Expect moving the second action will put it at the end of the list.
-  model()->MovePinnedAction(kActionSidePanelShowReadingList, 3);
+  model()->MovePinnedAction(kActionSidePanelShowReadingList, 2);
   EXPECT_EQ(0, observer()->removed_count());
   EXPECT_EQ(3, observer()->inserted_count());
-  EXPECT_EQ(3, observer()->moved_to_index());
+  EXPECT_EQ(2, observer()->moved_to_index());
 
   // Verify kActionCopy was moved to the end of the list which should be
   // index 2.
   const base::ListValue& list_1 =
       browser()->GetProfile()->GetPrefs()->GetList(prefs::kPinnedActions);
-  ASSERT_EQ(4u, list_1.size());
-  ASSERT_EQ("kActionShowChromeLabs", list_1[0].GetString());
-  EXPECT_EQ("kActionSidePanelShowBookmarks", list_1[1].GetString());
-  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list_1[2].GetString());
-  EXPECT_EQ("kActionSidePanelShowReadingList", list_1[3].GetString());
+  ASSERT_EQ(3u, list_1.size());
+  EXPECT_EQ("kActionSidePanelShowBookmarks", list_1[0].GetString());
+  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list_1[1].GetString());
+  EXPECT_EQ("kActionSidePanelShowReadingList", list_1[2].GetString());
 
   // Expect that we can move the first action after the second action correctly.
-  model()->MovePinnedAction(kActionSidePanelShowBookmarks, 2);
-  EXPECT_EQ(0, observer()->removed_count());
-  EXPECT_EQ(3, observer()->inserted_count());
-  EXPECT_EQ(2, observer()->moved_to_index());
-
-  // kActionSidePanelShowBookmarks was move to the end.
-  const base::ListValue& list_2 =
-      browser()->GetProfile()->GetPrefs()->GetList(prefs::kPinnedActions);
-  ASSERT_EQ(4u, list_2.size());
-  ASSERT_EQ("kActionShowChromeLabs", list_2[0].GetString());
-  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list_2[1].GetString());
-  EXPECT_EQ("kActionSidePanelShowBookmarks", list_2[2].GetString());
-  EXPECT_EQ("kActionSidePanelShowReadingList", list_2[3].GetString());
-
-  // Expect that moving the kActionCopy action to the beginning of the list will
-  // place it in front of the current first element.
-  model()->MovePinnedAction(kActionSidePanelShowReadingList, 1);
+  model()->MovePinnedAction(kActionSidePanelShowBookmarks, 1);
   EXPECT_EQ(0, observer()->removed_count());
   EXPECT_EQ(3, observer()->inserted_count());
   EXPECT_EQ(1, observer()->moved_to_index());
 
+  // kActionSidePanelShowBookmarks was move to the end.
+  const base::ListValue& list_2 =
+      browser()->GetProfile()->GetPrefs()->GetList(prefs::kPinnedActions);
+  ASSERT_EQ(3u, list_2.size());
+  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list_2[0].GetString());
+  EXPECT_EQ("kActionSidePanelShowBookmarks", list_2[1].GetString());
+  EXPECT_EQ("kActionSidePanelShowReadingList", list_2[2].GetString());
+
+  // Expect that moving the kActionCopy action to the beginning of the list will
+  // place it in front of the current first element.
+  model()->MovePinnedAction(kActionSidePanelShowReadingList, 0);
+  EXPECT_EQ(0, observer()->removed_count());
+  EXPECT_EQ(3, observer()->inserted_count());
+  EXPECT_EQ(0, observer()->moved_to_index());
+
   // Verify kActionCopy was moved to index 0.
   const base::ListValue& list_3 =
       browser()->GetProfile()->GetPrefs()->GetList(prefs::kPinnedActions);
-  ASSERT_EQ(4u, list_3.size());
-  ASSERT_EQ("kActionShowChromeLabs", list_3[0].GetString());
-  EXPECT_EQ("kActionSidePanelShowReadingList", list_3[1].GetString());
-  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list_3[2].GetString());
-  EXPECT_EQ("kActionSidePanelShowBookmarks", list_3[3].GetString());
+  ASSERT_EQ(3u, list_3.size());
+  EXPECT_EQ("kActionSidePanelShowReadingList", list_3[0].GetString());
+  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list_3[1].GetString());
+  EXPECT_EQ("kActionSidePanelShowBookmarks", list_3[2].GetString());
 }
 
 // Verify that trying to move a pinned action out of bounds will do nothing.
@@ -255,7 +250,7 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsModelBrowserTest,
 
   // Expect that moving an Action out of bounds at the end of the list does
   // nothing.
-  model()->MovePinnedAction(kActionSidePanelShowReadingList, 4);
+  model()->MovePinnedAction(kActionSidePanelShowReadingList, 3);
   EXPECT_EQ(0, observer()->removed_count());
   EXPECT_EQ(3, observer()->inserted_count());
   EXPECT_EQ(-1, observer()->moved_to_index());
@@ -263,11 +258,10 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsModelBrowserTest,
   // Verify the action did not move.
   const base::ListValue& list_1 =
       browser()->GetProfile()->GetPrefs()->GetList(prefs::kPinnedActions);
-  ASSERT_EQ(4u, list_1.size());
-  ASSERT_EQ("kActionShowChromeLabs", list_1[0].GetString());
-  EXPECT_EQ("kActionSidePanelShowBookmarks", list_1[1].GetString());
-  EXPECT_EQ("kActionSidePanelShowReadingList", list_1[2].GetString());
-  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list_1[3].GetString());
+  ASSERT_EQ(3u, list_1.size());
+  EXPECT_EQ("kActionSidePanelShowBookmarks", list_1[0].GetString());
+  EXPECT_EQ("kActionSidePanelShowReadingList", list_1[1].GetString());
+  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list_1[2].GetString());
 
   // Expect that moving an action out of bounds before the list does nothing.
   model()->MovePinnedAction(kActionSidePanelShowBookmarks, -1);
@@ -278,11 +272,10 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsModelBrowserTest,
   // Verify the action did not move.
   const base::ListValue& list_2 =
       browser()->GetProfile()->GetPrefs()->GetList(prefs::kPinnedActions);
-  ASSERT_EQ(4u, list_2.size());
-  ASSERT_EQ("kActionShowChromeLabs", list_2[0].GetString());
-  EXPECT_EQ("kActionSidePanelShowBookmarks", list_2[1].GetString());
-  EXPECT_EQ("kActionSidePanelShowReadingList", list_2[2].GetString());
-  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list_2[3].GetString());
+  ASSERT_EQ(3u, list_2.size());
+  EXPECT_EQ("kActionSidePanelShowBookmarks", list_2[0].GetString());
+  EXPECT_EQ("kActionSidePanelShowReadingList", list_2[1].GetString());
+  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list_2[2].GetString());
 }
 
 // Verify that trying to move a pinned action out of bounds will do nothing.
@@ -295,7 +288,7 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsModelBrowserTest,
                              /*should_pin=*/true);
 
   // Expect that moving an action which is not added to the model does nothing.
-  model()->MovePinnedAction(kActionSidePanelShowHistoryCluster, 3);
+  model()->MovePinnedAction(kActionSidePanelShowHistoryCluster, 2);
   EXPECT_EQ(0, observer()->removed_count());
   EXPECT_EQ(2, observer()->inserted_count());
   EXPECT_EQ(-1, observer()->moved_to_index());
@@ -303,10 +296,9 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsModelBrowserTest,
   // Verify nothing changed.
   const base::ListValue& list_1 =
       browser()->GetProfile()->GetPrefs()->GetList(prefs::kPinnedActions);
-  ASSERT_EQ(3u, list_1.size());
-  ASSERT_EQ("kActionShowChromeLabs", list_1[0].GetString());
-  EXPECT_EQ("kActionSidePanelShowBookmarks", list_1[1].GetString());
-  EXPECT_EQ("kActionSidePanelShowReadingList", list_1[2].GetString());
+  ASSERT_EQ(2u, list_1.size());
+  EXPECT_EQ("kActionSidePanelShowBookmarks", list_1[0].GetString());
+  EXPECT_EQ("kActionSidePanelShowReadingList", list_1[1].GetString());
 }
 
 // Verify that trying to move a pinned action to its current index does nothing.
@@ -321,7 +313,7 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsModelBrowserTest,
                              /*should_pin=*/true);
 
   // Expect that moving an action to the same index does nothing.
-  model()->MovePinnedAction(kActionSidePanelShowHistoryCluster, 3);
+  model()->MovePinnedAction(kActionSidePanelShowHistoryCluster, 2);
   EXPECT_EQ(0, observer()->removed_count());
   EXPECT_EQ(3, observer()->inserted_count());
   EXPECT_EQ(-1, observer()->moved_to_index());
@@ -329,30 +321,26 @@ IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsModelBrowserTest,
   // Verify no action moved.
   const base::ListValue& list_1 =
       browser()->GetProfile()->GetPrefs()->GetList(prefs::kPinnedActions);
-  ASSERT_EQ(4u, list_1.size());
-  ASSERT_EQ("kActionShowChromeLabs", list_1[0].GetString());
-  EXPECT_EQ("kActionSidePanelShowBookmarks", list_1[1].GetString());
-  EXPECT_EQ("kActionSidePanelShowReadingList", list_1[2].GetString());
-  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list_1[3].GetString());
+  ASSERT_EQ(3u, list_1.size());
+  EXPECT_EQ("kActionSidePanelShowBookmarks", list_1[0].GetString());
+  EXPECT_EQ("kActionSidePanelShowReadingList", list_1[1].GetString());
+  EXPECT_EQ("kActionSidePanelShowHistoryCluster", list_1[2].GetString());
 }
 
 IN_PROC_BROWSER_TEST_F(PinnedToolbarActionsModelBrowserTest,
                        ResetToDefaultResetsToDefault) {
   EXPECT_TRUE(model()->IsDefault());
   EXPECT_FALSE(model()->Contains(kActionSidePanelShowBookmarks));
-  EXPECT_TRUE(model()->Contains(kActionShowChromeLabs));
-  model()->UpdatePinnedState(kActionShowChromeLabs, false);
   model()->UpdatePinnedState(kActionSidePanelShowBookmarks, true);
 
   EXPECT_FALSE(model()->IsDefault());
   EXPECT_TRUE(model()->Contains(kActionSidePanelShowBookmarks));
-  EXPECT_FALSE(model()->Contains(kActionShowChromeLabs));
 
   model()->ResetToDefault();
 
   EXPECT_TRUE(model()->IsDefault());
   EXPECT_FALSE(model()->Contains(kActionSidePanelShowBookmarks));
-  EXPECT_TRUE(model()->Contains(kActionShowChromeLabs));
+  EXPECT_TRUE(model()->PinnedActionIds().empty());
 }
 
 class PinnedToolbarActionsModelWithTabsFromOtherDevicesPinnedBrowserTest

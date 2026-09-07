@@ -170,7 +170,6 @@ class ToolbarView : public views::AccessiblePaneView,
 
   // Accessors.
   Browser* browser() const { return browser_; }
-  views::Button* GetChromeLabsButton() const;
   ExtensionsToolbarDesktop* extensions_container() const {
     return extensions_container_;
   }
@@ -320,9 +319,6 @@ class ToolbarView : public views::AccessiblePaneView,
   // views::MouseWatcherListener:
   void MouseMovedOutOfHost() override;
 
-  // Changes the visibility of the Chrome Labs entry point based on prefs.
-  void OnChromeLabsPrefChanged();
-
   // Loads the images for all the child views.
   void LoadImages();
 
@@ -437,8 +433,6 @@ class ToolbarView : public views::AccessiblePaneView,
 
   // Controls whether or not a home button should be shown on the toolbar.
   BooleanPrefMember show_home_button_;
-
-  BooleanPrefMember show_chrome_labs_button_;
 
   // The display mode used when laying out the toolbar.
   const DisplayMode display_mode_;

@@ -29,7 +29,6 @@ enum ActionId {
   kRouteMedia,
   kTaskManager,
   kDevTools,
-  kShowChromeLabs,
   kCopyLink,
   kTabSearch,
   kSplitTab,

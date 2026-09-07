@@ -62,8 +62,6 @@
 #include "chrome/browser/ui/tabs/public/tab_features.h"
 #include "chrome/browser/ui/tabs/tab_strip_prefs.h"
 #include "chrome/browser/ui/tabs/vertical_tab_strip_state_controller.h"
-#include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_prefs.h"
-#include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_utils.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/view_ids.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_bubble_view.h"
@@ -97,7 +95,6 @@
 #include "chrome/browser/ui/views/toolbar/avatar_toolbar_button_interface.h"
 #include "chrome/browser/ui/views/toolbar/back_forward_button.h"
 #include "chrome/browser/ui/views/toolbar/browser_app_menu_button.h"
-#include "chrome/browser/ui/views/toolbar/chrome_labs/chrome_labs_coordinator.h"
 #include "chrome/browser/ui/views/toolbar/home_button.h"
 #include "chrome/browser/ui/views/toolbar/pinned_toolbar_actions_container.h"
 #include "chrome/browser/ui/views/toolbar/reload_button.h"
@@ -501,27 +498,6 @@ void ToolbarView::Init() {
     pinned_toolbar_actions_ = pinned_toolbar_actions_container_;
   } else {
     pinned_toolbar_actions_ = toolbar_webview_->GetPinnedToolbarActions();
-  }
-
-  if (IsChromeLabsEnabled()) {
-    UpdateChromeLabsNewBadgePrefs(browser_->GetProfile());
-
-    const bool should_show_chrome_labs_ui =
-        ShouldShowChromeLabsUI(browser_->GetProfile());
-    if (should_show_chrome_labs_ui) {
-      show_chrome_labs_button_.Init(
-          chrome_labs_prefs::kBrowserLabsEnabledEnterprisePolicy, prefs,
-          base::BindRepeating(&ToolbarView::OnChromeLabsPrefChanged,
-                              base::Unretained(this)));
-      CHECK(!features::IsWebUIPinnedToolbarActionsEnabled())
-          << "WebUIPinnedToolbarActions does not support ChromeLabs.";
-      // Set the visibility for the button based on initial enterprise policy
-      // value. Only call OnChromeLabsPrefChanged if there is a change from
-      // the initial value.
-      pinned_toolbar_actions_container_->GetActionItemFor(kActionShowChromeLabs)
-          ->SetVisible(show_chrome_labs_button_.GetValue() &&
-                       should_show_chrome_labs_ui);
-    }
   }
 
   // Only show the Battery Saver button when it is not controlled by the OS. On
@@ -1290,10 +1266,6 @@ void ToolbarView::RecordHitTestMetrics(bool is_caption_area) {
   }
 }
 
-views::Button* ToolbarView::GetChromeLabsButton() const {
-  return ChromeLabsCoordinator::From(browser_)->GetChromeLabsButton();
-}
-
 ExtensionsToolbarButton* ToolbarView::GetExtensionsButton() const {
   return extensions_container_->GetExtensionsButton();
 }
@@ -1934,19 +1906,6 @@ BrowserRootView::DropTarget* ToolbarView::GetDropTarget(
 
 views::View* ToolbarView::GetViewForDrop() {
   return this;
-}
-
-void ToolbarView::OnChromeLabsPrefChanged() {
-  actions::ActionItem* chrome_labs_action =
-      pinned_toolbar_actions_container_->GetActionItemFor(
-          kActionShowChromeLabs);
-  chrome_labs_action->SetVisible(
-      show_chrome_labs_button_.GetValue() &&
-      ShouldShowChromeLabsUI(browser_->GetProfile()));
-  GetViewAccessibility().AnnounceText(l10n_util::GetStringUTF16(
-      chrome_labs_action->GetVisible()
-          ? IDS_ACCESSIBLE_TEXT_CHROMELABS_BUTTON_ADDED_BY_ENTERPRISE_POLICY
-          : IDS_ACCESSIBLE_TEXT_CHROMELABS_BUTTON_REMOVED_BY_ENTERPRISE_POLICY));
 }
 
 void ToolbarView::LoadImages() {

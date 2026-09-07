@@ -130,7 +130,6 @@
 #include "chrome/browser/ui/tabs/tab_enums.h"
 #include "chrome/browser/ui/tabs/tab_strip_prefs.h"
 #include "chrome/browser/ui/tabs/vertical_tab_strip_state_controller.h"
-#include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_utils.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_page_action_controller.h"
@@ -150,7 +149,6 @@
 #include "chrome/browser/ui/views/tabs/groups/recent_activity_bubble_dialog_view.h"
 #include "chrome/browser/ui/views/tabs/organizer/organizer_panel_utils.h"
 #include "chrome/browser/ui/views/toolbar/ai_overlay_toolbar_button.h"
-#include "chrome/browser/ui/views/toolbar/chrome_labs/chrome_labs_coordinator.h"
 #include "chrome/browser/ui/views/toolbar/pinned_action_toolbar_button.h"
 #include "chrome/browser/ui/views/toolbar/pinned_action_toolbar_button_menu_model.h"
 #include "chrome/browser/ui/views/toolbar/pinned_toolbar_actions.h"
@@ -1348,24 +1346,6 @@ void BrowserActions::InitializeChromeMenuActions() {
                                             : kCreditCardChromeRefreshOldIcon)
           .SetEnabled(!is_guest_session)
           .Build());
-
-  // TODO(crbug.com/435220196): Ideally this action would have
-  // ChromeLabsCoordinator passed in as a dependency directly.
-  if (IsChromeLabsEnabled() && !web_app::AppBrowserController::IsWebApp(bwi)) {
-    root_action_item_->AddChild(
-        ChromeMenuAction(
-            base::BindRepeating(
-                [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                   actions::ActionInvocationContext context) {
-                  ChromeLabsCoordinator::From(bwi)->ShowOrHide();
-                },
-                bwi),
-            kActionShowChromeLabs, IDS_CHROMELABS, IDS_CHROMELABS,
-            features::IsRoundedIconsEnabled() ? vector_icons::kScienceIcon
-                                              : vector_icons::kScienceOldIcon)
-            .SetVisible(ShouldShowChromeLabsUI(profile))
-            .Build());
-  }
 
   root_action_item_->AddChild(
       actions::ActionItem::Builder(

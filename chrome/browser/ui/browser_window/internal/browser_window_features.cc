@@ -114,7 +114,6 @@
 #include "chrome/browser/ui/toasts/toast_controller.h"
 #include "chrome/browser/ui/toasts/toast_features.h"
 #include "chrome/browser/ui/toasts/toast_service.h"
-#include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_utils.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/unload_controller.h"
 #include "chrome/browser/ui/views/animations/side_panel_animations.h"
@@ -156,7 +155,6 @@
 #include "chrome/browser/ui/views/tabs/groups/recent_activity_bubble_dialog_view.h"
 #include "chrome/browser/ui/views/tabs/organizer/organizer_panel_utils.h"
 #include "chrome/browser/ui/views/tabs/tab_strip_action_container.h"
-#include "chrome/browser/ui/views/toolbar/chrome_labs/chrome_labs_coordinator.h"
 #include "chrome/browser/ui/views/toolbar/pinned_toolbar_actions.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
 #include "chrome/browser/ui/views/translate/translate_bubble_controller.h"
@@ -966,12 +964,6 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
       }
     }
 
-    if (IsChromeLabsEnabled()) {
-      chrome_labs_coordinator_ =
-          GetUserDataFactory().CreateInstance<ChromeLabsCoordinator>(*browser,
-                                                                     browser);
-    }
-
     if (MobilePromoOnDesktopEnabled()) {
       ios_promo_controller_ =
           GetUserDataFactory().CreateInstance<IOSPromoController>(*browser,
@@ -1111,9 +1103,6 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
   pinned_toolbar_actions_ = nullptr;
   memory_saver_opt_in_iph_controller_.reset();
   ios_promo_controller_.reset();
-  if (chrome_labs_coordinator_) {
-    chrome_labs_coordinator_->TearDown();
-  }
   cast_browser_controller_.reset();
   ai_mode_page_action_controller_.reset();
   if (actor_ui_window_controller_) {

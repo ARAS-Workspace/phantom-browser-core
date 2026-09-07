@@ -92,9 +92,6 @@ class ToolbarControllerUiTest : public InteractiveFeaturePromoTest,
     embedded_test_server()->StartAcceptingConnections();
     InteractiveFeaturePromoTest::SetUpOnMainThread();
     browser_view_ = BrowserView::GetBrowserViewForBrowser(browser());
-    PinnedToolbarActionsModel* const actions_model =
-        PinnedToolbarActionsModel::Get(browser()->GetProfile());
-    actions_model->UpdatePinnedState(kActionShowChromeLabs, false);
     CHECK(!features::IsWebUIPinnedToolbarActionsEnabled())
         << "Test needs modification to support WebUIPinnedToolbarActions";
     views::test::WaitForAnimatingLayoutManager(

@@ -136,7 +136,6 @@ class TestBrowserWindow : public BrowserWindow,
   bool IsLocationBarVisible() const override;
   bool IsToolbarShowing() const override;
   bool IsUnframedModeEnabled() const override;
-  void ShowChromeLabs() override {}
   BrowserView* AsBrowserView() override;
   void ShowUpdateChromeDialog() override {}
   void ShowBookmarkBubble(const GURL& url, bool already_bookmarked) override {}

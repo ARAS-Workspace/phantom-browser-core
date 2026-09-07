@@ -23,8 +23,6 @@ namespace user_education {
 class NewBadgeController;
 }
 
-class ChromeLabsViewController;
-
 namespace ui {
 
 class ButtonMenuItemModel;
@@ -41,8 +39,6 @@ class COMPONENT_EXPORT(UI_MENUS) IsNewFeatureAtValue {
   // Allowed factory classes:
   IsNewFeatureAtValue(base::PassKey<user_education::NewBadgeController>,
                       bool value)
-      : ui::IsNewFeatureAtValue(value) {}
-  IsNewFeatureAtValue(base::PassKey<ChromeLabsViewController>, bool value)
       : ui::IsNewFeatureAtValue(value) {}
 
   // For other platforms/factories, add appropriate PassKey.

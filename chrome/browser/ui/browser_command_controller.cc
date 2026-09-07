@@ -87,7 +87,6 @@
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_user_gesture_details.h"
 #include "chrome/browser/ui/tabs/vertical_tab_strip_state_controller.h"
-#include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_utils.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/side_panel/tabs_from_other_devices/tabs_from_other_devices_side_panel_coordinator.h"
@@ -1170,9 +1169,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
       OpenFeedbackDialog(browser_, feedback::kFeedbackSourceBrowserCommand);
       break;
 #endif
-    case IDC_SHOW_CHROME_LABS:
-      window()->ShowChromeLabs();
-      break;
     case IDC_SHOW_BOOKMARK_BAR:
       ToggleBookmarkBar(browser_);
       break;
@@ -1976,9 +1972,6 @@ void BrowserCommandController::InitCommandState() {
     command_updater_->UpdateCommandEnabled(kReadingListMenuId, true);
     command_updater_->UpdateCommandEnabled(IDC_READING_LIST_MENU_ADD_TAB, true);
     command_updater_->UpdateCommandEnabled(IDC_READING_LIST_MENU_SHOW_UI, true);
-  }
-  if (IsChromeLabsEnabled()) {
-    command_updater_->UpdateCommandEnabled(IDC_SHOW_CHROME_LABS, true);
   }
 
   // Glic commands.

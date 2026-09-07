@@ -100,7 +100,6 @@ class PinnedToolbarActionsContainer
   void GetBubbleAnchorAsync(
       actions::ActionId action_id,
       base::OnceCallback<void(BubbleAnchorResult)> callback) override;
-  PinnedActionToolbarButton* GetChromeLabsButton() override;
   void UpdatePinnedStateAndAnnounce(actions::ActionId id, bool pin) override;
   void MovePinnedAction(actions::ActionId action_id, int target_index) override;
   void MovePinnedActionBy(actions::ActionId action_id, int delta) override;

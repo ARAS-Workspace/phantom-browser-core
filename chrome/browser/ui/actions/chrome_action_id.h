@@ -520,7 +520,6 @@
   E(kActionTaskManagerContextMenu, IDC_TASK_MANAGER_CONTEXT_MENU) \
   E(kActionTaskManagerMainMenu, IDC_TASK_MANAGER_MAIN_MENU) \
   E(kActionDevTools, IDC_DEV_TOOLS) \
-  E(kActionShowChromeLabs, IDC_SHOW_CHROME_LABS) \
   E(kActionSaveCreditCardForPage, IDC_SAVE_CREDIT_CARD_FOR_PAGE) \
   E(kActionSaveIbanForPage, IDC_SAVE_IBAN_FOR_PAGE) \
   E(kActionShowPaymentsBubbleOrPage) \

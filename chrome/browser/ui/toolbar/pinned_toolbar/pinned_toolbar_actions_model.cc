@@ -237,10 +237,6 @@ void PinnedToolbarActionsModel::MaybeMigrateExistingPinnedStates() {
   if (!CanUpdate()) {
     return;
   }
-  if (!pref_service_->GetBoolean(prefs::kPinnedChromeLabsMigrationComplete)) {
-    UpdatePinnedState(kActionShowChromeLabs, true);
-    pref_service_->SetBoolean(prefs::kPinnedChromeLabsMigrationComplete, true);
-  }
   if (!pref_service_->GetBoolean(prefs::kPinnedCastMigrationComplete)) {
     bool previously_pinned =
         pref_service_->GetBoolean(prefs::kShowCastIconInToolbar);
