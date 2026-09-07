@@ -627,6 +627,18 @@ std::u16string FormatUrlWithAdjustments(
   url_string.insert(url_string.end(), spec.begin(), spec.begin() + scheme_size);
   new_parsed->scheme = parsed.scheme;
 
+  // chrome: URLs are shown under the phantom: alias. The URL keeps the chrome:
+  // scheme; url_fixer turns typed phantom: text back into chrome:.
+  static constexpr std::string_view kChromeUIScheme = "chrome";
+  static constexpr std::u16string_view kPhantomUIScheme = u"phantom";
+  if (url.SchemeIs(kChromeUIScheme)) {
+    url_string.replace(0, kChromeUIScheme.size(), kPhantomUIScheme);
+    adjustments->emplace_back(0, kChromeUIScheme.size(),
+                              kPhantomUIScheme.size());
+    scheme_size += kPhantomUIScheme.size() - kChromeUIScheme.size();
+    new_parsed->scheme.len = static_cast<int>(kPhantomUIScheme.size());
+  }
+
   // Username & password.
   if (((format_types & kFormatUrlOmitUsernamePassword) != 0) ||
       ((format_types & kFormatUrlTrimAfterHost) != 0)) {

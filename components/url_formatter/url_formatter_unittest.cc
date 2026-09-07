@@ -104,6 +104,10 @@ TEST(UrlFormatterTest, FormatUrl) {
       {"Simple URL", "http://www.google.com/", default_format_type,
        base::UnescapeRule::NORMAL, L"http://www.google.com/", 7},
 
+      {"chrome: scheme is shown as phantom:", "chrome://settings/help",
+       default_format_type, base::UnescapeRule::NORMAL,
+       L"phantom://settings/help", 10},
+
       {"With a port number and a reference",
        "http://www.google.com:8080/#\xE3\x82\xB0", default_format_type,
        base::UnescapeRule::NORMAL, L"http://www.google.com:8080/#\x30B0", 7},

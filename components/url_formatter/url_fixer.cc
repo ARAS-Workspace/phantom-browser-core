@@ -38,6 +38,9 @@ namespace {
 
 // Hardcode these constants to avoid dependences on //chrome and //content.
 const char kChromeUIScheme[] = "chrome";
+// The scheme the address bar shows for chrome: URLs (see url_formatter.cc).
+// Typed phantom: text is rewritten to chrome: below, like about:.
+const char kPhantomUIScheme[] = "phantom";
 const char kDevToolsScheme[] = "devtools";
 const char kChromeUIDefaultHost[] = "version";
 const char kViewSourceScheme[] = "view-source";
@@ -445,7 +448,8 @@ std::string SegmentURLInternal(std::string* text, url::Parsed* parts) {
       (*text)[semicolon] = ':';
       if (GetValidScheme(*text, &parts->scheme, &scheme) &&
           (url::IsStandard(scheme) || scheme == url::kAboutScheme ||
-           scheme == kChromeUIScheme || scheme == url::kFileScheme)) {
+           scheme == kChromeUIScheme || scheme == kPhantomUIScheme ||
+           scheme == url::kFileScheme)) {
         found_scheme = true;
       } else {
         (*text)[semicolon] = ';';
@@ -461,7 +465,8 @@ std::string SegmentURLInternal(std::string* text, url::Parsed* parts) {
   // Proceed with about, chrome, and devtools schemes,
   // but not file or nonstandard schemes.
   if ((scheme != url::kAboutScheme) && (scheme != kChromeUIScheme) &&
-      (scheme != kDevToolsScheme) && !url::IsStandard(scheme)) {
+      (scheme != kPhantomUIScheme) && (scheme != kDevToolsScheme) &&
+      !url::IsStandard(scheme)) {
     return scheme;
   }
 
@@ -613,12 +618,14 @@ GURL FixupURLInternal(const std::string& text,
   }
 
   // For some schemes whose layouts we understand, we rebuild the URL.
-  bool chrome_url =
-      (scheme == url::kAboutScheme) || (scheme == kChromeUIScheme);
+  bool chrome_url = (scheme == url::kAboutScheme) ||
+                    (scheme == kChromeUIScheme) || (scheme == kPhantomUIScheme);
   bool devtools_url = (scheme == kDevToolsScheme);
   if (chrome_url || devtools_url || url::IsStandard(scheme)) {
-    // Replace the about: scheme with the chrome: scheme.
-    std::string url(scheme == url::kAboutScheme ? kChromeUIScheme : scheme);
+    // Replace the about: and phantom: schemes with the chrome: scheme.
+    std::string url(scheme == url::kAboutScheme || scheme == kPhantomUIScheme
+                        ? kChromeUIScheme
+                        : scheme);
     url.append(url::kStandardSchemeSeparator);
 
     // We need to check whether the |username| is valid because it is our
@@ -741,7 +748,9 @@ bool IsEquivalentScheme(const std::string& scheme1,
                         const std::string& scheme2) {
   return scheme1 == scheme2 ||
          (scheme1 == url::kAboutScheme && scheme2 == kChromeUIScheme) ||
-         (scheme1 == kChromeUIScheme && scheme2 == url::kAboutScheme);
+         (scheme1 == kChromeUIScheme && scheme2 == url::kAboutScheme) ||
+         (scheme1 == kPhantomUIScheme && scheme2 == kChromeUIScheme) ||
+         (scheme1 == kChromeUIScheme && scheme2 == kPhantomUIScheme);
 }
 
 }  // namespace url_formatter
