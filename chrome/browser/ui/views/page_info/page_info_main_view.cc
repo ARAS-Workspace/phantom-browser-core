@@ -76,18 +76,16 @@ int GetSeparatorPadding() {
       DISTANCE_HORIZONTAL_SEPARATOR_PADDING_PAGE_INFO_VIEW);
 }
 
-// Creates a StyledLabel from a localized string containing <link>...</link>
-// tags, configuring the link style and binding it to |link_callback|.
-std::unique_ptr<views::StyledLabel> CreateLearnMoreLabel(
-    const std::u16string& raw_text,
-    base::RepeatingClosure link_callback) {
+// Creates a StyledLabel from a localized string, with the <link>...</link>
+// tags removed from the text.
+std::unique_ptr<views::StyledLabel> CreateDescriptionLabel(
+    const std::u16string& raw_text) {
   constexpr std::u16string_view kBeginTag = u"<link>";
   constexpr std::u16string_view kEndTag = u"</link>";
   const size_t begin_pos = raw_text.find(kBeginTag);
   const size_t end_pos = raw_text.find(kEndTag);
 
   std::u16string clean_text = raw_text;
-  gfx::Range link_range;
   if (begin_pos != std::u16string::npos && end_pos != std::u16string::npos &&
       end_pos > begin_pos) {
     const std::u16string link_text =
@@ -95,18 +93,12 @@ std::unique_ptr<views::StyledLabel> CreateLearnMoreLabel(
                         end_pos - (begin_pos + kBeginTag.length()));
     clean_text = raw_text.substr(0, begin_pos) + link_text +
                  raw_text.substr(end_pos + kEndTag.length());
-    link_range = gfx::Range(begin_pos, begin_pos + link_text.length());
   }
 
   auto label = std::make_unique<views::StyledLabel>();
   label->SetText(clean_text);
   label->SetDefaultTextStyle(views::style::STYLE_BODY_4);
   label->SetDefaultEnabledColorId(ui::kColorSysOnSurfaceSubtle);
-  if (link_range.IsValid()) {
-    label->AddStyleRange(link_range,
-                         views::StyledLabel::RangeStyleInfo::CreateForLink(
-                             std::move(link_callback)));
-  }
   return label;
 }
 
@@ -841,13 +833,8 @@ std::unique_ptr<views::View> PageInfoMainView::CreateSuspiciousSiteBannerView(
   title_label->SetEnabledColor(ui::kColorAlertHighSeverity);
   title_label->SetHorizontalAlignment(gfx::ALIGN_LEFT);
 
-  auto* description_label = text_column->AddChildView(CreateLearnMoreLabel(
-      l10n_util::GetStringUTF16(IDS_PAGE_INFO_SUSPICIOUS_SITE_DETAILS),
-      base::BindRepeating(
-          [](PageInfoMainView* view) {
-            view->presenter_->OpenSafeBrowsingHelpCenterPage(nullptr);
-          },
-          base::Unretained(this))));
+  auto* description_label = text_column->AddChildView(CreateDescriptionLabel(
+      l10n_util::GetStringUTF16(IDS_PAGE_INFO_SUSPICIOUS_SITE_DETAILS)));
   constexpr int kTargetDescriptionWidth = 300;
   description_label->SizeToFit(kTargetDescriptionWidth);
 

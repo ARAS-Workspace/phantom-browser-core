@@ -209,13 +209,11 @@ inline constexpr char kPrivacySandboxAdTopicsURL[] =
 inline constexpr char kPrivacySandboxManageTopicsURL[] =
     "chrome://settings/adPrivacy/interests/manage";
 
-// "Learn more" URL for Safebrowsing
-inline constexpr char kSafeBrowsingHelpCenterURL[] =
-    "https://support.google.com/chrome?p=cpn_safe_browsing";
-
+#if BUILDFLAG(IS_ANDROID)
 // "Learn more" URL for unsafe site warnings.
 inline constexpr char kUnsafeSiteWarningHelpCenterURL[] =
     "https://support.google.com/chrome?p=cpn_safe_browsing_wv";
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // "Learn more" URL for safety tip bubble.
 inline constexpr char kSafetyTipHelpCenterURL[] =

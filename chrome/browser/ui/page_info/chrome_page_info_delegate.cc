@@ -63,7 +63,6 @@
 #include "net/base/registry_controlled_domains/registry_controlled_domain.h"
 #include "services/network/public/cpp/features.h"
 #include "third_party/blink/public/common/features.h"
-#include "ui/base/window_open_disposition_utils.h"
 #include "ui/events/event.h"
 #include "url/origin.h"
 #include "url/url_constants.h"
@@ -437,19 +436,7 @@ void ChromePageInfoDelegate::OnUIClosing() {
 
 void ChromePageInfoDelegate::OpenSafeBrowsingHelpCenterPage(
     const ui::Event* event,
-    bool is_suspicious_site) {
-  int event_flags = event ? event->flags() : 0;
-  const char* const url = is_suspicious_site
-                              ? chrome::kUnsafeSiteWarningHelpCenterURL
-                              : chrome::kSafeBrowsingHelpCenterURL;
-  web_contents_->OpenURL(
-      content::OpenURLParams(
-          GURL(url), content::Referrer(),
-          ui::DispositionFromEventFlags(
-              event_flags, WindowOpenDisposition::NEW_FOREGROUND_TAB),
-          ui::PAGE_TRANSITION_LINK, false),
-      /*navigation_handle_callback=*/{});
-}
+    bool is_suspicious_site) {}
 
 void ChromePageInfoDelegate::OnSuspiciousSiteBackToSafety() {
 #if BUILDFLAG(IS_ANDROID)
