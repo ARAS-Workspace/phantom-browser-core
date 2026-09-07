@@ -89,7 +89,6 @@
 #include "components/bookmarks/browser/bookmark_utils.h"
 #include "components/bookmarks/common/bookmark_pref_names.h"
 #include "components/bookmarks/managed/managed_bookmark_service.h"
-#include "components/feature_engagement/public/feature_constants.h"
 #include "components/metrics/metrics_service.h"
 #include "components/prefs/pref_service.h"
 #include "components/profile_metrics/browser_profile_type.h"
@@ -1152,10 +1151,6 @@ void BookmarkBarView::ChildPreferredSizeChanged(views::View* child) {
   }
 
   InvalidateDrop();
-}
-
-void BookmarkBarView::AddedToWidget() {
-  MaybeShowSavedTabGroupsIntroPromo();
 }
 
 void BookmarkBarView::AnimationProgressed(const gfx::Animation* animation) {
@@ -2408,59 +2403,6 @@ int BookmarkBarView::GetDropLocationModelIndexForTesting() const {
 const views::View* BookmarkBarView::GetSavedTabGroupsSeparatorViewForTesting()
     const {
   return saved_tab_groups_separator_view_;
-}
-
-void BookmarkBarView::MaybeShowSavedTabGroupsIntroPromo() const {
-  // Check whether to show the synced, or unsyned version of the promo.
-  tab_groups::TabGroupSyncService* tab_group_service =
-      tab_groups::TabGroupSyncServiceFactory::GetForProfile(
-          browser_->GetProfile());
-  if (!tab_group_service) {
-    return;
-  }
-
-  // In order for IPH's for V2 to show up, there must be at least 1 group.
-  if (tab_group_service->GetAllGroups().empty()) {
-    return;
-  }
-
-  user_education::FeaturePromoParams params(
-      feature_engagement::kIPHTabGroupsSaveV2IntroFeature);
-
-  const bool everything_button_is_visible =
-      saved_tab_group_bar_ && saved_tab_group_bar_->GetVisible();
-
-  // TODO (crbug.com/343258921) Once A11y text is supported with string
-  // substitutions, add them in.
-
-  // If tabs groups are syncing...
-  if (tab_groups::SavedTabGroupUtils::AreSavedTabGroupsSyncedForProfile(
-          browser()->GetProfile())) {
-    // Anchor the IPH to the bookmarks bar if the everything button is visible.
-    // Otherwise, anchor to the AppMenu.
-    if (everything_button_is_visible) {
-      params.body_params = {l10n_util::GetStringUTF16(
-          IDS_SAVED_TAB_GROUPS_V2_INTRO_IPH_BOOKMARKS_BAR_SYNCED_BODY)};
-    } else {
-      params.body_params = {l10n_util::GetStringUTF16(
-          IDS_SAVED_TAB_GROUPS_V2_INTRO_IPH_APP_MENU_SYNCED_BODY)};
-    }
-  } else {
-    // Anchor the IPH to the bookmarks bar if the everything button is visible.
-    // Otherwise, anchor to the AppMenu.
-    if (everything_button_is_visible) {
-      params.body_params =
-          std::vector<std::u16string>{l10n_util::GetStringUTF16(
-              IDS_SAVED_TAB_GROUPS_V2_INTRO_IPH_BOOKMARKS_BAR_NOT_SYNCED_BODY)};
-    } else {
-      params.body_params =
-          std::vector<std::u16string>{l10n_util::GetStringUTF16(
-              IDS_SAVED_TAB_GROUPS_V2_INTRO_IPH_APP_MENU_NOT_SYNCED_BODY)};
-    }
-  }
-
-  BrowserUserEducationInterface::From(browser_view_->browser())
-      ->MaybeShowStartupFeaturePromo(std::move(params));
 }
 
 bool BookmarkBarView::HasDropInfo() const {

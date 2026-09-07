@@ -1353,23 +1353,6 @@ void MaybeRegisterChromeFeaturePromos(
                        "triggered on startup when the saved tab groups are "
                        "defaulted to saved for the first time.")));
 
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForCustomAction(
-          feature_engagement::kIPHTabGroupsSaveV2IntroFeature,
-          kToolbarAppMenuButtonElementId,
-          IDS_WILDCARD,  // Replaced by caller with the correct IDS string.
-          IDS_LEARN_MORE,
-          CreateNavigationAction(GURL(chrome::kTabGroupsLearnMoreURL)))
-          .SetBubbleArrow(HelpBubbleArrow::kTopRight)
-          .SetAnchorElementFilter(
-              base::BindRepeating(&tab_groups::SavedTabGroupUtils::
-                                      GetAnchorElementForTabGroupsV2IPH))
-          .SetBubbleArrowCallback(base::BindRepeating(
-              &tab_groups::SavedTabGroupUtils::GetArrowForTabGroupsV2IPH))
-          .SetMetadata(127, "dpenning@chromium.org",
-                       "triggered on startup when the saved tab groups are "
-                       "defaulted to saved for the first time.")));
-
   if (tab_groups::SavedTabGroupUtils::SupportsSharedTabGroups()) {
     registry.RegisterFeature(std::move(
         FeaturePromoSpecification::CreateForCustomAction(

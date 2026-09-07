@@ -231,8 +231,6 @@ class TabGroupEditorBubbleView : public views::BubbleDialogDelegateView,
    public:
     explicit Footer(BrowserWindowInterface* browser_);
     ~Footer() override = default;
-
-    static void OpenLearnMorePage(const BrowserWindowInterface* browser_);
   };
 
   TitleFieldController title_field_controller_;

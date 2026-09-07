@@ -197,7 +197,6 @@ class BookmarkBarView : public views::AccessiblePaneView,
   void OnThemeChanged() override;
   void VisibilityChanged(views::View* starting_from, bool is_visible) override;
   void ChildPreferredSizeChanged(views::View* child) override;
-  void AddedToWidget() override;
 
   // views::AnimationDelegateViews:
   void AnimationProgressed(const gfx::Animation* animation) override;
@@ -435,8 +434,6 @@ class BookmarkBarView : public views::AccessiblePaneView,
 
   int GetDropLocationModelIndexForTesting() const;
   const views::View* GetSavedTabGroupsSeparatorViewForTesting() const;
-
-  void MaybeShowSavedTabGroupsIntroPromo() const;
 
   // Return true when `drop_info_` is not null, as it indicates that a drag
   // action is being performed.

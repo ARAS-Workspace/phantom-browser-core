@@ -143,10 +143,6 @@ inline constexpr char kGooglePasswordManagerURL[] = "";
 inline constexpr char kLearnMoreReportingURL[] =
     "https://support.google.com/chrome?p=ui_usagestat";
 
-// The URL for the tab group sync help center page.
-inline constexpr char kTabGroupsLearnMoreURL[] =
-    "https://support.google.com/chrome?p=desktop_tab_groups";
-
 // The URL for the Learn More page about policies and enterprise enrollment.
 inline constexpr char16_t kManagedUiLearnMoreUrl[] =
 #if BUILDFLAG(IS_CHROMEOS)

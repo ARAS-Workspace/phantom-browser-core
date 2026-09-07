@@ -19,7 +19,6 @@
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/user_metrics.h"
 #include "base/metrics/user_metrics_action.h"
-#include "base/strings/string_util.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/app/vector_icons/vector_icons.h"
 #include "chrome/browser/collaboration/collaboration_service_factory.h"
@@ -64,7 +63,6 @@
 #include "chrome/browser/ui/views/tabs/groups/recent_activity_bubble_dialog_view.h"
 #include "chrome/browser/ui/views/tabs/tab_strip.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_ink_drop_util.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/bookmarks/common/bookmark_pref_names.h"
 #include "components/collaboration/public/collaboration_service.h"
@@ -1338,23 +1336,8 @@ TabGroupEditorBubbleView::Footer::Footer(BrowserWindowInterface* browser) {
           ? IDS_TAB_GROUP_EDITOR_BUBBLE_FOOTER_SYNC_ENABLED
           : IDS_TAB_GROUP_EDITOR_BUBBLE_FOOTER_SYNC_DISABLED));
 
-  // Learn more link for the footer.
-  footer_text_substr.push_back(
-      l10n_util::GetStringUTF16(IDS_TAB_GROUP_EDITOR_BUBBLE_FOOTER_LEARN_MORE));
-
-  std::vector<size_t> offsets;
-  std::u16string styled_text =
-      base::ReplaceStringPlaceholders(u"$1 $2", footer_text_substr, &offsets);
-  footer_label->SetText(styled_text);
+  footer_label->SetText(footer_text_substr.front());
   footer_label->SetDefaultEnabledColorId(ui::kColorLabelForegroundSecondary);
-
-  gfx::Range details_range(offsets[1], styled_text.length());
-
-  views::StyledLabel::RangeStyleInfo link_style =
-      views::StyledLabel::RangeStyleInfo::CreateForLink(base::BindRepeating(
-          &TabGroupEditorBubbleView::Footer::OpenLearnMorePage, browser));
-
-  footer_label->AddStyleRange(details_range, link_style);
 
   ChromeLayoutProvider* layout_provider = ChromeLayoutProvider::Get();
   const int horizontal_spacing = layout_provider->GetDistanceMetric(
@@ -1369,13 +1352,6 @@ TabGroupEditorBubbleView::Footer::Footer(BrowserWindowInterface* browser) {
                           control_insets.left());
   SetSize({kDialogWidth, height()});
   SetBorder(views::CreateEmptyBorder(control_insets));
-}
-
-// static
-void TabGroupEditorBubbleView::Footer::OpenLearnMorePage(
-    const BrowserWindowInterface* browser) {
-  browser->GetTabStripModel()->delegate()->AddTabAt(
-      GURL(chrome::kTabGroupsLearnMoreURL), -1, true);
 }
 
 BEGIN_METADATA(TabGroupEditorBubbleView, Footer)
