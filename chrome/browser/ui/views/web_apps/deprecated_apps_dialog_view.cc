@@ -32,7 +32,6 @@
 #include "ui/base/mojom/ui_base_types.mojom-shared.h"
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/base/ui_base_features.h"
-#include "ui/base/window_open_disposition_utils.h"
 #include "ui/gfx/favicon_size.h"
 #include "ui/gfx/image/image_skia.h"
 #include "ui/gfx/paint_vector_icon.h"
@@ -209,24 +208,6 @@ void DeprecatedAppsDialogView::InitDialog() {
       l10n_util::GetStringUTF16(IDS_DEPRECATED_APPS_MONITOR_RENDERER)));
   info_label_->SetMultiLine(true);
   info_label_->SetHorizontalAlignment(gfx::ALIGN_LEFT);
-
-  auto* learn_more = AddChildView(std::make_unique<views::Link>(
-      l10n_util::GetStringUTF16(IDS_DEPRECATED_APPS_LEARN_MORE)));
-  learn_more->SetCallback(base::BindRepeating(
-      [](content::WebContents* web_contents, const ui::Event& event) {
-        web_contents->OpenURL(
-            content::OpenURLParams(
-                GURL(chrome::kChromeAppsDeprecationLearnMoreURL),
-                content::Referrer(),
-                ui::DispositionFromEventFlags(
-                    event.flags(), WindowOpenDisposition::NEW_FOREGROUND_TAB),
-                ui::PAGE_TRANSITION_LINK, /*is_renderer_initiated=*/false),
-            /*navigation_handle_callback=*/{});
-      },
-      web_contents_));
-  learn_more->GetViewAccessibility().SetName(
-      l10n_util::GetStringUTF16(IDS_DEPRECATED_APPS_LEARN_MORE_AX_LABEL));
-  learn_more->SetHorizontalAlignment(gfx::ALIGN_LEFT);
 
   // Set up the table view.
   std::vector<ui::TableColumn> columns;

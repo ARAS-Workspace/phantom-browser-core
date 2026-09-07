@@ -32,11 +32,6 @@ namespace chrome {
 inline constexpr char kAccessCodeCastLearnMoreURL[] =
     "https://support.google.com/chrome/a/?p=cast_to_class_teacher";
 
-// "Learn more" URL for accessibility image labels, linked from the permissions
-// dialog shown when a user enables the feature.
-inline constexpr char kAccessibilityLabelsLearnMoreURL[] =
-    "https://support.google.com/chrome?p=image_descriptions";
-
 // "Chrome Settings" URL for the appearance page.
 inline constexpr char kBrowserSettingsSearchEngineURL[] =
     "chrome://settings/search";
@@ -379,12 +374,6 @@ inline constexpr char kWindowsXPVistaDeprecationURL[] =
 inline constexpr char kWindows78DeprecationURL[] =
     "https://support.google.com/chrome?p=unsupported_windows";
 
-#endif
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-// "Learn more" URL for the chrome apps deprecation dialog.
-inline constexpr char kChromeAppsDeprecationLearnMoreURL[] =
-    "https://support.google.com/chrome?p=chrome_app_deprecation";
 #endif
 
 #if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)

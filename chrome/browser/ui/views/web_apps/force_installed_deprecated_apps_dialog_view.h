@@ -13,8 +13,7 @@ namespace content {
 class WebContents;
 }  // namespace content
 
-// Creates a dialog with one button. Clicking it opens a new tab to
-// kChromeAppsDeprecationLearnMoreURL.
+// Creates a dialog with one button.
 class ForceInstalledDeprecatedAppsDialogView : public views::BoxLayoutView {
   METADATA_HEADER(ForceInstalledDeprecatedAppsDialogView, views::BoxLayoutView)
 

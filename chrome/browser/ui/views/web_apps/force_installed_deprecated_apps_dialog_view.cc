@@ -6,7 +6,6 @@
 
 #include <string>
 
-#include "base/functional/bind.h"
 #include "base/memory/ptr_util.h"
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
 #include "chrome/common/url_constants.h"
@@ -20,8 +19,6 @@
 #include "ui/base/mojom/dialog_button.mojom.h"
 #include "ui/base/mojom/ui_base_types.mojom-shared.h"
 #include "ui/base/ui_base_types.h"
-#include "ui/base/window_open_disposition.h"
-#include "ui/base/window_open_disposition_utils.h"
 #include "ui/views/accessibility/view_accessibility.h"
 #include "ui/views/controls/link.h"
 #include "ui/views/layout/box_layout.h"
@@ -67,24 +64,6 @@ ForceInstalledDeprecatedAppsDialogView::ForceInstalledDeprecatedAppsDialogView(
       l10n_util::GetStringUTF16(IDS_FORCE_INSTALLED_DEPRECATED_APPS_CONTENT)));
   info_label->SetMultiLine(true);
   info_label->SetHorizontalAlignment(gfx::ALIGN_LEFT);
-
-  auto* learn_more = AddChildView(std::make_unique<views::Link>(
-      l10n_util::GetStringUTF16(IDS_DEPRECATED_APPS_LEARN_MORE)));
-  learn_more->SetCallback(base::BindRepeating(
-      [](content::WebContents* web_contents, const ui::Event& event) {
-        web_contents->OpenURL(
-            content::OpenURLParams(
-                GURL(chrome::kChromeAppsDeprecationLearnMoreURL),
-                content::Referrer(),
-                ui::DispositionFromEventFlags(
-                    event.flags(), WindowOpenDisposition::NEW_FOREGROUND_TAB),
-                ui::PAGE_TRANSITION_LINK, /*is_renderer_initiated=*/false),
-            /*navigation_handle_callback=*/{});
-      },
-      web_contents));
-  learn_more->GetViewAccessibility().SetName(
-      l10n_util::GetStringUTF16(IDS_DEPRECATED_APPS_LEARN_MORE_AX_LABEL));
-  learn_more->SetHorizontalAlignment(gfx::ALIGN_LEFT);
 }
 
 BEGIN_METADATA(ForceInstalledDeprecatedAppsDialogView)

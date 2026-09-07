@@ -6213,12 +6213,6 @@ Keep your key file in a safe place. You will need it to create new versions of y
           Old versions of Chrome apps won't open after December 2022. You can check if there's a new version available.
         </message>
       </if>
-      <message name="IDS_DEPRECATED_APPS_LEARN_MORE" desc="Redirects to a link with more information on chrome apps deprecation">
-        Learn more
-      </message>
-      <message name="IDS_DEPRECATED_APPS_LEARN_MORE_AX_LABEL" desc="Accessibility label text for IDS_DEPRECATED_APPS_LEARN_MORE link">
-        Learn more about unsupported Chrome apps
-      </message>
       <message name="IDS_DEPRECATED_APPS_DELETION_LINK" desc="Contains link to trigger the deprecated apps deletion dialog from chrome://apps">
         {NUM_APPS, plural,
         =1 {Remove 1 unsupported app}

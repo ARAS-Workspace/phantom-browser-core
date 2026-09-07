@@ -87,28 +87,6 @@ void AccessibilityLabelsBubbleModel::Cancel() {
   RecordModalDialogAccepted(/* not accepted */ false);
 }
 
-std::u16string AccessibilityLabelsBubbleModel::GetLinkText() const {
-  return l10n_util::GetStringUTF16(IDS_LEARN_MORE);
-}
-
-GURL AccessibilityLabelsBubbleModel::GetHelpPageURL() const {
-  return GURL(chrome::kAccessibilityLabelsLearnMoreURL);
-}
-
-void AccessibilityLabelsBubbleModel::OpenHelpPage() {
-  OpenURLParams params(GetHelpPageURL(), Referrer(),
-                       WindowOpenDisposition::NEW_FOREGROUND_TAB,
-                       ui::PAGE_TRANSITION_LINK, false);
-  if (web_contents_) {
-    web_contents_->OpenURL(params, /*navigation_handle_callback=*/{});
-    return;
-  }
-  // The web contents used to open this dialog have been destroyed.
-  BrowserWindowInterface* browser =
-      chrome::ScopedTabbedBrowserDisplayer(profile_).browser_window_interface();
-  browser->OpenURL(params, /*navigation_handle_callback=*/{});
-}
-
 void AccessibilityLabelsBubbleModel::SetPref(bool enabled) {
   PrefService* prefs = profile_->GetPrefs();
   DCHECK(prefs);

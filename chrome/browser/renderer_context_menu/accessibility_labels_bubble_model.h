@@ -36,9 +36,6 @@ class AccessibilityLabelsBubbleModel : public ConfirmBubbleModel {
   std::u16string GetButtonLabel(ui::mojom::DialogButton button) const override;
   void Accept() override;
   void Cancel() override;
-  std::u16string GetLinkText() const override;
-  GURL GetHelpPageURL() const override;
-  void OpenHelpPage() override;
 
  private:
   // Set the profile preferences to enable or disable the feature.

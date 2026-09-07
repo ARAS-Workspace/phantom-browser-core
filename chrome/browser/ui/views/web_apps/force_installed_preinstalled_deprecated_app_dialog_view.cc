@@ -198,28 +198,6 @@ ForceInstalledPreinstalledDeprecatedAppDialogView::
                 /*navigation_handle_callback=*/{});
           },
           web_contents->GetWeakPtr(), app_link)));
-
-  auto* learn_more = AddChildView(std::make_unique<views::Link>(
-      l10n_util::GetStringUTF16(IDS_DEPRECATED_APPS_LEARN_MORE)));
-  learn_more->SetCallback(base::BindRepeating(
-      [](base::WeakPtr<content::WebContents> web_contents,
-         const ui::Event& event) {
-        if (!web_contents) {
-          return;
-        }
-        web_contents->OpenURL(
-            content::OpenURLParams(
-                GURL(chrome::kChromeAppsDeprecationLearnMoreURL),
-                content::Referrer(),
-                ui::DispositionFromEventFlags(
-                    event.flags(), WindowOpenDisposition::NEW_FOREGROUND_TAB),
-                ui::PAGE_TRANSITION_LINK, /*is_renderer_initiated=*/false),
-            /*navigation_handle_callback=*/{});
-      },
-      web_contents->GetWeakPtr()));
-  learn_more->GetViewAccessibility().SetName(
-      l10n_util::GetStringUTF16(IDS_DEPRECATED_APPS_LEARN_MORE_AX_LABEL));
-  learn_more->SetHorizontalAlignment(gfx::ALIGN_LEFT);
 }
 
 BEGIN_METADATA(ForceInstalledPreinstalledDeprecatedAppDialogView)
