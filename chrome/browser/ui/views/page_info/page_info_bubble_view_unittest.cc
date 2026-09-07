@@ -1099,11 +1099,10 @@ TEST_F(PageInfoBubbleViewTest, CheckHeaderInteractions) {
   const ui::MouseEvent event(ui::EventType::kMousePressed, gfx::Point(),
                              gfx::Point(), ui::EventTimeForNow(), 0, 0);
   // Navigating to the security page constitutes an interaction.
-  EXPECT_CALL(*mock_sentiment_service_, InteractedWithPageInfo).Times(3);
+  EXPECT_CALL(*mock_sentiment_service_, InteractedWithPageInfo).Times(2);
   api_->navigation_handler()->OpenSecurityPage();
   auto* page_view = static_cast<PageInfoSecurityContentView*>(
       api_->current_view()->children()[1]);
-  page_view->SecurityDetailsClicked(event);
   page_view->ResetDecisionsClicked();
 }
 

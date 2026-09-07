@@ -112,27 +112,6 @@ void SecurityInformationView::SetSummary(const std::u16string& summary_text,
   security_summary_label_->SetDefaultTextStyle(text_style);
 }
 
-void SecurityInformationView::SetDetailsWithLearnMore(
-    const std::u16string& details_text,
-    views::Link::ClickedCallback security_details_callback) {
-  std::vector<std::u16string> subst;
-  subst.push_back(details_text);
-  subst.push_back(l10n_util::GetStringUTF16(IDS_LEARN_MORE));
-
-  std::vector<size_t> offsets;
-
-  std::u16string text =
-      base::ReplaceStringPlaceholders(u"$1 $2", subst, &offsets);
-  security_details_label_->SetText(text);
-  gfx::Range details_range(offsets[1], text.length());
-
-  views::StyledLabel::RangeStyleInfo link_style =
-      views::StyledLabel::RangeStyleInfo::CreateForLink(
-          security_details_callback);
-
-  security_details_label_->AddStyleRange(details_range, link_style);
-}
-
 void SecurityInformationView::SetDetails(const std::u16string& details_text) {
   security_details_label_->SetText(details_text);
 }

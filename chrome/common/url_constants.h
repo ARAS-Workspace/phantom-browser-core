@@ -201,14 +201,6 @@ inline constexpr char16_t kMyActivityUrlInHistory[] =
 // The URL for "Your Gemini Apps Activity" page.
 inline constexpr char16_t kMyActivityGeminiAppsUrl[] = u"";
 
-// "What do these mean?" URL for the Page Info bubble.
-inline constexpr char kPageInfoHelpCenterURL[] =
-#if BUILDFLAG(IS_CHROMEOS)
-    "https://support.google.com/chromebook?p=ui_security_indicator";
-#else
-    "https://support.google.com/chrome?p=ui_security_indicator";
-#endif
-
 // "Chrome Settings" URL for Ad Topics page
 inline constexpr char kPrivacySandboxAdTopicsURL[] =
     "chrome://settings/adPrivacy/interests";

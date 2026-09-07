@@ -89,10 +89,7 @@ void PageInfoSecurityContentView::SetIdentityInfo(
     security_view_->SetSummary(security_description->summary,
                                views::style::STYLE_BODY_3_MEDIUM);
   }
-  security_view_->SetDetailsWithLearnMore(
-      security_description->details,
-      base::BindRepeating(&PageInfoSecurityContentView::SecurityDetailsClicked,
-                          base::Unretained(this)));
+  security_view_->SetDetails(security_description->details);
 
   // The "re-enable warnings" button is shown if the user has bypassed SSL
   // error interstitials or HTTP warning interstitials (with HTTPS-First Mode
@@ -273,18 +270,6 @@ void PageInfoSecurityContentView::SetIdentityInfo(
 void PageInfoSecurityContentView::ResetDecisionsClicked() {
   presenter_->OnRevokeSSLErrorBypassButtonPressed();
   GetWidget()->Close();
-}
-
-void PageInfoSecurityContentView::SecurityDetailsClicked(
-    const ui::Event& event) {
-  if (security_description_type_ == SecurityDescriptionType::SAFETY_TIP) {
-    presenter_->OpenSafetyTipHelpCenterPage();
-  } else if (security_description_type_ ==
-             SecurityDescriptionType::SAFE_BROWSING) {
-    presenter_->OpenSafeBrowsingHelpCenterPage(&event);
-  } else {
-    presenter_->OpenConnectionHelpCenterPage(event);
-  }
 }
 
 BEGIN_METADATA(PageInfoSecurityContentView)

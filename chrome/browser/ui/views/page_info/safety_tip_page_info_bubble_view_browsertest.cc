@@ -368,16 +368,6 @@ class SafetyTipPageInfoBubbleViewBrowserTest : public InProcessBrowserTest {
             l10n_util::GetStringUTF16(IDS_PAGE_INFO_NOT_SECURE_SUMMARY) ||
         GetSafetyTipSummaryText() ==
             l10n_util::GetStringUTF16(IDS_PAGE_INFO_INTERNAL_PAGE));
-    if (PageInfoBubbleViewBase::GetShownBubbleType() ==
-        PageInfoBubbleViewBase::BubbleType::BUBBLE_PAGE_INFO) {
-      content::WebContentsAddedObserver new_tab_observer;
-      static_cast<views::StyledLabel*>(
-          page_info->GetViewByID(
-              PageInfoViewFactory::VIEW_ID_PAGE_INFO_SECURITY_DETAILS_LABEL))
-          ->ClickFirstLinkForTesting();
-      EXPECT_EQ(chrome::kPageInfoHelpCenterURL,
-                new_tab_observer.GetWebContents()->GetVisibleURL());
-    }
   }
 
   // Checks that the metrics specified in |test_case| are properly recorded,

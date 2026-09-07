@@ -34,12 +34,6 @@ class SecurityInformationView : public views::View {
   // Sets the security summary for the current page.
   void SetSummary(const std::u16string& summary_text, int text_style);
 
-  // Sets the security details for the current page and the callback for the
-  // "Learn more" link.
-  void SetDetailsWithLearnMore(
-      const std::u16string& details_text,
-      views::Link::ClickedCallback security_details_callback);
-
   // Sets the security details for the current page.
   void SetDetails(const std::u16string& details_text);
 

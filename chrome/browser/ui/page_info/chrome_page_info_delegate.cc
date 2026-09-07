@@ -76,7 +76,6 @@
 #include "chrome/browser/hid/hid_chooser_context.h"
 #include "chrome/browser/hid/hid_chooser_context_factory.h"
 #include "chrome/browser/infobars/infobar_spec.h"
-#include "chrome/browser/lookalikes/safety_tip_ui_helper.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_web_contents_delegate/browser_web_contents_delegate.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -403,19 +402,9 @@ void ChromePageInfoDelegate::OpenCertificateDialog(
 }
 
 void ChromePageInfoDelegate::OpenConnectionHelpCenterPage(
-    const ui::Event& event) {
-  web_contents_->OpenURL(
-      content::OpenURLParams(
-          GURL(chrome::kPageInfoHelpCenterURL), content::Referrer(),
-          ui::DispositionFromEventFlags(
-              event.flags(), WindowOpenDisposition::NEW_FOREGROUND_TAB),
-          ui::PAGE_TRANSITION_LINK, false),
-      /*navigation_handle_callback=*/{});
-}
+    const ui::Event& event) {}
 
-void ChromePageInfoDelegate::OpenSafetyTipHelpCenterPage() {
-  OpenHelpCenterFromSafetyTip(web_contents_);
-}
+void ChromePageInfoDelegate::OpenSafetyTipHelpCenterPage() {}
 
 void ChromePageInfoDelegate::OpenContentSettingsExceptions(
     ContentSettingsType content_settings_type) {
