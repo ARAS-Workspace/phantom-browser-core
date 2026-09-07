@@ -10,18 +10,12 @@
 #include "chrome/browser/profiles/profile_attributes_storage_observer.h"
 #include "chrome/browser/status_icons/status_icon.h"
 
-namespace chrome {
-enum class HelpSource;
-}
-
 class DeviceStatusIconRenderer : public DeviceSystemTrayIconRenderer,
                                  public StatusIconMenuModel::Delegate,
                                  public ProfileAttributesStorageObserver {
  public:
   explicit DeviceStatusIconRenderer(
-      DeviceSystemTrayIcon* device_system_tray_icon,
-      const chrome::HelpSource help_source,
-      const int about_device_message_id);
+      DeviceSystemTrayIcon* device_system_tray_icon);
   DeviceStatusIconRenderer(const DeviceStatusIconRenderer&) = delete;
   DeviceStatusIconRenderer& operator=(const DeviceStatusIconRenderer&) = delete;
   ~DeviceStatusIconRenderer() override;
@@ -36,11 +30,6 @@ class DeviceStatusIconRenderer : public DeviceSystemTrayIconRenderer,
   }
 
  private:
-  // Returns a label for About device button.
-  std::u16string GetAboutDeviceLabel();
-
-  // Show the help center article for the device category.
-  void ShowHelpCenterUrl();
   void ShowContentSettings(base::WeakPtr<Profile> profile);
   void ShowSiteSettings(base::WeakPtr<Profile> profile,
                         const url::Origin& origin);
@@ -59,10 +48,6 @@ class DeviceStatusIconRenderer : public DeviceSystemTrayIconRenderer,
                base::RepeatingClosure callback);
 
   void RefreshIcon();
-
-  chrome::HelpSource help_source_;
-
-  int about_device_message_id_;
 
   // Reference to our status icon (if any) - owned by the StatusTray.
   raw_ptr<StatusIcon> status_icon_ = nullptr;

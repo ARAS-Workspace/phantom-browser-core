@@ -28,7 +28,6 @@ class UsbStatusIconTest : public DeviceStatusIconTestBase {
  public:
   UsbStatusIconTest()
       : DeviceStatusIconTestBase(
-            /*about_device_label=*/u"About USB devices",
             /*device_content_settings_label_=*/u"USB settings") {}
 
   void ResetTestingBrowserProcessSystemTrayIcon() override {

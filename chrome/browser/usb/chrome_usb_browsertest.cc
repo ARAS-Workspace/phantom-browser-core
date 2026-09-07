@@ -1311,15 +1311,10 @@ class WebUsbExtensionBrowserTest : public InProcessBrowserTestMixinHostSupport<
     status_icon_renderer->ExecuteCommandForTesting(
         IDC_DEVICE_SYSTEM_TRAY_ICON_FIRST, 0);
     EXPECT_EQ(GetActiveWebContents()->GetURL(),
-              "https://support.google.com/chrome?p=webusb");
-
-    status_icon_renderer->ExecuteCommandForTesting(
-        IDC_DEVICE_SYSTEM_TRAY_ICON_FIRST + 1, 0);
-    EXPECT_EQ(GetActiveWebContents()->GetURL(),
               "chrome://settings/content/usbDevices");
 
     status_icon_renderer->ExecuteCommandForTesting(
-        IDC_DEVICE_SYSTEM_TRAY_ICON_FIRST + 2, 0);
+        IDC_DEVICE_SYSTEM_TRAY_ICON_FIRST + 1, 0);
     EXPECT_EQ(
         GetActiveWebContents()->GetURL(),
         "chrome://settings/content/siteDetails?site=chrome-extension%3A%2F%2F" +

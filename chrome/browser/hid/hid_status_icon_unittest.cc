@@ -28,7 +28,6 @@ class HidStatusIconTest : public DeviceStatusIconTestBase {
  public:
   HidStatusIconTest()
       : DeviceStatusIconTestBase(
-            /*about_device_label=*/u"About HID devices",
             /*device_content_settings_label_=*/u"HID settings") {}
 
   void ResetTestingBrowserProcessSystemTrayIcon() override {

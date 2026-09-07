@@ -60,12 +60,8 @@ std::u16string GetOriginConnectionCountLabel(Profile* profile,
 }  // namespace
 
 DeviceStatusIconRenderer::DeviceStatusIconRenderer(
-    DeviceSystemTrayIcon* device_system_tray_icon,
-    const chrome::HelpSource help_source,
-    const int about_device_message_id)
-    : DeviceSystemTrayIconRenderer(device_system_tray_icon),
-      help_source_(help_source),
-      about_device_message_id_(about_device_message_id) {}
+    DeviceSystemTrayIcon* device_system_tray_icon)
+    : DeviceSystemTrayIconRenderer(device_system_tray_icon) {}
 
 DeviceStatusIconRenderer::~DeviceStatusIconRenderer() {
   if (status_icon_) {
@@ -76,10 +72,6 @@ DeviceStatusIconRenderer::~DeviceStatusIconRenderer() {
     status_icon_ = nullptr;
     removed_icon.reset();
   }
-}
-
-std::u16string DeviceStatusIconRenderer::GetAboutDeviceLabel() {
-  return l10n_util::GetStringUTF16(about_device_message_id_);
 }
 
 void DeviceStatusIconRenderer::AddProfile(Profile* profile) {
@@ -111,12 +103,6 @@ void DeviceStatusIconRenderer::ExecuteCommand(int command_id, int event_flags) {
   if (command_idx < command_id_callbacks_.size()) {
     command_id_callbacks_[command_idx].Run();
   }
-}
-
-void DeviceStatusIconRenderer::ShowHelpCenterUrl() {
-  auto* profile = ProfileManager::GetLastUsedProfileAllowedByPolicy();
-  CHECK(profile);
-  chrome::ShowHelpForProfile(profile, help_source_);
 }
 
 void DeviceStatusIconRenderer::ShowContentSettings(
@@ -165,9 +151,6 @@ void DeviceStatusIconRenderer::RefreshIcon() {
   size_t total_origin_count = 0;
   // Title will be updated after looping through profiles below.
   menu->AddTitle(u"");
-  AddItem(menu.get(), GetAboutDeviceLabel(),
-          base::BindRepeating(&DeviceStatusIconRenderer::ShowHelpCenterUrl,
-                              weak_factory_.GetWeakPtr()));
   for (const auto& [profile, staging] : device_system_tray_icon_->profiles()) {
     // Each profile section looks like this:
     // |---------------Separator---------------|

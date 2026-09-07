@@ -1822,13 +1822,6 @@ class AppControllerProfileObserver : public ProfileAttributesStorage::Observer,
         chrome::OpenExtensionsWindow(profile);
       }
       break;
-    case IDC_HELP_PAGE_VIA_MENU:
-      if (BrowserWindowInterface* browser = ActivateBrowser(profile)) {
-        chrome::ShowHelp(browser, chrome::HelpSource::kMenu);
-      } else {
-        chrome::OpenHelpWindow(profile, chrome::HelpSource::kMenu);
-      }
-      break;
     case IDC_OPTIONS:
       [self showPreferences:sender];
       break;

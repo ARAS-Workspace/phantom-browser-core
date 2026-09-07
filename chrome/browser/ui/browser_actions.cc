@@ -3682,28 +3682,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           base::BindRepeating(
               [](BrowserWindowInterface* bwi, actions::ActionItem* item,
                  actions::ActionInvocationContext context) {
-                chrome::ShowHelp(bwi, chrome::HelpSource::kKeyboard);
-              },
-              bwi))
-          .SetActionId(kActionHelpPageViaKeyboard)
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::ShowHelp(bwi, chrome::HelpSource::kMenu);
-              },
-              bwi))
-          .SetActionId(kActionHelpPageViaMenu)
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
                 base::RecordAction(
                     base::UserMetricsAction("Accel_Show_App_Menu"));
                 chrome::ShowAppMenu(bwi);
@@ -3797,17 +3775,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .SetActionId(kActionTakeScreenshot)
           .Build());
 #endif
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::ShowBetaForum(bwi);
-              },
-              bwi))
-          .SetActionId(kActionShowBetaForum)
-          .Build());
 
 #if BUILDFLAG(IS_MAC)
   root_action_item_->AddChild(

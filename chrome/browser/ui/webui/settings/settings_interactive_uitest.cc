@@ -11,7 +11,6 @@
 #include "chrome/browser/ui/interaction/browser_elements.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/common/chrome_switches.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/interaction/tracked_element_webcontents.h"
 #include "chrome/test/interaction/webcontents_interaction_test_util.h"
@@ -34,7 +33,6 @@
 
 namespace {
 DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kWebContentsInteractionTestUtilTestId);
-DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kWebContentsInteractionTestUtilTestId2);
 DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(
     kWebContentsInteractionTestUtilCustomEventId);
 }  // namespace
@@ -108,64 +106,6 @@ class SettingsInteractiveUiTest : public InProcessBrowserTest {
         .Build();
   }
 };
-
-IN_PROC_BROWSER_TEST_F(SettingsInteractiveUiTest,
-                       CheckQuestionMarkIsPresentUnderCookiesAndSiteData) {
-  UNCALLED_MOCK_CALLBACK(ui::InteractionSequence::CompletedCallback, completed);
-  UNCALLED_MOCK_CALLBACK(ui::InteractionSequence::AbortedCallback, aborted);
-
-  const GURL cookie_setting_url("chrome://settings/privacy");
-  const WebContentsInteractionTestUtil::DeepQuery cookies_link_row = {
-      "settings-ui",
-      "settings-main",
-      "settings-privacy-page-index",
-      "settings-privacy-page",
-      "cr-link-row#thirdPartyCookiesLinkRow"};
-  const WebContentsInteractionTestUtil::DeepQuery
-      cookies_setting_page_help_icon = {
-          "settings-ui",
-          "settings-main",
-          "settings-privacy-page-index",
-          "settings-cookies-page",
-          "settings-subpage",
-          "div#headerLine cr-icon-button[iron-icon='cr:help']"};
-
-  auto util = WebContentsInteractionTestUtil::ForExistingTabInBrowser(
-      browser(), kWebContentsInteractionTestUtilTestId);
-  util->LoadPage(cookie_setting_url);
-  const auto context = BrowserElements::From(browser())->GetContext();
-  auto util2 = WebContentsInteractionTestUtil::ForNextTabInContext(
-      context, kWebContentsInteractionTestUtilTestId2);
-
-  auto sequence =
-      ui::InteractionSequence::Builder()
-          .SetCompletedCallback(completed.Get())
-          .SetAbortedCallback(aborted.Get())
-          .SetContext(context)
-          // Click on 'Cookies and other site data'.
-          .AddStep(WaitFor(cookies_link_row))
-          .AddStep(Click(cookies_link_row))
-          // Click on the "?" mark (help icon) on top right corner.
-          .AddStep(WaitFor(cookies_setting_page_help_icon))
-          .AddStep(Click(cookies_setting_page_help_icon))
-          // Verify the new page opened.
-          .AddStep(
-              ui::InteractionSequence::StepBuilder()
-                  .SetElementID(kWebContentsInteractionTestUtilTestId2)
-                  .SetStartCallback(base::BindLambdaForTesting(
-                      [&](ui::InteractionSequence*,
-                          ui::TrackedElement* element) {
-                        auto* util =
-                            element->AsA<TrackedElementWebContents>()->owner();
-                        auto* const contents = util->web_contents();
-                        EXPECT_EQ(contents->GetURL(),
-                                  chrome::kCookiesSettingsHelpCenterURL);
-                      }))
-                  .Build())
-          .Build();
-
-  EXPECT_CALL_IN_SCOPE(completed, Run, sequence->RunSynchronouslyForTesting());
-}
 
 class ThemeSettingsInteractiveUiTest : public SettingsInteractiveUiTest {
  public:

@@ -1302,12 +1302,14 @@ void BrowserCommandController::HandleCommandWithDisposition(
     case IDC_UPGRADE_DIALOG:
       OpenUpdateChromeDialog(browser_);
       break;
+#if BUILDFLAG(IS_CHROMEOS)
     case IDC_HELP_PAGE_VIA_KEYBOARD:
       ShowHelp(browser_, chrome::HelpSource::kKeyboard);
       break;
     case IDC_HELP_PAGE_VIA_MENU:
       ShowHelp(browser_, chrome::HelpSource::kMenu);
       break;
+#endif  // BUILDFLAG(IS_CHROMEOS)
     case IDC_CHROME_TIPS:
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
       ShowChromeTips(browser_);
@@ -1324,9 +1326,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
       NOTREACHED();
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
         // (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
-    case IDC_SHOW_BETA_FORUM:
-      ShowBetaForum(browser_);
-      break;
     case IDC_CHROME_ENTERPRISE_RELEASE_NOTES:
       if (base::FeatureList::IsEnabled(features::kEnterpriseReleaseNotes)) {
         chrome::ShowChromeEnterpriseReleaseNotes(browser_);
@@ -1845,9 +1844,10 @@ void BrowserCommandController::InitCommandState() {
                                          !guest_session);
   command_updater_->UpdateCommandEnabled(IDC_SHOW_TRAVEL, !guest_session);
   command_updater_->UpdateCommandEnabled(kHelpMenuId, true);
+#if BUILDFLAG(IS_CHROMEOS)
   command_updater_->UpdateCommandEnabled(IDC_HELP_PAGE_VIA_KEYBOARD, true);
   command_updater_->UpdateCommandEnabled(IDC_HELP_PAGE_VIA_MENU, true);
-  command_updater_->UpdateCommandEnabled(IDC_SHOW_BETA_FORUM, true);
+#endif  // BUILDFLAG(IS_CHROMEOS)
   command_updater_->UpdateCommandEnabled(
       IDC_CHROME_ENTERPRISE_RELEASE_NOTES,
       base::FeatureList::IsEnabled(features::kEnterpriseReleaseNotes));

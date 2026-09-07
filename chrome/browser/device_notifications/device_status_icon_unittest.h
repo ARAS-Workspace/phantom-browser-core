@@ -12,8 +12,8 @@
 
 class DeviceStatusIconTestBase : public DeviceSystemTrayIconTestBase {
  public:
-  DeviceStatusIconTestBase(std::u16string about_device_label,
-                           std::u16string device_content_settings_label);
+  explicit DeviceStatusIconTestBase(
+      std::u16string device_content_settings_label);
 
   void SetUp() override;
   void TearDown() override;
@@ -44,7 +44,6 @@ class DeviceStatusIconTestBase : public DeviceSystemTrayIconTestBase {
                               int command_id,
                               bool click);
 
-  std::u16string about_device_label_;
   std::u16string device_content_settings_label_;
 };
 

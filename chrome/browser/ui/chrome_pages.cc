@@ -135,6 +135,7 @@ void LaunchReleaseNotesImpl(Profile* profile, apps::LaunchSource source) {
 }
 #endif
 
+#if BUILDFLAG(IS_CHROMEOS)
 // Shows either the help app or the appropriate help page for |source|. If
 // |browser| is NULL and the help page is used (vs the app), the help page is
 // shown in the last active browser. If there is no such browser, a new browser
@@ -200,6 +201,7 @@ void ShowHelpImpl(BrowserWindowInterface* browser,
   }
 #endif  // BUILDFLAG(IS_CHROMEOS) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
 }
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
 std::string GenerateContentSettingsExceptionsSubPage(ContentSettingsType type) {
   // In MD Settings, the exceptions no longer have a separate subpage.
@@ -382,6 +384,7 @@ void ShowExtensions(BrowserWindowInterface* browser,
   ShowSingletonTabIgnorePathOverwriteNTP(browser, url);
 }
 
+#if BUILDFLAG(IS_CHROMEOS)
 void ShowHelp(BrowserWindowInterface* browser, HelpSource source) {
   ShowHelpImpl(browser, browser->GetProfile(), source);
 }
@@ -389,6 +392,7 @@ void ShowHelp(BrowserWindowInterface* browser, HelpSource source) {
 void ShowHelpForProfile(Profile* profile, HelpSource source) {
   ShowHelpImpl(nullptr, profile, source);
 }
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 void ShowChromeTips(BrowserWindowInterface* browser) {
@@ -417,10 +421,6 @@ void ShowChromeEnterpriseReleaseNotes(BrowserWindowInterface* browser) {
        "&utm_campaign=release-notes-chrome-enterprise",
        "&utm_term=release-notes-m", version_info::GetMajorVersionNumber()});
   ShowSingletonTab(browser, GURL(url));
-}
-
-void ShowBetaForum(BrowserWindowInterface* browser) {
-  ShowSingletonTab(browser, GURL(kChromeBetaForumURL));
 }
 
 void ShowSlow(BrowserWindowInterface* browser) {

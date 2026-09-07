@@ -1032,11 +1032,6 @@ HelpMenuModel::HelpMenuModel(ui::SimpleMenuModel::Delegate* delegate,
 HelpMenuModel::~HelpMenuModel() = default;
 
 void HelpMenuModel::Build(BrowserWindowInterface* browser) {
-#if BUILDFLAG(IS_CHROMEOS) && defined(OFFICIAL_BUILD)
-  int help_string_id = IDS_GET_HELP;
-#else
-  int help_string_id = IDS_HELP_PAGE;
-#endif
   AddItemWithStringIdAndVectorIcon(this, IDC_ABOUT, IDS_ABOUT,
                                    features::IsRoundedIconsEnabled()
                                        ? vector_icons::kInfoIcon
@@ -1049,17 +1044,6 @@ void HelpMenuModel::Build(BrowserWindowInterface* browser) {
                                           : kReleaseAlertOldIcon);
   }
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  AddItemWithStringId(IDC_HELP_PAGE_VIA_MENU, help_string_id);
-  if (browser_defaults::kShowHelpMenuItemIcon) {
-    ui::ResourceBundle& rb = ui::ResourceBundle::GetSharedInstance();
-    SetIconForCommandId(
-        IDC_HELP_PAGE_VIA_MENU,
-        ui::ImageModel::FromImage(rb.GetNativeImageNamed(IDR_HELP_MENU)));
-  } else {
-    SetCommandIcon(
-        this, IDC_HELP_PAGE_VIA_MENU,
-        features::IsRoundedIconsEnabled() ? kHelpCustomIcon : kHelpMenuOldIcon);
-  }
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   if (chrome::CanShowFeedback(browser->GetProfile())) {
     AddItemWithStringIdAndVectorIcon(
@@ -1656,24 +1640,8 @@ void AppMenuModel::LogMenuMetrics(int command_id) {
       }
       LogMenuAction(MENU_ACTION_ABOUT);
       break;
-    // Help menu.
-    case IDC_HELP_PAGE_VIA_MENU:
-      base::RecordAction(UserMetricsAction("ShowHelpTabViaWrenchMenu"));
-
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes("WrenchMenu.TimeToAction.HelpPage",
-                                      delta);
-      }
-      LogMenuAction(MENU_ACTION_HELP_PAGE_VIA_MENU);
-      break;
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-    case IDC_SHOW_BETA_FORUM:
-      if (!uma_action_recorded_) {
-        base::UmaHistogramMediumTimes("WrenchMenu.TimeToAction.BetaForum",
-                                      delta);
-      }
-      LogMenuAction(MENU_ACTION_BETA_FORUM);
-      break;
+    // Help menu.
     case IDC_FEEDBACK:
       if (!uma_action_recorded_) {
         base::UmaHistogramMediumTimes("WrenchMenu.TimeToAction.Feedback",

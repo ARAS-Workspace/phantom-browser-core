@@ -311,9 +311,6 @@ void AboutHandler::RegisterMessages() {
       "openFeedbackDialog",
       base::BindRepeating(&AboutHandler::HandleOpenFeedbackDialog,
                           base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "openHelpPage", base::BindRepeating(&AboutHandler::HandleOpenHelpPage,
-                                          base::Unretained(this)));
 #if BUILDFLAG(IS_CHROMEOS)
   web_ui()->RegisterMessageCallback(
       "openDiagnostics",
@@ -506,14 +503,6 @@ void AboutHandler::HandleOpenFeedbackDialog(const base::ListValue& args) {
           web_ui()->GetWebContents());
   chrome::OpenFeedbackDialog(browser,
                              feedback::kFeedbackSourceMdSettingsAboutPage);
-}
-
-void AboutHandler::HandleOpenHelpPage(const base::ListValue& args) {
-  DCHECK(args.empty());
-  BrowserWindowInterface* browser =
-      GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
-          web_ui()->GetWebContents());
-  chrome::ShowHelp(browser, chrome::HelpSource::kWebUI);
 }
 
 #if BUILDFLAG(IS_CHROMEOS)

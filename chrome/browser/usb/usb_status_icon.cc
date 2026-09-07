@@ -5,13 +5,8 @@
 #include "chrome/browser/usb/usb_status_icon.h"
 
 #include "chrome/browser/device_notifications/device_status_icon_renderer.h"
-#include "chrome/browser/ui/chrome_pages.h"
-#include "chrome/grit/generated_resources.h"
 
 UsbStatusIcon::UsbStatusIcon()
-    : UsbSystemTrayIcon(std::make_unique<DeviceStatusIconRenderer>(
-          this,
-          chrome::HelpSource::kWebUSD,
-          IDS_WEBUSB_SYSTEM_TRAY_ICON_ABOUT_USB_DEVICE)) {}
+    : UsbSystemTrayIcon(std::make_unique<DeviceStatusIconRenderer>(this)) {}
 
 UsbStatusIcon::~UsbStatusIcon() = default;

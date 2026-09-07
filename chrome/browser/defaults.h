@@ -18,9 +18,6 @@ extern const bool kBrowserAliveWithNoWindows;
 extern const bool kShowExitMenuItem;
 extern const bool kShowUpgradeMenuItem;
 
-// Only used in branded builds.
-extern const bool kShowHelpMenuItemIcon;
-
 // Should a link be shown on the bookmark bar allowing the user to import
 // bookmarks?
 extern const bool kShowImportOnBookmarkBar;

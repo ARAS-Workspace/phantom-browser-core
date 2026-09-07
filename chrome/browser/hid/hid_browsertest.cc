@@ -358,15 +358,10 @@ class WebHidExtensionBrowserTest : public InProcessBrowserTestMixinHostSupport<
     status_icon_renderer->ExecuteCommandForTesting(
         IDC_DEVICE_SYSTEM_TRAY_ICON_FIRST, 0);
     EXPECT_EQ(browser->tab_strip_model()->GetActiveWebContents()->GetURL(),
-              "https://support.google.com/chrome?p=webhid");
-
-    status_icon_renderer->ExecuteCommandForTesting(
-        IDC_DEVICE_SYSTEM_TRAY_ICON_FIRST + 1, 0);
-    EXPECT_EQ(browser->tab_strip_model()->GetActiveWebContents()->GetURL(),
               "chrome://settings/content/hidDevices");
 
     status_icon_renderer->ExecuteCommandForTesting(
-        IDC_DEVICE_SYSTEM_TRAY_ICON_FIRST + 2, 0);
+        IDC_DEVICE_SYSTEM_TRAY_ICON_FIRST + 1, 0);
     EXPECT_EQ(
         browser->tab_strip_model()->GetActiveWebContents()->GetURL(),
         "chrome://settings/content/siteDetails?site=chrome-extension%3A%2F%2F" +

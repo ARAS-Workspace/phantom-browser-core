@@ -31,13 +31,6 @@ void OpenDownloadsWindow(Profile* profile) {
   browser->GetWindow()->Show();
 }
 
-void OpenHelpWindow(Profile* profile, HelpSource source) {
-  BrowserWindowInterface* browser =
-      CreateBrowserWindow(BrowserWindowCreateParams(profile, true));
-  ShowHelp(browser, source);
-  browser->GetWindow()->Show();
-}
-
 void OpenOptionsWindow(Profile* profile) {
   BrowserWindowInterface* browser =
       CreateBrowserWindow(BrowserWindowCreateParams(profile, true));

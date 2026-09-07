@@ -89,10 +89,8 @@ class MockStatusTray : public StatusTray {
 }  // namespace
 
 DeviceStatusIconTestBase::DeviceStatusIconTestBase(
-    std::u16string about_device_label,
     std::u16string device_content_settings_label)
-    : about_device_label_(std::move(about_device_label)),
-      device_content_settings_label_(std::move(device_content_settings_label)) {
+    : device_content_settings_label_(std::move(device_content_settings_label)) {
 }
 
 void DeviceStatusIconTestBase::SetUp() {
@@ -126,8 +124,6 @@ void DeviceStatusIconTestBase::CheckIcon(
   auto* menu_item = status_icon->menu_item();
   int menu_idx = 1;
   int expected_command_id = IDC_DEVICE_SYSTEM_TRAY_ICON_FIRST;
-  CheckClickableMenuItem(menu_item, menu_idx++, about_device_label_,
-                         expected_command_id++, /*click=*/false);
   for (const auto& [profile, origin_items] : sorted_profile_connection_counts) {
     total_origin_count += origin_items.size();
     auto sorted_origin_items = origin_items;

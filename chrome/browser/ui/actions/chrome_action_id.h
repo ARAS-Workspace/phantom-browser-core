@@ -154,8 +154,6 @@
   E(kActionOptions, IDC_OPTIONS) \
   E(kActionEditSearchEngines, IDC_EDIT_SEARCH_ENGINES) \
   E(kActionAbout, IDC_ABOUT) \
-  E(kActionHelpPageViaKeyboard, IDC_HELP_PAGE_VIA_KEYBOARD) \
-  E(kActionHelpPageViaMenu, IDC_HELP_PAGE_VIA_MENU) \
   E(kActionShowAppMenu, IDC_SHOW_APP_MENU) \
   E(kActionManageExtensions, IDC_MANAGE_EXTENSIONS) \
   E(kActionFindExtensions, IDC_FIND_EXTENSIONS) \
@@ -173,7 +171,6 @@
   E(kActionTakeScreenshot, IDC_TAKE_SCREENSHOT) \
   E(kActionToggleFullscreenToolbar, IDC_TOGGLE_FULLSCREEN_TOOLBAR) \
   E(kActionCustomizeTouchBar, IDC_CUSTOMIZE_TOUCH_BAR) \
-  E(kActionShowBetaForum, IDC_SHOW_BETA_FORUM) \
   E(kActionToggleJavascriptAppleEvents, IDC_TOGGLE_JAVASCRIPT_APPLE_EVENTS) \
   E(kActionInstallPwa, IDC_INSTALL_PWA) \
   E(kActionShowCollaborationRecentActivity) \

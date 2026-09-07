@@ -9,7 +9,6 @@
 #include "base/feature_list.h"
 #include "base/i18n/rtl.h"
 #include "base/mac/mac_util.h"
-#include "build/branding_buildflags.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/browser_features.h"
 #include "chrome/browser/ui/cocoa/accelerators_cocoa.h"
@@ -561,33 +560,6 @@ NSMenuItem* BuildTabMenu(NSApplication* nsapp,
   return item;
 }
 
-NSMenuItem* BuildHelpMenu(NSApplication* nsapp,
-                          id app_delegate,
-                          const std::u16string& product_name,
-                          bool is_pwa,
-                          bool is_rtl) {
-  if (is_pwa) {
-    return nil;
-  }
-
-  // clang-format off
-  std::vector<Item> items = {};
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  items.push_back(Item(IDS_FEEDBACK_MAC).command_id(IDC_FEEDBACK));
-#endif
-  items.push_back(Item(IDS_HELP_MAC)
-                      .string_format_1(product_name)
-                      .command_id(IDC_HELP_PAGE_VIA_MENU));
-  NSMenuItem* item =
-      Item(IDS_HELP_MENU_MAC)
-          .submenu(items)
-          .Build();
-  // clang-format on
-
-  nsapp.helpMenu = item.submenu;
-  return item;
-}
-
 }  // namespace
 
 NSMenu* BuildMainMenu(NSApplication* nsapp,
@@ -608,7 +580,6 @@ NSMenu* BuildMainMenu(NSApplication* nsapp,
            &BuildPeopleMenu,
            &BuildTabMenu,
            &BuildWindowMenu,
-           &BuildHelpMenu,
        }) {
     auto item = builder(nsapp, app_delegate, product_name, is_pwa, is_rtl);
     if (item) {

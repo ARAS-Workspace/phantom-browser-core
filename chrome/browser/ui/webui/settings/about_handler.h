@@ -74,9 +74,6 @@ class AboutHandler : public settings::SettingsPageUIHandler,
   // |args| must be empty.
   void HandleOpenFeedbackDialog(const base::ListValue& args);
 
-  // Opens the help page. |args| must be empty.
-  void HandleOpenHelpPage(const base::ListValue& args);
-
 #if BUILDFLAG(IS_CHROMEOS)
   // Checks if ReleaseNotes is enabled.
   void HandleGetEnabledReleaseNotes(const base::ListValue& args);

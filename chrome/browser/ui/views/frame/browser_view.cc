@@ -5679,11 +5679,6 @@ void BrowserView::UpdateAcceleratorMetrics(const ui::Accelerator& accelerator,
                              command_id);
   }
 
-  const ui::KeyboardCode key_code = accelerator.key_code();
-  if (command_id == IDC_HELP_PAGE_VIA_KEYBOARD && key_code == ui::VKEY_F1) {
-    base::RecordAction(UserMetricsAction("ShowHelpTabViaF1"));
-  }
-
   if (command_id == IDC_BOOKMARK_THIS_TAB) {
     UMA_HISTOGRAM_ENUMERATION("Bookmarks.EntryPoint",
                               BookmarkEntryPoint::kAccelerator);
@@ -5712,6 +5707,7 @@ void BrowserView::UpdateAcceleratorMetrics(const ui::Accelerator& accelerator,
   }
 
 #if BUILDFLAG(IS_CHROMEOS)
+  const ui::KeyboardCode key_code = accelerator.key_code();
   // Collect information about the relative popularity of various accelerators
   // on Chrome OS.
   switch (command_id) {

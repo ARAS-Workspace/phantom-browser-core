@@ -46,6 +46,7 @@ class Profile;
 
 namespace chrome {
 
+#if BUILDFLAG(IS_CHROMEOS)
 // Sources of requests to show the help tab.
 enum class HelpSource {
   // Keyboard accelerators.
@@ -68,6 +69,7 @@ enum class HelpSource {
   // WebUSB help center article.
   kWebUSD,
 };
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
 void ShowBookmarkManager(BrowserWindowInterface* browser);
 void ShowBookmarkManagerForNode(BrowserWindowInterface* browser,
@@ -80,15 +82,16 @@ void ShowDownloads(BrowserWindowInterface* browser);
 void ShowExtensions(BrowserWindowInterface* browser,
                     const std::string& extension_to_highlight = std::string());
 
+#if BUILDFLAG(IS_CHROMEOS)
 void ShowHelp(BrowserWindowInterface* browser, HelpSource source);
 void ShowHelpForProfile(Profile* profile, HelpSource source);
+#endif  // BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 void ShowChromeTips(BrowserWindowInterface* browser);
 void ShowChromeWhatsNew(BrowserWindowInterface* browser);
 #endif
 void LaunchReleaseNotes(Profile* profile, apps::LaunchSource source);
 void ShowChromeEnterpriseReleaseNotes(BrowserWindowInterface* browser);
-void ShowBetaForum(BrowserWindowInterface* browser);
 void ShowSlow(BrowserWindowInterface* browser);
 
 // Constructs a settings GURL for the specified |sub_page|.
