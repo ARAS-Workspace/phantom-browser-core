@@ -6,7 +6,6 @@
 
 #include <vector>
 
-#include "base/strings/stringprintf.h"
 #include "chrome/browser/download/download_item_model.h"
 #include "components/download/public/common/mock_download_item.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -161,18 +160,6 @@ TEST_F(DownloadCommandsTest, DoResume) {
   // Resume.
   EXPECT_CALL(item(), Resume(true)).Times(1);
   commands().ExecuteCommand(DownloadCommands::RESUME);
-}
-
-TEST_F(DownloadCommandsTest,
-       GetLearnMoreURLForInterruptedDownload_ContainsContext) {
-  EXPECT_CALL(item(), GetLastReason())
-      .WillOnce(
-          Return(download::DOWNLOAD_INTERRUPT_REASON_NETWORK_DISCONNECTED));
-  GURL learn_more_url = commands().GetLearnMoreURLForInterruptedDownload();
-  std::string name_value_pair = base::StringPrintf(
-      "ctx=%d", download::DOWNLOAD_INTERRUPT_REASON_NETWORK_DISCONNECTED);
-  EXPECT_LT(0u, learn_more_url.GetQuery().find(name_value_pair))
-      << learn_more_url.spec();
 }
 
 TEST_F(DownloadCommandsTest, InvalidDownloadWontCrashDownloadCommands) {

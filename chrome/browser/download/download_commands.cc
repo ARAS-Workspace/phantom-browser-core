@@ -9,7 +9,6 @@
 #include "base/base64.h"
 #include "base/files/file_util.h"
 #include "base/functional/bind.h"
-#include "base/strings/string_number_conversions.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/task/sequenced_task_runner.h"
 #include "base/task/thread_pool.h"
@@ -19,11 +18,8 @@
 #include "chrome/browser/download/download_crx_util.h"
 #include "chrome/browser/download/download_ui_model.h"
 #include "chrome/browser/image_decoder/image_decoder.h"
-#include "chrome/common/url_constants.h"
 #include "components/download/public/common/download_features.h"
-#include "components/google/core/common/google_util.h"
 #include "content/public/browser/browser_thread.h"
-#include "net/base/url_util.h"
 #include "ui/base/clipboard/scoped_clipboard_writer.h"
 
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
@@ -133,18 +129,6 @@ DownloadCommands::DownloadCommands(base::WeakPtr<DownloadUIModel> model)
 }
 
 DownloadCommands::~DownloadCommands() = default;
-
-GURL DownloadCommands::GetLearnMoreURLForInterruptedDownload() const {
-  if (!model_)
-    return GURL();
-
-  GURL learn_more_url(chrome::kDownloadInterruptedLearnMoreURL);
-  learn_more_url = google_util::AppendGoogleLocaleParam(
-      learn_more_url, g_browser_process->GetApplicationLocale());
-  return net::AppendQueryParameter(
-      learn_more_url, "ctx",
-      base::NumberToString(model_->GetDownloadItem()->GetLastReason()));
-}
 
 bool DownloadCommands::IsCommandEnabled(Command command) const {
   return model_ ? model_->IsCommandEnabled(this, command) : false;

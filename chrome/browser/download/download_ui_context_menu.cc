@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "base/metrics/histogram_functions.h"
-#include "build/build_config.h"
 #include "chrome/browser/download/chrome_download_manager_delegate.h"
 #include "chrome/browser/download/download_commands.h"
 #include "chrome/browser/download/download_stats.h"
@@ -334,14 +333,6 @@ ui::SimpleMenuModel* DownloadUiContextMenu::GetInterruptedMenuModel(
 
   interrupted_download_menu_model_->AddItem(
       DownloadCommands::RESUME, GetLabelForCommandId(DownloadCommands::RESUME));
-#if BUILDFLAG(IS_WIN)
-  // The Help Center article is currently Windows specific.
-  // TODO(asanka): Enable this for other platforms when the article is expanded
-  // for other platforms.
-  interrupted_download_menu_model_->AddItem(
-      DownloadCommands::LEARN_MORE_INTERRUPTED,
-      GetLabelForCommandId(DownloadCommands::LEARN_MORE_INTERRUPTED));
-#endif
   interrupted_download_menu_model_->AddSeparator(ui::NORMAL_SEPARATOR);
   interrupted_download_menu_model_->AddItem(
       DownloadCommands::CANCEL, GetLabelForCommandId(DownloadCommands::CANCEL));
@@ -430,11 +421,6 @@ ui::SimpleMenuModel* DownloadUiContextMenu::GetInsecureDownloadMenuModel() {
     insecure_download_menu_model_->AddItem(
         DownloadCommands::KEEP, GetLabelForCommandId(DownloadCommands::KEEP));
   }
-
-  insecure_download_menu_model_->AddSeparator(ui::NORMAL_SEPARATOR);
-  insecure_download_menu_model_->AddItem(
-      DownloadCommands::LEARN_MORE_INSECURE_DOWNLOAD,
-      GetLabelForCommandId(DownloadCommands::LEARN_MORE_INSECURE_DOWNLOAD));
 
   return insecure_download_menu_model_.get();
 }

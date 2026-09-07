@@ -120,10 +120,6 @@ inline constexpr char kChromeSearchScheme[] = "chrome-search";
 inline constexpr char kChromeUIUntrustedNewTabPageUrl[] =
     "chrome-untrusted://new-tab-page/";
 
-// The URL for the "Learn more" page for interrupted downloads.
-inline constexpr char kDownloadInterruptedLearnMoreURL[] =
-    "https://support.google.com/chrome?p=ui_download_errors";
-
 // The URL for the "Learn more" page for blocked downloads.
 // Note: This is the same as the above URL. This is done to decouple the URLs,
 // in case the support page is split apart into separate pages in the future.
@@ -164,10 +160,6 @@ inline constexpr char16_t kManagedUiLearnMoreUrl[] =
 #else
     u"https://support.google.com/chrome?p=is_chrome_managed";
 #endif
-
-// The URL for the "Learn more" page for insecure download blocking.
-inline constexpr char kInsecureDownloadBlockingLearnMoreUrl[] =
-    "https://support.google.com/chrome?p=mixed_content_downloads";
 
 inline constexpr char16_t kMyActivityUrlInHistory[] =
     u"https://myactivity.google.com/myactivity/?utm_source=chrome_h";

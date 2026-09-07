@@ -72,15 +72,10 @@ class DownloadCommands {
   BrowserWindowInterface* GetBrowser() const;
 #endif
 
-  GURL GetLearnMoreURLForInterruptedDownload() const;
   void CopyFileAsImageToClipboard();
   bool CanBeCopiedToClipboard() const;
 
  private:
-  FRIEND_TEST_ALL_PREFIXES(
-      DownloadCommandsTest,
-      GetLearnMoreURLForInterruptedDownload_ContainsContext);
-
   base::WeakPtr<DownloadUIModel> model_;
 
   scoped_refptr<base::SequencedTaskRunner> task_runner_;
