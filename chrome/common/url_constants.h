@@ -169,11 +169,6 @@ inline constexpr char kGoogleTwoFactorIntersitialURL[] =
 // URL of the Google Password Manager.
 inline constexpr char kGooglePasswordManagerURL[] = "";
 
-// "Learn more" URL for the web app installation flow, linked from installation
-// dialog and options view.
-inline constexpr char kInstallDialogFlowLearnMoreURL[] =
-    "https://support.google.com/chrome?p=pwa_install";
-
 // The URL for the "Learn more" page for the usage/crash reporting option in the
 // first run dialog.
 inline constexpr char kLearnMoreReportingURL[] =

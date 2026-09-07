@@ -62,7 +62,6 @@ std::ostream& operator<<(std::ostream& os, InstallOsType type);
 
 class WebAppInstallFlowDialogDelegate : public WebAppModalDialogDelegate {
  public:
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kLearnMoreButtonId);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kCancelButtonId);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kInstallButton);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kIntroViewId);
@@ -137,7 +136,6 @@ class WebAppInstallFlowDialogDelegate : public WebAppModalDialogDelegate {
   base::WeakPtr<WebAppInstallOptionsView> options_view_;
 
  private:
-  void OnLearnMoreButtonClicked();
   void UpdateDialogTitleAndHeader(InstallDialogStep step);
   void UpdateProgressAndMaybeAdvance();
 

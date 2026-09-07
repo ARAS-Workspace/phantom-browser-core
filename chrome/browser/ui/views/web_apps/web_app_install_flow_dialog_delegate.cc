@@ -56,7 +56,6 @@
 #include "chrome/browser/web_applications/web_app_install_info.h"
 #include "chrome/browser/web_applications/web_app_pref_guardrails.h"
 #include "chrome/browser/web_applications/web_app_screenshot_fetcher.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/grit/browser_resources.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/constrained_window/constrained_window_views.h"
@@ -68,7 +67,6 @@
 #include "components/url_formatter/elide_url.h"
 #include "components/webapps/browser/installable/ml_install_operation_tracker.h"
 #include "components/webapps/common/constants.h"
-#include "content/public/browser/page_navigator.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_contents_user_data.h"
 #include "skia/ext/image_operations.h"
@@ -112,8 +110,6 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(WebAppInstallFlowDialogDelegate,
                                       kProgressViewId);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(WebAppInstallFlowDialogDelegate,
                                       kSuccessfulViewId);
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(WebAppInstallFlowDialogDelegate,
-                                      kLearnMoreButtonId);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(WebAppInstallFlowDialogDelegate,
                                       kCancelButtonId);
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(WebAppInstallFlowDialogDelegate,
@@ -297,7 +293,6 @@ bool WebAppInstallFlowDialogDelegate::AdvanceToNextStepOrClose() {
                               weak_ptr_factory_.GetWeakPtr()));
 
       // Hide buttons on progress step.
-      dialog_model()->SetVisible(kLearnMoreButtonId, false);
       dialog_model()->SetVisible(kInstallButton, false);
       dialog_model()->SetVisible(kCancelButtonId, false);
       break;
@@ -337,15 +332,6 @@ bool WebAppInstallFlowDialogDelegate::AdvanceToNextStepOrClose() {
 
   UpdateDialogTitleAndHeader(current_step_);
   return false;
-}
-
-void WebAppInstallFlowDialogDelegate::OnLearnMoreButtonClicked() {
-  web_contents()->OpenURL(
-      content::OpenURLParams(
-          GURL(chrome::kInstallDialogFlowLearnMoreURL), content::Referrer(),
-          WindowOpenDisposition::NEW_FOREGROUND_TAB, ui::PAGE_TRANSITION_LINK,
-          /*is_renderer_initiated=*/false),
-      base::DoNothing());
 }
 
 void WebAppInstallFlowDialogDelegate::OnAccept() {
@@ -833,19 +819,6 @@ WebAppInstallFlowDialogDelegate::Show(
       // TODO(b/473080055): Use a translated string. Should use the correct
       // subtitle if DIY vs simple and detailed like the title above.
       .SetSubtitle(l10n_util::GetStringUTF16(IDS_WEB_APP_INSTALL_FLOW_SUBTITLE))
-      .AddExtraButton(
-          base::BindRepeating(
-              [](base::WeakPtr<WebAppInstallFlowDialogDelegate> delegate,
-                 const ui::Event&) {
-                if (delegate) {
-                  delegate->OnLearnMoreButtonClicked();
-                }
-              },
-              delegate_weak_ptr),
-          ui::DialogModel::Button::Params()
-              .SetLabel(
-                  l10n_util::GetStringUTF16(IDS_LEARN_MORE_MAYBE_TITLE_CASE))
-              .SetId(kLearnMoreButtonId))
       .AddOkButton(
           base::BindRepeating(
               [](base::WeakPtr<WebAppInstallFlowDialogDelegate> delegate) {
