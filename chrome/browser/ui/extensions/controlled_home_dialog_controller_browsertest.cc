@@ -125,8 +125,6 @@ class ControlledHomeDialogControllerTest
     }
   }
 
-  base::AutoReset<bool> ignore_learn_more_{
-      ControlledHomeDialogController::IgnoreLearnMoreForTesting()};
   raw_ptr<extensions::ExtensionPrefs> extension_prefs_;
   std::unique_ptr<base::CommandLine> command_line_;
   std::vector<std::unique_ptr<base::ScopedTempDir>> temp_dirs_;
@@ -211,27 +209,6 @@ IN_PROC_BROWSER_TEST_F(ControlledHomeDialogControllerTest,
     // bubble twice in the same session.
     EXPECT_FALSE(dialog_controller->ShouldShow());
   }
-}
-
-IN_PROC_BROWSER_TEST_F(ControlledHomeDialogControllerTest,
-                       ClickingLearnMoreAcknowledgesTheExtension) {
-  scoped_refptr<const extensions::Extension> extension =
-      LoadExtensionOverridingHome();
-  ASSERT_TRUE(extension);
-
-  auto dialog_controller = std::make_unique<ControlledHomeDialogController>(
-      profile(), GetActiveWebContents());
-  EXPECT_TRUE(dialog_controller->ShouldShow());
-  EXPECT_EQ(extension, dialog_controller->extension_for_testing());
-
-  dialog_controller->PendingShow();
-  dialog_controller->OnBubbleShown();
-
-  dialog_controller->OnBubbleClosed(
-      ControlledHomeDialogControllerInterface::CLOSE_LEARN_MORE);
-
-  EXPECT_TRUE(IsExtensionEnabled(extension->id()));
-  EXPECT_TRUE(IsExtensionAcknowledged(extension->id()));
 }
 
 IN_PROC_BROWSER_TEST_F(ControlledHomeDialogControllerTest,

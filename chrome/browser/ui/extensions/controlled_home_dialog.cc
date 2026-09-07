@@ -47,10 +47,6 @@ class ControlledHomeDialogDelegate
     controller_->OnBubbleClosed(ControlledHomeDialogControllerInterface::
                                     CloseAction::CLOSE_DISMISS_USER_ACTION);
   }
-  void OnLearnMoreClicked() {
-    controller_->OnBubbleClosed(
-        ControlledHomeDialogControllerInterface::CloseAction::CLOSE_LEARN_MORE);
-  }
   void OnDialogClosed() {
     controller_->OnBubbleClosed(ControlledHomeDialogControllerInterface::
                                     CloseAction::CLOSE_DISMISS_DEACTIVATION);
@@ -142,11 +138,8 @@ void ShowControlledHomeDialog(
   } else {
     dialog_builder.AddParagraph(ui::DialogModelLabel::CreateWithReplacement(
         IDS_EXTENSIONS_CONTROLLED_HOME_DIALOG_LEARN_MORE_LINK,
-        ui::DialogModelLabel::CreateLink(
-            IDS_LEARN_MORE,
-            base::BindRepeating(
-                &ControlledHomeDialogDelegate::OnLearnMoreClicked,
-                base::Unretained(dialog_delegate)))));
+        ui::DialogModelLabel::CreatePlainText(
+            l10n_util::GetStringUTF16(IDS_LEARN_MORE))));
   }
 
   std::u16string ok_button_text = dialog_controller->GetActionButtonText();

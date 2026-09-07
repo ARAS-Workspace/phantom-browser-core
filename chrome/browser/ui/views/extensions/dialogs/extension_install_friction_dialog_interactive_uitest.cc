@@ -36,20 +36,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionInstallFrictionDialogUITest, ShowDialog) {
 }
 
 IN_PROC_BROWSER_TEST_F(ExtensionInstallFrictionDialogUITest,
-                       LearnMoreLinkClosesDialog) {
-  RunTestSequence(
-      ShowExtensionInstallFrictionDialog(),
-      WaitForShow(extensions::kExtensionInstallFrictionLearnMoreLink),
-
-      // Clicking the link closes the dialog.
-      WithView(extensions::kExtensionInstallFrictionLearnMoreLink,
-               [](views::StyledLabel* learn_more_label) {
-                 learn_more_label->ClickFirstLinkForTesting();
-               }),
-      WaitForHide(extensions::kExtensionInstallFrictionLearnMoreLink));
-}
-
-IN_PROC_BROWSER_TEST_F(ExtensionInstallFrictionDialogUITest,
                        WebContentsDestroyedClosesDialog) {
   DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kFirstTab);
   DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kSecondTab);

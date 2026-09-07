@@ -146,11 +146,6 @@ inline constexpr char kDownloadInterruptedLearnMoreURL[] =
 inline constexpr char kDownloadBlockedLearnMoreURL[] =
     "https://support.google.com/chrome?p=ib_download_blocked";
 
-// "Learn more" URL for the Settings API, NTP bubble and other settings bubbles
-// showing which extension is controlling them.
-inline constexpr char kExtensionControlledSettingLearnMoreURL[] =
-    "https://support.google.com/chrome?p=ui_settings_api_extension";
-
 // URL of the Google Account.
 inline constexpr char kGoogleAccountURL[] = "https://myaccount.google.com";
 
@@ -294,10 +289,6 @@ inline constexpr char16_t kUserBypassHelpCenterURL[] =
 inline constexpr char kUpgradeHelpCenterBaseURL[] =
     "https://support.google.com/installer/?product="
     "{8A69D345-D564-463c-AFF1-A69D9E530F96}&error=";
-
-// The URL for the "Learn more" link about CWS Enhanced Safe Browsing.
-inline constexpr char16_t kCwsEnhancedSafeBrowsingLearnMoreURL[] =
-    u"https://support.google.com/chrome?p=cws_enhanced_safe_browsing";
 
 // The URL path to Google's Embedded Privacy Policy page.
 inline constexpr char kPrivacyPolicyOnlineURLPath[] =

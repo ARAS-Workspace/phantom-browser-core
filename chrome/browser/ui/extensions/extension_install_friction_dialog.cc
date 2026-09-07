@@ -7,7 +7,6 @@
 #include "base/metrics/histogram_functions.h"
 #include "chrome/browser/ui/extensions/extension_dialog_utils.h"
 #include "chrome/browser/ui/extensions/extensions_dialogs.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/vector_icons/vector_icons.h"
@@ -56,10 +55,8 @@ class ExtensionInstallFrictionDialogDelegate : public ui::DialogModelDelegate {
   }
 
   void OnDialogCanceled() {
-    ExtensionInstallFrictionDialogAction dialog_action =
-        learn_more_clicked_ ? ExtensionInstallFrictionDialogAction::kLearnMore
-                            : ExtensionInstallFrictionDialogAction::kClose;
-    ReportExtensionInstallFrictionDialogAction(dialog_action);
+    ReportExtensionInstallFrictionDialogAction(
+        ExtensionInstallFrictionDialogAction::kClose);
     std::move(callback_).Run(false);
   }
 
@@ -74,24 +71,9 @@ class ExtensionInstallFrictionDialogDelegate : public ui::DialogModelDelegate {
     }
   }
 
-  void OnLearnMoreLinkClicked() {
-    learn_more_clicked_ = true;
-
-    if (original_web_contents_) {
-      GURL url(chrome::kCwsEnhancedSafeBrowsingLearnMoreURL);
-      content::OpenURLParams params(
-          url, content::Referrer(), WindowOpenDisposition::NEW_FOREGROUND_TAB,
-          ui::PAGE_TRANSITION_LINK, /*is_renderer_initiated=*/false);
-      original_web_contents_->OpenURL(params, {});
-    }
-
-    dialog_model()->host()->Close();
-  }
-
  private:
   base::WeakPtr<content::WebContents> original_web_contents_;
   base::OnceCallback<void(bool)> callback_;
-  bool learn_more_clicked_ = false;
 };
 
 }  // namespace
@@ -141,12 +123,8 @@ void ShowExtensionInstallFrictionDialog(
           .OverrideDefaultButton(ui::mojom::DialogButton::kCancel)
           .AddParagraph(ui::DialogModelLabel::CreateWithReplacement(
                             IDS_EXTENSION_PROMPT_INSTALL_FRICTION_WARNING_TEXT,
-                            ui::DialogModelLabel::CreateLink(
-                                IDS_LEARN_MORE,
-                                base::BindRepeating(
-                                    &ExtensionInstallFrictionDialogDelegate::
-                                        OnLearnMoreLinkClicked,
-                                    base::Unretained(dialog_delegate)))),
+                            ui::DialogModelLabel::CreatePlainText(
+                                l10n_util::GetStringUTF16(IDS_LEARN_MORE))),
                         /*header=*/std::u16string(),
                         /*id=*/kExtensionInstallFrictionLearnMoreLink)
           .Build();

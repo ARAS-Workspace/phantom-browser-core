@@ -20,7 +20,6 @@ static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 class ControlledHomeDialogControllerInterface {
  public:
   enum CloseAction {
-    CLOSE_LEARN_MORE,
     CLOSE_EXECUTE,
     CLOSE_DISMISS_USER_ACTION,
     CLOSE_DISMISS_DEACTIVATION,

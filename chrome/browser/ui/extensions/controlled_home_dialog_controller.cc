@@ -6,16 +6,13 @@
 
 #include <utility>
 
-#include "base/auto_reset.h"
 #include "base/no_destructor.h"
 #include "base/task/single_thread_task_runner.h"
 #include "chrome/browser/extensions/settings_api_helpers.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/strings/grit/components_strings.h"
-#include "content/public/browser/page_navigator.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/common/referrer.h"
 #include "extensions/browser/disable_reason.h"
@@ -37,7 +34,6 @@ static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 namespace {
 
 // Whether we should ignore learn more clicks.
-bool g_should_ignore_learn_more_for_testing = false;
 
 // The set of profiles for which a controlled home bubble has been shown (we
 // only show once per profile per session).
@@ -99,11 +95,6 @@ ControlledHomeDialogController::ControlledHomeDialogController(
 
 ControlledHomeDialogController::~ControlledHomeDialogController() {
   GetPendingProfileSet().erase(profile_);
-}
-
-base::AutoReset<bool>
-ControlledHomeDialogController::IgnoreLearnMoreForTesting() {
-  return base::AutoReset<bool>(&g_should_ignore_learn_more_for_testing, true);
 }
 
 void ControlledHomeDialogController::ClearProfileSetForTesting() {
@@ -214,19 +205,6 @@ void ControlledHomeDialogController::OnBubbleClosed(CloseAction action) {
       extensions::ExtensionRegistrar::Get(profile_)->DisableExtension(
           extension_->id(), {extensions::disable_reason::DISABLE_USER_ACTION});
       break;
-    case CLOSE_LEARN_MORE: {
-      AcknowledgeExtension(*profile_, extension_->id());
-      if (!g_should_ignore_learn_more_for_testing && web_contents_) {
-        GURL learn_more_url(chrome::kExtensionControlledSettingLearnMoreURL);
-        CHECK(learn_more_url.is_valid());
-        content::OpenURLParams params(learn_more_url, content::Referrer(),
-                                      WindowOpenDisposition::NEW_FOREGROUND_TAB,
-                                      ui::PAGE_TRANSITION_LINK,
-                                      /*is_renderer_initiated=*/false);
-        web_contents_->OpenURL(params, {});
-      }
-      break;
-    }
     case CLOSE_DISMISS_USER_ACTION:
       AcknowledgeExtension(*profile_, extension_->id());
       break;

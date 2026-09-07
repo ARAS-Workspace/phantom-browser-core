@@ -63,8 +63,6 @@ class ControlledHomeDialogController
   const extensions::Extension* extension_for_testing() {
     return extension_.get();
   }
-  // Don't try to navigate when "learn more" is clicked.
-  static base::AutoReset<bool> IgnoreLearnMoreForTesting();
   // Clear the set of shown profiles.
   static void ClearProfileSetForTesting();
 
