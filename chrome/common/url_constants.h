@@ -36,10 +36,6 @@ inline constexpr char kAccessCodeCastLearnMoreURL[] =
 inline constexpr char kBrowserSettingsSearchEngineURL[] =
     "chrome://settings/search";
 
-// The URL for providing help when the Bluetooth adapter is off.
-inline constexpr char kBluetoothAdapterOffHelpURL[] =
-    "https://support.google.com/chrome?p=bluetooth";
-
 // The URL for the help center article to show when no Cast destination has been
 // found.
 inline constexpr char kCastNoDestinationFoundURL[] =

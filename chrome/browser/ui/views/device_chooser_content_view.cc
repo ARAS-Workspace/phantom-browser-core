@@ -10,6 +10,7 @@
 #include "base/functional/bind.h"
 #include "base/numerics/safe_conversions.h"
 #include "base/strings/strcat.h"
+#include "build/build_config.h"
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/strings/grit/components_strings.h"
@@ -124,11 +125,14 @@ DeviceChooserContentView::DeviceChooserContentView(
         chooser_controller_->GetAdapterOffMessageId(), link_text, &offset);
     auto adapter_off_help = std::make_unique<views::StyledLabel>();
     adapter_off_help->SetText(text);
+#if BUILDFLAG(IS_CHROMEOS)
+    // Chrome OS links the text to the OS setting that turns the adapter on.
     adapter_off_help->AddStyleRange(
         gfx::Range(offset, offset + link_text.size()),
         views::StyledLabel::RangeStyleInfo::CreateForLink(base::BindRepeating(
             &permissions::ChooserController::OpenAdapterOffHelpUrl,
             base::Unretained(chooser_controller_.get()))));
+#endif  // BUILDFLAG(IS_CHROMEOS)
     adapter_off_view_ = add_centering_view(std::move(adapter_off_help));
   }
 

@@ -18,8 +18,6 @@
 #include "chrome/browser/serial/serial_blocklist.h"
 #include "chrome/browser/serial/serial_chooser_context_factory.h"
 #include "chrome/browser/serial/serial_chooser_histograms.h"
-#include "chrome/browser/ui/scoped_tabbed_browser_displayer.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/strings/grit/components_strings.h"
@@ -504,36 +502,10 @@ bool SerialChooserController::IsWirelessSerialPortOnly() {
 // TODO(crbug.com/355570625): Shared impl with ChromeBluetoothChooserController.
 void SerialChooserController::OpenBluetoothHelpUrl() const {
   CHECK(chooser_context_);
-#if !BUILDFLAG(IS_ANDROID)
-  Profile* profile = chooser_context_->profile();
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_CHROMEOS)
   // Chrome OS can directly link to the OS setting to turn on the adapter.
   chrome::SettingsWindowManager::GetInstance()->ShowOSSettings(
-      profile, chromeos::settings::mojom::kBluetoothDevicesSubpagePath);
-#else
-  // For other operating systems, show a help center page in a tab.
-  content::OpenURLParams open_url_params(
-      GURL(chrome::kBluetoothAdapterOffHelpURL), content::Referrer(),
-      WindowOpenDisposition::NEW_FOREGROUND_TAB,
-      ui::PAGE_TRANSITION_AUTO_TOPLEVEL,
-      /*is_renderer_initiated=*/false);
-#if BUILDFLAG(IS_ANDROID)
-  auto* rfh = initiator_document_.AsRenderFrameHostIfValid();
-  auto* web_contents = rfh && rfh->IsActive()
-                           ? content::WebContents::FromRenderFrameHost(rfh)
-                           : nullptr;
-  if (web_contents) {
-    web_contents->OpenURL(open_url_params,
-                          /*navigation_handle_callback=*/{});
-  }
-#else
-  chrome::ScopedTabbedBrowserDisplayer browser_displayer(profile);
-  CHECK(browser_displayer.browser_window_interface());
-  browser_displayer.browser_window_interface()->OpenURL(
-      open_url_params,
-      /*navigation_handle_callback=*/{});
-#endif  // BUILDFLAG(IS_ANDROID)
+      chooser_context_->profile(),
+      chromeos::settings::mojom::kBluetoothDevicesSubpagePath);
 #endif  // BUILDFLAG(IS_CHROMEOS)
 }

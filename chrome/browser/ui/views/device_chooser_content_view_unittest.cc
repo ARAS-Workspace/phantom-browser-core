@@ -338,12 +338,14 @@ TEST_F(DeviceChooserContentViewTest, ScanForDevices) {
   EXPECT_FALSE(re_scan_button()->GetVisible());
 }
 
+#if BUILDFLAG(IS_CHROMEOS)
 TEST_F(DeviceChooserContentViewTest, ClickAdapterOffHelpLink) {
   widget()->LayoutRootViewIfNecessary();
   EXPECT_CALL(*controller(), OpenAdapterOffHelpUrl()).Times(1);
   static_cast<views::StyledLabel*>(adapter_off_view()->children().front())
       ->ClickFirstLinkForTesting();
 }
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(DeviceChooserContentViewTest, ClickRescanButton) {
   EXPECT_CALL(*controller(), RefreshOptions()).Times(1);
