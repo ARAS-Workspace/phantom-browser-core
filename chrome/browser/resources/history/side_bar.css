@@ -49,14 +49,6 @@ cr-menu-selector > a[disabled] {
   color: var(--cr-link-color);
 }
 
-managed-footnote {
-  --managed-footnote-icon-padding: 12px;
-  border: none;
-  margin: 24px 0;
-  padding-inline-end: 16px;
-  padding-inline-start: 24px;
-}
-
 #google-account-footer {
   display: flex;
   margin: 24px 0;

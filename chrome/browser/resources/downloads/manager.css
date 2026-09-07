@@ -98,19 +98,3 @@ cr-toast-manager {
   height: 100%;
   overflow-y: overlay;
 }
-
-managed-footnote {
-  border-top: none;
-  /* margin-bottom is needed to compensate for the next element's 21px
-   * margin at the top and 8px padding at the top. This leaves a 12px
-   * padding between this element's content and the top of the next
-   * element's text. */
-  margin-bottom: calc(-21px - 8px);
-  min-width: calc(
-      var(--downloads-card-width) + 2 * var(--downloads-card-margin));
-  padding-bottom: 12px;
-  padding-top: 12px;
-  /* The next element spills over this element. This ensures the link
-   * is clickable. */
-  z-index: 1;
-}
