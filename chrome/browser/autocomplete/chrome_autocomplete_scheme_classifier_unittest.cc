@@ -59,5 +59,12 @@ TEST_F(ChromeAutocompleteSchemeClassifierTest, DevToolsUrl) {
             metrics::OmniboxInputType::URL);
 }
 
+TEST_F(ChromeAutocompleteSchemeClassifierTest, PhantomUrl) {
+  GURL url("phantom://settings/people");
+  // The scheme the address bar shows for chrome: URLs.
+  EXPECT_EQ(scheme_classifier_->GetInputTypeForScheme(url.GetScheme()),
+            metrics::OmniboxInputType::URL);
+}
+
 // Can't test registered apps handling with mocking of shell_integration
 // because shell_integration is implemented via namespace shell_integration.

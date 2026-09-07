@@ -68,6 +68,14 @@ ChromeAutocompleteSchemeClassifier::GetInputTypeForScheme(
   if (scheme.empty()) {
     return metrics::OmniboxInputType::EMPTY;
   }
+
+  // The address bar shows chrome: URLs under the phantom: alias
+  // (url_formatter.cc); url_fixer rewrites typed phantom: text to chrome:.
+  static constexpr char kPhantomUIScheme[] = "phantom";
+  if (base::EqualsCaseInsensitiveASCII(scheme, kPhantomUIScheme)) {
+    return metrics::OmniboxInputType::URL;
+  }
+
   if (base::IsStringASCII(scheme) &&
       (ProfileIOData::IsHandledProtocol(scheme) ||
        base::EqualsCaseInsensitiveASCII(scheme, content::kViewSourceScheme) ||
