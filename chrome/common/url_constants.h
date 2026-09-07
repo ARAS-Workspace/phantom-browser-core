@@ -120,22 +120,6 @@ inline constexpr char kChromeSearchScheme[] = "chrome-search";
 inline constexpr char kChromeUIUntrustedNewTabPageUrl[] =
     "chrome-untrusted://new-tab-page/";
 
-// "Learn more" URL for "Aw snap" page when showing "Reload" button.
-inline constexpr char kCrashReasonURL[] =
-#if BUILDFLAG(IS_CHROMEOS)
-    "https://support.google.com/chromebook?p=e_awsnap";
-#else
-    "https://support.google.com/chrome?p=e_awsnap";
-#endif
-
-// "Learn more" URL for "Aw snap" page when showing "Send feedback" button.
-inline constexpr char kCrashReasonFeedbackDisplayedURL[] =
-#if BUILDFLAG(IS_CHROMEOS)
-    "https://support.google.com/chromebook?p=e_awsnap_rl";
-#else
-    "https://support.google.com/chrome?p=e_awsnap_rl";
-#endif
-
 // The URL for the "Learn more" page for interrupted downloads.
 inline constexpr char kDownloadInterruptedLearnMoreURL[] =
     "https://support.google.com/chrome?p=ui_download_errors";
@@ -322,13 +306,6 @@ inline constexpr char kLearnMoreEnterpriseURL[] =
     "https://support.google.com/chromebook?p=managed";
 
 #endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_MAC)
-
-// The URL for the "learn more" link on the macOS version obsolescence infobar.
-inline constexpr char kMacOsObsoleteURL[] =
-    "https://support.google.com/chrome?p=unsupported_mac";
-#endif
 
 #if BUILDFLAG(IS_WIN)
 // The URL for the Windows XP/Vista deprecation help center article.

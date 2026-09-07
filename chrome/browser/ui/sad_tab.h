@@ -21,7 +21,6 @@ class SadTab {
  public:
   enum class Action {
     kButton,
-    kHelpLink,
   };
 
   // Factory function to create the platform specific implementations.
@@ -48,14 +47,10 @@ class SadTab {
   int GetInfoMessage();
   int GetErrorCodeFormatString();
   int GetButtonTitle();
-  int GetHelpLinkTitle();
 
   // Returns the resource string IDs for bullet points or empty vector if no
   // bullet points should be displayed.
   std::vector<int> GetSubMessages();
-
-  // Returns the target of the "Learn more" link.
-  const char* GetHelpLinkURL();
 
   // Returns the error code describing the reason for the crash.
   int GetCrashedErrorCode();

@@ -18,7 +18,6 @@
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/tab_contents/tab_contents_iterator.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/tabs/public/tab_interface.h"
@@ -146,15 +145,6 @@ int SadTab::GetButtonTitle() {
                                : IDS_SAD_TAB_RELOAD_LABEL;
 }
 
-int SadTab::GetHelpLinkTitle() {
-  return IDS_LEARN_MORE;
-}
-
-const char* SadTab::GetHelpLinkURL() {
-  return show_feedback_button_ ? chrome::kCrashReasonFeedbackDisplayedURL
-                               : chrome::kCrashReasonURL;
-}
-
 std::vector<int> SadTab::GetSubMessages() {
   if (!is_repeatedly_crashing_) {
     return std::vector<int>();
@@ -219,14 +209,6 @@ void SadTab::PerformAction(SadTab::Action action) {
         web_contents_->GetController().Reload(content::ReloadType::NORMAL,
                                               true);
       }
-      break;
-    case Action::kHelpLink:
-      RecordEvent(show_feedback_button_,
-                  ui_metrics::SadTabEvent::HELP_LINK_CLICKED);
-      content::OpenURLParams params(GURL(GetHelpLinkURL()), content::Referrer(),
-                                    WindowOpenDisposition::CURRENT_TAB,
-                                    ui::PAGE_TRANSITION_LINK, false);
-      web_contents_->OpenURL(params, /*navigation_handle_callback=*/{});
       break;
   }
 }

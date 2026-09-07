@@ -11,7 +11,6 @@
 #include "components/infobars/content/content_infobar_manager.h"
 #include "components/infobars/core/infobar.h"
 #include "components/strings/grit/components_strings.h"
-#include "ui/base/l10n/l10n_util.h"
 
 // static
 void ObsoleteSystemInfoBarDelegate::Create(
@@ -26,14 +25,6 @@ ObsoleteSystemInfoBarDelegate::ObsoleteSystemInfoBarDelegate() = default;
 infobars::InfoBarDelegate::InfoBarIdentifier
 ObsoleteSystemInfoBarDelegate::GetIdentifier() const {
   return OBSOLETE_SYSTEM_INFOBAR_DELEGATE;
-}
-
-std::u16string ObsoleteSystemInfoBarDelegate::GetLinkText() const {
-  return l10n_util::GetStringUTF16(IDS_LEARN_MORE);
-}
-
-GURL ObsoleteSystemInfoBarDelegate::GetLinkURL() const {
-  return GURL(ObsoleteSystem::GetLinkURL());
 }
 
 std::u16string ObsoleteSystemInfoBarDelegate::GetMessageText() const {

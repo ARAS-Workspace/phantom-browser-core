@@ -82,8 +82,7 @@ void SadTabController::ReinstallInWebView() {
   if (!sad_tab_view) {
     sad_tab_view = std::make_unique<SadTabView>(
         this, kind(), GetTitle(), GetInfoMessage(), GetSubMessages(),
-        GetErrorCodeFormatString(), GetCrashedErrorCode(), GetButtonTitle(),
-        GetHelpLinkTitle());
+        GetErrorCodeFormatString(), GetCrashedErrorCode(), GetButtonTitle());
     view_tracker_.SetView(sad_tab_view.get());
   }
   CHECK_EQ(view_tracker_.view(), sad_tab_view.get());

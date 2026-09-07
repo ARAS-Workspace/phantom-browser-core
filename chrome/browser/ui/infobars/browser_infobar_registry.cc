@@ -74,8 +74,6 @@ void RegisterInfoBars() {
     auto spec =
         InfoBarSpec::Builder(InfoBarDelegate::OBSOLETE_SYSTEM_INFOBAR_DELEGATE)
             .SetMessageText(ObsoleteSystem::LocalizedObsoleteString())
-            .SetLinkText(l10n_util::GetStringUTF16(IDS_LEARN_MORE))
-            .SetLinkNavigationUrl(GURL(ObsoleteSystem::GetLinkURL()))
             .SetScope(InfoBarScope::kTab)
             .SetExpireOnNavigation(false)
             .Build();

@@ -29,17 +29,12 @@
 #include "ui/views/controls/button/md_text_button.h"
 #include "ui/views/controls/image_view.h"
 #include "ui/views/controls/label.h"
-#include "ui/views/controls/link.h"
 #include "ui/views/controls/webview/webview.h"
 #include "ui/views/layout/box_layout.h"
 #include "ui/views/layout/flex_layout_view.h"
 #include "ui/views/style/typography.h"
 #include "ui/views/view_class_properties.h"
 #include "ui/views/widget/widget.h"
-
-#if BUILDFLAG(IS_CHROMEOS)
-#include "chromeos/components/kiosk/kiosk_utils.h"
-#endif  // BUILDFLAG(IS_CHROMEOS)
 
 namespace {
 
@@ -79,8 +74,7 @@ SadTabView::SadTabView(SadTabController* controller,
                        std::vector<int> sub_message_ids,
                        int error_code_format_id,
                        int error_code,
-                       int button_title_id,
-                       int help_link_title_id)
+                       int button_title_id)
     : controller_(controller), kind_(kind) {
   SetBackground(views::CreateSolidBackground(ui::kColorDialogBackground));
   ChromeLayoutProvider* provider = ChromeLayoutProvider::Get();
@@ -167,8 +161,6 @@ SadTabView::SadTabView(SadTabController* controller,
   // element.
   actions_container->SetLayoutManagerUseConstrainedSpace(false);
 
-  EnableHelpLink(actions_container, help_link_title_id);
-
   action_button_ =
       actions_container->AddChildView(std::make_unique<views::MdTextButton>(
           base::BindRepeating(&SadTabController::PerformAction,
@@ -221,32 +213,6 @@ void SadTabView::OnPaint(gfx::Canvas* canvas) {
     painted_ = true;
   }
   View::OnPaint(canvas);
-}
-
-void SadTabView::EnableHelpLink(views::FlexLayoutView* actions_container,
-                                int help_link_title_id) {
-#if BUILDFLAG(IS_CHROMEOS)
-  // Do not show the help link in the kiosk session to prevent escape from a
-  // kiosk app.
-  if (chromeos::IsKioskSession()) {
-    return;
-  }
-#endif
-  auto* help_link =
-      actions_container->AddChildView(std::make_unique<views::Link>(
-          l10n_util::GetStringUTF16(help_link_title_id)));
-  help_link->SetCallback(base::BindRepeating(&SadTabController::PerformAction,
-                                             base::Unretained(controller_),
-                                             SadTab::Action::kHelpLink));
-  // Set the elide behavior to tail to ensure the text is truncated with an
-  // ellipsis if it overflows.
-  help_link->SetElideBehavior(gfx::ELIDE_TAIL);
-  help_link->SetProperty(views::kTableVertAlignKey,
-                         views::LayoutAlignment::kCenter);
-  help_link->SetProperty(
-      views::kFlexBehaviorKey,
-      views::FlexSpecification(views::MinimumFlexSizeRule::kScaleToZero,
-                               views::MaximumFlexSizeRule::kPreferred));
 }
 
 void SadTabView::OnBoundsChanged(const gfx::Rect& previous_bounds) {

@@ -31,8 +31,6 @@ class ObsoleteSystemInfoBarDelegate : public ConfirmInfoBarDelegate {
   ~ObsoleteSystemInfoBarDelegate() override = default;
 
   infobars::InfoBarDelegate::InfoBarIdentifier GetIdentifier() const override;
-  std::u16string GetLinkText() const override;
-  GURL GetLinkURL() const override;
   std::u16string GetMessageText() const override;
   int GetButtons() const override;
   bool ShouldExpire(const NavigationDetails& details) const override;

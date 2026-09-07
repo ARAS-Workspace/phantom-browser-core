@@ -45,8 +45,7 @@ class SadTabView : public views::View {
              std::vector<int> sub_message_ids,
              int error_code_format_id,
              int error_code,
-             int button_title_id,
-             int help_link_title_id);
+             int button_title_id);
 
   SadTabView(const SadTabView&) = delete;
   SadTabView& operator=(const SadTabView&) = delete;
@@ -66,10 +65,6 @@ class SadTabView : public views::View {
 
  private:
   friend class test::SadTabViewTestApi;
-
-  // Enable help link if needed.
-  void EnableHelpLink(views::FlexLayoutView* actions_container,
-                      int help_link_title_id);
 
   const raw_ptr<SadTabController> controller_;
   const SadTabKind kind_;

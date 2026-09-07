@@ -6,7 +6,6 @@
 
 #include "base/mac/mac_util.h"
 #include "chrome/common/chrome_version.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/grit/branded_strings.h"
 #include "ui/base/l10n/l10n_util.h"
 
@@ -30,10 +29,6 @@ std::u16string LocalizedObsoleteString() {
 
 bool IsEndOfTheLine() {
   return CHROME_VERSION_MAJOR >= kLastMStoneWithSupport;
-}
-
-const char* GetLinkURL() {
-  return chrome::kMacOsObsoleteURL;
 }
 
 }  // namespace ObsoleteSystem
