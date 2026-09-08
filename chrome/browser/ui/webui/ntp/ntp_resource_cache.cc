@@ -276,10 +276,8 @@ void NTPResourceCache::CreateNewTabIncognitoHTML(
       IDS_INCOGNITO_NTP_BLOCK_THIRD_PARTY_COOKIES_HEADER);
   localized_strings.Set(
       "cookieControlsDescription",
-      l10n_util::GetStringFUTF16(
-          IDS_INCOGNITO_NTP_BLOCK_THIRD_PARTY_COOKIES_DESCRIPTION_DESKTOP,
-          chrome::kUserBypassHelpCenterURL,
-          l10n_util::GetStringUTF16(IDS_NEW_TAB_OPENS_HC_ARTICLE_IN_NEW_TAB)));
+      l10n_util::GetStringUTF16(
+          IDS_INCOGNITO_NTP_BLOCK_THIRD_PARTY_COOKIES_DESCRIPTION_DESKTOP));
 
   Profile* incognito_profile = profile_->GetAllOffTheRecordProfiles()[0];
   const ui::ThemeProvider& tp =

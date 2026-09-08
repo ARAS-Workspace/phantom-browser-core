@@ -189,8 +189,5 @@
           <ph name="LIST_ITEM">&lt;li&gt;</ph>Your internet service provider
         <ph name="END_LIST">&lt;/ul&gt;</ph>
       </message>
-      <message name="IDS_NEW_TAB_OPENS_HC_ARTICLE_IN_NEW_TAB" desc="ARIA (accessibility) label describing a link which opens a help center article in a new tab.">
-        Opens a Help Center article in a new tab
-      </message>
 
 </grit-part>

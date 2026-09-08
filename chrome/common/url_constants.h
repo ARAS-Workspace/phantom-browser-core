@@ -239,10 +239,6 @@ inline constexpr char kWallpaperSearchLearnMorePageURL[] =
 inline constexpr char kSigninInterceptManagedDisclaimerLearnMoreURL[] =
     "https://support.google.com/chrome/a/?p=profile_separation";
 
-// The URL for the Help Center page about User Bypass.
-inline constexpr char16_t kUserBypassHelpCenterURL[] =
-    u"https://support.google.com/chrome?p=pause_protections";
-
 inline constexpr char kUpgradeHelpCenterBaseURL[] =
     "https://support.google.com/installer/?product="
     "{8A69D345-D564-463c-AFF1-A69D9E530F96}&error=";
