@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    echo "usage: verify-host"
+}
+
+case "${1-}" in
+    -h|--help) usage; exit 0 ;;
+    "") ;;
+    *) echo "verify-host: unexpected argument: $1" >&2; exit 2 ;;
+esac
+
+errors=0
+
+fail() {
+    echo "verify-host: $*" >&2
+    errors=$((errors + 1))
+}
+
+xcode=""
+if xcode="$(xcodebuild -version 2>&1)"; then
+    xcode="${xcode%%$'\n'*}"
+else
+    fail "xcodebuild does not run (${xcode%%$'\n'*}); chromium needs a full xcode, select one with: sudo xcode-select -s /Applications/Xcode.app"
+fi
+
+metal=""
+if metal="$(xcrun metal --version 2>&1)"; then
+    metal="${metal%%$'\n'*}"
+else
+    fail "metal does not run (${metal%%$'\n'*}); angle compiles its internal shaders with it and since xcode 26 the toolchain ships apart from xcode, install it with: xcodebuild -downloadComponent MetalToolchain"
+fi
+
+if [ "$errors" -ne 0 ]; then
+    echo "verify-host: FAILED with $errors error(s)" >&2
+    exit 1
+fi
+
+echo "verify-host: OK — $xcode, $metal"
