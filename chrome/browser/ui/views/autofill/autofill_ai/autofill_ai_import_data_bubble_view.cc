@@ -21,7 +21,6 @@
 #include "ui/base/metadata/metadata_impl_macros.h"
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/color/color_id.h"
-#include "ui/gfx/range/range.h"
 #include "ui/views/accessibility/view_accessibility.h"
 #include "ui/views/controls/image_view.h"
 #include "ui/views/controls/label.h"
@@ -208,9 +207,7 @@ AutofillAiImportDataBubbleView::GetLocalEntitySubtitle() const {
 
 std::unique_ptr<views::StyledLabel>
 AutofillAiImportDataBubbleView::GetWalletableEntitySubtitle() const {
-  std::vector<size_t> offsets;
   std::u16string formatted_text;
-  gfx::Range link_range;
 
   const std::u16string google_wallet_text =
       l10n_util::GetStringUTF16(IDS_AUTOFILL_GOOGLE_WALLET_TITLE);
@@ -221,26 +218,13 @@ AutofillAiImportDataBubbleView::GetWalletableEntitySubtitle() const {
     const std::u16string manage_info_text =
         l10n_util::GetStringUTF16(IDS_AUTOFILL_MANAGE_YOUR_INFO_LINK);
 
-    formatted_text =
-        l10n_util::GetStringFUTF16(controller_->GetNoticeStringId(),
-                                   {google_wallet_text, manage_info_text,
-                                    google_wallet_text, account_email},
-                                   &offsets);
-
-    link_range = gfx::Range(offsets[1], offsets[1] + manage_info_text.size());
-
+    formatted_text = l10n_util::GetStringFUTF16(
+        controller_->GetNoticeStringId(), google_wallet_text, manage_info_text,
+        google_wallet_text, account_email);
   } else {
     formatted_text = l10n_util::GetStringFUTF16(
-        controller_->GetNoticeStringId(), {google_wallet_text, account_email},
-        &offsets);
-
-    link_range = gfx::Range(offsets[0], offsets[0] + google_wallet_text.size());
+        controller_->GetNoticeStringId(), google_wallet_text, account_email);
   }
-
-  auto go_to_wallet =
-      views::StyledLabel::RangeStyleInfo::CreateForLink(base::BindRepeating(
-          &AutofillAiImportDataController::OnGoToWalletLinkClicked,
-          controller_));
 
   return views::Builder<views::StyledLabel>()
       .SetText(std::move(formatted_text))
@@ -248,7 +232,6 @@ AutofillAiImportDataBubbleView::GetWalletableEntitySubtitle() const {
       .SetDefaultEnabledColorId(ui::kColorSysOnSurfaceSubtle)
       .SetAccessibleRole(ax::mojom::Role::kDetails)
       .SetHorizontalAlignment(gfx::HorizontalAlignment::ALIGN_LEFT)
-      .AddStyleRange(link_range, go_to_wallet)
       .Build();
 }
 

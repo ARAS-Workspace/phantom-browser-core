@@ -72,10 +72,6 @@ class AutofillAiImportDataController {
   // wallet server.
   virtual bool IsWalletableEntity() const = 0;
 
-  // Whether the user clicked the link the dialog subtitle which navigates them
-  // to wallet.
-  virtual void OnGoToWalletLinkClicked() = 0;
-
   // Returns details about the new/updated prompted entity. This is used by the
   // UI layer to give users details about what changes will be done if they
   // accept the prompt.

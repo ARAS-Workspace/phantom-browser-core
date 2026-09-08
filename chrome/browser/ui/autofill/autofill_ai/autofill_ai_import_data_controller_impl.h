@@ -58,7 +58,6 @@ class AutofillAiImportDataControllerImpl
   int GetSaveUpdateDialogTitleImagesResourceId() const override;
   std::u16string GetPrimaryAccountEmail() const override;
   bool IsWalletableEntity() const override;
-  void OnGoToWalletLinkClicked() override;
   std::vector<EntityAttributeUpdateDetails> GetUpdatedAttributesDetails()
       const override;
   bool IsSavePrompt() const override;

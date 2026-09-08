@@ -19,7 +19,6 @@
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/extensions/api/pdf_viewer_private.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/grit/browser_resources.h"
 #include "chrome/grit/generated_resources.h"
 #include "chrome/grit/pdf_resources_map.h"
@@ -390,8 +389,6 @@ base::DictValue GetAdditionalData(content::WebContents* web_contents) {
 #if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
   const bool save_to_drive_enabled = IsPdfSaveToDriveEnabled(context);
   dict.Set("pdfSaveToDrive", save_to_drive_enabled);
-  dict.Set("pdfSaveToDriveHelpCenterURL",
-           chrome::kPdfViewerSaveToDriveHelpCenterURL);
 #endif
 
   return dict;

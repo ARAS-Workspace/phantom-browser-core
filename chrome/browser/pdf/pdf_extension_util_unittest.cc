@@ -10,7 +10,6 @@
 
 #include "base/test/scoped_feature_list.h"
 #include "base/values.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
 #include "chrome/test/base/testing_profile_manager.h"
@@ -113,11 +112,6 @@ TEST_F(PdfExtensionUtilTest, IsPdfSaveToDriveEnabledRegularUsers) {
     base::DictValue additional_data = GetAdditionalData(web_contents);
     EXPECT_THAT(additional_data.FindBool("pdfSaveToDrive"),
                 testing::Optional(true));
-    const std::string* help_center_url =
-        additional_data.FindString("pdfSaveToDriveHelpCenterURL");
-    ASSERT_TRUE(help_center_url);
-    EXPECT_EQ(*help_center_url, chrome::kPdfViewerSaveToDriveHelpCenterURL);
-
     TestingProfile* otr_profile =
         TestingProfile::Builder().BuildIncognito(regular_profile);
     content::WebContents* otr_web_contents =
@@ -263,11 +257,6 @@ TEST_F(PdfExtensionUtilTest, IsPdfSaveToDriveEnabled) {
     base::DictValue additional_data = GetAdditionalData(web_contents);
     EXPECT_THAT(additional_data.FindBool("pdfSaveToDrive"),
                 testing::Optional(true));
-    const std::string* help_center_url =
-        additional_data.FindString("pdfSaveToDriveHelpCenterURL");
-    ASSERT_TRUE(help_center_url);
-    EXPECT_EQ(*help_center_url, chrome::kPdfViewerSaveToDriveHelpCenterURL);
-
     TestingProfile* otr_profile =
         TestingProfile::Builder().BuildIncognito(profile);
     content::WebContents* otr_web_contents =

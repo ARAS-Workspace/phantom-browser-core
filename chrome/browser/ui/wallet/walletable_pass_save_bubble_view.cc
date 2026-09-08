@@ -234,20 +234,12 @@ void WalletablePassSaveBubbleView::AddedToWidget() {
 std::unique_ptr<views::StyledLabel>
 WalletablePassSaveBubbleView::GetSubtitleLabel(
     const std::u16string& user_email) {
-  std::vector<size_t> offsets;
   const std::u16string google_wallet_text =
       l10n_util::GetStringUTF16(IDS_WALLET_WALLETABLE_PASS_GOOGLE_WALLET_TITLE);
 
   std::u16string formatted_text = l10n_util::GetStringFUTF16(
-      IDS_WALLET_WALLETABLE_PASS_SAVE_DIALOG_SUBTITLE,
-      {google_wallet_text, user_email}, &offsets);
-
-  gfx::Range go_to_wallet_range(offsets[0],
-                                offsets[0] + google_wallet_text.size());
-  auto go_to_wallet =
-      views::StyledLabel::RangeStyleInfo::CreateForLink(base::BindRepeating(
-          &WalletablePassSaveBubbleController::OnGoToWalletClicked,
-          controller_));
+      IDS_WALLET_WALLETABLE_PASS_SAVE_DIALOG_SUBTITLE, google_wallet_text,
+      user_email);
 
   return views::Builder<views::StyledLabel>()
       .SetText(std::move(formatted_text))
@@ -255,7 +247,6 @@ WalletablePassSaveBubbleView::GetSubtitleLabel(
       .SetDefaultEnabledColorId(ui::kColorSysOnSurfaceSubtle)
       .SetAccessibleRole(ax::mojom::Role::kDetails)
       .SetHorizontalAlignment(gfx::HorizontalAlignment::ALIGN_LEFT)
-      .AddStyleRange(go_to_wallet_range, go_to_wallet)
       .Build();
 }
 

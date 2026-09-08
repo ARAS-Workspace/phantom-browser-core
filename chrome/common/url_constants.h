@@ -17,7 +17,6 @@
 
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
-#include "chrome/common/buildflags.h"
 #include "chrome/common/webui_url_constants.h"
 #include "content/public/common/url_constants.h"
 #include "net/net_buildflags.h"
@@ -235,14 +234,6 @@ inline constexpr char16_t kHistorySearchSettingURL[] =
 inline constexpr char kWallpaperSearchLearnMorePageURL[] =
     "https://support.google.com/chrome?p=create_themes_with_ai";
 
-// The URL for the passed in Google Wallet.
-inline constexpr char kWalletPassesPageURL[] =
-    "https://wallet.google.com/wallet/passes";
-
-// The help center article URL on using Wallet private passes across Google.
-inline constexpr char kWalletPrivatePassHelpCenterURL[] =
-    "https://support.google.com/wallet?p=private_use_across_google";
-
 // The URL for the "Learn more" link in the enterprise disclaimer for managed
 // profile in the Signin Intercept bubble.
 inline constexpr char kSigninInterceptManagedDisclaimerLearnMoreURL[] =
@@ -299,12 +290,6 @@ inline constexpr char kWindowsXPVistaDeprecationURL[] =
 inline constexpr char kWindows78DeprecationURL[] =
     "https://support.google.com/chrome?p=unsupported_windows";
 
-#endif
-
-#if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-// "Learn more" URL for how to save PDF to Google Drive from the PDF viewer.
-inline constexpr char kPdfViewerSaveToDriveHelpCenterURL[] =
-    "https://support.google.com/drive?p=save_from_chrome";
 #endif
 
 // Please do not append entries here. See the comments at the top of the file.

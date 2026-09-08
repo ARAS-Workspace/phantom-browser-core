@@ -49,8 +49,6 @@ class WalletablePassSaveBubbleController
 
   base::WeakPtr<WalletablePassSaveBubbleController> GetWeakPtr();
 
-  void OnGoToWalletClicked();
-
  protected:
   void ShowBubble() override;
 

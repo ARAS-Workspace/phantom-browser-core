@@ -242,12 +242,7 @@ export class ViewerSaveToDriveBubbleElement extends
         break;
       case SaveToDriveState.UNKNOWN_ERROR:
         this.description_ =
-            this.i18nAdvanced('saveToDriveDialogUnknownErrorMessage', {
-              tags: ['a'],
-              substitutions: [
-                this.i18n('pdfSaveToDriveHelpCenterURL'),
-              ],
-            });
+            this.i18nAdvanced('saveToDriveDialogUnknownErrorMessage');
         break;
       default:
         assertNotReached(`Invalid state for description: ${this.state}`);

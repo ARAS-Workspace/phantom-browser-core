@@ -26,8 +26,6 @@
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#include "chrome/browser/ui/singleton_tabs.h"
-#include "chrome/common/url_constants.h"
 #include "chrome/grit/browser_resources.h"
 #include "components/autofill/core/browser/data_model/autofill_ai/entity_instance.h"
 #include "components/autofill/core/browser/data_model/autofill_ai/entity_type.h"
@@ -170,22 +168,6 @@ std::u16string AutofillAiImportDataControllerImpl::GetSaveUpdateDialogTitle()
 bool AutofillAiImportDataControllerImpl::IsWalletableEntity() const {
   return GetSaveUpdateState().new_entity.record_type() ==
          EntityInstance::RecordType::kServerWallet;
-}
-
-void AutofillAiImportDataControllerImpl::OnGoToWalletLinkClicked() {
-  if (BrowserWindowInterface* browser =
-          GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
-              web_contents())) {
-    reopen_bubble_when_web_contents_becomes_visible_ = true;
-    const EntityInstance& new_entity = GetSaveUpdateState().new_entity;
-    EntityInstance::WalletPassType pass_type =
-        GetWalletPassType(new_entity.type(), new_entity.record_type());
-    CHECK_NE(pass_type, EntityInstance::WalletPassType::kUnsupported);
-    GURL wallet_url(pass_type == EntityInstance::WalletPassType::kPublic
-                        ? chrome::kWalletPassesPageURL
-                        : chrome::kWalletPrivatePassHelpCenterURL);
-    ShowSingletonTab(browser, wallet_url);
-  }
 }
 
 void AutofillAiImportDataControllerImpl::OnVisibilityChanged(
