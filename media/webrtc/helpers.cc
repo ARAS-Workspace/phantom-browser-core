@@ -90,8 +90,7 @@ void ConfigAutomaticGainControl(const AudioProcessingSettings& settings,
   apm_config.gain_controller1.analog_gain_controller.enable_digital_adaptive =
       false;
   return;
-#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS) || BUILDFLAG(IS_CASTOS) || \
-    BUILDFLAG(IS_CAST_ANDROID)
+#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
   // Configure AGC for mobile.
   apm_config.gain_controller1.enabled = false;
   apm_config.gain_controller2.enabled = true;

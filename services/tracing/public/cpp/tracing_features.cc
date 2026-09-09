@@ -30,7 +30,7 @@ BASE_FEATURE(kPerfettoBackendParams,
 
 // Runs the tracing service as an in-process browser service.
 BASE_FEATURE(kTracingServiceInProcess,
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CASTOS)
+#if BUILDFLAG(IS_ANDROID)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT

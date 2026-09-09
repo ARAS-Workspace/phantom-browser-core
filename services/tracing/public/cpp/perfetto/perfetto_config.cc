@@ -103,7 +103,7 @@ void AddDataSourceConfigs(
   // Capture system trace events if supported and enabled. The datasources will
   // only emit events if system tracing is enabled in |chrome_config|.
   if (!privacy_filtering_enabled && systrace_enabled) {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_CASTOS)
+#if BUILDFLAG(IS_CHROMEOS)
     AddDataSourceConfig(perfetto_config, kSystemTraceDataSourceName,
                         chrome_config_string, privacy_filtering_enabled,
                         convert_to_legacy_json, json_agent_label_filter,

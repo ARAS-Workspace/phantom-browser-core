@@ -1964,16 +1964,7 @@ bool IsVideoCaptureAcceleratedJpegDecodingEnabled() {
 
 #if BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
 bool IsOutOfProcessVideoDecodingEnabled() {
-#if BUILDFLAG(IS_CASTOS)
-  // The sandbox for OOP-VD was designed assuming that we're not on CastOS (see
-  // go/oop-vd-sandbox).
-  //
-  // TODO(b/210759684): revisit the sandbox to see if this restriction is
-  // necessary.
-  return false;
-#else
   return base::FeatureList::IsEnabled(kUseOutOfProcessVideoDecoding);
-#endif
 }
 
 #endif  // BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)

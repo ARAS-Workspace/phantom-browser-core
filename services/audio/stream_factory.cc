@@ -361,21 +361,7 @@ void StreamFactory::CreateOutputStreamInternal(
   auto deleter_callback = base::BindOnce(&StreamFactory::DestroyOutputStream,
                                          base::Unretained(this));
 
-  // This is required for multizone audio playback on Cast devices.
-  // See //chromecast/media/cast_audio_manager.h for more information.
-  //
-  // TODO(crbug.com/1336055): Determine if this condition should instead be
-  // ENABLE_CAST_RECEIVER && !IS_FUCHSIA.
-  const std::string device_id_or_group_id =
-#if BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
-      (::media::AudioDeviceDescription::IsCommunicationsDevice(
-           output_device_id) ||
-       group_id.is_empty())
-          ? output_device_id
-          : group_id.ToString();
-#else
-      output_device_id;
-#endif
+  const std::string device_id_or_group_id = output_device_id;
 
 #if !BUILDFLAG(ENABLE_PASSTHROUGH_AUDIO_CODECS)
   // This is forbidden by IPC validation.

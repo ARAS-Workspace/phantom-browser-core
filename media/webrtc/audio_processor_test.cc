@@ -170,9 +170,6 @@ class AudioProcessorTest : public ::testing::Test {
 #elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
     EXPECT_FALSE(config.gain_controller1.enabled);
     EXPECT_TRUE(config.gain_controller2.enabled);
-#elif BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
-    EXPECT_TRUE(config.gain_controller1.enabled);
-    EXPECT_FALSE(config.gain_controller2.enabled);
 #elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
     EXPECT_FALSE(config.gain_controller1.enabled);
     EXPECT_TRUE(config.gain_controller2.enabled);
@@ -476,15 +473,7 @@ TEST_P(AudioProcessorDefaultOutputFormatTest, GetDefaultOutputFormat) {
   AudioParameters output_params =
       AudioProcessor::GetDefaultOutputFormat(input_params, settings);
 
-  // TODO(crbug.com/1336055): Investigate why chromecast devices need special
-  // logic here. See https://crrev.com/c/1572807 and
-  // https://crrev.com/c/3621456/comments/2e73cc96_0e9773cd for details.
-  const int expected_sample_rate =
-#if BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
-      std::min(sample_rate, media::WebRtcAudioProcessingSampleRateHz());
-#else
-      media::WebRtcAudioProcessingSampleRateHz();
-#endif
+  const int expected_sample_rate = media::WebRtcAudioProcessingSampleRateHz();
   const int expected_output_channels =
       settings.multi_channel_capture_processing ? input_params.channels() : 1;
 

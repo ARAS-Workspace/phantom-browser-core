@@ -47,7 +47,7 @@ constexpr int kBuffersPerSecond = 100;  // 10 ms per buffer.
 
 int GetCaptureBufferSize(bool need_webrtc_processing,
                          const AudioParameters device_format) {
-#if BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CAST_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // TODO(henrika): Re-evaluate whether to use same logic as other platforms.
   // https://crbug.com/638081
   // Note: This computation does not match 2x10 ms as defined for audio
@@ -630,18 +630,9 @@ AudioParameters AudioProcessor::GetDefaultOutputFormat(
     const AudioProcessingSettings& settings) {
   const bool need_webrtc_audio_processing =
       settings.NeedWebrtcAudioProcessing();
-  // TODO(crbug.com/1336055): Investigate why chromecast devices need special
-  // logic here.
   const int output_sample_rate =
-      need_webrtc_audio_processing
-          ?
-#if BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
-          std::min(media::WebRtcAudioProcessingSampleRateHz(),
-                   input_format.sample_rate())
-#else
-          media::WebRtcAudioProcessingSampleRateHz()
-#endif
-          : input_format.sample_rate();
+      need_webrtc_audio_processing ? media::WebRtcAudioProcessingSampleRateHz()
+                                   : input_format.sample_rate();
 
   media::ChannelLayoutConfig output_channel_layout_config;
   if (!need_webrtc_audio_processing) {

@@ -235,7 +235,7 @@ TEST_F(AdaptPerfettoConfigForChromeTest, ProcessFilter) {
             PrintConfigToText(perfetto_config));
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_CASTOS)
+#if BUILDFLAG(IS_CHROMEOS)
 TEST_F(AdaptPerfettoConfigForChromeTest, Systrace) {
   auto perfetto_config = ParsePerfettoConfigFromText(R"pb(
     data_sources: { config: { name: "org.chromium.trace_system" } }
@@ -250,7 +250,7 @@ TEST_F(AdaptPerfettoConfigForChromeTest, Systrace) {
             PrintConfigToText(GetDataSourceConfig(
                 perfetto_config, "org.chromium.trace_system")));
 }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_CASTOS)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(AdaptPerfettoConfigForChromeTest, EnableSystemBackend_NonChrome) {
   auto perfetto_config = ParsePerfettoConfigFromText(R"pb(
