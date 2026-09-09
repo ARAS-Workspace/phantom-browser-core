@@ -256,8 +256,6 @@ source_set("tab_group_sync_bridge") {
     "//chrome/browser/ui/tabs:tab_group_impl",
     "//chrome/browser/ui/tabs/saved_tab_groups:impl",
     "//chrome/test:*",
-    "//ios/chrome/browser/saved_tab_groups/model",
-    "//ios/chrome/test/app:test_support",
   ]
 
   sources = [

@@ -20,7 +20,6 @@ static_library("internal") {
     "//chrome/test:*",
     "//components/segmentation_platform/embedder/*",
     "//components/visited_url_ranking/internal/*",
-    "//ios/chrome/browser/segmentation_platform/model:*",
   ]
 
   sources = [

@@ -22,8 +22,6 @@ static_library("core_internal") {
     "//chrome/browser",
     "//chrome/browser/collaboration:*",
     "//chrome/test:*",
-    "//ios/chrome/browser/collaboration/model",
-    "//ios/chrome/browser/data_sharing/model",
   ]
 
   sources = [

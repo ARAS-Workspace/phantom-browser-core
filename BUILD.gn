@@ -262,10 +262,7 @@ group("gn_all") {
         }
       }
     } else {
-      deps += [
-        "//ios:all",
-        "//third_party/crashpad/crashpad:crashpad_tests",
-      ]
+      deps += [ "//third_party/crashpad/crashpad:crashpad_tests" ]
     }
 
     if (is_fuchsia) {

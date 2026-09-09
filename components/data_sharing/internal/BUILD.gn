@@ -15,7 +15,6 @@ static_library("internal") {
     "//chrome/browser/data_sharing:*",
     "//chrome/test:*",
     "//components/data_sharing:test_support",
-    "//ios/chrome/browser/data_sharing/model",
   ]
 
   sources = [

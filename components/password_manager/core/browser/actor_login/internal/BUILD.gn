@@ -32,7 +32,6 @@ source_set("delegate") {
     "//chrome/browser/password_manager/actor_login/internal:*",
     "//components/password_manager/core/browser/actor_login:*",
     "//components/password_manager/core/browser/actor_login/test:*",
-    "//ios/chrome/browser/passwords/model/actor_login:*",
   ]
 
   deps = [
@@ -63,7 +62,6 @@ source_set("permission_service_impl") {
     ":unit_tests",
     "//chrome/browser/password_manager/actor_login:*",
     "//components/password_manager/core/browser/actor_login:*",
-    "//ios/chrome/browser/passwords/model/actor_login:*",
   ]
 
   deps = [
@@ -93,7 +91,6 @@ source_set("permission_cleaner") {
     "//chrome/browser/password_manager/actor_login:*",
     "//chrome/browser/password_manager/actor_login/internal:*",
     "//components/password_manager/core/browser/actor_login:*",
-    "//ios/chrome/browser/passwords/model/actor_login:*",
   ]
 
   deps = [

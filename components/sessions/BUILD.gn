@@ -63,18 +63,9 @@ if (use_blink && !(is_ios && target_platform == "iphoneos")) {
       "ios/ios_webstate_live_tab.mm",
     ]
 
-    public_deps = [
-      ":shared",
-      "//ios/web/public",
-      "//ios/web/public/session/proto",
-    ]
+    public_deps = [ ":shared" ]
 
-    deps = [
-      "//base",
-      "//ios/web/common",
-      "//ios/web/public/session",
-      "//ios/web/public/session/proto:proto_util",
-    ]
+    deps = [ "//base" ]
   }
 }
 
@@ -244,10 +235,7 @@ source_set("unit_tests") {
       "//content/test:test_support",
     ]
   } else {
-    deps += [
-      "//ios/web/public/test",
-      "//ios/web/public/test:test_fixture",
-    ]
+    deps += []
   }
 }
 

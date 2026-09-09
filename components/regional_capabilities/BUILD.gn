@@ -59,7 +59,6 @@ source_set("country_access_reason") {
     "//chrome/browser/ui/webui/regional_capabilities_internals",
     "//components/metrics/private_metrics",
     "//components/search_engines",
-    "//ios/chrome/browser/webui/ui_bundled/regional_capabilities_internals",
   ]
 
   sources = [ "access/country_access_reason.h" ]
@@ -83,9 +82,6 @@ source_set("switches") {
   visibility = [
     ":*",
     "//components/search_engines:search_engine_utils",
-    "//ios/chrome/browser/metrics/model",
-    "//ios/chrome/browser/metrics/model:eg2_tests",
-    "//ios/chrome/browser/metrics/model:unit_tests",
   ]
 
   sources = [
@@ -102,8 +98,6 @@ source_set("data") {
     "//chrome/browser/regional_capabilities:metrics_provider_impl",
     "//components/search_engines",
     "//components/search_engines:unit_tests",
-    "//ios/chrome/browser/regional_capabilities/model",
-    "//ios/chrome/browser/regional_capabilities/model:unit_tests",
   ]
 
   sources = [
