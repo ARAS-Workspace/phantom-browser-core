@@ -298,7 +298,6 @@ template("proto_library") {
                                 [
                                   "//third_party/perfetto/*",
                                   "//third_party/cast_core/*",
-                                  "//chromecast/*",
                                   "//components/policy/*",
                                   "//components/optimization_guide/internal/*",
                                 ]) == []

@@ -8,7 +8,6 @@ import("//media/media_options.gni")
 source_set("clients") {
   visibility = [
     ":test_support",
-    "//chromecast/*",
 
     # Mirroring Service needs the video accelerated encoder mojom interfaces.
     "//components/mirroring/service:mirroring_service",

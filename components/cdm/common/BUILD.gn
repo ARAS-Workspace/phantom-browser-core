@@ -17,7 +17,6 @@ static_library("common") {
   # See //components/cdm/README.md
   visibility = [
     "//chrome/*",
-    "//chromecast/*",
     "//components/cdm/*",
     "//content/shell/*",
     "//fuchsia_web/*",

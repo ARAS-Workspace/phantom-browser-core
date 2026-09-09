@@ -38,7 +38,6 @@ component("gpu") {
   visibility = [
     ":*",
     "//chrome/gpu",
-    "//chromecast/*",
     "//chromeos/ash/experiences/arc/mojom:media",
     "//chromeos/ash/experiences/arc/mojom:media_mojolpm",
     "//chromeos/ash/experiences/arc/video_accelerator:common",

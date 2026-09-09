@@ -2575,10 +2575,7 @@ source_set("browser") {
       "tracing/cast_tracing_agent.h",
     ]
 
-    deps += [
-      "//chromecast:chromecast_buildflags",
-      "//chromecast/tracing:system_tracer",
-    ]
+    deps += []
 
     defines += [ "CAST_TRACING_AGENT=1" ]
   }

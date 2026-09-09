@@ -359,12 +359,7 @@ test("device_unittests") {
       "bluetooth/test/bluetooth_test_cast.h",
     ]
 
-    deps += [
-      "//chromecast/device/bluetooth:util",
-      "//chromecast/device/bluetooth/le",
-      "//chromecast/device/bluetooth/le:test_support",
-      "//chromecast/device/bluetooth/shlib:mock_shlib",
-    ]
+    deps += []
   }
 
   if (is_apple) {

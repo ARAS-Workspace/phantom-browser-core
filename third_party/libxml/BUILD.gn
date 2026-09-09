@@ -143,7 +143,6 @@ static_library("libxml") {
     ":libxml_utils",
     ":xml_reader",
     ":xml_writer",
-    "//chromecast/internal",
     "//testing/libfuzzer/*",
     "//third_party/blink/renderer/*",
     "//third_party/fontconfig",

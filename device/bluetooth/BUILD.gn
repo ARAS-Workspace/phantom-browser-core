@@ -638,10 +638,7 @@ component("bluetooth") {
 
         public_deps += [ "//chromecast/public" ]
 
-        deps += [
-          "//chromecast/device/bluetooth:util",
-          "//chromecast/device/bluetooth/le",
-        ]
+        deps += []
       } else {
         defines += [ "NO_PLATFORM_BLUETOOTH" ]
         sources += [ "bluetooth_adapter_stub.cc" ]

@@ -277,7 +277,6 @@ group("gn_all") {
         "//tools/fuchsia/size_tests:fuchsia_sizes",
 
         # Ensure this target continues to build.
-        "//chromecast/bindings:bindings_manager_fuchsia",
       ]
     }
 
@@ -679,10 +678,7 @@ group("gn_all") {
     }
 
     if (is_cast_android || is_castos) {
-      deps += [
-        "//chromecast:cast_shell",
-        "//chromecast/cast_core:core_runtime_simple",
-      ]
+      deps += []
     }
 
     if (is_mac || is_win || is_android || is_linux || is_chromeos) {

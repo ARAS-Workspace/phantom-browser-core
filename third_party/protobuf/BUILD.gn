@@ -166,7 +166,6 @@ group("protobuf_full") {
       "//third_party/libprotobuf-mutator:*",
 
       # Chromecast requires descriptors and reflection.
-      "//chromecast/*",
 
       # libassistant requires descriptors and reflection for testing.
       "//libassistant/*",

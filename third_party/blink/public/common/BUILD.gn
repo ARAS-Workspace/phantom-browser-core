@@ -107,7 +107,6 @@ source_set("headers") {
   visibility = [
     ":*",
     "//chrome/*",
-    "//chromecast/*",
     "//components/*",
     "//content/*",
     "//fuchsia/*",

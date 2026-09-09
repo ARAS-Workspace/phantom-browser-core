@@ -250,7 +250,6 @@ source_set("host_resolver") {
   friend = [
     # chromecast/browser/url_request_context_factory.cc
     # URLRequestContext creation for chromecast.
-    "//chromecast/browser",
 
     # URLRequestContext and HttpNetworkSession::Context creation for iOS.
     "//ios/components/io_thread",
@@ -310,7 +309,6 @@ source_set("host_resolver_manager") {
   friend = [
     # chromecast/browser/url_request_context_factory.cc
     # URLRequestContext creation for chromecast.
-    "//chromecast/browser",
 
     # Tests and test support.
     "//components/cronet:cronet_common_unittests",
