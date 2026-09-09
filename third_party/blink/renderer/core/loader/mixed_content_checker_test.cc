@@ -9,7 +9,6 @@
 #include "base/memory/scoped_refptr.h"
 #include "base/test/scoped_feature_list.h"
 #include "build/build_config.h"
-#include "build/chromecast_buildflags.h"
 #include "services/network/public/cpp/features.h"
 #include "services/network/public/mojom/referrer_policy.mojom-blink.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -275,13 +274,7 @@ TEST(MixedContentCheckerTest, DetectUpgradeableMixedContent) {
       ResourceRequest::RedirectStatus::kNoRedirect, http_ip_address_audio_url,
       String(), ReportingDisposition::kSuppressReporting, *notifier_remote);
 
-#if BUILDFLAG(ENABLE_CAST_RECEIVER)
-  // Mixed Content from an insecure IP address is not blocked for Fuchsia Cast
-  // Receivers.
-  EXPECT_FALSE(blocked);
-#else
   EXPECT_TRUE(blocked);
-#endif  // BUILDFLAG(ENABLE_CAST_RECEIVER)
 }
 
 TEST(MixedContentCheckerTest, LNABypassTest) {

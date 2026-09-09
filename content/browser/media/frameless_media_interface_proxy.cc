@@ -115,11 +115,6 @@ void FramelessMediaInterfaceProxy::CreateDefaultRenderer(
     const std::string& audio_device_id,
     mojo::PendingReceiver<media::mojom::Renderer> receiver) {}
 
-#if BUILDFLAG(ENABLE_CAST_RENDERER)
-void FramelessMediaInterfaceProxy::CreateCastRenderer(
-    const base::UnguessableToken& overlay_plane_id,
-    mojo::PendingReceiver<media::mojom::Renderer> receiver) {}
-#endif  // BUILDFLAG(ENABLE_CAST_RENDERER)
 
 #if BUILDFLAG(IS_ANDROID)
 void FramelessMediaInterfaceProxy::CreateFlingingRenderer(

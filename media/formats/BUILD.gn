@@ -112,7 +112,6 @@ source_set("formats") {
 
   deps = [
     ":safe_mpeg_audio_parsers",
-    "//build:chromecast_buildflags",
     "//media:media_buildflags",
     "//media/base",
     "//media/parsers",

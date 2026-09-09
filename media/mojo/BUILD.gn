@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/buildflag_header.gni")
-import("//build/config/cast.gni")
 import("//media/media_options.gni")
 import("//testing/test.gni")
 
@@ -47,7 +46,6 @@ buildflag_header("buildflags") {
   }
 
   flags = [
-    "ENABLE_CAST_RENDERER=$enable_cast_renderer",
     "ENABLE_MOJO_RENDERER=$enable_mojo_renderer",
     "ENABLE_MOJO_CDM=$enable_mojo_cdm",
     "ENABLE_MOJO_AUDIO_DECODER=$enable_mojo_audio_decoder",

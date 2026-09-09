@@ -61,9 +61,6 @@ mojom("mojom") {
 
   # TODO(crbug.com/1293520): Revisit this after the cast renderer has been
   # deprecated and removed.
-  if (is_castos || is_cast_android) {
-    sources += [ "cast_application_media_info_manager.mojom" ]
-  }
 
   if (is_win) {
     sources += [
@@ -133,10 +130,6 @@ mojom("mojom") {
     enabled_features += [ "mojo_media_service_unused" ]
   } else {
     assert(false, "Invalid mojo media host: $mojo_media_host")
-  }
-
-  if (enable_cast_renderer) {
-    enabled_features += [ "enable_cast_renderer" ]
   }
 
   shared_typemaps = [

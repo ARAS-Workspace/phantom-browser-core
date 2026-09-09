@@ -29,7 +29,6 @@ component("webrtc") {
 
   deps = [
     "//base",
-    "//build:chromecast_buildflags",
     "//media",
     "//third_party/webrtc_overrides:webrtc_component",
   ]
@@ -50,7 +49,6 @@ source_set("unit_tests") {
   deps = [
     "//base",
     "//base/test:test_support",
-    "//build:chromecast_buildflags",
     "//media:test_support",
     "//media/webrtc",
     "//testing/gmock",

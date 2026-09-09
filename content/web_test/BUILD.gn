@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/config/cast.gni")
 import("//build/config/ui.gni")  # For the toolkit_views variables.
 import("//mojo/public/tools/bindings/mojom.gni")
 import("//printing/buildflags/buildflags.gni")
@@ -152,7 +151,7 @@ static_library("web_test_browser") {
 
   if (is_mac) {
     sources += [ "browser/web_test_shell_platform_delegate_mac.mm" ]
-  } else if (toolkit_views && !is_castos) {
+  } else if (toolkit_views) {
     sources += [ "browser/web_test_shell_platform_delegate_views.cc" ]
   } else if (is_ios) {
     sources += [ "browser/web_test_shell_platform_delegate_ios.mm" ]

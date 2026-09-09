@@ -13,7 +13,6 @@
 #include "base/i18n/rtl.h"
 #include "base/memory/raw_ptr.h"
 #include "base/strings/string_split.h"
-#include "build/chromecast_buildflags.h"
 #include "components/content_settings/core/common/content_settings_pattern.h"
 #include "components/embedder_support/user_agent_utils.h"
 #include "components/policy/content/safe_search_service.h"

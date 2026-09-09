@@ -39,13 +39,11 @@ source_set("shared_memory_user_stream") {
   deps = [ "//base" ]
 }
 
-use_crashpad_annotation =
-    (is_mac || is_ios || is_win || is_android || is_chromeos ||
-     (is_linux && !is_castos)) && !use_crash_key_stubs
+use_crashpad_annotation = (is_mac || is_ios || is_win || is_android ||
+                           is_chromeos || is_linux) && !use_crash_key_stubs
 
-# Make sure that breakpad use is limited to is_castos here so that there's no
 # unknown unenumerated target.
-assert(use_crash_key_stubs || use_crashpad_annotation || is_castos)
+assert(use_crash_key_stubs || use_crashpad_annotation)
 
 buildflag_header("crash_buildflags") {
   header = "crash_buildflags.h"
@@ -192,11 +190,6 @@ source_set("unit_tests") {
     # Do not compile with ARC because ARC would prevent intercepting and
     # interfering with low-level object destruction.
     configs -= [ "//build/config/compiler:enable_arc" ]
-  }
-
-  if (is_castos) {
-    include_dirs = [ "//third_party/breakpad/breakpad/src/" ]
-    sources += [ "crash_key_breakpad_unittest.cc" ]
   }
 
   # TODO(crbug.com/40172607): Enable when crash keys are supported on Fuchsia.

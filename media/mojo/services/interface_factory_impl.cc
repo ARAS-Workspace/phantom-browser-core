@@ -31,8 +31,7 @@
 #include "media/mojo/services/mojo_video_decoder_service.h"
 #endif  // BUILDFLAG(ENABLE_MOJO_VIDEO_DECODER)
 
-#if BUILDFLAG(ENABLE_MOJO_RENDERER) || BUILDFLAG(ENABLE_CAST_RENDERER) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(ENABLE_MOJO_RENDERER) || BUILDFLAG(IS_WIN)
 #include "base/functional/callback_helpers.h"
 #include "media/base/renderer.h"
 #include "media/mojo/services/mojo_renderer_service.h"
@@ -236,23 +235,6 @@ void InterfaceFactoryImpl::CreateDefaultRenderer(
 #endif  // BUILDFLAG(ENABLE_MOJO_RENDERER)
 }
 
-#if BUILDFLAG(ENABLE_CAST_RENDERER)
-void InterfaceFactoryImpl::CreateCastRenderer(
-    const base::UnguessableToken& overlay_plane_id,
-    mojo::PendingReceiver<media::mojom::Renderer> receiver) {
-  DVLOG(2) << __func__;
-  auto renderer = mojo_media_client_->CreateCastRenderer(
-      frame_interfaces_.get(),
-      base::SingleThreadTaskRunner::GetCurrentDefault(), &media_log_,
-      overlay_plane_id);
-  if (!renderer) {
-    DLOG(ERROR) << "Renderer creation failed.";
-    return;
-  }
-
-  AddRenderer(std::move(renderer), std::move(receiver));
-}
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 void InterfaceFactoryImpl::CreateFlingingRenderer(
@@ -337,8 +319,7 @@ bool InterfaceFactoryImpl::IsEmpty() {
     return false;
 #endif  // BUILDFLAG(ENABLE_MOJO_AUDIO_ENCODER)
 
-#if BUILDFLAG(ENABLE_MOJO_RENDERER) || BUILDFLAG(ENABLE_CAST_RENDERER) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(ENABLE_MOJO_RENDERER) || BUILDFLAG(IS_WIN)
   if (!renderer_receivers_.empty())
     return false;
 #endif
@@ -369,8 +350,7 @@ void InterfaceFactoryImpl::SetReceiverDisconnectHandler() {
   audio_encoder_receivers_.set_disconnect_handler(disconnect_cb);
 #endif  // BUILDFLAG(ENABLE_MOJO_AUDIO_ENCODER)
 
-#if BUILDFLAG(ENABLE_MOJO_RENDERER) || BUILDFLAG(ENABLE_CAST_RENDERER) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(ENABLE_MOJO_RENDERER) || BUILDFLAG(IS_WIN)
   renderer_receivers_.set_disconnect_handler(disconnect_cb);
 #endif
 
@@ -387,8 +367,7 @@ void InterfaceFactoryImpl::OnReceiverDisconnect() {
     std::move(destroy_cb_).Run();
 }
 
-#if BUILDFLAG(ENABLE_MOJO_RENDERER) || BUILDFLAG(ENABLE_CAST_RENDERER) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(ENABLE_MOJO_RENDERER) || BUILDFLAG(IS_WIN)
 void InterfaceFactoryImpl::AddRenderer(
     std::unique_ptr<media::Renderer> renderer,
     mojo::PendingReceiver<mojom::Renderer> receiver) {

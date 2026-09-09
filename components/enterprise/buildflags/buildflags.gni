@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/config/cast.gni")
 import("//build/config/chromeos/args.gni")
 import("//build/config/ui.gni")
 
@@ -25,8 +24,7 @@ declare_args() {
       is_win || is_mac || is_linux || is_android || is_ios || is_chromeos
 
   # Indicates support for watermark.
-  enterprise_watermark =
-      (is_win || is_mac || is_linux || is_chromeos || is_ios) && !is_castos
+  enterprise_watermark = is_win || is_mac || is_linux || is_chromeos || is_ios
 
   enterprise_screenshot_protection = is_win || is_mac || is_ios || is_android
 

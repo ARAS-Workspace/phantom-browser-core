@@ -174,7 +174,6 @@ blink_modules_sources("peerconnection") {
 
   public_deps = [ "//third_party/webrtc_overrides:webrtc_component" ]
   deps = [
-    "//build:chromecast_buildflags",
     "//components/webrtc:net_address_utils",
     "//components/webrtc:thread_wrapper",
     "//crypto",

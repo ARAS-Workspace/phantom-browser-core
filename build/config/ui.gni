@@ -17,7 +17,6 @@
 # There is more advice on where to put build flags in the "Build flag" section
 # of //build/config/BUILDCONFIG.gn.
 
-import("//build/config/cast.gni")
 import("//build/config/chromeos/args.gni")
 import("//build/config/ozone.gni")
 
@@ -31,13 +30,13 @@ declare_args() {
   # True means the UI is built using the "views" framework.
   toolkit_views = is_mac || is_win || is_linux || is_chromeos || is_fuchsia
 
-  use_glib = is_linux && !is_castos &&
-             # Avoid the need for glib when Android is building things via
-             # secondary toolchains.
-             target_os != "android"
+  use_glib =
+      is_linux &&  # Avoid the need for glib when Android is building things via
+      # secondary toolchains.
+      target_os != "android"
 }
 
-assert(!use_glib || (is_linux && !is_castos))
+assert(!use_glib || is_linux)
 
 use_atk = use_glib && current_toolchain == default_toolchain
 

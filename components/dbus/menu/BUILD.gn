@@ -33,7 +33,6 @@ source_set("unit_tests") {
   deps = [
     ":menu",
     "//base",
-    "//build:chromecast_buildflags",
     "//components/dbus/properties",
     "//components/dbus/utils",
     "//testing/gtest",

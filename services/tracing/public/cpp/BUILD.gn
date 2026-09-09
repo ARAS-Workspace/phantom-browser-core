@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/buildflag_header.gni")
-import("//build/config/cast.gni")
 import("//build/config/compiler/compiler.gni")
 import("//build/config/features.gni")
 import("//build_overrides/build.gni")
@@ -132,7 +131,6 @@ target("component", "cpp") {
     ]
 
     deps += [
-      "//build:chromecast_buildflags",
       "//third_party/perfetto/protos/perfetto/trace/chrome:minimal_complete_lite",
       "//third_party/snappy",
     ]

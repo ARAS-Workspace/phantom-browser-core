@@ -63,11 +63,6 @@ class FramelessMediaInterfaceProxy final
   void CreateDefaultRenderer(
       const std::string& audio_device_id,
       mojo::PendingReceiver<media::mojom::Renderer> receiver) final;
-#if BUILDFLAG(ENABLE_CAST_RENDERER)
-  void CreateCastRenderer(
-      const base::UnguessableToken& overlay_plane_id,
-      mojo::PendingReceiver<media::mojom::Renderer> receiver) final;
-#endif
 #if BUILDFLAG(IS_ANDROID)
   void CreateFlingingRenderer(
       const std::string& presentation_id,

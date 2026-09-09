@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/buildflag_header.gni")
-import("//build/config/cast.gni")
 import("//build/config/compiler/compiler.gni")
 import("//build/config/cronet/config.gni")
 import("//build/config/features.gni")
@@ -49,8 +48,7 @@ enable_unix_sockets = is_posix && !is_ios
 
 # x86/x64 cast_shell builds run on regular trybots and can use python runtime
 # and remote test server. ARM cast_shell builds don't have python runtime.
-is_arm_cast_shell_build = (is_castos || is_cast_android) &&
-                          (current_cpu == "arm" || current_cpu == "arm64")
+is_arm_cast_shell_build = false
 
 # Python works only on Linux, MacOS and Windows so exclude the others,
 # chromecast, android, fuchsia, ios.
@@ -1659,14 +1657,12 @@ component("net") {
       "third_party/mozilla_security_manager/nsPKCS12Blob.h",
     ]
     deps += [ "//build:chromeos_buildflags" ]
-    if (!is_castos) {
-      sources += [
-        "ssl/client_cert_store_nss.cc",
-        "ssl/client_cert_store_nss.h",
-        "ssl/ssl_platform_key_nss.cc",
-        "ssl/ssl_platform_key_nss.h",
-      ]
-    }
+    sources += [
+      "ssl/client_cert_store_nss.cc",
+      "ssl/client_cert_store_nss.h",
+      "ssl/ssl_platform_key_nss.cc",
+      "ssl/ssl_platform_key_nss.h",
+    ]
 
     # TODO(crbug.com/41467965): This is a public config because
     # multi_threaded_cert_verifier.h depends on NSS. When the linked bug is
@@ -3485,12 +3481,10 @@ target(_test_target_type, "net_unittests") {
       "cert/nss_cert_database_unittest.cc",
       "cert/x509_util_nss_unittest.cc",
     ]
-    if (!is_castos) {
-      sources += [
-        "ssl/client_cert_store_nss_unittest.cc",
-        "ssl/ssl_platform_key_nss_unittest.cc",
-      ]
-    }
+    sources += [
+      "ssl/client_cert_store_nss_unittest.cc",
+      "ssl/ssl_platform_key_nss_unittest.cc",
+    ]
     configs += [ "//build/config/linux/nss" ]
   }
 

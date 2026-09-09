@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/config/cast.gni")
 import("//ui/webui/resources/tools/generate_grd.gni")
 import("liblouis_library.gni")
 
@@ -19,22 +18,20 @@ generate_grd("build_grdp") {
   resource_path_prefix = "static/liblouis"
 }
 
-if (!is_castos) {
-  chromevox_test_data_dir = "$root_build_dir/chromevox_test_data/braille"
+chromevox_test_data_dir = "$root_build_dir/chromevox_test_data/braille"
 
-  liblouis_library("liblouis_test_data") {
-    testonly = true
-    dest_dir = chromevox_test_data_dir
-    deps = [ ":liblouis_test_files" ]
-  }
+liblouis_library("liblouis_test_data") {
+  testonly = true
+  dest_dir = chromevox_test_data_dir
+  deps = [ ":liblouis_test_files" ]
+}
 
-  copy("liblouis_test_files") {
-    visibility = [ ":liblouis_test_data" ]
-    testonly = true
-    sources = [
-      "//chrome/test/data/chromeos/liblouis_wasm/manifest.json",
-      "//chrome/test/data/chromeos/liblouis_wasm/test.js",
-    ]
-    outputs = [ "${chromevox_test_data_dir}/{{source_file_part}}" ]
-  }
+copy("liblouis_test_files") {
+  visibility = [ ":liblouis_test_data" ]
+  testonly = true
+  sources = [
+    "//chrome/test/data/chromeos/liblouis_wasm/manifest.json",
+    "//chrome/test/data/chromeos/liblouis_wasm/test.js",
+  ]
+  outputs = [ "${chromevox_test_data_dir}/{{source_file_part}}" ]
 }

@@ -383,7 +383,6 @@ target(link_target_type, "gles2_sources") {
     ":disk_cache_proto",
     ":service",
     "//base",
-    "//build:chromecast_buildflags",
     "//components/crash/core/common",
     "//components/persistent_cache",
     "//components/version_info",

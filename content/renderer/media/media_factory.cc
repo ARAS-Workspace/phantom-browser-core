@@ -24,7 +24,6 @@
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
 #include "build/buildflag.h"
-#include "build/chromecast_buildflags.h"
 #include "cc/trees/layer_tree_settings.h"
 #include "components/viz/common/features.h"
 #include "content/public/common/content_client.h"
@@ -81,12 +80,6 @@
 #include "url/gurl.h"
 #endif
 
-#if BUILDFLAG(ENABLE_CAST_RECEIVER)
-#include "components/cast_streaming/common/public/cast_streaming_url.h"  // nogncheck
-#include "components/cast_streaming/common/public/features.h"  // nogncheck
-#include "components/cast_streaming/renderer/public/resource_provider.h"  // nogncheck
-#include "components/cast_streaming/renderer/public/wrapping_renderer_factory_selector.h"  // nogncheck
-#endif
 
 #if BUILDFLAG(IS_FUCHSIA)
 #include "media/cdm/fuchsia/fuchsia_cdm_factory.h"
@@ -320,20 +313,6 @@ MediaFactory::~MediaFactory() {
 }
 
 void MediaFactory::SetupMojo() {
-#if BUILDFLAG(ENABLE_CAST_RECEIVER)
-  // Add callbacks for cast_streaming to the AssociatedInterfaceRegistry to be
-  // populated upon browser-process binding.
-  cast_streaming_resource_provider_ =
-      GetContentClient()->renderer()->CreateCastStreamingResourceProvider();
-  if (cast_streaming_resource_provider_) {
-    render_frame_->GetAssociatedInterfaceRegistry()
-        ->AddInterface<cast_streaming::mojom::RendererController>(
-            cast_streaming_resource_provider_->GetRendererControllerBinder());
-    render_frame_->GetAssociatedInterfaceRegistry()
-        ->AddInterface<cast_streaming::mojom::DemuxerConnector>(
-            cast_streaming_resource_provider_->GetDemuxerConnectorBinder());
-  }
-#endif
 }
 
 std::unique_ptr<blink::WebMediaPlayer> MediaFactory::CreateMediaPlayer(
@@ -445,13 +424,6 @@ std::unique_ptr<blink::WebMediaPlayer> MediaFactory::CreateMediaPlayer(
       GetContentClient()->renderer()->OverrideDemuxerForUrl(render_frame_, url,
                                                             media_task_runner);
 
-#if BUILDFLAG(ENABLE_CAST_RECEIVER)
-  if (!demuxer_override && cast_streaming_resource_provider_) {
-    demuxer_override =
-        cast_streaming_resource_provider_->MaybeGetDemuxerOverride(
-            url, media_task_runner);
-  }
-#endif
 
   if (!media_player_builder_) {
     media_player_builder_ = std::make_unique<blink::WebMediaPlayerBuilder>(
@@ -517,15 +489,6 @@ MediaFactory::CreateRendererFactorySelector(
   auto factory_selector = std::make_unique<media::RendererFactorySelector>();
   bool is_base_renderer_factory_set = false;
 
-#if BUILDFLAG(ENABLE_CAST_RECEIVER)
-  if (cast_streaming::IsCastRemotingEnabled() &&
-      cast_streaming::IsCastStreamingMediaSourceUrl(url) &&
-      cast_streaming_resource_provider_) {
-    factory_selector =
-        std::make_unique<cast_streaming::WrappingRendererFactorySelector>(
-            cast_streaming_resource_provider_.get());
-  }
-#endif
 
   auto factory = GetContentClient()->renderer()->GetBaseRendererFactory(
       render_frame_, media_log, decoder_factory,

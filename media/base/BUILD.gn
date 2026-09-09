@@ -506,8 +506,6 @@ source_set("base") {
 
   if (is_android) {
     sources += [ "demuxer_memory_limit_android.cc" ]
-  } else if (is_castos) {
-    sources += [ "demuxer_memory_limit_cast.cc" ]
   } else {
     sources += [ "demuxer_memory_limit_default.cc" ]
   }
@@ -732,10 +730,6 @@ source_set("unit_tests") {
       "d3d11.lib",
       "mfplat.lib",
     ]
-  }
-
-  if (is_castos) {
-    sources += [ "demuxer_memory_limit_cast_unittest.cc" ]
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and

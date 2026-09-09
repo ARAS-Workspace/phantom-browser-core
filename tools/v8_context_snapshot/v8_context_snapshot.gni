@@ -7,7 +7,6 @@
 # third_party/blink/renderer/bindings/core/v8/v8_context_snapshot.{cc|h}.
 # to speedup creating a V8 context and setting up around it.
 
-import("//build/config/cast.gni")
 import("//build/config/v8_target_cpu.gni")
 import("//v8/gni/v8.gni")
 
@@ -34,7 +33,7 @@ declare_args() {
   # Disable in mac and win cross builds since building Blink twice is slow.
   use_v8_context_snapshot =
       include_both_v8_snapshots ||
-      (!is_chromeos && !is_android && !is_castos && !is_fuchsia &&
+      (!is_chromeos && !is_android && !is_fuchsia &&
        !(host_toolchain == default_toolchain && is_msan) &&
        !(is_win && host_os != "win") && !(is_mac && host_os != "mac"))
 }

@@ -4,7 +4,6 @@
 
 #include "fuchsia_web/webengine/switches.h"
 
-#include "build/chromecast_buildflags.h"
 
 namespace switches {
 

@@ -104,7 +104,6 @@ executable("cast_runner_exe") {
     ":cast_runner_core",
     ":common",
     "//base",
-    "//build:chromecast_buildflags",
     "//components/fuchsia_component_support",
     "//fuchsia_web/common",
     "//fuchsia_web/webinstance_host",
@@ -182,7 +181,6 @@ test("cast_runner_integration_tests") {
   deps = [
     ":cast_runner_core",
     "//base/test:test_support",
-    "//build:chromecast_buildflags",
     "//components/cast/message_port",
     "//components/fuchsia_component_support:dynamic_component_host",
     "//fuchsia_web/common",

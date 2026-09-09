@@ -4,7 +4,6 @@
 
 assert(is_fuchsia)
 
-import("//build/config/cast.gni")
 import("//build/config/fuchsia/generate_runner_scripts.gni")
 import("//fuchsia_web/common/swiftshader_exclude.gni")
 import("//third_party/fuchsia-gn-sdk/src/component.gni")
@@ -26,10 +25,6 @@ group("shell") {
     "//fuchsia_web/av_testing:*",
   ]
   deps = [ ":web_engine_shell" ]
-
-  if (enable_cast_receiver) {
-    deps += [ ":cast_streaming_shell" ]
-  }
 }
 
 source_set("remote_debugging_port") {
@@ -132,73 +127,4 @@ source_set("shell_relauncher") {
     "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.component:fuchsia.component_hlcpp",
     "//third_party/fuchsia-sdk/sdk/pkg/sys_component_cpp_testing",
   ]
-}
-
-if (enable_cast_receiver) {
-  fuchsia_component("cast_streaming_shell_component") {
-    testonly = true
-    manifest = "cast_streaming_shell.cml"
-    data_deps = [ ":cast_streaming_shell_exe" ]
-  }
-
-  # WebInstanceHost needs to serve capabilities to child components, which is
-  # not possible when running inside a test component, such as
-  # cast_streaming_shell. The shell therefore uses an intermediate component to
-  # actually run the WebInstanceHost, from which the capabilities can be served.
-  fuchsia_component("cast_streaming_shell_for_web_instance_host_component") {
-    testonly = true
-    manifest = "cast_streaming_shell_for_web_instance_host.cml"
-    data_deps = [ ":cast_streaming_shell_exe" ]
-  }
-
-  fuchsia_package("cast_streaming_shell_pkg") {
-    testonly = true
-    package_name = "cast_streaming_shell"
-    deps = [
-      ":cast_streaming_shell_component",
-      ":cast_streaming_shell_for_web_instance_host_component",
-    ]
-    excluded_files = _web_shell_excluded_files
-  }
-
-  fuchsia_package_installer("cast_streaming_shell") {
-    testonly = true
-    package = ":cast_streaming_shell_pkg"
-    package_name = "cast_streaming_shell"
-    package_deps = [ [
-          "//fuchsia_web/webengine:web_engine",
-          "web_engine",
-        ] ]
-  }
-
-  executable("cast_streaming_shell_exe") {
-    testonly = true
-    sources = [ "cast_streaming_shell.cc" ]
-
-    data = [
-      "cast_streaming_shell_data",
-      rebase_path("//media/test/data/bear-1280x720.ivf"),
-    ]
-
-    deps = [
-      ":present_frame",
-      ":remote_debugging_port",
-      ":shell_relauncher",
-      "//base",
-      "//base/test:test_support",
-      "//components/cast/message_port",
-      "//components/cast_streaming/test:test_sender_using_net_sockets",
-      "//components/fuchsia_component_support:annotations_manager",
-      "//fuchsia_web/cast_streaming",
-      "//fuchsia_web/common",
-      "//fuchsia_web/common/test:test_support",
-      "//fuchsia_web/webengine:switches",
-      "//fuchsia_web/webinstance_host",
-      "//media",
-      "//media/gpu/test:test_helpers",
-      "//third_party/fuchsia-sdk/sdk/pkg/fdio",
-      "//third_party/fuchsia-sdk/sdk/pkg/sys_cpp",
-      "//url",
-    ]
-  }
 }

@@ -122,9 +122,6 @@
 #include "content/public/common/content_descriptors.h"
 #endif
 
-#if BUILDFLAG(ENABLE_CAST_RENDERER)
-#include "media/mojo/services/media_service_factory.h"  // nogncheck
-#endif
 
 #if BUILDFLAG(IS_CT_SUPPORTED)
 #include "services/network/public/mojom/ct_log_info.mojom.h"
@@ -621,12 +618,6 @@ void ShellContentBrowserClient::ExposeInterfacesToChild(
 mojo::Remote<::media::mojom::MediaService>
 ShellContentBrowserClient::RunSecondaryMediaService() {
   mojo::Remote<::media::mojom::MediaService> remote;
-#if BUILDFLAG(ENABLE_CAST_RENDERER)
-  static base::SequenceLocalStorageSlot<std::unique_ptr<::media::MediaService>>
-      service;
-  service.emplace(::media::CreateMediaServiceForTesting(
-      remote.BindNewPipeAndPassReceiver()));
-#endif
   return remote;
 }
 

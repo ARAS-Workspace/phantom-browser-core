@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/config/cast.gni")
 import("//build/config/chrome_build.gni")
 import("//build/config/compiler/compiler.gni")
 import("//build/config/features.gni")
@@ -888,9 +887,6 @@ if (is_fuchsia) {
         "$root_gen_dir/package_metadata/web_engine_shell.meta",
         "$root_gen_dir/package_metadata/web_engine_with_webui.meta",
       ]
-      if (enable_cast_receiver) {
-        data += [ "$root_gen_dir/package_metadata/cast_streaming_shell.meta" ]
-      }
 
       data_deps = [
         "//fuchsia_web/shell",
@@ -1112,7 +1108,7 @@ static_library("browsertest_support") {
     ]
   }
 
-  if (use_aura && toolkit_views && !is_castos) {
+  if (use_aura && toolkit_views) {
     deps += [ "//ui/views" ]
   }
 
@@ -1893,7 +1889,6 @@ test("content_browsertests") {
     ":web_ui_ts_test_mojo_bindings",
     "//base/test:proto_test_support",
     "//base/test:test_support",
-    "//build:chromecast_buildflags",
     "//cc/slim",
     "//components//unexportable_keys",
     "//components/cbor",
@@ -2123,7 +2118,7 @@ test("content_browsertests") {
 
     if (is_linux || is_chromeos || is_mac || is_win) {
       # For chromecast, content_browsertests does not provide a shell window.
-      if (use_aura && !is_castos) {
+      if (use_aura) {
         sources += [ "../browser/media/capture/aura_window_video_capture_device_browsertest.cc" ]
       }
 
@@ -2444,27 +2439,10 @@ test("content_browsertests") {
     ]
   }
 
-  if (is_castos || is_cast_android) {
-    sources -= [
-      # The cast shell media pipeline doesn't produce real video frames that we
-      # can inspect.
-      "../browser/media/media_color_browsertest.cc",
-
-      # The cast shell has plugin support but no pdf, causing blocked scheme PDF
-      # tests to fail.
-      "../browser/renderer_host/blocked_scheme_navigation_browsertest.cc",
-
-      # The multi-window tests don't work on cast_shell. Since there's little
-      # added value in running the single-window test on this platform, just
-      # exclude them all.
-      "../browser/snapshot_browsertest.cc",
-    ]
-  }
-
   # KeyboardLock is currently not supported in Android, Fuchsia and
   # Chromecast builds. TODO(crbug.com/40891949): Re-enable on Fuchsia
   # once its platform support is available.
-  if (is_android || is_fuchsia || is_castos) {
+  if (is_android || is_fuchsia) {
     sources -= [ "../browser/keyboard_lock_browsertest.cc" ]
   }
 
@@ -3214,7 +3192,6 @@ test("content_unittests") {
     "//base/test:test_support",
     "//build:android_buildflags",
     "//build:buildflag_header_h",
-    "//build:chromecast_buildflags",
     "//cc",
     "//cc:test_support",
     "//cc/mojom",

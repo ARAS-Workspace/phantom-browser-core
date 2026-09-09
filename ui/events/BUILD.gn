@@ -566,8 +566,6 @@ component("gesture_detection") {
     sources += [ "gesture_detection/gesture_configuration_android.cc" ]
   } else if (is_ios) {
     sources += [ "gesture_detection/gesture_configuration_ios.cc" ]
-  } else if (is_castos) {
-    sources += [ "gesture_detection/gesture_configuration_cast.cc" ]
   } else if (use_aura) {
     sources += [ "gesture_detection/gesture_configuration_aura.cc" ]
   } else {
@@ -821,10 +819,6 @@ if (use_blink) {
         "win/stylus_handwriting_properties_win_unittest.cc",
       ]
       deps += [ "//ui/events:keyboard_hook" ]
-    }
-
-    if (is_castos) {
-      sources += [ "chromecast/scroller_unittest.cc" ]
     }
 
     if (is_fuchsia) {

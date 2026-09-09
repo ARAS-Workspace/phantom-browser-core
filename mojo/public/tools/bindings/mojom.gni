@@ -9,8 +9,6 @@ import("//third_party/protobuf/proto_library.gni")
 import("//ui/webui/resources/tools/generate_grd.gni")
 import("//ui/webui/webui_features.gni")
 
-import("//build/config/cast.gni")
-
 # TODO(rockot): Maybe we can factor these dependencies out of //mojo. They're
 # used to conditionally enable message ID scrambling in a way which is
 # consistent across toolchains and which is affected by branded vs non-branded
@@ -65,8 +63,8 @@ if (is_chromeos) {
 # NOTE: We would like to avoid scrambling message IDs where it doesn't add
 # value, so we limit the behavior to desktop builds for now.
 # We *cannot* enable scrambling on Chrome OS (it would break ARC).
-enable_scrambled_message_ids = enable_mojom_message_id_scrambling &&
-                               (is_mac || is_win || (is_linux && !is_castos))
+enable_scrambled_message_ids =
+    enable_mojom_message_id_scrambling && (is_mac || is_win || is_linux)
 if (enable_scrambled_message_ids) {
   assert(!is_chromeos)
 }

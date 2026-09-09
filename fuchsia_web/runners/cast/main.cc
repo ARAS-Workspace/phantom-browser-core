@@ -24,7 +24,6 @@
 #include "base/run_loop.h"
 #include "base/task/single_thread_task_executor.h"
 #include "base/values.h"
-#include "build/chromecast_buildflags.h"
 #include "components/fuchsia_component_support/config_reader.h"
 #include "components/fuchsia_component_support/feedback_registration.h"
 #include "components/fuchsia_component_support/inspect.h"

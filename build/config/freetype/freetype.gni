@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/config/cast.gni")
-
 declare_args() {
   # Blink no longer needs FreeType. PDFium needs a recent and properly
   # build-configured FreeType version to work and avoid security bugs.
@@ -24,5 +22,5 @@ declare_args() {
   # This should be kept in sync with the value of `enable_pdf` in
   # //pdf/features.gni, but for layering reasons,
   # we can't import pdf's features.gni here.
-  enable_freetype = !is_android && !is_ios && !is_castos && !is_fuchsia
+  enable_freetype = !is_android && !is_ios && !is_fuchsia
 }

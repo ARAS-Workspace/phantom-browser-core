@@ -10,6 +10,6 @@ if (is_ios) {
 }
 
 declare_args() {
-  enable_remoting = !is_castos && !is_android && !is_ios && !is_fuchsia &&
-                    (!is_linux || use_gtk)
+  enable_remoting =
+      !is_android && !is_ios && !is_fuchsia && (!is_linux || use_gtk)
 }

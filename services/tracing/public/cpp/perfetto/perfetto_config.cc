@@ -18,7 +18,6 @@
 #include "base/trace_event/trace_event.h"
 #include "base/tracing/trace_time.h"
 #include "build/build_config.h"
-#include "build/chromecast_buildflags.h"
 #include "components/tracing/common/tracing_switches.h"
 #include "services/tracing/public/cpp/perfetto/perfetto_data_source_names.h"
 #include "third_party/perfetto/protos/perfetto/config/chrome/histogram_samples.gen.h"

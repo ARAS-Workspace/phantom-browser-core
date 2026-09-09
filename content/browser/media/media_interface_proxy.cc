@@ -435,20 +435,6 @@ void MediaInterfaceProxy::CreateDefaultRenderer(
     factory->CreateDefaultRenderer(audio_device_id, std::move(receiver));
 }
 
-#if BUILDFLAG(ENABLE_CAST_RENDERER)
-void MediaInterfaceProxy::CreateCastRenderer(
-    const base::UnguessableToken& overlay_plane_id,
-    mojo::PendingReceiver<media::mojom::Renderer> receiver) {
-  DCHECK(thread_checker_.CalledOnValidThread());
-
-  // CastRenderer is always hosted in the secondary Media Service instance.
-  // This may not be running in some test environments (e.g.
-  // content_browsertests) even though renderers may still request to bind it.
-  InterfaceFactory* factory = secondary_interface_factory_->Get();
-  if (factory)
-    factory->CreateCastRenderer(overlay_plane_id, std::move(receiver));
-}
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 void MediaInterfaceProxy::CreateFlingingRenderer(
@@ -569,12 +555,6 @@ void MediaInterfaceProxy::CreateCdm(const media::CdmConfig& cdm_config,
 #if BUILDFLAG(ENABLE_LIBRARY_CDMS)
   // Fallback to use CdmFactory even if `use_hw_secure_codecs` is true.
   auto* factory = GetCdmFactory(cdm_config.key_system);
-#elif BUILDFLAG(ENABLE_CAST_RENDERER)
-  // CDM service lives together with renderer service if cast renderer is
-  // enabled, because cast renderer creates its own audio/video decoder. Note
-  // that in content_browsertests (and Content Shell in general) we don't have
-  // an a cast renderer and this interface will be unbound.
-  auto* factory = secondary_interface_factory_->Get();
 #else
   // CDM service lives together with audio/video decoder service.
   auto* factory = media_interface_factory_ptr_->Get();

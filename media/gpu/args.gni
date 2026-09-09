@@ -14,8 +14,7 @@ declare_args() {
 
   # Indicates if VA-API-based hardware acceleration is to be used.
   use_vaapi =
-      is_linux && !is_castos &&
-      (ozone_platform_x11 || ozone_platform_wayland) &&
+      is_linux && (ozone_platform_x11 || ozone_platform_wayland) &&
       (target_cpu == "x86" || target_cpu == "x64" || target_cpu == "arm64")
 
   # Indicates if ChromeOS protected media support exists. This is used

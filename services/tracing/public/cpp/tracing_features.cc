@@ -11,7 +11,6 @@
 #include "base/strings/string_number_conversions.h"
 #include "base/tracing_buildflags.h"
 #include "build/build_config.h"
-#include "build/chromecast_buildflags.h"
 #include "components/tracing/common/tracing_switches.h"
 
 #if BUILDFLAG(IS_ANDROID)

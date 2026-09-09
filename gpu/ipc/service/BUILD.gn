@@ -55,7 +55,6 @@ component("service") {
   }
   public_deps = [
     "//base",
-    "//build:chromecast_buildflags",
     "//components/viz/common",
     "//gpu/config",
     "//gpu/ipc/common",

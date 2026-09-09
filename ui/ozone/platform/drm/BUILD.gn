@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/config/cast.gni")
 import("//build/config/linux/pkg_config.gni")
 import("//build/config/logging.gni")
 import("//build/config/ozone.gni")
@@ -12,7 +11,6 @@ import("//ui/gl/features.gni")
 
 # This is ChromeOS-only.
 assert(is_chromeos, "Ozone DRM platform is ChromeOS-only")
-assert(!is_castos, "Ozone DRM platform no longer supports CastOS")
 
 visibility = [ "//ui/ozone/*" ]
 

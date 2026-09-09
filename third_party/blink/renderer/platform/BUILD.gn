@@ -1825,7 +1825,6 @@ component("platform") {
     "fonts:font_format_bindings",
     "//base:base_static",
     "//base/allocator:buildflags",
-    "//build:chromecast_buildflags",
     "//cc",
     "//cc/mojo_embedder",
     "//components/input",

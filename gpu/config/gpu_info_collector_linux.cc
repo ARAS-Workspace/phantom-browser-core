@@ -4,7 +4,6 @@
 
 #include "base/trace_event/trace_event.h"
 #include "build/build_config.h"
-#include "build/chromecast_buildflags.h"
 #include "gpu/config/gpu_info_collector.h"
 #include "third_party/angle/src/gpu_info_util/SystemInfo.h"
 #include "ui/gl/gl_display.h"

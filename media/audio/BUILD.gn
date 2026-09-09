@@ -137,7 +137,6 @@ source_set("audio") {
   ]
   deps = [
     "//base",
-    "//build:chromecast_buildflags",
     "//media/base",
     "//third_party/flac",
     "//third_party/opus",

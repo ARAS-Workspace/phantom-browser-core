@@ -63,8 +63,6 @@ source_set("constants_impl") {
     "//extensions/common:export_impl",
   ]
 
-  deps = [ "//build:chromecast_buildflags" ]
-
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 }
 

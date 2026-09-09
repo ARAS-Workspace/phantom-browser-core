@@ -48,11 +48,11 @@ component("shell_dialogs") {
     "//url",
   ]
 
-  if (is_chromeos || is_castos) {
+  if (is_chromeos) {
     sources += [ "shell_dialog_stub.cc" ]
   }
 
-  if (is_linux && !is_castos) {
+  if (is_linux) {
     sources += [
       "select_file_dialog_linux.cc",
       "select_file_dialog_linux.h",
@@ -175,7 +175,7 @@ test("shell_dialogs_unittests") {
     "//ui/strings",
   ]
 
-  if (is_linux && !is_castos && use_dbus) {
+  if (is_linux && use_dbus) {
     sources += [ "select_file_dialog_linux_portal_unittest.cc" ]
     deps += [
       "//components/dbus",

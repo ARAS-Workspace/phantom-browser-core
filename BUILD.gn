@@ -9,7 +9,6 @@
 # file to your new one or GN won't know about it.
 
 import("//build/config/c++/modules.gni")
-import("//build/config/cast.gni")
 import("//build/config/chrome_build.gni")
 import("//build/config/compiler/compiler.gni")
 import("//build/config/cronet/config.gni")
@@ -139,14 +138,14 @@ group("gn_all") {
       deps += [ ":webui_closure_compile" ]
     }
 
-    if (!is_android && !is_castos) {
+    if (!is_android) {
       deps += [
         "//crypto:crypto_unittests",
         "//google_apis/gcm:gcm_unit_tests",
       ]
     }
 
-    if (!is_ios && !is_android && !is_castos) {
+    if (!is_ios && !is_android) {
       if (!is_fuchsia) {
         deps += [
           "//chrome",
@@ -167,7 +166,7 @@ group("gn_all") {
       ]
     }
 
-    if (!is_castos && !is_fuchsia) {
+    if (!is_fuchsia) {
       deps += [ "//chrome/installer" ]
     }
 
@@ -179,7 +178,7 @@ group("gn_all") {
       deps += [ "//chrome/enterprise_companion" ]
     }
 
-    if (!is_ios && !is_castos) {
+    if (!is_ios) {
       if (!is_fuchsia) {
         deps += [ "//chrome/test:unit_tests" ]
       }
@@ -251,7 +250,7 @@ group("gn_all") {
         "//third_party/catapult/telemetry:bitmaptools($host_toolchain)",
       ]
       if (!is_android) {
-        if (!is_castos && !is_fuchsia) {
+        if (!is_fuchsia) {
           deps += [ "//chrome/test:telemetry_perf_unittests" ]
         }
       } else {
@@ -401,20 +400,18 @@ group("gn_all") {
         "//url:url_unittests",
       ]
 
-      if (!is_cast_android) {
-        deps += [
-          "//chrome/android:chrome_junit_tests",
-          "//chrome/android:chrome_public_apk",
-          "//chrome/android:chrome_public_test_apk",
-          "//chrome/android:chrome_public_unit_test_apk",
-          "//chrome/browser/android/examples/custom_tabs_client:custom_tabs_client_example_apk",
-          "//chrome/browser/android/examples/inline_autofill_service:inline_autofill_service_example_apk",
-          "//chrome/browser/android/examples/partner_browser_customizations_provider:partner_browser_customizations_example_apk",
-          "//content/shell/android:content_shell_test_apk",
-        ]
-        if (defined(android_app_secondary_abi)) {
-          deps += [ "//android_webview/tools/pinlist:generate_pinlist" ]
-        }
+      deps += [
+        "//chrome/android:chrome_junit_tests",
+        "//chrome/android:chrome_public_apk",
+        "//chrome/android:chrome_public_test_apk",
+        "//chrome/android:chrome_public_unit_test_apk",
+        "//chrome/browser/android/examples/custom_tabs_client:custom_tabs_client_example_apk",
+        "//chrome/browser/android/examples/inline_autofill_service:inline_autofill_service_example_apk",
+        "//chrome/browser/android/examples/partner_browser_customizations_provider:partner_browser_customizations_example_apk",
+        "//content/shell/android:content_shell_test_apk",
+      ]
+      if (defined(android_app_secondary_abi)) {
+        deps += [ "//android_webview/tools/pinlist:generate_pinlist" ]
       }
 
       if (checkout_fuchsia) {
@@ -483,9 +480,7 @@ group("gn_all") {
         deps += [ "//testing:empty_main" ]
       }
 
-      if (!is_castos) {
-        deps += [ "//chrome:linux_cros_extra_data" ]
-      }
+      deps += [ "//chrome:linux_cros_extra_data" ]
 
       if (use_dbus) {
         deps += [
@@ -541,7 +536,7 @@ group("gn_all") {
         ]
       }
 
-      if (!is_android && !is_castos && !is_ios && !is_fuchsia) {
+      if (!is_android && !is_ios && !is_fuchsia) {
         deps += [
           "//chrome/test:load_library_perf_tests",
           "//chrome/test:sync_performance_tests",
@@ -588,11 +583,9 @@ group("gn_all") {
         "//ui/snapshot:snapshot_unittests",
       ]
 
-      if (!is_castos) {
-        deps += [ "//chrome/test:chrome_app_unittests" ]
-      }
+      deps += [ "//chrome/test:chrome_app_unittests" ]
 
-      if (!is_debug && !is_component_build && !is_castos) {
+      if (!is_debug && !is_component_build) {
         deps += [ "//chrome/tools/service_discovery_sniffer" ]
       }
     }
@@ -699,14 +692,14 @@ group("gn_all") {
       deps += [ "//third_party/sqlite:sqlite_shell" ]
     }
 
-    if ((is_linux && !is_castos) || is_fuchsia) {
+    if (is_linux || is_fuchsia) {
       # TODO(https://crbug.com/1329673): Figure out if this should be in gn_all
       # and how cross-platform this is.
       deps +=
           [ "//components/services/filesystem:filesystem_service_unittests" ]
     }
 
-    if (is_linux && !is_castos) {
+    if (is_linux) {
       # TODO(https://crbug.com/1329673): Figure out if any of these should be in
       # gn_all and figure out how cross-platform they are.
       deps += [
@@ -748,8 +741,7 @@ group("gn_all") {
       }
     }
 
-    if ((is_linux && !is_castos) || is_chromeos ||
-        ((is_win || is_mac) && use_fuzzing_engine)) {
+    if (is_linux || is_chromeos || ((is_win || is_mac) && use_fuzzing_engine)) {
       deps += [
         "//testing/libfuzzer/fuzzers",
         "//testing/libfuzzer/research",
@@ -1070,15 +1062,12 @@ if (use_blink && !is_cronet_build) {
     if (is_fuchsia || is_android) {
       # On Fuchsia and non-Cast Android, ChromeDriver runs on the host, not the
       # device.
-      if (!is_cast_android) {
-        deps = [
-          "//chrome/test/chromedriver:chromedriver_server($host_toolchain)",
-        ]
-      }
-      if (is_android && !is_cast_android) {
+      deps =
+          [ "//chrome/test/chromedriver:chromedriver_server($host_toolchain)" ]
+      if (is_android) {
         deps += [ "//chrome/test/chromedriver/test/webview_shell:chromedriver_webview_shell_apk" ]
       }
-    } else if (!is_castos && !is_ios) {
+    } else if (!is_ios) {
       deps = [
         "//chrome/test/chromedriver:chromedriver_server",
         "//chrome/test/chromedriver:chromedriver_unittests",
@@ -1131,7 +1120,7 @@ if (!running_modularize) {
 group("chromium_builder_perf") {
   testonly = true
 
-  if (!is_ios && !is_android && !is_castos && !is_cronet_build) {
+  if (!is_ios && !is_android && !is_cronet_build) {
     data_deps = [
       "//components/tracing:tracing_perftests",
       "//gpu:command_buffer_perftests",
@@ -1156,7 +1145,7 @@ group("chromium_builder_perf") {
     }
   }
 
-  if (is_linux && !is_castos) {
+  if (is_linux) {
     if (is_official_build) {
       # In GN builds, this is controlled by the 'linux_dump_symbols'
       # flag, which defaults to 1 for official builds. For now,
@@ -1176,7 +1165,7 @@ group("chromium_builder_perf") {
   }
 }
 
-if (!is_ios && !is_android && !is_castos && !is_cronet_build) {
+if (!is_ios && !is_android && !is_cronet_build) {
   group("blackbox_fuzzing_targets") {
     testonly = true
     write_runtime_deps = "${root_out_dir}/${target_name}.runtime_deps"

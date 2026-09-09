@@ -294,7 +294,6 @@ viz_component("service") {
   ]
 
   deps = [
-    "//build:chromecast_buildflags",
     "//cc/animation",
     "//cc/base",
     "//cc/paint",

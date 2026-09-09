@@ -21,7 +21,6 @@
 #include "base/trace_event/trace_config.h"
 #include "base/values.h"
 #include "build/build_config.h"
-#include "build/chromecast_buildflags.h"
 #include "content/browser/tracing/tracing_controller_impl.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"

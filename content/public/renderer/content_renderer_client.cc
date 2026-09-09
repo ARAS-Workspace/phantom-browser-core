@@ -10,7 +10,6 @@
 #include "base/task/sequenced_task_runner.h"
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
-#include "build/chromecast_buildflags.h"
 #include "content/public/common/content_switches.h"
 #include "media/base/demuxer.h"
 #include "media/base/renderer_factory.h"
@@ -312,12 +311,6 @@ ContentRendererClient::GetBaseRendererFactory(
   return nullptr;
 }
 
-#if BUILDFLAG(ENABLE_CAST_RECEIVER)
-std::unique_ptr<cast_streaming::ResourceProvider>
-ContentRendererClient::CreateCastStreamingResourceProvider() {
-  return nullptr;
-}
-#endif
 
 
 }  // namespace content

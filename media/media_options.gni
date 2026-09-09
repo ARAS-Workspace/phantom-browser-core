@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/config/cast.gni")
 import("//build/config/chrome_build.gni")
 import("//build/config/chromeos/args.gni")
 import("//build/config/features.gni")
@@ -12,7 +11,7 @@ import("//testing/libfuzzer/fuzzer_test.gni")
 import("//third_party/libaom/options.gni")
 
 # This flag sets defaults for the current generation of cast devices.
-is_cast_media_device = is_castos || is_cast_android
+is_cast_media_device = false
 
 # Out-of-process video decoding is a feature specific to Linux and ChromeOS
 # which makes the interaction with platform drivers (for the purposes of
@@ -125,7 +124,7 @@ declare_args() {
 
   # Enable browser managed persistent metadata storage for EME persistent
   # session.
-  enable_media_drm_storage = is_android || is_castos
+  enable_media_drm_storage = is_android
 
   # Enable HLS manifest parser and demuxer.
   enable_hls_demuxer = proprietary_codecs
@@ -158,8 +157,7 @@ declare_args() {
       (enable_hevc_parser_and_hw_decoder || is_cast_media_device)
 
   enable_mse_mpeg2ts_stream_parser =
-      proprietary_codecs &&
-      (enable_hls_demuxer || enable_cast_receiver || use_fuzzing_engine)
+      proprietary_codecs && (enable_hls_demuxer || use_fuzzing_engine)
 
   # Only Android and Windows actually have bitstream output implementations.
   enable_passthrough_audio_codecs =
@@ -219,8 +217,7 @@ declare_args() {
   #
   # TODO(crbug.com/1336055): Remove legacy target_cpu hack used for targeting
   # desktop Chromecast builds.
-  if (is_posix && !is_android && !is_apple &&
-      (!is_castos || (target_cpu == "x86" || target_cpu == "x64"))) {
+  if (is_posix && !is_android && !is_apple) {
     use_alsa = true
 
     # Pulse is not supported on Chromecast platforms.
@@ -231,7 +228,7 @@ declare_args() {
     # TODO(crbug.com/40636948): We shouldn't have to do this, but it's unclear
     # why our test bots are hanging and all of the ones that don't hang just
     # fall back to ALSA after a connection error anyways.
-    if (!use_cras && !is_castos && !is_asan && !is_tsan) {
+    if (!use_cras && !is_asan && !is_tsan) {
       use_pulseaudio = true
     }
   }
@@ -253,7 +250,7 @@ declare_args() {
   # media/cdm/api/content_decryption_module.h. If true, the actually library CDM
   # will be hosted in the mojo CDM service running in the CDM (utility) process.
   # Used for all desktop platforms.
-  enable_library_cdms = toolkit_views && !is_castos
+  enable_library_cdms = toolkit_views
 }
 
 # Use another declare_args() to allow dependence on `enable_library_cdms`.
@@ -290,24 +287,13 @@ _default_mojo_media_services = []
 _default_mojo_media_host = ""
 
 if (is_cast_media_device) {
-  if (enable_cast_renderer) {
-    # In this path, mojo media services are hosted in two processes:
-    # 1. "renderer" and "cdm" run in browser process.
-    # 2. "video_decoder" runs in the gpu process.
-    _default_mojo_media_services = [
-      "cdm",
-      "renderer",
-      "video_decoder",
-    ]
-  } else {
-    # On Cast Receiver on Android, all the enabled mojo media services run in
-    # the gpu process.
-    _default_mojo_media_services = [
-      "cdm",
-      "audio_decoder",
-      "video_decoder",
-    ]
-  }
+  # On Cast Receiver on Android, all the enabled mojo media services run in
+  # the gpu process.
+  _default_mojo_media_services = [
+    "cdm",
+    "audio_decoder",
+    "video_decoder",
+  ]
   _default_mojo_media_host = "gpu"
 } else if (is_android) {
   _default_mojo_media_services = [

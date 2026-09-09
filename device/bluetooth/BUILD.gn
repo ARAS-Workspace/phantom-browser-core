@@ -23,9 +23,6 @@ config("bluetooth_config") {
       "/DELAYLOAD:setupapi.dll",
     ]
   }
-  if (is_castos) {
-    defines = [ "USE_CAST_BLUETOOTH_ADAPTER" ]
-  }
 }
 
 config("bluetooth_emulation_config") {

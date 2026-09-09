@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/config/cast.gni")
 import("//build/config/ui.gni")
 import("//gpu/vulkan/features.gni")
 import("//media/media_options.gni")
@@ -123,8 +122,7 @@ target(link_target_type, "gpu_sources") {
   }
 
   # Use DRI on desktop Linux builds.
-  if (current_cpu != "s390x" && current_cpu != "ppc64" && is_linux &&
-      !is_castos) {
+  if (current_cpu != "s390x" && current_cpu != "ppc64" && is_linux) {
     configs += [ "//build/config/linux/dri" ]
   }
 }

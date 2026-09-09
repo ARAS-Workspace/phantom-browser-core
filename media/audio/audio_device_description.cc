@@ -11,7 +11,6 @@
 #include "base/strings/string_util.h"
 #include "base/strings/stringprintf.h"
 #include "build/build_config.h"
-#include "build/chromecast_buildflags.h"
 #include "media/base/localized_strings.h"
 
 namespace media {

@@ -6,7 +6,6 @@ import("//build/config/android/rules.gni")
 import("//third_party/protobuf/proto_library.gni")
 
 assert(is_android)
-assert(!is_cast_android)
 
 proto_java_library("cardboard_proto_java") {
   sources = [ "src/proto/cardboard_device.proto" ]

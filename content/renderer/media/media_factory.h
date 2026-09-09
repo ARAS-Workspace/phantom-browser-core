@@ -12,7 +12,6 @@
 #include "base/task/single_thread_task_runner.h"
 #include "build/build_config.h"
 #include "build/buildflag.h"
-#include "build/chromecast_buildflags.h"
 #include "components/viz/common/surfaces/surface_id.h"
 #include "media/base/key_system_info.h"
 #include "media/base/key_systems.h"
@@ -47,11 +46,6 @@ class WebMediaPlayerClient;
 class WebMediaPlayerEncryptedMediaClient;
 }  // namespace blink
 
-#if BUILDFLAG(ENABLE_CAST_RECEIVER)
-namespace cast_streaming {
-class ResourceProvider;
-}  // namespace cast_streaming
-#endif
 
 namespace cc {
 class LayerTreeSettings;
@@ -204,10 +198,6 @@ class MediaFactory {
   mojo::Remote<media::mojom::RemoterFactory> remoter_factory_;
 #endif
 
-#if BUILDFLAG(ENABLE_CAST_RECEIVER)
-  std::unique_ptr<cast_streaming::ResourceProvider>
-      cast_streaming_resource_provider_;
-#endif
 };
 
 }  // namespace content

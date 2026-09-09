@@ -22,7 +22,6 @@ source_set("time_zone_monitor") {
 
   deps = [
     "//base",
-    "//build:chromecast_buildflags",
     "//mojo/public/cpp/bindings",
     "//third_party/icu",
   ]

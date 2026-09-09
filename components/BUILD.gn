@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//base/debug/debug.gni")
-import("//build/config/cast.gni")
 import("//build/config/chrome_build.gni")
 import("//build/config/features.gni")
 import("//build/config/ui.gni")
@@ -794,11 +793,11 @@ test("components_unittests") {
     ]
   }
 
-  if (!is_fuchsia && !is_castos) {
+  if (!is_fuchsia) {
     deps += [ "//components/private_ai:unit_tests" ]
   }
 
-  if (!is_android && !is_ios && !is_fuchsia && !is_castos) {
+  if (!is_android && !is_ios && !is_fuchsia) {
     deps += [
       "//components/accessibility_annotator/content/content_annotator:unit_tests",
       "//components/accessibility_annotator/content/live_tab_context:unit_tests",
@@ -834,7 +833,7 @@ test("components_unittests") {
     ]
   }
 
-  if (toolkit_views && !is_castos) {
+  if (toolkit_views) {
     deps += [ "//components/constrained_window:unit_tests" ]
   }
 
@@ -948,9 +947,6 @@ test("components_unittests") {
   }
 
   # Only supported on cast-enabled platforms.
-  if (enable_cast_receiver) {
-    deps += [ "//components/cast_receiver:unit_tests" ]
-  }
 
   if (is_mac) {
     deps += [
@@ -1244,7 +1240,7 @@ if (use_blink) {
       data += [ "$root_out_dir/Content Shell.app/" ]
     }
 
-    if (toolkit_views && !is_mac && !is_castos) {
+    if (toolkit_views && !is_mac) {
       # TODO(crbug.com/349781050): Enable test on Mac.
       deps += [ "//components/constrained_window:browser_tests" ]
     }

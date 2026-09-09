@@ -73,15 +73,6 @@ std::unique_ptr<Renderer> MojoMediaClient::CreateRenderer(
   return nullptr;
 }
 
-#if BUILDFLAG(ENABLE_CAST_RENDERER)
-std::unique_ptr<Renderer> MojoMediaClient::CreateCastRenderer(
-    mojom::FrameInterfaceFactory* frame_interfaces,
-    scoped_refptr<base::SingleThreadTaskRunner> task_runner,
-    MediaLog* media_log,
-    const base::UnguessableToken& overlay_plane_id) {
-  return nullptr;
-}
-#endif  // BUILDFLAG(ENABLE_CAST_RENDERER)
 
 #if BUILDFLAG(IS_WIN)
 std::unique_ptr<Renderer> MojoMediaClient::CreateMediaFoundationRenderer(

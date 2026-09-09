@@ -11,7 +11,6 @@
 #include "base/logging.h"
 #include "base/metrics/histogram_functions.h"
 #include "build/build_config.h"
-#include "build/chromecast_buildflags.h"
 #include "media/base/key_systems.h"
 #include "media/base/renderer.h"
 #include "media/base/video_codecs.h"
@@ -25,11 +24,6 @@
 #include "media/filters/decrypting_video_decoder.h"
 #endif
 
-#if BUILDFLAG(ENABLE_CAST_RECEIVER) && \
-    (BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_ANDROID))
-#include "base/time/time.h"
-#include "media/mojo/services/playback_events_recorder.h"
-#endif
 
 namespace media {
 
@@ -429,10 +423,6 @@ void MediaMetricsProvider::AcquireVideoDecodeStatsRecorder(
 
 void MediaMetricsProvider::AcquirePlaybackEventsRecorder(
     mojo::PendingReceiver<mojom::PlaybackEventsRecorder> receiver) {
-#if BUILDFLAG(ENABLE_CAST_RECEIVER) && \
-    (BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_ANDROID))
-  PlaybackEventsRecorder::Create(std::move(receiver));
-#endif
 }
 
 bool MediaMetricsProvider::IsInitialized() const {

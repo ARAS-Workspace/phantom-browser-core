@@ -66,11 +66,6 @@ class InterfaceFactoryImpl final
   void CreateDefaultRenderer(
       const std::string& audio_device_id,
       mojo::PendingReceiver<mojom::Renderer> receiver) final;
-#if BUILDFLAG(ENABLE_CAST_RENDERER)
-  void CreateCastRenderer(
-      const base::UnguessableToken& overlay_plane_id,
-      mojo::PendingReceiver<mojom::Renderer> receiver) final;
-#endif
 #if BUILDFLAG(IS_ANDROID)
   void CreateFlingingRenderer(
       const std::string& presentation_id,
@@ -99,8 +94,7 @@ class InterfaceFactoryImpl final
   void SetReceiverDisconnectHandler();
   void OnReceiverDisconnect();
 
-#if BUILDFLAG(ENABLE_MOJO_RENDERER) || BUILDFLAG(ENABLE_CAST_RENDERER) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(ENABLE_MOJO_RENDERER) || BUILDFLAG(IS_WIN)
   // Creates MojoRendererService for `renderer`, bind it to `receiver` and add
   // them to `renderer_receivers_`.
   void AddRenderer(std::unique_ptr<media::Renderer> renderer,
@@ -139,8 +133,7 @@ class InterfaceFactoryImpl final
   mojo::UniqueReceiverSet<mojom::AudioEncoder> audio_encoder_receivers_;
 #endif  // BUILDFLAG(ENABLE_MOJO_VIDEO_ENCODER)
 
-#if BUILDFLAG(ENABLE_MOJO_RENDERER) || BUILDFLAG(ENABLE_CAST_RENDERER) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(ENABLE_MOJO_RENDERER) || BUILDFLAG(IS_WIN)
   // TODO(xhwang): Use MojoMediaLog for Renderer.
   NullMediaLog media_log_;
   mojo::UniqueReceiverSet<mojom::Renderer> renderer_receivers_;

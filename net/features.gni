@@ -19,7 +19,7 @@ declare_args() {
   # and Chromecast, at least for now. This feature needs configuration
   # (krb5.conf and so on).
   # TODO(fuchsia): Enable kerberos on Fuchsia when it's implemented there.
-  use_kerberos = !is_ios && !is_fuchsia && !is_castos && !is_cast_android
+  use_kerberos = !is_ios && !is_fuchsia
 
   # Do not disable brotli filter by default.
   disable_brotli_filter = false
@@ -72,9 +72,8 @@ declare_args() {
   # It is enabled only in specific build configurations to avoid increasing the
   # build size.
   enable_disk_cache_sql_backend =
-      (is_linux && !is_castos) ||
-      (is_android && !is_cast_android && !is_cronet_build) || is_win ||
-      is_mac || is_chromeos
+      is_linux || (is_android && !is_cronet_build) || is_win || is_mac ||
+      is_chromeos
 }
 
 assert(!chrome_root_store_optional || !chrome_root_store_only,

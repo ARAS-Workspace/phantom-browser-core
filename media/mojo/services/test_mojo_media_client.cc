@@ -92,16 +92,6 @@ std::unique_ptr<Renderer> TestMojoMediaClient::CreateRenderer(
       base::NullCallback(), gfx::ColorSpace());
 }
 
-#if BUILDFLAG(ENABLE_CAST_RENDERER)
-std::unique_ptr<Renderer> TestMojoMediaClient::CreateCastRenderer(
-    mojom::FrameInterfaceFactory* frame_interfaces,
-    scoped_refptr<base::SingleThreadTaskRunner> task_runner,
-    MediaLog* media_log,
-    const base::UnguessableToken& /* overlay_plane_id */) {
-  return CreateRenderer(frame_interfaces, task_runner, media_log,
-                        std::string());
-}
-#endif  // BUILDFLAG(ENABLE_CAST_RENDERER)
 
 std::unique_ptr<CdmFactory> TestMojoMediaClient::CreateCdmFactory(
     mojom::FrameInterfaceFactory* /* frame_interfaces */) {

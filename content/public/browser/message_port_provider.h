@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "build/build_config.h"
-#include "build/chromecast_buildflags.h"
 #include "content/common/content_export.h"
 #include "third_party/blink/public/common/messaging/string_message_codec.h"
 #include "third_party/blink/public/common/messaging/web_message_port.h"

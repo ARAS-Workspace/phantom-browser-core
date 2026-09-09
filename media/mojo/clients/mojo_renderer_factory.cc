@@ -66,24 +66,6 @@ MojoRendererFactory::CreateMediaFoundationRenderer(
 }
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(ENABLE_CAST_RENDERER)
-std::unique_ptr<MojoRenderer> MojoRendererFactory::CreateCastRenderer(
-    const scoped_refptr<base::SequencedTaskRunner>& media_task_runner,
-    VideoRendererSink* video_renderer_sink) {
-  DCHECK(interface_factory_);
-
-  auto overlay_factory = std::make_unique<VideoOverlayFactory>();
-
-  mojo::PendingRemote<mojom::Renderer> renderer_remote;
-  interface_factory_->CreateCastRenderer(
-      overlay_factory->overlay_plane_id(),
-      renderer_remote.InitWithNewPipeAndPassReceiver());
-
-  return std::make_unique<MojoRenderer>(
-      media_task_runner, std::move(overlay_factory), video_renderer_sink,
-      std::move(renderer_remote));
-}
-#endif  // BUILDFLAG(ENABLE_CAST_RENDERER)
 
 #if BUILDFLAG(IS_ANDROID)
 std::unique_ptr<MojoRenderer> MojoRendererFactory::CreateFlingingRenderer(

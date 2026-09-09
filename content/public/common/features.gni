@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/config/cast.gni")
 import("//build/config/features.gni")
 
 declare_args() {
@@ -13,7 +12,7 @@ declare_args() {
   # looking up plugins.
   #
   # In particular, the Desktop PDF viewer (enable_pdf) requires plugin support.
-  enable_plugins = !is_android && !is_ios && !is_castos && !is_fuchsia
+  enable_plugins = !is_android && !is_ios && !is_fuchsia
 
   # Enables separate renderer binary.
   enable_separate_renderer_binary = false

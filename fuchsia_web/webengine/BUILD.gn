@@ -4,7 +4,6 @@
 
 assert(is_fuchsia)
 
-import("//build/config/cast.gni")
 import("//build/config/fuchsia/generate_runner_scripts.gni")
 import("//build/config/fuchsia/packaged_content_embedder_excluded_dirs.gni")
 import("//build/config/locales.gni")
@@ -36,22 +35,20 @@ _disallowed_cast_deps = [
   "//third_party/openscreen/src/cast/sender/*",
 ]
 
-if (!enable_cast_receiver) {
-  _disallowed_cast_deps += [
-    "//components/cast/*",
+_disallowed_cast_deps += [
+  "//components/cast/*",
 
-    # TODO(crbug.com/1354845): Once this bug is fixed, update this list to
-    # include as much of "//components/cast_streaming/*" with as few individual
-    # exclusions as is reasonable.
-    "//components/cast_streaming/browser/*",
-    "//components/cast_streaming/renderer/*",
+  # TODO(crbug.com/1354845): Once this bug is fixed, update this list to
+  # include as much of "//components/cast_streaming/*" with as few individual
+  # exclusions as is reasonable.
+  "//components/cast_streaming/browser/*",
+  "//components/cast_streaming/renderer/*",
 
-    # TODO(crbug.com/1354845): Once this bug is fixed, update this list to
-    # include as much of "//third_party/openscreen/*" with as few individual
-    # exclusions as is reasonable.
-    "//third_party/openscreen/src/cast/receiver/*",
-  ]
-}
+  # TODO(crbug.com/1354845): Once this bug is fixed, update this list to
+  # include as much of "//third_party/openscreen/*" with as few individual
+  # exclusions as is reasonable.
+  "//third_party/openscreen/src/cast/receiver/*",
+]
 
 _disallowed_extensions_deps = [
   # Although `enable_extensions` is true for Fuchsia, extensions code should
@@ -183,7 +180,6 @@ component("web_engine_core") {
     "//base",
     "//base:base_static",
     "//build:branding_buildflags",
-    "//build:chromecast_buildflags",
     "//components/cdm/renderer",
     "//components/client_hints/browser:in_memory",
     "//components/embedder_support",
@@ -262,14 +258,6 @@ component("web_engine_core") {
     "//ui/wm/public",
   ]
 
-  if (enable_cast_receiver) {
-    deps += [
-      "//components/cast_streaming/common",
-      "//components/cast_streaming/common:mojom",
-      "//components/fuchsia_legacymetrics",
-    ]
-  }
-
   if (enable_widevine) {
     deps += [ "//third_party/widevine/cdm:headers" ]
   }
@@ -286,7 +274,6 @@ component("web_engine_core") {
   }
 
   public_deps = [
-    "//build:chromecast_buildflags",
     "//content/public/browser",
     "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.web:fuchsia.web_hlcpp",
 
@@ -375,13 +362,6 @@ component("web_engine_core") {
     "web_engine_main_delegate.h",
   ]
 
-  if (enable_cast_receiver) {
-    deps += [
-      ":cast_streaming_receiver",
-      "//components/cast_streaming/renderer",
-    ]
-  }
-
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
@@ -416,7 +396,6 @@ source_set("switches") {
     "//fuchsia_web/webinstance_host",
   ]
   deps = [ "//base" ]
-  public_deps = [ "//build:chromecast_buildflags" ]
   sources = [
     "features.h",
     "switches.cc",
@@ -621,10 +600,6 @@ test("web_engine_browsertests") {
     "//build/config/fuchsia/test/test_ui_stack.shard.test-cml",
     "//third_party/fuchsia-sdk/sdk/pkg/vulkan/client.shard.cml",
   ]
-
-  if (enable_cast_receiver) {
-    deps += [ ":cast_streaming_receiver_browsertests" ]
-  }
 }
 
 test("web_engine_unittests") {
@@ -650,7 +625,6 @@ test("web_engine_unittests") {
     ":web_engine_core",
     "//base",
     "//base/test:test_support",
-    "//build:chromecast_buildflags",
     "//components/fuchsia_component_support",
     "//components/fuchsia_component_support:test_support",
     "//components/url_rewrite/browser",

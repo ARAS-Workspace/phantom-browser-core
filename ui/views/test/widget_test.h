@@ -14,7 +14,6 @@
 #include "base/scoped_observation.h"
 #include "base/test/bind.h"
 #include "build/build_config.h"
-#include "build/chromecast_buildflags.h"
 #include "ui/gfx/native_ui_types.h"
 #include "ui/views/test/views_test_base.h"
 #include "ui/views/widget/widget.h"

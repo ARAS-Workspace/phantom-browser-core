@@ -5,7 +5,6 @@
 #ifndef FUCHSIA_WEB_WEBENGINE_SWITCHES_H_
 #define FUCHSIA_WEB_WEBENGINE_SWITCHES_H_
 
-#include "build/chromecast_buildflags.h"
 
 // Switches used by the ContextProviderImpl to configure each Context process.
 namespace switches {

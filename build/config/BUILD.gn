@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/config/c++/c++.gni")
-import("//build/config/cast.gni")
 import("//build/config/chrome_build.gni")
 import("//build/config/dcheck_always_on.gni")
 import("//build/config/features.gni")
@@ -343,9 +342,6 @@ config("executable_config") {
     ]
   } else if (is_linux || is_chromeos || is_android || current_os == "aix") {
     configs += [ "//build/config/gcc:executable_config" ]
-    if (is_castos || is_cast_android) {
-      configs += [ "//build/config/chromecast:executable_config" ]
-    }
   }
 
   # If we're using the prebuilt instrumented libraries with the sanitizers, we
@@ -373,8 +369,6 @@ config("shared_library_config") {
       "//build/config/ios:ios_dynamic_flags",
       "//build/config/ios:ios_shared_library_flags",
     ]
-  } else if (is_castos || is_cast_android) {
-    configs += [ "//build/config/chromecast:shared_library_config" ]
   } else if (is_linux || is_chromeos || current_os == "aix") {
     configs += [ "//build/config/gcc:shared_library_config" ]
   }

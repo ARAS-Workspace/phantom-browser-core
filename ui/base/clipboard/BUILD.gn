@@ -247,7 +247,6 @@ source_set("clipboard_test_support") {
 
   deps = [
     "//base/test:test_support",
-    "//build:chromecast_buildflags",
     "//ui/base:features",
     "//ui/gfx",
   ]

@@ -28,7 +28,6 @@
 # consider wrapping them into some partition_alloc specific names.
 
 import("//build/config/android/config.gni")
-import("//build/config/cast.gni")
 import("//build/config/compiler/compiler.gni")
 import("//build/config/cronet/config.gni")
 import("//build/config/dcheck_always_on.gni")
@@ -148,4 +147,4 @@ use_partition_alloc_default = !is_cronet_build
 # On Chromecast devices, some system libraries bypass the allocator shim and
 # call free() directly on memory not managed by PartitionAlloc. This flag
 # enables a fallback to the system __real_free() to prevent crashes.
-partition_alloc_enable_system_free_fallback_default = is_cast_android
+partition_alloc_enable_system_free_fallback_default = false

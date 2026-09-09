@@ -14,7 +14,6 @@
 #include "base/functional/callback.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/task/sequenced_task_runner.h"
-#include "build/chromecast_buildflags.h"
 #include "mojo/public/cpp/bindings/generic_pending_receiver.h"
 #include "mojo/public/cpp/bindings/lib/binder_map_internal.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"

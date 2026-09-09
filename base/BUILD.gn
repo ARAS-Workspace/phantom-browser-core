@@ -24,7 +24,6 @@ import("//base/trace_event/tracing.gni")
 import("//build/buildflag_header.gni")
 import("//build/config/arm.gni")
 import("//build/config/c++/c++.gni")
-import("//build/config/cast.gni")
 import("//build/config/compiler/compiler.gni")
 import("//build/config/cronet/config.gni")
 import("//build/config/dcheck_always_on.gni")
@@ -92,8 +91,7 @@ declare_args() {
 # Chromecast builds have full control over the platform and ensure that
 # the kernel and glibc versions used have patched the vulnerabilities,
 # so it is safe to use mutex priority inheritance on Chromecast platform.
-assert(!enable_mutex_priority_inheritance ||
-           (is_castos || is_cast_android || is_android),
+assert(!enable_mutex_priority_inheritance || is_android,
        "Do not enable PI mutexes without consulting the security team")
 
 # Prevent //base having to support a toolchain that uses a different
@@ -1187,7 +1185,6 @@ component("base") {
     "//base/logging:log_severity",
     "//base/numerics:base_numerics",
     "//base/third_party/icu",
-    "//build:chromecast_buildflags",
     "//build:robolectric_buildflags",
     "//third_party/abseil-cpp:absl",
   ]
@@ -1204,7 +1201,7 @@ component("base") {
   # Needed for <atomic> if using newer C++ library than sysroot, except if
   # building inside the cros_sdk environment - use host_toolchain as a
   # more robust check for this.
-  if (!use_sysroot && (is_android || is_chromeos || (is_linux && !is_castos)) &&
+  if (!use_sysroot && (is_android || is_chromeos || is_linux) &&
       host_toolchain != "//build/toolchain/cros:host") {
     libs += [ "atomic" ]
   }
@@ -1228,7 +1225,7 @@ component("base") {
 
   # Allow more direct string conversions on platforms with native utf8
   # strings
-  if (is_apple || is_chromeos || is_castos || is_cast_android || is_fuchsia) {
+  if (is_apple || is_chromeos || is_fuchsia) {
     defines += [ "SYSTEM_NATIVE_UTF8" ]
   }
 
@@ -2477,7 +2474,7 @@ component("base") {
     # headers which allows representing time as int64, which makes this entire
     # problem moot. Hence, why `!is_cronet_build` flag has been added.
     # See crbug.com/431972096#comment10 for more information.
-    if (!is_castos && !is_cast_android && !is_cronet_build) {
+    if (!is_cronet_build) {
       sources += [ "time/time_exploded_icu.cc" ]
 
       # The ICU dependency is only needed on systems with a 32-bit time_t.
@@ -3217,10 +3214,7 @@ component("i18n") {
     "//third_party/ced",
     "//third_party/icu",
   ]
-  deps = [
-    ":i18n_transliterator",
-    "//build:chromecast_buildflags",
-  ]
+  deps = [ ":i18n_transliterator" ]
 
   if (enable_rust_translit) {
     deps += [ ":i18n_transliterator_ffi" ]
@@ -4120,7 +4114,6 @@ test("base_unittests") {
     "//base/test:test_support",
     "//build:blink_buildflags",
     "//build:branding_buildflags",
-    "//build:chromecast_buildflags",
     "//build:chromeos_buildflags",
     "//testing/gmock",
     "//testing/gtest",
@@ -4352,7 +4345,7 @@ test("base_unittests") {
 
   # Allow more direct string conversions on platforms with native utf8
   # strings
-  if (is_apple || is_chromeos || is_castos || is_cast_android || is_fuchsia) {
+  if (is_apple || is_chromeos || is_fuchsia) {
     defines += [ "SYSTEM_NATIVE_UTF8" ]
   }
 

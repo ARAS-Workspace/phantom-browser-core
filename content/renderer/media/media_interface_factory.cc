@@ -109,23 +109,6 @@ void MediaInterfaceFactory::CreateDefaultRenderer(
                                                     std::move(receiver));
 }
 
-#if BUILDFLAG(ENABLE_CAST_RENDERER)
-void MediaInterfaceFactory::CreateCastRenderer(
-    const base::UnguessableToken& overlay_plane_id,
-    mojo::PendingReceiver<media::mojom::Renderer> receiver) {
-  if (!task_runner_->BelongsToCurrentThread()) {
-    task_runner_->PostTask(
-        FROM_HERE,
-        base::BindOnce(&MediaInterfaceFactory::CreateCastRenderer, weak_this_,
-                       overlay_plane_id, std::move(receiver)));
-    return;
-  }
-
-  DVLOG(1) << __func__;
-  GetMediaInterfaceFactory()->CreateCastRenderer(overlay_plane_id,
-                                                 std::move(receiver));
-}
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 void MediaInterfaceFactory::CreateFlingingRenderer(

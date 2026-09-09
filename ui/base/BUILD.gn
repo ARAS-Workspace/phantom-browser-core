@@ -836,7 +836,7 @@ static_library("test_support") {
     }
   }
 
-  if (use_aura && (is_win || is_chromeos || is_castos)) {
+  if (use_aura && (is_win || is_chromeos)) {
     sources += [
       "test/ui_controls_aura.cc",
       "test/ui_controls_aura.h",
@@ -1230,7 +1230,7 @@ test("ui_base_unittests") {
         "//ui/base/ime/linux",
       ]
     }
-    if (is_linux && !is_castos) {
+    if (is_linux) {
       sources += [ "ime/linux/composition_text_util_pango_unittest.cc" ]
     }
     if (is_chromeos || use_ozone) {

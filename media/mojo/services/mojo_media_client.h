@@ -102,18 +102,6 @@ class MEDIA_MOJO_EXPORT MojoMediaClient {
       MediaLog* media_log,
       const std::string& audio_device_id);
 
-#if BUILDFLAG(ENABLE_CAST_RENDERER)
-  // Used on Chromecast only.
-  // When CastRenderer is created to play video content, an |overlay_plane_id|
-  // is needed to indicate which |overlay_factory| this CastRenderer will be
-  // associtated with.
-  // Chromecast also uses CreateRenderer to create "audio only" renderers.
-  virtual std::unique_ptr<Renderer> CreateCastRenderer(
-      mojom::FrameInterfaceFactory* frame_interfaces,
-      scoped_refptr<base::SingleThreadTaskRunner> task_runner,
-      MediaLog* media_log,
-      const base::UnguessableToken& overlay_plane_id);
-#endif  // BUILDFLAG(ENABLE_CAST_RENDERER)
 
 #if BUILDFLAG(IS_WIN)
   virtual std::unique_ptr<Renderer> CreateMediaFoundationRenderer(

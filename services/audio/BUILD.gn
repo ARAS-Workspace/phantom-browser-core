@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/buildflag_header.gni")
-import("//build/config/cast.gni")
 import("//media/media_options.gni")
 import("//testing/test.gni")
 
@@ -74,10 +73,7 @@ source_set("audio") {
     "system_info.h",
   ]
 
-  deps = [
-    ":testing_api_support",
-    "//build:chromecast_buildflags",
-  ]
+  deps = [ ":testing_api_support" ]
 
   public_deps = [
     "//base",

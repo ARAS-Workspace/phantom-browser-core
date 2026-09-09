@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/config/c++/c++.gni")
-import("//build/config/cast.gni")
 import("//build/config/chrome_build.gni")
 import("//build/config/chromeos/args.gni")
 import("//build/config/compiler/pgo/pgo.gni")
@@ -95,8 +94,7 @@ declare_args() {
 declare_args() {
   # If true, optimize for size.
   # Default to favoring speed over size for platforms not listed below.
-  optimize_for_size =
-      !is_high_end_android && (is_android || is_castos || is_fuchsia)
+  optimize_for_size = !is_high_end_android && (is_android || is_fuchsia)
 }
 
 if (is_mac && use_lld) {
@@ -284,7 +282,7 @@ if (use_thin_lto) {
 
 # Determine whether to enable or disable frame pointers, based on the platform
 # and build arguments.
-if (is_chromeos || (enable_cast_receiver && is_linux)) {
+if (is_chromeos) {
   # ChromeOS generally prefers frame pointers, to support CWP.
   # However, Clang does not currently generate usable frame pointers in ARM
   # 32-bit builds (https://bugs.llvm.org/show_bug.cgi?id=18505) so disable them
