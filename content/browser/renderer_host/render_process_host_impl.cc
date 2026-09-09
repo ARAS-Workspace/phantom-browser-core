@@ -2921,7 +2921,7 @@ void RenderProcessHostImpl::OnMemoryPressure(
   // Match the existing behavior of only sending the memory pressure level on
   // select platforms.
   // TODO(pmonette): Enable for all platforms.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CASTOS)
+#if BUILDFLAG(IS_ANDROID)
   child_process_->OnMemoryPressure(memory_pressure_level);
 #endif  // BUILDFLAG(IS_ANDROID)
 }

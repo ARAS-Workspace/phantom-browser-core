@@ -6189,8 +6189,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 // On Mac and Android, the reported menu coordinates are relative to the
 // OOPIF, and its screen position is computed later, so this test isn't
 // relevant on those platforms.
-// This has been disabled on CastOS due to flakiness per crbug.com/1074249.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CASTOS)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
                        ScrolledNestedPopupMenuTest) {
   GURL main_url(embedded_test_server()->GetURL(
@@ -6300,17 +6299,15 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
   // they access deleted state.
   RunPostedTasks();
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CASTOS)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 
 // On Mac and Android, the reported menu coordinates are relative to the OOPIF,
 // and its screen position is computed later, so this test isn't relevant on
-// those platforms. This has been disabled on CastOS due to flakiness per
-// crbug.com/1074249. (This test is based on the one above which is disabled
-// on CastOS for this reason).
+// those platforms.
 //
 // Tests that a <select>'s visibility is correctly computed and thus shows the
 // popup when clicked.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CASTOS)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 // TODO(crbug.com/40252258): Test is flaky on every platform.
 IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
                        DISABLED_ScrolledMainFrameSelectInLongIframe) {
@@ -6370,7 +6367,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
   // Ensure the popup is requested. This test fails if this timesouts.
   popup_waiter.Wait();
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CASTOS)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 
 #if defined(USE_AURA)
 class SitePerProcessGestureHitTestBrowserTest

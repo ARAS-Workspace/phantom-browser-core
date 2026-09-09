@@ -108,7 +108,7 @@ void ContentBrowserTest::SetUp() {
   OverrideBundleID();
 #endif
 
-#if defined(USE_AURA) && defined(TOOLKIT_VIEWS) && !BUILDFLAG(IS_CASTOS)
+#if defined(USE_AURA) && defined(TOOLKIT_VIEWS)
   // https://crbug.com/695054: Ignore window activation/deactivation to make
   // the Chrome-internal focus unaffected by OS events caused by running tests
   // in parallel.

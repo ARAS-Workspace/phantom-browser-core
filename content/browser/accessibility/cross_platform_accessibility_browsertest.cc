@@ -2508,12 +2508,10 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
     ASSERT_NE(nullptr, popup_area);
     EXPECT_EQ(ax::mojom::Role::kGroup, popup_area->GetRole());
 
-#if !BUILDFLAG(IS_CASTOS) && !BUILDFLAG(IS_CAST_ANDROID)
     // Ensure that the bounding box of the popup area is at least 100
     // pixels down the page.
     gfx::Rect popup_bounds = popup_area->GetUnclippedRootFrameBoundsRect();
     EXPECT_GT(popup_bounds.y(), 100);
-#endif  // !BUILDFLAG(IS_CASTOS) && !BUILDFLAG(IS_CAST_ANDROID)
   }
 }
 

@@ -41,10 +41,6 @@
 #include "content/browser/tracing/cros_tracing_agent.h"
 #endif
 
-#if BUILDFLAG(IS_CASTOS)
-#include "content/browser/tracing/cast_tracing_agent.h"
-#endif
-
 using base::trace_event::TraceConfig;
 
 namespace content {
@@ -398,8 +394,8 @@ IN_PROC_BROWSER_TEST_F(TracingControllerTest, MAYBE_DoubleStopTracing) {
   run_loop.Run();
 }
 
-// Only CrOS and Cast support system tracing.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_CASTOS)
+// Only CrOS supports system tracing.
+#if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_SystemTraceEvents SystemTraceEvents
 #else
 #define MAYBE_SystemTraceEvents DISABLED_SystemTraceEvents
@@ -409,8 +405,6 @@ class SystemTraceTracingControllerTest : public TracingControllerTest {
   SystemTraceTracingControllerTest() {
 #if BUILDFLAG(IS_CHROMEOS)
     feature_list_.InitAndEnableFeature(kCrOSTracingDataSource);
-#elif BUILDFLAG(IS_CASTOS)
-    feature_list_.InitAndEnableFeature(kCastTracingDataSource);
 #endif
   }
 

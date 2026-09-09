@@ -901,8 +901,8 @@ IN_PROC_BROWSER_TEST_P(
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 
 // GetAXPlatformNode is currently only supported on windows and linux (excluding
-// Chrome OS or Chromecast)
-#if BUILDFLAG(IS_WIN) || (BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CASTOS))
+// Chrome OS)
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
 IN_PROC_BROWSER_TEST_P(AccessibilityHitTestingBrowserTest,
                        NearestLeafInIframes) {
   ASSERT_TRUE(embedded_test_server()->Start());

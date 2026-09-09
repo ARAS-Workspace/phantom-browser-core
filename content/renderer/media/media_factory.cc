@@ -88,10 +88,6 @@
 #include "components/cast_streaming/renderer/public/wrapping_renderer_factory_selector.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(ENABLE_CAST_RENDERER)
-#include "content/renderer/media/cast_renderer_client_factory.h"
-#endif
-
 #if BUILDFLAG(IS_FUCHSIA)
 #include "media/cdm/fuchsia/fuchsia_cdm_factory.h"
 #include "media/fuchsia/video/fuchsia_decoder_factory.h"
@@ -115,14 +111,6 @@
 #include "media/remoting/courier_renderer_factory.h"  // nogncheck
 #include "media/remoting/renderer_controller.h"       // nogncheck
 #endif
-
-
-#if BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
-// Enable remoting receiver
-#include "media/base/remoting_constants.h"             // nogncheck
-#include "media/remoting/receiver_controller.h"        // nogncheck
-#include "media/remoting/remoting_renderer_factory.h"  // nogncheck
-#endif  // BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
 
 #if BUILDFLAG(IS_WIN)
 #include "content/renderer/media/win/dcomp_texture_wrapper_impl.h"
@@ -574,17 +562,11 @@ MediaFactory::CreateRendererFactorySelector(
   if (!is_base_renderer_factory_set &&
       renderer_media_playback_options.is_mojo_renderer_enabled()) {
     is_base_renderer_factory_set = true;
-#if BUILDFLAG(ENABLE_CAST_RENDERER)
-    factory_selector->AddBaseFactory(
-        RendererType::kCast, std::make_unique<CastRendererClientFactory>(
-                                 media_log, CreateMojoRendererFactory()));
-#else
     // The "default" MojoRendererFactory can be wrapped by a
     // DecryptingRendererFactory without changing any behavior.
     factory_selector->AddBaseFactory(
         RendererType::kMojo, std::make_unique<media::DecryptingRendererFactory>(
                                  media_log, CreateMojoRendererFactory()));
-#endif  // BUILDFLAG(ENABLE_CAST_RENDERER)
   }
 #endif  // BUILDFLAG(ENABLE_MOJO_RENDERER)
 
@@ -663,32 +645,6 @@ MediaFactory::CreateRendererFactorySelector(
     }
   }
 #endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
-  if (renderer_media_playback_options.is_remoting_renderer_enabled()) {
-#if BUILDFLAG(ENABLE_CAST_RENDERER)
-    auto factory_remoting = std::make_unique<CastRendererClientFactory>(
-        media_log, CreateMojoRendererFactory());
-#else   // BUILDFLAG(ENABLE_CAST_RENDERER)
-    auto factory_remoting = CreateRendererImplFactory(
-        player_id, media_log, decoder_factory, render_thread, render_frame_);
-#endif  // BUILDFLAG(ENABLE_CAST_RENDERER)
-    mojo::PendingRemote<media::mojom::Remotee> remotee;
-    GetInterfaceBroker().GetInterface(remotee.InitWithNewPipeAndPassReceiver());
-    auto remoting_renderer_factory =
-        std::make_unique<media::remoting::RemotingRendererFactory>(
-            std::move(remotee), std::move(factory_remoting),
-            render_thread->GetMediaSequencedTaskRunner());
-    auto is_remoting_media = base::BindRepeating(
-        [](const GURL& url) -> bool {
-          return url.SchemeIs(media::remoting::kRemotingScheme);
-        },
-        url);
-    factory_selector->AddConditionalFactory(
-        RendererType::kRemoting, std::move(remoting_renderer_factory),
-        is_remoting_media);
-  }
-#endif  // BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
 
   if (!is_base_renderer_factory_set) {
     // TODO(crbug.com/1265448): These sorts of checks shouldn't be necessary if
