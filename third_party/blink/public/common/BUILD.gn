@@ -106,7 +106,6 @@ source_set("preloading_headers") {
 source_set("headers") {
   visibility = [
     ":*",
-    "//android_webview/*",
     "//chrome/*",
     "//chromecast/*",
     "//components/*",

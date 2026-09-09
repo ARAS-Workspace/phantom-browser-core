@@ -8,7 +8,6 @@ import("//third_party/widevine/cdm/widevine.gni")
 static_library("renderer") {
   # See //components/cdm/README.md
   visibility = [
-    "//android_webview/*",
     "//chrome/*",
     "//chromecast/*",
     "//components/cdm/*",

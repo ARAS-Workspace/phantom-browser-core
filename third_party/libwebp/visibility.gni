@@ -19,7 +19,6 @@ allowed_visibility = [
 # because depending on the `cwebp` executable doesn't result in having `libwebp`
 # linked into the browser binary.
 cwebp_exe_allowed_visibility = [
-  "//android_webview/*",
   "//chrome/android/*",
   "//clank/android_webview/*",
   "//clank/java/*",

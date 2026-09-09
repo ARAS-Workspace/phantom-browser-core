@@ -16,7 +16,6 @@ static_library("common") {
 
   # See //components/cdm/README.md
   visibility = [
-    "//android_webview/*",
     "//chrome/*",
     "//chromecast/*",
     "//components/cdm/*",
