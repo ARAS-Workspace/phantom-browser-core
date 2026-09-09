@@ -101,9 +101,7 @@ _TEST_CODE_EXCLUDED_PATHS = (
     # EarlGrey app side code for tests.
     r'ios/.*_app_interface\.mm$',
     # Views Examples code
-    r'ui/views/examples/.*',
-    # Chromium Codelab
-    r'codelabs/*')
+    r'ui/views/examples/.*')
 
 _THIRD_PARTY_EXCEPT_BLINK = '(?:ios/)?third_party/(?!blink/)'
 

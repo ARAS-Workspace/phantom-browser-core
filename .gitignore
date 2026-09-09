@@ -362,7 +362,6 @@ third_party/rust/target/
 /chrome/test/data/perf/canvas_bench
 /chrome/test/data/perf/frame_rate/content
 /chrome/test/data/xr/webvr_info
-/docs/website
 /media/cdm/api
 /net/third_party/quiche/src
 /testing/libfuzzer/fuzzers/wasm_corpus
