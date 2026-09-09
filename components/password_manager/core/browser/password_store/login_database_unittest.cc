@@ -2379,11 +2379,6 @@ TEST_F(LoginDatabaseUndecryptableLoginsTest, DeleteUndecryptableLoginsTest) {
       db.Init(/*on_undecryptable_passwords_removed=*/base::NullCallback(),
               /*encryptor=*/CreateEncryptor()));
 
-#if BUILDFLAG(IS_CASTOS)
-  // Disabling the checks in chromecast because encryption is unavailable.
-  EXPECT_EQ(DatabaseCleanupResult::kEncryptionUnavailable,
-            db.DeleteUndecryptableLogins());
-#else
   std::vector<StoredCredential> result;
   EXPECT_FALSE(db.GetAutofillableLogins(&result));
   EXPECT_TRUE(result.empty());
@@ -2406,7 +2401,6 @@ TEST_F(LoginDatabaseUndecryptableLoginsTest, DeleteUndecryptableLoginsTest) {
       "PasswordManager.DeleteUndecryptableLoginsReturnValue",
       metrics_util::DeleteCorruptedPasswordsResult::kSuccessPasswordsDeleted,
       1);
-#endif
 }
 
 #if BUILDFLAG(IS_LINUX)

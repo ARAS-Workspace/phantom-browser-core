@@ -123,10 +123,10 @@ std::unique_ptr<OutputSurface> OutputSurfaceProviderImpl::CreateOutputSurface(
 #endif  // BUILDFLAG(IS_ANDROID)
 
     if (!output_surface) {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_CASTOS)
-      // GPU compositing is expected to always work on Chrome OS and Cast
-      // devices, so we should never encounter fatal context error. This could
-      // be an unrecoverable hardware error or a bug.
+#if BUILDFLAG(IS_CHROMEOS)
+      // GPU compositing is expected to always work on Chrome OS, so we should
+      // never encounter fatal context error. This could be an unrecoverable
+      // hardware error or a bug.
       LOG(FATAL) << "Unexpected fatal context error";
 #elif !BUILDFLAG(IS_ANDROID)
       gpu_service_impl_->DisableGpuCompositing();

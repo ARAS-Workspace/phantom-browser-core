@@ -183,30 +183,12 @@ class BinderMapWithContext {
                   "ContextType is void.");
     auto it = binders_.find(*receiver->interface_name());
     if (it == binders_.end()) {
-#if BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
-      return default_binder_ && default_binder_.Run(context, *receiver);
-#else
       return false;
-#endif
     }
 
     it->second.BindInterface(std::move(context), receiver->PassPipe());
     return true;
   }
-
-#if BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
-  // DO NOT USE. This sets a generic default handler for any receiver that
-  // doesn't match a registered binder. It's a transitional API to help migrate
-  // some older code to BinderMap. Reliance on this mechanism makes security
-  // auditing more difficult. Note that this intentionally only supports use
-  // with a non-void ContextType, since that's the only existing use case.
-  using DefaultBinder =
-      base::RepeatingCallback<bool(ContextValueType context,
-                                   mojo::GenericPendingReceiver&)>;
-  void SetDefaultBinderDeprecated(DefaultBinder binder) {
-    default_binder_ = std::move(binder);
-  }
-#endif
 
   void GetInterfacesForTesting(std::vector<std::string>& out) {
     for (const auto& [key, _] : binders_) {
@@ -237,10 +219,6 @@ class BinderMapWithContext {
   absl::flat_hash_map<std::string_view,
                       internal::GenericCallbackBinderWithContext<ContextType>>
       binders_;
-
-#if BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
-  DefaultBinder default_binder_;
-#endif
 };
 
 // Common alias for BinderMapWithContext that has no context. Binders added to

@@ -111,7 +111,7 @@ GpuWatchdogThread::GpuWatchdogThread(base::TimeDelta timeout,
   }
 #endif
 
-#if BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CASTOS)
+#if BUILDFLAG(IS_LINUX)
   tty_file_.reset(base::OpenFile(
       base::FilePath(FILE_PATH_LITERAL("/sys/class/tty/tty0/active")), "r"));
   UpdateActiveTTY();
@@ -490,7 +490,7 @@ void GpuWatchdogThread::OnWatchdogTimeout() {
   if (foregrounded_event_)
     num_of_timeout_after_foregrounded_++;
 
-#if BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CASTOS)
+#if BUILDFLAG(IS_LINUX)
   UpdateActiveTTY();
 #endif
 
@@ -820,7 +820,7 @@ bool GpuWatchdogThread::WithinOneMinFromForegrounded() {
   return foregrounded_event_ && num_of_timeout_after_foregrounded_ <= count;
 }
 
-#if BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CASTOS)
+#if BUILDFLAG(IS_LINUX)
 void GpuWatchdogThread::UpdateActiveTTY() {
   last_active_tty_ = active_tty_;
 
@@ -837,7 +837,7 @@ void GpuWatchdogThread::UpdateActiveTTY() {
 #endif
 
 bool GpuWatchdogThread::ContinueOnNonHostX11ServerTty() {
-#if BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CASTOS)
+#if BUILDFLAG(IS_LINUX)
   if (host_tty_ == -1 || active_tty_ == -1)
     return false;
 

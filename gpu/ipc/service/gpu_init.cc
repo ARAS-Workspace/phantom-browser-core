@@ -169,7 +169,7 @@ void InitializePlatformOverlaySettings(GPUInfo* gpu_info,
 #endif  // BUILDFLAG(IS_WIN)
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CASTOS)
+#if !BUILDFLAG(IS_ANDROID)
 bool CanAccessDeviceFile(const GPUInfo& gpu_info) {
 #if BUILDFLAG(IS_LINUX)
   if (gpu_info.gpu.vendor_id != 0x10de ||  // NVIDIA
@@ -187,7 +187,7 @@ bool CanAccessDeviceFile(const GPUInfo& gpu_info) {
   return true;
 #endif  // BUILDFLAG(IS_LINUX)
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CASTOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 class GpuWatchdogInit {
  public:
@@ -378,7 +378,7 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
   // need more context based GPUInfo. In such situations, switching to
   // SwiftShader needs to wait until creating a context.
   bool needs_more_info = true;
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CASTOS)
+#if !BUILDFLAG(IS_ANDROID)
   needs_more_info = false;
   CollectBasicGraphicsInfo(command_line, &gpu_info_);
 
@@ -409,7 +409,7 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
   SetupGLDisplayManagerEGL(gpu_info_, gpu_feature_info_);
 #endif  // IS_WIN || IS_MAC
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CASTOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   GpuDriverBugWorkarounds workarounds(
       gpu_feature_info_.enabled_gpu_driver_bug_workarounds);
@@ -1070,7 +1070,6 @@ void GpuInit::InitializeInProcess(base::CommandLine* command_line,
 
   bool needs_more_info = true;
 
-#if !BUILDFLAG(IS_CASTOS) && !BUILDFLAG(IS_CAST_ANDROID)
   needs_more_info = false;
   CollectBasicGraphicsInfo(command_line, &gpu_info_);
 #if defined(SUBPIXEL_FONT_RENDERING_DISABLED)
@@ -1084,7 +1083,6 @@ void GpuInit::InitializeInProcess(base::CommandLine* command_line,
     InitializeSwitchableGPUs(
         gpu_feature_info_.enabled_gpu_driver_bug_workarounds);
   }
-#endif  // !BUILDFLAG(IS_CASTOS) && !BUILDFLAG(IS_CAST_ANDROID)
 
   gl::GLDisplay* gl_display = nullptr;
 
@@ -1239,11 +1237,11 @@ void GpuInit::RecordUMA() {
     return;
   }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CASTOS)
+#if !BUILDFLAG(IS_ANDROID)
   IntelGpuSeriesType intel_gpu_series_type = GetIntelGpuSeriesType(
       gpu_info_.active_gpu().vendor_id, gpu_info_.active_gpu().device_id);
   UMA_HISTOGRAM_ENUMERATION("GPU.IntelGpuSeriesType", intel_gpu_series_type);
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CASTOS)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   UMA_HISTOGRAM_ENUMERATION("GPU.GLImplementation", gl::GetGLImplementation());
 

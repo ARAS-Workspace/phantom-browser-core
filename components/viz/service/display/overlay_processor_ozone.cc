@@ -244,11 +244,7 @@ bool OverlayProcessorOzone::NeedsSurfaceDamageRectList() const {
 
 bool OverlayProcessorOzone::SupportsFlipRotateTransform() const {
   // TODO(petermcneeley): Test and enable for ChromeOS.
-#if BUILDFLAG(IS_CASTOS)
   return false;
-#else
-  return false;
-#endif
 }
 
 void OverlayProcessorOzone::NotifyOverlayPromotion(
@@ -499,11 +495,7 @@ void OverlayProcessorOzone::InsertPrimaryPlane(
 }
 
 bool OverlayProcessorOzone::ShouldCreatePrimaryPlane() const {
-#if BUILDFLAG(IS_CASTOS)
-  return false;
-#else
   return true;
-#endif
 }
 
 bool OverlayProcessorOzone::SetNativePixmapForCandidate(

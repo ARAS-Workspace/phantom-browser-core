@@ -135,12 +135,9 @@ OverlayProcessorInterface::CreateOverlayProcessor(
               .disable_video_overlay_if_moving));
 
 #elif BUILDFLAG(IS_OZONE)
-#if !BUILDFLAG(IS_CASTOS)
   // In tests and Ozone/X11, we do not expect surfaceless surface support.
-  // For CastOS, we always need OverlayProcessorOzone.
   if (!capabilities.supports_surfaceless)
     return std::make_unique<OverlayProcessorStub>();
-#endif  // #if !BUILDFLAG(IS_CASTOS)
 
   std::unique_ptr<OverlayProcessorOzone::PixmapProvider> pixmap_provider;
   auto* overlay_manager = ui::OzonePlatform::GetInstance()->GetOverlayManager();
