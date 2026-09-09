@@ -68,7 +68,6 @@ target(link_target_type, "gpu_sources") {
     "//components/viz/service/main",
     "//media/gpu/ipc/service",
     "//media/mojo/clients",
-    "//sandbox/policy:chromecast_sandbox_allowlist_buildflags",
     "//services/service_manager/public/cpp",
     "//services/service_manager/public/mojom",
     "//services/tracing/public/cpp",

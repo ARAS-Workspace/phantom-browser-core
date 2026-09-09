@@ -31,7 +31,6 @@
 #include "sandbox/linux/syscall_broker/broker_command.h"
 #include "sandbox/linux/syscall_broker/broker_file_permission.h"
 #include "sandbox/linux/syscall_broker/broker_process.h"
-#include "sandbox/policy/chromecast_sandbox_allowlist_buildflags.h"
 #include "sandbox/policy/linux/bpf_cros_amd_gpu_policy_linux.h"
 #include "sandbox/policy/linux/bpf_cros_arm_gpu_policy_linux.h"
 #include "sandbox/policy/linux/bpf_gpu_policy_linux.h"
@@ -50,14 +49,6 @@ namespace {
 
 inline bool IsChromeOS() {
 #if BUILDFLAG(IS_CHROMEOS)
-  return true;
-#else
-  return false;
-#endif
-}
-
-inline bool UseChromecastSandboxAllowlist() {
-#if BUILDFLAG(ENABLE_CHROMECAST_GPU_SANDBOX_ALLOWLIST)
   return true;
 #else
   return false;
@@ -182,12 +173,6 @@ void AddV4L2GpuPermissions(
     jpegEncPath << kDevJpegEncPath << i;
     permissions->push_back(
         BrokerFilePermission::ReadWrite(jpegEncPath.str()));
-  }
-
-  if (UseChromecastSandboxAllowlist()) {
-    static const char kAmlogicAvcEncoderPath[] = "/dev/amvenc_avc";
-    permissions->push_back(
-        BrokerFilePermission::ReadWrite(kAmlogicAvcEncoderPath));
   }
 }
 
@@ -398,42 +383,6 @@ void AddArmGpuPermissions(std::vector<BrokerFilePermission>* permissions) {
   AddArmMaliGpuPermissions(permissions);
 }
 
-// Need to look in vendor paths for custom vendor implementations.
-static const char* const kAllowedChromecastPaths[] = {
-    "/oem_cast_shlib/", "/system/vendor/lib/", "/system/lib/",
-    "/system/chrome/lib/"};
-
-void AddChromecastArmGpuPermissions(
-    std::vector<BrokerFilePermission>* permissions) {
-  // Device file needed by the ARM GPU userspace.
-  static const char kMali0Path[] = "/dev/mali0";
-  permissions->push_back(BrokerFilePermission::ReadWrite(kMali0Path));
-
-  // Files needed by the ARM GPU userspace.
-  static const char* const kReadOnlyLibraries[] = {"libGLESv2.so.2",
-                                                   "libEGL.so.1",
-                                                   // Allow ANGLE libraries.
-                                                   "libGLESv2.so", "libEGL.so"};
-
-  for (const char* library : kReadOnlyLibraries) {
-    for (const char* path : kAllowedChromecastPaths) {
-      const std::string library_path(std::string(path) + std::string(library));
-      permissions->push_back(BrokerFilePermission::ReadOnly(library_path));
-    }
-  }
-
-  static const char kLdSoCache[] = "/etc/ld.so.cache";
-  permissions->push_back(BrokerFilePermission::ReadOnly(kLdSoCache));
-
-  base::FileEnumerator enumerator(
-      base::FilePath(FILE_PATH_LITERAL("/dev/dri/")), false /* recursive */,
-      base::FileEnumerator::FILES, FILE_PATH_LITERAL("renderD*"));
-  for (base::FilePath name = enumerator.Next(); !name.empty();
-       name = enumerator.Next()) {
-    permissions->push_back(BrokerFilePermission::ReadWrite(name.value()));
-  }
-}
-
 void AddVulkanICDPermissions(std::vector<BrokerFilePermission>* permissions) {
   static const char* const kReadOnlyICDPrefixes[] = {"/usr/share/vulkan/icd.d",
                                                      "/etc/vulkan/icd.d"};
@@ -501,14 +450,7 @@ void LoadArmGpuLibraries() {
 #endif
 
   // Preload the Mali library.
-  if (UseChromecastSandboxAllowlist()) {
-    for (const char* path : kAllowedChromecastPaths) {
-      const std::string library_path(std::string(path) +
-                                     std::string("libMali.so"));
-      if (dlopen(library_path.c_str(), dlopen_flag))
-        break;
-    }
-  } else {
+  {
     bool is_mali = dlopen(kLibMaliPath, dlopen_flag) != nullptr;
 
     // Preload the Tegra V4L2 (video decode acceleration) library.
@@ -592,15 +534,6 @@ void LoadVulkanLibraries() {
   dlopen("libvulkan_freedreno.so", dlopen_flag);
 }
 
-void LoadChromecastV4L2Libraries() {
-  for (const char* path : kAllowedChromecastPaths) {
-    const std::string library_path(std::string(path) +
-                                   std::string("libvpcodec.so"));
-    if (dlopen(library_path.c_str(), dlopen_flag))
-      break;
-  }
-}
-
 }  // namespace
 
 sandbox::syscall_broker::BrokerCommandSet CommandSetForGPU(
@@ -657,17 +590,6 @@ std::vector<BrokerFilePermission> FilePermissionsForGpu(
     return permissions;
   }
 
-  if (UseChromecastSandboxAllowlist()) {
-    if (UseV4L2Codec(options)) {
-      AddV4L2GpuPermissions(&permissions, options);
-    }
-
-    if (IsArchitectureArm()) {
-      AddChromecastArmGpuPermissions(&permissions);
-      return permissions;
-    }
-  }
-
   AddStandardGpuPermissions(&permissions);
   return permissions;
 }
@@ -682,12 +604,6 @@ bool LoadLibrariesForGpu(
     if (options.use_amd_specific_policies) {
       if (!LoadAmdGpuLibraries())
         return false;
-    }
-  } else {
-    if (UseChromecastSandboxAllowlist() && IsArchitectureArm()) {
-      if (UseV4L2Codec(options)) {
-        LoadChromecastV4L2Libraries();
-      }
     }
   }
   if (options.use_nvidia_specific_policies)

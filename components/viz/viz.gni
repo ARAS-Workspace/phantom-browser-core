@@ -21,7 +21,6 @@ enable_skia_graphite_tests =
     skia_use_dawn && (is_mac || is_win || is_linux || (is_ios && use_blink))
 
 # TODO(crbug.com/1336055): Determine whether is_cast_android needs this.
-enable_cast_overlay_strategy = is_castos || is_cast_android
 
 viz_remove_configs = []
 viz_add_configs = [ "//build/config:precompiled_headers" ]

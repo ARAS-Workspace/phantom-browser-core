@@ -383,7 +383,6 @@ source_set("common") {
       "//media/gpu:buildflags",
       "//sandbox/linux:sandbox_services",
       "//sandbox/linux:seccomp_bpf",
-      "//sandbox/policy:chromecast_sandbox_allowlist_buildflags",
       "//third_party/fontconfig",
     ]
     if (use_v4l2_codec) {

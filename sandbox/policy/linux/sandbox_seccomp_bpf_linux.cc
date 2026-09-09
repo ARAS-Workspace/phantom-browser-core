@@ -34,7 +34,6 @@
 #include "sandbox/linux/seccomp-bpf-helpers/syscall_sets.h"
 #include "sandbox/linux/seccomp-bpf/sandbox_bpf.h"
 #include "sandbox/linux/system_headers/linux_syscalls.h"
-#include "sandbox/policy/chromecast_sandbox_allowlist_buildflags.h"
 #include "sandbox/policy/linux/bpf_audio_policy_linux.h"
 #include "sandbox/policy/linux/bpf_base_policy_linux.h"
 #include "sandbox/policy/linux/bpf_cdm_policy_linux.h"
@@ -102,14 +101,6 @@ inline bool IsChromeOS() {
 #endif
 }
 
-inline bool UseChromecastSandboxAllowlist() {
-#if BUILDFLAG(ENABLE_CHROMECAST_GPU_SANDBOX_ALLOWLIST)
-  return true;
-#else
-  return false;
-#endif
-}
-
 inline bool IsArchitectureArm() {
 #if defined(ARCH_CPU_ARM_FAMILY)
   return true;
@@ -121,7 +112,7 @@ inline bool IsArchitectureArm() {
 std::unique_ptr<BPFBasePolicy> GetGpuProcessSandbox(
     const SandboxSeccompBPF::Options& options,
     MremapPolicy mremap_policy) {
-  if (IsChromeOS() || UseChromecastSandboxAllowlist()) {
+  if (IsChromeOS()) {
     if (IsArchitectureArm()) {
       return std::make_unique<CrosArmGpuProcessPolicy>(
           mremap_policy, base::CommandLine::ForCurrentProcess()->HasSwitch(

@@ -82,9 +82,6 @@
 #include "ui/base/ui_base_features.h"
 #endif
 
-#if BUILDFLAG(ENABLE_CAST_OVERLAY_STRATEGY)
-#include "components/viz/service/display/overlay_strategy_underlay_cast.h"
-#endif
 
 using testing::_;
 using testing::Mock;
@@ -556,14 +553,6 @@ class TransparentUnderlayOverlayProcessor : public DefaultOverlayProcessor {
   }
 };
 
-#if BUILDFLAG(ENABLE_CAST_OVERLAY_STRATEGY)
-class UnderlayCastOverlayProcessor : public DefaultOverlayProcessor {
- public:
-  UnderlayCastOverlayProcessor() : DefaultOverlayProcessor() {
-    strategies_.push_back(std::make_unique<OverlayStrategyUnderlayCast>(this));
-  }
-};
-#endif
 
 class ChangeThresholdOnTopOverlayProcessor : public DefaultOverlayProcessor {
  public:
@@ -604,20 +593,6 @@ std::unique_ptr<AggregatedRenderPass> CreateRenderPass() {
   return pass;
 }
 
-#if BUILDFLAG(ENABLE_CAST_OVERLAY_STRATEGY)
-// For Cast we use VideoHoleDrawQuad, and that's what overlay_processor_
-// expects.
-VideoHoleDrawQuad* CreateVideoHoleDrawQuadAt(
-    const SharedQuadState* shared_quad_state,
-    AggregatedRenderPass* render_pass,
-    const gfx::Rect& rect) {
-  base::UnguessableToken overlay_plane_id = base::UnguessableToken::Create();
-  auto* overlay_quad =
-      render_pass->CreateAndAppendDrawQuad<VideoHoleDrawQuad>();
-  overlay_quad->SetNew(shared_quad_state, rect, rect, overlay_plane_id);
-  return overlay_quad;
-}
-#endif
 
 SolidColorDrawQuad* CreateSolidColorQuadAt(
     const SharedQuadState* shared_quad_state,
@@ -943,9 +918,6 @@ using OverlayHysteresisTest =
 using UnderlayTest = OverlayTest<UnderlayOverlayProcessor>;
 using TransparentUnderlayTest =
     OverlayTest<TransparentUnderlayOverlayProcessor>;
-#if BUILDFLAG(ENABLE_CAST_OVERLAY_STRATEGY)
-using UnderlayCastTest = OverlayTest<UnderlayCastOverlayProcessor>;
-#endif
 using MultiOverlayTest = UseMultipleOverlaysTest<MultiOverlayProcessor>;
 using MultiUnderlayTest = UseMultipleOverlaysTest<MultiUnderlayProcessor>;
 using MultiSingleOnTopOverlayTest =
@@ -4217,131 +4189,7 @@ TEST_F(UnderlayTest, CandidateNoDamageWhenQuadSharedStateNoOccludingDamage) {
 }
 #endif  // !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(ENABLE_CAST_OVERLAY_STRATEGY)
-TEST_F(UnderlayCastTest, ReplacementQuad) {
-  auto pass = CreateRenderPass();
-  CreateVideoHoleDrawQuadAt(pass->shared_quad_state_list.back(), pass.get(),
-                            kOverlayRect);
 
-  OverlayCandidateList candidate_list;
-  AggregatedRenderPassList pass_list;
-  pass_list.push_back(std::move(pass));
-  SurfaceDamageRectList surface_damage_rect_list;
-
-  overlay_processor_->ProcessForOverlays(
-      resource_provider(), &pass_list, GetIdentityColorMatrix(),
-      std::move(surface_damage_rect_list), GetDefaultPrimaryPlane(),
-      &candidate_list, &damage_rect_);
-  ASSERT_EQ(1U, pass_list.size());
-  ASSERT_EQ(1U, pass_list.front()->quad_list.size());
-  EXPECT_EQ(SkColors::kTransparent, static_cast<SolidColorDrawQuad*>(
-                                        pass_list.front()->quad_list.front())
-                                        ->color);
-  EXPECT_FALSE(pass_list.front()->quad_list.front()->ShouldDrawWithBlending());
-  EXPECT_FALSE(pass_list.front()
-                   ->quad_list.front()
-                   ->shared_quad_state->are_contents_opaque);
-}
-
-TEST_F(UnderlayCastTest, NoOverlayContentBounds) {
-  auto pass = CreateRenderPass();
-
-  CreateOpaqueQuadAt(pass->shared_quad_state_list.back(), pass.get(),
-                     kOverlayTopLeftRect);
-
-  OverlayCandidateList candidate_list;
-  AggregatedRenderPassList pass_list;
-  pass_list.push_back(std::move(pass));
-  SurfaceDamageRectList surface_damage_rect_list;
-
-  overlay_processor_->ProcessForOverlays(
-      resource_provider(), &pass_list, GetIdentityColorMatrix(),
-      std::move(surface_damage_rect_list), GetDefaultPrimaryPlane(),
-      &candidate_list, &damage_rect_);
-
-}
-
-
-
-TEST_F(UnderlayCastTest, NoOverlayPromotionWithoutProtectedContent) {
-  auto pass = CreateRenderPass();
-  CreateCandidateQuadAt(pass->shared_quad_state_list.back(), pass.get(),
-                        kOverlayRect);
-
-  OverlayCandidateList candidate_list;
-  AggregatedRenderPassList pass_list;
-  pass_list.push_back(std::move(pass));
-  SurfaceDamageRectList surface_damage_rect_list;
-
-  overlay_processor_->ProcessForOverlays(
-      resource_provider(), &pass_list, GetIdentityColorMatrix(),
-      std::move(surface_damage_rect_list), GetDefaultPrimaryPlane(),
-      &candidate_list, &damage_rect_);
-
-  ASSERT_TRUE(candidate_list.empty());
-
-}
-
-TEST_F(UnderlayCastTest, OverlayPromotionWithMaskFilter) {
-  auto pass = CreateRenderPass();
-
-  SurfaceDamageRectList surface_damage_rect_list;
-  auto* sqs = pass->shared_quad_state_list.front();
-  sqs->overlay_damage_index = 0;
-  surface_damage_rect_list.emplace_back(damage_rect_);
-  sqs->mask_filter_info =
-      gfx::MaskFilterInfo(gfx::RectF(kOverlayRect), gfx::RoundedCornersF(1.f),
-                          gfx::LinearGradient::GetEmpty());
-  CreateVideoHoleDrawQuadAt(sqs, pass.get(), kOverlayRect);
-
-  OverlayCandidateList candidate_list;
-  AggregatedRenderPassList pass_list;
-  pass_list.push_back(std::move(pass));
-
-  overlay_processor_->ProcessForOverlays(
-      resource_provider(), &pass_list, GetIdentityColorMatrix(),
-      std::move(surface_damage_rect_list), GetDefaultPrimaryPlane(),
-      &candidate_list, &damage_rect_);
-
-
-
-  ASSERT_EQ(1U, pass_list.size());
-  ASSERT_EQ(1U, pass_list.front()->quad_list.size());
-  EXPECT_EQ(SkColors::kBlack, static_cast<SolidColorDrawQuad*>(
-                                  pass_list.front()->quad_list.front())
-                                  ->color);
-  EXPECT_FALSE(pass_list.front()
-                   ->quad_list.front()
-                   ->shared_quad_state->are_contents_opaque);
-  EXPECT_EQ(
-      SkBlendMode::kDstOut,
-      pass_list.front()->quad_list.front()->shared_quad_state->blend_mode);
-}
-#endif  // BUILDFLAG(ENABLE_CAST_OVERLAY_STRATEGY)
-
-#if BUILDFLAG(ALWAYS_ENABLE_BLENDING_FOR_PRIMARY)
-TEST_F(UnderlayCastTest, PrimaryPlaneOverlayIsAlwaysTransparent) {
-  auto pass = CreateRenderPass();
-  gfx::Rect output_rect = pass->output_rect;
-  CreateOpaqueQuadAt(pass->shared_quad_state_list.back(), pass.get(),
-                     output_rect, SkColors::kWhite);
-
-  OverlayCandidateList candidate_list;
-
-  AggregatedRenderPassList pass_list;
-  pass_list.push_back(std::move(pass));
-
-  SurfaceDamageRectList surface_damage_rect_list;
-  overlay_processor_->ProcessForOverlays(
-      resource_provider(), &pass_list, GetIdentityColorMatrix(),
-      std::move(surface_damage_rect_list), GetDefaultPrimaryPlane(),
-      &candidate_list, &damage_rect_);
-
-
-  ASSERT_EQ(1U, test::NumOverlaysExcludingPrimaryPlane(candidate_list));
-  ASSERT_THAT(candidate_list, test::HasPrimaryPlaneWithOpaqueness(false));
-}
-#endif  // BUILDFLAG(ALWAYS_ENABLE_BLENDING_FOR_PRIMARY)
 
 void AddQuad(gfx::Rect quad_rect,
              const gfx::Transform& quad_to_target_transform,

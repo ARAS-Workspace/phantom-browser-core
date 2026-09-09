@@ -31,9 +31,6 @@
 #include "ui/gl/gl_switches.h"
 #endif
 
-#if BUILDFLAG(ENABLE_CAST_OVERLAY_STRATEGY)
-#include "components/viz/service/display/overlay_strategy_underlay_cast.h"
-#endif
 
 namespace viz {
 
@@ -220,12 +217,6 @@ OverlayProcessorOzone::OverlayProcessorOzone(
       case OverlayStrategy::kUnderlay:
         strategies_.push_back(std::make_unique<OverlayStrategyUnderlay>(this));
         break;
-#if BUILDFLAG(ENABLE_CAST_OVERLAY_STRATEGY)
-      case OverlayStrategy::kUnderlayCast:
-        strategies_.push_back(
-            std::make_unique<OverlayStrategyUnderlayCast>(this));
-        break;
-#endif
       default:
         NOTREACHED();
     }

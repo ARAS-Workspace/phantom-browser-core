@@ -4167,8 +4167,6 @@ def CheckSpamLogging(input_api, output_api):
             r'^components/media_control/renderer/media_playback_options\.cc$',
             r'^components/policy/core/common/policy_logger\.cc$',
             r'^components/supervised_user/core/browser/android/content_filters_observer_bridge\.cc',
-            r'^components/viz/service/display/'
-            r'overlay_strategy_underlay_cast\.cc$',
             r'^components/zucchini/.*',
             # Apéritif runs prior to system and //base static initializers, so it
             # cannot depend on base logging.

@@ -208,10 +208,6 @@ OverlayCandidate OverlayProcessorInterface::CreatePrimaryPlane(
       overlay_plane.display_rect.height() /
           static_cast<float>(overlay_plane.resource_size_in_pixels.height()));
 
-#if BUILDFLAG(ALWAYS_ENABLE_BLENDING_FOR_PRIMARY)
-  // On Chromecast, always use RGBA as the scanout format for the primary plane.
-  overlay_plane.is_opaque = false;
-#endif
 
   overlay_plane.format = params.si_format;
   overlay_plane.color_space = params.color_space;

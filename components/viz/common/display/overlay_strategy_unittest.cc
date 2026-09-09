@@ -23,15 +23,11 @@ TEST(ParseOverlayStrategiesTest, ParseEmptyList) {
 
 TEST(ParseOverlayStrategiesTest, ParseFullList) {
   std::vector<OverlayStrategy> strategies =
-      ParseOverlayStrategies("single-fullscreen,single-on-top,underlay,cast");
+      ParseOverlayStrategies("single-fullscreen,single-on-top,underlay");
 
   EXPECT_THAT(strategies, UnorderedElementsAre(OverlayStrategy::kFullscreen,
                                                OverlayStrategy::kSingleOnTop,
                                                OverlayStrategy::kUnderlay
-#if BUILDFLAG(ENABLE_CAST_OVERLAY_STRATEGY)
-                                               ,
-                                               OverlayStrategy::kUnderlayCast
-#endif
                                                ));
 }
 

@@ -22,10 +22,6 @@ struct EnumTraits<viz::mojom::OverlayStrategy, viz::OverlayStrategy> {
         return viz::mojom::OverlayStrategy::kSingleOnTop;
       case viz::OverlayStrategy::kUnderlay:
         return viz::mojom::OverlayStrategy::kUnderlay;
-#if BUILDFLAG(ENABLE_CAST_OVERLAY_STRATEGY)
-      case viz::OverlayStrategy::kUnderlayCast:
-        return viz::mojom::OverlayStrategy::kUnderlayCast;
-#endif
       default:
         break;
     }
@@ -40,10 +36,6 @@ struct EnumTraits<viz::mojom::OverlayStrategy, viz::OverlayStrategy> {
         return viz::OverlayStrategy::kSingleOnTop;
       case viz::mojom::OverlayStrategy::kUnderlay:
         return viz::OverlayStrategy::kUnderlay;
-#if BUILDFLAG(ENABLE_CAST_OVERLAY_STRATEGY)
-      case viz::mojom::OverlayStrategy::kUnderlayCast:
-        return viz::OverlayStrategy::kUnderlayCast;
-#endif
     }
     NOTREACHED();
   }

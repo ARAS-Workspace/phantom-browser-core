@@ -21,9 +21,6 @@ enum class OverlayStrategy {
   kFullscreen = 2,
   kSingleOnTop = 3,
   kUnderlay = 4,
-#if BUILDFLAG(ENABLE_CAST_OVERLAY_STRATEGY)
-  kUnderlayCast = 5,
-#endif
   kNoStrategyAllFail = 6,
   kNoStrategyFailMin = 7,
   kMaxValue = kNoStrategyFailMin,

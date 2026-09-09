@@ -21,10 +21,6 @@ auto AnyOverlayStrategy() {
   return fuzztest::ElementOf({OverlayStrategy::kFullscreen,
                               OverlayStrategy::kSingleOnTop,
                               OverlayStrategy::kUnderlay
-#if BUILDFLAG(ENABLE_CAST_OVERLAY_STRATEGY)
-                              ,
-                              OverlayStrategy::kUnderlayCast
-#endif
   });
 }
 #endif

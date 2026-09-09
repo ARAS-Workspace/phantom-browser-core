@@ -109,7 +109,6 @@ component("policy") {
       "//media/audio:platform_config",
     ]
     deps += [
-      ":chromecast_sandbox_allowlist_buildflags",
       "//media:media_buildflags",
       "//media/gpu:buildflags",
       "//sandbox:sandbox_buildflags",
@@ -192,11 +191,6 @@ component("policy") {
       "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.ui.composition:fuchsia.ui.composition_hlcpp",
     ]
   }
-}
-
-buildflag_header("chromecast_sandbox_allowlist_buildflags") {
-  header = "chromecast_sandbox_allowlist_buildflags.h"
-  flags = [ "ENABLE_CHROMECAST_GPU_SANDBOX_ALLOWLIST=$is_castos" ]
 }
 
 if (is_win) {

@@ -12,15 +12,10 @@ import("//testing/test.gni")
 
 import("//third_party/inspector_protocol/inspector_protocol.gni")
 
-always_enable_blending_for_primary = is_castos || is_cast_android
-assert(enable_cast_overlay_strategy || !always_enable_blending_for_primary)
-
 buildflag_header("buildflags") {
   header = "buildflags.h"
   flags = [
     "USE_VIZ_DEBUGGER=$use_viz_debugger",
-    "ENABLE_CAST_OVERLAY_STRATEGY=$enable_cast_overlay_strategy",
-    "ALWAYS_ENABLE_BLENDING_FOR_PRIMARY=$always_enable_blending_for_primary",
   ]
 }
 

@@ -12,7 +12,4 @@ enum OverlayStrategy {
   kFullscreen,
   kSingleOnTop,
   kUnderlay,
-
-  [EnableIf=enable_cast_overlay_strategy]
-  kUnderlayCast,
 };
