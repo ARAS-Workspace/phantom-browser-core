@@ -19,7 +19,6 @@ static_library("common") {
     "//chrome/*",
     "//components/cdm/*",
     "//content/shell/*",
-    "//fuchsia_web/*",
   ]
 
   deps = [

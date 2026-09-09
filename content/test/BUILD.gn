@@ -887,11 +887,6 @@ if (is_fuchsia) {
         "$root_gen_dir/package_metadata/web_engine_shell.meta",
         "$root_gen_dir/package_metadata/web_engine_with_webui.meta",
       ]
-
-      data_deps = [
-        "//fuchsia_web/shell",
-        "//fuchsia_web/webengine:web_engine_with_webui_installer",
-      ]
     } else {
       data += [ "$root_gen_dir/package_metadata/chrome.meta" ]
       data_deps = [ "//chrome/app:chrome_fuchsia" ]

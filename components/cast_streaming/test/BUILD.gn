@@ -26,7 +26,6 @@ if (!is_win) {
   # this target, which contains only the needed symbols, is provided.
   source_set("test_sender_using_net_sockets") {
     testonly = true
-    visibility += [ "//fuchsia_web/shell:cast_streaming_shell_exe" ]
     public_deps = [ ":test_sender_without_socket_deps" ]
     deps = [
       # Complete implementation of the platform API used by
