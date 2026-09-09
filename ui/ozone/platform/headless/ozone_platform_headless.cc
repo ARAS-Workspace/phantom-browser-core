@@ -107,8 +107,8 @@ class OzonePlatformHeadlessImpl : public OzonePlatformHeadless {
     return std::make_unique<InputMethodMinimal>(ime_key_event_dispatcher);
   }
 
-// Desktop Linux, not CastOS.
-#if BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CASTOS)
+// Desktop Linux.
+#if BUILDFLAG(IS_LINUX)
   const PlatformProperties& GetPlatformProperties() override {
     static base::NoDestructor<OzonePlatform::PlatformProperties> properties;
     static bool initialized = false;

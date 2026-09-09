@@ -29,8 +29,7 @@
 #include "third_party/skia/include/core/SkBitmap.h"
 #include "third_party/skia/include/core/SkColor.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || \
-    (BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CASTOS))
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // GN deps checking doesn't understand #if guards, so we need to use nogncheck
 // here: https://gn.googlesource.com/gn/+/main/docs/reference.md#nogncheck
 #include "ui/base/test/skia_gold_matching_algorithm.h"  // nogncheck
@@ -345,8 +344,7 @@ TEST_P(BMPImageDecoderSuiteTest, MAYBE_VerifyBMPSuiteImage) {
     result_image = &empty_bitmap;
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || \
-    (BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CASTOS))
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Verify image contents via go/chrome-engprod-skia-gold on platforms where
   // it is properly supported. On other platforms, decoding without a crash
   // counts as a pass.

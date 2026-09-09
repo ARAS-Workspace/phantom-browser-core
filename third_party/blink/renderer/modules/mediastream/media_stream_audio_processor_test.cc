@@ -162,9 +162,6 @@ class MediaStreamAudioProcessorTest : public ::testing::Test {
 #elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
     EXPECT_FALSE(config.gain_controller1.enabled);
     EXPECT_TRUE(config.gain_controller2.enabled);
-#elif BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
-    EXPECT_TRUE(config.gain_controller1.enabled);
-    EXPECT_FALSE(config.gain_controller2.enabled);
 #elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
     EXPECT_FALSE(config.gain_controller1.enabled);
     EXPECT_TRUE(config.gain_controller2.enabled);
@@ -266,10 +263,6 @@ TEST_P(MediaStreamAudioProcessorTestMultichannel, MAYBE_TestAllSampleRates) {
     32000,
     44100,
     48000
-#if BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
-    ,
-    96000
-#endif  // BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
   };
   for (int sample_rate : kSupportedSampleRates) {
     SCOPED_TRACE(testing::Message() << "sample_rate=" << sample_rate);
@@ -289,14 +282,7 @@ TEST_P(MediaStreamAudioProcessorTestMultichannel, MAYBE_TestAllSampleRates) {
     EXPECT_TRUE(audio_processor->has_webrtc_audio_processing());
     VerifyDefaultComponents(*audio_processor);
 
-    // TODO(crbug.com/1336055): Investigate why chromecast devices need special
-    // logic here.
-    int expected_sample_rate =
-#if BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
-        std::min(sample_rate, media::WebRtcAudioProcessingSampleRateHz());
-#else
-        media::WebRtcAudioProcessingSampleRateHz();
-#endif  // BUILDFLAG(IS_CASTOS) || BUILDFLAG(IS_CAST_ANDROID)
+    int expected_sample_rate = media::WebRtcAudioProcessingSampleRateHz();
     const int expected_output_channels =
         use_multichannel_processing ? params_.channels() : 1;
     ProcessDataAndVerifyFormat(*audio_processor, mock_capture_callback_,
