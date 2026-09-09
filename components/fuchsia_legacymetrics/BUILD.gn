@@ -9,7 +9,6 @@ visibility = []
 source_set("fuchsia_legacymetrics") {
   visibility += [
     ":unit_tests",
-    "//chromecast/internal/*",
     "//fuchsia_web/webengine/*",
   ]
   sources = [

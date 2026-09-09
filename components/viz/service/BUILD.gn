@@ -430,15 +430,6 @@ viz_component("service") {
     ]
   }
 
-  if (enable_cast_overlay_strategy) {
-    sources += [
-      "display/overlay_strategy_underlay_cast.cc",
-      "display/overlay_strategy_underlay_cast.h",
-    ]
-
-    deps += [ "//chromecast/media/service/mojom" ]
-  }
-
   if (is_android) {
     sources += [
       "display/overlay_processor_android.cc",

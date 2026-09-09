@@ -3714,11 +3714,6 @@ test("content_unittests") {
     deps += [ "//device/vr:vr_fakes" ]
   }
 
-  # TODO(crbug.com/1293538): Update to check is_cast_audio_only
-  if (is_castos || is_cast_android) {
-    deps += [ "//chromecast:chromecast_buildflags" ]
-  }
-
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]

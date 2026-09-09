@@ -620,29 +620,8 @@ component("bluetooth") {
     # force_cast_bluetooth is used to compile with both cast & BlueZ, by
     # omitting the stubs that would otherwise be added in.
     if (!use_bluez || force_cast_bluetooth) {
-      if (is_castos) {
-        sources += [
-          "cast/bluetooth_adapter_cast.cc",
-          "cast/bluetooth_adapter_cast.h",
-          "cast/bluetooth_device_cast.cc",
-          "cast/bluetooth_device_cast.h",
-          "cast/bluetooth_remote_gatt_characteristic_cast.cc",
-          "cast/bluetooth_remote_gatt_characteristic_cast.h",
-          "cast/bluetooth_remote_gatt_descriptor_cast.cc",
-          "cast/bluetooth_remote_gatt_descriptor_cast.h",
-          "cast/bluetooth_remote_gatt_service_cast.cc",
-          "cast/bluetooth_remote_gatt_service_cast.h",
-          "cast/bluetooth_utils.cc",
-          "cast/bluetooth_utils.h",
-        ]
-
-        public_deps += [ "//chromecast/public" ]
-
-        deps += []
-      } else {
-        defines += [ "NO_PLATFORM_BLUETOOTH" ]
-        sources += [ "bluetooth_adapter_stub.cc" ]
-      }
+      defines += [ "NO_PLATFORM_BLUETOOTH" ]
+      sources += [ "bluetooth_adapter_stub.cc" ]
     }
   }
 

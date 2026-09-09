@@ -118,7 +118,6 @@ class COMPONENT_EXPORT(MOJO_CPP_BINDINGS) SyncCallRestrictions {
   // running in the same process, so it won't block anything.
   // TODO(159346933) Remove once the origin isolation logic is moved outside of
   // cast media service.
-  friend class chromecast::CastCdmOriginProvider;
   // Android requires synchronous processing when overlay surfaces are
   // destroyed, else behavior is undefined.
   friend class content::AndroidOverlaySyncHelper;

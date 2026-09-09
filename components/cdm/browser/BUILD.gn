@@ -10,7 +10,6 @@ if (enable_media_drm_storage) {
     visibility = [
       "//android_webview/*",
       "//chrome/*",
-      "//chromecast/*",
       "//components/cdm/*",
       "//content/shell/*",
       "//fuchsia_web/*",

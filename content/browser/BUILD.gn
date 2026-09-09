@@ -2569,17 +2569,6 @@ source_set("browser") {
     public_deps += [ "//ash/webui/common/resources" ]
   }
 
-  if (is_castos) {
-    sources += [
-      "tracing/cast_tracing_agent.cc",
-      "tracing/cast_tracing_agent.h",
-    ]
-
-    deps += []
-
-    defines += [ "CAST_TRACING_AGENT=1" ]
-  }
-
   if (is_fuchsia) {
     sources += [
       "accessibility/accessibility_tree_formatter_fuchsia.cc",

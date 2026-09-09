@@ -27,7 +27,6 @@ class CONTENT_EXPORT SiteInstanceProcessCreationClient {
   SiteInstanceProcessCreationClient() = delete;
 
  private:
-  friend class chromecast::RendererPrelauncher;
 
   static PassKey GetPassKey();
 };
