@@ -46,7 +46,6 @@ gclient_gn_args = [
   'checkout_copybara',
   'checkout_fuchsia',
   'checkout_glic_e2e_tests',
-  'checkout_ios_webkit',
   'checkout_mutter',
   'checkout_openxr',
   'checkout_src_internal',
@@ -197,11 +196,6 @@ vars = {
   # By default bot checkouts the WPR archive files only when this
   # flag is set True.
   'checkout_wpr_archives': False,
-
-  # By default, do not check out WebKit for iOS, as it is not needed unless
-  # running against ToT WebKit rather than system WebKit. This can be overridden
-  # e.g. with custom_vars.
-  'checkout_ios_webkit': False,
 
   # Fetches only the SDK boot images that match at least one of the
   # entries in a comma-separated list.
@@ -450,10 +444,6 @@ vars = {
   # the commit queue can handle CLs rolling ink
   # and whatever else without interference from each other.
   'ink_revision': 'a4349e28c716c7baf0aba80d7602476ff9e65662',
-  # Three lines of non-changing comments so that
-  # the commit queue can handle CLs rolling ios_webkit
-  # and whatever else without interference from each other.
-  'ios_webkit_revision': 'f8c0fe750d94b7db23d193c0b1f31858c2537620',
   # Three lines of non-changing comments so that
   # the commit queue can handle CLs rolling libexpat
   # and whatever else without interference from each other.
@@ -1269,19 +1259,6 @@ deps = {
       'dep_type': 'cipd',
   },
 
-  'src/android_webview/tools/cts_archive/cipd': {
-      'packages': [
-          {
-              'package': 'chromium/android_webview/tools/cts_archive',
-              'version': 'oW6-jyOPGwPJeLlaldYwrxZoYqzXpjO1OZUdyF3Qq7sC',
-          },
-      ],
-      # TODO: crbug.com/487671154 - add back non_git_source condtion once we can
-      # find a way to make individual files in the package smaller.
-      'condition': 'checkout_android',
-      'dep_type': 'cipd',
-  },
-
   'src/chrome/android/orderfiles/arm': {
       'packages': [
           {
@@ -1298,28 +1275,6 @@ deps = {
           {
               'package': 'chromium/chrome/android/orderfiles/arm64',
               'version_file': 'chrome/build/android-arm64.orderfile.txt',
-          },
-      ],
-      'condition': 'checkout_android and non_git_source',
-      'dep_type': 'cipd',
-  },
-
-  'src/android_webview/tools/orderfiles/arm': {
-      'packages': [
-          {
-              'package': 'chromium/android_webview/tools/orderfiles/arm',
-              'version_file': 'android_webview/tools/android-webview-arm.orderfile.txt',
-          },
-      ],
-      'condition': 'checkout_android and non_git_source',
-      'dep_type': 'cipd',
-  },
-
-  'src/android_webview/tools/orderfiles/arm64': {
-      'packages': [
-          {
-              'package': 'chromium/android_webview/tools/orderfiles/arm64',
-              'version_file': 'android_webview/tools/android-webview-arm64.orderfile.txt',
           },
       ],
       'condition': 'checkout_android and non_git_source',
@@ -1740,32 +1695,6 @@ deps = {
     'url': Var('chrome_git') + '/clank/internal/apps.git' + '@' +
     '2e8e3054ca1a7392021631746ed6d87ac10b6a5b',
     'condition': 'checkout_android and checkout_src_internal',
-  },
-
-  'src/ios/third_party/earl_grey2/src': {
-      'url': Var('chromium_git') + '/external/github.com/google/EarlGrey.git' + '@' + 'f62e250172a3296e9ebe7efa4d0447ce447f94e5',
-      'condition': 'checkout_ios',
-  },
-
-  'src/ios/third_party/edo/src': {
-      'url': Var('chromium_git') + '/external/github.com/google/eDistantObject.git' + '@' + '2bbd17fe3acacc199efd2c758b1b8044acd9ee05',
-      'condition': 'checkout_ios',
-  },
-
-  'src/ios/third_party/gtx/src': {
-      'url': Var('chromium_git') + '/external/github.com/google/GTXiLib.git' + '@' + '0e6d6628c5b4d733dfc8f605ab576dcbb72aeeb9',
-      'condition': 'checkout_ios',
-  },
-
-  'src/ios/third_party/lottie/src': {
-      'url': Var('chromium_git') + '/external/github.com/airbnb/lottie-ios.git' + '@' + '4a4367659c0b8576d4a106669ff2ba129026085f',
-      'condition': 'checkout_ios',
-  },
-
-  'src/ios/third_party/webkit/src': {
-      'url': Var('chromium_git') + '/external/github.com/WebKit/webkit.git' +
-             '@' + Var('ios_webkit_revision'),
-      'condition': 'checkout_ios and checkout_ios_webkit'
   },
 
   'src/media/cdm/api':
@@ -4453,7 +4382,6 @@ hooks = [
     'action': [
         'python3',
         'src/tools/remove_stale_pyc_files.py',
-        'src/android_webview/tools',
         'src/build/android',
         'src/gpu/gles2_conform_support',
         'src/infra',
