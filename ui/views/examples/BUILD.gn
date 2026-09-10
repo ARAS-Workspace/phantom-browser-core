@@ -533,13 +533,6 @@ test("views_examples_unittests") {
     ]
   }
 
-  if (is_fuchsia) {
-    additional_manifest_fragments = [
-      "//build/config/fuchsia/test/fonts.shard.test-cml",
-      "//third_party/fuchsia-sdk/sdk/pkg/vulkan/client.shard.cml",
-    ]
-  }
-
   data_deps = [
     ":views_examples_resources_pak",
     "//testing/buildbot/filters:views_examples_unittests_filters",

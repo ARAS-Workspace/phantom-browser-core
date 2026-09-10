@@ -11,8 +11,6 @@ import("//extensions/buildflags/buildflags.gni")
 import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
 
-assert(!is_fuchsia, "Fuchsia shouldn't use anything in //chrome")
-
 source_set("path_parser") {
   public = [ "policy_path_parser.h" ]
 

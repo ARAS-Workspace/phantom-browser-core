@@ -93,7 +93,7 @@ source_set("internal") {
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 
   # TODO(crbug.com/40120259): Enable this on Fuchsia
-  if (safe_browsing_mode > 0 && !is_fuchsia) {
+  if (safe_browsing_mode > 0) {
     deps += [ "//components/safe_browsing/content/common:file_type_policies" ]
   }
 
@@ -117,7 +117,7 @@ source_set("internal") {
     sources += [ "base_file_win.cc" ]
   }
 
-  if (is_posix || is_fuchsia) {
+  if (is_posix) {
     sources += [ "base_file_posix.cc" ]
   }
 }

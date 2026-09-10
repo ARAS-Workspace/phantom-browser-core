@@ -128,12 +128,6 @@ static_library("test_support") {
     "//ui/gl:test_support",
   ]
 
-  if (is_fuchsia) {
-    deps += [
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.sysmem2:fuchsia.sysmem2_hlcpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/sys_cpp",
-    ]
-  }
   deps += [ "//third_party/angle:translator" ]
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
@@ -141,7 +135,7 @@ static_library("test_support") {
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 }
 
-if (!is_android && !is_fuchsia && !is_chromeos && !is_ios) {
+if (!is_android && !is_chromeos && !is_ios) {
   proto_library("gl_lpm_fuzzer_proto") {
     sources = [ "command_buffer/tests/lpm/gl_lpm_fuzzer.proto" ]
 

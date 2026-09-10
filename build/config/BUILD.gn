@@ -238,14 +238,6 @@ group("common_deps_without_libcxx") {
     public_deps += [ "//base/android/orderfile:orderfile_instrumentation" ]
   }
 
-  if (is_fuchsia) {
-    public_deps +=
-        [ "//third_party/fuchsia-gn-sdk/src/config:runtime_library_group" ]
-    if (is_asan) {
-      public_deps += [ "//build/config/fuchsia:asan_runtime_library" ]
-    }
-  }
-
   if (is_win) {
     if (build_with_chromium && is_component_build) {
       # To enable allocator_shim for the windows component built chrome,

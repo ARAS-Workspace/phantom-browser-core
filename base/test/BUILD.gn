@@ -378,26 +378,11 @@ static_library("test_support") {
     }
   }
 
-  if (is_posix || is_fuchsia) {
+  if (is_posix) {
     sources += [
       "scoped_locale.cc",
       "scoped_locale.h",
       "test_file_util_posix.cc",
-    ]
-  }
-
-  if (is_fuchsia) {
-    deps += [
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.io:fuchsia.io_cpp_hlcpp_conversion",
-      "//third_party/fuchsia-sdk/sdk/pkg/zx",
-    ]
-    public_deps += [ "//third_party/fuchsia-sdk/sdk/pkg/sys_cpp" ]
-    sources += [
-      "../fuchsia/test_component_context_for_process.cc",
-      "../fuchsia/test_component_context_for_process.h",
-      "fidl_matchers.h",
-      "scoped_dev_zero_fuchsia.cc",
-      "scoped_dev_zero_fuchsia.h",
     ]
   }
 
@@ -529,7 +514,7 @@ if (is_ios) {
   }
 }
 
-if (is_fuchsia || is_linux || is_chromeos) {
+if (is_linux || is_chromeos) {
   shared_library("malloc_wrapper") {
     testonly = true
     sources = [

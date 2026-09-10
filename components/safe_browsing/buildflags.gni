@@ -18,7 +18,7 @@ declare_args() {
   #   protection (typically used for desktop OSes).
   # 2 compiles it for Android mobile, enabling remote database lookups via an
   #   external API.
-  if (is_ios || is_fuchsia) {
+  if (is_ios) {
     safe_browsing_mode = 0
   } else if (is_android) {
     safe_browsing_mode = 2

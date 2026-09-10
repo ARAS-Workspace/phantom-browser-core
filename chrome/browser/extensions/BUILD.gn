@@ -24,7 +24,6 @@ import("//third_party/protobuf/proto_library.gni")
 
 assert(enable_extensions_core)
 assert(enable_supervised_users)
-assert(!is_fuchsia, "Fuchsia shouldn't use anything in //chrome")
 
 source_set("external_loader") {
   sources = [

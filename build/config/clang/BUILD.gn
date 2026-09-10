@@ -95,7 +95,7 @@ clang_plugin("find_bad_constructs") {
       "relax-ctor-checks-for-aggregates",
     ]
 
-    if (is_linux || is_chromeos || is_android || is_fuchsia) {
+    if (is_linux || is_chromeos || is_android) {
       plugin_arguments += [ "check-ipc" ]
     }
 
@@ -204,14 +204,6 @@ template("clang_lib") {
           _dir = "ppc64le-unknown-linux-gnu"
         } else if (current_cpu == "s390x") {
           _dir = "s390x-unknown-linux-gnu"
-        } else {
-          assert(false)  # Unhandled cpu type
-        }
-      } else if (is_fuchsia) {
-        if (current_cpu == "x64") {
-          _dir = "x86_64-unknown-fuchsia"
-        } else if (current_cpu == "arm64") {
-          _dir = "aarch64-unknown-fuchsia"
         } else {
           assert(false)  # Unhandled cpu type
         }

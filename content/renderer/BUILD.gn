@@ -345,16 +345,6 @@ target(link_target_type, "renderer") {
     deps += [ "//components/services/font/public/cpp" ]
   }
 
-  if (is_fuchsia) {
-    sources += [ "renderer_main_platform_delegate_fuchsia.cc" ]
-    public_deps += [ "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.mediacodec:fuchsia.mediacodec_hlcpp" ]
-
-    deps += [
-      "//media/fuchsia/video",
-      "//third_party/fuchsia-sdk/sdk/pkg/sys_cpp",
-    ]
-  }
-
   # TODO(crbug.com/1293520): Remove this dependency on cast devices.
   if (enable_media_remoting) {
     deps += [ "//media/mojo/mojom:remoting" ]

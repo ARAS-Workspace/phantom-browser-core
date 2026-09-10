@@ -667,7 +667,7 @@ source_set("browser_sources") {
     ]
   }
 
-  if (is_posix || is_fuchsia) {
+  if (is_posix) {
     sources += [ "posix_file_descriptor_info.h" ]
   }
 
@@ -713,10 +713,6 @@ source_set("browser_sources") {
       "native_event_processor_observer_mac.mm",
       "remote_cocoa.h",
     ]
-  }
-
-  if (is_fuchsia) {
-    sources += [ "ax_inspect_factory_fuchsia.cc" ]
   }
 
   if (is_win) {

@@ -63,7 +63,7 @@ target(libcxxabi_target_type, "libc++abi") {
     defines += [ "_LIBCXXABI_USE_FUTEX" ]
   }
 
-  if (is_fuchsia || (is_posix && !is_apple)) {
+  if (is_posix && !is_apple) {
     sources += [ "//third_party/libc++abi/src/src/cxa_thread_atexit.cpp" ]
 
     # Android's bionic libc added support for '__cxa_thread_atexit_impl' as of

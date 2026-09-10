@@ -112,7 +112,7 @@ source_set("indexed_db") {
     "//v8:v8_version",
   ]
 
-  if (!is_android && !is_fuchsia) {
+  if (!is_android) {
     deps += [ "//third_party/zstd:compress" ]
   }
 

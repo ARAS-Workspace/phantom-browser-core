@@ -24,7 +24,7 @@ declare_args() {
   # bad compile times.
   chrome_pgo_phase = 0
   if (!is_cronet_build && !dcheck_always_on && is_official_build &&
-      (is_high_end_android || is_win || is_mac || is_fuchsia || is_linux ||
+      (is_high_end_android || is_win || is_mac || is_linux ||
        (is_ios && use_blink && target_environment == "device"))) {
     chrome_pgo_phase = 2
   }

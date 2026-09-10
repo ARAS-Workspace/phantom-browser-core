@@ -103,8 +103,6 @@ if (use_unified_system_module) {
     extra_headers += [ ":mac_sysroot(${default_toolchain})" ]
   } else if (is_linux || is_mac || is_android || is_chromeos) {
     root_include_dir = "usr/include"
-  } else if (is_fuchsia) {
-    root_include_dir = "include"
   } else {
     assert(false, "Unsupported unified modules os: ${target_os}")
   }

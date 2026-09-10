@@ -517,13 +517,6 @@ viz_component("service") {
     ]
   }
 
-  if (is_fuchsia) {
-    sources += [
-      "display_embedder/output_presenter_fuchsia.cc",
-      "display_embedder/output_presenter_fuchsia.h",
-    ]
-  }
-
   if (use_vaapi) {
     deps += [ "//media/gpu/vaapi" ]
   }

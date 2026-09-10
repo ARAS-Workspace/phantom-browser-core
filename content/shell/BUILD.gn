@@ -26,10 +26,6 @@ if (is_android) {
   import("//third_party/icu/config.gni")
   import("//ui/gl/features.gni")
   import("//v8/gni/v8.gni")
-} else if (is_fuchsia) {
-  import("//build/config/fuchsia/generate_runner_scripts.gni")
-  import("//third_party/fuchsia-gn-sdk/src/component.gni")
-  import("//third_party/fuchsia-gn-sdk/src/package.gni")
 } else if (is_ios) {
   import("//build/config/apple/mobile_config.gni")
   import("//build/config/apple/swift_source_set.gni")
@@ -104,12 +100,10 @@ static_library("content_shell_app") {
       "//ui/native_theme",
     ]
   }
-  if (!is_fuchsia) {
-    deps += [
-      "//components/crash/core/app",
-      "//components/crash/core/app:test_support",
-    ]
-  }
+  deps += [
+    "//components/crash/core/app",
+    "//components/crash/core/app:test_support",
+  ]
   if (is_apple) {
     sources += [
       "app/paths_apple.h",
@@ -382,18 +376,10 @@ static_library("content_shell_lib") {
     "//v8",
   ]
 
-  if (is_fuchsia) {
-    sources += [
-      "browser/fuchsia_view_presenter.cc",
-      "browser/fuchsia_view_presenter.h",
-    ]
-    deps += [ "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.element:fuchsia.element_hlcpp" ]
-  } else {
-    deps += [
-      "//components/crash/content/browser",
-      "//components/crash/core/app",
-    ]
-  }
+  deps += [
+    "//components/crash/content/browser",
+    "//components/crash/core/app",
+  ]
 
   if (enable_plugins) {
     sources += [
@@ -604,7 +590,7 @@ repack("pak") {
     sources +=
         [ "$root_gen_dir/ui/views/resources/views_resources_100_percent.pak" ]
   }
-  if (!is_android && !is_fuchsia && !is_ios) {
+  if (!is_android && !is_ios) {
     sources +=
         [ "$root_gen_dir/content/browser/devtools/devtools_resources.pak" ]
     deps += [ "//content/browser/devtools:devtools_resources" ]
@@ -803,31 +789,6 @@ if (is_android) {
 
     if ((is_linux || is_chromeos) && !is_component_build) {
       configs += [ "//build/config/gcc:rpath_for_built_shared_libraries" ]
-    }
-  }
-
-  if (is_fuchsia) {
-    fuchsia_component("content_shell_component") {
-      testonly = true
-      manifest = "fuchsia/content_shell.cml"
-      data_deps = [ ":content_shell" ]
-      visibility = [ ":*" ]
-    }
-
-    fuchsia_package("content_shell_pkg") {
-      testonly = true
-      package_name = "content_shell"
-      deps = [ ":content_shell_component" ]
-    }
-
-    fuchsia_package_installer("content_shell_fuchsia") {
-      testonly = true
-      visibility = [
-        ":*",  # See https://crbug.com/1328459#c4.
-        "//:*",
-      ]
-      package = ":content_shell_pkg"
-      package_name = "content_shell"
     }
   }
 }
@@ -1122,14 +1083,6 @@ group("content_shell_crash_test") {
     "//testing:test_scripts_shared",
     "//third_party/angle:includes",
   ]
-  if (is_fuchsia) {
-    data_deps += [
-      ":content_shell_pkg",
-      ":content_shell_pkg__archive-manifest",
-      ":content_shell_script_meta",
-      "//build/config/fuchsia:deployment_resources",
-    ]
-  }
   data = [
     "//content/shell/tools/breakpad_integration_test.py",
     "//testing/scripts/content_shell_crash_test.py",

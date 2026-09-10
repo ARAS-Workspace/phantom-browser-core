@@ -268,8 +268,6 @@ if (target_os == "android") {
   } else {
     _default_toolchain = "//build/toolchain/linux:$target_cpu"
   }
-} else if (target_os == "fuchsia") {
-  _default_toolchain = "//build/toolchain/fuchsia:$target_cpu"
 } else if (target_os == "ios") {
   _default_toolchain = "//build/toolchain/ios:ios_clang_$target_cpu"
 } else if (target_os == "mac") {
@@ -341,7 +339,7 @@ is_watchos = current_os == "watchos"
 is_win = current_os == "win" || current_os == "winuwp"
 
 is_apple = is_ios || is_mac || is_watchos
-is_posix = !is_win && !is_fuchsia
+is_posix = !is_win
 
 # =============================================================================
 # TARGET DEFAULTS
@@ -411,10 +409,6 @@ if (is_posix) {
     default_compiler_configs +=
         [ "//build/config/gcc:symbol_visibility_hidden" ]
   }
-}
-
-if (is_fuchsia) {
-  default_compiler_configs += [ "//build/config/gcc:symbol_visibility_hidden" ]
 }
 
 if (is_android) {
@@ -487,14 +481,6 @@ if (is_win) {
   # if needed.
   default_executable_configs += [ "//build/config/win:cfi_linker" ]
 }
-if (is_fuchsia) {
-  # Sometimes executables are linked by rustc passing a command line to
-  # clang++. It includes "-pie" which is pointless on Fuchsia. Suppress the
-  # resulting (fatal) warning. Unfortunately there's no way to do this only
-  # for binaries linked by rustc; gn does not make the distinction.
-  default_executable_configs +=
-      [ "//build/config/fuchsia:rustc_no_pie_warning" ]
-}
 
 set_defaults("executable") {
   configs = default_executable_configs
@@ -514,14 +500,6 @@ if (is_android) {
   # want this can remove this config.
   default_shared_library_configs +=
       [ "//build/config/android:hide_all_but_jni_onload" ]
-}
-if (is_fuchsia) {
-  # Sometimes shared libraries are linked by rustc passing a command line to
-  # clang++. It includes "-pie" which is pointless on Fuchsia. Suppress the
-  # resulting (fatal) warning. Unfortunately there's no way to do this only
-  # for binaries linked by rustc; gn does not make the distinction.
-  default_shared_library_configs +=
-      [ "//build/config/fuchsia:rustc_no_pie_warning" ]
 }
 set_defaults("shared_library") {
   configs = default_shared_library_configs

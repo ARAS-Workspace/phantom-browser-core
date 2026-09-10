@@ -253,13 +253,5 @@ if (enable_message_center) {
         "//ui/views:test_support",
       ]
     }
-
-    if (is_fuchsia) {
-      additional_manifest_fragments = [
-        "//build/config/fuchsia/test/fonts.shard.test-cml",
-        "//build/config/fuchsia/test/present_view.shard.test-cml",
-        "//third_party/fuchsia-sdk/sdk/pkg/vulkan/client.shard.cml",
-      ]
-    }
   }
 }

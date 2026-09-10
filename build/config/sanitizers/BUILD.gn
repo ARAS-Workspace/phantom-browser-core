@@ -42,17 +42,15 @@ group("deps") {
       # to add the ldflags here as well as in default_sanitizer_flags.
       ":default_sanitizer_ldflags",
     ]
-    if (!is_fuchsia) {
-      if (is_win) {
-        exe = ".exe"
-      } else {
-        exe = ""
-      }
-      data += [
-        "//tools/valgrind/asan/",
-        "$clang_base_path/bin/llvm-symbolizer${exe}",
-      ]
+    if (is_win) {
+      exe = ".exe"
+    } else {
+      exe = ""
     }
+    data += [
+      "//tools/valgrind/asan/",
+      "$clang_base_path/bin/llvm-symbolizer${exe}",
+    ]
     if (is_asan || is_lsan || is_msan || is_tsan || is_ubsan_any) {
       public_configs += [ ":sanitizer_options_link_helper" ]
       deps += [ ":options_sources" ]
@@ -236,7 +234,7 @@ if (use_dlcloseshim) {
 # Applies linker flags necessary when either :deps or :default_sanitizer_flags
 # are used.
 config("default_sanitizer_ldflags") {
-  if (is_posix || is_fuchsia) {
+  if (is_posix) {
     sanitizers = []  # sanitizers applicable to both clang and rustc
     ldflags = []
     rustflags = []
@@ -376,7 +374,7 @@ config("asan_flags") {
     cflags += [ "-fsanitize=address" ]
 
     rustflags += [ "-Zsanitizer=address" ]
-    if (!is_win && !is_apple && !is_fuchsia) {
+    if (!is_win && !is_apple) {
       # TODO(crbug.com/1459233, crbug.com/1462248): This causes asan
       # odr-violation errors in rust code, and link failures for cros/asan.
       # Clang recently turned it on by default for all ELF targets (it was

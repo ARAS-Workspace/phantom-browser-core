@@ -14,7 +14,7 @@ static_library("browser") {
     "//components/upload_list",
   ]
 
-  if (!is_chromeos && !is_fuchsia) {
+  if (!is_chromeos) {
     sources += [
       "crash_upload_list_crashpad.cc",
       "crash_upload_list_crashpad.h",

@@ -165,13 +165,6 @@ test("services_unittests") {
     ]
   }
 
-  if (is_fuchsia) {
-    additional_manifest_fragments = [
-      "//build/config/fuchsia/test/mark_vmo_executable.shard.test-cml",
-      "//build/config/fuchsia/test/network.shard.test-cml",
-    ]
-  }
-
   if (enable_screen_ai_service) {
     deps += [ "//services/screen_ai:unit_tests" ]
   }

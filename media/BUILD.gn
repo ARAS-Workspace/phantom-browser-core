@@ -242,25 +242,6 @@ test("media_unittests") {
     ]
   }
 
-  if (is_fuchsia) {
-    deps += [ "//media/fuchsia/video:unittests" ]
-
-    # PaintCanvasVideoRendererWithGLTest.* uses SwiftShader, which generates
-    # machine code.
-    test_runner_shard = "//build/config/fuchsia/test/elf_test_ambient_exec_runner.shard.test-cml"
-
-    additional_manifest_fragments = [
-      "//build/config/fuchsia/test/audio_output.shard.test-cml",
-      "//build/config/fuchsia/test/mark_vmo_executable.shard.test-cml",
-      "//build/config/fuchsia/test/platform_video_codecs.shard.test-cml",
-      "//third_party/fuchsia-sdk/sdk/pkg/vulkan/client.shard.cml",
-    ]
-
-    if (enable_library_cdms) {
-      excluded_files = [ "lib.unstripped/libclearkeycdm.so" ]
-    }
-  }
-
   if (enable_media_remoting) {
     deps += [ "//media/remoting:media_remoting_tests" ]
   }

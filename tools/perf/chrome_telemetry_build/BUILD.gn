@@ -9,7 +9,7 @@ if (is_android) {
   import("//build/config/android/config.gni")
   import("//tools/perf/chrome_telemetry_build/android_browser_types.gni")
 }
-is_remote_platform = is_android || is_fuchsia || is_chromeos
+is_remote_platform = is_android || is_chromeos
 if (is_remote_platform) {
   import("//build/symlink.gni")
 }
@@ -48,7 +48,7 @@ group("telemetry_chrome_test") {
     data_deps += [ "//third_party/perfetto/src/trace_processor:trace_processor_shell($default_toolchain)" ]
   }
 
-  if (!is_fuchsia && !is_android && !is_ios) {
+  if (!is_android && !is_ios) {
     data_deps += [ "//chrome" ]
   }
 
@@ -190,7 +190,7 @@ group("telemetry_chrome_test_without_chrome") {
   ]
 
   # Cr-Fuchsia doesn't support breakpad.
-  if (!is_win && !is_fuchsia) {
+  if (!is_win) {
     data_deps += [
       # This is defined for Windows, but is unused by Telemetry on
       # Windows, and including it can have issues when cross-compiling
@@ -237,7 +237,7 @@ group("telemetry_chrome_test_without_chrome") {
       "//build/android:devil_chromium_py",
       "//build/android:stack_tools",
     ]
-  } else if (!is_fuchsia) {
+  } else {
     data_deps += [ "//third_party/catapult/telemetry:bitmaptools" ]
   }
 }

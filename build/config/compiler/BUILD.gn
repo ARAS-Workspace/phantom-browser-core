@@ -213,9 +213,9 @@ declare_args() {
 
 declare_args() {
   # Set to true to use icf, Identical Code Folding.
-  use_icf = (is_posix || is_fuchsia) && !is_debug && !using_sanitizer &&
-            !use_clang_coverage && !(is_android && use_order_profiling) &&
-            (use_lld || use_mold) && !is_wasm
+  use_icf =
+      is_posix && !is_debug && !using_sanitizer && !use_clang_coverage &&
+      !(is_android && use_order_profiling) && (use_lld || use_mold) && !is_wasm
 }
 
 if (is_android) {
@@ -308,7 +308,7 @@ config("default_include_dirs") {
 # time and -Wl,-z,defs can safely remain enabled to catch missing symbols.
 config("no_unresolved_symbols") {
   if ((!using_sanitizer || is_android) &&
-      (is_linux || is_chromeos || is_android || is_fuchsia)) {
+      (is_linux || is_chromeos || is_android)) {
     ldflags = [
       "-Wl,-z,defs",
       "-Wl,--as-needed",
@@ -354,8 +354,6 @@ config("compiler") {
     configs += [ "//build/config/mac:compiler" ]
   } else if (is_ios) {
     configs += [ "//build/config/ios:compiler" ]
-  } else if (is_fuchsia) {
-    configs += [ "//build/config/fuchsia:compiler" ]
   } else if (current_os == "aix") {
     configs += [ "//build/config/aix:compiler" ]
   } else if (current_os == "zos") {
@@ -461,7 +459,7 @@ config("compiler") {
         }
       } else if (is_chromeos) {
         cflags += [ "-fstack-protector-strong" ]
-      } else if (is_posix || is_fuchsia) {
+      } else if (is_posix) {
         if (current_os != "aix") {
           # Not available on aix.
           cflags += [ "-fstack-protector" ]
@@ -472,7 +470,7 @@ config("compiler") {
 
   # Non-Apple Posix and Fuchsia compiler flags setup.
   # -----------------------------------
-  if ((is_posix && !is_apple) || is_fuchsia) {
+  if (is_posix && !is_apple) {
     if (enable_profiling) {
       if (!is_debug) {
         cflags += [ "-g" ]
@@ -537,7 +535,7 @@ config("compiler") {
 
   # Linux/Android/Fuchsia common flags setup.
   # ---------------------------------
-  if (is_linux || is_chromeos || is_android || is_fuchsia) {
+  if (is_linux || is_chromeos || is_android) {
     asmflags += [ "-fPIC" ]
     cflags += [ "-fPIC" ]
     ldflags += [ "-fPIC" ]
@@ -568,7 +566,7 @@ config("compiler") {
     cflags_cc += [ "-D__google_stl_debug_vector=1" ]
   }
 
-  if (is_chromeos || is_fuchsia) {
+  if (is_chromeos) {
     # Use -fdebug-types-section to avoid out-of-range relocations
     # (crbug.com/1050819). When using ThinLTO, pass the equivalent
     # to the code generator.
@@ -733,7 +731,7 @@ config("compiler") {
   }
 
   # Fuchsia enables this by default.
-  if (use_relative_vtables_abi && !is_fuchsia) {
+  if (use_relative_vtables_abi) {
     cflags_cc += [ "-fexperimental-relative-c++-abi-vtables" ]
   }
 
@@ -963,7 +961,7 @@ config("compiler") {
   # Assign any flags set for the C compiler to asmflags so that they are sent
   # to the assembler. The Windows assembler takes different types of flags
   # so only do so for posix platforms.
-  if (is_posix || is_fuchsia) {
+  if (is_posix) {
     asmflags += cflags
     asmflags += cflags_c
   }
@@ -1078,7 +1076,7 @@ config("linker") {
     }
   }
 
-  if ((is_posix && !is_apple) || is_fuchsia) {
+  if (is_posix && !is_apple) {
     # Explicitly pass --build-id to ld. Compilers used to always pass this
     # implicitly but don't any more (in particular clang when built without
     # ENABLE_LINKER_BUILD_ID=ON).
@@ -1096,7 +1094,7 @@ config("linker") {
     }
   }
 
-  if (is_linux || is_chromeos || is_android || is_fuchsia) {
+  if (is_linux || is_chromeos || is_android) {
     ldflags += [
       "-Wl,-z,noexecstack",
       "-Wl,-z,relro",
@@ -1707,7 +1705,7 @@ config("runtime_library") {
 
   # TODO(crbug.com/40570904): Come up with a better name for is POSIX + Fuchsia
   # configuration.
-  if (is_posix || is_fuchsia) {
+  if (is_posix) {
     configs += [ "//build/config/posix:runtime_library" ]
 
     if (use_custom_libunwind) {
@@ -1978,16 +1976,6 @@ config("default_warnings") {
       # TODO(thakis): https://crbug.com/617318
       # Currently RBE can not handle case sensitiveness for windows well.
       cflags += [ "-Wno-nonportable-include-path" ]
-    }
-
-    if (is_fuchsia) {
-      cflags_cc += [
-        # TODO(crbug.com/42050603): fix and reenable
-        "-Wno-missing-field-initializers",
-
-        # TODO(crbug.com/522780099): fix and reenable
-        "-Wno-deprecated-builtins",
-      ]
     }
 
     if (is_component_build && use_clang_warning_suppression_file) {
@@ -2352,7 +2340,7 @@ config("thin_archive") {
       "-T",
       "-s",
     ]
-  } else if ((is_posix && (!is_apple || (use_lld || use_mold))) || is_fuchsia) {
+  } else if (is_posix && (!is_apple || use_lld || use_mold)) {
     # The macOS and iOS default linker ld64 does not support reading thin
     # archives.
     arflags = [
@@ -2619,11 +2607,7 @@ config("optimize") {
     # -Os in clang is more of a size-conscious -O2 than "size at any cost"
     # (AKA -Oz).
 
-    if (is_fuchsia) {
-      cflags = [ "-Oz" ] + common_optimize_on_cflags
-    } else {
-      cflags = [ "-Os" ] + common_optimize_on_cflags
-    }
+    cflags = [ "-Os" ] + common_optimize_on_cflags
 
     if (is_clang && use_ml_inliner && is_a_target_toolchain && !is_chromeos &&
         !is_high_end_android) {
@@ -2672,10 +2656,6 @@ config("no_optimize") {
     # installation, and for fat binaries, can lead to signing failure
     # https://crbug.com/402645059
     ldflags = [ "-Wl,--gc-sections" ]
-  } else if (is_fuchsia) {
-    # On Fuchsia, we optimize for size here to reduce the size of debug build
-    # packages so they can be run in a KVM. See crbug.com/910243 for details.
-    cflags = [ "-Og" ]
   } else {
     cflags = [ "-O0" ]
     ldflags = []

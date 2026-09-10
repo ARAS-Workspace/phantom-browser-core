@@ -36,10 +36,6 @@ declare_args() {
   enable_check_elision_warning = false
 }
 
-assert(!(build_allocation_stack_trace_recorder && is_fuchsia),
-       "Stack trace recording is not supported on Fuchsia due to missing" +
-           " Crashpad!")
-
 assert(!(build_allocation_stack_trace_recorder && is_linux),
        "WARNING: Stack trace recording is not supported on Linux due to" +
            " performance issues computing stack trace!")

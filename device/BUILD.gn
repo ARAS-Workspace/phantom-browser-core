@@ -115,13 +115,6 @@ test("device_unittests") {
     ]
   }
 
-  if (is_fuchsia) {
-    sources += [
-      "bluetooth/test/bluetooth_test_fuchsia.cc",
-      "bluetooth/test/bluetooth_test_fuchsia.h",
-    ]
-  }
-
   deps = [
     "//base",
     "//base/test:test_support",
@@ -458,7 +451,7 @@ test("device_unittests") {
 
   # Some gamepad tests require the HID service. Only build these tests on
   # platforms where the HID service is enabled.
-  if (!is_android && !is_fuchsia && !is_ios) {
+  if (!is_android && !is_ios) {
     sources += [ "gamepad/nintendo_data_fetcher_unittest.cc" ]
 
     deps += [

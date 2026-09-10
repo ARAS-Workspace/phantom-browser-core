@@ -278,7 +278,7 @@ declare_args() {
   # Everything is IPC on Fuchsia, so this workaround for code coverage inside
   # the sandbox does not apply.
   use_clang_profiling_inside_sandbox =
-      use_clang_profiling && !use_fuzzing_engine && !is_fuchsia
+      use_clang_profiling && !use_fuzzing_engine
 
   # These are set for some non-host toolchains which require running a binary
   # built for the host toolchain with MSan in a non-host toolchain context.

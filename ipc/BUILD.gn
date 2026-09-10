@@ -84,7 +84,7 @@ component("message_support") {
     ]
   }
 
-  if (is_posix || is_fuchsia) {
+  if (is_posix) {
     sources += [
       "ipc_platform_file_attachment_posix.cc",
       "ipc_platform_file_attachment_posix.h",
@@ -97,13 +97,6 @@ component("message_support") {
       "mach_port_attachment_mac.h",
       "mach_port_mac.cc",
       "mach_port_mac.h",
-    ]
-  }
-
-  if (is_fuchsia) {
-    sources += [
-      "handle_attachment_fuchsia.cc",
-      "handle_attachment_fuchsia.h",
     ]
   }
 
@@ -209,7 +202,7 @@ if (use_blink) {
       "param_traits_utils_unittest.cc",
     ]
 
-    if (is_posix || is_fuchsia) {
+    if (is_posix) {
       sources += [ "ipc_message_attachment_set_posix_unittest.cc" ]
     }
 

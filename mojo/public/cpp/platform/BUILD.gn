@@ -59,15 +59,8 @@ component("platform") {
     deps += [ "//net" ]
   }
 
-  if (is_fuchsia) {
-    public_deps += [
-      "//third_party/fuchsia-sdk/sdk/pkg/fdio",
-      "//third_party/fuchsia-sdk/sdk/pkg/zx",
-    ]
-  } else {
-    sources += [ "named_platform_channel.cc" ]
-    public += [ "named_platform_channel.h" ]
-  }
+  sources += [ "named_platform_channel.cc" ]
+  public += [ "named_platform_channel.h" ]
 
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 

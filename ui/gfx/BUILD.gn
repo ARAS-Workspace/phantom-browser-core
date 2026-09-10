@@ -398,14 +398,14 @@ component("gfx") {
     public_deps += [ "//cc/paint" ]
     deps += [ "//third_party/harfbuzz" ]
 
-    if (is_android || is_fuchsia || is_ios) {
+    if (is_android || is_ios) {
       sources += [
         "font_fallback_skia.cc",
         "font_render_params_skia.cc",
       ]
     }
 
-    if (is_android || is_fuchsia || is_win || is_apple) {
+    if (is_android || is_win || is_apple) {
       sources += [
         "font_fallback_skia_impl.cc",
         "font_fallback_skia_impl.h",
@@ -884,7 +884,7 @@ test("gfx_unittests") {
     sources += [ "system_fonts_win_unittest.cc" ]
   }
 
-  if (is_linux || is_chromeos || is_android || is_fuchsia || is_win) {
+  if (is_linux || is_chromeos || is_android || is_win) {
     sources += [ "platform_font_skia_unittest.cc" ]
   }
 
@@ -924,7 +924,7 @@ test("gfx_unittests") {
     deps += [ "//ui/gfx:codec_tests_bundle_data" ]
   }
 
-  if (is_android || is_fuchsia) {
+  if (is_android) {
     sources += [ "font_fallback_skia_unittest.cc" ]
   }
 
@@ -986,12 +986,6 @@ test("gfx_unittests") {
       "//components/viz/common/resources:shared_image_format",
       "//third_party/fontconfig",
     ]
-  }
-
-  if (is_fuchsia) {
-    deps += [ "//skia:test_fonts" ]
-    additional_manifest_fragments =
-        [ "//build/config/fuchsia/test/test_fonts.shard.test-cml" ]
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and

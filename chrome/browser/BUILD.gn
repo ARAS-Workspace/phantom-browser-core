@@ -56,8 +56,6 @@ if (is_win) {
   import("//build/config/win/manifest.gni")
 }
 
-assert(!is_fuchsia, "Fuchsia shouldn't use anything in //chrome")
-
 declare_args() {
   # You can set the variable 'use_official_enterprise_connectors_api_keys' to
   # true to use the Google-internal file containing official API keys

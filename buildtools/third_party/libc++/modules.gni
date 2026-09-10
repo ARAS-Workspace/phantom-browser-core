@@ -167,9 +167,6 @@ template("sysroot_modulemap") {
                                    root_build_dir))
   } else {
     include_dir = "${sysroot}/usr/include"
-    if (is_fuchsia) {
-      include_dir = "${sysroot}/include"
-    }
 
     # This must be relative to the directory the modulemap is contained within.
     content =

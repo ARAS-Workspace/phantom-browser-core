@@ -22,5 +22,5 @@ declare_args() {
   # This should be kept in sync with the value of `enable_pdf` in
   # //pdf/features.gni, but for layering reasons,
   # we can't import pdf's features.gni here.
-  enable_freetype = !is_android && !is_ios && !is_fuchsia
+  enable_freetype = !is_android && !is_ios
 }

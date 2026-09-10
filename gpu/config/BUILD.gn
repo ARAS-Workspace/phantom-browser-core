@@ -49,8 +49,6 @@ action("process_json") {
     args += [ "android" ]
   } else if (is_chromeos) {
     args += [ "chromeos" ]
-  } else if (is_fuchsia) {
-    args += [ "fuchsia" ]
   } else {
     args += [ "linux" ]
   }
@@ -123,10 +121,6 @@ component("config") {
     "webgpu_blocklist_impl.h",
   ]
 
-  if (is_fuchsia) {
-    sources += [ "gpu_info_collector_fuchsia.cc" ]
-  }
-
   sources += process_json_outputs
 
   defines = [ "GPU_CONFIG_IMPLEMENTATION" ]
@@ -198,7 +192,7 @@ component("config") {
   if (is_linux || is_chromeos) {
     sources += [ "gpu_info_collector_linux.cc" ]
   }
-  if (is_linux || is_chromeos || is_apple || is_fuchsia || is_android) {
+  if (is_linux || is_chromeos || is_apple || is_android) {
     deps += [ "//third_party/angle:angle_gpu_info_util" ]
   }
   if (use_ozone) {

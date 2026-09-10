@@ -5,8 +5,6 @@
 import("//chrome/common/features.gni")
 import("//components/safe_browsing/buildflags.gni")
 
-assert(!is_fuchsia, "Fuchsia shouldn't use anything in //chrome")
-
 if (safe_browsing_mode != 0) {
   source_set("archive_analyzer_results") {
     sources = [

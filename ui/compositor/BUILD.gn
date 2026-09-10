@@ -93,7 +93,7 @@ component("compositor") {
     ]
   }
 
-  if (is_linux || is_fuchsia) {
+  if (is_linux) {
     sources += [
       "external_begin_frame_adapter.cc",
       "external_begin_frame_adapter.h",
@@ -135,7 +135,7 @@ component("compositor") {
     deps += [ "//ui/resources" ]
   }
 
-  if (is_linux || is_fuchsia) {
+  if (is_linux) {
     deps += [ "//ui/platform_window" ]
   }
 }
@@ -299,20 +299,6 @@ test("compositor_unittests") {
     sources += [
       "animation_throughput_reporter_unittest.cc",
       "total_animation_throughput_reporter_unittest.cc",
-    ]
-  }
-
-  if (is_fuchsia) {
-    # TODO(crbug.com/42050042): Some of these tests use SwiftShader,
-    # which requires ambient VMEX.
-    test_runner_shard = "//build/config/fuchsia/test/elf_test_ambient_exec_runner.shard.test-cml"
-
-    additional_manifest_fragments = [
-      # TODO(crbug.com/40055105): Investigate removing the requirement
-      # for VmexResource.
-      "//build/config/fuchsia/test/mark_vmo_executable.shard.test-cml",
-      "//build/config/fuchsia/test/present_view.shard.test-cml",
-      "//third_party/fuchsia-sdk/sdk/pkg/vulkan/client.shard.cml",
     ]
   }
 

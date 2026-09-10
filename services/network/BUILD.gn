@@ -351,9 +351,7 @@ component("network_service") {
     ]
   }
 
-  if (!is_fuchsia) {
-    sources += [ "pervasive_resources/shared_resource_checker_patterns.h" ]
-  }
+  sources += [ "pervasive_resources/shared_resource_checker_patterns.h" ]
 
   configs += [ "//build/config/compiler:wexit_time_destructors" ]
 
@@ -607,9 +605,7 @@ source_set("tests") {
     ]
   }
 
-  if (!is_fuchsia) {
-    sources += [ "pervasive_resources/shared_resource_checker_unittest.cc" ]
-  }
+  sources += [ "pervasive_resources/shared_resource_checker_unittest.cc" ]
 
   deps = [
     ":network_service",

@@ -104,7 +104,7 @@ component("ax_base") {
     "ax_updates_and_events.h",
   ]
 
-  if (!is_chromeos && !is_fuchsia) {
+  if (!is_chromeos) {
     sources += [
       "ax_enum_localization_util.cc",
       "ax_enum_localization_util.h",
@@ -229,10 +229,6 @@ component("accessibility_internal") {
     ":ax_base",
     "//skia",
   ]
-
-  if (is_fuchsia) {
-    public_deps += [ "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.accessibility.semantics:fuchsia.accessibility.semantics_cpp" ]
-  }
 
   if (use_aura) {
     sources += [
@@ -385,33 +381,6 @@ test("accessibility_unittests") {
     ]
     public_deps = [ "//gin" ]
     configs += [ "//v8:external_startup_data" ]
-
-    if (is_fuchsia) {
-      additional_manifest_fragments = [
-        # TODO(crbug.com/40055105): Investigate removing the requirement
-        # for VmexResource.
-        "//build/config/fuchsia/test/mark_vmo_executable.shard.test-cml",
-        "//build/config/fuchsia/test/network.shard.test-cml",
-        "//third_party/fuchsia-sdk/sdk/pkg/vulkan/client.shard.cml",
-      ]
-    }
-  }
-
-  if (is_fuchsia) {
-    sources += [
-      "platform/fuchsia/accessibility_bridge_fuchsia_unittest.cc",
-      "platform/fuchsia/browser_accessibility_fuchsia_unittest.cc",
-      "platform/fuchsia/browser_accessibility_manager_fuchsia_unittest.cc",
-      "platform/fuchsia/semantic_provider_unittest.cc",
-    ]
-
-    deps += [
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.accessibility.semantics:fuchsia.accessibility.semantics_cpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.math:fuchsia.math_hlcpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.ui.views:fuchsia.ui.views_cpp_hlcpp_conversion",
-      "//third_party/fuchsia-sdk/sdk/pkg/inspect",
-      "//third_party/fuchsia-sdk/sdk/pkg/sys_cpp",
-    ]
   }
 
   if (has_native_accessibility) {

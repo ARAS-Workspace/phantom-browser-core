@@ -260,9 +260,4 @@ test("gin_unittests") {
   if (is_android) {
     deps += [ ":v8_snapshot_assets" ]
   }
-
-  if (is_fuchsia) {
-    additional_manifest_fragments =
-        [ "//build/config/fuchsia/test/mark_vmo_executable.shard.test-cml" ]
-  }
 }

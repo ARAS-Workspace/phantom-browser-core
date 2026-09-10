@@ -31,10 +31,6 @@ component("memory_instrumentation") {
     sources += [ "os_metrics_linux.cc" ]
   }
 
-  if (is_fuchsia) {
-    sources += [ "os_metrics_fuchsia.cc" ]
-  }
-
   defines = [ "IS_RESOURCE_COORDINATOR_PUBLIC_MEMORY_INSTRUMENTATION_IMPL" ]
 
   deps = []

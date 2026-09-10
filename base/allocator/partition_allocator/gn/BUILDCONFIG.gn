@@ -58,7 +58,7 @@ is_cronet_build = false
 enable_expensive_dchecks = false
 dcheck_is_configurable = false
 can_unwind_with_frame_pointers = false
-is_posix = !is_win && !is_fuchsia
+is_posix = !is_win
 is_apple = is_mac || is_ios
 
 # TODO(crbug.com/41481467): Consider expanding the standalone configuration for

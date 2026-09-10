@@ -25,7 +25,6 @@ source_set("filters") {
   # should be using //media and not directly DEP this roll-up target.
   visibility = [
     "//media",
-    "//media/fuchsia/audio",
     "//media/renderers",
   ]
 

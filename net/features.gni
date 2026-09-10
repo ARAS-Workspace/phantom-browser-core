@@ -19,7 +19,7 @@ declare_args() {
   # and Chromecast, at least for now. This feature needs configuration
   # (krb5.conf and so on).
   # TODO(fuchsia): Enable kerberos on Fuchsia when it's implemented there.
-  use_kerberos = !is_ios && !is_fuchsia
+  use_kerberos = !is_ios
 
   # Do not disable brotli filter by default.
   disable_brotli_filter = false
@@ -29,7 +29,7 @@ declare_args() {
   disable_zstd_filter = false
 
   # Multicast DNS. Enabled on desktop Android for the chrome.mdns extension API.
-  enable_mdns = is_win || is_linux || is_chromeos || is_fuchsia || is_apple ||
+  enable_mdns = is_win || is_linux || is_chromeos || is_apple ||
                 enable_desktop_android_extensions
 
   # Reporting not used on iOS.

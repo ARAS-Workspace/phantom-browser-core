@@ -13,8 +13,6 @@ import("//pdf/features.gni")
 import("//printing/buildflags/buildflags.gni")
 import("//services/screen_ai/buildflags/features.gni")
 
-assert(!is_fuchsia, "Fuchsia shouldn't use anything in //chrome")
-
 static_library("utility") {
   sources = [
     "chrome_content_utility_client.cc",

@@ -215,21 +215,6 @@ component("services") {
       "//services/viz/public/cpp/gpu",
     ]
   }
-
-  if (is_fuchsia) {
-    sources += [
-      "fuchsia_cdm_manager.cc",
-      "fuchsia_cdm_manager.h",
-      "fuchsia_cdm_provisioning_fetcher_impl.cc",
-      "fuchsia_cdm_provisioning_fetcher_impl.h",
-    ]
-
-    public_deps += [ "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.media.drm:fuchsia.media.drm_hlcpp" ]
-    deps += [
-      "//crypto",
-      "//third_party/fuchsia-sdk/sdk/pkg/fit-promise",
-    ]
-  }
 }
 
 source_set("test_support") {
@@ -326,15 +311,6 @@ source_set("unit_tests") {
   if (allow_hosting_oop_video_decoder) {
     sources += [ "oop_video_decoder_service_unittest.cc" ]
     deps += [ "//gpu:test_support" ]
-  }
-
-  if (is_fuchsia) {
-    sources += [
-      "fuchsia_cdm_manager_unittest.cc",
-      "fuchsia_cdm_provisioning_fetcher_impl_unittest.cc",
-    ]
-
-    deps += [ "//third_party/fuchsia-sdk/sdk/pkg/fit-promise" ]
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and

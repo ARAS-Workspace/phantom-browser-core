@@ -107,15 +107,6 @@ group("testing_pytype") {
   data_deps = [ ":pytype_dependencies" ]
 }
 
-group("fuchsia_pytype") {
-  testonly = true
-  data = [
-    "//build/fuchsia/test/",
-    "//build/util/lib/common/",
-  ]
-  data_deps = [ ":pytype_dependencies" ]
-}
-
 python_library("run_isolated_script_test") {
   testonly = true
   pydeps_file = "//testing/scripts/run_isolated_script_test.pydeps"

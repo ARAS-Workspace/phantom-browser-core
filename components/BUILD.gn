@@ -104,7 +104,7 @@ disallowed_extension_deps_ = [
 test("components_unittests") {
   use_xvfb = use_xvfb_in_this_config
 
-  if (is_android || is_linux || is_chromeos || is_mac || is_win || is_fuchsia) {
+  if (is_android || is_linux || is_chromeos || is_mac || is_win) {
     # Ideally these would be added to the specific :unit_tests targets they are
     # relevant for. Please try to do this rather than add to this list.
     data = [
@@ -160,19 +160,6 @@ test("components_unittests") {
       "test/data/web_package/",
       "test/data/webp_transcode/",
       "test/data/web_view/",
-    ]
-  }
-
-  if (is_fuchsia) {
-    additional_manifest_fragments = [
-      "//build/config/fuchsia/test/fonts.shard.test-cml",
-
-      # TODO(crbug.com/40055105): Investigate removing the requirement
-      # for VmexResource.
-      "//build/config/fuchsia/test/mark_vmo_executable.shard.test-cml",
-      "//build/config/fuchsia/test/network.shard.test-cml",
-      "//build/config/fuchsia/test/present_view.shard.test-cml",
-      "//third_party/fuchsia-sdk/sdk/pkg/vulkan/client.shard.cml",
     ]
   }
 
@@ -446,27 +433,20 @@ test("components_unittests") {
     deps += [ "//components/ui_devtools/views:unit_tests" ]
   }
 
-  if (is_fuchsia) {
-    deps += [
-      "//components/fuchsia_component_support:unit_tests",
-      "//components/fuchsia_legacymetrics:unit_tests",
-    ]
-  } else {
-    # TODO(crbug.com/40818181): Enable all relevant tests on Fuchsia too.
-    deps += [
-      "//components/browser_sync:unit_tests",
-      "//components/enterprise:unit_tests",
-      "//components/enterprise/common:unit_tests",
-      "//components/enterprise/connectors/core:unit_tests",
-      "//components/enterprise/data_protection:unit_tests",
-      "//components/enterprise/isolated_mode:unit_tests",
-      "//components/enterprise/obfuscation/core:unit_tests",
-      "//components/send_tab_to_self:unit_tests",
-      "//components/sync_sessions:unit_tests",
-      "//components/update_client:unit_tests",
-      "//components/visited_url_ranking/internal:unit_tests",
-    ]
-  }
+  # TODO(crbug.com/40818181): Enable all relevant tests on Fuchsia too.
+  deps += [
+    "//components/browser_sync:unit_tests",
+    "//components/enterprise:unit_tests",
+    "//components/enterprise/common:unit_tests",
+    "//components/enterprise/connectors/core:unit_tests",
+    "//components/enterprise/data_protection:unit_tests",
+    "//components/enterprise/isolated_mode:unit_tests",
+    "//components/enterprise/obfuscation/core:unit_tests",
+    "//components/send_tab_to_self:unit_tests",
+    "//components/sync_sessions:unit_tests",
+    "//components/update_client:unit_tests",
+    "//components/visited_url_ranking/internal:unit_tests",
+  ]
 
   if (enterprise_cloud_content_analysis || is_android) {
     deps += [ "//components/enterprise/connectors/core:cloud_content_scanning_unit_tests" ]
@@ -663,15 +643,13 @@ test("components_unittests") {
       "//components/user_education/webui:unit_tests",
     ]
 
-    if (!is_fuchsia) {  #!iOS and!Fuchsia
-      deps += [
-        "//components/crash/content/browser:unit_tests",
-        "//components/crash/core/app:unit_tests",
-        "//components/enterprise/content:unit_tests",
-        "//components/history_embeddings/content:unit_tests",
-        "//components/page_content_annotations/content:unit_tests",
-      ]
-    }
+    deps += [
+      "//components/crash/content/browser:unit_tests",
+      "//components/crash/core/app:unit_tests",
+      "//components/enterprise/content:unit_tests",
+      "//components/history_embeddings/content:unit_tests",
+      "//components/page_content_annotations/content:unit_tests",
+    ]
 
     data_deps += [
       ":components_tests_pak",
@@ -793,11 +771,9 @@ test("components_unittests") {
     ]
   }
 
-  if (!is_fuchsia) {
-    deps += [ "//components/private_ai:unit_tests" ]
-  }
+  deps += [ "//components/private_ai:unit_tests" ]
 
-  if (!is_android && !is_ios && !is_fuchsia) {
+  if (!is_android && !is_ios) {
     deps += [
       "//components/accessibility_annotator/content/content_annotator:unit_tests",
       "//components/accessibility_annotator/content/live_tab_context:unit_tests",
@@ -1354,15 +1330,6 @@ if (use_blink) {
     assert_no_deps = [ "//chrome/*" ]
     assert_no_deps += disallowed_extension_deps_
 
-    if (is_fuchsia) {
-      additional_manifest_fragments = [
-        "//build/config/fuchsia/test/present_view.shard.test-cml",
-        "//build/config/fuchsia/test/fonts.shard.test-cml",
-        "//build/config/fuchsia/test/mark_vmo_executable.shard.test-cml",
-        "//build/config/fuchsia/test/network.shard.test-cml",
-      ]
-    }
-
     # This test won't work as-is on POSIX platforms, where fork()+exec() is
     # used to launch child processes, failure does not happen until exec().
     # See also ServiceProcessLauncherTest.FailToLaunchProcess and
@@ -1454,9 +1421,7 @@ if (use_blink) {
       ]
     }
 
-    if (!is_fuchsia) {
-      deps += [ "//components/persistent_cache:perf_tests" ]
-    }
+    deps += [ "//components/persistent_cache:perf_tests" ]
 
     # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
     # enable the diagnostic by removing this line.

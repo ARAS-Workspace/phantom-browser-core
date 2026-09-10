@@ -6,5 +6,5 @@ import("//pdf/features.gni")
 
 declare_args() {
   # Enable PDF translation.
-  enable_pdf_translation = enable_pdf && !(is_android || is_ios || is_fuchsia)
+  enable_pdf_translation = enable_pdf && !(is_android || is_ios)
 }

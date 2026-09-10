@@ -5,7 +5,7 @@
 import("//build/config/sysroot.gni")
 
 # This build configuration is used by both Fuchsia and POSIX systems.
-assert(is_posix || is_fuchsia)
+assert(is_posix)
 
 group("posix") {
   visibility = [ "//:optimize_gn_gen" ]

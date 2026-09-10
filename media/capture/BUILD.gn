@@ -58,7 +58,6 @@ source_set("capture_device_specific") {
     "//media/capture/video/android",
     "//media/capture/video/apple",
     "//media/capture/video/chromeos",
-    "//media/capture/video/fuchsia",
     "//media/capture/video/ios",
     "//media/capture/video/linux",
     "//media/capture/video/mac",
@@ -201,10 +200,6 @@ component("capture_lib") {
     public_deps += [ "video/chromeos" ]
     data_deps = [ "video/chromeos:mojo_policies" ]
   }
-
-  if (is_fuchsia) {
-    deps += [ "video/fuchsia" ]
-  }
 }
 
 source_set("capture_gpu_channel") {
@@ -315,12 +310,6 @@ test("capture_unittests") {
       "//media/capture/video/android",
       "//media/capture/video/android:capture_java",
     ]
-  }
-
-  if (is_fuchsia) {
-    deps += [ "video/fuchsia:unit_tests" ]
-    additional_manifest_fragments =
-        [ "//build/config/fuchsia/test/sysmem.shard.test-cml" ]
   }
 
   if (is_apple) {

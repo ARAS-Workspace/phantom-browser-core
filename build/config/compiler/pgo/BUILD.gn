@@ -91,12 +91,6 @@ config("pgo_optimization_flags") {
       } else {
         _pgo_target = "android-arm32"
       }
-    } else if (is_fuchsia) {
-      if (target_cpu == "arm64") {
-        _pgo_target = "mac-arm"
-      } else {
-        _pgo_target = "mac"
-      }
     } else if (is_ios && use_blink) {
       if (target_cpu == "arm64") {
         _pgo_target = "mac-arm"
@@ -173,7 +167,7 @@ config("pgo_optimization_flags") {
     ]
 
     # TODO(crbug.com/383537825): Try enabling on all platforms.
-    if (is_android || is_fuchsia) {
+    if (is_android) {
       cflags += [
         "-mllvm",
         "-pgo-cold-func-opt=minsize",

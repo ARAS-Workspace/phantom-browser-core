@@ -153,11 +153,6 @@ if (toolchain_has_rust) {
         "Security.framework",
         "Foundation.framework",
       ]
-    } else if (is_fuchsia) {
-      libs = [
-        "zircon",
-        "fdio",
-      ]
     }
   }
 

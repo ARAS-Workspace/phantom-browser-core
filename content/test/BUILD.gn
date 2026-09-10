@@ -679,14 +679,12 @@ static_library("test_support") {
       "../public/test/mock_captured_surface_controller.h",
     ]
 
-    if (!is_fuchsia) {
-      sources += [
-        "../browser/speech/fake_speech_recognition_manager_delegate.cc",
-        "../browser/speech/fake_speech_recognition_manager_delegate.h",
-      ]
-      deps += [ "//components/soda" ]
-      public_deps += [ "//components/soda:test_support" ]
-    }
+    sources += [
+      "../browser/speech/fake_speech_recognition_manager_delegate.cc",
+      "../browser/speech/fake_speech_recognition_manager_delegate.h",
+    ]
+    deps += [ "//components/soda" ]
+    public_deps += [ "//components/soda:test_support" ]
 
     if (is_win) {
       sources += [
@@ -848,10 +846,6 @@ static_library("test_support") {
     ]
   }
 
-  if (is_fuchsia) {
-    public_deps += [ "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.mediacodec:fuchsia.mediacodec_hlcpp" ]
-  }
-
   if (use_dbus) {
     deps += [ "//components/dbus" ]
   }
@@ -863,36 +857,6 @@ static_library("test_support") {
 
 # Fuchsia performance tests on smart displays use web_engine and a browser
 # like shell instead of an actual browser, so Fuchsia needs a separate target.
-if (is_fuchsia) {
-  # TODO(crbug.com/40830160): Split this test suite into chrome/WebEngine
-  # versions.
-  # TODO(crbug.com/40829930): Move WebEngine-specific suites to
-  # //fuchsia_web/webengine/
-  group("performance_web_engine_test_suite") {
-    testonly = true
-    data = [ "//content/test/gpu/run_telemetry_benchmark_fuchsia.py" ]
-    data_deps = [
-      ":fuchsia_telemetry_test_data",
-      ":telemetry_gpu_integration_test_data",
-      "//base:base_perftests",
-      "//testing:run_perf_test",
-      "//tools/perf/:perf",
-    ]
-  }
-  group("fuchsia_telemetry_test_data") {
-    testonly = true
-    data = [ "//content/test/gpu/fuchsia_util.py" ]
-    if (fuchsia_browser_type == "web_engine_shell") {
-      data += [
-        "$root_gen_dir/package_metadata/web_engine_shell.meta",
-        "$root_gen_dir/package_metadata/web_engine_with_webui.meta",
-      ]
-    } else {
-      data += [ "$root_gen_dir/package_metadata/chrome.meta" ]
-      data_deps = [ "//chrome/app:chrome_fuchsia" ]
-    }
-  }
-}
 
 group("telemetry_gpu_integration_test_scripts_only") {
   testonly = true
@@ -2123,7 +2087,7 @@ test("content_browsertests") {
     }
   }
 
-  if (is_linux || is_chromeos || is_mac || is_win || is_fuchsia) {
+  if (is_linux || is_chromeos || is_mac || is_win) {
     deps += [ "//third_party/libyuv" ]
     data += [
       "//net/tools/testserver/",
@@ -2281,7 +2245,7 @@ test("content_browsertests") {
     if (!is_ios) {
       data += [ "//content/test/data/clipboard/" ]
     }
-    if (!is_ios && !is_fuchsia) {
+    if (!is_ios) {
       sources += [
         "../browser/direct_sockets/direct_sockets_open_browsertest.cc",
         "../browser/direct_sockets/direct_sockets_tcp_browsertest.cc",
@@ -2437,14 +2401,11 @@ test("content_browsertests") {
   # KeyboardLock is currently not supported in Android, Fuchsia and
   # Chromecast builds. TODO(crbug.com/40891949): Re-enable on Fuchsia
   # once its platform support is available.
-  if (is_android || is_fuchsia) {
+  if (is_android) {
     sources -= [ "../browser/keyboard_lock_browsertest.cc" ]
   }
 
   # MidiManager is not supported in Fuchsia (see crbug.com/40217214).
-  if (is_fuchsia) {
-    sources -= [ "../browser/media/midi_browsertest.cc" ]
-  }
 
   if (use_ozone) {
     deps += [ "//ui/ozone" ]
@@ -2452,17 +2413,6 @@ test("content_browsertests") {
 
   if (is_chromeos) {
     deps += [ "//chromeos/dbus/constants" ]
-  }
-
-  if (is_fuchsia) {
-    additional_manifest_fragments = [
-      "//build/config/fuchsia/test/audio_output.shard.test-cml",
-      "//build/config/fuchsia/test/fonts.shard.test-cml",
-      "//build/config/fuchsia/test/mark_vmo_executable.shard.test-cml",
-      "//build/config/fuchsia/test/network.shard.test-cml",
-      "//build/config/fuchsia/test/present_view.shard.test-cml",
-      "//third_party/fuchsia-sdk/sdk/pkg/vulkan/client.shard.cml",
-    ]
   }
 
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
@@ -3065,22 +3015,6 @@ test("content_unittests") {
     ]
   }
 
-  if (is_fuchsia) {
-    sources += [ "../browser/renderer_host/media/fuchsia_media_codec_provider_impl_unittest.cc" ]
-
-    additional_manifest_fragments = [
-      "//build/config/fuchsia/test/fonts.shard.test-cml",
-
-      # TODO(crbug.com/40055105): Investigate removing the requirement
-      # for VmexResource.
-      "//build/config/fuchsia/test/mark_vmo_executable.shard.test-cml",
-      "//build/config/fuchsia/test/network.shard.test-cml",
-      "//build/config/fuchsia/test/platform_video_codecs.shard.test-cml",
-      "//build/config/fuchsia/test/present_view.shard.test-cml",
-      "//third_party/fuchsia-sdk/sdk/pkg/vulkan/client.shard.cml",
-    ]
-  }
-
   if (is_android) {
     sources += [
       "../browser/accessibility/ax_style_data_unittest.cc",
@@ -3142,7 +3076,7 @@ test("content_unittests") {
     sources += [ "../browser/accessibility/browser_accessibility_state_impl_auralinux_unittest.cc" ]
   }
 
-  if (is_android || is_linux || is_chromeos || is_mac || is_win || is_fuchsia) {
+  if (is_android || is_linux || is_chromeos || is_mac || is_win) {
     data = [
       "$root_out_dir/content_shell.pak",
       "data/",
@@ -3388,10 +3322,6 @@ test("content_unittests") {
     deps += [ "//components/crash/content/browser/error_reporting" ]
   }
 
-  if (is_fuchsia) {
-    deps += [ "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.accessibility.semantics:fuchsia.accessibility.semantics_cpp" ]
-  }
-
   if (enable_printing || enable_printing_tests) {
     deps += [
       "//printing",
@@ -3589,20 +3519,18 @@ test("content_unittests") {
       "//media/mojo/mojom:web_speech_recognition",
     ]
 
-    if (!is_fuchsia) {
-      sources += [
-        "../browser/speech/on_device_speech_recognition_engine_unittest.cc",
-        "../browser/speech/soda_speech_recognition_engine_impl_unittest.cc",
-        "../browser/speech/speech_recognition_dispatcher_host_unittest.cc",
-        "../browser/speech/speech_recognition_manager_impl_unittest.cc",
-      ]
-      deps += [
-        "//components/optimization_guide/core:ondevice",
-        "//components/soda:constants",
-        "//components/soda:utils",
-        "//media/mojo/mojom:speech_recognition",
-      ]
-    }
+    sources += [
+      "../browser/speech/on_device_speech_recognition_engine_unittest.cc",
+      "../browser/speech/soda_speech_recognition_engine_impl_unittest.cc",
+      "../browser/speech/speech_recognition_dispatcher_host_unittest.cc",
+      "../browser/speech/speech_recognition_manager_impl_unittest.cc",
+    ]
+    deps += [
+      "//components/optimization_guide/core:ondevice",
+      "//components/soda:constants",
+      "//components/soda:utils",
+      "//media/mojo/mojom:speech_recognition",
+    ]
   }
 
   # Tests for platforms that support extensions. Linux requires udev.
@@ -3808,16 +3736,4 @@ group("gpu_pytype") {
     ":telemetry_gpu_integration_test_support",
     "//testing:pytype_dependencies",
   ]
-}
-
-if (is_fuchsia) {
-  group("telemetry_gpu_integration_test_fuchsia") {
-    testonly = true
-    data = [ "//content/test/gpu/run_gpu_integration_test_fuchsia.py" ]
-    data_deps = [
-      "//content/test:fuchsia_telemetry_test_data",
-      "//content/test:telemetry_gpu_integration_test_support",
-      "//tools/perf/chrome_telemetry_build:telemetry_chrome_test",
-    ]
-  }
 }

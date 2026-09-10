@@ -296,7 +296,7 @@ source_set("tests") {
         "hid/input_service_linux_unittest.cc",
       ]
     }
-    if (!is_fuchsia && !is_ios && !is_android) {
+    if (!is_ios && !is_android) {
       # Fuchsia, iOS, and Android do not currently implement HidService.
       sources += [ "hid/hid_service_unittest.cc" ]
     }

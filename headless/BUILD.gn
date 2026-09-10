@@ -93,11 +93,8 @@ repack("resource_pack_strings") {
     "//ui/strings",
   ]
 
-  if (!is_fuchsia) {
-    sources +=
-        [ "$root_gen_dir/content/browser/devtools/devtools_resources.pak" ]
-    deps += [ "//content/browser/devtools:devtools_resources" ]
-  }
+  sources += [ "$root_gen_dir/content/browser/devtools/devtools_resources.pak" ]
+  deps += [ "//content/browser/devtools:devtools_resources" ]
 
   output = "$root_out_dir/headless_lib_strings.pak"
 }
@@ -464,16 +461,14 @@ source_set("headless_browser") {
     ]
   }
 
-  if (!is_fuchsia) {
-    sources += [
-      "lib/headless_crash_reporter_client.cc",
-      "lib/headless_crash_reporter_client.h",
-    ]
-    deps += [
-      "//components/crash/content/browser",
-      "//components/crash/core/app",
-    ]
-  }
+  sources += [
+    "lib/headless_crash_reporter_client.cc",
+    "lib/headless_crash_reporter_client.h",
+  ]
+  deps += [
+    "//components/crash/content/browser",
+    "//components/crash/core/app",
+  ]
 
   if (is_win) {
     deps += [ "//components/os_crypt/async/browser:dpapi_key_provider" ]
@@ -626,13 +621,11 @@ test("headless_browsertests") {
   }
 
   # TODO(crbug.com/40222911): Enable on Fuchsia when no longer flakily timeout.
-  if (!is_fuchsia) {
-    sources += [
-      "test/headless_compositor_browsertest.cc",
-      "test/headless_protocol_browsertest.cc",
-      "test/headless_protocol_browsertest.h",
-    ]
-  }
+  sources += [
+    "test/headless_compositor_browsertest.cc",
+    "test/headless_protocol_browsertest.cc",
+    "test/headless_protocol_browsertest.h",
+  ]
 
   data = [
     "test/data/",
@@ -655,18 +648,6 @@ test("headless_browsertests") {
   if (headless_enable_commands) {
     data += [ "$root_out_dir/headless_command_resources.pak" ]
     data_deps += [ "//components/headless/command_handler" ]
-  }
-
-  if (is_fuchsia) {
-    additional_manifest_fragments = [
-      "//build/config/fuchsia/test/fonts.shard.test-cml",
-
-      # TODO(crbug.com/40055105): Investigate removing the requirement
-      # for VmexResource.
-      "//build/config/fuchsia/test/mark_vmo_executable.shard.test-cml",
-      "//build/config/fuchsia/test/network.shard.test-cml",
-      "//third_party/fuchsia-sdk/sdk/pkg/vulkan/client.shard.cml",
-    ]
   }
 
   if (is_mac) {
@@ -717,14 +698,12 @@ test("headless_browsertests") {
     deps += [ "//services/device/public/cpp:test_support" ]
   }
 
-  if (!is_fuchsia) {
-    deps += [
-      "//third_party/crashpad/crashpad/client",
-      "//third_party/crashpad/crashpad/handler:common",
-      "//third_party/crashpad/crashpad/snapshot",
-      "//third_party/crashpad/crashpad/util",
-    ]
-  }
+  deps += [
+    "//third_party/crashpad/crashpad/client",
+    "//third_party/crashpad/crashpad/handler:common",
+    "//third_party/crashpad/crashpad/snapshot",
+    "//third_party/crashpad/crashpad/util",
+  ]
 
   if (enable_printing) {
     deps += [
@@ -789,9 +768,7 @@ component("headless_shell_lib") {
     "//v8",
   ]
 
-  if (!is_fuchsia) {
-    deps += [ "//components/crash/core/app" ]
-  }
+  deps += [ "//components/crash/core/app" ]
 
   public_deps = [
     ":headless_browser",
@@ -916,9 +893,7 @@ executable("headless_shell") {
     ]
   }
 
-  if (!is_fuchsia) {
-    deps += [ "//components/crash/core/app" ]
-  }
+  deps += [ "//components/crash/core/app" ]
 
   configs += [
     ":headless_defines_config",

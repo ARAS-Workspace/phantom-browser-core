@@ -50,12 +50,6 @@ if (target_os == "win") {
   build_gn_logs += [ "" ]
 }
 
-if (target_os == "fuchsia") {
-  import("//build/config/fuchsia/gn_configs.gni")
-  build_gn_logs += [ "### fuchsia/gn_configs.gni ###" ] + fuchsia_gn_logs
-  build_gn_logs += [ "" ]
-}
-
 build_gn_logs += [ "#### get_concurrent_links.py ####" ] + concurrent_links_logs
 
 if (defined(build_with_chromium) && build_with_chromium) {

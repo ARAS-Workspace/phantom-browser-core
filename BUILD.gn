@@ -44,12 +44,6 @@ if (is_android) {
   import("//build/config/android/config.gni")
 }
 
-if (is_fuchsia) {
-  import("//build/config/fuchsia/generate_runner_scripts.gni")
-  import("//third_party/fuchsia-gn-sdk/src/component.gni")
-  import("//third_party/fuchsia-gn-sdk/src/package.gni")
-}
-
 if (is_ios) {
   import("//build/config/apple/mobile_config.gni")
 }
@@ -146,14 +140,12 @@ group("gn_all") {
     }
 
     if (!is_ios && !is_android) {
-      if (!is_fuchsia) {
-        deps += [
-          "//chrome",
-          "//chrome/browser/ui/actions:dump_actions",
-          "//chrome/browser/ui/color:dump_colors",
-          "//chrome/test:browser_tests",
-        ]
-      }
+      deps += [
+        "//chrome",
+        "//chrome/browser/ui/actions:dump_actions",
+        "//chrome/browser/ui/color:dump_colors",
+        "//chrome/test:browser_tests",
+      ]
       deps += [
         "//components/subresource_filter/tools:subresource_filter_tools",
         "//components/zucchini",
@@ -166,9 +158,7 @@ group("gn_all") {
       ]
     }
 
-    if (!is_fuchsia) {
-      deps += [ "//chrome/installer" ]
-    }
+    deps += [ "//chrome/installer" ]
 
     if (enable_updater) {
       deps += [ "//chrome/updater" ]
@@ -179,9 +169,7 @@ group("gn_all") {
     }
 
     if (!is_ios) {
-      if (!is_fuchsia) {
-        deps += [ "//chrome/test:unit_tests" ]
-      }
+      deps += [ "//chrome/test:unit_tests" ]
       deps += [ "//ui/accessibility:accessibility_unittests" ]
     }
 
@@ -250,9 +238,7 @@ group("gn_all") {
         "//third_party/catapult/telemetry:bitmaptools($host_toolchain)",
       ]
       if (!is_android) {
-        if (!is_fuchsia) {
-          deps += [ "//chrome/test:telemetry_perf_unittests" ]
-        }
+        deps += [ "//chrome/test:telemetry_perf_unittests" ]
       } else {
         import("//tools/perf/chrome_telemetry_build/android_browser_types.gni")
         foreach(_target_suffix, telemetry_android_browser_target_suffixes) {
@@ -261,17 +247,6 @@ group("gn_all") {
       }
     } else {
       deps += [ "//third_party/crashpad/crashpad:crashpad_tests" ]
-    }
-
-    if (is_fuchsia) {
-      # Add targets that only exist on Fuchsia.
-      deps += [
-        ":d8_fuchsia",
-        "//build/fuchsia/cipd",
-        "//tools/fuchsia/size_tests:fuchsia_sizes",
-
-        # Ensure this target continues to build.
-      ]
     }
 
     deps += root_extra_deps
@@ -329,7 +304,7 @@ group("gn_all") {
       ]
     }
 
-    if (!is_android && !is_ios && !is_fuchsia) {
+    if (!is_android && !is_ios) {
       deps += [
         "//components/sync:sync_full_proto_unittests",
         "//ui/webui/examples:webui_examples",
@@ -341,9 +316,7 @@ group("gn_all") {
         "//ui/ozone",
         "//ui/ozone:unittests",
       ]
-      if (!is_fuchsia) {
-        deps += [ "//ui/ozone/demo" ]
-      }
+      deps += [ "//ui/ozone/demo" ]
     }
 
     if (is_win) {
@@ -411,10 +384,6 @@ group("gn_all") {
       ]
       if (defined(android_app_secondary_abi)) {
         deps += [ "//android_webview/tools/pinlist:generate_pinlist" ]
-      }
-
-      if (checkout_fuchsia) {
-        deps += [ "//build/fuchsia/starview:run_cuttlefish_test" ]
       }
 
       if (enable_chrome_android_internal) {
@@ -494,14 +463,14 @@ group("gn_all") {
       }
     }
 
-    if (is_ios || is_win || is_linux || is_fuchsia) {
+    if (is_ios || is_win || is_linux) {
       deps += [
         "//base:base_i18n_perftests",
         "//google_apis:google_apis_unittests",
       ]
     }
 
-    if ((is_win || is_mac || is_linux || is_chromeos || is_fuchsia) &&
+    if ((is_win || is_mac || is_linux || is_chromeos) &&
         (target_cpu == "x86" || target_cpu == "x64")) {
       deps += [
         "//third_party/swiftshader/src/Vulkan:icd_file",
@@ -535,7 +504,7 @@ group("gn_all") {
         ]
       }
 
-      if (!is_android && !is_ios && !is_fuchsia) {
+      if (!is_android && !is_ios) {
         deps += [
           "//chrome/test:load_library_perf_tests",
           "//chrome/test:sync_performance_tests",
@@ -637,14 +606,12 @@ group("gn_all") {
       }
     }
 
-    if (!is_fuchsia) {
-      # The official builders use this binary from the default toolchain's
-      # output directory after building in order to upload the symbols of that
-      # binary. They build the binary like `ninja symupload` which requires the
-      # target to be a dependency in the default_toolchain from `gn_all` for the
-      # name to resolve.
-      deps += [ "//third_party/breakpad:symupload" ]
-    }
+    # The official builders use this binary from the default toolchain's
+    # output directory after building in order to upload the symbols of that
+    # binary. They build the binary like `ninja symupload` which requires the
+    # target to be a dependency in the default_toolchain from `gn_all` for the
+    # name to resolve.
+    deps += [ "//third_party/breakpad:symupload" ]
     if (is_mac && host_cpu == "arm64") {
       # TODO(crbug.com/349268750): This alias exists because the official Mac
       # arm64 builders (which cross-build the x64 binaries) use the hardcoded
@@ -683,7 +650,7 @@ group("gn_all") {
       deps += [ "//mojo" ]
     }
 
-    if (is_mac || is_linux || is_chromeos || is_android || is_fuchsia) {
+    if (is_mac || is_linux || is_chromeos || is_android) {
       deps += [ "//third_party/perfetto:all" ]
     }
 
@@ -691,7 +658,7 @@ group("gn_all") {
       deps += [ "//third_party/sqlite:sqlite_shell" ]
     }
 
-    if (is_linux || is_fuchsia) {
+    if (is_linux) {
       # TODO(https://crbug.com/1329673): Figure out if this should be in gn_all
       # and how cross-platform this is.
       deps +=
@@ -750,7 +717,7 @@ group("gn_all") {
       ]
     }
 
-    if (((is_linux || is_chromeos) && use_ozone) || is_fuchsia) {
+    if ((is_linux || is_chromeos) && use_ozone) {
       deps += [
         "//headless:headless_shell",
         "//headless:headless_tests",
@@ -881,26 +848,6 @@ if (is_android && !is_cronet_build) {
       "//chrome/android:chrome_public_apk",
       "//tools/traffic_annotation:annotations_xml",
     ]
-  }
-}
-
-if (is_fuchsia) {
-  # TODO(https://crbug.com/731217): This can't practically be in //v8 without
-  # duplicating all the Fuchsia running infrastructure there.
-  fuchsia_component("d8_component") {
-    testonly = true
-    manifest = "//v8/gni/v8.cml"
-    data_deps = [ "//v8:d8" ]
-  }
-  fuchsia_package("d8_pkg") {
-    testonly = true
-    package_name = "d8"
-    deps = [ ":d8_component" ]
-  }
-  fuchsia_package_installer("d8_fuchsia") {
-    testonly = true
-    package = ":d8_pkg"
-    package_name = "d8"
   }
 }
 
@@ -1058,7 +1005,7 @@ if (use_blink && !is_cronet_build) {
   group("chromedriver_group") {
     testonly = true
 
-    if (is_fuchsia || is_android) {
+    if (is_android) {
       # On Fuchsia and non-Cast Android, ChromeDriver runs on the host, not the
       # device.
       deps =
@@ -1128,14 +1075,12 @@ group("chromium_builder_perf") {
       "//tools/perf/chrome_telemetry_build:telemetry_chrome_test",
     ]
 
-    if (!is_fuchsia) {
-      data_deps += [
-        "//chrome/test:load_library_perf_tests",
-        "//chrome/test:performance_test_suite",
-      ]
-    }
+    data_deps += [
+      "//chrome/test:load_library_perf_tests",
+      "//chrome/test:performance_test_suite",
+    ]
 
-    if (!is_chromeos && !is_fuchsia) {
+    if (!is_chromeos) {
       data_deps += [ "//chrome/test:performance_browser_tests" ]
     }
 
@@ -1174,9 +1119,7 @@ if (!is_ios && !is_android && !is_cronet_build) {
       "//third_party/blink/public/mojom:mojom_modules_js",
       "//v8:d8",
     ]
-    if (!is_fuchsia) {
-      data_deps += [ "//chrome" ]
-    }
+    data_deps += [ "//chrome" ]
     if (!is_win) {
       data_deps += [ "//skia:filter_fuzz_stub" ]
     }

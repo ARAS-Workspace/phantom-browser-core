@@ -52,8 +52,7 @@ is_arm_cast_shell_build = false
 
 # Python works only on Linux, MacOS and Windows so exclude the others,
 # chromecast, android, fuchsia, ios.
-enable_python_utils =
-    !is_arm_cast_shell_build && !is_android && !is_fuchsia && !is_ios
+enable_python_utils = !is_arm_cast_shell_build && !is_android && !is_ios
 
 # Whether //net should use an external GSSAPI library for implementing HTTP
 # Negotiate authentication. All platforms for which use_kerberos is true should
@@ -1196,7 +1195,7 @@ component("net") {
     "url_request/websocket_handshake_userdata_key.h",
   ]
 
-  if (is_posix || is_fuchsia) {
+  if (is_posix) {
     sources += [ "base/net_errors_posix.cc" ]
   }
 
@@ -1539,7 +1538,7 @@ component("net") {
     ]
   }
 
-  if (is_posix || is_fuchsia) {
+  if (is_posix) {
     sources += [
       "base/file_stream_context_posix.cc",
       "base/network_interfaces_posix.cc",
@@ -1669,24 +1668,6 @@ component("net") {
     # fixed, switch this to a non-public config, so NSS usage must be explicit
     # in the build.
     public_configs = [ "//build/config/linux/nss" ]
-  }
-
-  if (is_fuchsia) {
-    deps += [
-      "//net/data/ssl/chrome_root_store:gen_root_store_inc",
-      "//third_party/fuchsia-sdk/sdk/pkg/async-loop-cpp",
-    ]
-    public_deps += [ "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.net.interfaces:fuchsia.net.interfaces_hlcpp" ]
-    sources += [
-      "base/fuchsia/network_interface_cache.cc",
-      "base/fuchsia/network_interface_cache.h",
-      "base/network_change_notifier_fuchsia.cc",
-      "base/network_change_notifier_fuchsia.h",
-      "base/network_interfaces_fuchsia.cc",
-      "base/network_interfaces_fuchsia.h",
-      "base/platform_mime_util_fuchsia.cc",
-      "cert/test_root_certs_builtin.cc",
-    ]
   }
 
   if (enable_unix_sockets) {
@@ -1978,14 +1959,6 @@ source_set("net_deps") {
 
   if (is_android) {
     public_deps += [ ":net_jni_headers" ]
-  }
-
-  if (is_fuchsia) {
-    public_deps += [
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.hardware.network:fuchsia.hardware.network_hlcpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.net.interfaces:fuchsia.net.interfaces_hlcpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/sys_cpp",
-    ]
   }
 
   if (use_platform_icu_alternatives) {
@@ -3460,19 +3433,6 @@ target(_test_target_type, "net_unittests") {
 
   if (enable_python_utils) {
     sources += [ "test/python_utils_unittest.cc" ]
-  }
-
-  if (is_fuchsia) {
-    deps += [
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.net.interfaces:fuchsia.net.interfaces_hlcpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/fidl_cpp",
-    ]
-    sources += [
-      "base/fuchsia/network_interface_cache_unittest.cc",
-      "base/network_change_notifier_fuchsia_unittest.cc",
-    ]
-    additional_manifest_fragments =
-        [ "//build/config/fuchsia/test/network.shard.test-cml" ]
   }
 
   if (use_nss_certs) {

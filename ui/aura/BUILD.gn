@@ -347,13 +347,6 @@ test("aura_unittests") {
     deps += [ "//ui/ozone" ]
   }
 
-  if (is_fuchsia) {
-    additional_manifest_fragments = [
-      "//build/config/fuchsia/test/present_view.shard.test-cml",
-      "//third_party/fuchsia-sdk/sdk/pkg/vulkan/client.shard.cml",
-    ]
-  }
-
   data_deps = [
     "//third_party/angle:includes",
     "//ui/resources:ui_test_pak_data",

@@ -132,7 +132,7 @@ component("gamepad") {
     deps += [ ":jni_headers" ]
   }
 
-  if (!is_android && !is_fuchsia && !is_ios) {
+  if (!is_android && !is_ios) {
     sources += [
       "nintendo_controller.cc",
       "nintendo_controller.h",

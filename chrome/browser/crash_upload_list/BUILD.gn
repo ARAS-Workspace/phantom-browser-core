@@ -6,8 +6,6 @@ import("//build/buildflag_header.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//testing/test.gni")
 
-assert(!is_fuchsia, "Fuchsia shouldn't use anything in //chrome")
-
 static_library("crash_upload_list") {
   sources = [
     "crash_upload_list.cc",

@@ -152,9 +152,6 @@ component("service") {
   if (use_ozone) {
     deps += [ "//ui/ozone" ]
   }
-  if (is_fuchsia) {
-    sources += [ "image_transport_surface_fuchsia.cc" ]
-  }
   if (enable_vulkan) {
     deps += [ "//gpu/vulkan/init" ]
   }

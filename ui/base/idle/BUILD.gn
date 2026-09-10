@@ -61,10 +61,6 @@ component("idle") {
     deps += [ "//ui/gfx" ]
   }
 
-  if (is_fuchsia) {
-    sources += [ "idle_fuchsia.cc" ]
-  }
-
   if (is_linux) {
     sources += [ "idle_linux.cc" ]
     deps += [ "//ui/display" ]

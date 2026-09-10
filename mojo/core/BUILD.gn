@@ -100,12 +100,6 @@ source_set("impl_for_embedder") {
     "//third_party/ipcz/src:ipcz",
   ]
 
-  if (is_fuchsia) {
-    sources += [ "channel_fuchsia.cc" ]
-
-    public_deps += [ "//third_party/fuchsia-sdk/sdk/pkg/fdio" ]
-  }
-
   if (is_posix && !mojo_use_apple_channel) {
     sources += [
       "broker_posix.cc",

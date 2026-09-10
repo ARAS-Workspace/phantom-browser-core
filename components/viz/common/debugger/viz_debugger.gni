@@ -7,5 +7,5 @@ declare_args() {
   # official builds due to security and performance reasons. test
   # crbug/1466891 Fuchia threading model does not play well with the
   # visual debugger multithreaded submission mechanism.
-  use_viz_debugger = !is_official_build && !is_fuchsia
+  use_viz_debugger = !is_official_build
 }

@@ -67,8 +67,5 @@ if (sysroot == "") {
   } else if (is_ios) {
     import("//build/config/ios/ios_sdk.gni")
     sysroot = ios_sdk_path
-  } else if (is_fuchsia) {
-    import("//build/config/fuchsia/gn_configs.gni")
-    sysroot = "${fuchsia_arch_root}/sysroot"
   }
 }

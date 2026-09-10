@@ -9,7 +9,7 @@ import("//pdf/features.gni")
 
 declare_args() {
   # Enables printing support.
-  enable_printing = !is_ios && !is_fuchsia
+  enable_printing = !is_ios
 
   # TODO(crbug.com/40263786): iOS blink port only enables printing_tests to run
   # unit tests and web tests for now because the port does not enable the
@@ -37,7 +37,7 @@ declare_args() {
     # 32-bit Linux fuzzer builds don't include libcups.so.2.
     use_cups = target_cpu != "x86"
   } else {
-    use_cups = (is_chromeos_device || is_linux || is_mac) && !is_fuchsia
+    use_cups = is_chromeos_device || is_linux || is_mac
   }
 
   # Enables out-of-process printing.  Do not have this definition just be

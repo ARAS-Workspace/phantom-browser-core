@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 # TODO(crbug.com/40188745): Complete crash reporting integration on Fuchsia.
-assert(!is_fuchsia)
 
 import("//base/debug/debug.gni")
 import("//components/gwp_asan/buildflags/buildflags.gni")

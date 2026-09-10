@@ -108,10 +108,6 @@ if (is_android || is_robolectric) {
   import("//third_party/jni_zero/jni_zero.gni")
 }
 
-if (is_fuchsia) {
-  import("//third_party/fuchsia-gn-sdk/src/fidl_library.gni")
-}
-
 _build_date_header = "$target_gen_dir/generated_build_date.h"
 
 _enable_code_ordering = is_android && !is_component_build &&
@@ -151,14 +147,6 @@ if (is_android) {
     libs = [
       "android",
       "log",  # Used by logging.cc.
-    ]
-  }
-}
-
-if (is_fuchsia) {
-  config("fuchsia_sync_lib") {
-    libs = [
-      "sync",  # Used by spinning_mutex.h.
     ]
   }
 }
@@ -1225,7 +1213,7 @@ component("base") {
 
   # Allow more direct string conversions on platforms with native utf8
   # strings
-  if (is_apple || is_chromeos || is_fuchsia) {
+  if (is_apple || is_chromeos) {
     defines += [ "SYSTEM_NATIVE_UTF8" ]
   }
 
@@ -1499,130 +1487,6 @@ component("base") {
   }
 
   # Fuchsia.
-  if (is_fuchsia) {
-    sources += [
-      "base_paths_fuchsia.cc",
-      "debug/debugger_fuchsia.cc",
-      "debug/elf_reader.cc",
-      "debug/elf_reader.h",
-      "debug/stack_trace_fuchsia.cc",
-      "file_descriptor_posix.cc",
-      "file_descriptor_posix.h",
-      "files/dir_reader_posix.h",
-      "files/file_path_watcher_stub.cc",  # See crbug.com/851641.
-      "files/file_posix.cc",
-      "files/memory_mapped_file_posix.cc",
-      "fuchsia/default_job.cc",
-      "fuchsia/default_job.h",
-      "fuchsia/fidl_event_handler.h",
-      "fuchsia/file_utils.cc",
-      "fuchsia/file_utils.h",
-      "fuchsia/filtered_service_directory.cc",
-      "fuchsia/filtered_service_directory.h",
-      "fuchsia/fuchsia_component_connect.h",
-      "fuchsia/fuchsia_logging.cc",
-      "fuchsia/fuchsia_logging.h",
-      "fuchsia/intl_profile_watcher.cc",
-      "fuchsia/intl_profile_watcher.h",
-      "fuchsia/koid.cc",
-      "fuchsia/koid.h",
-      "fuchsia/mem_buffer_util.cc",
-      "fuchsia/mem_buffer_util.h",
-      "fuchsia/process_context.cc",
-      "fuchsia/process_context.h",
-      "fuchsia/process_lifecycle.cc",
-      "fuchsia/process_lifecycle.h",
-      "fuchsia/scheduler.h",
-      "fuchsia/scoped_fx_logger.cc",
-      "fuchsia/scoped_fx_logger.h",
-      "fuchsia/scoped_service_binding.h",
-      "fuchsia/scoped_service_publisher.h",
-      "fuchsia/startup_context.cc",
-      "fuchsia/startup_context.h",
-      "fuchsia/system_info.cc",
-      "fuchsia/system_info.h",
-      "memory/platform_shared_memory_mapper_fuchsia.cc",
-      "memory/platform_shared_memory_region_fuchsia.cc",
-      "memory/protected_memory_posix.cc",
-      "message_loop/message_pump_fuchsia.cc",
-      "message_loop/message_pump_fuchsia.h",
-      "message_loop/watchable_io_message_pump_posix.cc",
-      "message_loop/watchable_io_message_pump_posix.h",
-      "native_library_fuchsia.cc",
-      "posix/eintr_wrapper.h",
-      "posix/file_descriptor_shuffle.cc",
-      "posix/file_descriptor_shuffle.h",
-      "posix/global_descriptors.cc",
-      "posix/global_descriptors.h",
-      "posix/safe_strerror.cc",
-      "posix/safe_strerror.h",
-      "process/kill_fuchsia.cc",
-      "process/launch_fuchsia.cc",
-      "process/memory_fuchsia.cc",
-      "process/process_fuchsia.cc",
-      "process/process_handle_fuchsia.cc",
-      "process/process_iterator_fuchsia.cc",
-      "process/process_metrics_fuchsia.cc",
-      "profiler/module_cache_posix.cc",
-      "rand_util_fuchsia.cc",
-      "strings/string_util_posix.h",
-      "strings/sys_string_conversions_posix.cc",
-      "synchronization/condition_variable_posix.cc",
-      "synchronization/lock_impl_posix.cc",
-      "synchronization/waitable_event_posix.cc",
-      "synchronization/waitable_event_watcher_posix.cc",
-      "system/sys_info_fuchsia.cc",
-      "threading/platform_thread_fuchsia.cc",
-      "threading/platform_thread_metrics_fuchsia.cc",
-      "threading/platform_thread_posix.cc",
-      "threading/thread_local_storage_posix.cc",
-      "time/time_conversion_posix.cc",
-      "time/time_exploded_icu.cc",
-      "time/time_fuchsia.cc",
-      "timer/hi_res_timer_manager_posix.cc",
-    ]
-
-    # These only need to be public deps because of includes of their headers
-    # by public //base headers, which requires they be on the include path.
-    # TODO(crbug.com/40575514): Move these back to |deps|.
-    public_deps += [
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.component.runner:fuchsia.component.runner_hlcpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.intl:fuchsia.intl_hlcpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.io:fuchsia.io_cpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.io:fuchsia.io_hlcpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.logger:fuchsia.logger_cpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.mem:fuchsia.mem_hlcpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.process.lifecycle:fuchsia.process.lifecycle_cpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/async",
-      "//third_party/fuchsia-sdk/sdk/pkg/component_incoming_cpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/fdio",
-      "//third_party/fuchsia-sdk/sdk/pkg/fidl_cpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/fidl_cpp_wire",
-      "//third_party/fuchsia-sdk/sdk/pkg/sync",
-      "//third_party/fuchsia-sdk/sdk/pkg/sys_cpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/syslog_structured_backend",
-      "//third_party/fuchsia-sdk/sdk/pkg/vfs_cpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/zx",
-    ]
-
-    deps += [
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.buildinfo:fuchsia.buildinfo_cpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.hwinfo:fuchsia.hwinfo_cpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.io:fuchsia.io_cpp_hlcpp_conversion",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.media:fuchsia.media_cpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/async-default",
-      "//third_party/fuchsia-sdk/sdk/pkg/async-loop-cpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/async-loop-default",
-      "//third_party/fuchsia-sdk/sdk/pkg/fidl",
-      "//third_party/fuchsia-sdk/sdk/pkg/inspect_component_cpp",
-      "//third_party/icu",
-    ]
-
-    # Needed for users of spinning_mutex.h, which for performance reasons,
-    # contains inlined calls to `libsync` inside the header file.
-    # It appends an entry to the "libs" section of the dependent target.
-    public_configs = [ ":fuchsia_sync_lib" ]
-  }
 
   sources += [
     "hash/sha1.cc",
@@ -1717,7 +1581,7 @@ component("base") {
     ]
   }
 
-  if (is_posix || is_fuchsia) {
+  if (is_posix) {
     sources += [
       "files/file_descriptor_watcher_posix.cc",
       "files/file_descriptor_watcher_posix.h",
@@ -1731,7 +1595,7 @@ component("base") {
     }
   }
 
-  if ((is_posix && !is_ios) || is_fuchsia) {
+  if (is_posix && !is_ios) {
     sources += [
       "process/process_metrics_posix.cc",
       "sync_socket_posix.cc",
@@ -2494,14 +2358,14 @@ component("base") {
     sources += [ "time/time_exploded_posix.cc" ]
   }
 
-  if ((is_posix && !is_apple && !is_android) || is_fuchsia) {
+  if (is_posix && !is_apple && !is_android) {
     sources += [
       "profiler/core_unwinders_posix.cc",
       "profiler/stack_sampler_posix.cc",
     ]
   }
 
-  if ((is_posix && !is_apple && !is_android && !is_chromeos) || is_fuchsia) {
+  if (is_posix && !is_apple && !is_android && !is_chromeos) {
     sources += [ "power_monitor/power_monitor_device_source_stub.cc" ]
   }
 
@@ -2623,7 +2487,7 @@ component("base") {
     ]
   }
 
-  if (using_sanitizer && !is_fuchsia) {
+  if (using_sanitizer) {
     data += [ "//tools/valgrind/asan/" ]
     data_deps +=
         [ "//build/config/clang:llvm-symbolizer_data($host_toolchain)" ]
@@ -3289,11 +3153,6 @@ test("base_perftests") {
     shard_timeout = 600
   }
 
-  if (is_fuchsia) {
-    # Run these performance tests against the actual system.
-    run_as_chromium_system_test = true
-  }
-
   if (!is_official_build) {
     # The extra data tables required by stack traces are turned off for official
     # build, only do stack trace perftest for unofficial build
@@ -3531,66 +3390,6 @@ if (is_linux || is_chromeos) {
     deps = [
       "//base",
       "//testing/gtest",
-    ]
-  }
-}
-
-if (is_fuchsia) {
-  fidl_library("testfidl") {
-    library_name = "base.testfidl"
-
-    sources = [ "fuchsia/test.test-fidl" ]
-  }
-
-  # TODO(crbug.com/40256912): remove this once all users are migrated to natural
-  # bindings.
-  source_set("test_interface_impl") {
-    testonly = true
-    sources = [
-      "fuchsia/test_interface_impl.cc",
-      "fuchsia/test_interface_impl.h",
-    ]
-    deps = [
-      ":base",
-      "//testing/gtest",
-    ]
-    public_deps = [
-      ":testfidl_hlcpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/fidl_cpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/zx",
-    ]
-  }
-
-  source_set("test_interface_natural_impl") {
-    testonly = true
-    public = [ "fuchsia/test_interface_natural_impl.h" ]
-    sources = [ "fuchsia/test_interface_natural_impl.cc" ]
-    deps = [
-      ":base",
-      "//testing/gtest",
-      "//third_party/fuchsia-sdk/sdk/pkg/async",
-    ]
-    public_deps = [
-      ":testfidl_cpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.io:fuchsia.io_cpp_common",
-      "//third_party/fuchsia-sdk/sdk/pkg/fidl_cpp_wire",
-      "//third_party/fuchsia-sdk/sdk/pkg/sys_cpp",
-    ]
-  }
-
-  source_set("test_log_listener_safe") {
-    testonly = true
-    sources = [
-      "fuchsia/test_log_listener_safe.cc",
-      "fuchsia/test_log_listener_safe.h",
-    ]
-    deps = [
-      ":base",
-      "//base/test:test_support",
-      "//testing/gtest",
-    ]
-    public_deps = [
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.logger:fuchsia.logger_hlcpp",
     ]
   }
 }
@@ -4134,7 +3933,7 @@ test("base_unittests") {
   # and by
   # https://ci.chromium.org/ui/p/chromium/builders/try/fuchsia-x64-cast-receiver-rel/1591660/overview
   # (not diagnosed yet).
-  if (!is_chromeos && !is_fuchsia) {
+  if (!is_chromeos) {
     deps += [ "//build/rust/tests" ]
   }
 
@@ -4345,7 +4144,7 @@ test("base_unittests") {
 
   # Allow more direct string conversions on platforms with native utf8
   # strings
-  if (is_apple || is_chromeos || is_fuchsia) {
+  if (is_apple || is_chromeos) {
     defines += [ "SYSTEM_NATIVE_UTF8" ]
   }
 
@@ -4529,7 +4328,7 @@ test("base_unittests") {
     deps += [ ":base_profiler_test_support_library" ]
   }
 
-  if (is_fuchsia || is_linux || is_chromeos) {
+  if (is_linux || is_chromeos) {
     sources += [
       "debug/elf_reader_unittest.cc",
       "debug/test_elf_image_builder.cc",
@@ -4563,54 +4362,7 @@ test("base_unittests") {
     sources += [ "message_loop/message_pump_epoll_unittest.cc" ]
   }
 
-  if (is_fuchsia) {
-    sources += [
-      "files/dir_reader_posix_unittest.cc",
-      "files/file_descriptor_watcher_posix_unittest.cc",
-      "fuchsia/fidl_event_handler_unittest.cc",
-      "fuchsia/file_utils_unittest.cc",
-      "fuchsia/filtered_service_directory_unittest.cc",
-      "fuchsia/fuchsia_logging_unittest.cc",
-      "fuchsia/intl_profile_watcher_unittest.cc",
-      "fuchsia/mem_buffer_util_unittest.cc",
-      "fuchsia/scoped_natural_service_binding_unittest.cc",
-      "fuchsia/scoped_natural_service_publisher_unittest.cc",
-      "fuchsia/scoped_service_binding_unittest.cc",
-      "fuchsia/scoped_service_publisher_unittest.cc",
-      "fuchsia/system_build_info_unittest.cc",
-      "fuchsia/system_product_info_unittest.cc",
-      "fuchsia/test_component_context_for_process_unittest.cc",
-      "fuchsia/time_zone_data_unittest.cc",
-      "message_loop/fd_watch_controller_posix_unittest.cc",
-      "posix/file_descriptor_shuffle_unittest.cc",
-    ]
-
-    deps += [
-      ":test_interface_impl",
-      ":test_interface_natural_impl",
-      ":test_log_listener_safe",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.buildinfo:fuchsia.buildinfo_cpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.buildinfo:fuchsia.buildinfo_hlcpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.hwinfo:fuchsia.hwinfo_cpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.intl:fuchsia.intl_hlcpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.logger:fuchsia.logger_cpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.mem:fuchsia.mem_hlcpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/async",
-      "//third_party/fuchsia-sdk/sdk/pkg/async-default",
-      "//third_party/fuchsia-sdk/sdk/pkg/component_incoming_cpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/fdio",
-      "//third_party/fuchsia-sdk/sdk/pkg/sys_cpp",
-    ]
-
-    additional_manifest_fragments = [
-      "//build/config/fuchsia/test/logger.shard.test-cml",
-
-      # Required by PartitionAllocPageAllocatorTest tests with exec capability.
-      "//build/config/fuchsia/test/mark_vmo_executable.shard.test-cml",
-    ]
-  }
-
-  if (!is_fuchsia && !is_ios) {
+  if (!is_ios) {
     sources += [ "files/file_locking_unittest.cc" ]
   }
 

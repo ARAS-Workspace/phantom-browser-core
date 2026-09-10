@@ -16,5 +16,5 @@ declare_args() {
   # This is exposed with the macro ENABLE_ACCESSIBILITY_SERVICE.
   enable_accessibility_service_internal =
       enable_accessibility_service &&
-      (is_chromeos || is_linux || is_mac || is_win || is_fuchsia)
+      (is_chromeos || is_linux || is_mac || is_win)
 }

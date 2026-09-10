@@ -4,8 +4,6 @@
 
 import("//build/config/chrome_build.gni")
 
-assert(!is_fuchsia, "Fuchsia shouldn't use anything in //chrome")
-
 source_set("google") {
   sources = [
     "google_brand.cc",
@@ -76,9 +74,7 @@ source_set("google") {
 source_set("unit_tests") {
   testonly = true
 
-  sources = [
-    "google_update_settings_unittest.cc",
-  ]
+  sources = [ "google_update_settings_unittest.cc" ]
 
   deps = [
     ":google",

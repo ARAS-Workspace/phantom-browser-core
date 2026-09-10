@@ -8,14 +8,12 @@ import("//testing/test.gni")
 
 # Fuchsia doesn't support GL rendering so there is no need to run tests for
 # that code path.
-enable_gl_backend_tests = !is_fuchsia
+enable_gl_backend_tests = true
 
 # TODO(samans): Support more configurations.
 # CFI: TODO(crbug.com/40629477): Fix Control Flow Integrity check failure.
 # Fuchsia: TODO(crbug.com/42050537): Enable on ARM64 when bots support Vulkan.
-enable_vulkan_backend_tests =
-    enable_vulkan &&
-    ((is_linux && !is_cfi) || (is_fuchsia && target_cpu == "x64"))
+enable_vulkan_backend_tests = enable_vulkan && is_linux && !is_cfi
 
 enable_skia_graphite_tests =
     skia_use_dawn && (is_mac || is_win || is_linux || (is_ios && use_blink))

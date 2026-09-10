@@ -6,9 +6,7 @@ if (is_android) {
   import("//build/config/android/rules.gni")
 }
 
-if (!is_fuchsia) {
-  import("//pdf/features.gni")
-}
+import("//pdf/features.gni")
 
 source_set("identity_manager") {
   sources = [
@@ -74,9 +72,7 @@ source_set("identity_manager") {
     "//services/network/public/cpp",
   ]
 
-  if (!is_fuchsia) {
-    deps += [ "//pdf:buildflags" ]
-  }
+  deps += [ "//pdf:buildflags" ]
 
   if (is_chromeos) {
     deps += [ "//components/user_manager" ]
@@ -172,9 +168,7 @@ source_set("unit_tests") {
     ]
   }
 
-  if (!is_fuchsia) {
-    deps += [ "//pdf:buildflags" ]
-  }
+  deps += [ "//pdf:buildflags" ]
 
   if (is_android) {
     deps += [ "//components/signin/public/android:jni_headers" ]

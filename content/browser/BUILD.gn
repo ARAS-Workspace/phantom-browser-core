@@ -2568,30 +2568,7 @@ source_set("browser") {
     public_deps += [ "//ash/webui/common/resources" ]
   }
 
-  if (is_fuchsia) {
-    sources += [
-      "accessibility/accessibility_tree_formatter_fuchsia.cc",
-      "accessibility/accessibility_tree_formatter_fuchsia.h",
-      "child_process_launcher_helper_fuchsia.cc",
-      "font_access/font_enumeration_data_source_fuchsia.cc",
-      "font_access/font_enumeration_data_source_fuchsia.h",
-      "memory/swap_metrics_driver_impl_fuchsia.cc",
-      "renderer_host/media/fuchsia_media_cdm_provider_impl.cc",
-      "renderer_host/media/fuchsia_media_cdm_provider_impl.h",
-      "renderer_host/media/fuchsia_media_codec_provider_impl.cc",
-      "renderer_host/media/fuchsia_media_codec_provider_impl.h",
-      "speech/tts_fuchsia.cc",
-    ]
-    deps += [
-      "//third_party/abseil-cpp:absl",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.accessibility.semantics:fuchsia.accessibility.semantics_cpp",
-      "//third_party/fuchsia-sdk/sdk/fidl/fuchsia.mediacodec:fuchsia.mediacodec_hlcpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/inspect",
-      "//third_party/fuchsia-sdk/sdk/pkg/inspect_component_cpp",
-      "//third_party/fuchsia-sdk/sdk/pkg/zx",
-      "//ui/accessibility",
-    ]
-  } else if (is_posix) {
+  if (is_posix) {
     sources += [
       "child_process_launcher_helper_posix.cc",
       "child_process_launcher_helper_posix.h",
@@ -2605,7 +2582,7 @@ source_set("browser") {
   # on Android at all (see https://crbug.com/1011535), whereas
   # `base::FilePatchWatcher` is not implemented on Fuchsia (see
   # https://crbug.com/851641)
-  if (!is_android && !is_ios && !is_fuchsia) {
+  if (!is_android && !is_ios) {
     sources += [
       "file_system_access/file_system_access_local_path_watcher.cc",
       "file_system_access/file_system_access_local_path_watcher.h",
@@ -3373,16 +3350,14 @@ source_set("browser") {
       "digital_credentials/cross_device_transaction_impl.h",
     ]
 
-    if (!is_fuchsia) {
-      sources += [
-        "speech/on_device_speech_recognition_engine_impl.cc",
-        "speech/on_device_speech_recognition_engine_impl.h",
-        "speech/soda_speech_recognition_engine_impl.cc",
-        "speech/soda_speech_recognition_engine_impl.h",
-      ]
+    sources += [
+      "speech/on_device_speech_recognition_engine_impl.cc",
+      "speech/on_device_speech_recognition_engine_impl.h",
+      "speech/soda_speech_recognition_engine_impl.cc",
+      "speech/soda_speech_recognition_engine_impl.h",
+    ]
 
-      deps += [ "//media/mojo/mojom:web_speech_recognition" ]
-    }
+    deps += [ "//media/mojo/mojom:web_speech_recognition" ]
 
     deps += [
       "//components/device_event_log",
@@ -3399,15 +3374,12 @@ source_set("browser") {
     ]
   }
 
-  if (!is_fuchsia) {
-    deps += [ "//components/crash/content/browser/error_reporting" ]
-  }
+  deps += [ "//components/crash/content/browser/error_reporting" ]
 
   # For platforms that support extension service workers.
   # NOTE: Fuchsia depends on this class, but probably shouldn't, as it doesn't
   # support extensions.
-  if (is_win || is_apple || is_linux || is_chromeos || is_desktop_android ||
-      is_fuchsia) {
+  if (is_win || is_apple || is_linux || is_chromeos || is_desktop_android) {
     sources += [
       "service_worker/service_worker_usb_delegate_observer.cc",
       "service_worker/service_worker_usb_delegate_observer.h",
@@ -3434,7 +3406,7 @@ source_set("browser") {
     ]
   }
 
-  if (!is_android && !is_ios && !is_fuchsia) {
+  if (!is_android && !is_ios) {
     sources += [
       # Trace report internal UI is not adapted for mobile use.
       "tracing/traces_internals/traces_internals_ui.cc",

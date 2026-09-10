@@ -8,7 +8,6 @@ import("//extensions/buildflags/buildflags.gni")
 import("//mojo/public/tools/bindings/mojom.gni")
 import("//testing/test.gni")
 
-assert(!is_fuchsia, "Fuchsia shouldn't use anything in //chrome")
 assert(!is_android,
        "Android shouldn't use anything in //chrome/web_applications")
 

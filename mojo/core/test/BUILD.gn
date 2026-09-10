@@ -30,7 +30,7 @@ static_library("test_support") {
     sources += [ "test_utils_win.cc" ]
   }
 
-  if (is_fuchsia || is_posix) {
+  if (is_posix) {
     sources += [ "test_utils.cc" ]
   }
 

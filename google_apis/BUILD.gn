@@ -56,13 +56,12 @@ if (use_official_google_api_keys == "") {
 # target_os == "fuchsia". current_os can be "linux" when building
 # //chrome/test/chromedriver
 assert(use_official_google_api_keys || !is_internal_chrome_branded || is_ios ||
-       is_fuchsia || target_os == "fuchsia")
+       target_os == "fuchsia")
 
 declare_args() {
   # Whether the SetAPIKey() method is defined.
   # iOS and Fuchsia builds that do not use the built-in key use this.
-  support_external_google_api_key =
-      is_ios || (is_fuchsia && !use_official_google_api_keys)
+  support_external_google_api_key = is_ios
 
   # Whether to support the CDM Server Certificate.
   support_cdm_server_certificate = is_mac || is_linux || is_win
@@ -305,11 +304,6 @@ test("google_apis_unittests") {
 
   if (is_android) {
     deps += [ "//net/android:net_java" ]
-  }
-
-  if (is_fuchsia) {
-    additional_manifest_fragments =
-        [ "//build/config/fuchsia/test/network.shard.test-cml" ]
   }
 
   if (enable_extensions) {
