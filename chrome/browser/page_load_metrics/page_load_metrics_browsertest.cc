@@ -1015,7 +1015,7 @@ IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest, NoPaintForEmptyDocument) {
                                       0);
 }
 
-// TODO(crbug.com/41472183): Flaky on Win and Linux.
+// TODO(crbug.com/41472183): Flaky on Linux.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_NoPaintForEmptyDocumentInChildFrame \
   DISABLED_NoPaintForEmptyDocumentInChildFrame
@@ -1099,7 +1099,6 @@ IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest, PaintInMultipleChildFrames) {
   histogram_tester_->ExpectTotalCount(internal::kHistogramFirstPaint, 1);
 }
 
-// TODO(crbug.com/334416161): Re-enable this test on Windows.
 #define MAYBE_PaintInMainAndChildFrame PaintInMainAndChildFrame
 IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest,
                        MAYBE_PaintInMainAndChildFrame) {
@@ -1293,7 +1292,6 @@ IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest, DocumentWriteBlock) {
       internal::kHistogramDocWriteBlockParseStartToFirstContentfulPaint, 1);
 }
 
-// TODO(crbug.com/334416161): Re-enable this test on Windows.
 #define MAYBE_DocumentWriteReload DocumentWriteReload
 IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest, MAYBE_DocumentWriteReload) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -2403,7 +2401,6 @@ IN_PROC_BROWSER_TEST_F(PageLoadMetricsResourceLoadBrowserTest,
   waiter->Wait();
 }
 
-// TODO(crbug.com/334416161): Re-enable this test on Windows.
 #define MAYBE_InputEventsForClick InputEventsForClick
 IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest, MAYBE_InputEventsForClick) {
   embedded_test_server()->ServeFilesFromSourceDirectory("content/test/data");
@@ -2805,7 +2802,6 @@ IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest, InputEventsForOmniboxMatch) {
   VerifyNavigationMetrics({url});
 }
 
-// TODO(crbug.com/334416161): Re-enable this test on Windows.
 #define MAYBE_InputEventsForJavaScriptHref InputEventsForJavaScriptHref
 IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest,
                        MAYBE_InputEventsForJavaScriptHref) {
@@ -3599,7 +3595,6 @@ IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest, SameOriginNavigation) {
       "PageLoad.Clients.SameOrigin.LargestContentfulPaint", 1);
 }
 
-// TODO(crbug.com/334416161): Re-enable this test on Windows.
 #define MAYBE_CrossOriginNavigation CrossOriginNavigation
 IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest,
                        MAYBE_CrossOriginNavigation) {
@@ -3649,7 +3644,6 @@ class PageLoadMetricsBrowserTestWithFencedFrames
   content::test::FencedFrameTestHelper helper_;
 };
 
-// TODO(crbug.com/334416161): Re-enable this test on Windows.
 #define MAYBE_PageLoadPrivacySandboxAdsFencedFramesMetrics \
   PageLoadPrivacySandboxAdsFencedFramesMetrics
 IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTestWithFencedFrames,

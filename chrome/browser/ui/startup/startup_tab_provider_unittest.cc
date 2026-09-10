@@ -467,8 +467,6 @@ TEST(StartupTabProviderTest, GetCommandLineTabsCustomScheme) {
 }
 #endif  // BUILDFLAG(CHROME_FOR_TESTING)
 
-// This test fails on Windows. TODO(crbug.com/40265634): Investigate and
-// fix this test on Windows.
 #define MAYBE_GetCommandLineTabsFileUrl GetCommandLineTabsFileUrl
 TEST(StartupTabProviderTest, MAYBE_GetCommandLineTabsFileUrl) {
   content::BrowserTaskEnvironment task_environment;

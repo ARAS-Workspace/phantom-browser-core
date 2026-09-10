@@ -1047,12 +1047,6 @@ bool DesktopCaptureDevice::Core::DeliverTextureToClient(
   TRACE_EVENT0(TRACE_DISABLED_BY_DEFAULT("video_and_image_capture"),
                "DesktopCaptureDevice::DeliverTextureToClient");
 
-  // Check if the active GPU adapter LUID has changed (e.g. after GPU process
-  // crash). The WGC capturer's D3D11 device (and thus all its textures) is
-  // bound to the adapter that was active at creation time. If the active
-  // adapter changes mid-capture, the textures are no longer usable by the
-  // new GPU process.
-
   gfx::Size texture_size(frame->size().width(), frame->size().height());
 
   DCHECK_EQ(frame->pixel_format(), webrtc::FOURCC_ARGB);
@@ -1379,7 +1373,7 @@ DesktopCaptureDevice::DesktopCaptureDevice(
   thread_.Start();
 #else
 #if BUILDFLAG(IS_MAC)
-  // On Windows/OSX the thread must be a UI thread.
+  // On OSX the thread must be a UI thread.
   base::MessagePumpType thread_type = base::MessagePumpType::UI;
 #else
   base::MessagePumpType thread_type = base::MessagePumpType::DEFAULT;

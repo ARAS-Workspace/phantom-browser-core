@@ -19,16 +19,10 @@ using base::WideToUTF16;
 namespace {
 
 void CheckSpellingServiceCallCount(size_t actual, size_t expected) {
-  // On Windows, if the native spell checker integration is enabled,
-  // CallSpellingService() is not used, so the fake provider's |text_| is never
-  // assigned. Don't assert the text in that case.
   EXPECT_EQ(actual, expected);
 }
 
 void CheckProviderText(std::u16string expected, std::u16string actual) {
-  // On Windows, if the native spell checker integration is enabled,
-  // CallSpellingService() is not used, so the fake provider's |text_| is never
-  // assigned. Don't assert the text in that case.
   EXPECT_EQ(actual, expected);
 }
 

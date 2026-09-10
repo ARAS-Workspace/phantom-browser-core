@@ -57,8 +57,7 @@ TEST(FileTest, DeleteFileWarnIfFailed) {
   // Don't test on Fuchsia: No file permission support. See
   // base/files/file_util_unittest.cc for some similar tests being skipped.
   {
-    // On Windows, we open the file to prevent it from being deleted. Otherwise,
-    // we modify the directory permission to prevent it from being deleted.
+    // Modify the directory permission to prevent the file from being deleted.
     base::FilePermissionRestorer restore_permissions_for(dir_path);
     // Get rid of the write permission from temp_dir
     ASSERT_TRUE(base::MakeFileUnwritable(dir_path));

@@ -173,7 +173,6 @@ void PrepareForUTF8Output(std::basic_string_view<CHAR> src,
 }
 
 // Instantiate versions we know callers will need.
-// wchar_t and char16_t are the same thing on Windows.
 template void PrepareForUTF8Output(std::wstring_view, std::string*);
 template void PrepareForUTF8Output(std::u16string_view, std::string*);
 
@@ -194,7 +193,6 @@ void PrepareForUTF16Or32Output(std::string_view src, STRING* output) {
 }
 
 // Instantiate versions we know callers will need.
-// std::wstring and std::u16string are the same thing on Windows.
 template void PrepareForUTF16Or32Output(std::string_view, std::wstring*);
 template void PrepareForUTF16Or32Output(std::string_view, std::u16string*);
 

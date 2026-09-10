@@ -197,7 +197,6 @@ class MultipartUploadDataPipeRequestTest
 
 INSTANTIATE_TEST_SUITE_P(, MultipartUploadDataPipeRequestTest, testing::Bool());
 
-// Disabled due to flakiness on Windows https://crbug.com/1286638
 #define MAYBE_Retries Retries
 TEST_P(MultipartUploadDataPipeRequestTest, MAYBE_Retries) {
   std::string expected_body =

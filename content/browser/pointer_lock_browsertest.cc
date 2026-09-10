@@ -953,6 +953,4 @@ IN_PROC_BROWSER_TEST_F(PointerLockBrowserTest,
 }
 #endif
 
-#if defined(USE_AURA)
-#endif  // USE_AURA
 }  // namespace content

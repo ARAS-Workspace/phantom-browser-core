@@ -142,8 +142,5 @@ TEST(SandboxTypeTest, Nonesuch) {
   EXPECT_EQ(Sandbox::kNoSandbox, SandboxTypeFromCommandLine(command_line));
 }
 
-// This flag is impossible on non-Windows platforms where it crashes in
-// a NOTREACHED(), but validate that it does exist on Windows.
-
 }  // namespace policy
 }  // namespace sandbox

@@ -384,7 +384,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiCaptureTest,
       << message_;
 }
 
-// https://crbug.com/40707203 Flaky on Windows, Linux, ChromeOS.
+// https://crbug.com/40707203 Flaky on Linux, ChromeOS.
 // TODO(crbug.com/488154807): Flaky on desktop Android.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 #define MAYBE_CaptureVisibleFile DISABLED_CaptureVisibleFile
@@ -444,7 +444,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTabTest, DISABLED_HostPermission) {
 // TODO(https://crbug.com/449095632): Enable these tests.
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 
-// Flaky on Windows, Mac and Linux. http://crbug.com/41375473.
+// Flaky on Mac and Linux. http://crbug.com/41375473.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_UpdateWindowResize DISABLED_UpdateWindowResize
 #else

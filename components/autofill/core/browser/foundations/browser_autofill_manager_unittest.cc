@@ -2815,9 +2815,8 @@ TEST_F(BrowserAutofillManagerTest,
       /*blocked_fields=*/{});
 }
 
-// BNPL suggestion is limited to Windows, macOS, Linux, and ChromeOS.
-// Therefore, the system will only check for supported BNPL issuers on these
-// platforms.
+// BNPL suggestion is limited to macOS, Linux, and ChromeOS. Therefore, the
+// system will only check for supported BNPL issuers on these platforms.
 // TODO(crbug.com/401370610): Update when BNPL is launched to other platform.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Tests that, in the BNPL flow, a VCN is not fetched again due to prior

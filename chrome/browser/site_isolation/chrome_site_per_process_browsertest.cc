@@ -146,7 +146,6 @@ double GetFrameDeviceScaleFactor(const content::ToRenderFrameHost& adapter) {
   return content::EvalJs(adapter, kGetFrameDeviceScaleFactor).ExtractDouble();
 }
 
-// Flaky on Windows 10. http://crbug.com/41306592
 #define MAYBE_InterstitialLoadsWithCorrectDeviceScaleFactor \
   InterstitialLoadsWithCorrectDeviceScaleFactor
 IN_PROC_BROWSER_TEST_F(SitePerProcessHighDPIExpiredCertBrowserTest,

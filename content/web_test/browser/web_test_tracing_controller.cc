@@ -35,11 +35,8 @@ void WebTestTracingController::StartTracing() {
           "*", base::trace_event::RECORD_UNTIL_FULL));
   tracing_session_ =
       perfetto::Tracing::NewTrace(perfetto::BackendType::kCustomBackend);
-  // TODO(crbug.com/40736989): Perfetto does not (yet) support writing directly
-  // to a file on Windows. For non-Windows, we pass an open file handle to the
-  // tracing session initializer for incremental writes. For windows, the
-  // tracing session will buffer all data in memory and we write out the
-  // complete trace file only when tracing stops.
+  // Pass an open file handle to the tracing session initializer for
+  // incremental writes.
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     tracing_file_.Initialize(trace_file_path_, base::File::FLAG_CREATE_ALWAYS |

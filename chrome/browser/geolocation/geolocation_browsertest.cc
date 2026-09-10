@@ -515,7 +515,6 @@ IN_PROC_BROWSER_TEST_P(GeolocationBrowserTest, NoPromptForAllowedOrigin) {
   ExpectPosition(fake_latitude(), fake_longitude());
 }
 
-// Crashes on Win only.  http://crbug.com/40653217
 #define MAYBE_PromptForOffTheRecord PromptForOffTheRecord
 
 IN_PROC_BROWSER_TEST_P(GeolocationBrowserTest, MAYBE_PromptForOffTheRecord) {

@@ -334,9 +334,6 @@ std::unique_ptr<VideoOverlayWindowViews> VideoOverlayWindowViews::Create(
   params.layer_type = ui::LAYER_NOT_DRAWN;
   params.delegate = new OverlayWindowWidgetDelegate();
 
-// Fade in animation is disabled for Document and Video Picture-in-Picture on
-// Windows. On Windows, resizable windows can not be translucent. See
-// crbug.com/425711450.
   params.opacity = views::Widget::InitParams::WindowOpacity::kTranslucent;
 
 #if BUILDFLAG(IS_MAC)
@@ -561,10 +558,6 @@ void VideoOverlayWindowViews::OnKeyEvent(ui::KeyEvent* event) {
       event->key_code() == ui::VKEY_TAB) {
     UpdateControlsVisibility(true);
   }
-
-// On Windows, the Alt+F4 keyboard combination closes the window. Only handle
-// closure on key press so Close() is not called a second time when the key
-// is released.
 
   // If there's no focused control, then we handle certain keys as if they went
   // to the relevant control.
@@ -1667,9 +1660,6 @@ void VideoOverlayWindowViews::Close() {
 }
 
 void VideoOverlayWindowViews::ShowInactive() {
-// Fade in animation is disabled for Document and Video Picture-in-Picture on
-// Windows. On Windows, resizable windows can not be translucent. See
-// crbug.com/425711450.
   if (!fade_animator_) {
     fade_animator_ = std::make_unique<PictureInPictureWidgetFadeAnimator>();
   }

@@ -741,8 +741,6 @@ TEST_F(AudioOutputResamplerTest, LowLatencyOpenFailedFallback) {
 TEST_F(AudioOutputResamplerTest, HighLatencyFallbackFailed) {
   MockAudioOutputStream okay_stream(&manager_, params_);
 
-// Only Windows has a high latency output driver that is not the same as the low
-// latency path.
   static const int kFallbackCount = 1;
   EXPECT_CALL(manager(), MakeAudioOutputStream(_, _, _))
       .Times(kFallbackCount)
@@ -773,8 +771,6 @@ TEST_F(AudioOutputResamplerTest, HighLatencyFallbackFailed) {
 // stream, and the fake audio output stream and ensure AudioOutputResampler
 // terminates normally.
 TEST_F(AudioOutputResamplerTest, AllFallbackFailed) {
-// Only Windows has a high latency output driver that is not the same as the low
-// latency path.
   static const int kFallbackCount = 2;
   EXPECT_CALL(manager(), MakeAudioOutputStream(_, _, _))
       .Times(kFallbackCount)

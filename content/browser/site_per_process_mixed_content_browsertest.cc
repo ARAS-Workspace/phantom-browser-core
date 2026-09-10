@@ -146,7 +146,6 @@ IN_PROC_BROWSER_TEST_P(SitePerProcessIgnoreCertErrorsBrowserTest,
 // displayed in an OOPIF. The test ignores cert errors so that an HTTPS
 // iframe can be loaded from a site other than localhost (the
 // EmbeddedTestServer serves a certificate that is valid for localhost).
-// This test crashes on Windows under Dr. Memory, see https://crbug.com/600942.
 #define MAYBE_PassiveMixedContentInIframe PassiveMixedContentInIframe
 IN_PROC_BROWSER_TEST_P(
     SitePerProcessIgnoreCertErrorsAllowMixedContentBrowserTest,

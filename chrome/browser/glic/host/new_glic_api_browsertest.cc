@@ -3826,7 +3826,6 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testRegisterConversationWithEmptyId) {
   EXPECT_EQ("Empty Conversation", retrieved_info->conversation_title);
 }
 
-// TODO(b/548051765): Flaky on Windows.
 #define MAYBE_testCallingApiWhileHiddenRecordsMetrics \
   testCallingApiWhileHiddenRecordsMetrics
 IN_PROC_BROWSER_TEST_P(NewGlicApiTest,

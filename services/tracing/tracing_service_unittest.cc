@@ -394,7 +394,6 @@ TEST_F(TracingServiceTest, PerfettoClientProducer) {
   EXPECT_EQ(kNumPackets, ReadAndCountTestPackets(*session));
 }
 
-// TODO(crbug.com/40736989): Support tracing to file on Windows.
 TEST_F(TracingServiceTest, TraceToFile) {
   // Set up API bindings.
   EnableClientApiConsumer();

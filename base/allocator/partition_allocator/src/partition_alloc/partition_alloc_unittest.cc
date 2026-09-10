@@ -2706,9 +2706,6 @@ TEST_P(PartitionAllocTest, CheckMetadataIntegrityPass) {
 //
 // Disable these tests on Android because, due to the allocation-heavy behavior,
 // they tend to get OOM-killed rather than pass.
-//
-// Disable these test on Windows, since they run slower, so tend to timeout and
-// cause flake.
 #if (!PA_BUILDFLAG(PA_ARCH_CPU_64_BITS) || \
      (PA_BUILDFLAG(IS_POSIX) &&            \
       !(PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID))))

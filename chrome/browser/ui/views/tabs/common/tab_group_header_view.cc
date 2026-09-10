@@ -639,8 +639,6 @@ void TabGroupHeaderView::UpdateAccessibleName() {
   const std::u16string contents = delegate_->GetGroupContentString();
   std::u16string group_status = std::u16string();
 
-  // Windows screen readers reads out the collapsed state based on the
-  // accessibility node data information.
   const bool is_collapsed = tab_group_visual_data_.is_collapsed();
   group_status = is_collapsed
                      ? l10n_util::GetStringUTF16(IDS_GROUP_AX_LABEL_COLLAPSED)

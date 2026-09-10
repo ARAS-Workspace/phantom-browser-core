@@ -34,11 +34,11 @@ namespace {
 AudioDeviceFactory* g_factory_override = nullptr;
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-// Due to driver deadlock issues on Windows (http://crbug/422522) there is a
-// chance device authorization response is never received from the browser side.
-// In this case we will time out, to avoid renderer hang forever waiting for
-// device authorization (http://crbug/615589). This will result in "no audio".
-// There are also cases when authorization takes too long on Mac and Linux.
+// There is a chance device authorization response is never received from the
+// browser side. In this case we will time out, to avoid renderer hang forever
+// waiting for device authorization (http://crbug/615589). This will result in
+// "no audio". There are also cases when authorization takes too long on Mac
+// and Linux.
 constexpr base::TimeDelta kMaxAuthorizationTimeout = base::Seconds(10);
 #else
 constexpr base::TimeDelta kMaxAuthorizationTimeout;  // No timeout.

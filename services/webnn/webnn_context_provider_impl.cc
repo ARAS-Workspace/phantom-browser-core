@@ -281,11 +281,6 @@ void WebNNContextProviderImpl::GetExistingContextsDetails(
 void WebNNContextProviderImpl::GetAvailableExecutionProvidersDetails(
     GetAvailableExecutionProvidersDetailsCallback callback) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(main_sequence_checker_);
-  // This implementation currently only supports reporting execution providers
-  // for the ORT backend on Windows, and returns an empty list for other
-  // platforms and backends. This is because the ORT backend is the only one
-  // that has multiple execution providers and where the available execution
-  // providers can vary based on the system configuration.
   std::move(callback).Run({});
 }
 

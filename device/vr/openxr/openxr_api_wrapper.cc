@@ -869,9 +869,6 @@ bool OpenXrApiWrapper::ShouldCreateSharedImages() const {
     return false;
   }
 
-  // TODO(crbug.com/40917171): Investigate moving the remaining Windows-
-  // only checks out of this class and into the GraphicsBinding.
-
   return graphics_binding_->CanUseSharedImages();
 }
 

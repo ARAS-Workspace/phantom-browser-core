@@ -142,8 +142,8 @@ Browser* GetExistingBrowserForOpenBehavior(
       current_browser ? current_browser->GetBrowserForMigrationOnly() : nullptr;
 
 #if BUILDFLAG(IS_CHROMEOS)
-  // On Windows and ChromeOS we specifically want to select the last active
-  // window on the current workspace if possible, see crbug.com/497494119.
+  // On ChromeOS we specifically want to select the last active window on the
+  // current workspace if possible, see crbug.com/497494119.
   ProfileBrowserCollection::GetForProfile(profile)->ForEach(
       [&](BrowserWindowInterface* window) {
         Browser* const candidate = window->GetBrowserForMigrationOnly();

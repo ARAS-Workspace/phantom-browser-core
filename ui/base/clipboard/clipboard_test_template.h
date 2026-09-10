@@ -226,7 +226,6 @@ TYPED_TEST(ClipboardTest, SvgTest) {
       /* data_dst = */ nullptr);
 
   EXPECT_EQ(markup, markup_result);
-  // On Windows, the SVG data is written as UTF-8.
 }
 
 #if !BUILDFLAG(IS_ANDROID)

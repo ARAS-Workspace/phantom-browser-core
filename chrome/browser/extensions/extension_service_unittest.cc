@@ -4317,9 +4317,9 @@ TEST_F(ExtensionServiceTest, PolicyInstalledExtensionsAllowlisted) {
   EXPECT_TRUE(registry()->enabled_extensions().GetByID(kGoodCrx));
 }
 
-// These tests are restricted to Windows and Mac platforms because the disable
-// logic for off-store force-installed extensions in low-trust environments
-// (non-domain-joined) is only implemented on these platforms as per the changes
+// These tests are restricted to the Mac platform because the disable logic for
+// off-store force-installed extensions in low-trust environments
+// (non-domain-joined) is only implemented on this platform as per the changes
 // in `standard_management_policy_provider.cc`.
 #if BUILDFLAG(IS_MAC)
 // Tests that non-CWS extensions are disabled when force-installed in a non

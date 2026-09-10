@@ -215,7 +215,7 @@ void ShowSettingsOverriddenDialog(
   dialog_builder.SetInternalName(kExtensionSettingsOverriddenDialogName);
 
 #if BUILDFLAG(IS_MAC)
-  // The "explicit choice" dialog is only supported on Windows and Mac.
+  // The "explicit choice" dialog is only supported on Mac.
   if (base::FeatureList::IsEnabled(
           extensions_features::kSearchEngineExplicitChoiceDialog) &&
       show_params.new_setting && show_params.previous_setting) {

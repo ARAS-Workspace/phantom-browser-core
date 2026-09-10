@@ -479,8 +479,8 @@ void ThemeService::UseSystemTheme() {
 
 void ThemeService::UseDeviceTheme(bool follow) {
 #if BUILDFLAG(IS_CHROMEOS)
-  // This toggle is currently supported on ChromeOS and Windows and we only want
-  // platforms to set the value if they have a visible toggle.
+  // This toggle is currently supported on ChromeOS and we only want platforms
+  // to set the value if they have a visible toggle.
   profile_->GetPrefs()->SetBoolean(prefs::kBrowserFollowsSystemThemeColors,
                                    follow);
   NotifyThemeChanged();
@@ -910,8 +910,8 @@ void ThemeService::ClearThemeData(bool reset_all_settings) {
   ClearThemePrefs();
   if (reset_all_settings) {
 #if BUILDFLAG(IS_CHROMEOS)
-    // This toggle is currently supported on ChromeOS and Windows and we only
-    // want platforms to set the value if they have a visible toggle.
+    // This toggle is currently supported on ChromeOS and we only want
+    // platforms to set the value if they have a visible toggle.
     profile_->GetPrefs()->ClearPref(prefs::kBrowserFollowsSystemThemeColors);
 #endif
     NtpCustomBackgroundService::ResetNtpTheme(profile_);

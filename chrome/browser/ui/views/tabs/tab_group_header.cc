@@ -841,11 +841,8 @@ void TabGroupHeader::UpdateAccessibleName() {
       tab_slot_controller_->GetGroupContentString(group().value());
   std::u16string group_status = std::u16string();
 
-// Windows screen reader properly announces the state set above in `node_data`
-// and will read out the state change when the header's collapsed state is
-// toggled. The state is added into the title for other platforms and the title
-// will be reread with the updated state when the header's collapsed state is
-// toggled.
+// The state is added into the title and the title will be reread with the
+// updated state when the header's collapsed state is toggled.
   bool is_collapsed = tab_slot_controller_->IsGroupCollapsed(group().value());
   group_status = is_collapsed
                      ? l10n_util::GetStringUTF16(IDS_GROUP_AX_LABEL_COLLAPSED)

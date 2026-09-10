@@ -729,9 +729,9 @@ IN_PROC_BROWSER_TEST_F(NotificationsTest, TestShouldDisplayPopupNotification) {
 }
 
 #if !BUILDFLAG(IS_ANDROID)
-// TODO(crbug.com/40721738): Test fails on Windows and macOS on the bots as
-// there is no real display to test with. Need to find a way to run these
-// without a display. Tests pass locally with a real display.
+// TODO(crbug.com/40721738): Test fails on macOS on the bots as there is no
+// real display to test with. Need to find a way to run these without a
+// display. Tests pass locally with a real display.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_ShouldQueueDuringScreenPresent \
   DISABLED_ShouldQueueDuringScreenPresent

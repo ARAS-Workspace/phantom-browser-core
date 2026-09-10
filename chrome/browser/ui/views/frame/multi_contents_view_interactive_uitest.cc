@@ -485,8 +485,7 @@ IN_PROC_BROWSER_TEST_P(MultiContentsViewUiTest, ActiveContentsViewHasFocus) {
 
 // Split view active tab change while browser window doesn't have focus. This
 // is used to simulate tab switching scenarios using Tab Search
-// TODO(https://crbug.com/422941990): Flaky (times out) on Linux and Windows
-// debug bots.
+// TODO(https://crbug.com/422941990): Flaky (times out) on Linux debug bots.
 #if !defined(NDEBUG) && BUILDFLAG(IS_LINUX)
 #define MAYBE_TabChangeInSplitViewWithInactiveBrowserWindow \
   DISABLED_TabChangeInSplitViewWithInactiveBrowserWindow
@@ -518,8 +517,7 @@ IN_PROC_BROWSER_TEST_P(MultiContentsViewUiTest,
 // Switch to the not last used tab inside a split view from a not split tab
 // while the browser is inactive. This is used to simulate tab switching
 // scenarios using Tab Search
-// TODO(https://crbug.com/422941990): Flaky (times out) on Linux and Windows
-// debug bots.
+// TODO(https://crbug.com/422941990): Flaky (times out) on Linux debug bots.
 #if (!defined(NDEBUG) && BUILDFLAG(IS_LINUX)) || defined(THREAD_SANITIZER)
 #define MAYBE_SwitchToSplitViewWithInactiveBrowserWindow \
   DISABLED_SwitchToSplitViewWithInactiveBrowserWindow

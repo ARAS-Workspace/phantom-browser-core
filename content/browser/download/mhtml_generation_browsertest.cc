@@ -664,7 +664,6 @@ IN_PROC_BROWSER_TEST_F(MHTMLGenerationTest,
   EXPECT_EQ(ReadFileSizeFromDisk(path), file_size());
 }
 
-// TODO(crbug.com/41290169): Flaky on Windows.
 #define MAYBE_InvalidPath InvalidPath
 IN_PROC_BROWSER_TEST_F(MHTMLGenerationTest, MAYBE_InvalidPath) {
   base::FilePath path(FILE_PATH_LITERAL("/invalid/file/path"));

@@ -88,7 +88,6 @@ class RenderThreadImplDiscardableMemoryBrowserTest : public ContentBrowserTest {
   raw_ptr<base::DiscardableMemoryAllocator> discardable_memory_allocator_;
 };
 
-// TODO(crbug.com/362224383): This test was flaky on Windows ASan bots.
 #define MAYBE_LockDiscardableMemory LockDiscardableMemory
 IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,
                        MAYBE_LockDiscardableMemory) {
@@ -166,7 +165,6 @@ IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,
   }));
 }
 
-// TODO(crbug.com/362120461): This test was flaky on Windows bots.
 #define MAYBE_ReleaseFreeDiscardableMemory_ByCriticalPressure \
   ReleaseFreeDiscardableMemory_ByCriticalPressure
 IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,
@@ -198,7 +196,6 @@ IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,
                     ->GetBytesAllocated());
 }
 
-// TODO(crbug.com/364379688): This test is flaky on Windows ASan bots.
 #define MAYBE_CheckReleaseMemory CheckReleaseMemory
 IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,
                        MAYBE_CheckReleaseMemory) {

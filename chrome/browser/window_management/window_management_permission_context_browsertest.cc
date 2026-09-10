@@ -312,9 +312,6 @@ IN_PROC_BROWSER_TEST_F(WindowManagementPermissionContextTest,
   EXPECT_TRUE(child->GetMainFrame()->HasTransientUserActivation());
 }
 
-// TODO(enne): Windows assumes that display::GetScreen() is a ScreenWin
-// which is not true here.
-
 // Verify that window.screen.isExtended returns true in a same-origin
 // iframe without the window management permission policy allowed.
 IN_PROC_BROWSER_TEST_F(MultiscreenWindowManagementPermissionContextTest,

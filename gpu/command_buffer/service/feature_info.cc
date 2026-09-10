@@ -1191,7 +1191,6 @@ void FeatureInfo::InitializeFeatures(uint32_t complete_fbo_for_workarounds) {
   // to handle well also.
   feature_flags_.chromium_image_ar30 = true;
 #else
-  // TODO(mcasas): connect in Windows, https://crbug.com/803451
   // XB30 support was introduced in GLES 3.0/ OpenGL 3.3, before that it was
   // signalled via a specific extension.
   feature_flags_.chromium_image_ab30 =

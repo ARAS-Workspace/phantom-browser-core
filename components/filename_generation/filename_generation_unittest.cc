@@ -55,7 +55,6 @@ static const auto kExtensionTestCases = std::to_array<ExtensionTestCases>({
     {FPL("helloworld."), FPL("helloworld.") FPL_HTML_EXTENSION},
 });
 
-// Crashing on Windows, see http://crbug.com/79365
 #define MAYBE_TestEnsureHtmlExtension TestEnsureHtmlExtension
 TEST(FilenameGenerationTest, MAYBE_TestEnsureHtmlExtension) {
   for (size_t i = 0; i < std::size(kExtensionTestCases); ++i) {
@@ -68,7 +67,6 @@ TEST(FilenameGenerationTest, MAYBE_TestEnsureHtmlExtension) {
   }
 }
 
-// Crashing on Windows, see http://crbug.com/79365
 #define MAYBE_TestEnsureMimeExtension TestEnsureMimeExtension
 TEST(FilenameGenerationTest, MAYBE_TestEnsureMimeExtension) {
   struct ExtensionTests {
@@ -148,7 +146,6 @@ static const auto kGenerateFilenameCases =
          FPL("http___www.foo.com_path_title.txt"), false},
     });
 
-// Crashing on Windows, see http://crbug.com/79365
 #define MAYBE_TestGenerateFilename TestGenerateFilename
 TEST(FilenameGenerationTest, MAYBE_TestGenerateFilename) {
   for (size_t i = 0; i < std::size(kGenerateFilenameCases); ++i) {

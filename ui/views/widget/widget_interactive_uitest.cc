@@ -1667,10 +1667,6 @@ TEST_F(WidgetCaptureTest, MAYBE_MouseExitOnCaptureGrab) {
 
   widget2->SetCapture(nullptr);
   EXPECT_EQ(0, mouse_view1->EnteredCalls());
-  // On Windows, Chrome doesn't synthesize a separate mouse exited event.
-  // Instead, it uses ::TrackMouseEvent to get notified of the mouse leaving.
-  // Calling SetCapture does not cause Windows to generate a WM_MOUSELEAVE
-  // event. See WindowEventDispatcher::OnOtherRootGotCapture() for more info.
   EXPECT_EQ(1, mouse_view1->ExitedCalls());
 }
 
@@ -2072,8 +2068,6 @@ class DesktopWidgetDragTestInteractive : public DesktopWidgetTestInteractive,
 };
 
 // Cancels a DnD session started by `RunDragDropLoop()`.
-//
-// TODO(crbug.com/332944429): Re-enable on Windows AMR64.
 #define MAYBE_CancelDragDropLoop CancelDragDropLoop
 TEST_F(DesktopWidgetDragTestInteractive, MAYBE_CancelDragDropLoop) {
   auto widget = std::make_unique<Widget>();

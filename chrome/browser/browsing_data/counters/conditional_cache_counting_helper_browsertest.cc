@@ -122,7 +122,6 @@ class ConditionalCacheCountingHelperBrowserTest : public InProcessBrowserTest {
 
 // Tests that ConditionalCacheCountingHelper only counts those cache entries
 // that match the condition.
-// TODO(crbug.com/40816226): The test is flaky on Win.
 #define MAYBE_Count Count
 IN_PROC_BROWSER_TEST_F(ConditionalCacheCountingHelperBrowserTest, MAYBE_Count) {
   // Create 5 entries.

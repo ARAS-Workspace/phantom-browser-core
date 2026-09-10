@@ -4680,7 +4680,6 @@ class SitePerProcessMouseWheelHitTestBrowserTest
   raw_ptr<RenderWidgetHostViewAura, DanglingUntriaged> rwhv_root_;
 };
 
-// Fails on Windows official build, see // https://crbug.com/800822
 #define MAYBE_MultipleSubframeWheelEventsOnMainThread \
   MultipleSubframeWheelEventsOnMainThread
 IN_PROC_BROWSER_TEST_F(SitePerProcessMouseWheelHitTestBrowserTest,
@@ -4722,7 +4721,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessMouseWheelHitTestBrowserTest,
 
 // Verifies that test in SubframeWheelEventsOnMainThread also makes sense for
 // the same page loaded in the mainframe.
-// Fails on Windows official build, see // https://crbug.com/800822
 #define MAYBE_MainframeWheelEventsOnMainThread MainframeWheelEventsOnMainThread
 IN_PROC_BROWSER_TEST_F(SitePerProcessMouseWheelHitTestBrowserTest,
                        MAYBE_MainframeWheelEventsOnMainThread) {
@@ -5288,7 +5286,6 @@ void SendTouchpadPinchSequenceWithExpectedTarget(
   EXPECT_EQ(nullptr, router_touchpad_gesture_target);
 }
 
-// Sending touchpad fling events is not supported on Windows.
 void SendTouchpadFlingSequenceWithExpectedTarget(
     RenderWidgetHostViewBase* root_view,
     const gfx::Point& gesture_point,
@@ -5567,8 +5564,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
   SendTouchpadPinchSequenceWithExpectedTarget(rwhv_parent, main_frame_point,
                                               router->touchpad_gesture_target_,
                                               rwhv_parent);
-
-  // Sending touchpad fling events is not supported on Windows.
 
   // Send touchpad fling sequence to main-frame.
   SendTouchpadFlingSequenceWithExpectedTarget(

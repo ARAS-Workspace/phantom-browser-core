@@ -2375,7 +2375,7 @@ class IntegrationTestDeviceManagement : public IntegrationTest {
   }
 
   void SetCloudPolicyOverridesPlatformPolicy() {
-// Cloud policy overrides platform policy default, except on Windows.
+// Cloud policy overrides platform policy default.
   }
 
   std::unique_ptr<ScopedServer> test_server_;
@@ -3962,9 +3962,7 @@ TEST_F(IntegrationTestKSAdminFourApps, CRURegistrationFetchTag) {
 #endif  // !defined(ADDRESS_SANITIZER)
 #endif  // BUILDFLAG(IS_MAC)
 
-// Windows specific tests.
-
-// Event logging is only implemented on Mac and Windows.
+// Event logging is only implemented on Mac.
 #if BUILDFLAG(IS_MAC)
 
 class EventLoggingIntegrationTest : public IntegrationTest {

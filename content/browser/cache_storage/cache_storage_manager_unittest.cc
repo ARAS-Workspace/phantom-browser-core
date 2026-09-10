@@ -1844,7 +1844,6 @@ TEST_F(CacheStorageManagerTest, GetBucketUsageConflictingBucketIds) {
   EXPECT_NE(Size(bucket_locator1_), 0);
 }
 
-// TODO(crbug.com/40868994): Re-enable test for Windows.
 #define MAYBE_GetBucketUsageWithPadding GetBucketUsageWithPadding
 TEST_P(CacheStorageManagerStorageKeyAndBucketTestP,
        MAYBE_GetBucketUsageWithPadding) {

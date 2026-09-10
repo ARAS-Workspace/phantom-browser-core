@@ -75,9 +75,7 @@
 #define MAYBE_UsingRealWebcam_CheckPhotoCallbackRelease \
   UsingRealWebcam_CheckPhotoCallbackRelease
 #elif BUILDFLAG(IS_LINUX)
-// Windows test bots don't have camera.
 // Linux test bots don't have camera.
-// On Fuchsia the tests run under emulator that doesn't support camera.
 #define MAYBE_UsingRealWebcam_AllocateBadSize \
   DISABLED_UsingRealWebcam_AllocateBadSize
 #define MAYBE_UsingRealWebcam_CaptureMjpeg DISABLED_UsingRealWebcam_CaptureMjpeg
@@ -369,7 +367,6 @@ class VideoCaptureDeviceTest
   std::unique_ptr<VideoCaptureDeviceFactory> video_capture_device_factory_;
 };
 
-// Cause hangs on Windows Debug. http://crbug.com/417824
 #define MAYBE_UsingRealWebcam_OpenInvalidDevice \
   UsingRealWebcam_OpenInvalidDevice
 // Tries to allocate an invalid device and verifies it doesn't work.

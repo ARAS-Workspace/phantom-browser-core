@@ -41,11 +41,6 @@ void AddDialogContent(
   // dialog properly. This is important because this dialog is meant to be
   // non-escapable, so screen-readers need to work well.
   //
-  // On Windows, we need to focus the paragraph element (which is explicitly
-  // made focusable when created), or else the dialog does not grab focus when
-  // it appears (ie. nothing is read, and a Tab keystroke is required to select
-  // the dialog).
-  //
   // On Mac, the dialog heading is picked up as the initially-focused element
   // and the dialog is properly introduced by screen readers. If we set an
   // initially-focused field, the focus appears to change within the dialog

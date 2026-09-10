@@ -2878,8 +2878,6 @@ IN_PROC_BROWSER_TEST_F(EnclaveAuthenticatorBrowserTest, BiometricsInPWA) {
 }
 #endif
 
-// Without a Windows-on-ARM device we've been unable to debug why these
-// tests fail in that that context.
 #define MAYBE_NoGpmForCrossPlatformAttachment NoGpmForCrossPlatformAttachment
 IN_PROC_BROWSER_TEST_F(EnclaveAuthenticatorBrowserTest,
                        MAYBE_NoGpmForCrossPlatformAttachment) {

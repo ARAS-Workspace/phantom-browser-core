@@ -282,13 +282,12 @@ bool ImportantFileWriter::WriteFileAtomicallyImpl(
 
   // The file must be closed for ReplaceFile to do its job, which opens up a
   // race with other software that may open the temp file (e.g., an A/V scanner
-  // doing its job without oplocks). Boost a background thread's priority on
-  // Windows and close as late as possible to improve the chances that the other
-  // software will lose the race.
+  // doing its job without oplocks). Close as late as possible to improve the
+  // chances that the other software will lose the race.
   tmp_file.Close();
   result = replace_file_callback.Run(tmp_file_path, path, &replace_file_error);
-  // Log the result of the ReplaceFile operation. In contrast with Windows,
-  // we don't retry the operation, so we only record the result.
+  // Log the result of the ReplaceFile operation. We don't retry the
+  // operation, so we only record the result.
   UmaHistogramReplaceResultWithSuffix(
       histogram_suffix,
       result ? ReplaceResult::kSuccessWithoutRetry : ReplaceResult::kFailure);

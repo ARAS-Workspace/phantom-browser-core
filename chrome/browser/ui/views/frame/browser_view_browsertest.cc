@@ -716,8 +716,6 @@ IN_PROC_BROWSER_TEST_F(BrowserViewTest, GetAccessibleTabModalDialogTree) {
       ui::kAXModeComplete);
   ui::AXPlatformNode* ax_node = ui::AXPlatformNode::FromNativeViewAccessible(
       browser_view()->GetWidget()->GetRootView()->GetNativeViewAccessible());
-// We expect this conversion to be safe on Windows, but can't guarantee that it
-// is safe on other platforms.
   if (!ax_node) {
     return;
   }

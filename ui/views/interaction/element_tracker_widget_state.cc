@@ -27,7 +27,7 @@ void ElementTrackerWidgetState::OnWidgetVisibilityChanged(Widget* widget,
     return;
   }
 
-  // On all platforms but Windows, minimization comes with an automatic hide.
+  // Minimization comes with an automatic hide.
   if (!visible && widget == widget->GetPrimaryWindowWidget()) {
     // This happens *before* the minimized signal is sent, so delay processing
     // until the message queue is cleared.

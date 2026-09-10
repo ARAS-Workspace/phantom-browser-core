@@ -675,7 +675,7 @@ IN_PROC_BROWSER_TEST_F(
 // verifying that we don't crash when we pass this limit.
 // Warning: this test can take >30 seconds when running on a slow (low
 // memory?) Mac builder.
-// Test is flaky on Win, Linux, Mac: https://crbug.com/40702340.
+// Test is flaky on Linux, Mac: https://crbug.com/40702340.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_ThirtyFourTabs DISABLED_ThirtyFourTabs
 #else

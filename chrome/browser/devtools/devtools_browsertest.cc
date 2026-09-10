@@ -983,8 +983,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsBeforeUnloadTest, TestDockedDevToolsClose) {
 
 // Tests that BeforeUnload event gets called on docked devtools if
 // we try to close the inspected page.
-//
-// TODO(crbug.com/40679397): Flaky on Windows.
 #define MAYBE_TestDockedDevToolsInspectedTabClose \
   TestDockedDevToolsInspectedTabClose
 IN_PROC_BROWSER_TEST_F(DevToolsBeforeUnloadTest,
@@ -1901,7 +1899,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsExtensionTest,
   }
 }
 
-// Disabled on Windows due to flakiness. http://crbug.com/40967938
 // TODO(crbug.com/425268770): Flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_TestDevToolsExtensionMessaging \
@@ -3381,7 +3378,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, TestRawHeadersWithRedirectAndHSTS) {
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 // Tests that OpenInNewTab filters URLs.
-// TODO(crbug.com/40847130): Flaky on Windows and Linux.
+// TODO(crbug.com/40847130): Flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_TestOpenInNewTabFilter DISABLED_TestOpenInNewTabFilter
 #else
@@ -4687,7 +4684,6 @@ class ActiveTabChangedObserver : public TabStripModelObserver {
   base::RunLoop loop_;
 };
 
-// TODO: crbug.com/337141755 - Flaky on Windows ASAN.
 #define MAYBE_PausedDebuggerFocus PausedDebuggerFocus
 IN_PROC_BROWSER_TEST_F(DevToolsProcessPerSiteTest, MAYBE_PausedDebuggerFocus) {
   const GURL url = embedded_test_server()->GetURL("foo.test", "/hello.html");

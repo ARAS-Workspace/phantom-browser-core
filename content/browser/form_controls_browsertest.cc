@@ -174,7 +174,6 @@ class FormControlsBrowserTest : public ContentBrowserTest {
   base::test::ScopedFeatureList feature_list_;
 };
 
-// TODO(crbug.com/401594933): The test fails on Windows ARM64.
 #define MAYBE_Checkbox Checkbox
 IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, MAYBE_Checkbox) {
   if (SkipTestForOldAndroidVersions())
@@ -266,7 +265,6 @@ IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, Input) {
           /* screenshot_height */ 330);
 }
 
-// The test fails on Windows ARM64: crbug.com/401594933.
 #if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_Textarea DISABLED_Textarea
 #else
@@ -335,7 +333,6 @@ IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, Button) {
           /* screenshot_height */ 300);
 }
 
-// TODO(crbug.com/401594933): The test fails on Windows ARM64.
 #define MAYBE_ColorInput ColorInput
 IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, MAYBE_ColorInput) {
   if (SkipTestForOldAndroidVersions())
@@ -356,7 +353,6 @@ IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, MAYBE_ColorInput) {
           /* screenshot_height */ 250);
 }
 
-// TODO(crbug.com/401594933): The test fails on Windows ARM64.
 #define MAYBE_Select Select
 IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, MAYBE_Select) {
   if (SkipTestForOldAndroidVersions())
@@ -387,9 +383,6 @@ IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, MAYBE_Select) {
           });
 }
 
-// TODO(crbug.com/377986468) : Flaky on Windows. Seems to lose focus of top
-// <select> in some runs which causes the results to be different from
-// expectations.
 // TODO(crbug.com/448656594): The test fails on Android. Probably we need
 // separate baselines for phone and tablet devices.
 // TODO(crbug.com/449053040): Re-enable the test on Linux.

@@ -177,7 +177,6 @@ TEST(FileSystemApiUnitTest, FileSystemChooseEntryFunctionSuggestionTest) {
   EXPECT_EQ(suggested_name.MaybeAsASCII(), "path");
   EXPECT_TRUE(suggested_extension.empty());
 
-  // TODO(thorogood): Fix this test on Windows.
   // Filter out absolute paths with no basename.
   opt_name = std::string("/");
   FileSystemChooseEntryFunction::BuildSuggestion(opt_name, &suggested_name,

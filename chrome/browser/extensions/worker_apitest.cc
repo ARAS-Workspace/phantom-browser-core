@@ -19,7 +19,6 @@ class WorkerTest : public ExtensionApiTest {
   }
 };
 
-// TODO(crbug.com/431290255): Flaky on Windows with ASAN.
 #define MAYBE_WorkerInBackgroundPage WorkerInBackgroundPage
 IN_PROC_BROWSER_TEST_F(WorkerTest, MAYBE_WorkerInBackgroundPage) {
   embedded_test_server()->ServeFilesFromDirectory(test_data_dir_);

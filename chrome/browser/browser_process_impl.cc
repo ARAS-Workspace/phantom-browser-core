@@ -286,10 +286,9 @@ static const int kUpdateCheckIntervalHours = 6;
 #endif
 
 #if BUILDFLAG(IS_OZONE)
-// How long to wait for the File thread to complete during EndSession, on Linux
-// and Windows. We have a timeout here because we're unable to run the UI
-// messageloop and there's some deadlock risk. Our only option is to exit
-// anyway.
+// How long to wait for the File thread to complete during EndSession, on Linux.
+// We have a timeout here because we're unable to run the UI messageloop and
+// there's some deadlock risk. Our only option is to exit anyway.
 static constexpr base::TimeDelta kEndSessionTimeout = base::Seconds(10);
 #endif
 
@@ -860,19 +859,7 @@ void BrowserProcessImpl::EndSession() {
   // If you change the condition here, be sure to also change
   // ProfileBrowserTests to match.
 #if BUILDFLAG(IS_OZONE)
-  // Do a best-effort wait on the successful countdown of rundown tasks. Note
-  // that if we don't complete "quickly enough", Windows will terminate our
-  // process.
-  //
-  // On Windows, we previously posted a message to FILE and then ran a nested
-  // message loop, waiting for that message to be processed until quitting.
-  // However, doing so means that other messages will also be processed. In
-  // particular, if the GPU process host notices that the GPU has been killed
-  // during shutdown, it races exiting the nested loop with the process host
-  // blocking the message loop attempting to re-establish a connection to the
-  // GPU process synchronously. Because the system may not be allowing
-  // processes to launch, this can result in a hang. See
-  // http://crbug.com/40341017.
+  // Do a best-effort wait on the successful countdown of rundown tasks.
   rundown_counter->TimedWait(kEndSessionTimeout);
 #else
   NOTIMPLEMENTED();

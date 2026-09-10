@@ -21,8 +21,6 @@ namespace base {
 namespace {
 
 std::string FixNewlines(const std::string& json) {
-  // The pretty-printer uses a different newline style on Windows than on
-  // other platforms.
   return json;
 }
 

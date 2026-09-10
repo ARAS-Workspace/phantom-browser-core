@@ -533,8 +533,6 @@ IN_PROC_BROWSER_TEST_P(ToolbarViewTest,
 // assigned so that the menu can be located by tests when it is shown.
 //
 // The back button is just one example for which the menu identifier is defined.
-//
-// TODO: crbug.com/494279213 - Re-enable this test on Windows.
 #define MAYBE_BackButtonMenu BackButtonMenu
 IN_PROC_BROWSER_TEST_P(ToolbarViewTest, MAYBE_BackButtonMenu) {
   // TODO(crbug.com/470038385): Support WebUI back button in this test.

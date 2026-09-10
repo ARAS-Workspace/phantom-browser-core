@@ -85,9 +85,6 @@ class CONTENT_EXPORT SystemMediaControlsNotifier
   // metadata updates.
   void ClearAllMetadata();
 
-  // We want to hide the controls on the lock screen on Windows in certain
-  // cases. We don't want this functionality on other OSes.
-
   // Our connection to the System Media Controls instance we should notify.
   // Owned by WebAppSystemMediaControls.
   const raw_ptr<system_media_controls::SystemMediaControls>

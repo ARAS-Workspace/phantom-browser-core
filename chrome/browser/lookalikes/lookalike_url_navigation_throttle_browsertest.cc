@@ -1042,7 +1042,7 @@ IN_PROC_BROWSER_TEST_F(LookalikeUrlNavigationThrottleBrowserTest,
 }
 
 // TODO(crbug.com/40146482): Enable test when MacOS flake is fixed.
-// TODO(crbug.com/40706320): Enable test when Win/Linux flake is fixed.
+// TODO(crbug.com/40706320): Enable test when Linux flake is fixed.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_Idn_SiteEngagement_Match DISABLED_Idn_SiteEngagement_Match
 #else

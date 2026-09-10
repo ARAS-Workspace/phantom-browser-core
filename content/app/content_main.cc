@@ -201,7 +201,6 @@ NO_STACK_PROTECTOR int RunContentProcess(
     int argc = 0;
     const char** argv = nullptr;
 
-    // argc/argv are ignored on Windows; see command_line.h for details.
     argc = params.argc;
     argv = params.argv;
 

@@ -297,8 +297,8 @@ BASE_EXPORT void IncreaseFdLimitTo(unsigned int max_descriptors);
 
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
     BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
-// Data about system-wide memory consumption. Available on Windows, Mac, Linux,
-// Android and Chrome OS.
+// Data about system-wide memory consumption. Available on Mac, Linux, Android
+// and Chrome OS.
 //
 // The values are kept in ByteSize but depending on the platform, the
 // granularity might be at the KB level or higher.
@@ -308,8 +308,7 @@ BASE_EXPORT void IncreaseFdLimitTo(unsigned int max_descriptors);
 // except on Mac. Buffers/cached/active_anon/inactive_anon/active_file/
 // inactive_file/dirty/reclaimable/pswpin/pswpout/pgmajfault are available on
 // Linux/Android/Chrome OS. Shmem/slab are Chrome OS only.
-// Speculative/file_backed/purgeable are Mac and iOS only. Free is absent on
-// Windows (see "avail_phys" below).
+// Speculative/file_backed/purgeable are Mac and iOS only.
 struct BASE_EXPORT SystemMemoryInfo {
   SystemMemoryInfo();
   SystemMemoryInfo(const SystemMemoryInfo& other);

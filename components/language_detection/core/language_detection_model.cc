@@ -81,7 +81,6 @@ LanguageDetectionModel::LoadModelFromFile(base::File model_file,
       ->set_num_threads(num_threads);
 
   base::ElapsedTimer timer;
-// Windows doesn't support using mmap for the language detection model.
   options.mutable_base_options()
       ->mutable_model_file()
       ->mutable_file_descriptor_meta()

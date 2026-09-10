@@ -37,11 +37,6 @@ NOINLINE BASE_EXPORT void AsanHeapUseAfterFree();
 // a deterministic crash.
 NOINLINE BASE_EXPORT void AsanHeapMemberDereferenceAfterFree();
 
-#if defined(ADDRESS_SANITIZER) || BUILDFLAG(IS_HWASAN)
-// The "corrupt-block" and "corrupt-heap" classes of bugs is specific to
-// Windows.
-#endif  // ADDRESS_SANITIZER
-
 }  // namespace base::debug
 
 #endif  // BASE_DEBUG_ASAN_INVALID_ACCESS_H_

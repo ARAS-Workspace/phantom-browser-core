@@ -99,7 +99,6 @@ TEST_F(InputFileTest, TestRead_Valid) {
   VerifyRead(kChunkSize);
 }
 
-// TODO(crbug.com/40148372): Fix these tests from crashing on Windows.
 TEST_F(InputFileTest, TestRead_Valid_ChunkLargerThanFileSize) {
   VerifyRead(kTestDataSize * 2);
 }

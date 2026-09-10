@@ -170,10 +170,6 @@ class LazyInstance {
     return 0 != private_instance_.load(std::memory_order_relaxed);
   }
 
-  // MSVC gives a warning that the alignment expands the size of the
-  // LazyInstance struct to make the size a multiple of the alignment. This
-  // is expected in this case.
-
   // Effectively private: member data is only public to allow the linker to
   // statically initialize it and to maintain a POD class. DO NOT USE FROM
   // OUTSIDE THIS CLASS.

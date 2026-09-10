@@ -650,7 +650,6 @@ IN_PROC_BROWSER_TEST_F(WebAppEngagementBrowserTest,
 }
 
 // TODO(crbug.com/40877225): Flaky on Mac.
-// TODO(crbug.com/399243964): Flaky on Windows.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_CommandLineWindowByAppId DISABLED_CommandLineWindowByAppId
 #else

@@ -2128,7 +2128,6 @@ IN_PROC_BROWSER_TEST_F(AutoPictureInPictureTabHelperBrowserTest,
   EXPECT_TRUE(original_web_contents->HasPictureInPictureDocument());
 }
 
-// TODO(https://crbug.com/371850487): failing on Windows.
 #define MAYBE_ShowsMostRecentlyHiddenTab ShowsMostRecentlyHiddenTab
 IN_PROC_BROWSER_TEST_F(AutoPictureInPictureTabHelperBrowserTest,
                        MAYBE_ShowsMostRecentlyHiddenTab) {
@@ -2557,7 +2556,6 @@ IN_PROC_BROWSER_TEST_F(AutoPictureInPictureWithVideoPlaybackBrowserTest,
   tab_helper->set_auto_blocker_for_testing(nullptr);
 }
 
-// TODO(crbug.com/372777367): Test failing on Windows
 // TODO(crbug.com/409069588): Re-enable this test on Mac.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_DoesNotCloseAutomaticallyOpenedPip \

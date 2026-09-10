@@ -169,7 +169,6 @@ IN_PROC_BROWSER_TEST_F(MetricsServiceBrowserTest, CloseRenderersNormally) {
 
 // Child crashes fail the process on ASan (see crbug.com/40383003,
 // crbug.com/40363314).
-// TODO(crbug.com/487848164): Flaky on Windows.
 // Note to sheriffs: Do not disable these tests if they starts to flake. If
 // either of these tests start to fail then changes likely need to be made
 // elsewhere in crash processing, metrics analysis, and dashboards. Please
@@ -198,10 +197,6 @@ IN_PROC_BROWSER_TEST_F(MetricsServiceBrowserTest, MAYBE_CrashRenderers) {
   VerifyRendererExitCodeIsSignal(histogram_tester, SIGSEGV);
 #endif
 }
-
-// Test is disabled on Windows AMR64 because
-// TerminateWithHeapCorruption() isn't expected to work there.
-// See: https://crbug.com/40119520
 
 IN_PROC_BROWSER_TEST_F(MetricsServiceBrowserTest, MAYBE_CheckCrashRenderers) {
   base::HistogramTester histogram_tester;
@@ -242,8 +237,6 @@ IN_PROC_BROWSER_TEST_F(MetricsServiceBrowserTest, CrashRenderersInRust) {
   histogram_tester.ExpectBucketCount(
       "Stability.Counts2", metrics::StabilityEventType::kRendererCrash, 1);
 }
-
-// OOM code only works on Windows.
 
 // Base class for testing if browser-metrics files get removed or not.
 // The code under tests is run before any actual test methods so the test

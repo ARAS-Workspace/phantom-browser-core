@@ -98,8 +98,6 @@ struct VideoCaptureImpl::BufferContext
         // On macOS, an IOSurfaces passed as a GpuMemoryBufferHandle can be
         // used by both hardware and software paths.
         // https://crbug.com/1125879
-        // On Windows, GMBs might be passed by the capture process even if
-        // the acceleration disabled during the capture.
         CHECK(media_task_runner_);
 #endif
         InitializeFromGpuMemoryBufferHandle(

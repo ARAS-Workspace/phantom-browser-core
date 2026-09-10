@@ -664,7 +664,7 @@ IN_PROC_BROWSER_TEST_F(PopupTrackerBrowserTest,
   test_ukm_recorder_->ExpectEntryMetric(entry, kUkmRedirectCount, 2);
 }
 
-// TODO(crbug.com/40749954): Test is flaky on Windows and Linux.
+// TODO(crbug.com/40749954): Test is flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_PopupJavascriptRenavigation_RedirectCountZero \
   DISABLED_PopupJavascriptRenavigation_RedirectCountZero

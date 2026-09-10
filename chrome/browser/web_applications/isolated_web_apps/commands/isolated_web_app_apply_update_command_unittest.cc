@@ -454,7 +454,6 @@ TEST_F(IsolatedWebAppApplyUpdateCommandTest, FailsIfIconDownloadFails) {
   ExpectAppNotUpdatedAndDataCleared();
 }
 
-// TODO(https://crbug.com/487841728): Test is very flaky on Windows.
 #define MAYBE_FailsIfInstallFinalizerFails FailsIfInstallFinalizerFails
 TEST_F(IsolatedWebAppApplyUpdateCommandTest,
        MAYBE_FailsIfInstallFinalizerFails) {

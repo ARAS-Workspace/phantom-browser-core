@@ -175,7 +175,6 @@ HeadlessRequestContextManager::HeadlessRequestContextManager(
     base::FilePath user_data_path,
     os_crypt_async::OSCryptAsync* os_crypt_async)
     :
-// On Windows, Cookie encryption requires access to local_state prefs.
       cookie_encryption_enabled_(
           !base::CommandLine::ForCurrentProcess()->HasSwitch(
               switches::kDisableCookieEncryption)),

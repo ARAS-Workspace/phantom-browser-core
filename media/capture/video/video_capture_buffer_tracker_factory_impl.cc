@@ -43,10 +43,10 @@ VideoCaptureBufferTrackerFactoryImpl::CreateTracker(
       return nullptr;
     default:
 #if BUILDFLAG(IS_MAC)
-      // Since Windows and macOS capturer outputs NV12 only for GMBs and I420
-      // for software frames, the pixel format is used to choose between shmem
-      // and gmb trackers. Therefore I420 shmem trackers must not be reusable
-      // for NV12 format.
+      // Since the macOS capturer outputs NV12 only for GMBs and I420 for
+      // software frames, the pixel format is used to choose between shmem and
+      // gmb trackers. Therefore I420 shmem trackers must not be reusable for
+      // NV12 format.
       return std::make_unique<SharedMemoryBufferTracker>(
           /*reusable_only_for_same_format=*/true);
 #else

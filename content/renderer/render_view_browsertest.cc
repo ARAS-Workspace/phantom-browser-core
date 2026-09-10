@@ -2571,7 +2571,6 @@ class RenderViewImplTextInputMessageOrder : public RenderViewImplTest {
   }
 };
 
-// Failing on Windows; see https://crbug.com/1134571.
 #define MAYBE_MessageOrderInDidChangeSelection MessageOrderInDidChangeSelection
 TEST_F(RenderViewImplTextInputMessageOrder,
        MAYBE_MessageOrderInDidChangeSelection) {

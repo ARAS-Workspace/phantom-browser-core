@@ -57,14 +57,8 @@ constexpr size_t kOversizedCapacity = std::numeric_limits<uint32_t>::max();
 // want this to be as small as possible without causing too much flakiness.
 base::TimeDelta EpsilonDeadline() {
   const int64_t tiny_timeout = TestTimeouts::tiny_timeout().InMicroseconds();
-// Originally, our epsilon timeout was 10 ms, which was mostly fine but flaky on
-// some Windows bots. I don't recall ever seeing flakes on other bots. At 30 ms
-// tests seem reliable on Windows bots, but not at 25 ms. We'd like this timeout
-// to be as small as possible (see the description in the .h file).
-//
 // Currently, |tiny_timeout()| is usually 100 ms (possibly scaled under ASAN,
-// etc.). Based on this, set it to (usually be) 30 ms on Windows and 20 ms
-// elsewhere.
+// etc.). Based on this, set it to (usually be) 20 ms.
 #if BUILDFLAG(IS_ANDROID)
   const int64_t deadline = (tiny_timeout * 3) / 10;
 #else

@@ -59,10 +59,10 @@ MULTIPROCESS_TEST_MAIN(InitFromLaunchParameters) {
 
   EXPECT_FALSE(IsTracingInitialized());
 
-  // On Windows and Fuchsia getting shmem handle from --trace-buffer-handle can
-  // only be done once and subsequent calls `UnsafeSharedMemoryRegionFrom()`
-  // calls will not get a valid `shmem_region`. So we skip tracing init, to
-  // avoid `ConnectProducer()` grabbing the shmem first.
+  // On Fuchsia getting shmem handle from --trace-buffer-handle can only be done
+  // once and subsequent calls `UnsafeSharedMemoryRegionFrom()` calls will not
+  // get a valid `shmem_region`. So we skip tracing init, to avoid
+  // `ConnectProducer()` grabbing the shmem first.
   base::FeatureList::InitInstance("", "");
   base::ThreadPoolInstance::CreateAndStartWithDefaultParams("StartupTraceTest");
   tracing::InitTracingPostFeatureList(/*enable_consumer=*/false,

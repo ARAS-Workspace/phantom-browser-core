@@ -666,7 +666,6 @@ INSTANTIATE_TEST_SUITE_P(
           "_");
     });
 
-// Flaky on Win bots http://crbug.com/40800993
 #define MAYBE_ScreenShareFromEmbedded ScreenShareFromEmbedded
 IN_PROC_BROWSER_TEST_P(WebRtcScreenCapturePermissionPolicyBrowserTest,
                        MAYBE_ScreenShareFromEmbedded) {
@@ -2833,7 +2832,7 @@ IN_PROC_BROWSER_TEST_P(WebRtcScreenCaptureBrowserTestUserRejection,
       /*expected_error=*/"NotAllowedError: Permission denied by user");
 }
 
-// RestrictOwnAudio is only supported on macOS and Windows.
+// RestrictOwnAudio is only supported on macOS.
 #if BUILDFLAG(IS_MAC)
 class GetDisplayMediaRestrictOwnAudioTest
     : public WebRtcTestBase,

@@ -54,7 +54,6 @@ TEST(ExtensionPathUtilTest, ResolveHomeDirTest) {
   const FilePath rel_path_with_tilde(FILE_PATH_LITERAL("~/foo/bar"));
   const FilePath rel_path_with_tilde_no_separator(FILE_PATH_LITERAL("~foobar"));
 
-// This function is a no-op on Windows.
   EXPECT_EQ(home_dir.Append("foo/bar"),
             path_util::ResolveHomeDirectory(rel_path_with_tilde));
   // Make sure tilde without any relative path works as expected.

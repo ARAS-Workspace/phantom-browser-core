@@ -116,7 +116,6 @@ IN_PROC_BROWSER_TEST_F(FedCmCUJTest, BubbleHidesWhenModalUIShown) {
       WaitForShow(kFedCmAccountChooserDialogAccountElementId));
 }
 
-// TODO(https://crbug.com/387473078): Fix this on Windows.
 #define MAYBE_OneClickOutsideBubble OneClickOutsideBubble
 // When the bubble view is showing, a single click outside the bubble should be
 // received by the website.

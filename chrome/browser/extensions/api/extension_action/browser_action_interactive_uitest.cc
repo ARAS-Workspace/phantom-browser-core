@@ -688,7 +688,6 @@ class MainFrameSizeWaiter : public content::WebContentsObserver {
   base::RunLoop run_loop_;
 };
 
-// TODO(crbug.com/40791502): Test crashes on Windows
 #if BUILDFLAG(IS_LINUX) && \
     (defined(THREAD_SANITIZER) || defined(ADDRESS_SANITIZER))
 // TODO(crbug.com/40803969): Test is flaky for linux tsan and asan builds

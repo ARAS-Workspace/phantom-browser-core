@@ -226,10 +226,6 @@ bool SlowWebPreferenceCache::Update() {
 
 // static
 std::pair<int, int> SlowWebPreferenceCache::GetAvailablePointerAndHoverTypes() {
-  // On Windows we have to temporarily allow blocking calls since
-  // ui::GetAvailablePointerAndHoverTypes needs to call some in order to
-  // figure out tablet device details in base::win::IsDeviceUsedAsATablet,
-  // see https://crbug.com/1262162.
   return ui::GetAvailablePointerAndHoverTypes();
 }
 

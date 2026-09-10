@@ -653,8 +653,8 @@ NativeDesktopMediaList::NativeDesktopMediaList(
          !add_current_process_windows_);
 
 #if BUILDFLAG(IS_MAC)
-  // webrtc::DesktopCapturer implementations on Windows and MacOS expect to
-  // run on a thread with a UI message pump.
+  // webrtc::DesktopCapturer implementations on MacOS expect to run on a thread
+  // with a UI message pump.
   base::MessagePumpType thread_type = base::MessagePumpType::UI;
 #else
   base::MessagePumpType thread_type = base::MessagePumpType::DEFAULT;

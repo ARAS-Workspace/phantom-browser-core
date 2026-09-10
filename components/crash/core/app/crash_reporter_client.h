@@ -59,8 +59,8 @@ class CrashReporterClient {
   // |client_guid| may either be a full GUID or a GUID that was already stripped
   // from its dashes.
   //
-  // On macOS, Windows, and Android this is the responsibility of Crashpad, and
-  // can not be set directly by the client.
+  // On macOS and Android this is the responsibility of Crashpad, and can not be
+  // set directly by the client.
   virtual void SetCrashReporterClientIdFromGUID(const std::string& client_guid);
 #endif
 
@@ -82,15 +82,11 @@ class CrashReporterClient {
 #endif
 
   // The location where minidump files should be written. Returns true if
-  // |crash_dir| was set. Windows has to use std::wstring because this code
-  // needs to work in chrome_elf, where only kernel32.dll is allowed, and
-  // base::FilePath and its dependencies pull in other DLLs.
+  // |crash_dir| was set.
   virtual bool GetCrashDumpLocation(base::FilePath* crash_dir);
 
   // The location where metrics files should be written. Returns true if
-  // |metrics_dir| was set. Windows has to use std::wstring because this code
-  // needs to work in chrome_elf, where only kernel32.dll is allowed, and
-  // base::FilePath and its dependencies pull in other DLLs.
+  // |metrics_dir| was set.
   virtual bool GetCrashMetricsLocation(base::FilePath* metrics_dir);
 
   // Returns a textual description of the product info (product name, version,

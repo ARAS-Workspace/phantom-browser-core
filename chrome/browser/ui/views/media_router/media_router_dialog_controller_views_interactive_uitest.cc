@@ -141,7 +141,7 @@ IN_PROC_BROWSER_TEST_F(MediaRouterDialogControllerViewsTest,
   CloseWebContents();
 }
 
-// Global Media Controls are supported on Mac, Linux and Windows only.
+// Global Media Controls are supported on Mac and Linux only.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class GlobalMediaControlsDialogTest
     : public MediaRouterDialogControllerViewsTest {

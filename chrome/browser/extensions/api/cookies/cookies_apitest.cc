@@ -110,7 +110,6 @@ INSTANTIATE_TEST_SUITE_P(All,
                          ::testing::Values(SameSiteCookieSemantics::kLegacy,
                                            SameSiteCookieSemantics::kModern));
 
-// TODO(crbug.com/40839864): Flaky on Windows.
 // TODO(crbug.com/371423073): Flaky on desktop Android.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_Cookies DISABLED_Cookies

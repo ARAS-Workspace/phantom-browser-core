@@ -3809,11 +3809,10 @@ void RenderWidgetHostImpl::GotResponseToForceRedraw(int snapshot_id) {
     return;
   }
 #if BUILDFLAG(IS_MAC)
-  // On Mac, when using CoreAnimation, or Win32 when using GDI, there is a
-  // delay between when content is drawn to the screen, and when the
-  // snapshot will actually pick up that content. Insert a manual delay of
-  // 1/6th of a second (to simulate 10 frames at 60 fps) before actually
-  // taking the snapshot.
+  // On Mac, when using CoreAnimation, there is a delay between when content is
+  // drawn to the screen, and when the snapshot will actually pick up that
+  // content. Insert a manual delay of 1/6th of a second (to simulate 10 frames
+  // at 60 fps) before actually taking the snapshot.
   base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
       FROM_HERE,
       base::BindOnce(&RenderWidgetHostImpl::WindowSnapshotReachedScreen,

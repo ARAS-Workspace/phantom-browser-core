@@ -87,7 +87,6 @@ class StorageServiceRestartBrowserTest : public ContentBrowserTest {
   mojo::Remote<storage::mojom::TestApi> test_api_;
 };
 
-// TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
 #define MAYBE_BasicReconnect BasicReconnect
 IN_PROC_BROWSER_TEST_F(StorageServiceRestartBrowserTest, MAYBE_BasicReconnect) {
   // Basic smoke test to ensure that we can force-crash the service and

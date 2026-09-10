@@ -488,7 +488,6 @@ class LocalNetworkAccessWebSocketCountersBrowserTest
 
 // When WebSocket is connected to a more-private ip address space, log a use
 // counter.
-// TODO(crbug.com/336429017): Flaky on Win.
 #define MAYBE_WebSocketConnectedPublicToLocal WebSocketConnectedPublicToLocal
 IN_PROC_BROWSER_TEST_F(LocalNetworkAccessWebSocketCountersBrowserTest,
                        MAYBE_WebSocketConnectedPublicToLocal) {
@@ -547,7 +546,6 @@ IN_PROC_BROWSER_TEST_F(LocalNetworkAccessWebSocketCountersBrowserTest,
 
 // When WebSocket is connected to the same ip address space, do not log a use
 // counter.
-// TODO(crbug.com/336429017): Flaky on Win.
 #define MAYBE_WebSocketConnectedLocalToLocal WebSocketConnectedLocalToLocal
 IN_PROC_BROWSER_TEST_F(LocalNetworkAccessWebSocketCountersBrowserTest,
                        MAYBE_WebSocketConnectedLocalToLocal) {

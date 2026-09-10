@@ -12,7 +12,7 @@ namespace features {
 
 #if BUILDFLAG(IS_LINUX)
 // Controls whether Web Bluetooth should support confirm-only and confirm-PIN
-// pairing mode on Win/Linux
+// pairing mode on Linux
 BASE_FEATURE(kWebBluetoothConfirmPairingSupport,
              base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_LINUX)

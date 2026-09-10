@@ -409,10 +409,6 @@ StartupProfileInfo CreateInitialProfile(
 
   bool last_used_profile_set = false;
 
-// If the browser is launched due to activation on Windows native
-// notification, the profile id encoded in the notification launch id should
-// be chosen over all others.
-
   bool profile_dir_specified =
       profiles::IsMultipleProfilesEnabled() &&
       parsed_command_line.HasSwitch(switches::kProfileDirectory);

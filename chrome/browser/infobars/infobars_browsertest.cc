@@ -491,13 +491,11 @@ IN_PROC_BROWSER_TEST_P(InfoBarUiTest, MAYBE_InvokeUi_automation) {
   ShowAndVerifyUi();
 }
 
-// Consistently failing on Windows https://crbug.com/40921752.
 #define MAYBE_InvokeUi_tab_sharing InvokeUi_tab_sharing
 IN_PROC_BROWSER_TEST_P(InfoBarUiTest, MAYBE_InvokeUi_tab_sharing) {
   ShowAndVerifyUi();
 }
 
-// Consistently failing on Windows https://crbug.com/40921752.
 #define MAYBE_InvokeUi_multiple_infobars InvokeUi_multiple_infobars
 IN_PROC_BROWSER_TEST_P(InfoBarUiTest, MAYBE_InvokeUi_multiple_infobars) {
   ShowAndVerifyUi();

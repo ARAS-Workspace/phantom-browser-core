@@ -38,8 +38,6 @@ class COMPONENT_EXPORT(NETWORK_CPP_BASE) TransferableSocket {
 
   // Create a TransferableSocket from `socket`. This object takes ownership of
   // the `socket` handle.
-  // On Windows, a `destination_process` must be supplied which must match the
-  // process that the TransferableSocket will be transmitted to using IPC.
 #if BUILDFLAG(IS_POSIX)
   explicit TransferableSocket(net::SocketDescriptor socket);
 #else

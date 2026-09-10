@@ -288,7 +288,6 @@ MojoGpuVideoAcceleratorFactories::VideoFrameOutputFormat(
     }
 #endif  // !BUILDFLAG(IS_MAC)
 
-    // TODO(mcasas): enable Win https://crbug.com/803451.
     // TODO(mcasas): remove the |bit_depth| check when libyuv supports more than
     // just x010ToAR30 conversions, https://crbug.com/libyuv/751.
     if (bit_depth == 10) {

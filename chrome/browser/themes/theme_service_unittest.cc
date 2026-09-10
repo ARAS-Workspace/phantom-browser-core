@@ -620,8 +620,6 @@ TEST_F(ThemeServiceTest, UseDefaultTheme_DisableNtpThemeTest) {
 }
 
 TEST_P(ColorProviderTest, OmniboxContrast) {
-  // TODO(crbug.com/40847629): Windows platform high contrast colors are
-  // not sufficiently high-contrast to pass this test.
 #if BUILDFLAG(IS_LINUX)
   // TODO(crbug.com/41494383): Linux platform native dark mode colors aren't
   //                      sufficiently high contrast to pass.

@@ -390,9 +390,6 @@ TEST_F(FileUtilTest, CheckIllegalFilenamesReservedAndIllegal) {
   EXPECT_FALSE(file_util::CheckForIllegalFilenames(temp.GetPath(), &error));
 }
 
-// These tests do not work on Windows, because it is illegal to create a
-// file/directory with a Windows reserved name. Because we cannot create a
-// file that will cause the test to fail, let's skip the test.
 TEST_F(FileUtilTest, CheckIllegalFilenamesDirectoryWindowsReserved) {
   base::ScopedTempDir temp;
   ASSERT_TRUE(temp.CreateUniqueTempDir());

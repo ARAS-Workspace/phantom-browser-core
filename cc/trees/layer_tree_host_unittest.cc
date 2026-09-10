@@ -895,7 +895,7 @@ class LayerTreeHostTestSetNeedsCommit2 : public LayerTreeHostTest {
   std::atomic<int> num_draws_;
 };
 
-// TODO(crbug.com/527726460): Flaky on Linux and Windows debug builds.
+// TODO(crbug.com/527726460): Flaky on Linux debug builds.
 #if BUILDFLAG(IS_LINUX) && !defined(NDEBUG)
 #define MAYBE_RunMultiThread_DelegatingRenderer \
   DISABLED_RunMultiThread_DelegatingRenderer

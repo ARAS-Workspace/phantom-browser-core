@@ -210,7 +210,6 @@ class SmsBrowserTest : public ContentBrowserTest {
 
 }  // namespace
 
-// TODO(crbug.com/41486967): Flaky on Win Debug
 #define MAYBE_Receive Receive
 IN_PROC_BROWSER_TEST_F(SmsBrowserTest, MAYBE_Receive) {
   base::HistogramTester histogram_tester;
@@ -629,7 +628,6 @@ IN_PROC_BROWSER_TEST_F(SmsBrowserTest, DISABLED_TwoTabsDifferentOrigin) {
   ExpectOutcomeUKM(url2, blink::WebOTPServiceOutcome::kSuccess);
 }
 
-// TODO(crbug.com/41486967): Flaky on Win Debug
 #define MAYBE_SmsReceivedAfterTabIsClosed SmsReceivedAfterTabIsClosed
 IN_PROC_BROWSER_TEST_F(SmsBrowserTest, MAYBE_SmsReceivedAfterTabIsClosed) {
   GURL url = GetTestUrl(nullptr, "simple_page.html");

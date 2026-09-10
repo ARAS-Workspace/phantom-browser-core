@@ -34,7 +34,6 @@ TEST(ClipboardFormatTypeTest, Deserialize) {
   // used for internal serializations which might technically allow it, or at
   // least it doesn't have the ASCII CHECK.
   // On Apple platforms, GetName() returns an empty string for invalid UTF-8.
-  // On Windows, Deserialize expects a numeric string.
   std::string non_ascii_format = "non-ascii-\xff";
   ClipboardFormatType type2 =
       ClipboardFormatType::Deserialize(non_ascii_format);

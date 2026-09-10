@@ -859,7 +859,6 @@ IN_PROC_BROWSER_TEST_P(
                                             StoragePartitioningEnabled());
 }
 
-// TODO(crbug.com/394386466): Test failing on Windows-asan
 #define MAYBE_UserSetting UserSetting
 IN_PROC_BROWSER_TEST_P(
     ThirdPartyPartitionedStorageAccessibilitySharedWorkerTest,

@@ -259,7 +259,7 @@ class PredictionModelStoreBrowserTest
       const PredictionModelStoreBrowserTest&) = delete;
 };
 
-// TODO(crbug.com/329617221): Test is flaky on Win, Linux, and Mac ASan bots.
+// TODO(crbug.com/329617221): Test is flaky on Linux and Mac ASan bots.
 #if BUILDFLAG(IS_LINUX) || (BUILDFLAG(IS_MAC) && defined(ADDRESS_SANITIZER))
 #define MAYBE_TestRegularProfile DISABLED_TestRegularProfile
 #else

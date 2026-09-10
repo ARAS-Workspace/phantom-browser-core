@@ -44,8 +44,8 @@
 #include <alloca.h>
 
 // STACK_SAMPLING_PROFILER_SUPPORTED is used to conditionally enable the tests
-// below for supported platforms (currently Win x64, Mac, iOS 64, some
-// Android, and ChromeOS x64).
+// below for supported platforms (currently Mac, iOS 64, some Android, and
+// ChromeOS x64).
 // ChromeOS: These don't run under MSan because parts of the stack aren't
 // initialized.
 #if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_IOS) && defined(ARCH_CPU_64_BITS)) || \

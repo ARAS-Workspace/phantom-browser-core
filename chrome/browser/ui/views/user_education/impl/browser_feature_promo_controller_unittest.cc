@@ -1674,11 +1674,6 @@ class BrowserFeaturePromoControllerViewsTest
   }
 };
 
-// In branded builds on Windows, some of the required strings may be optimized
-// out during Chrome resource compilation. To avoid issues, simply don't run
-// these tests on those specific bots.
-// See https://crbug.com/434261108 and https://crbug.com/40750695 for more info.
-
 namespace {
 const int kStringWithSingleSubstitution =
     IDS_APP_TABLE_COLUMN_SORTED_ASC_ACCNAME;

@@ -2253,8 +2253,6 @@ TEST_F(ReadOnlyFileUtilTest, TextContentsEqual) {
   EXPECT_TRUE(TextContentsEqual(blank_line_file, blank_line_crlf_file));
 }
 
-// We don't need equivalent functionality outside of Windows.
-
 // Test that files opened by OpenFile are not set up for inheritance into child
 // procs.
 TEST_F(FileUtilTest, OpenFileNoInheritance) {

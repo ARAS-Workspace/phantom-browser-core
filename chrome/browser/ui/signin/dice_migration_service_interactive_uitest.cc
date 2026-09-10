@@ -108,7 +108,6 @@ class DiceMigrationServiceForcedMigrationInteractiveUiTest
 
 // TODO(https://crbug.com/506054344): Disabled on Mac due to excessive
 // flakiness.
-// TODO(https://crbug.com/538010159): Disabled on Windows ASAN.
 #if !BUILDFLAG(IS_MAC)
 DICE_MIGRATION_TEST_F(DiceMigrationServiceForcedMigrationInteractiveUiTest,
                       ToastActionButton) {

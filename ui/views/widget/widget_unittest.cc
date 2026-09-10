@@ -4122,7 +4122,6 @@ BEGIN_METADATA(RootViewTestView)
 END_METADATA
 
 // Checks if RootView::*_handler_ fields are unset when widget is hidden.
-// Fails on chromium.webkit Windows bot, see crbug.com/264872.
 #define MAYBE_DisableTestRootViewHandlersWhenHidden \
   TestRootViewHandlersWhenHidden
 TEST_F(WidgetTest, MAYBE_DisableTestRootViewHandlersWhenHidden) {

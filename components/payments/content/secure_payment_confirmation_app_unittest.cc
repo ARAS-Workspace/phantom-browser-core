@@ -438,7 +438,6 @@ TEST_P(SecurePaymentConfirmationAppBrowserBindingTest,
   app.InvokePaymentApp(/*delegate=*/weak_ptr_factory_.GetWeakPtr());
 
   if (GetParam().expect_browser_bound_key) {
-    // Last used time should only be set/updated on Windows platform.
     if (GetParam().is_new_bbk) {
       EXPECT_CALL(
           *mock_service,

@@ -244,7 +244,7 @@ TEST_F(ListFamilyMembersServiceTest,
   EXPECT_EQ(pref_service_.GetString(prefs::kFamilyLinkUserMemberRole), "");
 }
 
-// Data cleanup is only available for Windows, Mac and Linux
+// Data cleanup is only available for Mac and Linux
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_F(ListFamilyMembersServiceTest, ListFamilyFetcherClearsResponseOnSignout) {
   // Test the `fetcher_`.

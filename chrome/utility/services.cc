@@ -471,7 +471,6 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-  // On Windows, this service runs in an elevated utility process.
   services.Add(RunRemovableStorageWriter);
 #endif
 

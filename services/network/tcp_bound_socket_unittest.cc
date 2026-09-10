@@ -262,9 +262,9 @@ TEST_F(TCPBoundSocketTest, ConnectError) {
 
 // Test listen failure.
 
-// All platforms except Windows use SO_REUSEADDR on server sockets by default,
-// which allows binding multiple sockets to the same port at once, as long as
-// nothing is listening on it yet.
+// SO_REUSEADDR is used on server sockets by default, which allows binding
+// multiple sockets to the same port at once, as long as nothing is listening
+// on it yet.
 //
 // Apple platforms don't allow binding multiple TCP sockets to the same port
 // even with SO_REUSEADDR enabled.

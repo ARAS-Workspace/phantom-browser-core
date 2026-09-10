@@ -25,7 +25,7 @@
 #include "components/sync/service/sync_service_impl.h"
 #include "content/public/test/browser_test.h"
 
-// The local sync backend is currently only supported on Windows, Mac, Linux.
+// The local sync backend is currently only supported on Mac, Linux.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 namespace {
@@ -117,7 +117,7 @@ IN_PROC_BROWSER_TEST_F(LocalSyncTest, ShouldStart) {
 
   expected_active_data_types.Put(syncer::AUTOFILL_WALLET_CREDENTIAL);
 
-  // The dictionary is currently only synced on Windows and Linux.
+  // The dictionary is currently only synced on Linux.
 #if BUILDFLAG(IS_LINUX)
   expected_active_data_types.Put(syncer::DICTIONARY);
 #endif

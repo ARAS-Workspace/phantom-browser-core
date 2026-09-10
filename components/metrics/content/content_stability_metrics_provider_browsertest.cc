@@ -33,8 +33,6 @@ namespace content {
 
 template <>
 sandbox::mojom::Sandbox GetServiceSandboxType<content::mojom::TestService>() {
-  // On Windows, the sandbox does not like having a different binary name
-  // 'non_existent_path' from the browser process, so set no sandbox here.
   return sandbox::mojom::Sandbox::kService;
 }
 

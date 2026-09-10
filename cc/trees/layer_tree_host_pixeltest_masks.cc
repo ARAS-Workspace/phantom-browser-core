@@ -756,7 +756,7 @@ class LayerTreeHostMaskAsBlendingPixelTest
     } else {
 #if defined(ARCH_CPU_ARM64)
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
-      // ARM Windows, macOS, iOS, Fuchsia and Linux have some pixels difference
+      // macOS, iOS and Linux have some pixels difference
       // Affected tests: RotatedClippedCircle, RotatedClippedCircleUnderflow
       // crbug.com/1030244, crbug.com/1048249, crbug.com/1128443
       percentage_pixels_large_error = 7.f;

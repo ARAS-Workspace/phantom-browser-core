@@ -104,8 +104,6 @@ class HeadlessCrashObserverTest : public HeadlessDevTooledBrowserTest {
   content::ScopedAllowRendererCrashes scoped_allow_renderer_crashes_;
 };
 
-// TODO(crbug.com/40206073): HeadlessCrashObserverTest.RunAsyncTest is flaky on
-// Win debug.
 HEADLESS_DEVTOOLED_TEST_F(HeadlessCrashObserverTest);
 
 class HeadlessDevToolsNetworkBlockedUrlTest

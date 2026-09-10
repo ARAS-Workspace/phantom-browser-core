@@ -404,7 +404,7 @@ static size_t PartitionPurgeSlotSpan(PartitionRoot* root,
   size_t num_provisioned_slots =
       bucket_num_slots - slot_span->num_unprovisioned_slots;
   std::array<char, kMaxSlotCount> slot_usage{};
-  // The last freelist entry should not be discarded when using OS_WIN.
+  // The last freelist entry should not be discarded.
   // DiscardVirtualMemory makes the contents of discarded memory undefined.
   size_t last_slot = static_cast<size_t>(-1);
   std::fill_n(slot_usage.begin(), num_provisioned_slots, 1);

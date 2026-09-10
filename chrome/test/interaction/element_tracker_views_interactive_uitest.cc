@@ -94,7 +94,6 @@ class ElementTrackerViewsMinimizeRestoreUiTest : public InteractiveBrowserTest,
 
 IN_PROC_BROWSER_TEST_F(ElementTrackerViewsMinimizeRestoreUiTest,
                        TestAssumptions) {
-  // Note: on Windows, visibility does not change on minimization.
   bool shown = false;
 
   RunTestSequence(

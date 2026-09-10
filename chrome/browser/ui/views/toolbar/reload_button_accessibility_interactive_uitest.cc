@@ -232,7 +232,6 @@ IN_PROC_BROWSER_TEST_P(ReloadButtonAccessibilityTest, MAYBE_NormalReload) {
 
 // Tests that clicking the reload button with a modifier (Shift) performs a
 // hard reload (bypassing cache).
-// TODO(behamilton): On Windows this test is flaky.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_HardReloadModifier DISABLED_HardReloadModifier
 #else
@@ -275,7 +274,6 @@ IN_PROC_BROWSER_TEST_P(ReloadButtonAccessibilityTest,
 }
 
 // Middle-clicking is not supported by ClickMouse on Macs
-// TODO(behamilton): On Windows this test is flaky.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_MiddleClickReload DISABLED_MiddleClickReload
 #else

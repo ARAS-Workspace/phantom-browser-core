@@ -34,8 +34,6 @@ class COMPONENT_EXPORT(METRICS_STRUCTURED) StructuredMetricsClient {
   StructuredMetricsClient& operator=(const StructuredMetricsClient& client) =
       delete;
 
-// Windows errors out with dllexport class cannot be applied to member of
-// dllexport class.
   // Provides access to global StructuredMetricsClient instance to record
   // metrics. This is typically used in the codegen.
   static COMPONENT_EXPORT(METRICS_STRUCTURED) StructuredMetricsClient* Get();

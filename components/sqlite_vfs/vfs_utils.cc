@@ -229,9 +229,7 @@ base::expected<PendingFileSet, FileSetError> MakePendingFileSet(
     //
     // sqlite_vfs has a hard requirement that MakePendingFileSet must be used to
     // make the initial connection to a database, and that ShareConnection must
-    // be used to create additional connections. This requirement is enforced on
-    // Windows by opening the -shm file for exclusive read/write access -- this
-    // will fail with a sharing violation if the file is already in use.
+    // be used to create additional connections.
     //
     // It is tempting to use base::File::Lock() on POSIX systems to detect an
     // attempt to make a pending file set for a database that is in-use. This
@@ -241,20 +239,10 @@ base::expected<PendingFileSet, FileSetError> MakePendingFileSet(
     // file set while the files are open.
     //
     // The task of discarding any stale data left behind is handled by
-    // unconditionally using a new -shm file for each file set. Handling differs
-    // by platform:
-    //
-    // - On Windows, FLAG_DELETE_ON_CLOSE is used so that the file is
-    //   automatically deleted once all handles are closed. Since this file is
-    //   mapped into the address spaces of all processes connection to a
-    //   database with the generated file set, it is not reliable to delete the
-    //   file via DeleteFile. Additionally, FLAG_WIN_TEMPORARY is used as a hint
-    //   to the OS that the data does not need to be written to disk. This will
-    //   avoid I/O provided that there is sufficient cache to hold the index.
-    //
-    // - On POSIX systems, a second read-only handle to the file is opened
-    //   immediately and then the file is unlinked. The read-only handle is kept
-    //   in the file set and duplicated when shared for read-only access.
+    // unconditionally using a new -shm file for each file set: a second
+    // read-only handle to the file is opened immediately and then the file is
+    // unlinked. The read-only handle is kept in the file set and duplicated
+    // when shared for read-only access.
     pending_file_set.wal_index_file = base::File(
         wal_index_file_path, (create_flags & ~base::File::FLAG_OPEN_ALWAYS) |
                                  base::File::FLAG_CREATE_ALWAYS);

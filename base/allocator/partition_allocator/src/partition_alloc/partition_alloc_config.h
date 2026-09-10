@@ -104,11 +104,6 @@ static_assert(sizeof(void*) == 8);
 // However the total count is collected on all platforms.
 #define PA_CONFIG_COUNT_SYSCALL_TIME() 0
 
-// On Windows, |thread_local| variables cannot be marked "dllexport", see
-// compiler error C2492 at
-// https://docs.microsoft.com/en-us/cpp/error-messages/compiler-errors-1/compiler-error-c2492?view=msvc-160.
-// Don't use it there.
-//
 // On macOS and iOS:
 // - With PartitionAlloc-Everywhere, thread_local allocates, reentering the
 //   allocator.
@@ -149,9 +144,6 @@ static_assert(sizeof(void*) == 8);
 #define PA_CONFIG_THREAD_CACHE_FAST_TLS() 0
 #endif
 
-// Lazy commit should only be enabled on Windows, because commit charge is
-// only meaningful and limited on Windows. It affects performance on other
-// platforms and is simply not needed there due to OS supporting overcommit.
 constexpr bool kUseLazyCommit = false;
 
 // See the comment in PartitionBucket::SlotSpanCommittedSize(). This should not

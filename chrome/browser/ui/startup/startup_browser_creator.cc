@@ -1418,9 +1418,6 @@ StartupProfilePathInfo GetStartupProfilePath(
     bool ignore_profile_picker) {
   ProfileManager* profile_manager = g_browser_process->profile_manager();
   const base::FilePath& user_data_dir = profile_manager->user_data_dir();
-// If the browser is launched due to activation on Windows native notification,
-// the profile id encoded in the notification launch id should be chosen over
-// all others.
 
   // If opening in Guest mode is requested, load the default profile so that
   // last opened profile would not trigger a user management dialog.

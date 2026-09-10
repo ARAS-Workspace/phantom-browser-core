@@ -962,8 +962,6 @@ void CloudPolicyClient::FetchPolicyInternal(
   // since it is now the invalidation version used for the latest fetch.
   fetched_invalidation_version_ = invalidation_version_;
 
-  // CBCM policy fetch request on Windows needs to get device identifier on a
-  // background COM thread.
   if (reason == PolicyFetchReason::kExtensionInstall) {
     request_jobs_.push_back(service_->CreateJob(std::move(config)));
   } else {

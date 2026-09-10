@@ -1127,8 +1127,7 @@ void RecordNpuHistograms(const GPUInfo& gpu_info) {
 }
 
 #if BUILDFLAG(IS_MAC)
-// GPU picking is only effective with ANGLE/Metal backend on Mac and
-// on Windows with EGL.
+// GPU picking is only effective with ANGLE/Metal backend on Mac.
 void TrySetNonSoftwareDevicePreferenceForTesting(
     gl::GpuPreference gpu_preference) {
   // `SetGpuPreferenceEGL` fails when a preference was previously already set.

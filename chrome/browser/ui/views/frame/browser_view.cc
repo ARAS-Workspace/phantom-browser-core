@@ -1545,9 +1545,9 @@ void BrowserView::Show() {
 #if !BUILDFLAG(IS_CHROMEOS)
   // The Browser associated with this browser window must become the active
   // browser at the time |Show()| is called. This is the natural behavior under
-  // Windows and Chrome OS, but other platforms will not trigger
-  // OnWidgetActivationChanged() until we return to the runloop. Therefore any
-  // calls to Browser::GetLastActive() will return the wrong result if we do not
+  // Chrome OS, but other platforms will not trigger OnWidgetActivationChanged()
+  // until we return to the runloop. Therefore any calls to
+  // Browser::GetLastActive() will return the wrong result if we do not
   // explicitly set it here.
   BrowserActiveStateManager::From(browser())->DidBecomeActive();
 #endif
@@ -2231,11 +2231,9 @@ LocationBar* BrowserView::GetLocationBar() const {
 }
 
 void BrowserView::SetFocusToLocationBar(bool is_user_initiated) {
-  // On Windows, changing focus to the location bar causes the browser window to
-  // become active. This can steal focus if the user has another window open
-  // already. On Chrome OS, changing focus makes a view believe it has a focus
-  // even if the widget doens't have a focus. Either cases, we need to ignore
-  // this when the browser window isn't active.
+  // On Chrome OS, changing focus makes a view believe it has a focus even if
+  // the widget doens't have a focus. We need to ignore this when the browser
+  // window isn't active.
 #if BUILDFLAG(IS_CHROMEOS)
   if (!IsActive()) {
     return;

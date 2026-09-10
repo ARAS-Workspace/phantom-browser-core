@@ -1173,7 +1173,7 @@ BASE_FEATURE(kPlatformEncryptedDolbyVision,
 BASE_FEATURE(kPlatformHEVCDecoderSupport, base::FEATURE_ENABLED_BY_DEFAULT);
 
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
-// Enables HEVC hardware accelerated encoding for Windows, Apple, and Android.
+// Enables HEVC hardware accelerated encoding for Apple and Android.
 BASE_FEATURE(kPlatformHEVCEncoderSupport, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
 

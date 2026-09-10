@@ -1508,9 +1508,7 @@ void DragAndDropBrowserTest::DragImageBetweenFrames_Step3(
                    {"dragstart", "dragleave", "dragenter", "dragend"}));
 }
 
-// There is no known way to execute test-controlled tasks during
-// a drag-and-drop loop run by Windows OS.
-// Also disable the test on Linux due to flaky: crbug.com/40163536
+// Disable the test on Linux due to flaky: crbug.com/40163536
 // TODO(crbug.com/40876472): Enable on ChromeOS once flakiness is fixed.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_DragImageFromDisappearingFrame \
@@ -1641,8 +1639,6 @@ void DragAndDropBrowserTest::DragImageFromDisappearingFrame_Step3(
   }
 }
 
-// There is no known way to execute test-controlled tasks during
-// a drag-and-drop loop run by Windows OS.
 // TODO(b:361552512): Flaky on Chrome OS
 #if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_CrossSiteDrag DISABLED_CrossSiteDrag
@@ -1752,8 +1748,6 @@ void DragAndDropBrowserTest::CrossSiteDrag_Step3(
                     "dragend"}));
 }
 
-// There is no known way to execute test-controlled tasks during
-// a drag-and-drop loop run by Windows OS.
 #define MAYBE_CrossNavCrossSiteDrag CrossNavCrossSiteDrag
 
 struct DragAndDropBrowserTest::CrossNavCrossSiteDrag_TestState {
@@ -1856,8 +1850,6 @@ void DragAndDropBrowserTest::CrossNavCrossSiteDrag_Step3(
                     "dragend"}));
 }
 
-// There is no known way to execute test-controlled tasks during
-// a drag-and-drop loop run by Windows OS.
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 // TODO(crbug.com/442927728): Fix failing test on Linux and ChromeOS
 // https://crbug.com/40248270: Flaky at ChromeOS ASAN and Debug builds

@@ -1185,7 +1185,7 @@ void ChromeExtensionsBrowserClient::
   bool new_tab_page_set =
       URLOverrides::GetChromeURLOverrides(extension).count("newtab");
   bool default_search_engine_set = false;
-  // SettingsOverrides are only available on Windows and macOS.
+  // SettingsOverrides are only available on macOS.
 #if BUILDFLAG(IS_MAC)
   const SettingsOverrides* settings = SettingsOverrides::Get(extension);
   default_search_engine_set = settings && settings->search_engine &&

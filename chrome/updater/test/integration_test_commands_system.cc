@@ -661,8 +661,6 @@ class IntegrationTestCommandsSystem : public IntegrationTestCommands {
     const base::CommandLine command_line =
         *base::CommandLine::ForCurrentProcess();
     base::FilePath path(command_line.GetProgram());
-    // Check the presence of the program on non-Windows platform only, because
-    // on Windows the program may run without extension.
     EXPECT_TRUE(base::PathExists(path));
     path = path.DirName();
     EXPECT_TRUE(base::PathExists(path));

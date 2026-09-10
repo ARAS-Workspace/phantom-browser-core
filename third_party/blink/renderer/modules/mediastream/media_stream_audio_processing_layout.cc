@@ -55,9 +55,6 @@ int ConfigureEchoCancellationEffects(const EchoCanceller& echo_canceller,
   // TODO(crbug.com/405165917): CHECK(platform_effects &
   // media::AudioParameters::ECHO_CANCELLER);
 
-  // On Windows  can only disable platform NS and AGC effects if platform
-  // AEC effect is disabled.
-
   // Disable platform NS effect if it's not requested.
   if (!ns_requested) {
     if (!IsIndependentSystemNsAllowed()) {

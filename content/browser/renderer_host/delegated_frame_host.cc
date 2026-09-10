@@ -341,14 +341,13 @@ void DelegatedFrameHost::EmbedSurface(
   if (!primary_surface_id ||
       primary_surface_id->local_surface_id() != local_surface_id_) {
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-    // On Windows, Linux, and macOS, we would like to produce new content as
-    // soon as possible or the OS will create an additional black gutter.
-    // Until we can block resize on surface synchronization on these
-    // platforms, we will not block UI on the top-level renderer. The
-    // exception is if we're using an infinite deadline, in which case we
-    // should respect the specified deadline and block UI since that's what
-    // was requested. The actual deadline policy is determined by the
-    // client via GetResizeDeadlinePolicy().
+    // On Linux and macOS, we would like to produce new content as soon as
+    // possible or the OS will create an additional black gutter. Until we can
+    // block resize on surface synchronization on these platforms, we will not
+    // block UI on the top-level renderer. The exception is if we're using an
+    // infinite deadline, in which case we should respect the specified deadline
+    // and block UI since that's what was requested. The actual deadline policy
+    // is determined by the client via GetResizeDeadlinePolicy().
     if (deadline_policy.policy_type() !=
             cc::DeadlinePolicy::kUseInfiniteDeadline &&
         !current_frame_size_in_dip_.IsEmpty() &&

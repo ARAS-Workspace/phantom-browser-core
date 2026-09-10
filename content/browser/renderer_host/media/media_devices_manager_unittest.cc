@@ -1303,14 +1303,10 @@ TEST_F(MediaDevicesManagerTest, EnumerateDevicesUnplugDefaultDevice) {
 }
 
 TEST_F(MediaDevicesManagerTest, EnumerateDevicesUnplugCommunicationsDevice) {
-  // This test has only significance on Windows devices, since communication
-  // devices can only be found on windows.
 }
 
 TEST_F(MediaDevicesManagerTest,
        EnumerateDevicesUnplugDefaultAndCommunicationsDevice) {
-  // This test has only significance on Windows devices, since communication
-  // devices can only be found on windows.
 }
 
 TEST_F(MediaDevicesManagerTest, GuessVideoGroupID) {

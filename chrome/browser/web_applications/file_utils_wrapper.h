@@ -13,9 +13,6 @@
 #include "base/memory/ref_counted.h"
 #include "build/build_config.h"
 
-// Include this to avoid conflicts with CreateDirectory Win macro.
-// It converts CreateDirectory into CreateDirectoryW.
-
 namespace base {
 class FilePath;
 }

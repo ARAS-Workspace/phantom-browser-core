@@ -78,8 +78,8 @@ class FontUniqueNameLookup {
  protected:
   FontUniqueNameLookup();
 
-  // Windows and Android share the concept of connecting to a Mojo service for
-  // retrieving a ReadOnlySharedMemoryRegion with the lookup table in it.
+  // Android connects to a Mojo service for retrieving a
+  // ReadOnlySharedMemoryRegion with the lookup table in it.
 #if BUILDFLAG(IS_ANDROID)
   std::unique_ptr<FontTableMatcher> font_table_matcher_;
 #endif

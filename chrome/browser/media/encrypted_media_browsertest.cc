@@ -128,8 +128,6 @@ class EncryptedMediaTestBase : public MediaBrowserTest {
     if (key_system == media::kExternalClearKeyKeySystem) {
       return true;
     }
-    // Treat `media::kMediaFoundationClearKeyKeySystem` as a separate key system
-    // only for Windows
     std::string prefix = std::string(media::kExternalClearKeyKeySystem) + '.';
     return key_system.substr(0, prefix.size()) == prefix;
   }
@@ -1049,7 +1047,6 @@ IN_PROC_BROWSER_TEST_P(ECKEncryptedMediaTest, InitializeCDMFail) {
                        kEmeNotSupportedError);
 }
 
-// TODO(crbug.com/40105240): Failing on Windows.
 #define MAYBE_CDMCrashDuringDecode CDMCrashDuringDecode
 // When CDM crashes, we should still get a decode error and all sessions should
 // be closed.
@@ -1203,14 +1200,12 @@ INSTANTIATE_TEST_SUITE_P(Capture_Browser,
                          ECKEncryptedMediaOutputProtectionTest,
                          Values("browser"));
 
-// TODO(crbug.com/40671674): Failing on Win.
 #define MAYBE_BeforeMediaKeys BeforeMediaKeys
 IN_PROC_BROWSER_TEST_P(ECKEncryptedMediaOutputProtectionTest,
                        MAYBE_BeforeMediaKeys) {
   TestOutputProtection(/*create_recorder_before_media_keys=*/true);
 }
 
-// TODO(crbug.com/40671674): Failing on Win.
 #define MAYBE_AfterMediaKeys AfterMediaKeys
 IN_PROC_BROWSER_TEST_P(ECKEncryptedMediaOutputProtectionTest,
                        MAYBE_AfterMediaKeys) {

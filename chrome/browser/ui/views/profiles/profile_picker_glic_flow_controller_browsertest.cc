@@ -89,7 +89,6 @@ IN_PROC_BROWSER_TEST_F(ProfilePickerGlicFlowControllerBrowserTest,
       IdentityManagerFactory::GetForProfile(loaded_profile));
 }
 
-// TODO(crbug.com/404425678): Re-enable failing test on Windows.
 #define MAYBE_PickProfileWithCurrentProfile PickProfileWithCurrentProfile
 IN_PROC_BROWSER_TEST_F(ProfilePickerGlicFlowControllerBrowserTest,
                        MAYBE_PickProfileWithCurrentProfile) {

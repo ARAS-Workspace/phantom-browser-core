@@ -36,13 +36,6 @@
 #include "third_party/blink/renderer/platform/wtf/text/text_encoding.h"
 #include "third_party/ced/src/compact_enc_det/compact_enc_det.h"
 
-// third_party/ced/src/util/encodings/encodings.h, which is included
-// by the include above, undefs UNICODE because that is a macro used
-// internally in ced. If we later in the same translation unit do
-// anything related to Windows or Windows headers those will then use
-// the ASCII versions which we do not want. To avoid that happening in
-// jumbo builds, we redefine UNICODE again here.
-
 namespace blink {
 
 bool DetectTextEncoding(base::span<const uint8_t> bytes,

@@ -6,7 +6,7 @@
 
 #include "build/build_config.h"
 
-// Native headless is currently available on Linux, Windows and Mac platforms.
+// Native headless is currently available on Linux and Mac platforms.
 // More platforms will be added later, so avoid function level clutter by
 // providing a compile time condition over the entire file.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
@@ -467,8 +467,8 @@ IN_PROC_BROWSER_TEST_F(HeadlessModeBrowserTest, HeadlessBubbleVisibility) {
   Widget* bubble_widget = ShowTestBubble(browser());
 
 #if BUILDFLAG(IS_MAC)
-  // On Windows and Mac in headless mode we still have actual platform
-  // windows which are always hidden, so verify that they are not visible.
+  // On Mac in headless mode we still have actual platform windows which are
+  // always hidden, so verify that they are not visible.
   EXPECT_FALSE(test::IsPlatformWindowVisible(bubble_widget));
 #elif BUILDFLAG(IS_LINUX)
   // On Linux headless mode uses Ozone/Headless where platform windows are not
@@ -487,9 +487,6 @@ IN_PROC_BROWSER_TEST_F(HeadlessModeBrowserTest, HeadlessBubbleSize) {
   EXPECT_FALSE(bounds.IsEmpty());
 }
 
-// On Windows user data dir is created before chrome.dll is loaded in
-// chrome_elf, see chrome/install_static/user_data_dir.h/cc, so the following
-// test does not apply.
 IN_PROC_BROWSER_TEST_F(HeadlessModeBrowserTest, CreateUniqueUserDataDir) {
   base::ScopedAllowBlockingForTesting allow_blocking;
   base::test::ScopedCommandLine scoped_command_line;

@@ -720,7 +720,6 @@ IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest, ResourceLoadComplete) {
 
 // Same as WebContentsImplBrowserTest.ResourceLoadComplete but with resources
 // retrieved from the network cache.
-// TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
 #define MAYBE_ResourceLoadCompleteFromNetworkCache \
   ResourceLoadCompleteFromNetworkCache
 IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest,

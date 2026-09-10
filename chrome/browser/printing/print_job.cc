@@ -288,9 +288,6 @@ void PrintJob::OnDocumentDone() {
 void PrintJob::ControlledWorkerShutdown() {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
 
-  // The deadlock this code works around is specific to window messaging on
-  // Windows, so we aren't likely to need it on any other platforms.
-
   // Now make sure the thread object is cleaned up. Do this on a worker
   // thread because it may block.
   base::ThreadPool::PostTaskAndReply(

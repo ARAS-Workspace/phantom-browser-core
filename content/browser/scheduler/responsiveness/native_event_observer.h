@@ -72,7 +72,6 @@ class CONTENT_EXPORT BrowserUINativeEventObserver
   void DidProcessEvent(const ui::PlatformEvent& event) override;
   void PlatformEventSourceDestroying() override;
 #elif BUILDFLAG(IS_MAC)
-  // base::MessagePumpForUI::NativeEventObserver overrides (Win) or
   // NativeEventProcessorObserver overrides (Mac):
   void WillRunNativeEvent(uintptr_t identifier) override;
   void DidRunNativeEvent(uintptr_t identifier) override;

@@ -735,7 +735,6 @@ class ServiceWorkerRegistrationAtStartupTest
   TestServiceWorkerTaskQueueObserver extension_activate_observer_;
 };
 
-// Disabled on Win due an unrelated bug: https://crbug.com/41491822.
 #define MAYBE_PRE_ExtensionActivationDoesNotReregister \
   PRE_ExtensionActivationDoesNotReregister
 #define MAYBE_ExtensionActivationDoesNotReregister \

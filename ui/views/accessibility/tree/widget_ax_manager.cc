@@ -458,7 +458,6 @@ void WidgetAXManager::UnrecoverableAccessibilityError() {
 }
 
 gfx::AcceleratedWidget WidgetAXManager::AccessibilityGetAcceleratedWidget() {
-  // This method is only used on Windows, where we need the HWND to fire events.
   return gfx::kNullAcceleratedWidget;
 }
 

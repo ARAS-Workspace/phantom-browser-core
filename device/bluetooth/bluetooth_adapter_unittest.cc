@@ -996,8 +996,6 @@ TEST_F(BluetoothTest, MAYBE_DiscoverMultipleLowEnergyDevices) {
   EXPECT_EQ(2u, adapter_->GetDevices().size());
 }
 
-// TODO(crbug.com/41366193): Enable this test on old Windows versions as
-// well.
 #if BUILDFLAG(IS_IOS)
 #define MAYBE_TogglePowerFakeAdapter DISABLED_TogglePowerFakeAdapter
 #else
@@ -1031,10 +1029,9 @@ TEST_F(BluetoothTest, MAYBE_TogglePowerFakeAdapter) {
 #else
 #define MAYBE_TogglePowerFakeAdapter_Twice DISABLED_TogglePowerFakeAdapter_Twice
 #endif
-// These tests are not relevant for BlueZ and old Windows versions. On these
-// platforms the corresponding system APIs are blocking or use callbacks, so
-// that it is not necessary to store pending callbacks and wait for the
-// appropriate events.
+// These tests are not relevant for BlueZ. On that platform the corresponding
+// system APIs are blocking or use callbacks, so that it is not necessary to
+// store pending callbacks and wait for the appropriate events.
 TEST_F(BluetoothTest, MAYBE_TogglePowerFakeAdapter_Twice) {
   InitWithFakeAdapter();
   TestBluetoothAdapterObserver observer(adapter_);

@@ -2770,7 +2770,6 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
 #if defined(IS_FAST_BUILD)  // Avoid flakiness on slower debug/sanitizer builds.
 
 // TODO(crbug.com/40923912):  Enable once thread flakiness is resolved.
-// TODO(crbug.com/332652840): It is flaky with SkiaGraphite enabled on Windows.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_NonInteractiveChangesAreBatched \
   DISABLED_NonInteractiveChangesAreBatched
@@ -2830,7 +2829,6 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
 
 #if defined(IS_FAST_BUILD)  // Avoid flakiness on slower debug/sanitizer builds.
 // TODO(crbug.com/40749521): Fix disabled flaky test.
-// TODO(crbug.com/332652840): It is flaky with SkiaGraphite enabled on Windows.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_DocumentSelectionChangesAreNotBatched \
   DISABLED_DocumentSelectionChangesAreNotBatched
@@ -2886,7 +2884,6 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
 
 #if defined(IS_FAST_BUILD)  // Avoid flakiness on slower debug/sanitizer builds.
 // TODO(crbug.com/40749521): Fix disabled flaky test.
-// TODO(crbug.com/332652840): It is flaky with SkiaGraphite enabled on Windows.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_ActiveDescendantChangesAreNotBatched \
   DISABLED_ActiveDescendantChangesAreNotBatched

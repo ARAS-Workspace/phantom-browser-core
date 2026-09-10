@@ -1090,9 +1090,9 @@ INSTANTIATE_TEST_SUITE_P(All,
                          TypedNavigationUpgradeThrottleRedirectBrowserTest,
                          testing::Bool() /* IsFeatureEnabled */);
 
-// This test is broken on Mac and Windows bots, but the typed navigations
-// feature is now disabled (see crbug.com/375004882) so just skip running this
-// test on those platforms.
+// This test is broken on Mac bots, but the typed navigations feature is now
+// disabled (see crbug.com/375004882) so just skip running this test on that
+// platform.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_UrlTypedWithoutScheme_GoodHttps_Redirected_ShouldUpgrade \
   DISABLED_UrlTypedWithoutScheme_GoodHttps_Redirected_ShouldUpgrade

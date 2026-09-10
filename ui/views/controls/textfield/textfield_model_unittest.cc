@@ -213,8 +213,6 @@ TEST_F(TextfieldModelTest, EditString_ComplexScript) {
   model.MoveCursorTo(3);
   EXPECT_EQ(3U, model.GetCursorPosition());
 
-  // TODO(asvitkine): Temporarily disable the following check on Windows. It
-  // seems Windows treats "\x0D38\x0D4D\x0D15" as a single grapheme.
   model.MoveCursorTo(2);
   EXPECT_EQ(3U, model.GetCursorPosition());
   EXPECT_TRUE(model.Backspace());

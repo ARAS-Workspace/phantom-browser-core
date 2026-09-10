@@ -1074,7 +1074,7 @@ TEST_F(MockCastSocketTest, TestOpenChannelClosedSocket) {
                                   base::Unretained(&handler_)));
 }
 
-// https://crbug.com/874491, flaky on Win and Mac
+// https://crbug.com/874491, flaky on Mac
 #if BUILDFLAG(IS_APPLE)
 #define MAYBE_TestConnectEndToEndWithRealSSL \
   DISABLED_TestConnectEndToEndWithRealSSL

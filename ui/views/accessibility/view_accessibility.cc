@@ -1517,11 +1517,6 @@ void ViewAccessibility::SetValue(const std::string& value) {
     OnStringAttributeChanged(ax::mojom::StringAttribute::kValue, value);
     NotifyEvent(ax::mojom::Event::kValueChanged, true);
 
-    // TODO(crbug.com/40672441): Remove this once ViewsAX is enabled on
-    // Windows. Only fire a text changed event on text fields and select
-    // elements on Windows so that UIA fires UIA_Text_TextChangedEventId.
-    // On macOS and Linux, this incorrectly maps to title/name-changed
-    // events rather than value-changed events.
   }
 
   NotifyDataChanged();

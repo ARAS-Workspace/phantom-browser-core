@@ -497,9 +497,8 @@ TEST(ProcessMemoryDumpTest, MAYBE_CountResidentBytesInSharedMemory) {
     std::ranges::fill(mapping_mem, 0u);
     std::optional<size_t> res1 = CountResidentBytesInSharedMemory(mapping);
     ASSERT_TRUE(res1.has_value());
-    // On Windows (where VirtualQuery returns the full region size for mapped
-    // sections) and Apple (which queries resident Mach VM pages), the mapped
-    // span granularity includes all page-aligned pages (6.0 pages total).
+    // On Apple (which queries resident Mach VM pages), the mapped span
+    // granularity includes all page-aligned pages (6.0 pages total).
     // On POSIX/Linux, exact sub-page overlap calculation returns 5.5 pages.
 #if BUILDFLAG(IS_APPLE)
     ASSERT_EQ(res1.value(), kDirtyMemorySize + page_size);

@@ -920,7 +920,6 @@ class NoGPUCaptureScreenshotTest : public CaptureScreenshotTest {
 // Tests that large screenshots are composited fine with software compositor.
 // Regression test for https://crbug.com/1137291.
 // Flaky on Linux.  http://crbug.com/1301176
-// TODO(crbug.com/396301195): Failing on Win 10 Tests x64 dbg bot.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_LargeScreenshot DISABLED_LargeScreenshot
 #else
@@ -1780,7 +1779,6 @@ IN_PROC_BROWSER_TEST_F(FlattenedDevToolsProtocolTest,
                                /*use_cbor=*/true);
 }
 
-// TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
 #define MAYBE_PageCrashClearsPendingCommands PageCrashClearsPendingCommands
 IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest,
                        MAYBE_PageCrashClearsPendingCommands) {
@@ -2021,7 +2019,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest, CrossSiteCrash) {
   // Should not crash at this point.
 }
 
-// TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
 #define MAYBE_InspectorTargetCrashedNavigate InspectorTargetCrashedNavigate
 IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest,
                        MAYBE_InspectorTargetCrashedNavigate) {
@@ -2044,7 +2041,6 @@ IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest,
   WaitForNotification("Inspector.targetReloadedAfterCrash", true);
 }
 
-// TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
 #define MAYBE_TargetGetTargetsAfterCrash TargetGetTargetsAfterCrash
 IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest, MAYBE_TargetGetTargetsAfterCrash) {
   set_agent_host_can_close();

@@ -186,8 +186,8 @@ TEST_F(ChildAccountServiceTest, GetGoogleAuthStateNotAuthenticatedNotSignedIn) {
             child_account_service_->GetGoogleAuthState());
 }
 
-// Tests that SafeSearch is correctly enforced for a supervised profile on Mac,
-// Linux, and Windows,.
+// Tests that SafeSearch is correctly enforced for a supervised profile on Mac
+// and Linux.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_F(ChildAccountServiceTest, UpdateForceGoogleSafeSearch) {
   // SafeSearch should not be forced for signed-out users.

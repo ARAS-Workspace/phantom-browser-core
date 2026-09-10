@@ -1227,7 +1227,6 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksInteractiveUiTest,
           lens::LensOverlayRequestId::MEDIA_TYPE_DEFAULT_IMAGE));
 }
 
-// TODO(crbug.com/516333831): Re-enable this test on Windows.
 // TODO(crbug.com/543925663): Re-enable this test on Linux TSAN.
 #if BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
 #define MAYBE_AddAndSubmitMultipleContextsFromComposebox \
@@ -1350,7 +1349,6 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksInteractiveUiTest,
       WaitForInputCleared(kPrimaryTab));
 }
 
-// TODO(crbug.com/516333831): Re-enable this test on Windows.
 #define MAYBE_AddAndSubmitMultipleContextsWithTextFromComposebox \
   AddAndSubmitMultipleContextsWithTextFromComposebox
 IN_PROC_BROWSER_TEST_F(ContextualTasksInteractiveUiTest,

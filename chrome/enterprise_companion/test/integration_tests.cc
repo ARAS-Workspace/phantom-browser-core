@@ -732,8 +732,6 @@ TEST_F(IntegrationTests, CloudPolicyProxy_SettingsChangeAppliedAtRuntime) {
 
 #endif  // BUILDFLAG(IS_LINUX)
 
-// Tests relating to Windows-specific proxy settings.
-
 #if BUILDFLAG(CHROMIUM_BRANDING)
 
 // The application should be able to install over a previous version.

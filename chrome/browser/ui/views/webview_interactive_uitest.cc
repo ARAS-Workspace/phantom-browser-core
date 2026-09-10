@@ -30,7 +30,6 @@ class WebViewInteractiveUiTest : public InProcessBrowserTest {
   }
 };
 
-// TODO(crbug.com/517764196): Fails on Windows.
 #define MAYBE_MouseMoveEventDelivered MouseMoveEventDelivered
 IN_PROC_BROWSER_TEST_F(WebViewInteractiveUiTest,
                        MAYBE_MouseMoveEventDelivered) {

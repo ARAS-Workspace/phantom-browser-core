@@ -1545,7 +1545,7 @@ IN_PROC_BROWSER_TEST_F(TabRestoreTest,
   EXPECT_EQ(4, browser->GetTabStripModel()->count());
 }
 
-// Test is flaky on Win and Mac. crbug.com/40786215, crbug.com/330838232.
+// Test is flaky on Mac. crbug.com/40786215, crbug.com/330838232.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_TabsFromRestoredWindowsAreLoadedGradually \
   DISABLED_TabsFromRestoredWindowsAreLoadedGradually

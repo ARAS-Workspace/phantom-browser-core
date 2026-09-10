@@ -11,8 +11,7 @@
 #include "base/memory/raw_ptr.h"
 #include "build/build_config.h"
 
-// This contains the portable and the SSPI implementations for NTLM.
-// We use NTLM_SSPI for Windows, and NTLM_PORTABLE for other platforms.
+// This contains the portable implementation for NTLM (NTLM_PORTABLE).
 #define NTLM_PORTABLE
 
 #if defined(NTLM_SSPI)

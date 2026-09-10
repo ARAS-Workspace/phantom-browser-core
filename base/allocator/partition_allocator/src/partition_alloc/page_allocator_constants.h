@@ -177,9 +177,6 @@ PageAllocationGranularityBaseMask() {
 
 PA_ALWAYS_INLINE PAGE_ALLOCATOR_CONSTANTS_DECLARE_CONSTEXPR size_t
 SystemPageShift() {
-  // On Windows allocation granularity is higher than the page size. This comes
-  // into play when reserving address space range (allocation granularity),
-  // compared to committing pages into memory (system page granularity).
   return PageAllocationGranularityShift();
 }
 

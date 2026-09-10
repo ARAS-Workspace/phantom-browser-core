@@ -603,7 +603,6 @@ IN_PROC_BROWSER_TEST_F(FullscreenControllerInteractiveTest,
   ASSERT_FALSE(IsExclusiveAccessBubbleDisplayed());
 }
 
-// TODO: crbug.com/371511161 - Flaky on Windows.
 #define MAYBE_SecondPointerLockShowsBubble SecondPointerLockShowsBubble
 IN_PROC_BROWSER_TEST_F(FullscreenControllerInteractiveTest,
                        MAYBE_SecondPointerLockShowsBubble) {
@@ -1873,8 +1872,6 @@ IN_PROC_BROWSER_TEST_F(MAYBE_MultiScreenFullscreenControllerInteractiveTest,
   EXPECT_TRUE(IsExclusiveAccessBubbleDisplayed());
 }
 
-// TODO(crbug.com/40723237): Disabled on Windows, where RenderWidgetHostViewAura
-// blindly casts display::Screen::Get() to display::win::ScreenWin*.
 #define MAYBE_FullscreenOnPermissionGrant FullscreenOnPermissionGrant
 // Test requesting fullscreen using the permission grant's transient activation.
 IN_PROC_BROWSER_TEST_F(MAYBE_MultiScreenFullscreenControllerInteractiveTest,

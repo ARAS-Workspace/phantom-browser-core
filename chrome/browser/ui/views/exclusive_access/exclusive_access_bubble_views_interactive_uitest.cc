@@ -218,8 +218,3 @@ IN_PROC_BROWSER_TEST_F(ExclusiveAccessBubbleViewsTest,
   // Clean up.
   ExclusiveAccessBubbleViews::set_simulate_gpu_hang_for_testing(false);
 }
-
-// This test is Windows-only because it tests Win32-specific pointer-lock
-// behavior (unadjusted movement drifting cursor to screen boundaries causing
-// DWM caption click interception) and utilizes Win32-specific APIs
-// (GetCursorPos).

@@ -117,9 +117,6 @@ static void RecordStats(const AudioParameters& output_params) {
       static_cast<AudioSampleRate>(kAudioSampleRateMax + 1));
 }
 
-// Only Windows has a high latency output driver that is not the same as the low
-// latency path.
-
 // This enum must match the numbering for
 // AudioOutputResamplerOpenLowLatencyStreamResult in enums.xml. Do not reorder
 // or remove items, only add new items before OPEN_STREAM_MAX.
@@ -290,10 +287,6 @@ bool AudioOutputResampler::OpenStream() {
         GetSubsequentStreamCreationResultBucket(output_params_, false));
     return false;
   }
-
-  // Only Windows has a high latency output driver that is not the same as the
-  // low latency path; or it may originally be attempted to be initialized in
-  // offload mode while rejected later due to resource limitation.
 
   DLOG(ERROR) << "Unable to open audio device in high latency mode.  Falling "
               << "back to fake audio output.";

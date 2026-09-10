@@ -3498,7 +3498,7 @@ TEST_F(TextfieldTest, CommitEmptyComposingTextTest) {
 }
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-// SetCompositionFromExistingText is only available on Windows and Chrome OS.
+// SetCompositionFromExistingText is only available on Chrome OS.
 TEST_F(TextfieldTest, SetCompositionFromExistingTextTest) {
   InitTextfield();
   textfield_->SetText(u"abc");
@@ -4337,10 +4337,6 @@ TEST_F(TextfieldTest, SetAccessibleNameNotifiesAccessibilityEvent) {
   // typically not an appropriate value.
   EXPECT_EQ(data.GetNameFrom(), ax::mojom::NameFrom::kAttribute);
 }
-
-// TODO(crbug.com/40672441): Remove this once ViewsAX is enabled on Windows.
-// kTextChanged from SetValue() is only fired on Windows so that UIA fires
-// UIA_Text_TextChangedEventId.
 
 TEST_F(TextfieldTest, AccessiblePlaceholderTest) {
   InitTextfield();

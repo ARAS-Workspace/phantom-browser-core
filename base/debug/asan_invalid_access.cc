@@ -116,9 +116,4 @@ void AsanHeapMemberDereferenceAfterFree() {
   MaybeImmediateCrash();
 }
 
-#if defined(ADDRESS_SANITIZER) || BUILDFLAG(IS_HWASAN)
-// The "corrupt-block" and "corrupt-heap" classes of bugs is specific to
-// Windows.
-#endif  // ADDRESS_SANITIZER
-
 }  // namespace base::debug

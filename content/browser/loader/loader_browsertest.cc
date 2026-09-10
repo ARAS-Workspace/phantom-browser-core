@@ -416,7 +416,6 @@ IN_PROC_BROWSER_TEST_F(LoaderBrowserTest, CrossSiteNoUnloadOn204) {
 // app isn't stripped of debug symbols, this takes about five minutes to
 // complete and isn't conducive to quick turnarounds. As we don't currently
 // strip the app on the build bots, this is bad times.
-// TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_CrossSiteAfterCrash DISABLED_CrossSiteAfterCrash
 #else
@@ -1394,8 +1393,6 @@ IN_PROC_BROWSER_TEST_F(LoaderNoScriptStreamingBrowserTest, LoadScript) {
 
 // Regression test for https://crbug.com/362788339
 // Tests that script can be loaded when the server responded 304 response.
-// TODO(crbug.com/369439037):  Re-enable once flakiness is resolved for Windows
-// ASAN.
 #define MAYBE_Subresource304Response Subresource304Response
 IN_PROC_BROWSER_TEST_F(LoaderBrowserTest, MAYBE_Subresource304Response) {
   embedded_test_server()->RegisterRequestHandler(base::BindRepeating(

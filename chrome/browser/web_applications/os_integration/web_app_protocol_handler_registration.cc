@@ -12,8 +12,7 @@
 namespace web_app {
 
 // This block defines stub implementations of OS specific methods for
-// FileHandling. Currently, Windows and MacOSX have their own
-// implementations.
+// FileHandling. Currently, MacOSX has its own implementation.
 #if !BUILDFLAG(IS_MAC)
 // Registers a protocol handler for the web app with the OS.
 void RegisterProtocolHandlersWithOs(

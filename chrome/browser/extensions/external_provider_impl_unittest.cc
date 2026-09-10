@@ -147,9 +147,6 @@ class ExternalProviderImplTest : public ExtensionServiceTestBase {
   }
 
   void OverrideExternalExtensionsPath() {
-    // Windows doesn't use the provider that installs the |kExternalAppId|
-    // extension implicitly, so to test that the blocking policy works on
-    // Windows it is installed through a Windows-specific registry provider.
     external_externsions_overrides_ =
         std::make_unique<base::ScopedPathOverride>(
             chrome::DIR_EXTERNAL_EXTENSIONS,

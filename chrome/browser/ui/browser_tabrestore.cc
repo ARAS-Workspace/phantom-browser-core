@@ -229,7 +229,7 @@ WebContents* AddRestoredTabImpl(std::unique_ptr<WebContents> web_contents,
         // Activating a window on another space causes the system to switch to
         // that space. Since the session restore process shows and activates
         // windows itself, activating windows here should be safe to skip.
-        // Cautiously apply only to Windows and MacOS, for now
+        // Cautiously apply only to MacOS, for now
         // (https://crbug.com/40105184).
         !from_session_restore;
 #else

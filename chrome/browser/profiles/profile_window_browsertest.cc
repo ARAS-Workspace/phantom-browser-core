@@ -352,7 +352,7 @@ IN_PROC_BROWSER_TEST_F(ProfileWindowBrowserTest,
   EXPECT_FALSE(ProfilePicker::IsOpen());
 }
 
-// TODO(crbug.com/41443527): Test is flaky on Win and Linux.
+// TODO(crbug.com/41443527): Test is flaky on Linux.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_OpenBrowserWindowForProfileWithSigninRequired \
   DISABLED_OpenBrowserWindowForProfileWithSigninRequired

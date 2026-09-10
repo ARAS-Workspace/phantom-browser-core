@@ -394,7 +394,7 @@ BASE_FEATURE(kAutofillUpstreamEnforceStrikeDelay,
 
 bool ShouldShowImprovedUserConsentForCreditCardSave() {
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
-  // The new user consent UI is fully launched on MacOS, Windows and Linux.
+  // The new user consent UI is fully launched on MacOS and Linux.
   return true;
 #else
   // Chrome OS does not have the new UI.

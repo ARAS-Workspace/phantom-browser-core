@@ -127,7 +127,7 @@ class SettingsOverriddenParamsProvidersBrowserTest
 };
 
 // The chrome_settings_overrides API that allows extensions to override the
-// default search provider is only available on Windows and Mac.
+// default search provider is only available on Mac.
 #if BUILDFLAG(IS_MAC)
 
 class SearchOverriddenParamsProvidersBrowserTest
@@ -627,7 +627,7 @@ class ExtensionControllingSearchExplicitChoiceParamsBrowserTest
 };
 
 // The chrome_settings_overrides API that allows extensions to override the
-// default search provider is only available on Windows and Mac.
+// default search provider is only available on Mac.
 #if BUILDFLAG(IS_MAC)
 
 IN_PROC_BROWSER_TEST_F(

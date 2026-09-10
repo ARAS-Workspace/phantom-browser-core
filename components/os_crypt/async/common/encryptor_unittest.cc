@@ -200,8 +200,6 @@ TEST_P(EncryptorParamTest, DecryptEmpty) {
   EXPECT_TRUE(plaintext->empty());
 }
 
-// Non-Windows platforms can decrypt random data fine.
-
 INSTANTIATE_TEST_SUITE_P(All,
                          EncryptorParamTest,
                          ::testing::ValuesIn(kTestCases),

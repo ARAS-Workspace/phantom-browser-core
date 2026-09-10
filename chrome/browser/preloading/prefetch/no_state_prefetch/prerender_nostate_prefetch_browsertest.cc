@@ -1505,7 +1505,6 @@ IN_PROC_BROWSER_TEST_F(NoStatePrefetchBrowserTest, Loop) {
   WaitForRequestCount(src_server()->GetURL(kPrefetchScript), 1);
 }
 
-// Crashes on Win.  http://crbug.com/41489875
 #define MAYBE_RendererCrash RendererCrash
 IN_PROC_BROWSER_TEST_F(NoStatePrefetchBrowserTest, MAYBE_RendererCrash) {
   ASSERT_TRUE(ui_test_utils::NavigateToURL(current_browser(),

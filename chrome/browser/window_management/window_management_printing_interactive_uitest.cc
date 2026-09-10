@@ -53,7 +53,6 @@ class WindowManagementTest : public InProcessBrowserTest {
 #endif
 };
 
-// TODO(crbug.com/40115071): Windows crashes static casting to ScreenWin.
 // TODO(crbug.com/433855037): Disabling on Mac due to flakiness.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_NoCrashOnEventsDuringHandlerPrint \

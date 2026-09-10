@@ -396,8 +396,7 @@ class PrefHashBrowserTestBase : public extensions::ExtensionBrowserTest {
       return PROTECTION_DISABLED_ON_PLATFORM;
 
 #if BUILDFLAG(IS_MAC)
-    // The strongest mode is enforced on Windows and MacOS in the absence of a
-    // field trial.
+    // The strongest mode is enforced on MacOS in the absence of a field trial.
     return PROTECTION_ENABLED_ALL;
 #else
     return PROTECTION_DISABLED_FOR_GROUP;

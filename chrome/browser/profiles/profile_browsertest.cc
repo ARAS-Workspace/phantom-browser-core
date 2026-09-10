@@ -520,8 +520,8 @@ IN_PROC_BROWSER_TEST_F(ProfileBrowserTest, SyncToSigninMigrationAsynchronous) {
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-// The EndSession IO synchronization is only critical on Windows, but also
-// happens under Ozone. See BrowserProcessImpl::EndSession.
+// The EndSession IO synchronization happens under Ozone. See
+// BrowserProcessImpl::EndSession.
 #if BUILDFLAG(IS_OZONE)
 
 namespace {

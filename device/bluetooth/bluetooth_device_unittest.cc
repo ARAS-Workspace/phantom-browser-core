@@ -218,7 +218,6 @@ TEST_F(BluetoothTest, LowEnergyDeviceProperties) {
   StartLowEnergyDiscoverySession();
   BluetoothDevice* device = SimulateLowEnergyDevice(1);
   ASSERT_TRUE(device);
-// Bluetooth class information for BLE device is not available on Windows.
   EXPECT_EQ(0x1F00u, device->GetBluetoothClass());
   EXPECT_EQ(kTestDeviceAddress1, device->GetAddress());
   EXPECT_EQ(BluetoothDevice::VENDOR_ID_UNKNOWN, device->GetVendorIDSource());
@@ -580,8 +579,8 @@ TEST_F(BluetoothTest, MAYBE_GetUUIDs_Connection) {
             device->GetUUIDs());
 
 #if BUILDFLAG(IS_APPLE)
-  // TODO(ortuno): Enable in Android and classic Windows.
-  // Android and Windows don't yet support service changed events.
+  // TODO(ortuno): Enable in Android.
+  // Android doesn't yet support service changed events.
   // http://crbug.com/548280
   // http://crbug.com/579202
 
@@ -1357,8 +1356,6 @@ TEST_F(BluetoothTest,
       ConnectGatt(device,
                   /*service_uuid=*/std::nullopt,
                   base::BindLambdaForTesting([this](BluetoothDevice* device) {
-                    // On Windows there is currently no way to cancel a
-                    // pending GATT connection from the caller's side.
                     device->DisconnectGatt();
                     SimulateGattConnection(device);
                   }));
@@ -1500,7 +1497,6 @@ TEST_F(BluetoothTest, MAYBE_BluetoothGattConnection_ErrorAfterConnection) {
   // TODO(crbug.com/40452547): Change to ERROR_AUTH_FAILED. We should be getting
   // a callback only with the first error, but our android framework doesn't yet
   // support sending different errors.
-  // On Windows, any GattConnectionError will result in ERROR_FAILED.
   EXPECT_EQ(BluetoothDevice::ERROR_FAILED, last_connect_error_code_);
 #else
   EXPECT_EQ(BluetoothDevice::ERROR_AUTH_FAILED, last_connect_error_code_);
@@ -1619,7 +1615,6 @@ TEST_F(BluetoothTest, MAYBE_GattServicesDiscoveredError_AfterDeleted) {
 #define MAYBE_GattServicesDiscovered_AfterDisconnection \
   DISABLED_GattServicesDiscovered_AfterDisconnection
 #endif
-// Classic Windows does not support disconnection.
 TEST_F(BluetoothTest, MAYBE_GattServicesDiscovered_AfterDisconnection) {
   // Tests that we don't crash if there was an error discovering services after
   // the device disconnects.
@@ -1649,7 +1644,6 @@ TEST_F(BluetoothTest, MAYBE_GattServicesDiscovered_AfterDisconnection) {
 #define MAYBE_GattServicesDiscoveredError_AfterDisconnection \
   DISABLED_GattServicesDiscoveredError_AfterDisconnection
 #endif
-// Windows does not support disconnecting.
 TEST_F(BluetoothTest, MAYBE_GattServicesDiscoveredError_AfterDisconnection) {
   // Tests that we don't crash if services are discovered after
   // the device disconnects.
@@ -1892,7 +1886,6 @@ TEST_F(BluetoothTest, MAYBE_ServiceSpecificDiscovery) {
   EXPECT_EQ(1, gatt_connection_attempts_);
   EXPECT_EQ(1, gatt_discovery_attempts_);
 
-  // Outside of WinRT, service-specific discovery should be ignored.
   ASSERT_FALSE(device->supports_service_specific_discovery());
 
   EXPECT_FALSE(GetTargetGattService(device).has_value());

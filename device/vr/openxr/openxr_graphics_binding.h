@@ -91,17 +91,6 @@ class OpenXrGraphicsBinding {
   // composited during calls to `Render`.
   void SetOverlayAndWebXrVisibility(bool overlay_visible, bool webxr_visible);
 
-  // There are three different paths that submitting an image can take. In two
-  // of them, we provide the surface/image for the page to draw into. The third
-  // is only supported on Windows or via the overlay code and requires
-  // submitting a texture handle to us, which we don't own. The first two
-  // rendering methods will have their data tied to the active swapchain image,
-  // but for the third method, we don't have to do any lifecycle management and
-  // will just hold a reference to the latest submitted texture. It will be
-  // valid until we end the frame, but can then be overwritten independently
-  // during the cycle. Since this third code-path only exists on Windows we
-  // restrict this method to that platform.
-
   // Much like the `SetWebXrTexture` path above, the texture submitted here is
   // owned by the browser process with corresponding lifetime management
   // and synchronization happening there. It's valid until we tell it we're done

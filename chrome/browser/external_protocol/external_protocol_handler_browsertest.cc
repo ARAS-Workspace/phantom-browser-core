@@ -190,8 +190,8 @@ IN_PROC_BROWSER_TEST_F(ExternalProtocolHandlerBrowserTest,
 
 IN_PROC_BROWSER_TEST_F(ExternalProtocolHandlerBrowserTest,
                        ProtocolFailureEmitsConsoleLog) {
-// Only on Mac and Windows is there a way for Chromium to know whether a
-// protocol handler is registered ahead of time.
+// Only on Mac is there a way for Chromium to know whether a protocol handler
+// is registered ahead of time.
 #if BUILDFLAG(IS_MAC)
   content::WebContentsConsoleObserver observer(web_content());
   observer.SetPattern("Failed to launch 'does.not.exist:failure'*");

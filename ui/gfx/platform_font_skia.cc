@@ -435,13 +435,6 @@ void PlatformFontSkia::ComputeMetricsIfNecessary() {
     ascent_pixels_ = SkScalarCeilToInt(-metrics.fAscent);
     cap_height_pixels_ = SkScalarCeilToInt(metrics.fCapHeight);
 
-    // There is a mismatch between the way the PlatformFontWin was computing the
-    // font height in pixel. The font height may vary by one pixel due to
-    // decimal rounding.
-    //     Windows Skia implements : ceil(descent - ascent)
-    //     Linux Skia implements   : ceil(-ascent) + ceil(descent)
-    // TODO(etienneb): Make both implementation consistent and fix the broken
-    // unittests.
     height_pixels_ = ascent_pixels_ + SkScalarCeilToInt(metrics.fDescent);
 
     if (metrics.fAvgCharWidth) {

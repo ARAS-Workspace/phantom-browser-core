@@ -1683,7 +1683,7 @@ class HintsFetcherSearchPageLimitedURLsBrowserTest
   }
 };
 
-// TODO(crbug.com/40067071): Disable limited SRP test on Windows/CrOS for now.
+// TODO(crbug.com/40067071): Disable limited SRP test on CrOS for now.
 #if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_HintsFetcherLimitedResults DISABLED_HintsFetcherLimitedResults
 #else

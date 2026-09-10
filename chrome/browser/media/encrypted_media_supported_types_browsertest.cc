@@ -148,8 +148,8 @@ const char16_t kUnexpectedResult16[] = u"unexpected result";
 #endif  // BUILDFLAG(BUNDLE_WIDEVINE_CDM)
 
 // For Widevine key system with software secure robustness, persistent license
-// session is supported on Windows and Mac. On ChromeOS, it is supported when
-// the protected media identifier permission is allowed. See
+// session is supported on Mac. On ChromeOS, it is supported when the
+// protected media identifier permission is allowed. See
 // kUnsafelyAllowProtectedMediaIdentifierForDomain used below.
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #define EXPECT_WV_SW_SECURE_PERSISTENT_SESSION EXPECT_WV
@@ -514,10 +514,8 @@ class EncryptedMediaSupportedTypesTest : public InProcessBrowserTest {
                                                  video_mp4_hevc_codecs());
 #if BUILDFLAG(ENABLE_HEVC_PARSER_AND_HW_DECODER)
 #if BUILDFLAG(IS_LINUX)
-    // On Windows & Linux platforms, HEVC support is detected through the GPU
-    // capabilities which won't indicate support when running the tests.
-    // TODO(crbug.com/40226210): Fix this so that we can inject HEVC support on
-    // Windows.
+    // On Linux, HEVC support is detected through the GPU capabilities which
+    // won't indicate support when running the tests.
     EXPECT_UNSUPPORTED(hevc_supported);
 #else
     // On other platforms, HEVC support should be available if

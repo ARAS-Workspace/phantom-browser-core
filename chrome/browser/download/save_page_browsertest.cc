@@ -745,7 +745,6 @@ IN_PROC_BROWSER_TEST_F(SavePageBrowserTest, SecurityLevelHistogram) {
 }
 
 // Tests that a page can be saved as MHTML.
-// Flaky on Windows, crbug.com/40671774
 #define MAYBE_SavePageAsMHTML SavePageAsMHTML
 IN_PROC_BROWSER_TEST_F(SavePageBrowserTest, MAYBE_SavePageAsMHTML) {
   static const int64_t kFileSizeMin = 2758;
@@ -836,7 +835,6 @@ IN_PROC_BROWSER_TEST_F(SavePageBrowserTest,
   EXPECT_EQ(received_params.save_type, content::SAVE_PAGE_TYPE_AS_MHTML);
 }
 
-// Flaky on Windows: https://crbug.com/40789916.
 #define MAYBE_SavePageBrowserTest_NonMHTML SavePageBrowserTest_NonMHTML
 IN_PROC_BROWSER_TEST_F(SavePageBrowserTest,
                        MAYBE_SavePageBrowserTest_NonMHTML) {
@@ -1508,7 +1506,6 @@ IN_PROC_BROWSER_TEST_P(SavePageOriginalVsSavedComparisonTest, BrokenImage) {
 }
 
 // Test for saving a page with a cross-site <object> element.
-// Disabled on Windows due to flakiness. crbug.com/40684650.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_CrossSiteObject DISABLED_CrossSiteObject
 #else

@@ -390,8 +390,6 @@ void RenderWidgetHostViewEventHandler::OnScrollEvent(ui::ScrollEvent* event) {
   }
 
   if (event->type() == ui::EventType::kScroll) {
-    // TODO(ananta)
-    // Investigate if this is true for Windows 8 Metro ASH as well.
     if (event->finger_count() != 2)
       return;
     blink::WebMouseWheelEvent mouse_wheel_event =

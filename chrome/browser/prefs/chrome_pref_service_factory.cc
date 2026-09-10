@@ -196,8 +196,8 @@ enum SettingsEnforcementGroup {
 
 SettingsEnforcementGroup GetSettingsEnforcementGroup() {
 
-  // Use the strongest enforcement setting on Windows and MacOS. Remember to
-  // update the OFFICIAL_BUILD section of extension_startup_browsertest.cc and
+  // Use the strongest enforcement setting on MacOS. Remember to update the
+  // OFFICIAL_BUILD section of extension_startup_browsertest.cc and
   // pref_hash_browsertest.cc when updating the default value below.
 #if BUILDFLAG(IS_MAC)
   return GROUP_ENFORCE_DEFAULT;

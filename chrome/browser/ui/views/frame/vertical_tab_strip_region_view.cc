@@ -476,9 +476,6 @@ void VerticalTabStripRegionView::OnMouseExited(const ui::MouseEvent& event) {
 }
 
 void VerticalTabStripRegionView::HandleMouseExited() {
-  // On Windows, we get mouse exit events when moving between the caption area
-  // and client as well as when we transition between web contents area
-  // underneath the expanded on hover overlay to outside it.
   UpdateExpandOnHoverState(false);
 }
 

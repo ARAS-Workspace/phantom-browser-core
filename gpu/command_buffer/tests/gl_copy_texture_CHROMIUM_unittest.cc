@@ -1176,7 +1176,7 @@ TEST_P(GLCopyTextureCHROMIUMES3Test, CopyTextureLevel) {
 #if BUILDFLAG(IS_ANDROID)
         // TODO(qiankun.miao@intel.com): source_level > 0 or dest_level > 0
         // isn't available due to renderinig bug for non-zero base level in
-        // NVIDIA Windows: crbug.com/679639 and Android: crbug.com/680460.
+        // Android: crbug.com/680460.
         if (dest_level > 0)
           continue;
 #endif

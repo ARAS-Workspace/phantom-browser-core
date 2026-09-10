@@ -1263,7 +1263,6 @@ IN_PROC_BROWSER_TEST_F(TabGroupShortcutsInteractiveTest,
       WaitForHide(kTabGroupEditorBubbleCloseGroupButtonId));
 }
 
-// TODO(crbug.com/456197972): This test is flaky on Windows.
 #define MAYBE_ScreenshotAcceleratorsInTabGroupSubmenu \
   ScreenshotAcceleratorsInTabGroupSubmenu
 IN_PROC_BROWSER_TEST_F(TabGroupShortcutsInteractiveTest,

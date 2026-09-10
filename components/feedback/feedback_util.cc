@@ -117,8 +117,6 @@ void RemoveUrlsFromAutofillData(std::string& autofill_metadata) {
   return;
 }
 
-// Note: This function is excluded from win build because its unit tests do
-// not pass on OS_WIN.
 // This function is only called on ChromeOS.
 // See https://crbug.com/1119560.
 std::optional<std::string> ReadEndOfFile(const base::FilePath& path,

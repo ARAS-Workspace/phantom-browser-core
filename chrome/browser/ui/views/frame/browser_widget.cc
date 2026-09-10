@@ -137,11 +137,6 @@ void BrowserWidget::InitBrowserWidget() {
     params.z_order = ui::ZOrderLevel::kFloatingWindow;
     params.visible_on_all_workspaces = true;
     // This has the side-effect of keeping the pip window in the tab order.
-    //
-    // On all platforms, except for Windows, this doesn't change anything
-    // visually. If this is set for the Windows platform, the UI will be
-    // affected. Specifically, the title bar will not render correctly, see
-    // https://crbug.com/40273014 for more details.
     params.remove_standard_frame = true;
   }
 

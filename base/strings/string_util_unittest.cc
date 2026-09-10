@@ -1842,7 +1842,6 @@ TEST(StringUtilTest, EqualsCaseInsensitiveASCII) {
   EXPECT_TRUE(EqualsCaseInsensitiveASCII("aaa \xc3\xa4", "AAA \xc3\xa4"));
   EXPECT_FALSE(EqualsCaseInsensitiveASCII("aaa \xc3\x84", "AAA \xc3\xa4"));
 
-  // The `std::wstring_view` overloads are only defined on Windows.
 }
 
 TEST(StringUtilTest, IsUnicodeWhitespace) {

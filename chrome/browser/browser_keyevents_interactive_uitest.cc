@@ -824,8 +824,6 @@ IN_PROC_BROWSER_TEST_F(BrowserKeyEventsTest, PageUpDownKeys) {
   EXPECT_NO_FATAL_FAILURE(CheckTextBoxValue(tab_index, "A", ""));
 }
 
-// AltKey is enabled only on Windows. See crbug.com/40155843.
-
 // Regression test for crbug.com/407601713. When the content area is in focus,
 // hiding and then re-showing the browser window should restore the focus. The
 // test sends keyboard events to the browser window and verifies that the

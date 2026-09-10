@@ -429,7 +429,6 @@ class ClearSiteDataHandlerBrowserTest : public ContentBrowserTest {
 // the end of a navigation redirect chain. Each of the three parts of the chain
 // may or may not send the header, so there are 8 configurations to test.
 
-// Crashes on Win only. https://crbug.com/741189
 #define MAYBE_RedirectNavigation RedirectNavigation
 IN_PROC_BROWSER_TEST_F(ClearSiteDataHandlerBrowserTest,
                        MAYBE_RedirectNavigation) {
@@ -475,7 +474,6 @@ IN_PROC_BROWSER_TEST_F(ClearSiteDataHandlerBrowserTest,
 // the end of a resource load redirect chain. Each of the three parts of the
 // chain may or may not send the header, so there are 8 configurations to test.
 
-// Crashes on Win only. https://crbug.com/741189
 #define MAYBE_RedirectResourceLoad RedirectResourceLoad
 IN_PROC_BROWSER_TEST_F(ClearSiteDataHandlerBrowserTest,
                        MAYBE_RedirectResourceLoad) {
@@ -774,7 +772,6 @@ IN_PROC_BROWSER_TEST_F(ClearSiteDataHandlerBrowserTest,
 // Tests that Clear-Site-Data is only executed on a resource fetch
 // if credentials are allowed in that fetch.
 
-// Crashes on Win only. https://crbug.com/741189
 #define MAYBE_Credentials Credentials
 IN_PROC_BROWSER_TEST_F(ClearSiteDataHandlerBrowserTest, MAYBE_Credentials) {
   GURL page_template = https_server()->GetURL("origin1.com", "/");

@@ -1820,7 +1820,6 @@ TEST_F(ContentAnalysisDelegateWithLocalClient, FailClosed) {
                    EXPECT_EQ(0u, result.paths_results.size());
 
                    bool expected_result = true;
-    // Should only fail closed on Windows.
                    EXPECT_EQ(expected_result, result.text_results[0]);
                    *called = true;
                  },

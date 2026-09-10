@@ -2789,7 +2789,6 @@ TEST_F(DiskCacheEntryTest, SimpleCacheGiantEntry) {
   CacheGiantEntry();
 }
 
-// This test is too slow on Windows which ends up with Timeout.
 // Writing to a large offset can be slow on some filesystems if they don't
 // efficiently support sparse files.
 TEST_F(DiskCacheEntryTest, SimpleCacheLargeOffsetIO) {

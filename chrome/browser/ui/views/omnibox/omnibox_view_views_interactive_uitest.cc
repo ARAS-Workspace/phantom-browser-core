@@ -932,9 +932,6 @@ IN_PROC_BROWSER_TEST_F(OmniboxViewViewsTest, AlwaysShowFullURLs) {
   EXPECT_EQ(url_text, u"http://" + omnibox_view_views->GetText());
 }
 
-// The following set of tests require UIA accessibility support, which only
-// exists on Windows.
-
 // ClickOnView(VIEW_ID_OMNIBOX) does not set focus to omnibox on Mac.
 // Looks like the same problem as in the SelectAllOnClick().
 // Tracked in: https://crbug.com/41432033

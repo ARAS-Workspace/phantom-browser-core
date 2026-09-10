@@ -433,8 +433,8 @@ std::unique_ptr<KeyedService> BuildSyncService(
   init_params.os_crypt_async = g_browser_process->os_crypt_async();
 
   bool local_sync_backend_enabled = false;
-  // Only check the local sync backend pref on the supported platforms of
-  // Windows, Mac and Linux.
+  // Only check the local sync backend pref on the supported platforms of Mac
+  // and Linux.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   syncer::SyncPrefs prefs(profile->GetPrefs());
   local_sync_backend_enabled = prefs.IsLocalSyncEnabled();

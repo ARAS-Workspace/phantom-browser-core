@@ -3487,9 +3487,9 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_WriteWithoutResponseOnlyCharacteristic_WriteRemoteCharacteristicDuringDisconnect
 #endif
 // Tests that writing without response during a disconnect results in an error.
-// Only applies to macOS and WinRT whose events arrive all on the UI thread. See
-// other *DuringDisconnect tests for Android and Windows whose events arrive on
-// a different thread.
+// Only applies to macOS whose events arrive all on the UI thread. See other
+// *DuringDisconnect tests for Android whose events arrive on a different
+// thread.
 TEST_F(
     BluetoothRemoteGattCharacteristicTest,
     MAYBE_WriteWithoutResponseOnlyCharacteristic_WriteRemoteCharacteristicDuringDisconnect) {
@@ -3521,9 +3521,9 @@ TEST_F(
   DISABLED_WriteWithoutResponseOnlyCharacteristic_DeprecatedWriteRemoteCharacteristicDuringDisconnect
 #endif
 // Tests that writing without response during a disconnect results in an error.
-// Only applies to macOS and WinRT whose events arrive all on the UI thread. See
-// other *DuringDisconnect tests for Android and Windows whose events arrive on
-// a different thread.
+// Only applies to macOS whose events arrive all on the UI thread. See other
+// *DuringDisconnect tests for Android whose events arrive on a different
+// thread.
 TEST_F(
     BluetoothRemoteGattCharacteristicTest,
     MAYBE_WriteWithoutResponseOnlyCharacteristic_DeprecatedWriteRemoteCharacteristicDuringDisconnect) {

@@ -46,8 +46,8 @@ PA_NOINLINE void HandlePoolAllocFailure() {
   PA_NO_CODE_FOLDING();
   uint32_t alloc_page_error_code = GetAllocPageErrorCode();
   PA_DEBUG_DATA_ON_STACK("error", static_cast<size_t>(alloc_page_error_code));
-  // It's important to easily differentiate these two failures on Windows, so
-  // crash with different stacks.
+  // It's important to easily differentiate these two failures, so crash with
+  // different stacks.
   {
     PA_CHECK(false);
   }

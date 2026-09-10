@@ -178,8 +178,7 @@ LaunchContext::BackgroundLaunchResult LaunchContext::LaunchInBackground(
 
   base::FilePath host_path = manifest->path();
   if (!host_path.IsAbsolute()) {
-    // On Windows host path is allowed to be relative to the location of the
-    // manifest file. On all other platforms the path must be absolute.
+    // The host path must be absolute.
     LOG(WARNING) << "Native messaging host path must be absolute for "
                  << native_host_name;
     return BackgroundLaunchResult(NativeProcessLauncher::RESULT_NOT_FOUND);

@@ -6,9 +6,4 @@
 
 namespace video_capture::features {
 
-// Enables video capture device monitoring in video capture service instead of
-// the browser process. Implementing now for Windows.
-// Using a different feature name so as not to confuse with the old one used for
-// Mac.
-
 }  // namespace video_capture::features

@@ -88,7 +88,6 @@ class FakeScreenDetailsTest : public ScreenDetailsTest {
   raw_ptr<Shell> test_shell_ = nullptr;
 };
 
-// TODO(crbug.com/40115071): Windows crashes static casting to ScreenWin.
 // TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_GetScreensFaked DISABLED_GetScreensFaked
@@ -127,7 +126,6 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest, MAYBE_GetScreensFaked) {
   EXPECT_EQ(content::test::GetExpectedScreenDetails(), result);
 }
 
-// TODO(crbug.com/40115071): Windows crashes static casting to ScreenWin.
 // TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_IsExtendedFaked DISABLED_IsExtendedFaked
@@ -146,7 +144,6 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest, MAYBE_IsExtendedFaked) {
   EXPECT_FALSE(EvalJs(test_shell(), "screen.isExtended").ExtractBool());
 }
 
-// TODO(crbug.com/40115071): Windows crashes static casting to ScreenWin.
 // TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_ScreenOnchangeNoPermission DISABLED_ScreenOnchangeNoPermission
@@ -197,7 +194,6 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest,
   EXPECT_EQ("2", EvalJs(test_shell(), "document.title"));
 }
 
-// TODO(crbug.com/40115071): Windows crashes static casting to ScreenWin.
 // TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_ScreenOnChangeForIsExtended DISABLED_ScreenOnChangeForIsExtended
@@ -246,7 +242,6 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest,
   EXPECT_EQ("2", EvalJs(test_shell(), "document.title"));
 }
 
-// TODO(crbug.com/40115071): Windows crashes static casting to ScreenWin.
 // TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_ScreenOnChangeForAttributes DISABLED_ScreenOnChangeForAttributes

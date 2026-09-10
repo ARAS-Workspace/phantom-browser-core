@@ -683,7 +683,7 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // TODO(crbug.com/40937315): Test is flaky on MSAN.
-// TODO(https://crbug.com/40799125): Test is flaky on Windows and Mac.
+// TODO(https://crbug.com/40799125): Test is flaky on Mac.
 #if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_MAC)
 #define MAYBE_InteractionToNextPaintCalculatorWithSendingAllLatencies \
   DISABLED_InteractionToNextPaintCalculatorWithSendingAllLatencies

@@ -272,8 +272,6 @@ int BubbleFrameView::NonClientHitTest(const gfx::Point& point) {
   if (hit_test_transparent_) {
     return HTTRANSPARENT;
   }
-  // Windows will automatically create a tooltip for the button based on
-  // the HTCLOSE or the HTMINBUTTON
   if (close_->GetVisible() && close_->GetMirroredBounds().Contains(point)) {
     return HTCLOSE;
   }

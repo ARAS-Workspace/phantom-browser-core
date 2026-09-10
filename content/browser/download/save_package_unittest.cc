@@ -211,7 +211,6 @@ TEST_F(SavePackageTest, TestUnSuccessfullyGenerateSavePackageFilename) {
   }
 }
 
-// Crashing on Windows, see http://crbug.com/79365
 #define MAYBE_TestLongSavePackageFilename TestLongSavePackageFilename
 TEST_F(SavePackageTest, MAYBE_TestLongSavePackageFilename) {
   const std::string base_url("http://www.google.com/");
@@ -242,7 +241,6 @@ TEST_F(SavePackageTest, MAYBE_TestLongSavePackageFilename) {
   EXPECT_NE(filename, filename2);
 }
 
-// Crashing on Windows, see http://crbug.com/79365
 #define MAYBE_TestLongSafePureFilename TestLongSafePureFilename
 TEST_F(SavePackageTest, MAYBE_TestLongSafePureFilename) {
   const base::FilePath save_dir(FPL("test_dir"));

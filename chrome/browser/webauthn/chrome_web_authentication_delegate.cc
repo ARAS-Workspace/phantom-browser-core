@@ -325,7 +325,7 @@ ChromeWebAuthenticationDelegate::MaybeGetRequestProxy(
     content::BrowserContext* browser_context,
     const url::Origin& caller_origin) {
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  // The webAuthenticationProxy extension API is supported on Win/Mac/Linux.
+  // The webAuthenticationProxy extension API is supported on Mac/Linux.
   auto* service = extensions::WebAuthenticationProxyService::GetIfProxyAttached(
       Profile::FromBrowserContext(browser_context));
   return service && service->IsActive(caller_origin) ? service : nullptr;

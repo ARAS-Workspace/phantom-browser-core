@@ -3043,9 +3043,6 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
   RunHtmlTest(FILE_PATH_LITERAL("input-date-with-popup-open.html"));
 }
 
-// The /blink test pass is different when run on Windows vs other OSs.
-// So separate into two different tests: <input type="datetime-local"> has a
-// ", " inserted between fields on Windows.
 #define AccessibilityInputDateWithPopupOpenMultiple_TestFile \
   FILE_PATH_LITERAL("input-date-with-popup-open-multiple.html")
 
@@ -3256,8 +3253,6 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest, AccessibilityInputTime) {
   RunHtmlTest(FILE_PATH_LITERAL("input-time.html"));
 }
 
-// The /blink test pass is different when run on Windows vs other OSs.
-// So separate into two different tests.
 #define AccessibilityInputTypes_TestFile FILE_PATH_LITERAL("input-types.html")
 
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest, AccessibilityInputTypes) {

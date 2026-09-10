@@ -30,8 +30,6 @@ namespace {
 
 using BuiltCallback = PredictionModelOverrides::Entry::BuiltCallback;
 
-// The ":" character is reserved in Windows as part of an absolute file path,
-// e.g.: C:\model.tflite, so we use a different separator.
 const char kModelOverrideSeparator[] = ":";
 
 std::unique_ptr<proto::PredictionModel> ProcessModelOverrideOnBGThread(

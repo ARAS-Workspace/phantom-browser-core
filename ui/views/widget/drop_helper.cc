@@ -181,9 +181,6 @@ View* DropHelper::CalculateTargetViewImpl(const gfx::Point& root_view_location,
   if (deepest_view) {
     *deepest_view = view;
   }
-  // TODO(sky): for the time being these are separate. Once I port chrome menu
-  // I can switch to the #else implementation and nuke the OS_WIN
-  // implementation.
   int formats = 0;
   std::set<ui::ClipboardFormatType> format_types;
   while (view && view != target_view_) {

@@ -1622,7 +1622,6 @@ IN_PROC_BROWSER_TEST_F(PasswordManagerBrowserTest,
 
 // Tests that obsolete HTTP credentials are moved when a site migrated to HTTPS
 // and has HSTS enabled.
-// TODO(crbug.com/440205556): Flaky on Win.
 #define MAYBE_ObsoleteHttpCredentialMovedOnMigrationToHstsSite \
   ObsoleteHttpCredentialMovedOnMigrationToHstsSite
 IN_PROC_BROWSER_TEST_F(PasswordManagerBrowserTest,

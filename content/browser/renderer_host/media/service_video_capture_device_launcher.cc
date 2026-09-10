@@ -147,8 +147,8 @@ void ServiceVideoCaptureDeviceLauncher::LaunchDeviceAsync(
   new_params.power_line_frequency =
       media::VideoCaptureDevice::GetPowerLineFrequency(params);
 
-  // GpuMemoryBuffer-based VideoCapture buffer works only on the Chrome OS,
-  // Windows and Linux VideoCaptureDevice implementations.
+  // GpuMemoryBuffer-based VideoCapture buffer works only on the Chrome OS and
+  // Linux VideoCaptureDevice implementations.
 #if BUILDFLAG(IS_MAC)
   // For mac(https://crbug.com/1175142), zero-copy is always enabled unless the
   // user explicitly asks to disable it.

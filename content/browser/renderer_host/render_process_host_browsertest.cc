@@ -373,7 +373,6 @@ class ObserverLogger : public RenderProcessHostObserver {
 };
 
 // Flaky on Android. http://crbug.com/759514.
-// TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_AllProcessExitedCallsBeforeAnyHostDestroyedCalls \
   DISABLED_AllProcessExitedCallsBeforeAnyHostDestroyedCalls

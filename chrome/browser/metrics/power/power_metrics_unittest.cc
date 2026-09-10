@@ -60,8 +60,6 @@ TEST(PowerMetricsTest, ReportAggregatedProcessMetricsHistograms) {
   ExpectHistogramSamples(
       &histogram_tester, suffixes,
       {
-// Windows ARM64 does not support Constant Rate TSC so
-// PerformanceMonitor.AverageCPU10.Total is not recorded there.
           {"PerformanceMonitor.AverageCPU10.Total", 20},
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \

@@ -586,7 +586,6 @@ IN_PROC_BROWSER_TEST_F(MediaSessionPictureInPictureContentBrowserTest,
 // Tests Media Session action availability upon reaching the end of stream by
 // verifying that the "nexttrack" action can be invoked after playing through
 // to the end of media.
-// TODO(https://crbug.com/422414020): This is failing on Windows arm64.
 #define MAYBE_ActionAvailableAfterEndOfStreamAndSrcUpdate \
   ActionAvailableAfterEndOfStreamAndSrcUpdate
 IN_PROC_BROWSER_TEST_F(MediaSessionPictureInPictureContentBrowserTest,

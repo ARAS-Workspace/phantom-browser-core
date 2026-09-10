@@ -4455,8 +4455,6 @@ INSTANTIATE_TEST_SUITE_P(
       return name;
     });
 
-// TODO(crbug.com/40265712): Mocking the logger appears to not work correctly on
-// Windows. Investigate why it is not working and enable the test on Windows.
 class StartupBrowserCreatorIwaCommandLineInstallProfilePickerErrorTest
     : public StartupBrowserCreatorPickerTestBase {
  protected:

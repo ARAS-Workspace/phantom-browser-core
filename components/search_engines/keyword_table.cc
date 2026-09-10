@@ -170,8 +170,6 @@ void UpdateAllKeywordHashes(sql::Database* db,
     }
   };
 
-  // See the comment in `GetKeywordDataFromStatement` as to why this code is
-  // only enabled for Windows.
 }
 
 WebDatabaseTable::TypeKey GetKey() {
@@ -610,13 +608,6 @@ std::optional<TemplateURLData> KeywordTable::GetKeywordDataFromStatement(
                                   status);
   };
 
-// Only enable this hash checking feature on Windows. This because the value of
-// `os_crypt_async::Encryptor::IsDecryptionAvailable` can vary and is platform
-// specific. E.g. some platforms might historically have returned 'false' for
-// encryption availability. On Linux, decryption availability can return
-// `false` if no encryption backend is available, and the backend can change
-// for various reasons including command line options or desktop window
-// manager.
   status = HashValidationStatus::kNotVerifiedFeatureDisabled;
   return data;
 }

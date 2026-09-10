@@ -87,8 +87,7 @@ class SettingsGlicSubpageFocusTest : public SettingsFocusTest {
   glic::GlicTestEnvironment glic_test_env_;
 };
 
-// TODO(crbug.com/424864547): Investigate flakiness and enable on Mac64 and
-// Win64.
+// TODO(crbug.com/424864547): Investigate flakiness and enable on Mac64.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_GlicSubpageFocus DISABLED_GlicSubpageFocus
 #else

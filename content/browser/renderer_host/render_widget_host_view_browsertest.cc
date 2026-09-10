@@ -1530,8 +1530,6 @@ class CompositingRenderWidgetHostViewBrowserTestTabCaptureHighDPI
   float scale() const override { return 2.0f; }
 };
 
-// NineImagePainter implementation crashes the process on Windows when this
-// content_browsertest forces a device scale factor.  http://crbug.com/399349
 #define MAYBE_CopyToBitmap_EntireRegion CopyToBitmap_EntireRegion
 #define MAYBE_CopyToBitmap_CenterRegion CopyToBitmap_CenterRegion
 #define MAYBE_CopyToBitmap_ScaledResult CopyToBitmap_ScaledResult

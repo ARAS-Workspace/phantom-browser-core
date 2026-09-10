@@ -600,7 +600,7 @@ IN_PROC_BROWSER_TEST_F(VerticalTabDragTest, MAYBE_DragMultipleTabs) {
       ReleaseMouse());
 }
 
-// TODO(crbug.com/40249472): Fails on ChromeOS and Windows.
+// TODO(crbug.com/40249472): Fails on ChromeOS.
 #if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_DragMultipleTabsInGroup DISABLED_DragMultipleTabsInGroup
 #else

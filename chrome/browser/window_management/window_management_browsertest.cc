@@ -59,7 +59,6 @@ class FakeScreen : public display::ScreenBase {
   }
 };
 
-// TODO(crbug.com/40111905): Windows downcasts Screen to ScreenWin and fails.
 #define MAYBE_WindowManagementTest WindowManagementTest
 
 class MAYBE_WindowManagementTest : public InProcessBrowserTest {

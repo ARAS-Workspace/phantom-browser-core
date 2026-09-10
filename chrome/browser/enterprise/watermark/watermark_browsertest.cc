@@ -177,7 +177,6 @@ IN_PROC_BROWSER_TEST_P(WatermarkBrowserTest, WatermarkShownAfterNavigation) {
   ShowAndVerifyUi();
 }
 
-// TODO(crbug.com/40261456): Flakily fails on Windows
 #define MAYBE_WatermarkClearedAfterNavigation WatermarkClearedAfterNavigation
 IN_PROC_BROWSER_TEST_P(WatermarkBrowserTest,
                        MAYBE_WatermarkClearedAfterNavigation) {

@@ -278,7 +278,6 @@ IN_PROC_BROWSER_TEST_F(AppMenuBrowserTest, InvokeUi_main_upgrade_available) {
   ShowAndVerifyUi();
 }
 
-// TODO(crbug.com/484789570): Flaky on Windows 10 x64 builds.
 #define MAYBE_InvokeUi_main_guest InvokeUi_main_guest
 IN_PROC_BROWSER_TEST_F(AppMenuBrowserTest, MAYBE_InvokeUi_main_guest) {
 // TODO(crbug.com/40899974): ChromeOS specific profile logic still needs to be

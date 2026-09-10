@@ -415,7 +415,6 @@ TEST(FileEnumerator, InvalidDirectory) {
   FilePath path = enumerator.Next();
   EXPECT_TRUE(path.empty());
 
-  // Slightly different outcomes between Windows and POSIX.
   EXPECT_EQ(File::Error::FILE_ERROR_NOT_A_DIRECTORY, enumerator.GetError());
 }
 

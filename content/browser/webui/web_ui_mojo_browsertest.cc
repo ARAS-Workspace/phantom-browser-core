@@ -479,7 +479,6 @@ IN_PROC_BROWSER_TEST_F(WebUIMojoTest, MAYBE_ChromeSendAvailable) {
   EXPECT_FALSE(RunBoolFunction("isChromeSendAvailable()"));
 }
 
-// TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
 #define MAYBE_ChromeSendAvailable_AfterCrash ChromeSendAvailable_AfterCrash
 IN_PROC_BROWSER_TEST_F(WebUIMojoTest, MAYBE_ChromeSendAvailable_AfterCrash) {
   GURL test_url(GetWebUIURL(GetMojoWebUiHost() +

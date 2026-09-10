@@ -77,8 +77,6 @@ mojom::TypefaceStylePtr CreateTypefaceStyle(int weight,
   return style;
 }
 
-// The CheckMatchesRequiredStyles workaround is only implemented on Windows.
-
 TEST_F(FontDataServiceImplUnitTest, MatchFamilyName) {
   mojom::MatchFamilyNameResultPtr out_result;
   std::string family_name = "Arimo";

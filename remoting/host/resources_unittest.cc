@@ -32,7 +32,7 @@ TEST_F(ResourcesTest, DISABLED_ProductName) {
   std::string expected_product_name = "Chromoting";
 #endif  // BUILDFLAGdefined(GOOGLE_CRANDING)
 
-  // Chrome-style i18n is not used on Windows or Android.
+  // Chrome-style i18n is not used on Android.
 #if BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(resources_available_);
 #else

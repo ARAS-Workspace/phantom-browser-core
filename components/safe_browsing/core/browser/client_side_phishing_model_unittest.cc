@@ -759,8 +759,6 @@ TEST_F(ClientSidePhishingModelTest, FlatbufferOnFollowingUpdate) {
 
   // Mapping should be undone automatically, even with a region copy lying
   // around.
-  // Can remove this if flaky.
-  // Windows ASAN flake: crbug.com/1234652
   BASE_EXPECT_DEATH(memory_span[0] = 'G', "");
 }
 

@@ -306,7 +306,6 @@ IN_PROC_BROWSER_TEST_F(InterstitialUITest, InterstitialViewSource) {
 // Tests that view-source: works correctly on a subpage of
 // chrome://interstitials (using chrome://interstitials/ssl).
 
-// Test is currently flaky on Windows (crbug.com/41437969)
 #define MAYBE_InterstitialWithPathViewSource InterstitialWithPathViewSource
 
 IN_PROC_BROWSER_TEST_F(InterstitialUITest,

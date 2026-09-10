@@ -159,11 +159,9 @@ struct ParamTraits<unsigned int> {
 // 8 bytes on 64 bit builds. So if a 32 bit and 64 bit process have a channel
 // that would cause problem.
 // We need to keep this on for a few configs:
-//   1) Windows because DWORD is typedef'd to it, which is fine because we have
-//      very few IPCs that cross this boundary.
-//   2) We also need to keep it for Linux for two reasons: int64_t is typedef'd
+//   1) We need to keep it for Linux for two reasons: int64_t is typedef'd
 //      to long, and gfx::PluginWindow is long and is used in one GPU IPC.
-//   3) Android 64 bit and Fuchsia also have int64_t typedef'd to long.
+//   2) Android 64 bit also has int64_t typedef'd to long.
 // Since we want to support Android 32<>64 bit IPC, as long as we don't have
 // these traits for 32 bit ARM then that'll catch any errors.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \

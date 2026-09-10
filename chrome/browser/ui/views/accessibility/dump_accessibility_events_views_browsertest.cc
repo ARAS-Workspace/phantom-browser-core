@@ -42,7 +42,6 @@ class DumpAccessibilityEventsViewsTest
 // Meta-tests to validate the testing framework itself.
 
 // Tests that focus events are recorded and match the expectation file.
-// TODO(crbug.com/521439532): Re-enable the test on Win.
 #define MAYBE_MetaTest_FocusEventRecorded MetaTest_FocusEventRecorded
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsViewsTest,
                        MAYBE_MetaTest_FocusEventRecorded) {

@@ -1042,8 +1042,6 @@ void HostProcess::CreateAuthenticatorFactory() {
   } else {
     scoped_refptr<PairingRegistry> pairing_registry;
     if (allow_pairing_) {
-      // On Windows |pairing_registry_| is initialized in
-      // InitializePairingRegistry().
       if (!pairing_registry_) {
         std::unique_ptr<PairingRegistry::Delegate> delegate =
             CreatePairingRegistryDelegate();

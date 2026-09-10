@@ -2100,8 +2100,7 @@ scoped_refptr<DrawingBuffer::ColorBuffer> DrawingBuffer::CreateColorBuffer(
     bool use_as_overlay = UseOverlaysForWebGL() || can_use_low_latency_;
     if (use_as_overlay) {
 #if !BUILDFLAG(IS_ANDROID)
-      // Android's SharedImage backing for ChromiumImage does not support BGRX,
-      // and the adjustments below were historically not made on Windows.
+      // Android's SharedImage backing for ChromiumImage does not support BGRX.
 
       // TODO(b/286417069): BGRX has issues when Vulkan is used for raster and
       // composite. Using BGRX is technically possible but will require a lot
@@ -2123,7 +2122,6 @@ scoped_refptr<DrawingBuffer::ColorBuffer> DrawingBuffer::CreateColorBuffer(
       }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-      // This check was historically not made on Windows.
       if (IsScanoutSupportedForCanvasWithFormat(color_buffer_format_, caps)) {
         usage = usage | gpu::SHARED_IMAGE_USAGE_SCANOUT;
         if (can_use_low_latency_) {

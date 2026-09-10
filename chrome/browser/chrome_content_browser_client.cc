@@ -8878,8 +8878,8 @@ void ChromeContentBrowserClient::ShowCaptionSettings(
     content::RenderFrameHost* rfh) {
   CHECK(rfh);
 #if BUILDFLAG(IS_MAC)
-  // Windows and Mac caption styles come from the OS settings. Open the native
-  // dialog to allow users to change them.
+  // Mac caption styles come from the OS settings. Open the native dialog to
+  // allow users to change them.
   captions::CaptionSettingsDialog::ShowCaptionSettingsDialog();
 #else
   // Other platforms have no native dialog, so navigate to the Chrome

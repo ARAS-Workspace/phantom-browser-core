@@ -56,8 +56,7 @@ void TrustSafetySentimentServiceFactory::ShutDownForTesting(
 std::unique_ptr<KeyedService>
 TrustSafetySentimentServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
-  // TrustSafetySentimentSurvey is conducted only for Windows, MacOS and Linux
-  // currently.
+  // TrustSafetySentimentSurvey is conducted only for MacOS and Linux currently.
 #if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS))
 
   // TrustSafetySentimentSurvey is conducted only in English currently.

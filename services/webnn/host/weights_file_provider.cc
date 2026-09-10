@@ -68,9 +68,6 @@ base::File CreateTemporaryFile() {
       temp_dir, &path,
       base::File::FLAG_WIN_TEMPORARY | base::File::FLAG_WIN_NO_EXECUTE);
   if (weights_file.IsValid()) {
-    // On POSIX platforms we can just call unlink(2) immediately and the file
-    // will be deleted when the FD is closed but on Windows instead set this
-    // up explicitly.
     base::DeleteFile(path);
   }
   return weights_file;

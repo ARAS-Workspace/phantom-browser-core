@@ -51,8 +51,6 @@
 
 namespace web_app {
 
-// TODO(crbug.com/478831891): Fix and enable
-// `IsolatedWebAppInstallerViewUiPixelTest` for Windows.
 namespace {
 
 using Step = IsolatedWebAppInstallerModel::Step;

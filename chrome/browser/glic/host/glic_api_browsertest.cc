@@ -820,7 +820,6 @@ IN_PROC_BROWSER_TEST_P(GlicApiTestWithOneTab,
               testing::IsEmpty());
 }
 
-// Note: Win-ASAN is flaky.
 #define MAYBE_testGetContextFromFocusedTabWithAllRequestedData \
   testGetContextFromFocusedTabWithAllRequestedData
 IN_PROC_BROWSER_TEST_P(GlicApiTestWithOneTab,
@@ -1191,7 +1190,6 @@ IN_PROC_BROWSER_TEST_F(GlicApiTestWithOneTab,
 }
 
 // TODO(crbug.com/460826488): Enable on ChromeOS.
-// Win-asan is flaky.
 #if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_testFetchInactiveTabScreenshotWhileMinimized \
   DISABLED_testFetchInactiveTabScreenshotWhileMinimized

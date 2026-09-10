@@ -15,5 +15,3 @@
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkPixelRef.h"
-
-// Native drawing context is only used/supported on Windows.

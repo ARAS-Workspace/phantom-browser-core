@@ -1219,7 +1219,6 @@ IN_PROC_BROWSER_TEST_F(WebViewInteractiveTest, MAYBE_LongPressSelection) {
       FROM_HERE, run_loop->QuitClosure(), base::Milliseconds(200));
   run_loop->Run();
 
-// TODO: Fix quick menu opening on Windows.
   EXPECT_TRUE(ui::TouchSelectionMenuRunner::GetInstance()->IsRunning());
 
   EXPECT_FALSE(GetGuestView()->web_contents()->IsShowingContextMenu());

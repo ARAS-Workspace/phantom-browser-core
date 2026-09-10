@@ -52,7 +52,7 @@ IPEndPoint GetMdnsReceiveEndPoint(AddressFamily address_family) {
 // mitigation to reconcile the two issues. Remove this after closing
 // crbug.com/899310.
 #if BUILDFLAG(IS_APPLE)
-  // With Windows, binding to a mulitcast group address is not allowed.
+  // Binding to a mulitcast group address is not allowed.
   // Multicast messages will be received appropriate to the multicast groups the
   // socket has joined. Sockets intending to receive multicast messages should
   // bind to a wildcard address (e.g. 0.0.0.0).

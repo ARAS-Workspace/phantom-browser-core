@@ -1210,7 +1210,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionWebRequestApiTest, DISABLED_WebRequestTypes) {
 
 // Test that a request to an OpenSearch description document (OSDD) generates
 // an event with the expected details.
-// Flaky on Windows and Mac: https://crbug.com/40771884
+// Flaky on Mac: https://crbug.com/40771884
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_WebRequestTestOSDD DISABLED_WebRequestTestOSDD
 #else
@@ -9510,8 +9510,6 @@ INSTANTIATE_TEST_SUITE_P(/* no prefix */,
                          testing::Combine(testing::Bool(), testing::Bool()),
                          ExtensionWebRequestApiCoverageTest::DescribeParams);
 
-// TODO(crbug.com/502806827): Multiple worker threads creation fails silently on
-// Windows ASAN builds, causing this test to hang.
 #define MAYBE_RequestInterceptionCoverage RequestInterceptionCoverage
 IN_PROC_BROWSER_TEST_P(ExtensionWebRequestApiCoverageTest,
                        MAYBE_RequestInterceptionCoverage) {

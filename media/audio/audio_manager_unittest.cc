@@ -281,10 +281,6 @@ TEST_F(AudioManagerTest, EnumerateOutputDevices) {
   CheckDeviceDescriptions(device_descriptions);
 }
 
-// Run additional tests for Windows since enumeration can be done using
-// two different APIs. MMDevice is default for Vista and higher and Wave
-// is default for XP and lower.
-
 #if defined(USE_PULSEAUDIO)
 // On Linux, there are two implementations available and both can
 // sometimes be tested on a single system. These tests specifically

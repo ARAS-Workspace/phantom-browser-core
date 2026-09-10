@@ -5025,7 +5025,6 @@ IN_PROC_BROWSER_TEST_F(LensOverlayControllerBrowserTest,
       [&]() { return controller->state() == State::kOff; }));
 }
 
-// TODO(crbug.com/422501416): Re-enable this test on Windows.
 #define MAYBE_OverlayInBackgroundClosesIfRendererExits \
   OverlayInBackgroundClosesIfRendererExits
 IN_PROC_BROWSER_TEST_F(LensOverlayControllerBrowserTest,
@@ -6061,7 +6060,6 @@ IN_PROC_BROWSER_TEST_P(LensOverlayControllerBrowserPDFContextualizationTest,
   }));
 }
 
-// TODO(crbug.com/423881729): Flaky on Win ASAN
 #define MAYBE_Histograms Histograms
 IN_PROC_BROWSER_TEST_P(LensOverlayControllerBrowserPDFContextualizationTest,
                        MAYBE_Histograms) {
@@ -7616,7 +7614,6 @@ IN_PROC_BROWSER_TEST_F(LensOverlayControllerBrowserTest,
 // TODO(crbug.com/413042395): This test is not testing overlay logic, but
 // instead the side panel logic. Therefore, this test should be moved to a side
 // panel browsertest file.
-// TODO(crbug.com/439622878): Test is flaky on Windows.
 #define MAYBE_IssueTextSearchRequest_SuppressesContextualization \
   IssueTextSearchRequest_SuppressesContextualization
 IN_PROC_BROWSER_TEST_F(
@@ -8321,7 +8318,6 @@ IN_PROC_BROWSER_TEST_F(LensOverlayControllerInnerTextAndApc,
                   .last_received_should_show_contextual_searchbox_);
 }
 
-// TODO(crbug.com/422479353): This test seems to be too slow on Windows ASAN.
 #define MAYBE_PageContentTypeHistograms PageContentTypeHistograms
 IN_PROC_BROWSER_TEST_F(LensOverlayControllerInnerTextAndApc,
                        MAYBE_PageContentTypeHistograms) {

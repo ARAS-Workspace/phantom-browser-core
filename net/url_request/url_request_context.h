@@ -95,9 +95,8 @@ class NET_EXPORT URLRequestContext final {
   // This function should not be used in Chromium, please use the version with
   // NetworkTrafficAnnotationTag in the future.
   //
-  // The unannotated method is not available on desktop Linux + Windows. It's
-  // available on other platforms, since we only audit network annotations on
-  // Linux & Windows.
+  // The unannotated method is not available on desktop Linux. It's available on
+  // other platforms, since we only audit network annotations on Linux.
   std::unique_ptr<URLRequest> CreateRequest(
       const GURL& url,
       RequestPriority priority,

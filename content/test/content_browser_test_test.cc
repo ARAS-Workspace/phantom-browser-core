@@ -91,8 +91,8 @@ IN_PROC_BROWSER_TEST_F(ContentBrowserTest, MANUAL_RendererCrash) {
   EXPECT_FALSE(renderer_shutdown_observer.did_exit_normally());
 }
 
-// Non-Windows sanitizer builds do not symbolize stack traces internally, so use
-// this macro to avoid looking for symbols from the stack trace.
+// Sanitizer builds do not symbolize stack traces internally, so use this
+// macro to avoid looking for symbols from the stack trace.
 #if (defined(ADDRESS_SANITIZER) || defined(LEAK_SANITIZER) || \
      defined(MEMORY_SANITIZER) || defined(THREAD_SANITIZER))
 #define USE_EXTERNAL_SYMBOLIZER 1
@@ -152,9 +152,6 @@ IN_PROC_BROWSER_TEST_F(ContentBrowserTest, MANUAL_BrowserCrash) {
 #endif
 
 // Tests that browser tests print the callstack on asserts.
-// Disabled on Windows crbug.com/1034784
-// TODO(crbug.com/40834746): Enable this test on Fuchsia once the test
-// expectations have been updated.
 #define MAYBE_BrowserCrashCallStack BrowserCrashCallStack
 IN_PROC_BROWSER_TEST_F(ContentBrowserTest, MAYBE_BrowserCrashCallStack) {
   base::ScopedAllowBlockingForTesting allow_blocking;
@@ -369,7 +366,6 @@ IN_PROC_BROWSER_TEST_F(ContentBrowserTest, NonNestableTask) {
   ASSERT_TRUE(non_nested_task_ran);
 }
 
-// TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
 #define MAYBE_RunTimeoutInstalled RunTimeoutInstalled
 IN_PROC_BROWSER_TEST_F(ContentBrowserTest, MAYBE_RunTimeoutInstalled) {
   // Verify that a RunLoop timeout is installed and shorter than the test

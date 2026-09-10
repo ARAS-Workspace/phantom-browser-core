@@ -139,7 +139,6 @@ IN_PROC_BROWSER_TEST_F(PageLifecycleStateManagerBrowserTest, SetVisibility) {
             EvalJs(rfh, "window.performanceObserverEntries"));
 }
 
-// TODO(crbug.com/40786254): Test is flaky on Win
 #define MAYBE_CrossProcessIframeHiddenAnFrozen CrossProcessIframeHiddenAnFrozen
 IN_PROC_BROWSER_TEST_F(PageLifecycleStateManagerBrowserTest,
                        MAYBE_CrossProcessIframeHiddenAnFrozen) {

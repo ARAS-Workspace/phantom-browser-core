@@ -864,7 +864,6 @@ class SplitCacheComputeHttpCacheSize {
 // is_subframe_document_resource by checking that the size of the http cache
 // resources accessed after the resource is loaded from the blink cache is the
 // same as before that.
-// TODO(crbug.com/40164302): Test is flaky on Win.
 #define MAYBE_NotifyExternalCacheHitCheckSubframeBit \
   NotifyExternalCacheHitCheckSubframeBit
 IN_PROC_BROWSER_TEST_F(SplitCacheEnabledContentBrowserTest,

@@ -33,9 +33,6 @@
 #include "ui/message_center/public/cpp/notification_delegate.h"
 #include "url/gurl.h"
 
-// These tests are disabled because WebUsbDetector::Initialize is a noop on
-// Windows due to jank and hangs caused by enumerating devices.
-// https://crbug.com/41281414
 namespace {
 
 // USB device product name.

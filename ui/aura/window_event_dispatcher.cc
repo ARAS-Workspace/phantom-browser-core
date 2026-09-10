@@ -466,12 +466,6 @@ void WindowEventDispatcher::UpdateCapture(Window* old_capture,
 }
 
 void WindowEventDispatcher::OnOtherRootGotCapture() {
-  // Windows provides the TrackMouseEvents API which allows us to rely on the
-  // OS to send us the mouse exit events (WM_MOUSELEAVE). Additionally on
-  // desktop Windows, every top level window could potentially have its own
-  // root window, in which case this function will get called whenever those
-  // windows grab mouse capture. Sending mouse exit messages in these cases
-  // causes subtle bugs like (crbug.com/394672).
   if (mouse_moved_handler_) {
     // Dispatch a mouse exit to reset any state associated with hover. This is
     // important when going from no window having capture to a window having

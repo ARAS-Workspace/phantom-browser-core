@@ -300,8 +300,6 @@ IN_PROC_BROWSER_TEST_F(ServiceProcessHostBrowserTest,
   EXPECT_EQ(1, observer2.terminate_count);
 }
 
-// Pre-IPC crash detection is only available on Windows.
-
 IN_PROC_BROWSER_TEST_F(ServiceProcessHostBrowserTest, IdleTimeout) {
   EchoServiceProcessObserver observer;
   auto echo_service = ServiceProcessHost::Launch<echo::mojom::EchoService>();

@@ -65,10 +65,9 @@ TEST(ProcessBound, Move) {
 
 using ProcessBoundEncryptionTest = ::testing::Test;
 
-// Only Windows supports real encryption at the moment. On other platforms, the
-// underlying decrypted buffer is returned and since it was never decrypted,
-// Short String Optimization means that the custom allocator is never used for
-// the test string, meaning it never gets cleared. Which is fine, since it was
-// never encrypted anyway.
+// The underlying decrypted buffer is returned and since it was never
+// decrypted, Short String Optimization means that the custom allocator is
+// never used for the test string, meaning it never gets cleared. Which is
+// fine, since it was never encrypted anyway.
 
 }  // namespace crypto

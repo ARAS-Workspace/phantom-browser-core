@@ -3325,7 +3325,6 @@ IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
             GetInterstitialType(broken_tab_contents));
 }
 
-// TODO(crbug.com/339524384) Flaky on Windows.
 #define MAYBE_SecureDnsCaptivePortal SecureDnsCaptivePortal
 IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest, MAYBE_SecureDnsCaptivePortal) {
   PrefService* pref_service = g_browser_process->local_state();
@@ -3372,7 +3371,6 @@ IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest, MAYBE_SecureDnsCaptivePortal) {
 // An HTTP load results in a secure DNS error, which triggers a captive portal
 // probe that fails. After logging in, the secure DNS error happens again,
 // triggering a captive portal probe that now succeeds.
-// TODO(crbug.com/339524384) Flaky on Windows.
 #define MAYBE_SecureDnsErrorTriggersCheck SecureDnsErrorTriggersCheck
 IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
                        MAYBE_SecureDnsErrorTriggersCheck) {
@@ -3419,7 +3417,6 @@ IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
 // which finds a captive portal. The HTTPS load finally completes with a secure
 // DNS error, which does not trigger another captive portal check. Only one
 // login tab should exist.
-// TODO(crbug.com/339524384) Flaky on Windows.
 #define MAYBE_SlowLoadSecureDnsErrorWithCaptivePortal \
   SlowLoadSecureDnsErrorWithCaptivePortal
 IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
@@ -3456,7 +3453,6 @@ IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
 // which finds a captive portal. After logging in, the HTTPS load finally
 // completes with a secure DNS error, which triggers another captive portal
 // check that should succeed.
-// TODO(crbug.com/339524384) Flaky on Windows.
 // TODO(crbug.com/463028193) Flaky on Mac.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_SlowLoadSecureDnsErrorAfterLogin \

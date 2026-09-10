@@ -41,8 +41,8 @@ class PeerSession {
  public:
   // LINT.IfChange(peer_session_event_handler)
 #if BUILDFLAG(IS_LINUX)
-  // On Windows and Linux, `PeerSession::EventHandler` is an alias to the
-  // generated Mojo interface `mojom::PeerSessionEventHandler`.
+  // On Linux, `PeerSession::EventHandler` is an alias to the generated Mojo
+  // interface `mojom::PeerSessionEventHandler`.
   using EventHandler = mojom::PeerSessionEventHandler;
 #else
   // Pure virtual fallback interface for platforms that do not support

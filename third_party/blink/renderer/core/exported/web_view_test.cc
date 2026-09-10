@@ -7589,7 +7589,7 @@ TEST_F(WebViewTest, DragAndDropUnknownHistogramsTest) {
 
 // Verifies that the histogram `Event.DragDrop.Tool` gets fired with the
 // correct enum values when the drag and drop is started by pressing the pen's
-// button. This manner of drag and drop is not enabled in Windows.
+// button.
 TEST_F(WebViewTest, DragAndDropPenButtonHistogramsTest) {
   base::HistogramTester histogram_tester;
   RegisterMockedHttpURLLoad("long_press_draggable_div.html");

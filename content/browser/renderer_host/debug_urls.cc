@@ -119,9 +119,6 @@ void HandleAsanDebugURL(const GURL& url) {
     }
   }
 
-#if defined(ADDRESS_SANITIZER) || BUILDFLAG(IS_HWASAN)
-
-#endif
 }
 
 NOINLINE void HangCurrentThread() {

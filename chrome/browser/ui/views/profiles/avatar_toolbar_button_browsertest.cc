@@ -1753,7 +1753,6 @@ class AvatarToolbarButtonWithInteractiveFeaturePromoBrowserTest
 // that specific feature flags are not enabled at the same time, since some
 // features are not compatible (SyncPromo have a higher priority than
 // HistorySync), this is handled in the constructor.
-// TODO(crbug.com/331746545): Check the flaky test suite issue on Windows.
 #define MAYBE_AvatarToolbarButtonPromoBrowserTest \
   AvatarToolbarButtonPromoBrowserTest
 class MAYBE_AvatarToolbarButtonPromoBrowserTest
@@ -1986,7 +1985,6 @@ struct HistorySyncOptinSyncManagedTypeTestCase {
   syncer::UserSelectableType managed_type;
 };
 
-// TODO(crbug.com/331746545): Check the flaky test issue on Windows.
 class AvatarToolbarButtonHistorySyncOptinManagedTypeTest
     : public AvatarToolbarButtonWithInteractiveFeaturePromoBrowserTest,
       public WithParamInterface<HistorySyncOptinSyncManagedTypeTestCase> {
@@ -2286,7 +2284,6 @@ INSTANTIATE_TEST_SUITE_P(
               signin::ProfileMenuAvatarButtonPromoInfo::Type::
                   kBatchUploadWindows10DepreciationPromo}));
 
-// TODO(crbug.com/331746545): Check the flaky test suite issue on Windows.
 #define MAYBE_AvatarToolbarButtonPromoClickBrowserTest \
   AvatarToolbarButtonPromoClickBrowserTest
 class MAYBE_AvatarToolbarButtonPromoClickBrowserTest
@@ -3418,7 +3415,6 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest, AccessibilityLabels) {
       << avatar_accessor.GetAccessibilityDescription();
 }
 
-// TODO(crbug.com/359995696): Flaky on Windows.
 #define MAYBE_PassphraseErrorSignedIn PassphraseErrorSignedIn
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
                        MAYBE_PassphraseErrorSignedIn) {
@@ -3433,7 +3429,6 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
       IDS_SYNC_STATUS_NEEDS_PASSWORD_BUTTON_MAYBE_TITLE_CASE)));
 }
 
-// TODO(crbug.com/359995696): Flaky on Windows.
 #define MAYBE_PassphraseErrorSyncing PassphraseErrorSyncing
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
                        MAYBE_PassphraseErrorSyncing) {
@@ -3447,7 +3442,6 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
       IDS_SYNC_STATUS_NEEDS_PASSWORD_BUTTON_MAYBE_TITLE_CASE)));
 }
 
-// TODO(crbug.com/359995696): Flaky on Windows.
 #define MAYBE_UpgradeClientError UpgradeClientError
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
                        MAYBE_UpgradeClientError) {
@@ -3463,7 +3457,6 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
 
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
-// TODO(crbug.com/331746545): Check the flaky test issue on Windows.
 #define MAYBE_ShowMakingChromeYoursOnSignin ShowMakingChromeYoursOnSignin
 IN_PROC_BROWSER_TEST_F(
     AvatarToolbarButtonReplaceSyncPromosWithSignInPromosBrowserTest,
@@ -3488,7 +3481,6 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
-// TODO(crbug.com/331746545): Check the flaky test issue on Windows.
 #define MAYBE_ClearMakingChromeYoursOnSignout ClearMakingChromeYoursOnSignout
 IN_PROC_BROWSER_TEST_F(
     AvatarToolbarButtonReplaceSyncPromosWithSignInPromosBrowserTest,
@@ -3504,7 +3496,6 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_TRUE(avatar_accessor.GetText().empty());
 }
 
-// TODO(crbug.com/331746545): Check the flaky test issue on Windows.
 #define MAYBE_ShowMakingChromeYoursOnSigninThenClick \
   ShowMakingChromeYoursOnSigninThenClick
 IN_PROC_BROWSER_TEST_F(
@@ -3529,7 +3520,6 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_TRUE(second_avatar_accessor.GetText().empty());
 }
 
-// TODO(crbug.com/331746545): Check the flaky test issue on Windows.
 #define MAYBE_ShowMakingChromeYoursOnSigninBeforeBrowserWindow \
   ShowMakingChromeYoursOnSigninBeforeBrowserWindow
 IN_PROC_BROWSER_TEST_F(
@@ -3561,7 +3551,6 @@ IN_PROC_BROWSER_TEST_F(
 }
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
-// TODO(crbug.com/331746545): Check the flaky test issue on Windows.
 #define MAYBE_ShowMakingChromeYoursOnSigninAndSync \
   ShowMakingChromeYoursOnSigninAndSync
 IN_PROC_BROWSER_TEST_F(
@@ -3580,7 +3569,6 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_TRUE(avatar_accessor.GetText().empty());
 }
 
-// TODO(crbug.com/331746545): Check the flaky test issue on Windows.
 #define MAYBE_MakingChromeYoursThenExplicitState \
   MakingChromeYoursThenExplicitState
 IN_PROC_BROWSER_TEST_F(
@@ -3608,7 +3596,6 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_EQ(avatar_accessor.GetText(), std::u16string());
 }
 
-// TODO(crbug.com/331746545): Check the flaky test issue on Windows.
 #define MAYBE_MakingChromeYoursThenSyncError MakingChromeYoursThenSyncError
 IN_PROC_BROWSER_TEST_F(
     AvatarToolbarButtonReplaceSyncPromosWithSignInPromosBrowserTest,
@@ -3632,7 +3619,6 @@ IN_PROC_BROWSER_TEST_F(
             l10n_util::GetStringUTF16(IDS_AVATAR_BUTTON_SYNC_ERROR));
 }
 
-// TODO(crbug.com/331746545): Check the flaky test issue on Windows.
 #define MAYBE_PRE_DoesNotShowOnBrowserRestart PRE_DoesNotShowOnBrowserRestart
 #define MAYBE_DoesNotShowOnBrowserRestart DoesNotShowOnBrowserRestart
 IN_PROC_BROWSER_TEST_F(

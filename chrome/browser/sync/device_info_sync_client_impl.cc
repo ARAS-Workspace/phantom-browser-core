@@ -37,8 +37,8 @@ DeviceInfoSyncClientImpl::~DeviceInfoSyncClientImpl() = default;
 
 // syncer::DeviceInfoSyncClient:
 std::string DeviceInfoSyncClientImpl::GetSigninScopedDeviceId() const {
-// Since the local sync backend is currently only supported on Windows, Mac and
-// Linux don't even check the pref on other os-es.
+// Since the local sync backend is currently only supported on Mac and Linux
+// don't even check the pref on other os-es.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   syncer::SyncPrefs prefs(profile_->GetPrefs());
   if (prefs.IsLocalSyncEnabled()) {

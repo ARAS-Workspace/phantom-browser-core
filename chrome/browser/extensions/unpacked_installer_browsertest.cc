@@ -126,7 +126,7 @@ IN_PROC_BROWSER_TEST_F(UnpackedInstallerBrowserTest,
       /*expected_bucket_count=*/1);
 }
 
-// SettingsOverrides are only available on Windows and macOS.
+// SettingsOverrides are only available on macOS.
 #if BUILDFLAG(IS_MAC)
 // Tests that `kSearchEngine` is recorded for an extension that only overrides
 // the default search engine.

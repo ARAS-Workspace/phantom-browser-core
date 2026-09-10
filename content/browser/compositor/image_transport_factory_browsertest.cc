@@ -28,7 +28,7 @@ class MockContextLostObserver : public viz::ContextLostObserver {
 };
 
 // TODO(crbug.com/394083, crbug.com/1305007, crbug.com/1302879): Flaky on
-// ChromeOS, Linux, and Windows.
+// ChromeOS and Linux.
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 #define MAYBE_TestLostContext DISABLED_TestLostContext
 #else

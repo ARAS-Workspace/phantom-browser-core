@@ -1774,7 +1774,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxContextMenuControllerBrowserTest,
   EXPECT_FALSE(controller.IsCommandIdEnabled(33001));
 }
 
-// TODO(crbug.com/530351886): Times out flakily on Linux, Win, Mac and ChromeOS.
+// TODO(crbug.com/530351886): Times out flakily on Linux, Mac and ChromeOS.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_VerifyTabEnablementWhenMaxInputsReached \
   DISABLED_VerifyTabEnablementWhenMaxInputsReached

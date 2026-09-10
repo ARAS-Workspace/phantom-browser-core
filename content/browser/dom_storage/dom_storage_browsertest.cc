@@ -286,8 +286,6 @@ IN_PROC_BROWSER_TEST_P(DOMStorageBrowserTest, MAYBE_DeletePhysicalStorageKey) {
   EXPECT_EQ(0U, GetUsage().size());
 }
 
-// On Windows file://localhost/C:/src/chromium/src/content/test/data/title1.html
-// doesn't work.
 // Regression test for https://crbug.com/776160.  The test verifies that there
 // is no disagreement between 1) site URL used for browser-side isolation
 // enforcement and 2) the origin requested by Blink.  Before this bug was fixed,

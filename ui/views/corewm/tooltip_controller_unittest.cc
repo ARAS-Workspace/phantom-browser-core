@@ -738,7 +738,6 @@ TEST_F(TooltipControllerTest, DISABLED_CloseOnCaptureLost) {
 
 // Disabled on Linux as X11ScreenOzone::GetAcceleratedWidgetAtScreenPoint
 // and WaylandScreen::GetAcceleratedWidgetAtScreenPoint don't consider z-order.
-// Disabled on Windows due to failing bots. http://crbug.com/604479
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_Capture DISABLED_Capture
 #else

@@ -59,8 +59,8 @@ std::string HostedProcessTypesToString(
 base::Value GetProcessValueDict(const base::Process& process) {
   base::DictValue ret;
 
-  // On Windows, handle is a void *. On Fuchsia it's an int. On other platforms
-  // it is equal to the pid, so don't bother to record it.
+  // On Fuchsia the handle is an int. On other platforms it is equal to the pid,
+  // so don't bother to record it.
 
   // Most processes are not current, so only show the outliers.
   if (process.is_current()) {

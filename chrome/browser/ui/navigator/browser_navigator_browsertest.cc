@@ -2245,8 +2245,6 @@ class MockScreen : public display::ScreenBase {
 };
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 
-// Windows has assumptions that the screen is a ScreenWin, which causes a crash
-// when we inject the MockScreen.
 #define MAYBE_BrowserNavigatorTestWithMockScreen \
   BrowserNavigatorTestWithMockScreen
 class MAYBE_BrowserNavigatorTestWithMockScreen : public BrowserNavigatorTest {

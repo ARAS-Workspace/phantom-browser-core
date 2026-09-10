@@ -444,8 +444,8 @@ TEST_F(SSLClientSessionCacheTest, LookupExpirationCheck) {
   EXPECT_EQ(0u, cache.size());
 }
 
-// Memory pressure listeners are disabled on Windows and Mac, so this test
-// is disabled on those platforms as it relies on receiving notifications.
+// Memory pressure listeners are disabled on Mac, so this test is disabled on
+// that platform as it relies on receiving notifications.
 //
 // TODO(crbug.com/483018445): Check the kSuppressMemoryMonitor feature flag
 // instead of buildflags once the feature is exposed publicly or moved to base.
@@ -505,8 +505,8 @@ TEST_F(SSLClientSessionCacheTest, MAYBE_TestFlushOnMemoryNotifications) {
   EXPECT_EQ(0u, cache.size());
 }
 
-// Memory pressure listeners are disabled on Windows and Mac, so this test
-// is disabled on those platforms as it relies on receiving notifications.
+// Memory pressure listeners are disabled on Mac, so this test is disabled on
+// that platform as it relies on receiving notifications.
 //
 // TODO(crbug.com/483018445): Check the kSuppressMemoryMonitor feature flag
 // instead of buildflags once the feature is exposed publicly or moved to base.

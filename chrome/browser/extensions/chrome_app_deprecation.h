@@ -27,7 +27,7 @@ extern bool g_enable_chrome_apps_for_testing;
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Returns whether the extension with `extension_id` is an unsupported
 // deprecated app (hosted app, legacy packaged app, or platform app) on
-// Windows/Mac/Linux.
+// Mac/Linux.
 bool IsExtensionUnsupportedDeprecatedApp(content::BrowserContext* context,
                                          const std::string& extension_id);
 #endif

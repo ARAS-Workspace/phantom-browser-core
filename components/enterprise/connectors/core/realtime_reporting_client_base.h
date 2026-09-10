@@ -114,9 +114,8 @@ class RealtimeReportingClientBase : public KeyedService,
   virtual std::string GetBrowserClientId() = 0;
 
   // Sub-method called by ReportEventWithTimestamp() to collect device signals
-  // on Windows/Mac/Linux platforms. Regardless of collecting device signals or
-  // not, this method is expected to call `UploadSecurityEvent()` in the
-  // end.
+  // on Mac/Linux platforms. Regardless of collecting device signals or not,
+  // this method is expected to call `UploadSecurityEvent()` in the end.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   virtual void MaybeCollectDeviceSignalsAndReportEvent(

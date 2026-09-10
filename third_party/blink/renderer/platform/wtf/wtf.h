@@ -43,9 +43,8 @@ WTF_EXPORT extern base::PlatformThreadId g_main_thread_identifier;
 // anything else in WTF.
 WTF_EXPORT void InitializeWtf();
 
-// thread_local variables can't be exported on Windows, so we use an extra
-// function call on component builds. Also, thread_local on Android is emulated
-// by the runtime lib; gettid(3) in bionic already caches tid in a TLS variable.
+// thread_local on Android is emulated by the runtime lib; gettid(3) in bionic
+// already caches tid in a TLS variable.
 #if BUILDFLAG(IS_ANDROID)
 WTF_EXPORT bool IsMainThread();
 #else

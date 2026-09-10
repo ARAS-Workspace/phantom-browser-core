@@ -242,8 +242,6 @@ TEST(JSONValueSerializerTest, Roundtrip) {
 
   mutable_serializer.set_pretty_print(true);
   ASSERT_TRUE(mutable_serializer.Serialize(*root_dict));
-  // JSON output uses a different newline style on Windows than on other
-  // platforms.
 #define JSON_NEWLINE "\n"
   const std::string pretty_serialization =
       "{" JSON_NEWLINE "   \"bool\": true," JSON_NEWLINE

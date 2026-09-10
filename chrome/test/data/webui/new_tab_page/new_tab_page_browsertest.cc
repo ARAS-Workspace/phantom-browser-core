@@ -278,7 +278,6 @@ IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, DriveModuleV2) {
           "mocha.run()");
 }
 
-// TODO(crbug.com/534399662): Flaky on Windows.
 #define MAYBE_FileSuggestion FileSuggestion
 IN_PROC_BROWSER_TEST_F(NewTabPageModulesTest, MAYBE_FileSuggestion) {
   RunTest("new_tab_page/modules/file_suggestion/file_suggestion_test.js",

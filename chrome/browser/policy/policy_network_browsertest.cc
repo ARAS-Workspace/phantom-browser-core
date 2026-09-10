@@ -844,7 +844,7 @@ IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyTest,
   EXPECT_EQ(FetchResourceForEarlyDataCheck(), kEarlyDataNotAcceptedTitle);
 }
 
-// TODO(crbug.com/418717917, crbug.com/419211957): Flaky on Windows and Android.
+// TODO(crbug.com/418717917, crbug.com/419211957): Flaky on Android.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_TLS13EarlyDataPolicyEnable DISABLED_TLS13EarlyDataPolicyEnable
 #else
@@ -874,7 +874,7 @@ IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyTest, TLS13EarlyDataPolicyDisable) {
   EXPECT_EQ(FetchResourceForEarlyDataCheck(), kEarlyDataNotAcceptedTitle);
 }
 
-// TODO(crbug.com/475587477, crbug.com/477510552): Flaky on Windows and Android.
+// TODO(crbug.com/475587477, crbug.com/477510552): Flaky on Android.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_EnableWithRestart DISABLED_EnableWithRestart
 #else

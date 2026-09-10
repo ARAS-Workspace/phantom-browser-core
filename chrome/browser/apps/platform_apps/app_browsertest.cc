@@ -493,7 +493,7 @@ IN_PROC_BROWSER_TEST_F(PlatformAppBrowserTest,
             observer.tabs()[kExpectedNumberOfTabs - 2]->GetURL());
 }
 
-// Failing on some Win and Linux buildbots.  See crbug.com/41095977.
+// Failing on some Linux buildbots.  See crbug.com/41095977.
 // TODO(crbug.com/40846460): Fix flakiness on macOS and re-enable this test.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #define MAYBE_Iframes DISABLED_Iframes

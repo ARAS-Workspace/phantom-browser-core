@@ -679,7 +679,6 @@ class BookmarkBarViewTest1 : public BookmarkBarViewEventTestBase {
   }
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_Basic Basic
 VIEW_TEST(BookmarkBarViewTest1, MAYBE_Basic)
 
@@ -725,7 +724,6 @@ class BookmarkBarViewTest2 : public BookmarkBarViewEventTestBase {
   }
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_HideOnDesktopClick HideOnDesktopClick
 VIEW_TEST(BookmarkBarViewTest2, MAYBE_HideOnDesktopClick)
 
@@ -777,7 +775,6 @@ class BookmarkBarViewTest3 : public BookmarkBarViewEventTestBase {
   }
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_Submenus Submenus
 VIEW_TEST(BookmarkBarViewTest3, MAYBE_Submenus)
 
@@ -858,7 +855,6 @@ class BookmarkBarViewTest4 : public BookmarkBarViewEventTestBase {
   BookmarkContextMenuNotificationObserver observer_;
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_ContextMenus ContextMenus
 VIEW_TEST(BookmarkBarViewTest4, MAYBE_ContextMenus)
 
@@ -995,7 +991,6 @@ class BookmarkBarViewTest7 : public BookmarkBarViewDragTestBase {
   }
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_DNDToDifferentMenu DNDToDifferentMenu
 VIEW_TEST(BookmarkBarViewTest7, MAYBE_DNDToDifferentMenu)
 
@@ -1059,7 +1054,6 @@ class BookmarkBarViewTest8 : public BookmarkBarViewDragTestBase {
   }
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_DNDBackToOriginatingMenu DNDBackToOriginatingMenu
 VIEW_TEST(BookmarkBarViewTest8, MAYBE_DNDBackToOriginatingMenu)
 
@@ -1143,7 +1137,6 @@ class BookmarkBarViewTest9 : public BookmarkBarViewEventTestBase {
 // Something about coordinate transforms is wrong on Wayland -- attempting to
 // hover the scroll buttons sends the mouse to the wrong location, so it never
 // winds up over the button, so the test times out.
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_ScrollButtonScrolls ScrollButtonScrolls
 TEST_F(BookmarkBarViewTest9, MAYBE_ScrollButtonScrolls) {
 #if BUILDFLAG(IS_OZONE)
@@ -1251,7 +1244,6 @@ class BookmarkBarViewTest10 : public BookmarkBarViewEventTestBase {
   }
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_KeyEvents KeyEvents
 VIEW_TEST(BookmarkBarViewTest10, MAYBE_KeyEvents)
 
@@ -1313,7 +1305,6 @@ class BookmarkBarViewTest11 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40282036): Fails on latest versions of ChromeOS.
-// TODO(crbug.com/337055374): Flaky on Windows.
 #if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_CloseMenuAfterClosingContextMenu \
   DISABLED_CloseMenuAfterClosingContextMenu
@@ -1392,7 +1383,6 @@ class BookmarkBarViewTest12 : public BookmarkBarViewEventTestBase {
       &bookmarks::kNumBookmarkUrlsBeforePrompting, 1};
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_CloseWithModalDialog CloseWithModalDialog
 VIEW_TEST(BookmarkBarViewTest12, MAYBE_CloseWithModalDialog)
 
@@ -1454,7 +1444,6 @@ class BookmarkBarViewTest13 : public BookmarkBarViewEventTestBase {
   BookmarkContextMenuNotificationObserver observer_;
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_ClickOnContextMenuSeparator ClickOnContextMenuSeparator
 VIEW_TEST(BookmarkBarViewTest13, MAYBE_ClickOnContextMenuSeparator)
 
@@ -1490,7 +1479,6 @@ class BookmarkBarViewTest14 : public BookmarkBarViewEventTestBase {
   BookmarkContextMenuNotificationObserver observer_;
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_ContextMenus2 ContextMenus2
 VIEW_TEST(BookmarkBarViewTest14, MAYBE_ContextMenus2)
 
@@ -1553,7 +1541,6 @@ class BookmarkBarViewTest15 : public BookmarkBarViewEventTestBase {
   BookmarkContextMenuNotificationObserver observer_;
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_MenuStaysVisibleAfterDelete MenuStaysVisibleAfterDelete
 VIEW_TEST(BookmarkBarViewTest15, MAYBE_MenuStaysVisibleAfterDelete)
 
@@ -1580,7 +1567,6 @@ class BookmarkBarViewTest16 : public BookmarkBarViewEventTestBase {
   }
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_DeleteMenu DeleteMenu
 VIEW_TEST(BookmarkBarViewTest16, MAYBE_DeleteMenu)
 
@@ -1650,7 +1636,6 @@ class BookmarkBarViewTest17 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40282036): Fails on latest versions of ChromeOS.
-// TODO(crbug.com/40947483): Flaky on Windows.
 #if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_ContextMenus3 DISABLED_ContextMenus3
 #else
@@ -1700,7 +1685,6 @@ class BookmarkBarViewTest18 : public BookmarkBarViewEventTestBase {
   }
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_BookmarkBarViewTest18_SiblingMenu \
   BookmarkBarViewTest18_SiblingMenu
 VIEW_TEST(BookmarkBarViewTest18, MAYBE_BookmarkBarViewTest18_SiblingMenu)
@@ -1759,7 +1743,6 @@ class BookmarkBarViewTest19 : public BookmarkBarViewEventTestBase {
   }
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_BookmarkBarViewTest19_SiblingMenu \
   BookmarkBarViewTest19_SiblingMenu
 VIEW_TEST(BookmarkBarViewTest19, MAYBE_BookmarkBarViewTest19_SiblingMenu)
@@ -1853,9 +1836,6 @@ class BookmarkBarViewTest20 : public BookmarkBarViewEventTestBase {
 BEGIN_METADATA(BookmarkBarViewTest20, TestViewForMenuExit)
 END_METADATA
 
-// TODO(crbug.com/40947483): Flaky on Windows.
-// TODO (crbug.com/41496199): This test is failing under Windows.
-// This skips it until it can be fixed.
 #define MAYBE_ContextMenuExitTest ContextMenuExitTest
 TEST_F(BookmarkBarViewTest20, MAYBE_ContextMenuExitTest) {
 #if BUILDFLAG(IS_OZONE)
@@ -1929,7 +1909,6 @@ class BookmarkBarViewTest21 : public BookmarkBarViewEventTestBase {
 };
 
 // If this flakes, disable and log details in http://crbug.com/40432443.
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_ContextMenusForEmptyFolder ContextMenusForEmptyFolder
 VIEW_TEST(BookmarkBarViewTest21, MAYBE_ContextMenusForEmptyFolder)
 
@@ -1973,7 +1952,6 @@ class BookmarkBarViewTest22 : public BookmarkBarViewDragTestBase {
   }
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_CloseSourceBrowserDuringDrag CloseSourceBrowserDuringDrag
 VIEW_TEST(BookmarkBarViewTest22, MAYBE_CloseSourceBrowserDuringDrag)
 
@@ -2038,7 +2016,6 @@ class BookmarkBarViewTest23 : public BookmarkBarViewEventTestBase {
   BookmarkContextMenuNotificationObserver observer_;
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_ContextMenusKeyboard ContextMenusKeyboard
 VIEW_TEST(BookmarkBarViewTest23, MAYBE_ContextMenusKeyboard)
 
@@ -2120,7 +2097,6 @@ class BookmarkBarViewTest27 : public BookmarkBarViewEventTestBase {
   }
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_MiddleClickOnFolderOpensAllBookmarks \
   MiddleClickOnFolderOpensAllBookmarks
 VIEW_TEST(BookmarkBarViewTest27, MAYBE_MiddleClickOnFolderOpensAllBookmarks)
@@ -2150,7 +2126,6 @@ class BookmarkBarViewTest28 : public BookmarkBarViewEventTestBase {
   }
 };
 
-// TODO(crbug.com/40947483): Flaky on Windows.
 #define MAYBE_ClickWithModifierOnFolderOpensAllBookmarks \
   ClickWithModifierOnFolderOpensAllBookmarks
 

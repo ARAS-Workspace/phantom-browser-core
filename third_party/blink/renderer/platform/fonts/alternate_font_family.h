@@ -53,9 +53,6 @@ inline const AtomicString& AlternateFamilyName(
   if (EqualIgnoringAsciiCase(family_name, font_family_names::kCourier)) {
     return font_family_names::kCourierNew;
   }
-  // On Windows, Courier New (truetype font) is always present and
-  // Courier is a bitmap font. So, we don't want to map Courier New to
-  // Courier.
   if (EqualIgnoringAsciiCase(family_name, font_family_names::kCourierNew)) {
     return font_family_names::kCourier;
   }

@@ -2513,7 +2513,6 @@ INSTANTIATE_TEST_SUITE_P(/* no prefix */,
 
 // Test makes sure that an interstitial is shown in `<webview>` with an SSL
 // error.
-// Flaky on Win dbg: crbug.com/40547388
 #define MAYBE_ShowInterstitialForSSLError ShowInterstitialForSSLError
 IN_PROC_BROWSER_TEST_P(WebViewSSLErrorTest, MAYBE_ShowInterstitialForSSLError) {
   SSLTestHelper();
@@ -2610,7 +2609,6 @@ IN_PROC_BROWSER_TEST_P(WebViewSSLErrorTest, NavigateThroughSSLError) {
 
 // Test makes sure that the interstitial is registered in the
 // `RenderWidgetHostInputEventRouter` when inside a `<webview>`.
-// Flaky on Win dbg: crbug.com/40547388
 #define MAYBE_InterstitialPageRouteEvents InterstitialPageRouteEvents
 IN_PROC_BROWSER_TEST_P(WebViewSSLErrorTest, MAYBE_InterstitialPageRouteEvents) {
   SSLTestHelper();
@@ -2630,7 +2628,6 @@ IN_PROC_BROWSER_TEST_P(WebViewSSLErrorTest, MAYBE_InterstitialPageRouteEvents) {
 
 // Test makes sure that the browser does not crash when a `<webview>` navigates
 // out of an interstitial caused by a SSL error.
-// Flaky on Win dbg: crbug.com/40547388
 #define MAYBE_InterstitialPageDetach InterstitialPageDetach
 IN_PROC_BROWSER_TEST_P(WebViewSSLErrorTest, MAYBE_InterstitialPageDetach) {
   SSLTestHelper();
@@ -2642,7 +2639,6 @@ IN_PROC_BROWSER_TEST_P(WebViewSSLErrorTest, MAYBE_InterstitialPageDetach) {
 
 // This test makes sure the browser process does not crash if app is closed
 // while an interstitial is being shown in guest.
-// Flaky on Win dbg: crbug.com/40547388
 #define MAYBE_InterstitialTearDown InterstitialTearDown
 IN_PROC_BROWSER_TEST_P(WebViewSSLErrorTest, MAYBE_InterstitialTearDown) {
   SSLTestHelper();

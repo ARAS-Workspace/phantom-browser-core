@@ -327,10 +327,6 @@ TEST_F(ProcessTest, PredefinedProcessIsRunning) {
 }
 #endif
 
-// Test is disabled on Windows AMR64 because
-// TerminateWithHeapCorruption() isn't expected to work there.
-// See: https://crbug.com/1054423
-
 TEST_F(ProcessTest, ChildProcessIsRunning) {
   Process process(SpawnChild("SleepyChildProcess"));
   EXPECT_FALSE(process.WaitForExitWithTimeout(base::TimeDelta(), nullptr));

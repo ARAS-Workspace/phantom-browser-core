@@ -257,8 +257,7 @@ inline constexpr auto ModifiedMatcher = [](base::FilePath reported_path,
 };
 
 #elif BUILDFLAG(IS_MAC)
-// Windows figures out if a file path is a directory or file with `GetFileInfo`,
-// but since the file is deleted, it can't know.
+// The path type of a deleted file can't be determined.
 //
 // This also needs to be used for events for a deleted file before it's actually
 // deleted since the file path type still can't be determined.
@@ -1209,8 +1208,6 @@ TEST_F(FilePathWatcherTest, DirectoryChain) {
   delegate.RunUntilEventsMatch(event_expecter);
 }
 
-// Windows doesn't allow the target directory to be deleted while there is a
-// FilePathWatcher watching it.
 TEST_F(FilePathWatcherTest, DisappearingDirectory) {
   FilePathWatcher watcher;
   base::FilePath dir(temp_dir_.GetPath().AppendASCII("dir"));
@@ -2740,8 +2737,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, DirectoryChain) {
   delegate.RunUntilEventsMatch(matcher);
 }
 
-// Windows doesn't allow the target directory to be deleted while there is a
-// FilePathWatcher watching it.
 TEST_P(FilePathWatcherWithChangeInfoTest, DisappearingDirectory) {
   EventExpecterWithChangeInfo event_expecter;
 
@@ -3575,8 +3570,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, MAYBE_NestedDirectoryInDirectory) {
   delegate.RunUntilEventsMatch(matcher);
 }
 
-// Windows doesn't allow the target directory to be deleted while there is a
-// FilePathWatcher watching it.
 TEST_P(FilePathWatcherWithChangeInfoTest, DeleteDirectoryRecursively) {
   base::FilePath grandparent(temp_dir_.GetPath());
   base::FilePath parent(grandparent.AppendASCII("parent"));

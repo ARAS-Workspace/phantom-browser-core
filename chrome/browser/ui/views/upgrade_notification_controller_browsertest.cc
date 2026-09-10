@@ -45,5 +45,3 @@ IN_PROC_BROWSER_TEST_F(OutdatedUpgradeBubbleTest, InvokeUi_Outdated) {
 IN_PROC_BROWSER_TEST_F(OutdatedUpgradeBubbleTest, InvokeUi_NoAutoUpdate) {
   ShowAndVerifyUi();
 }
-
-// The critical upgrade dialog is intentionally only shown on Windows.

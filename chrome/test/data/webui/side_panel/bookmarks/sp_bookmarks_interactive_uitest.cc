@@ -45,7 +45,7 @@ IN_PROC_BROWSER_TEST_F(SidePanelPowerBookmarksTest,
           "mocha.run()");
 }
 
-// TODO(crbug.com/521419448): Flaky on Mac and Windows.
+// TODO(crbug.com/521419448): Flaky on Mac.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_DragManager DISABLED_DragManager
 #else

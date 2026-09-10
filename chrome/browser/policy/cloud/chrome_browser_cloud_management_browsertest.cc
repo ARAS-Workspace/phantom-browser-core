@@ -641,7 +641,6 @@ class ChromeBrowserCloudManagementEnrollmentTest
   ChromeBrowserCloudManagementControllerObserver observer_;
 };
 
-// Consistently timing out on Windows. http://crbug.com/40659096
 #define MAYBE_Test Test
 IN_PROC_BROWSER_TEST_P(ChromeBrowserCloudManagementEnrollmentTest, MAYBE_Test) {
 #undef MAYBE_Test

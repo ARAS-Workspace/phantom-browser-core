@@ -113,7 +113,6 @@ IN_PROC_BROWSER_TEST_F(HelpBubbleHandlerInteractiveUiTest,
 // This test is flaky on Mac; see: https://crbug.com/348242589
 // Suspect that something in the async way the combo box works is causing this
 // particular issue. Might be solved by programmatically switching panels.
-// TODO(crbug.com/524036564): flaky on Win.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_ElementBecomesHiddenOnSecondaryUISwap \
   DISABLED_ElementBecomesHiddenOnSecondaryUISwap

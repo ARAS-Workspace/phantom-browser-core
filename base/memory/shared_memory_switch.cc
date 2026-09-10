@@ -160,9 +160,7 @@ expected<PlatformSharedMemoryRegion, SharedMemoryError> Deserialize(
     return unexpected(SharedMemoryError::kParseInt0Failed);
   }
 
-  // token[1] has a fixed value but is ignored on all platforms except
-  // Windows, where it can be 'i' or 'p' to indicate that the handle is
-  // inherited or must be obtained from the parent.
+  // token[1] has a fixed value and is ignored.
 #if BUILDFLAG(IS_IOS_TVOS)
   // Create an empty handle to prevent a build failure when returning a writable
   // shared memory region at the end of the function.

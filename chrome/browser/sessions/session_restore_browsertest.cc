@@ -2419,7 +2419,7 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreTest, RecordNormalTabWindowDiff) {
       "SessionRestore.WindowDiffAfterRestart.App", 1, 1);
 }
 
-// Test is flaky on Linux and Windows: https://crbug.com/40170555
+// Test is flaky on Linux: https://crbug.com/40170555
 #if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_LINUX)
 namespace {
 

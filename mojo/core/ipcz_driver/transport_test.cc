@@ -401,9 +401,6 @@ TEST_F(MojoIpczTransportTest, MalformedObjects) {
       });
 }
 
-// Transport on Windows does not support out-of-band handle transfer, so this
-// test is impossible there. Windows handle transmission is instead covered by
-// tests which more broadly cover driver object serialization.
 IpczDriverHandle MakeHandleFromEndpoint(PlatformChannelEndpoint endpoint) {
   return TransmissiblePlatformHandle::ReleaseAsHandle(
       base::MakeRefCounted<TransmissiblePlatformHandle>(
@@ -544,11 +541,9 @@ class MojoIpczTransportSecurityTest
                      /*add_no_execute_flags=*/bool>> {
  protected:
   bool IsEnforcementEnabled() {
-// Enforcement only happens on Windows.
     return false;
   }
   Transport::ProcessTrust TransportProcessTrust() {
-// Enforcement only happens on Windows.
     return Transport::ProcessTrust::kUntracked;
   }
   bool ShouldMarkNoExecute() { return std::get<1>(GetParam()); }

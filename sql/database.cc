@@ -841,8 +841,7 @@ std::string Database::CollectErrorInfo(int sqlite_error_code,
     base::StringAppendF(&debug_info, "reported error: %d\n", sqlite_error_code);
   }
 
-// System error information.  Interpretation of Windows errors is different
-// from posix.
+// System error information.
 #if BUILDFLAG(IS_POSIX)
   int last_errno = GetLastErrno();
   base::StringAppendF(&debug_info, "errno: %d\n", last_errno);

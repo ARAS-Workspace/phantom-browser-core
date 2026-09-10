@@ -449,8 +449,8 @@ int GetMouseClickCount(int last_click_count,
     return 1;
 
 #if !BUILDFLAG(IS_MAC)
-  // On Mac and Windows, we keep increasing the click count, but on the other
-  // platforms, we reset the count to 1 when it is greater than 3.
+  // On Mac, we keep increasing the click count, but on the other platforms, we
+  // reset the count to 1 when it is greater than 3.
   if (last_click_count >= 3)
     return 1;
 #endif

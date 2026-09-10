@@ -273,8 +273,7 @@ BASE_FEATURE(kFocusRenderWidgetHostViewAndroidOnMouseDown,
 #endif
 // This feature controls whether the renderer should use FontDataManager to
 // fetch fonts from the Browser's FontDataService. It is currently scoped to
-// Windows and Linux (via separate features and experiments). See
-// crbug.com/335680565.
+// Linux (via separate features and experiments). See crbug.com/335680565.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 const base::FeatureParam<FontDataServiceTypefaceType>::Option
     font_data_service_typeface[] = {

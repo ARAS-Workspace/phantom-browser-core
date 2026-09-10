@@ -837,7 +837,6 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsTest,
   RunEventTest(FILE_PATH_LITERAL("description-changed-pane-title.html"));
 }
 
-// TODO(crbug.com/399735836): Fix failure on Windows
 #define MAYBE_AccessibilityEventsDescriptionChangeSubtree \
   AccessibilityEventsDescriptionChangeSubtree
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsTest,
@@ -992,7 +991,7 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsTestExceptUIA,
   RunEventTest(FILE_PATH_LITERAL("menulist-collapse-next.html"));
 }
 
-// TODO(crbug.com/40780161): Flaky on Linux and Win.
+// TODO(crbug.com/40780161): Flaky on Linux.
 // TODO(crbug.com/40779330): locks up with popup open, only on Mac
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_AccessibilityEventsMenuListExpand \
@@ -1024,12 +1023,6 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsTest,
 }
 
 // The Material Design tests are not supported on Android.
-// In the case of Windows, many DumpAccessibility* tests fail due to
-// crrev.com/c/6620083 which causes tests to fail if there is a leaked COM
-// object. The Material Design tests are not special; just more tests that
-// fail due to the leak.
-// TODO(crbug.com/424781310): Re-enable these tests on Windows once the leak
-// issue is resolved.
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsWithMaterialDesignTest,
                        MaterialDesignButtonEvents) {

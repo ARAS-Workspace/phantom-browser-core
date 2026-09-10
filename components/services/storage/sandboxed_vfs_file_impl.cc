@@ -348,7 +348,6 @@ int SandboxedVfsFileImpl::SectorSize() {
 }
 
 int SandboxedVfsFileImpl::DeviceCharacteristics() {
-  // TODO(pwnall): Figure out if we can get away with returning 0 on Windows.
   // NOTE: SQLite's unix VFS attempts to detect the underlying filesystem and
   // sets some flags based on the result.
   return 0;

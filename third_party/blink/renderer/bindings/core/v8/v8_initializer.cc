@@ -1150,11 +1150,6 @@ v8::Isolate* V8Initializer::InitializeMainThread() {
 // Stack size for workers is limited to 500KB because default stack size for
 // secondary threads is 512KB on macOS. See GetDefaultThreadStackSize() in
 // base/threading/platform_thread_apple.mm for details.
-//
-// For 32-bit Windows, the stack region always starts with an odd number of
-// reserved pages, followed by two guard pages, followed by the committed
-// memory for the stack, and the worker stack size need to be reduced
-// (https://crbug.com/1412239).
 static const int kWorkerMaxStackSize = 500 * 1024;
 
 void V8Initializer::InitializeWorker(v8::Isolate* isolate) {

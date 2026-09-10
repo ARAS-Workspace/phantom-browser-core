@@ -719,7 +719,6 @@ IN_PROC_BROWSER_TEST_P(DeclarativeContentApiTestWithContextType,
   EXPECT_TRUE(incognito_action->GetIsVisible(incognito_tab_id));
 }
 
-// TODO(crbug.com/41189874): Flaky on Windows release builds.
 #define MAYBE_PRE_RulesPersistence PRE_RulesPersistence
 // Sets up rules matching http://test1/ in a normal and incognito browser.
 IN_PROC_BROWSER_TEST_P(DeclarativeContentApiTestWithContextType,
@@ -740,7 +739,6 @@ IN_PROC_BROWSER_TEST_P(DeclarativeContentApiTestWithContextType,
   ASSERT_TRUE(ready_split.WaitUntilSatisfied());
 }
 
-// TODO(crbug.com/41189874): Flaky on Windows release builds.
 #define MAYBE_RulesPersistence RulesPersistence
 // Reloads the extension from PRE_RulesPersistence and checks that the rules
 // continue to work as expected after being persisted and reloaded.

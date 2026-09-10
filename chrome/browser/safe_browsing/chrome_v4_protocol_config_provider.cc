@@ -15,9 +15,6 @@ namespace safe_browsing {
 
 std::string GetProtocolConfigClientName() {
   std::string client_name;
-  // On Windows, get the safe browsing client name from the browser
-  // distribution classes in installer util. These classes don't yet have
-  // an analog on non-Windows builds so just keep the name specified here.
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   client_name = "googlechrome";
 #else

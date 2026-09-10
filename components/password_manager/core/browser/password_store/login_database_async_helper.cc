@@ -89,8 +89,7 @@ bool LoginDatabaseAsyncHelper::Initialize(
     password_sync_bridge_->Init(this, sync_enabled_or_disabled_cb);
   }
 
-// On Windows encryption capability is expected to be available by default.
-// On MacOS encrpytion is also expected to be available unless the user didn't
+// On MacOS encrpytion is expected to be available unless the user didn't
 // unlock the Keychain.
 #if BUILDFLAG(IS_MAC)
   // Check that the backend works.

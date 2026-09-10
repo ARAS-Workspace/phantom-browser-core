@@ -169,7 +169,6 @@ class TooltipBrowserTest : public InProcessBrowserTest {
   base::test::ScopedFeatureList scoped_feature_list_;
 };  // class TooltipBrowserTest
 
-// TOOD(crbug.com/40768202): Flakily fails on Windows
 #define MAYBE_ShowTooltipFromWebContentWithCursor \
   ShowTooltipFromWebContentWithCursor
 IN_PROC_BROWSER_TEST_F(TooltipBrowserTest,
@@ -259,7 +258,6 @@ IN_PROC_BROWSER_TEST_F(TooltipBrowserTest,
 
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 // https://crbug.com/40768202. Flaky on linux-chromeos-rel.
-// https://crbug.com/40786199. Flaky on Win.
 #define MAYBE_HideTooltipOnKeyPressTriggeredByCursor \
   DISABLED_HideTooltipOnKeyPressTriggeredByCursor
 #else
@@ -288,7 +286,6 @@ IN_PROC_BROWSER_TEST_F(TooltipBrowserTest,
 
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 // https://crbug.com/40768202. Flaky on linux-chromeos-rel.
-// https://crbug.com/40786199. Flaky on Win.
 #define MAYBE_HideTooltipOnKeyPressTriggeredByKeyboard \
   DISABLED_HideTooltipOnKeyPressTriggeredByKeyboard
 #else

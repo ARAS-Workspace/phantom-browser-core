@@ -246,12 +246,9 @@ IN_PROC_BROWSER_TEST_F(SnapshotBrowserTest, MAYBE_SingleWindowTest) {
 
 // Timing out either all the time, or infrequently, apparently because
 // they're too slow, on the following configurations:
-//   Windows Debug
-//   Windows Release (https://crbug.com/1376441)
 //   Linux Chromium OS ASAN LSAN Tests (1)
 //   Linux TSAN Tests
 // See crbug.com/771119
-// TODO(crbug.com/40834774): Fix and enable on Fuchsia.
 #if BUILDFLAG(IS_CHROMEOS) || (BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER))
 #define MAYBE_SyncMultiWindowTest DISABLED_SyncMultiWindowTest
 #else
@@ -305,13 +302,11 @@ IN_PROC_BROWSER_TEST_F(SnapshotBrowserTest, MAYBE_SyncMultiWindowTest) {
 
 // Timing out either all the time, or infrequently, apparently because
 // they're too slow, on the following configurations:
-//   Windows Debug
 //   Linux Chromium OS ASAN LSAN Tests (1)
 //   Linux TSAN Tests
 // See crbug.com/771119
 // TODO(crbug.com/40740836): recently crashes flakily on
 // linux_chromium_asan_rel_ng and linux-rel.
-// TODO(crbug.com/40834774): Fix and enable on Fuchsia.
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 #define MAYBE_AsyncMultiWindowTest DISABLED_AsyncMultiWindowTest
 #else

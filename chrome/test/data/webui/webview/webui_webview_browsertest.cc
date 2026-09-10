@@ -347,7 +347,7 @@ IN_PROC_BROWSER_TEST_F(WebUIWebViewBrowserPEPCTest,
                    GetTestUrl("webview/mediarequest_pepc.html").spec());
 }
 
-// TODO(crbug.com/444024595): Flaky on Linux and Windows
+// TODO(crbug.com/444024595): Flaky on Linux
 // TODO(crbug.com/460836171): Enable on ChromeOS.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_MediaRequestAllowOnSignIn DISABLED_MediaRequestAllowOnSignIn

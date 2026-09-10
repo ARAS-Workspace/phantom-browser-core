@@ -525,9 +525,6 @@ IN_PROC_BROWSER_TEST_F(BookmarkBrowsertest, DragSingleBookmark) {
         ASSERT_FALSE(url_infos.empty());
         EXPECT_EQ(page_url, url_infos.front().url);
         EXPECT_EQ(page_title, url_infos.front().title);
-        // On Windows, GetDragImage() is a NOTREACHED() as the Windows
-        // implementation of OSExchangeData just sets the drag image on the OS
-        // API. https://crbug.com/41419592
         EXPECT_FALSE(drag_data->provider().GetDragImage().isNull());
         EXPECT_EQ(expected_point, point);
         run_loop->Quit();
@@ -610,9 +607,6 @@ IN_PROC_BROWSER_TEST_F(BookmarkBrowsertest, DragMultipleBookmarks) {
         // TODO(http://crbug.com/41011768): test the bookmark folder.
         EXPECT_EQ(page_title, url_infos.front().title);
         EXPECT_EQ(page_url, url_infos.front().url);
-        // On Windows, GetDragImage() is a NOTREACHED() as the Windows
-        // implementation of OSExchangeData just sets the drag image on the OS
-        // API. https://crbug.com/41419592
         EXPECT_FALSE(drag_data->provider().GetDragImage().isNull());
         EXPECT_EQ(expected_point, point);
         run_loop->Quit();

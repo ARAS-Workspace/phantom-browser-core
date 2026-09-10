@@ -307,10 +307,6 @@ void LanguageSettingsPrivateApiTest::RunGetLanguageListTest() {
       {"st", "ast", true, false},
   };
 
-  // A few more test cases for non-Hunspell languages. These languages do have
-  // Windows spellcheck support depending on the OS version. GetLanguageList
-  // only reports spellchecking is supported for these languages if the language
-  // pack is installed.
   languages_to_test.push_back({"ar", "ar-SA", true, false});
   languages_to_test.push_back({"bn", "bn-IN", false, false});
 

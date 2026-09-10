@@ -20,8 +20,6 @@ void ReportLoadResult(const std::string& uma_prefix,
 
 void ReportLoadErrorCode(const std::string& uma_prefix,
                          const base::NativeLibraryLoadError* error) {
-// Only report load error code on Windows because that's the only platform that
-// has a numerical error value.
 }
 
 void ReportLoadTime(const std::string& uma_prefix,

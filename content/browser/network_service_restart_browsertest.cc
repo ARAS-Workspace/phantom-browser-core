@@ -583,7 +583,6 @@ IN_PROC_BROWSER_TEST_F(NetworkServiceRestartBrowserTest,
 // Make sure the factory pending factory returned from
 // |StoragePartition::GetURLLoaderFactoryForBrowserProcessIOThread()| can be
 // used after crashes.
-// Flaky on Windows. https://crbug.com/840127
 #define MAYBE_BrowserIOPendingFactory BrowserIOPendingFactory
 IN_PROC_BROWSER_TEST_F(NetworkServiceRestartBrowserTest,
                        MAYBE_BrowserIOPendingFactory) {

@@ -1580,8 +1580,6 @@ TEST_F(SQLitePersistentCookieStoreTest, NoCoalesceUnrelated) {
   db_thread_event_.Signal();
 }
 
-// Locking is only supported on Windows.
-
 TEST_F(SQLitePersistentCookieStoreTest, CorruptStore) {
   base::HistogramTester histograms;
   base::WriteFile(temp_dir_.GetPath().Append(kCookieFilename),

@@ -6,7 +6,7 @@
 
 #include "build/build_config.h"
 
-// New headless mode is available on Linux, Windows and Mac platforms.
+// New headless mode is available on Linux and Mac platforms.
 // More platforms will be added later, so avoid function level clutter
 // by providing stub implementations at the end of the file.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

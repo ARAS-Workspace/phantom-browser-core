@@ -783,7 +783,6 @@ IN_PROC_BROWSER_TEST_P(HostedOrWebAppTest,
   NavigateAndCheckForToolbar(app_browser_, app_url, true);
 }
 
-// Flaky, mostly on Windows: http://crbug.com/40662800
 #define MAYBE_ShouldShowCustomTabBarForHTTPAppHTTPSUrl \
   ShouldShowCustomTabBarForHTTPAppHTTPSUrl
 IN_PROC_BROWSER_TEST_P(HostedOrWebAppTest,
@@ -1495,8 +1494,6 @@ IN_PROC_BROWSER_TEST_P(HostedAppProcessModelTest,
 // "//" path (on which GURL::Resolve() currently fails due to
 // https://crbug.com/40663665), and that the resulting SiteInstance has a valid
 // site URL. See https://crbug.com/40104314.
-// The navigation currently fails/results in a 404 on Windows, so it's currently
-// disabled.  TODO(crbug.com/40152624): Fix this.
 #define MAYBE_NavigateToAppURLWithDoubleSlashPath \
   NavigateToAppURLWithDoubleSlashPath
 IN_PROC_BROWSER_TEST_P(HostedAppProcessModelTest,

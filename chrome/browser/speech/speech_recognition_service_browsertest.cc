@@ -148,8 +148,8 @@ class SpeechRecognitionServiceTest
   void OnLanguageIdentificationEvent(
       media::mojom::LanguageIdentificationEventPtr event) override;
 
-  // Disable the sandbox on Windows and MacOS as the sandboxes on those
-  // platforms have not been configured yet.
+  // Disable the sandbox on MacOS as the sandbox on that platform has not been
+  // configured yet.
 #if BUILDFLAG(IS_MAC)
   void SetUpCommandLine(base::CommandLine* command_line) override {
     // Required for the utility process to access the directory containing the

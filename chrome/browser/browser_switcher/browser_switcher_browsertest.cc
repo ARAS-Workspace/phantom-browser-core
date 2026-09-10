@@ -44,8 +44,7 @@ const char kTestUrlWithSpaces[] = "http://example.com/foobar baz";
 // A URL that shouldn't trigger a switch.
 const char kOtherUrl[] = "http://google.com/";
 
-// |echo| adds a newline at the end of the file. CRLF on Windows, but just LF on
-// POSIX systems.
+// |echo| adds a newline at the end of the file: LF on POSIX systems.
 const char kTestUrlWithLineEnding[] = "http://example.com/foobar\n";
 
 std::string NativeToUTF8(const std::string& native) {

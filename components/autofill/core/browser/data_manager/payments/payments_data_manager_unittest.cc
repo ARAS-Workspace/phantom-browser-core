@@ -1675,7 +1675,7 @@ TEST_F(PaymentsDataManagerSyncTransportModeTest,
   EXPECT_EQ(local_card.LastFourDigits(), cards[0]->LastFourDigits());
 }
 
-// Sync Transport mode is only for Win, Mac, and Linux.
+// Sync Transport mode is only for Mac and Linux.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 TEST_F(PaymentsDataManagerSyncTransportModeTest,
        ServerCardsShowInTransportMode) {

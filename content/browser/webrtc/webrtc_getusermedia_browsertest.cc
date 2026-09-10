@@ -762,7 +762,6 @@ IN_PROC_BROWSER_TEST_F(WebRtcGetUserMediaBrowserTest,
   EXPECT_TRUE(ExecJs(shell(), "applyConstraintsVideoOverconstrained()"));
 }
 
-// Flaky on Win, see https://crbug.com/915135
 // Flaky on Linux, see https://crbug.com/952381
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_ApplyConstraintsNonDevice DISABLED_ApplyConstraintsNonDevice

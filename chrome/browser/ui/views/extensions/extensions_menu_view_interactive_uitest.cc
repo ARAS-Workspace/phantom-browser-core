@@ -160,7 +160,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionsMenuViewInteractiveUITest, InvokeUi_default) {
 
 // Invokes the UI shown when a user has to reload a page in order to run an
 // extension.
-// TODO(crbug.com/40171640): Very flaky on Linux and Windows.
+// TODO(crbug.com/40171640): Very flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_InvokeUi_ReloadPageBubble DISABLED_InvokeUi_ReloadPageBubble
 #else

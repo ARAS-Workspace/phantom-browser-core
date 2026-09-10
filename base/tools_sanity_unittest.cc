@@ -115,8 +115,6 @@ NOOPT void MakeSomeErrors(char* ptr, size_t size) {
 #if BUILDFLAG(IS_ANDROID)
 // TODO(crbug.com/40224191): Sanitizer options are currently broken
 // on Android.
-// TODO(crbug.com/40223949): __asan_default_options should be used
-// on Windows too, but currently isn't.
 #define MAYBE_LinksSanitizerOptions DISABLED_LinksSanitizerOptions
 #else
 #define MAYBE_LinksSanitizerOptions LinksSanitizerOptions

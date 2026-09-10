@@ -247,7 +247,6 @@ IN_PROC_BROWSER_TEST_F(ScrollLatencyBrowserTest,
       0, "EventLatency.GestureScrollUpdate.TotalLatency2"));
 }
 
-// TODO(crbug.com/370658912) heap-use-after-free on Win ASAN.
 #define MAYBE_ScrollingEventLatencyTrace ScrollingEventLatencyTrace
 
 // A basic smoke test verifying that key scroll-related events are recorded

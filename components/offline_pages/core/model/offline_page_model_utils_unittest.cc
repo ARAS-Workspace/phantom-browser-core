@@ -73,7 +73,6 @@ const std::vector<GenerateUniqueFilenameTestCase>& UniqueFilenameCases() {
   return *cases;
 }
 
-// Crashing on Windows, see http://crbug.com/79365
 #define MAYBE_TestGenerateUniqueFilename TestGenerateUniqueFilename
 TEST(OfflinePageModelUtilsTest, MAYBE_TestGenerateUniqueFilename) {
   base::ScopedTempDir temp_dir;

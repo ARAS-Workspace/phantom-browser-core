@@ -193,8 +193,6 @@ void ReadAnythingService::InstallComponent(const base::FilePath& new_dir) {
 }
 void ReadAnythingService::RecordEngineVersion(
     const base::FilePath& engine_version) {
-// Per FilePath documentation, Windows uses std::wstring, so string
-// so string manipulations must be handled slightly differently.
   using path_string_t = std::string;
   constexpr auto delimiter = '.';
 

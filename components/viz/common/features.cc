@@ -244,9 +244,7 @@ const base::FeatureParam<base::TimeDelta>
 // as the HDR metadata NDWL nits for PQ content (if none was specified). This
 // has the effect that its "opts-out" PQ content from being affected by the OS'
 // SDR white level (effectively the OS' brightness setting). This behavior is
-// preferred on Windows, to avoid flicker when entering/leaving overlays
-// (https://crbug.com/40285630) but otherwise is undesirable behavior
-// (https://crbug.com/40266959 and https://crbug.com/486121442).
+// undesirable (https://crbug.com/40266959 and https://crbug.com/486121442).
 BASE_FEATURE(kUseDisplaySDRMaxLuminanceNits, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // On mac, when the RenderWidgetHostViewMac is hidden, also hide the

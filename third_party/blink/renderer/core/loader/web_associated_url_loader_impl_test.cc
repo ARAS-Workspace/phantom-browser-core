@@ -455,7 +455,7 @@ TEST_F(WebAssociatedURLLoaderTest, UntrustedCheckMethods) {
   CheckMethodFails("TrAcE");
 }
 
-// This test is flaky on Windows and Android. See <http://crbug.com/471645>.
+// This test is flaky on Android. See <http://crbug.com/471645>.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_UntrustedCheckHeaders DISABLED_UntrustedCheckHeaders
 #else

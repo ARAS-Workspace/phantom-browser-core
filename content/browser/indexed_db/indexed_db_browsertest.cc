@@ -1373,9 +1373,8 @@ std::unique_ptr<net::test_server::HttpResponse> StaticFileRequestHandler(
 
 // TODO(crbug.com/419272072): Adapt this test suite to also work with the SQLite
 // backing store.
-// See TODO in CorruptDBRequestHandler.  Windows does not support nested
-// message loops on the IO thread, so run this test on other platforms.
-// iOS runs into difficulty with the nested IO message loop as well.
+// See TODO in CorruptDBRequestHandler.  iOS runs into difficulty with the
+// nested IO message loop, so run this test on other platforms.
 #if !BUILDFLAG(IS_IOS)
 class IndexedDBBrowserTestWithCorruption
     : public IndexedDBLevelDBOnlyTest,

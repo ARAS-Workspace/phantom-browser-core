@@ -152,7 +152,7 @@ HEADLESS_COMPOSITOR_TEST(RendererCssUrlFilter,
 HEADLESS_COMPOSITOR_TEST(RendererCanvas, "virtual-time/renderer-canvas.js")
 
 #if BUILDFLAG(IS_LINUX)
-// Flaky on at least Linux and Windows: crbug.com/1294751.
+// Flaky on at least Linux: crbug.com/1294751.
 #define MAYBE_RendererOpacityAnimation DISABLED_RendererOpacityAnimation
 #else
 #define MAYBE_RendererOpacityAnimation RendererOpacityAnimation

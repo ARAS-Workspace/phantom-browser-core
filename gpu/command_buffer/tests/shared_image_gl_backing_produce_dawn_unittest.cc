@@ -64,7 +64,6 @@ class SharedImageGLBackingProduceDawnTest : public WebGPUTest {
   }
 
   bool ShouldSkipTest() {
-// Windows is the only platform enabled passthrough in this test.
     return true;
   }
 

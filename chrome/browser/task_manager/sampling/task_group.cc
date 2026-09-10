@@ -124,8 +124,6 @@ void TaskGroup::Refresh(const gpu::VideoMemoryUsageStats& gpu_memory_stats,
     RefreshGpuMemory(gpu_memory_stats);
   }
 
-  // 3- Refresh Windows handles (if enabled).
-
   int64_t shared_refresh_flags =
       refresh_flags & shared_sampler_->GetSupportedFlags();
 

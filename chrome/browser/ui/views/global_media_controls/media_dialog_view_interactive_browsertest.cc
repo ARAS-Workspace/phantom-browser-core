@@ -731,8 +731,7 @@ IN_PROC_BROWSER_TEST_F(MediaDialogViewBrowserTest,
   EXPECT_TRUE(IsPlayingSessionDisplayedFirst());
 }
 
-// TODO(crbug.com/40898509): Live captioning not supported on Arm64 Windows or
-// Linux.
+// TODO(crbug.com/40898509): Live captioning not supported on Linux.
 #if (BUILDFLAG(IS_LINUX) && defined(ARCH_CPU_ARM64)) || BUILDFLAG(IS_MAC)
 #define MAYBE_LiveCaption DISABLED_LiveCaption
 #else

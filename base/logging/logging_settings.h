@@ -31,10 +31,8 @@ enum : uint32_t {
 
   LOG_TO_ALL = LOG_TO_FILE | LOG_TO_SYSTEM_DEBUG_LOG | LOG_TO_STDERR,
 
-// On Windows, use a file next to the exe.
 // On POSIX platforms, where it may not even be possible to locate the
 // executable on disk, use stderr.
-// On Fuchsia, use the Fuchsia logging service.
 #if BUILDFLAG(IS_POSIX)
   LOG_DEFAULT = LOG_TO_SYSTEM_DEBUG_LOG | LOG_TO_STDERR,
 #endif

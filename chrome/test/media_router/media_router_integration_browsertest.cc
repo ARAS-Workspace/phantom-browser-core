@@ -435,7 +435,7 @@ bool MediaRouterIntegrationBrowserTest::RequiresMediaRouteProviders() const {
   return false;
 }
 
-// TODO(crbug.com/1238758): Test is flaky on Windows and Linux.
+// TODO(crbug.com/1238758): Test is flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_Basic MANUAL_Basic
 #elif BUILDFLAG(IS_CHROMEOS)
@@ -448,7 +448,7 @@ IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest, MAYBE_Basic) {
   RunBasicTest();
 }
 
-// TODO(crbug.com/40784325): Test is flaky on Windows and Linux.
+// TODO(crbug.com/40784325): Test is flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_SendAndOnMessage MANUAL_SendAndOnMessage
 #elif BUILDFLAG(IS_CHROMEOS)

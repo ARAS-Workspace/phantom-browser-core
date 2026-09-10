@@ -170,9 +170,9 @@ int RendererMain(MainFunctionParams parameters) {
   InitializeSkia();
 
 #if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
-  // On Linux, Windows, and ChromeOS, the font manager is overridden or
-  // specially handled in RendererBlinkPlatformImpl(). On other platforms,
-  // initialise the default one on a thread pool, to avoid blocking on it later.
+  // On Linux and ChromeOS, the font manager is overridden or specially handled
+  // in RendererBlinkPlatformImpl(). On other platforms, initialise the default
+  // one on a thread pool, to avoid blocking on it later.
   base::ThreadPool::PostTask(FROM_HERE,
                              base::BindOnce([] { skia::DefaultFontMgr(); }));
 #endif
@@ -234,8 +234,8 @@ int RendererMain(MainFunctionParams parameters) {
 
 #if !BUILDFLAG(IS_MAC)
     // Sandbox is enabled before RenderProcess initialization on all platforms,
-    // except Windows and Mac.
-    // TODO(markus): Check if it is OK to remove ifdefs for Windows and Mac.
+    // except Mac.
+    // TODO(markus): Check if it is OK to remove ifdefs for Mac.
     if (need_sandbox) {
       should_run_loop = platform.EnableSandbox();
       need_sandbox = false;

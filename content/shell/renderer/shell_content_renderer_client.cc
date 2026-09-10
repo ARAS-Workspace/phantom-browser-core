@@ -263,8 +263,8 @@ ShellContentRendererClient::~ShellContentRendererClient() {
 
 void ShellContentRendererClient::SetUpWebAssemblyTrapHandler() {
 #if BUILDFLAG(IS_MAC)
-  // Mac and Windows use the default implementation (where the default v8 trap
-  // handler gets set up).
+  // Mac uses the default implementation (where the default v8 trap handler gets
+  // set up).
   ContentRendererClient::SetUpWebAssemblyTrapHandler();
   return;
 #else

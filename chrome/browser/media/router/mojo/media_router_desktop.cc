@@ -407,8 +407,8 @@ bool MediaRouterDesktop::RegisterMediaSinksObserver(
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
 
 #if !BUILDFLAG(IS_MAC)
-  // On Windows and macOS, where discovery might trigger a permission
-  // prompt, do not start discovery service.
+  // On macOS, where discovery might trigger a permission prompt, do not start
+  // discovery service.
   if (media_sink_service_) {
     media_sink_service_->StartDiscovery();
     GetLogger()->LogInfo(mojom::LogCategory::kDiscovery, kLoggerComponent,

@@ -2370,7 +2370,6 @@ IN_PROC_BROWSER_TEST_P(StorageAccessAPIStorageBrowserTest,
   ExpectStorage(GetFrame(), DoesPermissionGrantStorage());
   EXPECT_FALSE(storage::test::HasStorageAccessForFrame(GetFrame()));
 }
-// TODO(crbug.com/430495897): Test is flaky on Windows ASAN builds.
 #define MAYBE_NestedThirdPartyIFrameStorage NestedThirdPartyIFrameStorage
 IN_PROC_BROWSER_TEST_P(StorageAccessAPIStorageBrowserTest,
                        MAYBE_NestedThirdPartyIFrameStorage) {

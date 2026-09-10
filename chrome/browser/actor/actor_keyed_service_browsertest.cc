@@ -154,7 +154,7 @@ IN_PROC_BROWSER_TEST_F(ActorKeyedServiceBrowserTest, StartStopTask) {
   EXPECT_NE(first_task_id, second_task_id);
 }
 
-// TODO(crbug.com/439247740): Fails on Win ASan and Android.
+// TODO(crbug.com/439247740): Fails on Android.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_StartNavigateStopTask DISABLED_StartNavigateStopTask
 #else

@@ -31,8 +31,6 @@ namespace {
 constexpr double kProduceCompileHintsNoiseLevel = 0.5;
 
 bool RandomlySelectedToGenerateData() {
-  // Data collection is only enabled on Windows. TODO(chromium:1406506): enable
-  // on more platforms.
   return false;
 }
 

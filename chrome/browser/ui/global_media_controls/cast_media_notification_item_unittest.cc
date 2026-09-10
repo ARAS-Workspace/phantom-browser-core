@@ -322,7 +322,6 @@ TEST_F(CastMediaNotificationItemTest, DownloadImage) {
   bitmap_fetcher_delegate->OnFetchComplete(image_url, &bitmap);
 }
 
-// TODO(crbug.com/327498504): Fix the test flakiness on Win Arm64.
 #define MAYBE_MediaPositionUpdate MediaPositionUpdate
 TEST_F(CastMediaNotificationItemTest, MAYBE_MediaPositionUpdate) {
   SetView();

@@ -2416,7 +2416,6 @@ class FirstRunInSearchChoiceRegionInteractiveUiTest
   std::unique_ptr<base::AutoReset<bool>> scoped_chrome_build_override_;
 };
 
-// TODO(crbug.com/366119368): Re-enable this test. (FRE does not open on Win)
 #define MAYBE_SkipChoiceScreenDynamically SkipChoiceScreenDynamically
 IN_PROC_BROWSER_TEST_P(FirstRunInSearchChoiceRegionInteractiveUiTest,
                        MAYBE_SkipChoiceScreenDynamically) {

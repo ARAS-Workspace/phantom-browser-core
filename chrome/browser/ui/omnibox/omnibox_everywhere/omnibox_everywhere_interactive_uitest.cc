@@ -402,8 +402,8 @@ IN_PROC_BROWSER_TEST_F(OmniboxEverywhereBrowserTest,
 
 #if BUILDFLAG(IS_MAC)
   // TODO(crbug.com/40249472): Modal drag loops in tests aren't supported on
-  // MacOS and Windows. Manually set widget bounds to test position retention
-  // across re-invocations.
+  // MacOS. Manually set widget bounds to test position retention across
+  // re-invocations.
   auto reposition_step = Steps(Do([&]() {
     views::Widget* widget = controller->ui_manager()->widget();
     gfx::Rect target_bounds = widget->GetWindowBoundsInScreen();

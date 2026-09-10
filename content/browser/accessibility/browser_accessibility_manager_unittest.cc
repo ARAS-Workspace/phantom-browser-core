@@ -176,8 +176,7 @@ TEST_F(BrowserAccessibilityManagerTest, TestErrorOnUpdate) {
 #endif
 }
 
-// This test depends on hypertext, which is only used on
-// Linux and Windows.
+// This test depends on hypertext, which is only used on Linux.
 #if BUILDFLAG(USE_ATK)
 TEST_F(BrowserAccessibilityManagerTest, BoundsForRange) {
   ui::AXNodeData root;
@@ -394,8 +393,7 @@ TEST_F(BrowserAccessibilityManagerTest, BoundsForRangeMultiElement) {
                 .ToString());
 }
 
-// This test depends on hypertext, which is only used on
-// Linux and Windows.
+// This test depends on hypertext, which is only used on Linux.
 #if BUILDFLAG(USE_ATK)
 TEST_F(BrowserAccessibilityManagerTest, BoundsForRangeBiDi) {
   // In this example, we assume that the string "123abc" is rendered with
@@ -500,8 +498,7 @@ TEST_F(BrowserAccessibilityManagerTest, BoundsForRangeBiDi) {
 }
 #endif  // BUILDFLAG(USE_ATK)
 
-// This test depends on hypertext, which is only used on
-// Linux and Windows.
+// This test depends on hypertext, which is only used on Linux.
 #if BUILDFLAG(USE_ATK)
 TEST_F(BrowserAccessibilityManagerTest, BoundsForRangeScrolledWindow) {
   ui::AXNodeData root;
@@ -560,8 +557,7 @@ TEST_F(BrowserAccessibilityManagerTest, BoundsForRangeScrolledWindow) {
 }
 #endif  // BUILDFLAG(USE_ATK)
 
-// This test depends on hypertext, which is only used on
-// Linux and Windows.
+// This test depends on hypertext, which is only used on Linux.
 #if BUILDFLAG(USE_ATK)
 TEST_F(BrowserAccessibilityManagerTest, BoundsForRangeOnParentElement) {
   ui::AXNodeData root;
@@ -886,8 +882,7 @@ TEST_F(BrowserAccessibilityManagerTest, TestNextPreviousTextOnlyObject) {
   EXPECT_EQ(nullptr, manager->PreviousTextOnlyObject(root_accessible));
 }
 
-// This test depends on hypertext, which is only used on
-// Linux and Windows.
+// This test depends on hypertext, which is only used on Linux.
 #if BUILDFLAG(USE_ATK)
 TEST_F(BrowserAccessibilityManagerTest, TestFindIndicesInCommonParent) {
   ui::TestAXTreeUpdate update(std::string(R"HTML(
@@ -998,8 +993,7 @@ TEST_F(BrowserAccessibilityManagerTest, TestFindIndicesInCommonParent) {
 }
 #endif  // BUILDFLAG(USE_ATK)
 
-// This test depends on hypertext, which is only used on
-// Linux and Windows.
+// This test depends on hypertext, which is only used on Linux.
 #if BUILDFLAG(USE_ATK)
 TEST_F(BrowserAccessibilityManagerTest, TestGetTextForRange) {
   ui::AXNodeData root;

@@ -249,8 +249,6 @@ void BindIndicatorTranscience(TransientElement* e,
 }
 
 int GetIndicatorsTimeout() {
-  // Some runtimes on Windows have quite lengthy animations that may cause
-  // indicators to not be visible at our normal timeout length.
   return kToastTimeoutSeconds;
 }
 
@@ -473,9 +471,6 @@ void UiSceneCreator::CreateViewportAwareRoot() {
   auto element = std::make_unique<ViewportAwareRoot>();
   element->SetName(kWebVrViewportAwareRoot);
 
-  // On Windows, allow the viewport-aware UI to translate as well as rotate, so
-  // it remains centered appropriately if the user moves.  Only enabled for
-  // OS_WIN, since it conflicts with browser UI that isn't shown on Windows.
   scene_->AddUiElement(kWebVrRoot, std::move(element));
 }
 

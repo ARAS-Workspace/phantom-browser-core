@@ -1296,7 +1296,7 @@ IN_PROC_BROWSER_TEST_F(ProfilePickerCreationFlowBrowserTest,
   WaitForPickerClosed();
 }
 
-// TODO(crbug.com/40868761): Test is flaky on Linux and Windows.
+// TODO(crbug.com/40868761): Test is flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_CreateForceSignedInProfile DISABLED_CreateForceSignedInProfile
 #else
@@ -3921,7 +3921,6 @@ class ProfilePickerCreationFlowEphemeralProfileBrowserTest
   testing::NiceMock<policy::MockConfigurationPolicyProvider> policy_provider_;
 };
 
-// Flaky on Windows: https://crbug.com/40196889.
 #define MAYBE_PRE_Signin PRE_Signin
 #define MAYBE_Signin Signin
 // Checks that the new profile is no longer ephemeral at the end of the flow and
@@ -3988,7 +3987,6 @@ IN_PROC_BROWSER_TEST_P(ProfilePickerCreationFlowEphemeralProfileBrowserTest,
   EXPECT_TRUE(OriginalProfileExists());
 }
 
-// Flaky on Windows: https://crbug.com/40196889.
 #define MAYBE_PRE_ExitDuringSignin PRE_ExitDuringSignin
 #define MAYBE_ExitDuringSignin ExitDuringSignin
 // Checks that the new profile is deleted on next startup if Chrome exits during

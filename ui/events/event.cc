@@ -657,8 +657,7 @@ std::unique_ptr<Event> MouseWheelEvent::Clone() const {
 }
 
 #if BUILDFLAG(IS_LINUX)
-// This value matches Windows, Fuchsia WHEEL_DELTA, and (roughly) Firefox on
-// Linux.
+// This value (roughly) matches Firefox on Linux.
 // static
 const int MouseWheelEvent::kWheelDelta = 120;
 #else
@@ -949,9 +948,6 @@ void KeyEvent::ApplyLayout() const {
   }
 #endif
 
-  // Native Windows character events always have is_char_ == true,
-  // so this is a synthetic or native keystroke event.
-  // Therefore, perform only the fallback action.
   if (IsPlatformEventValid(native_event())) {
     DCHECK(EventTypeFromNative(native_event()) == EventType::kKeyPressed ||
            EventTypeFromNative(native_event()) == EventType::kKeyReleased);

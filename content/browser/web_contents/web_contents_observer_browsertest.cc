@@ -425,7 +425,7 @@ MATCHER_P9(MatchesCookieAccess,
 
 }  // namespace
 
-// TODO(crbug.com/40211581): Flaky on Windows, Mac, and Android.
+// TODO(crbug.com/40211581): Flaky on Mac and Android.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 #define MAYBE_CookieCallbacks_MainFrame DISABLED_CookieCallbacks_MainFrame
 #else
@@ -486,7 +486,7 @@ IN_PROC_BROWSER_TEST_F(WebContentsObserverBrowserTest,
   cookie_tracker.cookie_accesses().clear();
 }
 
-// TODO(crbug.com/40211581): Flaky on Mac and Android and Win.
+// TODO(crbug.com/40211581): Flaky on Mac and Android.
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
 #define MAYBE_CookieCallbacks_MainFrameRedirect \
   DISABLED_CookieCallbacks_MainFrameRedirect
@@ -566,7 +566,7 @@ IN_PROC_BROWSER_TEST_F(WebContentsObserverBrowserTest,
   cookie_tracker.cookie_accesses().clear();
 }
 
-// TODO(crbug.com/40211581): Flaky on Mac, Android and Windows.
+// TODO(crbug.com/40211581): Flaky on Mac and Android.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 #define MAYBE_CookieCallbacks_Subframe DISABLED_CookieCallbacks_Subframe
 #else

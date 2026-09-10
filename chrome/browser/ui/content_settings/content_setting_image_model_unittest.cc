@@ -461,7 +461,7 @@ TEST_F(ContentSettingImageModelTest, GeolocationAccessPermissionsChanged) {
 
 #if BUILDFLAG(IS_MAC)
 // This test verifies the UI behavior when OS-level geolocation permission is
-// undetermined. This state is only applicable on macOS and Windows.
+// undetermined. This state is only applicable on macOS.
 TEST_F(ContentSettingImageModelTest, GeolocationAccessPermissionsUndetermined) {
   system_permission_settings::MockPlatformHandle mock_platform_handle;
   system_permission_settings::SetInstanceForTesting(&mock_platform_handle);

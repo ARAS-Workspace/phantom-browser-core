@@ -1092,12 +1092,6 @@ class InputMethodObserverForShowIme : public InputMethodObserverBase {
 // the TextInputState has not changed (according to the platform), e.g., in
 // aura when receiving two consecutive updates with same |TextInputState.type|.
 
-// This test is disabled on Windows because we have removed TryShow/TryHide API
-// calls and replaced it with TSF input pane policy which is a policy applied by
-// text service framework on Windows based on whether TSF edit control has focus
-// or not. On Windows we have implemented TSF1 on Chromium that takes care of
-// IME compositions, handwriting panels, SIP visibility etc. Please see
-// (https://crbug.com/40649743) for more details.
 IN_PROC_BROWSER_TEST_F(SitePerProcessTextInputManagerTest,
                        CorrectlyShowVirtualKeyboardIfEnabled) {
   // We only need the <iframe> page to create RWHV.

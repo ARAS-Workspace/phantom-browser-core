@@ -90,7 +90,7 @@ class FakeProtocolHandlerDelegate : public ExternalProtocolHandler::Delegate {
 
 }  // namespace
 
-// TODO(crbug.com/40853146): Fix flakiness on Win and Mac.
+// TODO(crbug.com/40853146): Fix flakiness on Mac.
 // TODO(crbug.com/41481789): Fix consistent failing on Linux.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_AllowExternalProtocols DISABLED_AllowExternalProtocols

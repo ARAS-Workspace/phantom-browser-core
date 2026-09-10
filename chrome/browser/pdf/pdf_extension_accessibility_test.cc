@@ -435,7 +435,6 @@ IN_PROC_BROWSER_TEST_P(PDFExtensionAccessibilityTestWithOopifOverride,
   EXPECT_EQ(ax::mojom::Role::kRegion, region->GetRole());
 }
 
-// TODO(crbug.com/330202391): Fix the flakiness on Windows.
 #define MAYBE_PdfAccessibilityContextMenuAction \
   PdfAccessibilityContextMenuAction
 IN_PROC_BROWSER_TEST_P(PDFExtensionAccessibilityTestWithOopifOverride,

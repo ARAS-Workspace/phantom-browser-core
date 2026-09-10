@@ -352,9 +352,6 @@ TEST_P(NamedMojoIpcServerTest, RemoteProcessTerminated_ConnectionRemoved) {
   ASSERT_EQ(0u, ipc_server_->GetNumberOfActiveConnectionsForTesting());
 }
 
-// On Windows the server endpoint must be recreated between connections. The
-// following tests check this behavior.
-
 TEST_P(NamedMojoIpcServerTest, ParallelIpcs) {
   base::MockCallback<EchoStringHandler> mock_echo_string_handler;
   echo_string_handler_ = mock_echo_string_handler.Get();

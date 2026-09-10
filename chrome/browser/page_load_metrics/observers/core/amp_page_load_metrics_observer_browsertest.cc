@@ -158,7 +158,6 @@ IN_PROC_BROWSER_TEST_P(AmpPageLoadMetricsBrowserTest, AmpMainFrame) {
   ExpectMetricCountForUrl(url, "SubFrameAmpPageLoad", 0);
 }
 
-// TODO(crbug.com/428095827): Test is flaky on Windows.
 #define MAYBE_AmpSubframe AmpSubframe
 IN_PROC_BROWSER_TEST_P(AmpPageLoadMetricsBrowserTest, MAYBE_AmpSubframe) {
   // Navigate to an empty page to inject SpeculationRules if prerendered case.

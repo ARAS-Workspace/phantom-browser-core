@@ -462,7 +462,6 @@ IN_PROC_BROWSER_TEST_F(SharedTabGroupInteractiveUiTest,
 // Verify members see the leave group button instead of the delete button and
 // that pressing the leave group buttons displays a dialog.
 
-// Disable flaky test under Windows ASAN.  http://crbug.com/421907007
 #define MAYBE_LeaveGroupPressed LeaveGroupPressed
 IN_PROC_BROWSER_TEST_F(SharedTabGroupInteractiveUiTest,
                        MAYBE_LeaveGroupPressed) {

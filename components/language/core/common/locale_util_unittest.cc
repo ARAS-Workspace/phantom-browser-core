@@ -117,11 +117,11 @@ TEST_F(LocaleUtilTest, ConvertToActualUILocale) {
   EXPECT_TRUE(is_ui);
   EXPECT_EQ("de", locale);
 
-//---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 // Languages that cannot be used as display UI.
-//---------------------------------------------------------------------------
-// This only matters for ChromeOS and Windows, as they are the only systems
-// where users can set the display UI.
+// ---------------------------------------------------------------------------
+// This only matters for ChromeOS, as it is the only system where users can
+// set the display UI.
 #if BUILDFLAG(IS_CHROMEOS)
   locale = "sd";  // Sindhi
   is_ui = ConvertToActualUILocale(&locale);

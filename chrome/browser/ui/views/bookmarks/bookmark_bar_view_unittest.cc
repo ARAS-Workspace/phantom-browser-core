@@ -326,7 +326,6 @@ TEST_F(BookmarkBarViewTest, OverflowVisibility) {
 
 // Verifies buttons get added correctly when BookmarkBarView is created after
 // the model and the model has nodes.
-// TODO(crbug.com/375364962): Flaky on Windows.
 #define MAYBE_ButtonsDynamicallyAddedAfterModelHasNodes \
   ButtonsDynamicallyAddedAfterModelHasNodes
 TEST_F(BookmarkBarViewTest, MAYBE_ButtonsDynamicallyAddedAfterModelHasNodes) {
@@ -676,7 +675,7 @@ TEST_F(BookmarkBarViewTest, ManagedShowAppsShortcutInBookmarksBar) {
 
 // Verifies the SavedTabGroupBar's page navigator is set when the
 // bookmarkbarview's page navigator is set.
-// TODO(crbug.com/375364962): Flaky on Windows & Linux.
+// TODO(crbug.com/375364962): Flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_PageNavigatorSet DISABLED_PageNavigatorSet
 #else
@@ -838,7 +837,7 @@ TEST_F(BookmarkBarViewInWidgetTest,
   }
 }
 
-// TODO(crbug.com/375364962): Flaky on Windows & Linux.
+// TODO(crbug.com/375364962): Flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_AccessibleRoleDescription DISABLED_AccessibleRoleDescription
 #else

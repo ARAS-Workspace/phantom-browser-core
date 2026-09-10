@@ -386,7 +386,7 @@ IN_PROC_BROWSER_TEST_F(AppWindowInteractiveTest, MAYBE_TestFullscreen) {
   ASSERT_TRUE(RunAppWindowInteractiveTest("testFullscreen")) << message_;
 }
 
-// Only Linux and Windows use keep-alive to determine when to shut down.
+// Only Linux uses keep-alive to determine when to shut down.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 // In general, hidden windows should not keep Chrome alive. The exception is

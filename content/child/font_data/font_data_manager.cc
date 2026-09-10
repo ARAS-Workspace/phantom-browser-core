@@ -259,8 +259,7 @@ sk_sp<SkTypeface> FontDataManager::onMakeFromStreamArgs(
   // Experiment will test the performance of different SkTypefaces.
   // 'custom_fnt_mgr_' is a wrapper to create an SkFreeType typeface.
 
-  // DWRITE is only an option on Windows. Other platforms must use Freetype or
-  // Fontations.
+  // Use Freetype or Fontations.
   // Chromium currently always sets ENABLE_FREETYPE, but nonetheless allow
   // falling back to fontations if the param is set to freetype but freetype
   // isn't enabled.

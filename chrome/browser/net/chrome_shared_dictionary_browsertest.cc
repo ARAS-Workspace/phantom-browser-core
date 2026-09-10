@@ -878,8 +878,6 @@ class DevToolsSharedDictionaryFeatureDisabledBrowserTest
   ~DevToolsSharedDictionaryFeatureDisabledBrowserTest() override = default;
 };
 
-// Can't cause the dictionary load failure by deletaing the disk cache directory
-// on Windows.
 IN_PROC_BROWSER_TEST_F(SharedDictionaryDevToolsBrowserTest,
                        UseErrorDictionaryLoadFailure) {
   ASSERT_TRUE(embedded_test_server()->Start());

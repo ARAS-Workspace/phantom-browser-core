@@ -153,7 +153,6 @@ class VerticalTabStripInteractiveUiTest : public InteractiveBrowserTest {
   std::optional<ui::UserDataFactory::ScopedOverride> override_;
 };
 
-// Unable to programmatically click System Context Menu Items in Windows.
 #define MAYBE_VerifyTabsToTheSideButton VerifyTabsToTheSideButton
 // This test checks that we can click the show tabs to the side button
 IN_PROC_BROWSER_TEST_F(VerticalTabStripInteractiveUiTest,
@@ -172,7 +171,6 @@ IN_PROC_BROWSER_TEST_F(VerticalTabStripInteractiveUiTest,
   EXPECT_TRUE(SystemMenuContainsStringId(IDS_SWITCH_TO_HORIZONTAL_TAB));
 }
 
-// Unable to programmatically click System Context Menu Items in Windows.
 #define MAYBE_VerifyTabsToTheTopButton VerifyTabsToTheTopButton
 // This test checks that we can click the show tabs at the top button
 IN_PROC_BROWSER_TEST_F(VerticalTabStripInteractiveUiTest,
@@ -196,7 +194,6 @@ IN_PROC_BROWSER_TEST_F(VerticalTabStripInteractiveUiTest,
   EXPECT_TRUE(SystemMenuContainsStringId(IDS_SWITCH_TO_VERTICAL_TAB));
 }
 
-// Unable to programmatically click System Context Menu Items in Windows.
 #define MAYBE_EnablingExpandOnHoverSystemContextMenu \
   EnablingExpandOnHoverSystemContextMenu
 // This test checks that we can enable the expand on hover behavior via the
@@ -227,7 +224,6 @@ IN_PROC_BROWSER_TEST_F(VerticalTabStripInteractiveUiTest,
       SystemMenuContainsStringId(IDS_VERTICAL_TABS_DISABLE_EXPAND_ON_HOVER));
 }
 
-// Unable to programmatically click System Context Menu Items in Windows.
 #define MAYBE_DisablingExpandOnHoverSystemContextMenu \
   DisablingExpandOnHoverSystemContextMenu
 // This test checks that we can disable the expand on hover behavior via the
@@ -256,7 +252,6 @@ IN_PROC_BROWSER_TEST_F(VerticalTabStripInteractiveUiTest,
       SystemMenuContainsStringId(IDS_VERTICAL_TABS_ENABLE_EXPAND_ON_HOVER));
 }
 
-// Unable to programmatically click System Context Menu Items in Windows.
 #define MAYBE_ToggleCollapseSystemContextMenu ToggleCollapseSystemContextMenu
 // This test checks that we can toggle the collapse state via the system context
 // menu.

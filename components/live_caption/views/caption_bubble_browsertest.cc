@@ -208,7 +208,6 @@ class CaptionBubbleBrowserTest : public UiBrowserTest {
 };
 
 // Test that calls ShowUi("default").
-// TODO(crbug.com/422524764): Flakily failing on Windows
 #define MAYBE_InvokeUi_default InvokeUi_default
 IN_PROC_BROWSER_TEST_F(CaptionBubbleBrowserTest, MAYBE_InvokeUi_default) {
   ShowAndVerifyUi();

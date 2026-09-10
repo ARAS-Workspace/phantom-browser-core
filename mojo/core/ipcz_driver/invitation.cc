@@ -223,7 +223,6 @@ MojoResult Invitation::Send(
 
   const bool is_peer_elevated =
       options && (options->flags & MOJO_SEND_INVITATION_FLAG_ELEVATED);
-  // For now, the concept of an elevated process is only meaningful on Windows.
   CHECK(!is_peer_elevated);
 
   IpczDriverHandle transport = CreateTransportForMojoEndpoint(
@@ -318,7 +317,6 @@ MojoHandle Invitation::Accept(
 
   const bool is_elevated =
       options && (options->flags & MOJO_ACCEPT_INVITATION_FLAG_ELEVATED) != 0;
-  // For now, the concept of an elevated process is only meaningful on Windows.
   DCHECK(!is_elevated);
 
   // When accepting an invitation, we ConnectNode() with the maximum possible

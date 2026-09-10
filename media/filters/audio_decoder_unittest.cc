@@ -672,7 +672,6 @@ constexpr TestParams kXheAacTestParams[] = {
      CHANNEL_LAYOUT_STEREO,
      AudioCodecProfile::kXHE_AAC,
     },
-// Windows doesn't support 29.4kHz
     {AudioCodec::kAAC,
      "noise-xhe-aac-mono.mp4",
      {{

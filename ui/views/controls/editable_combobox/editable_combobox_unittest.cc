@@ -651,7 +651,7 @@ TEST_F(EditableComboboxTest, SpaceIsReflectedInTextfield) {
 }
 
 #if BUILDFLAG(IS_LINUX)
-// Flaky on Windows and Linux. https://crbug.com/965601
+// Flaky on Linux. https://crbug.com/965601
 #define MAYBE_MenuCanAdaptToContentChange DISABLED_MenuCanAdaptToContentChange
 #else
 #define MAYBE_MenuCanAdaptToContentChange MenuCanAdaptToContentChange

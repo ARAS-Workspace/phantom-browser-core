@@ -679,7 +679,6 @@ INSTANTIATE_TEST_SUITE_P(
     ToolbarControllerOrderingOmniboxResizingPrioritizationUiTest,
     ::testing::Bool());
 
-// TODO(crbug.com/41495158): Flaky on Windows.
 #define MAYBE_StartBrowserWithThresholdWidth StartBrowserWithThresholdWidth
 IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
                        MAYBE_StartBrowserWithThresholdWidth) {
@@ -721,7 +720,6 @@ IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
   EXPECT_EQ(1, user_action_tester.GetActionCount(
                    "ResponsiveToolbar.OverflowButtonHidden"));
 }
-// TODO(crbug.com/41495158): Flaky on Windows.
 #if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_StartBrowserWithWidthSmallerThanThreshold \
   DISABLED_StartBrowserWithWidthSmallerThanThreshold
@@ -1169,7 +1167,6 @@ IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
                    ->is_animating());
 }
 
-// TODO(crbug.com/41495158): Flaky on Windows.
 #define MAYBE_DoNotShowIphWhenOverflowed DoNotShowIphWhenOverflowed
 IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
                        MAYBE_DoNotShowIphWhenOverflowed) {

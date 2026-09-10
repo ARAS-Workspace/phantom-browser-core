@@ -544,9 +544,6 @@ void PictureInPictureBrowserFrameView::AddedToWidget() {
   // light mode window.
   GetWidget()->SetColorModeOverride(ui::ColorProviderKey::ColorMode::kDark);
 
-// Fade in animation is disabled for Document and Video Picture-in-Picture on
-// Windows. On Windows, resizable windows can not be translucent. See
-// crbug.com/425711450.
   if (!fade_animator_) {
     fade_animator_ = std::make_unique<PictureInPictureWidgetFadeAnimator>();
   }

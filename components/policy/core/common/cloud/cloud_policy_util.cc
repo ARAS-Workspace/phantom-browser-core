@@ -196,8 +196,6 @@ std::unique_ptr<em::BrowserDeviceIdentifier> GetBrowserDeviceIdentifier() {
 }
 
 std::string GetDeviceFqdn() {
-  // Retrieves the FQDN of the computer for Windows and if this fails it reverts
-  // to the hostname as known to the net subsystem.
   // TODO(crbug.com/398257759): Perform DNS lookup to obtain the FQDN for
   // non-Windows platforms.
   return net::GetHostName();

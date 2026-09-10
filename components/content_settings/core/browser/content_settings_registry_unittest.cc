@@ -57,7 +57,7 @@ TEST_F(ContentSettingsRegistryTest, GetPlatformDependent) {
   EXPECT_FALSE(registry()->Get(ContentSettingsType::IMAGES));
 #endif
 
-// Protected media identifier only registered on Android, Chrome OS and Windows.
+// Protected media identifier only registered on Android and Chrome OS.
 #if defined(ANDROID) || BUILDFLAG(IS_CHROMEOS)
   EXPECT_TRUE(registry()->Get(ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER));
 #else

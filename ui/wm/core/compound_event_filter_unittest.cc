@@ -118,7 +118,7 @@ TEST_F(CompoundEventFilterTest, CursorVisibilityChange) {
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_CHROMEOS)
-// Touch visually hides the cursor on ChromeOS and Windows.
+// Touch visually hides the cursor on ChromeOS.
 TEST_F(CompoundEventFilterTest, TouchHidesCursor) {
   std::unique_ptr<CompoundEventFilter> compound_filter(new CompoundEventFilter);
   aura::Env::GetInstance()->AddPreTargetHandler(compound_filter.get());

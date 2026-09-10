@@ -365,9 +365,7 @@ class WebContentsViewAuraTest : public ContentBrowserTest {
   std::unique_ptr<RenderFrameSubmissionObserver> frame_observer_;
 };
 
-// Flaky on Windows: http://crbug.com/305722
-// The test frequently times out on Linux, too. See crbug.com/440043.
-// For Fuchsia, see https://crbug.com/1318245.
+// The test frequently times out on Linux. See crbug.com/440043.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_OverscrollNavigation DISABLED_OverscrollNavigation
 #else
@@ -378,10 +376,7 @@ IN_PROC_BROWSER_TEST_F(WebContentsViewAuraTest, MAYBE_OverscrollNavigation) {
   TestOverscrollNavigation(false);
 }
 
-// Flaky on Windows (might be related to the above test):
-// http://crbug.com/305722
 // On Linux, the test frequently times out. (See crbug.com/440043).
-// For Fuchsia, see https://crbug.com/1318245.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_OverscrollNavigationWithTouchHandler \
   DISABLED_OverscrollNavigationWithTouchHandler
@@ -494,9 +489,7 @@ IN_PROC_BROWSER_TEST_F(WebContentsViewAuraTest,
   EXPECT_NE(OVERSCROLL_NONE, overscroll_controller->overscroll_mode());
 }
 
-// Disabled because the test always fails the first time it runs on the Win Aura
-// bots, and usually but not always passes second-try (See crbug.com/179532).
-// Flaky on CrOS, Linux, and Fuchsia as well: https://crbug.com/856079
+// Flaky on CrOS and Linux: https://crbug.com/856079
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 #define MAYBE_QuickOverscrollDirectionChange \
   DISABLED_QuickOverscrollDirectionChange
@@ -805,11 +798,9 @@ IN_PROC_BROWSER_TEST_F(WebContentsViewAuraTest, ContentWindowClose) {
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // This appears to be flaky in the same was as the other overscroll
-// tests. Enabling for non-Windows platforms.
-// See http://crbug.com/369871.
+// tests. See http://crbug.com/369871.
 // For linux, see http://crbug.com/381294.
 // For ChromeOS, see http://crbug.com/668128.
-// For Fuchsia, see https://crbug.com/1318245.
 #define MAYBE_RepeatedQuickOverscrollGestures \
   DISABLED_RepeatedQuickOverscrollGestures
 #else

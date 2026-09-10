@@ -220,8 +220,6 @@ class PowerMetricsReporterWithoutBatteryLevelProviderUnitTest
 
 }  // namespace
 
-// Windows ARM64 does not support Constant Rate TSC so
-// PerformanceMonitor.AverageCPU10.* is not recorded there.
 TEST_F(PowerMetricsReporterUnitTest,
        UtilityProcessesWithSubtypeReportedInSuffixedHistogram) {
   base::HistogramTester tester;

@@ -666,7 +666,7 @@ TEST_F(ResourceBundleImageTest, GetImageNamed) {
   gfx::ImageSkia* image_skia = resource_bundle->GetImageSkiaNamed(3);
 
 #if BUILDFLAG(IS_CHROMEOS)
-  // ChromeOS/Windows load highest scale factor first.
+  // ChromeOS loads highest scale factor first.
   EXPECT_EQ(ui::k200Percent, GetSupportedResourceScaleFactor(
                                  image_skia->image_reps()[0].scale()));
 #else

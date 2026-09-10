@@ -866,7 +866,6 @@ TEST_F(FilePathWatcherTest, WatchDirectory) {
   delegate.RunUntilEventsMatch(event_expecter);
 }
 
-// TODO(crbug.com/40846416): Re-enable this test on Windows.
 #define MAYBE_MoveParent MoveParent
 TEST_F(FilePathWatcherTest, MAYBE_MoveParent) {
   FilePathWatcher file_watcher, subdir_watcher;

@@ -1992,7 +1992,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessInteractiveBrowserTest,
 // Check that window.focus works for cross-process popups.
 // Flaky on ChromeOS debug and ASAN builds. https://crbug.com/40840456
 // Flaky on Linux https://crbug.com/40847510.
-// Flaky on Win https://crbug.com/40848559.
 #if BUILDFLAG(IS_LINUX) || (BUILDFLAG(IS_CHROMEOS) && \
                             (!defined(NDEBUG) || defined(ADDRESS_SANITIZER)))
 #define MAYBE_PopupWindowFocus DISABLED_PopupWindowFocus

@@ -292,7 +292,6 @@ TEST_F(WebRtcRtpDumpWriterTest, WriteAndFlushSmallSizeDump) {
   VerifyDumps(1, 1);
 }
 
-// Flaky test disabled on Windows (https://crbug.com/40669633).
 #define MAYBE_WriteOverMaxLimit WriteOverMaxLimit
 TEST_F(WebRtcRtpDumpWriterTest, MAYBE_WriteOverMaxLimit) {
   // Reset the writer with a small max size limit.

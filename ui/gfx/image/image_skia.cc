@@ -534,8 +534,6 @@ const SkBitmap& ImageSkia::GetBitmap() const {
     return NullImageRep().GetBitmap();
   }
 
-  // TODO(oshima): This made a few tests flaky on Windows.
-  // Fix the root cause and re-enable this. crbug.com/145623.
   CHECK(CanRead());
 
   auto it = storage_->FindRepresentation(1.0f, true);

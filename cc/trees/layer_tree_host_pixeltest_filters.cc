@@ -115,7 +115,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, BackdropFilterBlurRect) {
       SkRect::MakeWH(blur->bounds().width(), blur->bounds().height())));
 
 #if defined(ARCH_CPU_ARM64)
-  // Windows and ARM64 have 436 pixels off by 1: crbug.com/259915
+  // ARM64 has 436 pixels off by 1: crbug.com/259915
   pixel_comparator_ = std::make_unique<FuzzyPixelComparator>(
       FuzzyPixelComparator()
           .DiscardAlpha()
@@ -182,7 +182,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_BackdropFilterBlurRadius) {
   blur->SetBackdropFilterBounds(backdrop_filter_bounds);
 
 #if defined(ARCH_CPU_ARM64)
-  // Windows and ARM64 have 436 pixels off by 1 or 2: crbug.com/259915
+  // ARM64 has 436 pixels off by 1 or 2: crbug.com/259915
   float percentage_pixels_error = 1.09f;  // 436px / (200*200)
   pixel_comparator_ = std::make_unique<FuzzyPixelComparator>(
       FuzzyPixelComparator()
@@ -276,7 +276,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, BackdropFilterBlurOutsets) {
 
 #if defined(_MIPS_ARCH_LOONGSON) || defined(ARCH_CPU_ARM64)
 #if defined(ARCH_CPU_ARM64)
-  // Windows has 5.9325% pixels by at most 2: crbug.com/259922
+  // ARM64 has 5.9325% pixels by at most 2: crbug.com/259922
   float percentage_pixels_error = 6.0f;
 #else
   // Loongson has 8.685% pixels by at most 2: crbug.com/819110
@@ -325,7 +325,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, BackdropFilterQuality_0_33) {
   pixel_comparator_ =
       std::make_unique<AlphaDiscardingFuzzyPixelOffByOneComparator>();
 #elif defined(ARCH_CPU_ARM64)
-  // Windows and ARM64 (non-iOS) have 436 pixels off by 1: crbug.com/259915
+  // ARM64 (non-iOS) has 436 pixels off by 1: crbug.com/259915
   pixel_comparator_ = std::make_unique<FuzzyPixelComparator>(
       FuzzyPixelComparator()
           .DiscardAlpha()
@@ -365,7 +365,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, BackdropFilterQuality_1_0) {
   pixel_comparator_ =
       std::make_unique<AlphaDiscardingFuzzyPixelOffByOneComparator>();
 #elif defined(ARCH_CPU_ARM64)
-  // Windows and ARM64 (non-iOS) have 436 pixels off by 1: crbug.com/259915
+  // ARM64 (non-iOS) has 436 pixels off by 1: crbug.com/259915
   pixel_comparator_ = std::make_unique<FuzzyPixelComparator>(
       FuzzyPixelComparator()
           .DiscardAlpha()

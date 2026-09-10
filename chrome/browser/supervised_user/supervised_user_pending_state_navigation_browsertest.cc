@@ -426,7 +426,6 @@ MATCHER(ContainsGoogleApiKey, "") {
 
 // Tests that when the user doesn't have a valid access token the request is
 // sent with an api key and not an access token (i.e an anonymous request).
-// TODO(https://crbug.com/385450025): Flaky on Win ASAN.
 #define MAYBE_TestPendingStateRequestHasGoogleApiInHeader \
   TestPendingStateRequestHasGoogleApiInHeader
 IN_PROC_BROWSER_TEST_F(SupervisedUserPendingStateNavigationTest,

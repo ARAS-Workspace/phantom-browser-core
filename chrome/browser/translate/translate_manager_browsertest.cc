@@ -479,7 +479,6 @@ IN_PROC_BROWSER_TEST_F(TranslateManagerBrowserTest,
 }
 
 // Test that the translation was successful.
-// TODO(crbug.com/518688037): Flaky on Windows.
 #define MAYBE_PageTranslationSuccess PageTranslationSuccess
 IN_PROC_BROWSER_TEST_F(TranslateManagerBrowserTest,
                        MAYBE_PageTranslationSuccess) {
@@ -1109,7 +1108,6 @@ IN_PROC_BROWSER_TEST_F(TranslateManagerBrowserTest,
             chrome_translate_client->GetLanguageState().source_language());
 }
 
-// TODO(crbug.com/518213587): Flaky on Windows
 #define MAYBE_TranslateSessionRestore TranslateSessionRestore
 IN_PROC_BROWSER_TEST_F(TranslateManagerBrowserTest,
                        MAYBE_TranslateSessionRestore) {

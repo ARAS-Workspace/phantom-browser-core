@@ -615,8 +615,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessPrintToPdfSvgEllipseWithStyleCommandBrowserTest,
 
 #endif  // BUILDFLAG(ENABLE_PRINTING) && BUILDFLAG(ENABLE_PDF)
 
-// Graceful signal handling is currently available only on Linux, Mac and
-// Windows.
+// Graceful signal handling is currently available only on Linux and Mac.
 #if BUILDFLAG(IS_POSIX)
 
 class HeadlessCommandSignalBrowserTest

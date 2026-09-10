@@ -32,7 +32,6 @@
 namespace {
 
 // TODO(crbug.com/414590951): Tab DnD tests not working on Mac.
-// TODO(crbug.com/500937645): Re-enable the test on Windows.
 #if !BUILDFLAG(IS_MAC)
 
 DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kNewTab);

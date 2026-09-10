@@ -1014,7 +1014,7 @@ TEST_F(DesktopMediaPickerViewsSystemAudioTest,
 // each type of pane (Tab, Window, Screen) when application audio capture is
 // available/unavailable. Also checks that the checkbox string is correct for
 // each type of pane. Application audio capture is currently only supported on
-// Windows and macOS.
+// macOS.
 class DesktopMediaPickerViewsApplicationAudioTest
     : public DesktopMediaPickerViewsTestBase,
       public testing::WithParamInterface<

@@ -424,8 +424,6 @@ IN_PROC_BROWSER_TEST_F(PolicyTest, DeveloperToolsDisabledExtensionsDevMode) {
 // blocked or allowed for different pages depending on the
 // DeveloperToolsAvailability policy setting. Note: javascript URLs are always
 // blocked on extension schemes, regardless of the policy setting.
-// TODO(crbug.com/40064953): The loading of a force installed extension in this
-// test runs into an issue on branded Windows builders.
 #define MAYBE_DebugURLsDisabledByDeveloperToolsAvailability \
   DebugURLsDisabledByDeveloperToolsAvailability
 IN_PROC_BROWSER_TEST_F(PolicyTest,

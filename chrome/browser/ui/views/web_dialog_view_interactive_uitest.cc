@@ -133,8 +133,6 @@ void WebDialogBrowserTest::SimulateEscapeKey() {
   }
 }
 
-// Windows has some issues resizing windows. An off by one problem, and a
-// minimum size that seems too big. See http://crbug.com/41198181.
 #define MAYBE_SizeWindow SizeWindow
 IN_PROC_BROWSER_TEST_F(WebDialogBrowserTest, MAYBE_SizeWindow) {
 #if BUILDFLAG(IS_MAC)

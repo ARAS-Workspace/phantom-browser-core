@@ -233,7 +233,7 @@ TEST_F(MenuRunnerTest, MAYBE_LatinMnemonic) {
 }
 
 // Tests that a key press on a non-US keyboard layout activates the correct menu
-// item. Disabled on Windows because a WM_CHAR event does not activate an item.
+// item.
 TEST_F(MenuRunnerTest, NonLatinMnemonic) {
   if (!MenuSupportsMnemonics()) {
     return;

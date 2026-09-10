@@ -227,8 +227,6 @@ ThreadIsolatedAllocator* V8Platform::GetThreadIsolatedAllocator() {
 #endif  // PA_BUILDFLAG(ENABLE_THREAD_ISOLATION)
 
 void V8Platform::OnCriticalMemoryPressure() {
-// We only have a reservation on 32-bit Windows systems.
-// TODO(bbudge) Make the #if's in BlinkInitializer match.
 }
 
 size_t V8Platform::GetZeroSegmentSize() {

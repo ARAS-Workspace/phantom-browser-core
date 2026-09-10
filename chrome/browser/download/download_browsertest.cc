@@ -3973,7 +3973,6 @@ IN_PROC_BROWSER_TEST_F(DownloadTest, DownloadTest_Renaming) {
 }
 
 // Test that the entire download pipeline handles unicode correctly.
-// Disabled on Windows due to flaky timeouts: crbug.com/41150886
 #define MAYBE_DownloadTest_CrazyFilenames DownloadTest_CrazyFilenames
 IN_PROC_BROWSER_TEST_F(DownloadTest, MAYBE_DownloadTest_CrazyFilenames) {
   constexpr static const auto kCrazyFilenames = std::to_array<const wchar_t*>({

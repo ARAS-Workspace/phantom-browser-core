@@ -1682,7 +1682,6 @@ void ExpectCleanProcesses() {
   }
 }
 
-// Standalone installers are supported for Windows only.
 void RunOfflineInstall(UpdaterScope scope,
                        bool is_legacy_install,
                        bool is_silent_install,

@@ -32,9 +32,6 @@ class AudioLatencyTest : public testing::TestWithParam<AudioLatencyTestData> {
     const int platform_min_buffer_size =
         min_buffer_size ? min_buffer_size : hardware_buffer_size;
 
-// Windows 10 may allow exactly the minimum buffer size using the IAudioClient3
-// API but any other buffer size must be a multiple of the hardware_buffer_size
-// and not the min_buffer_size.
     const int multiplier = platform_min_buffer_size;
 
     const int platform_max_buffer_size =

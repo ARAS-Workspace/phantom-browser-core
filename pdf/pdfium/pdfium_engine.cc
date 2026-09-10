@@ -271,7 +271,6 @@ FS_MATRIX CalculateTextObjectOriginTransform(
 }
 #endif  // BUILDFLAG(ENABLE_PDF_INK2)
 
-// Windows has native panning capabilities. No need to use our own.
 constexpr bool kViewerImplementedPanning = true;
 
 constexpr int32_t kLoadingTextVerticalOffset = 50;

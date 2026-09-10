@@ -2183,9 +2183,6 @@ bool SkiaOutputSurfaceImplOnGpu::InitializeForDawn() {
 }
 
 bool SkiaOutputSurfaceImplOnGpu::MakeCurrent(bool need_framebuffer) {
-  // Windows still uses gl_surface for DComp presentation. Once that's switched
-  // over to presenter, these DCHECKs will be actual on all platforms and code
-  // can be simplified.
   if (gl_surface_) {
     DCHECK(context_state_->GrContextIsGL());
     DCHECK(!gl_surface_->IsSurfaceless() || gl_surface_->IsOffscreen());

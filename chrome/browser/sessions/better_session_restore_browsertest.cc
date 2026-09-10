@@ -726,7 +726,6 @@ IN_PROC_BROWSER_TEST_F(RestartTest, Post) {
   CheckFormRestored(true, false);
 }
 
-// TODO(crbug.com/509692227): Re-enable this test on Windows.
 #define MAYBE_Restart_PostWithPassword PostWithPassword
 #define MAYBE_Restart_PRE_PostWithPassword PRE_PostWithPassword
 
