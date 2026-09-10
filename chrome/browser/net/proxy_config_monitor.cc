@@ -37,9 +37,6 @@ ProxyConfigMonitor::ProxyConfigMonitor(Profile* profile) {
   profile_ = profile;
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-// If this is the ChromeOS sign-in or lock screen profile, just create the
-// tracker from global state.
-
   if (!pref_proxy_config_tracker_) {
     enterprise_net::EnterpriseProxyService* enterprise_proxy_service = nullptr;
 #if BUILDFLAG(ENTERPRISE_PROXY)

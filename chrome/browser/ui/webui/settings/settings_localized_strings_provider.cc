@@ -1073,7 +1073,7 @@ void AddAutofillStrings(content::WebUIDataSource* html_source,
   bool is_mandatory_reauth_feature_flag_enabled = false;
 
 #if BUILDFLAG(IS_MAC)
-  // The feature is already launched on Mac and ChromeOS.
+  // The feature is already launched on Mac.
   is_mandatory_reauth_feature_flag_enabled = true;
 #endif
   html_source->AddBoolean("mandatoryReauthFeatureFlagEnabled",

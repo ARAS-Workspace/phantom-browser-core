@@ -50,10 +50,6 @@ IN_PROC_BROWSER_TEST_F(RegularUserUrlFilteringServiceCommonBrowserTest,
           ->GetWebFilterType());
 }
 
-// TODO(crbug.com/468935875) - Re-enable on ChromeOS with user type support.
-// Tests in ChromeOS require proper user account, which is not available at
-// the time for these tests.
-
 // A suite for supervised users configured by Family Link (most of the time
 // should assert that features are initially enabled, unless users transition to
 // regular state).

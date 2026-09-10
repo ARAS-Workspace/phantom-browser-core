@@ -126,7 +126,6 @@ TEST_F(PerformanceLogSourceTest, CheckMemorySaverModeLogs) {
   EXPECT_EQ("false", response->at(kMemorySaverModeActiveKey));
 }
 
-// Battery and battery saver logs are not used on ChromeOS.
 TEST_F(PerformanceLogSourceTest, CheckBatterySaverModeLogs) {
   SetBatterySaverModeEnabled(true);
   auto response = GetPerformanceLogs();

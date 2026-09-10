@@ -2177,9 +2177,6 @@ TEST_F(AccountReconcilorTest, AuthErrorTriggersListAccount) {
   identity_test_env()->identity_manager()->RemoveObserver(&observer);
 }
 
-// This test does not run on ChromeOS because it clears the primary account,
-// which is not a flow that exists on ChromeOS.
-
 TEST_F(AccountReconcilorMirrorTest, SignoutAfterErrorDoesNotRecordUma) {
   AccountInfo account_info = ConnectProfileToAccount(kFakeEmail);
   const CoreAccountId account_id = account_info.account_id;

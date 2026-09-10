@@ -147,8 +147,7 @@ void ExpectDwaAllowedForAllProfiles(TestUkmConsentStateObserver& observer,
                                     bool expected_allowed) {
   // App sync is turned off by default in CHROMEOS. This results in DWA not
   // being allowed for that particular test setup, however can be enabled for
-  // other platforms.
-  // DWA and ChromeOS are tested further below.
+  // other platforms. DWA are tested further below.
   EXPECT_EQ(expected_allowed, observer.IsDwaAllowedForAllProfiles());
 }
 

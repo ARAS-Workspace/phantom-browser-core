@@ -455,7 +455,6 @@ bool ProfileOAuth2TokenService::HasLoadCredentialsFinishedWithNoErrors() {
 }
 
 void ProfileOAuth2TokenService::RecreateDeviceIdIfNeeded() {
-// On ChromeOS the device ID is not managed by the token service.
   if (AreAllCredentialsLoaded() && HasLoadCredentialsFinishedWithNoErrors() &&
       GetAccounts().empty()) {
     signin::RecreateSigninScopedDeviceId(user_prefs_);

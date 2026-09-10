@@ -584,9 +584,7 @@ INSTANTIATE_TEST_SUITE_P(
 // compositing, whether the WebContents is visible/hidden or occluded/unoccluded
 // and whether the main document contains a cross-site iframe.
 // TODO(crbug.com/40947039): Fails with MSAN. Determine if enabling the test for
-// MSAN is feasible or not
-// TODO(crbug.com/328419809): Also flaky on Mac.
-// TODO(crbug.com/329654821): Also flaky for ChromeOS ASAN LSAN and debug.
+// MSAN is feasible or not TODO(crbug.com/328419809): Also flaky on Mac.
 // TODO(crbug.com/540031290): Also flaky on Win ASAN.
 #if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_CapturesContentChanges DISABLED_CapturesContentChanges

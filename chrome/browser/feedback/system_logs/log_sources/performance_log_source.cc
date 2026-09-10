@@ -72,7 +72,6 @@ void PerformanceLogSource::PopulatePerformanceSettingLogs(
   response->emplace("high_efficiency_mode_active",
                     BoolToString(tuning_manager_->IsMemorySaverModeActive()));
 
-  // Battery and battery saver logs are not used on ChromeOS.
   PrefService* local_prefs = g_browser_process->local_state();
   int battery_saver_state = local_prefs->GetInteger(kBatterySaverModeState);
   bool is_battery_saver_active =

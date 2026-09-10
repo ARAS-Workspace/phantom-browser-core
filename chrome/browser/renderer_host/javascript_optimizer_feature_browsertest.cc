@@ -1082,7 +1082,7 @@ IN_PROC_BROWSER_TEST_F(
                    ->AreV8OptimizationsDisabled());
 }
 
-// TODO(crbug.com/461777786): Flaky on Linux and CrOS.
+// TODO(crbug.com/461777786): Flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_ExpectOptimizationsEnabledInSpareRenderer \
   DISABLED_ExpectOptimizationsEnabledInSpareRenderer

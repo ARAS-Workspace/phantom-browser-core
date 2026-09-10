@@ -5345,7 +5345,6 @@ IN_PROC_BROWSER_TEST_F(LensOverlayControllerBrowserTest,
   ASSERT_FALSE(FeedbackDialog::GetInstanceForTest());
   coordinator->RequestSendFeedback();
 
-// ChromeOS opens its own feedback dialog.
   // Wait for the feedback dialog to appear instead of a new tab.
   ASSERT_TRUE(base::test::RunUntil(
       []() { return FeedbackDialog::GetInstanceForTest() != nullptr; }));

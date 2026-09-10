@@ -741,8 +741,6 @@ class PrefHashBrowserTestChangedAtomic : public PrefHashBrowserTestBase {
                   user_prefs::tracked::kTrackedPrefHistogramReset,
                   BEGIN_ALLOW_SINGLE_BUCKET + 4));
 
-// TODO(gab): This doesn't work on OS_CHROMEOS because we fail to attack
-// Preferences.
     // Explicitly verify the result of reported resets.
     EXPECT_EQ(
         protection_level_ >= PROTECTION_ENABLED_BASIC ? 0U : 2U,
@@ -1127,7 +1125,6 @@ class PrefHashBrowserTestDefaultSearch : public PrefHashBrowserTestBase {
         template_url_service->GetDefaultSearchProvider();
 
     if (protection_level_ < PROTECTION_ENABLED_DSE) {
-// This doesn't work on OS_CHROMEOS because we fail to attack Preferences.
       // Attack is successful.
       EXPECT_EQ(DefaultSearchManager::FROM_USER, dse_source);
       EXPECT_EQ(current_dse->keyword(), u"badkeyword");
@@ -1264,8 +1261,6 @@ class PrefHashBrowserTestAccountValueUntrustedAddition
                   user_prefs::tracked::kTrackedPrefHistogramReset,
                   BEGIN_ALLOW_SINGLE_BUCKET + 0));
 
-// TODO(gab): This doesn't work on OS_CHROMEOS because we fail to attack
-// Preferences.
     // Explicitly verify the result of reported resets.
     EXPECT_EQ(protection_level_ < PROTECTION_ENABLED_BASIC,
               profile()->GetPrefs()->GetBoolean(prefs::kShowHomeButton));

@@ -16,7 +16,6 @@
 
 namespace policy {
 
-// HasMachineLevelPolicies() is not implemented on ChromeOS.
 TEST(ChromeBrowserPolicyConnectorTest, HasMachineLevelPolicies) {
   base::test::TaskEnvironment env;
   MockConfigurationPolicyProvider provider;

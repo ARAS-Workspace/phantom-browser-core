@@ -237,8 +237,6 @@ IN_PROC_BROWSER_TEST_F(GlicBackgroundModeManagerUiTest, HotkeyPressed) {
                                      1);
 }
 
-// In ChromeOS, we do not expect removing a user Profile during the user
-// session.
 IN_PROC_BROWSER_TEST_F(GlicBackgroundModeManagerUiTest, DeleteEligibleProfile) {
   // TODO(crbug.com/527717763): Re-enable this test
   if (!base::FeatureList::IsEnabled(features::kInitialWebUI)) {

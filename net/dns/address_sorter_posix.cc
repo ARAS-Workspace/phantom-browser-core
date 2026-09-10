@@ -500,7 +500,6 @@ void AddressSorterPosix::OnIPAddressChanged(
   DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
   source_map_.clear();
 #if BUILDFLAG(IS_LINUX)
-  // TODO(crbug.com/40263501): This always returns nullptr on ChromeOS.
   const AddressMapOwnerLinux* address_map_owner =
       NetworkChangeNotifier::GetAddressMapOwner();
   if (!address_map_owner) {

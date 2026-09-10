@@ -143,7 +143,6 @@ IN_PROC_BROWSER_TEST_F(TabStripModelPreventCloseTest,
   }
 }
 
-// TODO(b/321593065): enable this flaky test.
 #define MAYBE_PreventCloseEnforcedByPolicyTabbedAppShallBeClosable \
   PreventCloseEnforcedByPolicyTabbedAppShallBeClosable
 IN_PROC_BROWSER_TEST_F(

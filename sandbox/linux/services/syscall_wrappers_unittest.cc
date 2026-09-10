@@ -261,9 +261,6 @@ TEST(SyscallWrappers, LStat) {
   // lstat should produce information about a symlink.
   ASSERT_TRUE(S_ISLNK(lstat_info.st_mode));
 
-// /tmp is mounted with nosymfollow on ChromeOS so calling
-// sys_stat leads to an error.
-
   struct kernel_stat stat_info;
   rc = sys_stat(symlink_name.c_str(), &stat_info);
   if (rc < 0 && errno == EOVERFLOW) {

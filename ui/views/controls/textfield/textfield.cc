@@ -2580,7 +2580,7 @@ ui::TextEditCommand Textfield::GetCommandForKeyEvent(
         return ui::TextEditCommand::DELETE_BACKWARD;
       }
 #if BUILDFLAG(IS_LINUX)
-      // Only erase by line break on Linux and ChromeOS.
+      // Only erase by line break on Linux.
       if (shift) {
         return ui::TextEditCommand::DELETE_TO_BEGINNING_OF_LINE;
       }
@@ -2588,7 +2588,7 @@ ui::TextEditCommand Textfield::GetCommandForKeyEvent(
       return ui::TextEditCommand::DELETE_WORD_BACKWARD;
     case ui::VKEY_DELETE:
 #if BUILDFLAG(IS_LINUX)
-      // Only erase by line break on Linux and ChromeOS.
+      // Only erase by line break on Linux.
       if (shift && control) {
         return ui::TextEditCommand::DELETE_TO_END_OF_LINE;
       }

@@ -33,8 +33,6 @@ const std::vector<GURL>& GetUrlAllowList() {
        GURL(chrome::kChromeUINativeNewTabURL),
 #endif
 #if !BUILDFLAG(IS_ANDROID)
-       // NEEDS_ANDROID_IMPL: what's new page
-       // "What's New" does not exist in the form of a tab on ChromeOS.
        GURL(chrome::kChromeUIWhatsNewURL)
 #endif
       }};

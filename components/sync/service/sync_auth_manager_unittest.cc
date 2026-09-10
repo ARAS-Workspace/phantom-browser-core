@@ -103,13 +103,11 @@ TEST_P(SyncAuthManagerTest, IgnoresEventsIfNotRegistered) {
   EXPECT_TRUE(
       auth_manager->GetActiveAccountInfo().account_info.account_id.empty());
 
-// ChromeOS doesn't support sign-out.
   identity_env()->ClearPrimaryAccount();
   EXPECT_TRUE(
       auth_manager->GetActiveAccountInfo().account_info.account_id.empty());
 }
 
-// ChromeOS doesn't support sign-out.
 TEST_P(SyncAuthManagerTest, ForwardsPrimaryAccountEvents) {
   // Start out already signed in before the SyncAuthManager is created.
   CoreAccountId account_id =
@@ -219,7 +217,6 @@ TEST_P(SyncAuthManagerTest, ForwardsUnconsentedAccountEvents) {
 }
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 
-// ChromeOS doesn't support sign-out.
 TEST_P(SyncAuthManagerTest, ClearsAuthErrorOnSignoutWithRefreshTokenRemoval) {
   // Start out already signed in before the SyncAuthManager is created.
   CoreAccountId account_id =
@@ -917,8 +914,6 @@ TEST_P(SyncAuthManagerTest, PrimaryAccountWithNoSyncConsent) {
 
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 // Primary account with no sync consent is not supported on Android and iOS.
-// On CrOS the unconsented primary account can't be changed or removed, but can
-// be granted sync consent.
 TEST_P(SyncAuthManagerTest, PicksNewPrimaryAccountWithSyncConsent) {
   std::unique_ptr<SyncAuthManager> auth_manager = CreateAuthManager();
   auth_manager->RegisterForAuthNotifications();

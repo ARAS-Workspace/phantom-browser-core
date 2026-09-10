@@ -363,8 +363,8 @@ TEST_F(WebAppIconGeneratorTest, GenerateIcons) {
     EXPECT_EQ(bg_color, bitmap.getColor(center_x, border_radius * 2));
 
     // Only for large icons with a sharp letter: Peek a pixel at the center of
-    // icon. This is tested on Linux and ChromeOS only because different OSes
-    // use different text shaping engines.
+    // icon. This is tested on Linux only because different OSes use different
+    // text shaping engines.
 #if BUILDFLAG(IS_LINUX)
     const SkColor letter_color = color_utils::GetColorWithMaxContrast(bg_color);
     if (size >= icon_size::k256) {

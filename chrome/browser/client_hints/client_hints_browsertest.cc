@@ -4821,8 +4821,6 @@ IN_PROC_BROWSER_TEST_F(ThirdPartyUaReductionBrowserTest,
   EXPECT_EQ(GetLastRequestedURL()->GetPath(), "/style.css");
 }
 
-// CrOS multi-profiles implementation is too different for these tests.
-
 void ClientHintsBrowserTest::TestSwitchWithNewProfile(
     const std::string& switch_value,
     size_t origins_stored) {

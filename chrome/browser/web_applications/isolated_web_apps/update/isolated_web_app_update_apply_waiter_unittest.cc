@@ -102,7 +102,5 @@ TEST_F(IsolatedWebAppUpdateApplyWaiterTest,
   auto [keep_alive, profile_keep_alive] = future.Take();
 }
 
-// Other platforms do not have a `WebAppProvider` in guest sessions.
-
 }  // namespace
 }  // namespace web_app

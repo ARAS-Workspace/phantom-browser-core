@@ -176,8 +176,6 @@
 #endif  // BUILDFLAG(IS_ANDROID)
 
 void RegisterChromeWebUIConfigs() {
-  // Don't add calls to `AddWebUIConfig()` for Ash-specific WebUIs here. Add
-  // them in chrome_web_ui_configs_chromeos.cc.
 
   auto& map = content::WebUIConfigMap::GetInstance();
   map.AddWebUIConfig(std::make_unique<AccessibilityUIConfig>());

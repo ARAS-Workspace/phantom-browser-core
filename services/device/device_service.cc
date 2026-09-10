@@ -109,10 +109,6 @@ DeviceService::DeviceService(
 
 DeviceService::~DeviceService() {
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS_TVOS)
-  // NOTE: We don't call this on Chrome OS due to https://crbug.com/856771, as
-  // Shutdown() implicitly depends on DBusThreadManager, which may already be
-  // destroyed by the time DeviceService is destroyed. Fortunately on Chrome OS
-  // it's not really important that this runs anyway.
   device::BatteryStatusService::GetInstance()->Shutdown();
 #endif
 }

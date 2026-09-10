@@ -835,8 +835,6 @@ class SelectionOverlayHotkeyInteractiveTest
 
   // Only call this on the browser UI thread.
   static bool IsHotkeySupported() {
-    // ChromeOS uses ash's accelerator controller rather than global accelerator
-    // listener.
     auto* const global_shortcut_listener =
         ui::GlobalAcceleratorListener::GetInstance();
     return global_shortcut_listener != nullptr &&

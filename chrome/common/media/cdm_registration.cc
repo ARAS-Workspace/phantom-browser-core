@@ -162,7 +162,7 @@ void AddSoftwareSecureWidevine(std::vector<content::CdmInfo>* cdms) {
       kWidevineCdmType, base::FilePath());
 
 #elif BUILDFLAG(IS_LINUX)
-  // The Widevine CDM on Linux/ChromeOS needs to be registered (and loaded)
+  // The Widevine CDM on Linux needs to be registered (and loaded)
   // before the zygote is locked down. The CDM can be found from the version
   // bundled with Chrome (if BUNDLE_WIDEVINE_CDM = true) and/or the version
   // selected by Component Update (if ENABLE_WIDEVINE_CDM_COMPONENT = true).

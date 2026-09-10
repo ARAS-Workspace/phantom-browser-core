@@ -153,7 +153,6 @@ IN_PROC_BROWSER_TEST_F(ChromeMainTest, SecondLaunchFromIncognitoWithNormalUrl) {
   ASSERT_EQ(1u, GetTabbedBrowserCount(profile));
 }
 
-// Multi-profile is not supported on ChromeOS.
 IN_PROC_BROWSER_TEST_F(ChromeMainTest, SecondLaunchWithProfileDir) {
   const base::FilePath kProfileDir(FILE_PATH_LITERAL("Other"));
   Profile* other_profile = CreateProfile(kProfileDir);

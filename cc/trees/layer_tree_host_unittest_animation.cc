@@ -1108,7 +1108,7 @@ class LayerTreeHostPresentationDuringAnimation
   uint32_t received_token_ = 0;
 };
 
-// Disabled on ChromeOS due to test flakiness. See https://crbug.com/1246422
+// See https://crbug.com/1246422
 MULTI_THREAD_TEST_F(LayerTreeHostPresentationDuringAnimation);
 
 // Verifies that when the main thread removes a scroll animation and sets a new
@@ -1639,7 +1639,7 @@ class LayerTreeHostAnimationTestRemoveKeyframeModel
   bool animation_stopped_;
 };
 
-// Disabled on ChromeOS due to test flakiness. See https://crbug.com/1246422
+// See https://crbug.com/1246422
 SINGLE_THREAD_TEST_F(LayerTreeHostAnimationTestRemoveKeyframeModel);
 
 MULTI_THREAD_TEST_F(LayerTreeHostAnimationTestRemoveKeyframeModel);

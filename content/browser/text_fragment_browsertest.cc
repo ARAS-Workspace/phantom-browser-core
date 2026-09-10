@@ -313,7 +313,6 @@ IN_PROC_BROWSER_TEST_F(TextFragmentAnchorBrowserTest,
   EXPECT_DID_SCROLL(false);
 }
 
-// crbug.com/1470712: Flaky on CrOS Debug
 #define MAYBE_SameDocumentBrowserNavigation SameDocumentBrowserNavigation
 // Ensure a same-document navigation from browser UI scrolls to the text
 // fragment.
@@ -349,7 +348,6 @@ IN_PROC_BROWSER_TEST_F(TextFragmentAnchorBrowserTest,
   EXPECT_DID_SCROLL(true);
 }
 
-// crbug.com/1470712: Flaky on CrOS Debug
 #define MAYBE_SameDocumentBrowserNavigationOnScriptNavigatedDocument \
   SameDocumentBrowserNavigationOnScriptNavigatedDocument
 IN_PROC_BROWSER_TEST_F(

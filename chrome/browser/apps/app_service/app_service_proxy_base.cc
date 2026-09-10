@@ -188,7 +188,6 @@ Publisher* AppServiceProxyBase::GetPublisher(AppType app_type) {
   return it == publishers_.end() ? nullptr : it->second;
 }
 
-// In ChromeOS, this is defined in AppServiceProxyAsh.
 bool AppServiceProxyBase::MaybeShowLaunchPreventionDialog(
     const apps::AppUpdate& update) {
   return false;

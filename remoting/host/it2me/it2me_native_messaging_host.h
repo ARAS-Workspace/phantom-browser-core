@@ -119,8 +119,6 @@ class It2MeNativeMessagingHost : public It2MeHost::Observer,
   PassthroughOAuthTokenGetter signaling_token_getter_;
   PassthroughOAuthTokenGetter api_token_getter_;
 
-  // Don't install a log message handler on ChromeOS because we run in the
-  // browser process and don't want to intercept all its log messages.
   std::unique_ptr<LogMessageHandler> log_message_handler_;
 
   // Cached, read-only copies of |it2me_host_| session state.

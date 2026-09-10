@@ -681,7 +681,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
         IsOpenAllowed(download_dir.AppendASCII("foo"), HandleType::kDirectory));
   }
 
-  // The profile directory is the home directory on ChromeOS.
   // The profile directory, its children, and its direct parent should all be
   // blocked. Note that this may not match USER_DATA_DIR if the --user-data-dir
   // override is used.
@@ -4167,7 +4166,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
 
 #endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 
-// ChromeOS doesn't use the same method for setting the home path override.
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
        ConfirmSensitiveEntryAccess_NonAbsolutePath) {
   base::FilePath home_dir(FILE_PATH_LITERAL("./"));

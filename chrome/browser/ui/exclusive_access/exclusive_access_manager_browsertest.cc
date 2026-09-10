@@ -153,8 +153,6 @@ IN_PROC_BROWSER_TEST_F(ExclusiveAccessManagerPressAndHoldEscTest,
   EXPECT_FALSE(IsEscKeyHoldTimerRunning());
 }
 
-// Disable the test on ChromeOS because the Exclusive Access Bubble isn't shown
-// for browser fullscreen.
 #define MAYBE_ShowExclusiveAccessBubble ShowExclusiveAccessBubble
 IN_PROC_BROWSER_TEST_F(ExclusiveAccessManagerPressAndHoldEscTest,
                        MAYBE_ShowExclusiveAccessBubble) {

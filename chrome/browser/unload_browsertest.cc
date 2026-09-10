@@ -535,9 +535,6 @@ IN_PROC_BROWSER_TEST_F(UnloadTest,
   ManuallyCloseWindow();
 }
 
-// Tests terminating the browser with a beforeunload handler.
-// Currently only ChromeOS shuts down gracefully.
-
 // Tests closing the browser and clicking OK in the beforeunload confirm dialog
 // if an inner frame has the focus.
 // If this flakes, use http://crbug.com/40343878 and http://crbug.com/41156488

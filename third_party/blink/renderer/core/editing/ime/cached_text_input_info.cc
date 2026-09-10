@@ -215,7 +215,6 @@ PlainTextRange CachedTextInputInfo::GetPlainTextRange(
       range.IsCollapsed()
           ? start_offset
           : RangeLength(EphemeralRange(container_start, range.EndPosition()));
-// TODO(crbug.com/1256635): This DCHECK is triggered by Crostini on CrOS.
   DCHECK_EQ(
       static_cast<wtf_size_t>(TextIterator::RangeLength(
           EphemeralRange(container_start, range.EndPosition()), Behavior())),
@@ -257,8 +256,6 @@ wtf_size_t CachedTextInputInfo::RangeLength(const EphemeralRange& range) const {
           TextIterator::RangeLength(
               EphemeralRange(Position(node, 0), range.EndPosition()),
               Behavior());
-// TODO(crbug.com/1256635): Revert https://crrev.com/c/3221041 to re-enable this
-// DCHECK on CrOS.
       DCHECK_EQ(TextIterator::RangeLength(range, Behavior()), length)
           << it->value << " " << range;
       return length;

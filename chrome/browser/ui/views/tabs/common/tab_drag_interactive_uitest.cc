@@ -390,7 +390,6 @@ IN_PROC_BROWSER_TEST_F(VerticalTabDragTest, DragWithinUnpinnedContainer) {
 }
 
 // This test uses an experimental API to replace mouse events with touch events.
-// It is currently only supported on Ash Chrome.
 #define MAYBE_DragWithinUnpinnedContainerTouch \
   DISABLED_DragWithinUnpinnedContainerTouch
 IN_PROC_BROWSER_TEST_F(VerticalTabDragTest,
@@ -567,7 +566,6 @@ IN_PROC_BROWSER_TEST_F(VerticalTabDragTest, DragOverSplitInGroup) {
       ReleaseMouse());
 }
 
-// TODO(crbug.com/40249472): Fails on ChromeOS.
 #define MAYBE_DragMultipleTabs DragMultipleTabs
 IN_PROC_BROWSER_TEST_F(VerticalTabDragTest, MAYBE_DragMultipleTabs) {
   TabStripModel* tab_strip_model = browser()->GetTabStripModel();
@@ -592,7 +590,6 @@ IN_PROC_BROWSER_TEST_F(VerticalTabDragTest, MAYBE_DragMultipleTabs) {
       ReleaseMouse());
 }
 
-// TODO(crbug.com/40249472): Fails on ChromeOS.
 #define MAYBE_DragMultipleTabsInGroup DragMultipleTabsInGroup
 IN_PROC_BROWSER_TEST_F(VerticalTabDragTest, MAYBE_DragMultipleTabsInGroup) {
   DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kFourthTab);
@@ -718,7 +715,6 @@ IN_PROC_BROWSER_TEST_F(VerticalTabDragTest, DragOutOfGroup) {
       }));
 }
 
-// TODO(crbug.com/40249472): Fails on ChromeOS.
 #define MAYBE_DragMultiplePinnedTabsWithinContainer \
   DragMultiplePinnedTabsWithinContainer
 IN_PROC_BROWSER_TEST_F(VerticalTabDragTest,

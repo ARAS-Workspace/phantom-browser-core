@@ -115,9 +115,6 @@ constexpr const char* kDisallowedFeatures[] = {
     "action_handlers",
     "file_system_provider_capabilities",
 
-// Unlike the keys above, chromeos_system_extension *is* only defined on
-// ChromeOS.
-
     // The following features have no declared constant, but are present in
     // the manifest_features file (they may be used only in a single other file,
     // and thus not exposed in a .h).

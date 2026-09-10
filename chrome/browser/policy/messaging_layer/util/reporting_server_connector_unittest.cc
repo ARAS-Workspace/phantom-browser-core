@@ -181,8 +181,4 @@ TEST_F(ReportingServerConnectorTest,
   EXPECT_TRUE(response_event.result().has_value());
 }
 
-// This test verifies that we can upload from an unmanaged device when the
-// proper features are enabled.
-// TODO(b/281905099): remove feature dependencies after roll out.
-
 }  // namespace reporting

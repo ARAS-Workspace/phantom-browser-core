@@ -106,8 +106,6 @@ IN_PROC_BROWSER_TEST_P(TwoClientPasswordsSyncTest, E2E_ENABLED(Add)) {
   ASSERT_EQ(1, GetPasswordCount(1, GetPasswordStoreType()));
 }
 
-// TwoClientPasswordsSyncTest.AddInTransportMode is disabled on CrOS as the
-// signed in, non-syncing state does not exist
 IN_PROC_BROWSER_TEST_P(TwoClientPasswordsSyncTest,
                        E2E_ENABLED(AddInTransportMode)) {
   if (GetSetupSyncMode() != SetupSyncMode::kSyncTransportOnly) {

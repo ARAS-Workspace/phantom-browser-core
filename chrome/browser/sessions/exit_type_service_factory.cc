@@ -43,7 +43,6 @@ std::unique_ptr<KeyedService>
 ExitTypeServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
   Profile* profile = Profile::FromBrowserContext(context);
-  // TODO(sky): is this necessary?
   return std::make_unique<ExitTypeService>(profile);
 }
 

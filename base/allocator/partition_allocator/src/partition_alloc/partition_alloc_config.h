@@ -108,7 +108,7 @@ static_assert(sizeof(void*) == 8);
 //   allocator.
 // - Component builds triggered a clang bug: crbug.com/1243375
 //
-// On GNU/Linux and ChromeOS:
+// On GNU/Linux:
 // - `thread_local` allocates, reentering the allocator.
 //
 // Regardless, the "normal" TLS access is fast on x86_64 (see partition_tls.h),

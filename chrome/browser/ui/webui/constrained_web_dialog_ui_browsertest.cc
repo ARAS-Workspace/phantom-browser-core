@@ -189,10 +189,8 @@ INSTANTIATE_TEST_SUITE_P(
                         : "AutoSizeUsesScrollWidthForOverflowDisabled";
     });
 
-// Tests that dialog autoresizes based on web contents when autoresizing
-// is enabled.
-// Flaky on CrOS: http://crbug.com/41439468
-// Flaky on Mac: http://crbug.com/40939810
+// Tests that dialog autoresizes based on web contents when autoresizing is
+// enabled.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_ContentResizeInAutoResizingDialog \
   DISABLED_ContentResizeInAutoResizingDialog

@@ -762,7 +762,7 @@ TEST(AddressTrackerLinuxNetlinkTest, TestInitializeTwoTrackers) {
 }
 
 // These tests use `base::LaunchOptions::clone_flags` for fine-grained control
-// over the clone syscall, but the field is only defined on Linux and ChromeOS.
+// over the clone syscall, but the field is only defined on Linux.
 // Unfortunately, this means these tests do not have coverage on Android.
 #if BUILDFLAG(IS_LINUX)
 // These tests require specific flag values defined in <sched.h>.

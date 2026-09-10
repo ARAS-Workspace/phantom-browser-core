@@ -1248,7 +1248,6 @@ class ChromeAimEligibilityServiceOAuthBrowserTest
   base::test::ScopedFeatureList feature_list_;
 };
 
-// TODO(crbug.com/541665465): Test is flaky on ChromeOS.
 #define MAYBE_RequestIncludesOAuthToken RequestIncludesOAuthToken
 IN_PROC_BROWSER_TEST_F(ChromeAimEligibilityServiceOAuthBrowserTest,
                        MAYBE_RequestIncludesOAuthToken) {
@@ -1323,8 +1322,7 @@ IN_PROC_BROWSER_TEST_F(ChromeAimEligibilityServiceOAuthBrowserTest,
   EXPECT_TRUE(request_handled_future.Get());
 }
 
-// This test is not supported on ChromeOS since there isn't a way to clear the
-// primary account. See:
+// See:
 // https://crsrc.org/c/components/signin/public/identity_manager/identity_test_utils.cc;?q=signin::ClearPrimaryAccount&ss=chromium
 IN_PROC_BROWSER_TEST_F(ChromeAimEligibilityServiceOAuthBrowserTest,
                        PrimaryAccountTracking) {
@@ -1461,8 +1459,7 @@ IN_PROC_BROWSER_TEST_F(ChromeAimEligibilityServiceOAuthBrowserTest,
   EXPECT_TRUE(request_handled_future.Take());
 }
 
-// This test is not supported on ChromeOS since there isn't a way to clear the
-// primary account. See:
+// See:
 // https://crsrc.org/c/components/signin/public/identity_manager/identity_test_utils.cc;?q=signin::ClearPrimaryAccount&ss=chromium
 IN_PROC_BROWSER_TEST_F(ChromeAimEligibilityServiceOAuthBrowserTest,
                        AccountTracking) {

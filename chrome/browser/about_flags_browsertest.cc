@@ -274,7 +274,7 @@ IN_PROC_BROWSER_TEST_P(AboutFlagsBrowserTest, PRE_OriginFlagEnabled) {
   // non-ChromeOS.
   ToggleEnableDropdown(contents, kFlagName, true);
 
-  // On non-ChromeOS, the command line is not modified until restart.
+  // the command line is not modified until restart.
   EXPECT_EQ(kInitialSwitches,
             base::CommandLine::ForCurrentProcess()->GetSwitches());
 
@@ -286,7 +286,7 @@ IN_PROC_BROWSER_TEST_P(AboutFlagsBrowserTest, PRE_OriginFlagEnabled) {
 
 // Flaky. http://crbug.com/40651256
 IN_PROC_BROWSER_TEST_P(AboutFlagsBrowserTest, DISABLED_OriginFlagEnabled) {
-  // On non-ChromeOS, the command line is modified after restart.
+  // the command line is modified after restart.
   EXPECT_EQ(
       GetSanitizedInputAndCommandLine(),
       base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(kSwitchName));

@@ -121,8 +121,8 @@ void RandBytesInternal(span<uint8_t> output, bool avoid_allocation) {
   }
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   // On Android it is mandatory to check that the kernel _version_ has the
-  // support for a syscall before calling. The same check is made on Linux and
-  // ChromeOS to avoid making a syscall that predictably returns ENOSYS.
+  // support for a syscall before calling. The same check is made on Linux to
+  // avoid making a syscall that predictably returns ENOSYS.
   static const bool kernel_has_support = KernelSupportsGetRandom();
   if (kernel_has_support && GetRandomSyscall(output.data(), output.size())) {
     return;

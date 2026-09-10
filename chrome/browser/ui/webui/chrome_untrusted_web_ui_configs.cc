@@ -31,8 +31,6 @@
 #endif  // BUILDFLAG(IS_ANDROID)
 
 void RegisterChromeUntrustedWebUIConfigs() {
-  // Don't add calls to `AddUntrustedWebUIConfig()` for ash-specific UIs here.
-  // Add them in chrome_untrusted_web_ui_configs_chromeos.cc.
 
 #if defined(TOOLKIT_VIEWS) || BUILDFLAG(ENABLE_PRINT_PREVIEW) || \
     BUILDFLAG(IS_ANDROID)

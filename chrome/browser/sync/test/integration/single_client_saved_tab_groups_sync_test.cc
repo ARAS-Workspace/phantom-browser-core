@@ -190,7 +190,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSavedTabGroupsSyncTest,
   EXPECT_TRUE(
       tab_groups::SavedTabOrGroupExistsChecker(service, tab2.saved_tab_guid())
           .Wait());
-// Signing out isn't supported on ChromeOS.
   if (GetSetupSyncMode() == SetupSyncMode::kSyncTransportOnly) {
     // Sign out and verify that the tabs are gone.
     GetClient(0)->SignOutPrimaryAccount();

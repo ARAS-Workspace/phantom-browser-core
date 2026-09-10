@@ -133,7 +133,6 @@ class ScreenOrientationOOPIFBrowserTest : public ScreenOrientationBrowserTest {
 // used Aura. It could be set as !BUILDFLAG(IS_MAC) but the rule below will
 // actually support MacOS X if and when it switches to Aura.
 #if defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
-// Flaky on Chrome OS: http://crbug.com/468259
 #define MAYBE_ScreenOrientationChange ScreenOrientationChange
 IN_PROC_BROWSER_TEST_F(ScreenOrientationBrowserTest,
                        MAYBE_ScreenOrientationChange) {
@@ -164,7 +163,6 @@ IN_PROC_BROWSER_TEST_F(ScreenOrientationBrowserTest,
 }
 #endif  // defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
 
-// Flaky on Chrome OS: http://crbug.com/468259
 #define MAYBE_WindowOrientationChange WindowOrientationChange
 IN_PROC_BROWSER_TEST_F(ScreenOrientationBrowserTest,
                        MAYBE_WindowOrientationChange) {

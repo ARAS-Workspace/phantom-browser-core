@@ -140,7 +140,6 @@ INSTANTIATE_TEST_SUITE_P(All,
                          LogNetLogExplicitFileTest,
                          ::testing::Values(nullptr, "IncludeSensitive"));
 
-// TODO(crbug.com/521183804): Flaky on Chrome OS ASAN/LSAN.
 #define MAYBE_Basic Basic
 IN_PROC_BROWSER_TEST_P(LogNetLogExplicitFileTest, MAYBE_Basic) {
   ASSERT_TRUE(embedded_test_server()->Start());

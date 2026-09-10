@@ -31,7 +31,6 @@ inline constexpr char kCleanUpStatsTableFromAccountPasswordStore[] =
 namespace internal {
 
 // Boolean specifying whether the user finished setting up sync at least once.
-// On ChromeOS, the concept of initial-sync-setup doesn't exist.
 inline constexpr char kSyncInitialSyncFeatureSetupComplete[] =
     "sync.has_setup_completed";
 

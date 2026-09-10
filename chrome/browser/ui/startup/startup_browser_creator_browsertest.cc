@@ -338,9 +338,8 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest, OpenURLsPopup) {
   ASSERT_NE(popup, created_browser);
 }
 
-// We don't do non-process-startup browser launches on ChromeOS.
-// Session restore for process-startup browser launches is tested
-// in session_restore_uitest.
+// Session restore for process-startup browser launches is tested in
+// session_restore_uitest.
 // Verify that startup URLs are honored when the process already exists but has
 // no tabbed browser windows (eg. as if the process is running only due to a
 // background application.
@@ -1220,8 +1219,7 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
 }
 
 // If startup pref is set as LAST_AND_URLS, startup urls should be opened in a
-// new browser window separated from the last-session-restored browser. This
-// test does not apply to ChromeOS.
+// new browser window separated from the last-session-restored browser.
 IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest, StartupPrefSetAsLastAndURLs) {
   ASSERT_TRUE(embedded_test_server()->Start());
 
@@ -3184,9 +3182,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserWebAppProtocolAndFileHandlingTest,
 
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-// These tests are not applicable to Chrome OS as neither initial preferences
-// nor the onboarding promos exist there.
-
 class StartupBrowserCreatorFirstRunTest : public InProcessBrowserTest {
  public:
   StartupBrowserCreatorFirstRunTest() = default;
@@ -3224,7 +3219,6 @@ bool StartupBrowserCreatorFirstRunTest::SetUpUserDataDirectory() {
 #endif
 
 void StartupBrowserCreatorFirstRunTest::SetUpInProcessBrowserTestFixture() {
-  // TODO(crbug.com/382086296): Confirm IS_CHROMEOS is needed here.
 #if BUILDFLAG(IS_LINUX) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
   // Set a policy that prevents the first-run dialog from being shown.
   policy_map_.Set(
@@ -3431,7 +3425,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorWasRestartedFlag, Test) {
       g_browser_process->local_state()->GetBoolean(prefs::kWasRestarted));
 }
 
-// The kCommandLineFlagSecurityWarningsEnabled policy doesn't exist on ChromeOS.
 enum class CommandLineFlagSecurityWarningsPolicy {
   kNoPolicy,
   kEnabled,

@@ -166,9 +166,6 @@ base::ListValue CaptionsHandler::GetAvailableLanguagePacks() {
       }
     }
   }
-  // On ChromeOS we have already checked config availability on disk via the
-  // installer, so we don't need to check the speech::kLanguageComponentConfigs
-  // list.
   for (const auto& config : speech::kLanguageComponentConfigs) {
     if (config.language_code != speech::LanguageCode::kNone &&
         std::ranges::contains(enabled_and_available_languages,

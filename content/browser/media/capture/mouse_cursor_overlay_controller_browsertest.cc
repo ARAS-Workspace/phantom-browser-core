@@ -88,9 +88,6 @@ class MouseCursorOverlayControllerBrowserTest : public ContentBrowserTest {
   void SetUpOnMainThread() final {
     ContentBrowserTest::SetUpOnMainThread();
 
-    // On Ash content browsertests, ash::Shell isn't initialized and thus
-    // neither NativeCursorManagerAsh, the owner of CursorLoader.
-
 #if BUILDFLAG(IS_ANDROID)
     // Save the target size so that Android's
     // ComputeRelativeBoundsForOverlay has a fallback when the view is

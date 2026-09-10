@@ -55,7 +55,6 @@ DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kAnnotationAgentDisconnectedByRemote);
 DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kScrollStarted);
 DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kScrollToRequestReceived);
 
-// TODO(crbug.com/494144298): Re-enable once ASAN issues on ChromeOS are fixed.
 #define MAYBE_GlicAnnotationManagerUiTest GlicAnnotationManagerUiTest
 #define MAYBE_GlicAnnotationManagerWithFloatingWindowInLiveModeUiTest \
   GlicAnnotationManagerWithFloatingWindowInLiveModeUiTest

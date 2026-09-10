@@ -2126,8 +2126,6 @@ IN_PROC_BROWSER_TEST_F(IWACaptivePortalBrowserTest,
       });
 }
 
-// ChromeApps are only enabled on ChromeOS
-
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
 // Check the captive portal result when the test request reports a network

@@ -5015,8 +5015,6 @@ ChromeContentBrowserClient::CreateScreenEnumerator() const {
 }
 
 bool ChromeContentBrowserClient::EnforceSystemAudioEchoCancellation() {
-  // TODO(b/270042522): This is a short term solution to enforce the system
-  // audio cancellation.
   return false;
 }
 

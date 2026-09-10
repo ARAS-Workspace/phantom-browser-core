@@ -52,9 +52,6 @@ TEST(AcceleratorTableTest, PrintKeySupport) {
       command_id = entry.command_id;
     }
   }
-// KEY_PRINT->DomCode::PRINT->VKEY_PRINT are only mapped to IDC_PRINT on
-// Chrome OS. On Linux KEY_PRINT is treated as print screen which isn't
-// handled by the browser.
   EXPECT_EQ(-1, command_id);
 }
 

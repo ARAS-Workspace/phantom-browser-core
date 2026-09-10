@@ -375,7 +375,6 @@ TEST_F(SegmentationPlatformServiceFactoryTest, TestPasswordManagerUserSegment) {
       std::vector<std::string>(1, "Not_PasswordManagerUser"));
 }
 
-// Segmentation Ukm Engine is disabled on CrOS.
 TEST_F(SegmentationPlatformServiceFactoryTest, TestSearchUserModel) {
   InitServiceAndCacheResults(kSearchUserKey);
 
@@ -481,7 +480,6 @@ TEST_F(SegmentationPlatformServiceFactoryTest, URLVisitResumptionRanker) {
                                   PredictionStatus::kSucceeded);
 }
 
-// Segmentation Ukm Engine is disabled on CrOS.
 TEST_F(SegmentationPlatformServiceFactoryTest, TabResupmtionRanker) {
   InitService();
 

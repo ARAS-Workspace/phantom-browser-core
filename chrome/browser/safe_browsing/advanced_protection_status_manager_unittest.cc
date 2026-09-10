@@ -62,8 +62,7 @@ class AdvancedProtectionStatusManagerTest : public testing::Test {
   sync_preferences::TestingPrefServiceSyncable pref_service_;
 };
 
-// On ChromeOS, there is no unconsented primary account. We can only track the
-// primary account.
+// We can only track the primary account.
 TEST_F(AdvancedProtectionStatusManagerTest, TracksUnconsentedPrimaryAccount) {
   base::test::TaskEnvironment task_environment;
   signin::IdentityTestEnvironment identity_test_env(

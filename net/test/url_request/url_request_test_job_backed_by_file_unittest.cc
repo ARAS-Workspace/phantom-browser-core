@@ -266,7 +266,6 @@ TEST_F(URLRequestTestJobBackedByFileEventsTest, SmallFile) {
   RunSuccessfulRequestWithString(MakeContentOfSize(17 * 1024), nullptr);
 }
 
-// TODO(crbug.com/398792039): Re-enable this test
 #define MAYBE_BigFile BigFile
 TEST_F(URLRequestTestJobBackedByFileEventsTest, MAYBE_BigFile) {
   RunSuccessfulRequestWithString(MakeContentOfSize(3 * 1024 * 1024), nullptr);

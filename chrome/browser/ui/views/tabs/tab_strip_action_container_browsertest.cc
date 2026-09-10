@@ -282,8 +282,6 @@ IN_PROC_BROWSER_TEST_F(TabStripActionContainerBrowserTest,
 }
 
 // TODO(crbug.com/451697169): Fix this test for Linux.
-// TODO(crbug.com/461145884): Enable on ChromeOS
-// TODO(crbug.com/465247286): Fix this for Mac.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_GlicLabelEnablementFollowsWindowActivation \
   DISABLED_GlicLabelEnablementFollowsWindowActivation

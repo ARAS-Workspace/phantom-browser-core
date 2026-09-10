@@ -67,8 +67,7 @@ bool WebGPUTest::WebGPUSupported() const {
 }
 
 bool WebGPUTest::WebGPUSharedImageSupported() const {
-  // Currently WebGPUSharedImage is only implemented on Mac, Linux, Windows
-  // and ChromeOS.
+  // Currently WebGPUSharedImage is only implemented on Mac, Linux, Windows.
 #if (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)) && BUILDFLAG(USE_DAWN)
   // TODO(crbug.com/40166640): Re-enable on AMD when the RX 5500 XT issues are
   // resolved.

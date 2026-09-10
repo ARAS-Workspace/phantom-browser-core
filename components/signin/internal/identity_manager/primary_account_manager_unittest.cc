@@ -895,7 +895,6 @@ TEST_F(PrimaryAccountManagerTest, AccountStoragePrefNewUser) {
   EXPECT_TRUE(prefs()->GetBoolean(
       prefs::kPrefsThemesSearchEnginesAccountStorageEnabled));
 
-// ChromeOS does not support signing out.
   // Signout does not clear the pref.
   manager_->ClearPrimaryAccount(signin_metrics::ProfileSignout::kTest);
   EXPECT_TRUE(prefs()->GetBoolean(

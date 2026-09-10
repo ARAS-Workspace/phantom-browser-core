@@ -29,7 +29,6 @@ class BrowsingDataCounterUtilsBrowserTest : public SyncTest {
   ~BrowsingDataCounterUtilsBrowserTest() override = default;
 };
 
-// TODO(crbug.com/40935822): Test is flaky on ChromeOS.
 #define MAYBE_ShouldShowCookieException ShouldShowCookieException
 IN_PROC_BROWSER_TEST_F(BrowsingDataCounterUtilsBrowserTest,
                        MAYBE_ShouldShowCookieException) {

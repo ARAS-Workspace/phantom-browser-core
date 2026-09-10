@@ -455,7 +455,7 @@ EncryptedReportingClient::Delegate::device_management_service() const {
 // Returns false otherwise.
 // static
 bool EncryptedReportingClient::GenerationGuidIsRequired() {
-  // For non-ChromeOS returns false.
+  // returns false.
   return false;
 }
 

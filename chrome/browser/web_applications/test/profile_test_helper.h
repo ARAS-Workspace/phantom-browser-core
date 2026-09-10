@@ -77,10 +77,10 @@ class TestProfileTypeMixin
 #define INSTANTIATE_SYSTEM_WEB_APP_MANAGER_TEST_SUITE_P(SUITE, PARAMS) \
   INSTANTIATE_TEST_SUITE_P(All, SUITE, PARAMS, TestProfileTypeToString)
 
-// Instantiates 3 versions of each test in |SUITE| to ensure coverage of
-// Guest and Incognito profiles, as well as regular profiles. This is currently
-// only used on ChromeOS. Other platforms will likely need a differently defined
-// macro because there is no such thing as Guest mode.
+// Instantiates 3 versions of each test in |SUITE| to ensure coverage of Guest
+// and Incognito profiles, as well as regular profiles. Other platforms will
+// likely need a differently defined macro because there is no such thing as
+// Guest mode.
 #define INSTANTIATE_SYSTEM_WEB_APP_MANAGER_TEST_SUITE_ALL_PROFILE_TYPES_P( \
     SUITE)                                                                 \
   INSTANTIATE_SYSTEM_WEB_APP_MANAGER_TEST_SUITE_P(                         \

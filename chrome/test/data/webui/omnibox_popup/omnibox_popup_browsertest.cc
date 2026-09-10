@@ -79,7 +79,6 @@ IN_PROC_BROWSER_TEST_F(OmniboxPopupAimTest, PopupContextualEntrypoint) {
           "mocha.run();");
 }
 
-// TODO(crbug.com/519692372): Investigate why this fails on ChromeOS.
 // TODO(crbug.com/532163956): Flaky on Linux Debug.
 #if BUILDFLAG(IS_LINUX) && !defined(NDEBUG)
 #define MAYBE_Composebox DISABLED_Composebox

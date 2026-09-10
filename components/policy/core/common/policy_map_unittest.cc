@@ -408,7 +408,6 @@ TEST_F(PolicyMapTest, Swap) {
   EXPECT_FALSE(b.Equals(empty));
 }
 
-// Policy precedence changes are not supported on Chrome OS.
 TEST_F(PolicyMapTest, MergeFrom_CloudMetapolicies) {
   // The two precedence metapolicies, CloudPolicyOverridesPlatformPolicy and
   // CloudUserPolicyOverridesCloudMachinePolicy, are set as cloud policies in

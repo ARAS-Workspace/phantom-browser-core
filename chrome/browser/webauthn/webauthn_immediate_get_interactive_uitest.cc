@@ -199,7 +199,6 @@ class WebAuthnImmediateGetWithBootstrappedEnclaveTest
   }
 };
 
-// TODO(crbug.com/422074323): Re-enable this test suite in ChromeOS.
 #define MAYBE_WebAuthnImmediateGetWithBootstrappedEnclaveTest \
   WebAuthnImmediateGetWithBootstrappedEnclaveTest
 

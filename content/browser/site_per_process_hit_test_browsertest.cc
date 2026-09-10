@@ -7313,8 +7313,6 @@ using SitePerProcessDelegatedInkBrowserTest = SitePerProcessHitTestBrowserTest;
 // trails results in the metadata being correctly sent to the child's
 // RenderWidgetHost and is usable for sending delegated ink points.
 // TODO(crbug.com/40835227): Fix and enable the test on Fuchsia.
-// TODO(crbug.com/40935254): flaky on ChromeOS
-// TODO(http://b/331190208): Test failing on Linux
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_MetadataAndPointGoThroughOOPIF \
   DISABLED_MetadataAndPointGoThroughOOPIF

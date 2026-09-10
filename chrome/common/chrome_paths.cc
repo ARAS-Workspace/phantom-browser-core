@@ -171,9 +171,6 @@ bool PathProvider(int key, base::FilePath* result) {
       }
       break;
     case chrome::DIR_CRASH_DUMPS:
-// Only use /var/log/chrome on IS_CHROMEOS_DEVICE builds. For non-device
-// ChromeOS builds we fall back to the #else below and store relative to the
-// default user-data directory.
 #if BUILDFLAG(IS_ANDROID)
       if (!base::android::GetCacheDirectory(&cur)) {
         return false;

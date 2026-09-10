@@ -682,8 +682,6 @@ IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyEnabledByDefaultTest,
             kEarlyDataNotAcceptedTitle);
 }
 
-// Creating arbitrary user profiles via `ProfileManager` is not supported on
-// ChromeOS, so this test cannot work there.
 IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyEnabledByDefaultTest,
                        DisableWithNewRegularProfile) {
   PolicyMap policies;

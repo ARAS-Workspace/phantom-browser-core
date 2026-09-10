@@ -412,14 +412,10 @@ bool ContentAnalysisBrowserTestBase::MatchesRequest(
 }
 
 std::string ContentAnalysisBrowserTestBase::ExpectedDeviceToken() {
-  // TODO(crbug.com/498915066): Handle cases where device_token is set with a
-  // profile DM token.
   return "browser_dm_token";
 }
 
 std::string ContentAnalysisBrowserTestBase::ExpectedProfileToken() {
-  // TODO(crbug.com/498915066): Handle more complex profile/device management
-  // cases.
   return "profile_dm_token";
 }
 

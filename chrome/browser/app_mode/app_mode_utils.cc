@@ -37,10 +37,6 @@ std::optional<std::string> GetForcedAppModeApp() {
   return command_line->GetSwitchValueASCII(switches::kAppId);
 }
 
-// This method matches the `origin` with the url patterns from
-// https://chromeenterprise.google/policies/url-patterns/. Note: just using the
-// "*" wildcard is not allowed.
-
 }  // namespace
 
 bool IsCommandAllowedInAppMode(int command_id, bool is_popup) {

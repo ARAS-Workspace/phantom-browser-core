@@ -369,9 +369,6 @@ void ChromeBrowserMainExtraPartsPerformanceManager::PostCreateThreads() {
   // Some browser tests need to control how the battery state behaves, so they
   // install a test `BatteryStateSampler` before browser setup.
   if (!base::BatteryStateSampler::HasTestingInstance()) {
-    // The ChromeOS `BatteryLevelProvider` and `SamplingEventSource`
-    // implementations are in `components` for dependency reasons, so they need
-    // to be created here and passed in explicitly to `BatteryStateSampler`.
     // TODO(crbug.com/40871810): All of the battery level machinery should be in
     // the same location, and the ifdefs should be contained to the
     // `BatteryLevelProvider` and SamplingEventSource` instantiation functions.

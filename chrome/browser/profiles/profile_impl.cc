@@ -710,9 +710,8 @@ void ProfileImpl::DoFinalInit(CreateMode create_mode) {
   // as a URLDataSource early.
   dom_distiller::RegisterViewerSource(this);
 
-  // Listen for bookmark model load, to bootstrap the sync service.
-  // Not necessary for profiles that don't have a BookmarkModel.
-  // On CrOS sync service will be initialized after sign in.
+  // Listen for bookmark model load, to bootstrap the sync service. Not
+  // necessary for profiles that don't have a BookmarkModel.
   BookmarkModel* model = BookmarkModelFactory::GetForBrowserContext(this);
   if (model) {
     // `BookmarkModelLoadedObserver` destroys itself eventually, when loading

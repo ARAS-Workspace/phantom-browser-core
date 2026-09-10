@@ -445,8 +445,6 @@ bool H265VaapiWrapper::SubmitSlice(
   }
   SHDR_TO_SP(five_minus_max_num_merge_cand);
 
-  // TODO(jchinlee): Remove this guard once Chrome has libva uprev'd to 2.6.0.
-
   last_slice_data_.assign(data, UNSAFE_TODO(data + size));
   return true;
 }

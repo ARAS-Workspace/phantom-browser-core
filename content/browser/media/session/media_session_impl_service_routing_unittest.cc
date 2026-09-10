@@ -734,8 +734,6 @@ TEST_F(MediaSessionImplServiceRoutingTest,
   }
 }
 
-// We hide the media metadata only from CrOS' media controls by replacing the
-// metadata in the MediaSessionImpl with some placeholder metadata.
 TEST_F(MediaSessionImplServiceRoutingTest, DontHideMediaMetadataInNonCrOS) {
   client_.SetShouldHideMetadata(true);
 

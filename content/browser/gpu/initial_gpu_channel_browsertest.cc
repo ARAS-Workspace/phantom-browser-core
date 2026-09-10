@@ -235,8 +235,6 @@ IN_PROC_BROWSER_TEST_F(InitialGpuChannelBrowserTest,
   auto* rwhi = static_cast<RenderWidgetHostImpl*>(
       shell()->web_contents()->GetPrimaryMainFrame()->GetRenderWidgetHost());
 
-  // On non-ChromeOS platforms, the frame sink pipes should be created but
-  // deferred because we are hidden.
   // Note that there might be some racy Show() call before this, which might
   // trigger the sending of the initial frame sink pipe earlier.
   EXPECT_EQ(rwhi->is_hidden_for_testing(),

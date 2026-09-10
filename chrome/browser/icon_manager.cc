@@ -33,8 +33,6 @@ IconManager::~IconManager() = default;
 gfx::Image* IconManager::LookupIconFromFilepath(const base::FilePath& file_path,
                                                 IconLoader::IconSize size,
                                                 float scale) {
-  // Since loading the icon is synchronous on Chrome OS (and doesn't require
-  // disk access), if it hasn't already been loaded, load immediately.
   return DoLookupIconFromFilepath(file_path, size, scale);
 }
 

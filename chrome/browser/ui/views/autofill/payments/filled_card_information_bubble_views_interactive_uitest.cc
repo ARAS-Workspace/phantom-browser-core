@@ -718,7 +718,6 @@ IN_PROC_BROWSER_TEST_F(FilledCardInformationBubbleViewsInteractiveUiTest,
 }
 
 // Test BNPL-specific card image and name views.
-// Consistently fails on multiple ChromeOS bots, see also crbug.com/414487274
 #define MAYBE_BnplCardImageAndName BnplCardImageAndName
 IN_PROC_BROWSER_TEST_F(FilledCardInformationBubbleViewsInteractiveUiTest,
                        MAYBE_BnplCardImageAndName) {

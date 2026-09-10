@@ -204,8 +204,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientCommonSyncTest,
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-// ChromeOS doesn't support primary account signout.
-
 // Note: See also SyncErrorTest.ClientDataObsoleteTest, which ensures the cache
 // GUID does *not* get reused if the client's data needs to be reset.
 IN_PROC_BROWSER_TEST_P(SingleClientCommonSyncTest,
@@ -294,7 +292,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientCommonSyncTest, PRE_ReusesSameCacheGuid) {
   ASSERT_EQ(syncer::SyncService::TransportState::ACTIVE,
             GetSyncService(0)->GetTransportState());
 
-  // On ChromeOS, IsInitialSyncFeatureSetupComplete() is always true.
   ASSERT_FALSE(GetSyncService(0)
                    ->GetUserSettings()
                    ->IsInitialSyncFeatureSetupComplete());
@@ -325,7 +322,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientCommonSyncTest, ReusesSameCacheGuid) {
   ASSERT_EQ(syncer::SyncService::TransportState::ACTIVE,
             GetSyncService(0)->GetTransportState());
 
-  // On ChromeOS, IsInitialSyncFeatureSetupComplete() is always true.
   ASSERT_FALSE(GetSyncService(0)
                    ->GetUserSettings()
                    ->IsInitialSyncFeatureSetupComplete());

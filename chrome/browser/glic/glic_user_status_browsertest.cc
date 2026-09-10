@@ -115,8 +115,6 @@ class GlicUserStatusBrowserTest : public InProcessBrowserTest {
         std::to_underlying(
             optimization_guide::prefs::GeminiSettingsPolicyState::kEnabled));
 
-    // TODO(crbug.com/460830699): Evaluate whether this is necessary on
-    // ChromeOS.
     disclaimer_service_resetter_ =
         enterprise_util::DisableAutomaticManagementDisclaimerUntilReset(
             profile());
@@ -274,7 +272,6 @@ IN_PROC_BROWSER_TEST_F(GlicUserStatusBrowserTest, EnterpriseSignInEnabled) {
   EXPECT_TRUE(IsGlicEnabled());
 }
 
-// TODO(460830699): Re-enable on ChromeOS.
 #define MAYBE_EnterpriseSignInEnabledGeminiSettings \
   EnterpriseSignInEnabledGeminiSettings
 IN_PROC_BROWSER_TEST_F(GlicUserStatusBrowserTest,
@@ -733,7 +730,6 @@ IN_PROC_BROWSER_TEST_F(GlicUserStatusBrowserTest,
   EXPECT_FALSE(IsGlicEnabled());
 }
 
-// TODO(460830699): Re-enable on ChromeOS.
 #define MAYBE_EnterpriseSignOut EnterpriseSignOut
 IN_PROC_BROWSER_TEST_F(GlicUserStatusBrowserTest, MAYBE_EnterpriseSignOut) {
   policy::ScopedManagementServiceOverrideForTesting platform_management(

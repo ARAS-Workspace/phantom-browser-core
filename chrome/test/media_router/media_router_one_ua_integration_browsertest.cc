@@ -60,7 +60,6 @@ class MediaRouterIntegrationOneUABrowserTest
   }
 };
 
-// TODO(crbug.com/380369297): Flaky in Chromium waterfall.
 #define MAYBE_Basic Basic
 IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationOneUABrowserTest, MAYBE_Basic) {
   RunBasicTest();
@@ -81,7 +80,6 @@ IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationOneUABrowserTest,
   ExecuteJavaScriptAPI(web_contents, kInitiateCloseFromReceiverPageScript);
 }
 
-// TODO(crbug.com/380369297): Flaky in Chromium waterfall.
 #define MAYBE_Fail_SendMessage Fail_SendMessage
 IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationOneUABrowserTest,
                        MAYBE_Fail_SendMessage) {
@@ -104,7 +102,6 @@ IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationOneUABrowserTest,
 }
 #undef MAYBE_ReconnectSession
 
-// TODO(crbug.com/380369297): Flaky in Chromium waterfall.
 #define MAYBE_ReconnectSessionSameTab ReconnectSessionSameTab
 IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationOneUABrowserTest,
                        MAYBE_ReconnectSessionSameTab) {
@@ -121,7 +118,6 @@ class MediaRouterIntegrationOneUANoReceiverBrowserTest
   }
 };  // namespace media_router
 
-// TODO(crbug.com/380369297): Flaky in Chromium waterfall.
 #define MAYBE_Basic Basic
 IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationOneUANoReceiverBrowserTest,
                        MAYBE_Basic) {
@@ -129,7 +125,6 @@ IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationOneUANoReceiverBrowserTest,
 }
 #undef MAYBE_Basic
 
-// TODO(crbug.com/380369297): Flaky in Chromium waterfall.
 #define MAYBE_Fail_SendMessage Fail_SendMessage
 IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationOneUANoReceiverBrowserTest,
                        MAYBE_Fail_SendMessage) {
@@ -137,14 +132,12 @@ IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationOneUANoReceiverBrowserTest,
 }
 #undef MAYBE_Fail_SendMessage
 
-// TODO(crbug.com/380369297): Flaky in Chromium waterfall.
 #define MAYBE_ReconnectSession ReconnectSession
 IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationOneUANoReceiverBrowserTest,
                        MAYBE_ReconnectSession) {
   RunReconnectSessionTest();
 }
 
-// TODO(crbug.com/380369297): Flaky in Chromium waterfall.
 #define MAYBE_ReconnectSessionSameTab ReconnectSessionSameTab
 IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationOneUANoReceiverBrowserTest,
                        MAYBE_ReconnectSessionSameTab) {

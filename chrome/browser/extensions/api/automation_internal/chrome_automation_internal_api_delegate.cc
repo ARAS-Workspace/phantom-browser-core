@@ -85,8 +85,6 @@ void ChromeAutomationInternalApiDelegate::SetAutomationEventRouterInterface(
 
 content::BrowserContext*
 ChromeAutomationInternalApiDelegate::GetActiveUserContext() {
-  // Use the main profile on ChromeOS. Desktop platforms don't have the concept
-  // of a "main" profile, so pick the "last used" profile instead.
   return profile_util::GetLastUsedProfile();
 }
 

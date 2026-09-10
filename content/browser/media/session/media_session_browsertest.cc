@@ -380,9 +380,6 @@ IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest, GetMediaImageBitmap) {
   EXPECT_TRUE(WasURLVisited(GetTestImageURL()));
 }
 
-// We hide the media image from CrOS' media controls by replacing the image in
-// the MediaSessionImpl with a placeholder image. These changes are gated to
-// only affect ChromeOS, hence why the testing for this is also ChromeOS only.
 IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest,
                        DontHideMediaMetadataImageInNonCrOS) {
   client_.SetShouldHideMetadata(true);

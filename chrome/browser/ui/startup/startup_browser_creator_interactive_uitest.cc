@@ -36,9 +36,8 @@
 
 using StartupBrowserCreatorTest = InProcessBrowserTest;
 
-// Chrome OS doesn't support multiprofile.
-// And BrowserWindow::IsActive() always returns false in tests on MAC.
-// And this test is useless without that functionality.
+// BrowserWindow::IsActive() always returns false in tests on MAC, and this
+// test is useless without that functionality.
 #if !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest, LastUsedProfileActivated) {
   ProfileManager* profile_manager = g_browser_process->profile_manager();

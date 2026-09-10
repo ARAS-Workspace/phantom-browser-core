@@ -270,8 +270,7 @@ TEST_F(ChromeMetricsServiceClientTest, TestRegisterMetricsServiceProviders) {
   expected_providers += 1;
 #endif  // BUILDFLAG(IS_ANDROID)
 
-  // ChromeSigninStatusMetricsProvider (for non ChromeOS).
-  // FamilyLinkUserMetricsProvider
+  // ChromeSigninStatusMetricsProvider (for non). FamilyLinkUserMetricsProvider
   expected_providers += 2;
 
 #if BUILDFLAG(IS_MAC)

@@ -169,9 +169,6 @@ ChromeClipboardContext::GetClipboardSource(
     case SourceType::OTHER_PROFILE:
       // Only add a source URL if the other profile is getting the policy
       // applied at the machine scope, not the user scope.
-      //
-      // This doesn't apply to ChromeOS as the policy scope is always
-      // user-level, even though the policy is applied to the whole device.
       if (PolicyAppliedAtUserScope(destination.browser_context(), scope_pref)) {
         break;
       }

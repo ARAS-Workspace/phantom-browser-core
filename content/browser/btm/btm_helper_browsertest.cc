@@ -637,7 +637,7 @@ IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
                    .has_value());
 }
 
-// Multiple running profiles is not supported on Android or ChromeOS.
+// Multiple running profiles is not supported on Android.
 #if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(BtmTabHelperBrowserTest,
                        SitesInOpenTabsForDifferentProfilesAreNotExempt) {

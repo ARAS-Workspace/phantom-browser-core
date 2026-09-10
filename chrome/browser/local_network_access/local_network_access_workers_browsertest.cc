@@ -21,9 +21,6 @@
 #include "services/network/public/cpp/features.h"
 #include "third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom.h"
 
-#if BUILDFLAG(ENABLE_EXTENSIONS)
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-
 // Local network access browser tests related to workers
 // (dedicated/shared/service).
 
@@ -369,7 +366,5 @@ IN_PROC_BROWSER_TEST_F(LocalNetworkAccessWorkersBrowserTest,
   CheckCounter(WebFeature::kPrivateNetworkAccessWithinWorker, 1);
   CheckCounter(WebFeature::kLocalNetworkAccessWithinSharedWorker, 1);
 }
-
-// ChromeApps are only enabled on ChromeOS.
 
 }  // namespace local_network_access

@@ -291,8 +291,6 @@ class AppBrowserController : public ui::ColorProviderKey::InitializerSupplier,
   virtual bool IsWindowCaptureHandleAllowed() const;
 
   // Whether the browser should show the profile menu button in the toolbar.
-  // Not appliccable to ChromeOS, because apps can be installed only for
-  // one main profile there.
   virtual bool HasProfileMenuButton() const;
   virtual bool IsProfileMenuButtonVisible() const;
 

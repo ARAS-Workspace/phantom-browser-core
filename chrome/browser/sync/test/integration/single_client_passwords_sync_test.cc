@@ -360,8 +360,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
   EXPECT_EQ(passwords_helper::GetAllLogins(account_store).size(), 0u);
 }
 
-// On ChromeOS, Sync-the-feature gets started automatically once a primary
-// account is signed in and the transport mode is not a thing.
 IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
                        StoresDataForNonSyncingPrimaryAccountInAccountDB) {
   AddTestPasswordToFakeServer();
@@ -380,7 +378,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
   EXPECT_EQ(passwords_helper::GetAllLogins(account_store).size(), 1u);
 }
 
-// The unconsented primary account isn't supported on ChromeOS.
 // This test verifies that account storage is used when an account is signed in
 // but Sync-the-feature is not enabled.
 IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
@@ -400,8 +397,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
       passwords_helper::GetAccountPasswordStoreInterface(0);
   EXPECT_EQ(passwords_helper::GetAllLogins(account_store).size(), 1u);
 }
-
-// ChromeOS does not support signing out of a primary account.
 
 // Sanity check: The profile database should *not* get cleared on signout.
 IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
@@ -425,8 +420,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
   ASSERT_EQ(passwords_helper::GetAllLogins(profile_store).size(), 1u);
 }
 
-// The unconsented primary account isn't supported on ChromeOS so Sync won't
-// start up for an unconsented account.
 IN_PROC_BROWSER_TEST_F(SingleClientPasswordsWithAccountStorageSyncTest,
                        ClearsAccountDBOnSignout) {
   AddTestPasswordToFakeServer();

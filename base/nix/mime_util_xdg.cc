@@ -251,8 +251,8 @@ std::string GetFileMimeType(const FilePath& filepath) {
     return map;
   }());
 
-  // Files never change on ChromeOS, but for linux, match xdgmime behavior and
-  // check every 5s and reload if any files have changed.
+  // Match xdgmime behavior and check every 5s and reload if any files have
+  // changed.
   static Time last_check;
   // Lock is required since this may be called on any thread. The lock is held
   // until the function returns to ensure that the map lookup and result copy

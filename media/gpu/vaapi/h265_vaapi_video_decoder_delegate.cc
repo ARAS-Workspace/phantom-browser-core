@@ -497,8 +497,6 @@ DecodeStatus H265VaapiVideoDecoderDelegate::SubmitSlice(
   }
   SHDR_TO_SP(five_minus_max_num_merge_cand);
 
-  // TODO(jkardatzke): Remove this guard once Chrome has libva uprev'd to 2.6.0.
-
   if (IsTranscrypted()) {
     // We use the encrypted region of the data as the actual slice data.
     CHECK_EQ(subsamples.size(), 1u);

@@ -984,8 +984,7 @@ NewTabPageUI::NewTabPageUI(content::WebUI* web_ui)
 
   web_ui->AddRequestableScheme(content::kChromeUIUntrustedScheme);
 
-// Give OGB 3P Cookie Permissions. Only necessary on non-Ash builds. Granting
-// 3P cookies on Ash causes b/314326552.
+// Give OGB 3P Cookie Permissions. Only necessary.
   WebUIAllowlist::GetOrCreate(profile_)->RegisterAutoGrantedThirdPartyCookies(
       url::Origin::Create(GURL(chrome::kChromeUIUntrustedNewTabPageUrl)),
       {

@@ -99,8 +99,8 @@ IN_PROC_BROWSER_TEST_F(BrowserViewTest, FullscreenClearsFocus) {
 }
 
 // Test that the view tree order is preserved after entering and exiting
-// immersive fullscreen. Immersive fullscreen is only supported on ChromeOS and
-// MacOS at this point in time.
+// immersive fullscreen. Immersive fullscreen is only supported on MacOS at this
+// point in time.
 #if BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(BrowserViewTest, ImmersiveFullscreenViewTreeOrder) {
   auto* const immersive_mode_controller =

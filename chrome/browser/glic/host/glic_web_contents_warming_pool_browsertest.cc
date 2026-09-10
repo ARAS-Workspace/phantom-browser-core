@@ -60,7 +60,6 @@ class GlicWarmingPoolBrowserTest
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-// TODO(b/496609005): Skip on ChromeOS due to profile ineligibility timeouts.
 #define MAYBE_ColdWarming ColdWarming
 IN_PROC_BROWSER_TEST_F(GlicWarmingPoolBrowserTest, MAYBE_ColdWarming) {
   EXPECT_TRUE(
@@ -68,7 +67,6 @@ IN_PROC_BROWSER_TEST_F(GlicWarmingPoolBrowserTest, MAYBE_ColdWarming) {
                "Wait for cold warming"));
 }
 
-// TODO(b/496609005): Skip on ChromeOS due to profile ineligibility timeouts.
 #define MAYBE_BackfillWarming BackfillWarming
 IN_PROC_BROWSER_TEST_F(GlicWarmingPoolBrowserTest, MAYBE_BackfillWarming) {
   // Wait for initial preload to complete.
@@ -155,7 +153,6 @@ IN_PROC_BROWSER_TEST_F(GlicWarmingPoolBrowserTest, NoWarmingIfUnpinned) {
   EXPECT_FALSE(pool().HasWarmedContainerForTesting());
 }
 
-// TODO(b/496609005): Skip on ChromeOS due to profile ineligibility timeouts.
 #define MAYBE_ClearedOnMemoryPressure ClearedOnMemoryPressure
 IN_PROC_BROWSER_TEST_F(GlicWarmingPoolBrowserTest,
                        MAYBE_ClearedOnMemoryPressure) {

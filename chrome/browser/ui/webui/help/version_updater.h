@@ -44,9 +44,6 @@ class VersionUpdater {
     PROMOTED,
   };
 
-  // TODO(jhawkins): Use a delegate interface instead of multiple callback
-  // types.
-
   // Used to update the client of status changes.
   // |status| is the current state of the update.
   // |progress| should only be non-zero for the UPDATING state.

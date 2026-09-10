@@ -414,9 +414,6 @@ TEST_F(VaapiTest, VbrAndCbrResolutionsMatch) {
   }
 }
 
-#if BUILDFLAG(USE_CHROMEOS_PROTECTED_MEDIA)
-#endif  // BUILDFLAG(USE_CHROMEOS_PROTECTED_MEDIA)
-
 // Verifies that if JPEG decoding and encoding are supported by VaapiWrapper,
 // they are also supported by by the command line vainfo utility.
 TEST_F(VaapiTest, VaapiProfilesJPEG) {

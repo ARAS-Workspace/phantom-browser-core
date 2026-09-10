@@ -282,8 +282,7 @@ TEST_F(ReportGeneratorTest, GenerateBasicReport) {
 
   auto* basic_request = requests[0].get();
 
-  // In the ChromeOsUserReportRequest for Chrome OS, these fields are not
-  // existing. Therefore, they are skipped according to current environment.
+  // Therefore, they are skipped according to current environment.
   EXPECT_NE(std::string(),
             basic_request->GetDeviceReportRequest().computer_name());
   EXPECT_NE(std::string(),
@@ -318,8 +317,7 @@ TEST_F(ReportGeneratorTest, GenerateWithoutProfiles) {
 
   auto* basic_request = requests[0].get();
 
-  // In the ChromeOsUserReportRequest for Chrome OS, these fields are not
-  // existing. Therefore, they are skipped according to current environment.
+  // Therefore, they are skipped according to current environment.
   EXPECT_NE(std::string(),
             basic_request->GetDeviceReportRequest().computer_name());
   EXPECT_NE(std::string(),

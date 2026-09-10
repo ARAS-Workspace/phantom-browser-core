@@ -525,12 +525,10 @@ IN_PROC_BROWSER_TEST_P(EnableDisableSingleClientTest, FastEnableDisableEnable) {
   }
 }
 
-// This test makes sure that after a signout, Sync data gets redownloaded
-// when Sync is started again. This does not actually verify that the data is
-// gone from disk (which seems infeasible); it's mostly here as a baseline for
-// the following tests.
-//
-// ChromeOS does not support signing out of a primary account.
+// This test makes sure that after a signout, Sync data gets redownloaded when
+// Sync is started again. This does not actually verify that the data is gone
+// from disk (which seems infeasible); it's mostly here as a baseline for the
+// following tests.
 IN_PROC_BROWSER_TEST_P(EnableDisableSingleClientTest, RedownloadsAfterSignout) {
   ASSERT_TRUE(SetupClients());
   ASSERT_FALSE(bookmarks_helper::GetBookmarkModel(0)->IsBookmarked(

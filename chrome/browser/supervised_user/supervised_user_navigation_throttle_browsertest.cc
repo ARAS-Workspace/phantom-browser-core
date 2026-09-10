@@ -962,10 +962,6 @@ IN_PROC_BROWSER_TEST_F(SupervisedUserIframeFilterTest,
             "www.c.example2.com");
 }
 
-// The switches::kHostWindowBounds commandline flag doesn't appear to work
-// for tests on other platforms.
-// TODO(b/300426225): enable these tests on Linux/Mac/Windows.
-
 class SupervisedUserNavigationThrottleOnlyEnabledForSupervisedUsers
     : public SupervisedUserNavigationThrottleTestBase,
       public testing::WithParamInterface<

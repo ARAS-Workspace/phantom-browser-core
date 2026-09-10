@@ -216,7 +216,6 @@ class ProcessSingletonTest : public InProcessBrowserTest {
   base::ScopedTempDir temp_profile_dir_;
 };
 
-// ChromeOS hits DCHECKS on ProcessSingleton rendezvous: crbug.com/40548646
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_StartupRaceCondition DISABLED_StartupRaceCondition
 #else

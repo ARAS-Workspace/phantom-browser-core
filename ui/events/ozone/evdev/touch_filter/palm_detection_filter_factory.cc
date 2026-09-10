@@ -65,8 +65,6 @@ std::string FetchNeuralPalmRadiusPolynomial(const EventDeviceInfo& devinfo,
     }
   }
 
-  // TODO(robsc): Remove this when comfortable.
-
   // Basking. Does not report vendor_id / product_id
   if (devinfo.name() == "Elan Touchscreen") {
     return "0.17889799,4.22584412";

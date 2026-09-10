@@ -356,7 +356,6 @@ TEST_P(ReportingServiceTest,
       context()->cache()->GetExpiredSources().contains(*kReportingSource_));
 }
 
-// Flaky in ChromeOS: crbug.com/1356127
 #define MAYBE_SendReportsAndRemoveSourceWithPendingReports \
   SendReportsAndRemoveSourceWithPendingReports
 TEST_P(ReportingServiceTest,

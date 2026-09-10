@@ -210,7 +210,6 @@ void ChromeFeatureListCreator::CreateMetricsServices() {
 
 void ChromeFeatureListCreator::SetupInitialPrefs() {
 // Android does first run in Java instead of native.
-// ChromeOS has its own out-of-box-experience code.
 #if !BUILDFLAG(IS_ANDROID)
   // On first run, we need to process the predictor preferences before the
   // browser's profile_manager object is created, but after ResourceBundle

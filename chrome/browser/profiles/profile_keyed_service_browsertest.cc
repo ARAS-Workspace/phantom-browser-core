@@ -211,7 +211,6 @@ class ProfileKeyedServiceBrowserTest : public InProcessBrowserTest {
   base::test::ScopedFeatureList feature_list_;
 };
 
-// System Profile does not exist on ChromeOS.
 IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
                        SystemProfileOTR_NeededServices) {
   Profile* system_profile =
@@ -404,7 +403,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "HidDeviceManager",
     "HostContentSettingsMap",
     "LiveCaptionController",
-    // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "LiveTranslateController",
 
     "MediaRouter",
@@ -456,9 +454,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "ClientHints",
     "ConnectorsService",
     "DataControlsRulesService",
-    // TODO(crbug.com/374351946): This is most likely unnesssary on CrOS because
-    // it has its own UI, but factory is created, which should probably be
-    // removed.
     "DownloadBubbleUpdateService",
     "EnterpriseManagementService",
     "FindBarState",
@@ -469,7 +464,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "MediaNotificationService",
     "MerchantPromoCodeManager",
     "NoStatePrefetchManager",
-    // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "OfflineItemModelManager",
     "OmniboxInputWatcher",
     "PermissionManagerFactory",
@@ -535,7 +529,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "AppLifetimeMonitor",
     "AppLoadService",
     "AppRestoreService",
-    // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "AppServiceProxy",
     "AppSessionService",
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
@@ -633,7 +626,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "FirstPartySetsPolicyService",
     "FontPrefChangeNotifier",
     "FontSettingsAPI",
-    // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "GAIAInfoUpdateService",
     "GCMProfileService",
     "GeneratedPrefs",
@@ -655,7 +647,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "InstallTracker",
     "InstallVerifier",
     "InstanceIDProfileService",
-    // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "InvalidationService",
     "LanguageModelManager",
     "LanguageSettingsPrivateDelegate",
@@ -687,7 +678,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "OperationManager",
     "OptimizationGuideGlobalStateHolderKeyedService",
     "OptimizationGuideKeyedService",
-    // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "PageContentAnnotationsService",
     "PasswordsPrivateEventRouter",
     "PendingExtensionManager",
@@ -776,14 +766,12 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "UkmBackgroundRecorderService",
     "UsbDeviceManager",
     "UsbDeviceResourceManager",
-    // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "UserCloudPolicyInvalidator",
     "UserFmRegistrationTokenUploader",
     "UserPolicySigninService",
     "UserScriptWorldConfigurationManager",
     "WarningBadgeService",
     "WarningService",
-    // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "WebAppProvider",
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     "WebAuthenticationProxyAPI",
@@ -796,7 +784,6 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "WriteQuotaChecker",
     "feedback::FeedbackUploaderChrome",
     "sct_reporting::Factory",
-    // TODO(crbug.com/374351946): Investigate if this is necessary on CrOS.
     "ZeroSuggestCacheServiceFactory",
 
   };

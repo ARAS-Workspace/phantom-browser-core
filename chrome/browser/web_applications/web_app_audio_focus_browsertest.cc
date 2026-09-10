@@ -175,8 +175,6 @@ IN_PROC_BROWSER_TEST_P(WebAppAudioFocusBrowserTest, AppHasDifferentAudioFocus) {
 
   // Open an auxiliary window, which should also open in an app window and share
   // the group id.
-  // TODO(crbug.com/392106502): Fix this test and enable once auxiliary context
-  // support is added to PWAs and works on ChromeOS.
   {
     content::WebContents* new_contents =
         OpenWindow(web_contents, /*aux=*/true, app_url);

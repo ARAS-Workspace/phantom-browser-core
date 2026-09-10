@@ -353,12 +353,6 @@ void SyncServiceImpl::Initialize(DataTypeController::TypeVector controllers) {
   if (HasDisableReason(DISABLE_REASON_ENTERPRISE_POLICY)) {
     StopAndClear(ResetEngineReason::kEnterprisePolicy);
   } else if (HasDisableReason(DISABLE_REASON_NOT_SIGNED_IN)) {
-    // On ChromeOS-Ash, signout is not possible, so it's not necessary to handle
-    // this case.
-    // TODO(crbug.com/40272157): It *should* be harmless to handle this case on
-    // ChromeOS-Ash since it's supposedly unreachable, *but* during the very
-    // first startup of a fresh profile, the signed-in account isn't known yet
-    // at this point (see also https://crbug.com/1458701#c7).
     StopAndClear(ResetEngineReason::kNotSignedIn);
   }
 

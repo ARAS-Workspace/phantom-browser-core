@@ -798,10 +798,10 @@ IN_PROC_BROWSER_TEST_P(FileSystemAccessObserverBrowserTest,
   auto records = EvalJs(shell(), script).TakeValue().TakeList();
   ASSERT_THAT(records, testing::Not(testing::IsEmpty()));
 #if BUILDFLAG(IS_LINUX)
-  // On Linux or ChromeOS, the change type can be "modified" if the swap file is
-  // 'renamed' to observed file's name. On other occasions, this can be a 2 step
-  // process where we see a deleted event on the CrSwap file and then an
-  // "appeared" event on the observed file.
+  // On Linux, the change type can be "modified" if the swap file is 'renamed'
+  // to observed file's name. On other occasions, this can be a 2 step process
+  // where we see a deleted event on the CrSwap file and then an "appeared"
+  // event on the observed file.
   EXPECT_THAT(
       *records.front().GetDict().FindString("type"),
       testing::AnyOf(testing::StrEq("modified"), testing::StrEq("appeared")));
@@ -1163,10 +1163,10 @@ IN_PROC_BROWSER_TEST_P(FileSystemAccessObserverBrowserTest,
   EXPECT_THAT(records, testing::SizeIs(1));
   auto& record_dict = records.front().GetDict();
 #if BUILDFLAG(IS_LINUX)
-  // On Linux or ChromeOS, the change type can be "modified" if the swap file is
-  // 'renamed' to the target file's name. On other occasions, this can be a 2
-  // step process where we see a deleted event on the CrSwap file and then an
-  // "appeared" event on the target file.
+  // On Linux, the change type can be "modified" if the swap file is 'renamed'
+  // to the target file's name. On other occasions, this can be a 2 step process
+  // where we see a deleted event on the CrSwap file and then an "appeared"
+  // event on the target file.
   EXPECT_THAT(
       *record_dict.FindString("type"),
       testing::AnyOf(testing::StrEq("modified"), testing::StrEq("appeared")));

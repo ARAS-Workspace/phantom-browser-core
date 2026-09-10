@@ -353,7 +353,6 @@ IN_PROC_BROWSER_TEST_F(GlicEnablingSimultaneousRolloutTest,
                                         GlicProfilesAllSomeNone::kAll, 1);
   }
 
-  // ChromeOS does not support multiple profiles.
   // Add another profile and have it signed in. The default value for
   // tiered rollout is false but this profile is enabled via the general
   // GlicRollout flag and canUseModelExecutionFeatures check.

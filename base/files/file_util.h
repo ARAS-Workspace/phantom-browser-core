@@ -334,9 +334,7 @@ BASE_EXPORT bool ExecutableExistsInPath(Environment* env,
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
 // Determine if files under a given |path| can be mapped and then mprotect'd
 // PROT_EXEC. This depends on the mount options used for |path|, which vary
-// among different Linux distributions and possibly local configuration. It also
-// depends on details of kernel--ChromeOS uses the noexec option for /dev/shm
-// but its kernel allows mprotect with PROT_EXEC anyway.
+// among different Linux distributions and possibly local configuration.
 BASE_EXPORT bool IsPathExecutable(const FilePath& path);
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_AIX)
 

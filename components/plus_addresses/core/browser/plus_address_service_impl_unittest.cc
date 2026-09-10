@@ -437,7 +437,6 @@ TEST_F(PlusAddressServiceRequestsTest, ConfirmPlusAddress_Fails) {
 
 // Tests that plus address creation is toggled off when the primary account is
 // cleared.
-// Doesn't run on ChromeOS since ClearPrimaryAccount() doesn't exist for it.
 TEST_F(PlusAddressServiceRequestsTest,
        PrimaryAccountCleared_TogglesPlusAddressCreationOff) {
   // Toggle creation off by removing the primary account.
@@ -894,7 +893,6 @@ class PlusAddressServiceSignoutTest : public PlusAddressServiceTest {
 
 // Tests that `IsEnabled` is toggled to false when the primary account is
 // cleared.
-// Doesn't run on ChromeOS since ClearPrimaryAccount() doesn't exist for it.
 TEST_F(PlusAddressServiceSignoutTest, PrimaryAccountCleared_TogglesIsEnabled) {
   ASSERT_TRUE(service().IsEnabled());
 

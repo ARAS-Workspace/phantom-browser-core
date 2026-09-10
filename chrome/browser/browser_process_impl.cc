@@ -775,12 +775,9 @@ void BrowserProcessImpl::EndSession() {
   metrics::MetricsService* metrics = g_browser_process->metrics_service();
   if (metrics) {
     metrics->LogCleanShutdown();
-    // The MetricsService may update Local State prefs in memory without
-    // writing the updated prefs to disk, so schedule a Local State write now.
-    //
-    // Do not schedule a write on ChromeOS because writing to disk multiple
-    // times during shutdown was causing shutdown problems. See
-    // crbug.com/41062061.
+    // The MetricsService may update Local State prefs in memory without writing
+    // the updated prefs to disk, so schedule a Local State write now.
+    // See crbug.com/41062061.
     local_state_->CommitPendingWrite(base::OnceClosure(),
                                      rundown_counter->GetRundownClosure());
   }

@@ -46,8 +46,6 @@ void AttemptExitInternal(bool try_to_quit_application) {
 
 }  // namespace
 
-// The ChromeOS implementations are in application_lifetime_chromeos.cc
-
 void AttemptUserExit() {
   // Reset the restart bit that might have been set in cancelled restart
   // request.

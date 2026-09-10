@@ -41,7 +41,6 @@ gfx::NativeCursor WebCursor::GetNativeCursor() {
   return cursor_.type();
 }
 
-// Ash has its own UpdateDisplayInfoForWindow that takes rotation into account.
 void WebCursor::UpdateDisplayInfoForWindow(aura::Window* window) {
   float preferred_scale =
       display::Screen::Get()->GetPreferredScaleFactorForWindow(window).value_or(

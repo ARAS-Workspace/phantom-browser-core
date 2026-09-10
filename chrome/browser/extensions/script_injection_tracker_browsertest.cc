@@ -2456,8 +2456,6 @@ IN_PROC_BROWSER_TEST_F(UserScriptTrackerBrowserTest,
       *second_tab->GetPrimaryMainFrame()->GetProcess(), extension->id()));
 }
 
-// The following tests use Chrome Apps, which are only supported on ChromeOS.
-
 // Tests that error pages, such as those shown when a frame is blocked via CSP,
 // do not get counted as having scripts injected into them.
 // Regression test for https://crbug.com/511249430.

@@ -525,8 +525,6 @@ class OptimizationGuideKeyedServiceOnDeviceModelDisabledBrowserTest
 
 IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
                        RemoteFetchingDisabled) {
-  // ChromeOS has multiple profiles and optimization guide currently does not
-  // run on non-Android.
   histogram_tester()->ExpectUniqueSample(
       "OptimizationGuide.RemoteFetchingEnabled", false, 1);
   EXPECT_TRUE(variations::IsInSyntheticTrialGroup(
@@ -919,7 +917,6 @@ IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceUnsignedUserBrowserTest,
 
   EXPECT_TRUE(IsSettingVisible(UserVisibleFeatureKey::kCompose));
 
-  // SignOut not supported on ChromeOS.
   SignOut();
   // Wallpaper Search is visible to unsigned users.
   EXPECT_TRUE(IsSettingVisible(UserVisibleFeatureKey::kWallpaperSearch));
@@ -995,7 +992,6 @@ IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
   EXPECT_FALSE(ogks->ShouldFeatureBeCurrentlyEnabledForUser(
       UserVisibleFeatureKey::kCompose));
 
-  // SignOut not supported on ChromeOS.
   SignOut();
 
   EXPECT_FALSE(ogks->ShouldFeatureBeCurrentlyEnabledForUser(
@@ -1086,7 +1082,7 @@ IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
 }
 
 #if !BUILDFLAG(IS_ANDROID)
-// CreateGuestBrowser() is not supported for Android or ChromeOS out of the box.
+// CreateGuestBrowser() is not supported for Android out of the box.
 IN_PROC_BROWSER_TEST_F(OptimizationGuideKeyedServiceBrowserTest,
                        GuestProfileUniqueKeyedService) {
   Browser* guest_browser = CreateGuestBrowser();
@@ -1186,8 +1182,6 @@ class OptimizationGuideKeyedServicePermissionsCheckDisabledTest
 IN_PROC_BROWSER_TEST_F(
     OptimizationGuideKeyedServicePermissionsCheckDisabledTest,
     RemoteFetchingAllowed) {
-  // ChromeOS has multiple profiles and optimization guide currently does not
-  // run on non-Android.
   histogram_tester()->ExpectUniqueSample(
       "OptimizationGuide.RemoteFetchingEnabled", true, 1);
   EXPECT_TRUE(variations::IsInSyntheticTrialGroup(

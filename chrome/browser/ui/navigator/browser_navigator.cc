@@ -550,10 +550,6 @@ base::WeakPtr<content::NavigationHandle> NavigateImpl(
     return nullptr;
   }
 
-  // Open System Apps in their standalone window if necessary.
-  // TODO(crbug.com/40136163): Remove this code after we integrate with intent
-  // handling.
-
   if (!AdjustNavigateParamsForURL(params)) {
     return nullptr;
   }

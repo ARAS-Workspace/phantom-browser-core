@@ -1467,8 +1467,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
     prefs::kManagedLocalNetworkAccessRestrictionsTemporaryOptOut,
     base::Value::Type::BOOLEAN },
 
-  // For Local Network Access policies, device policies are added before user
-  // policies so that user policies override device policies.
   { key::kLocalNetworkAccessAllowedForUrls,
     prefs::kManagedLocalNetworkAccessAllowedForUrls,
     base::Value::Type::LIST },
@@ -1546,9 +1544,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
 // clang-format off
 const SchemaValidatingPolicyToPreferenceMapEntry kSchemaValidatingPolicyMap[] =
     {
-  // Policies for all platforms - Start.
-  // Policies for all platforms - End.
-  // Policies for ChromeOS - Start.
 };
 // clang-format on
 
@@ -1603,8 +1598,6 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
 
   // Policies for all platforms - Start
 
-  // For Local Network Access policies, device policies are added before user
-  // policies so that user policies override device policies.
   handlers->AddHandler(
       std::make_unique<LocalNetworkAccessIpAddressSpaceOverridesPolicyHandler>(
           key::kLocalNetworkAccessIpAddressSpaceOverrides));
@@ -2088,8 +2081,7 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
 // On most platforms, there is a legacy policy
 // kUnsafelyTreatInsecureOriginAsSecure which has been replaced by
 // kOverrideSecurityRestrictionsOnInsecureOrigin. The legacy policy was never
-// supported on ChromeOS or Android, so on those platforms, simply use the new
-// one.
+// supported on Android, so on those platforms, simply use the new one.
 #if BUILDFLAG(IS_ANDROID)
   handlers->AddHandler(std::make_unique<SecureOriginPolicyHandler>(
       key::kOverrideSecurityRestrictionsOnInsecureOrigin, chrome_schema));

@@ -544,7 +544,6 @@ PA_ALWAYS_INLINE internal::UntaggedSlotStart ThreadCache::GetFromCache(
 
   PA_DCHECK(bucket.count != 0);
   internal::FreelistEntry* entry = bucket.freelist_head;
-  // TODO(lizeb): Consider removing once crbug.com/1382658 is fixed.
 
   // Passes the bucket size to |GetNextForThreadCache()|, so that in case of
   // freelist corruption, we know the bucket size that lead to the crash,

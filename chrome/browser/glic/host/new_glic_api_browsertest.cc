@@ -2385,7 +2385,6 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, MAYBE_testCreateTabInBackground) {
   EXPECT_EQ(background_tab->GetGroup(), group_id);
 }
 
-// TODO(crbug.com/469210106): Re-enable this test on ChromeOS.
 // TODO(crbug.com/508123456): Re-enable this test on Android once tab group
 // inheritance is supported on Android's tab creation.
 // TODO(crbug.com/515495117): Fix and re-enable this test on Mac.
@@ -2904,10 +2903,8 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testReloadWebUi) {
 }
 
 // Checks that all tests in new_glic_api_browsertest.ts have a corresponding
-// test case in this file.
-// TODO(crbug.com/460826483): Enable on CrOS.
-// TODO(crbug.com/508123456): Enable on Android once all disabled createTab
-// tests are fixed and re-enabled.
+// test case in this file. TODO(crbug.com/508123456): Enable on Android once all
+// disabled createTab tests are fixed and re-enabled.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_testAllTestsAreRegistered DISABLED_testAllTestsAreRegistered
 #else

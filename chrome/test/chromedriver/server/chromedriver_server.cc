@@ -180,7 +180,6 @@ void StartServerOnIOThread(
 // best to determine the current setting. See https://crbug.com/41398711.
 #if BUILDFLAG(IS_LINUX)
     // On Linux, dual-protocol bind is controlled by a system file.
-    // ChromeOS builds also have OS_LINUX defined, so the code below applies.
     std::string bindv6only;
     base::FilePath bindv6only_filename("/proc/sys/net/ipv6/bindv6only");
     if (!base::ReadFileToString(bindv6only_filename, &bindv6only)) {

@@ -1400,12 +1400,9 @@ void WidgetBase::ClearTextInputState() {
 void WidgetBase::ShowVirtualKeyboardOnElementFocus() {
   base::WeakPtr<WidgetBase> weak_this = weak_ptr_factory_.GetWeakPtr();
 #if BUILDFLAG(IS_IOS_TVOS)
-  // On ChromeOS, virtual keyboard is triggered only when users leave the
-  // mouse button or the finger and a text input element is focused at that
-  // time. Focus event itself shouldn't trigger virtual keyboard.
-  // On tvOS, the system keyboard takes the entire screen, so we want to show
-  // it only when an input field is explicitly tapped rather than when an
-  // element is focused.
+  // Focus event itself shouldn't trigger virtual keyboard. On tvOS, the system
+  // keyboard takes the entire screen, so we want to show it only when an input
+  // field is explicitly tapped rather than when an element is focused.
   UpdateTextInputState();
 #else
   ShowVirtualKeyboard();

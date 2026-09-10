@@ -345,7 +345,6 @@ IN_PROC_BROWSER_TEST_P(TabStripCollectionControllerInteractiveUiTest,
           1));
 }
 
-// Tab Group Accelerators are not defined on ChromeOS.
 #define MAYBE_KeyboardTabGroupCommands KeyboardTabGroupCommands
 IN_PROC_BROWSER_TEST_P(TabStripCollectionControllerInteractiveUiTest,
                        MAYBE_KeyboardTabGroupCommands) {

@@ -163,10 +163,6 @@ void AndroidPaymentApp::AbortPaymentApp(
 }
 
 bool AndroidPaymentApp::IsPreferred() const {
-  // This class used only on Chrome OS, where the only Android payment app
-  // available is the trusted web application (TWA) that launched this instance
-  // of Chrome with a TWA specific payment method, so this app should be
-  // preferred.
   NOTREACHED();
 }
 

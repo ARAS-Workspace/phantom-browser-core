@@ -346,13 +346,8 @@ class BrowserTestBase : public ::testing::Test {
   // Expected exit code.
   int expected_exit_code_ = 0;
 
-  // On ChromeOS, many tests expect the `ash::DarkLightModeController` to
-  // control the `ui::NativeTheme`. Since this is plumbed through
-  // `ui::OsSettingsProviderAsh`, the following instantiation breaks these
-  // tests.
-  // TODO(pkasting): Consider an alternate solution, e.g. changing tests to use
-  // a `ui::MockOsSettingsProvider` instead of the
-  // `ash::DarkLightModeController` and removing the `#if` guards here.
+  // Since this is plumbed through `ui::OsSettingsProviderAsh`, the following
+  // instantiation breaks these tests.
   // Browser tests should not use the current machine settings for theming, but
   // should default to a consistent baseline. Instantiating
   // `ui::OsSettingsProvider` will both provide sane default behavior and

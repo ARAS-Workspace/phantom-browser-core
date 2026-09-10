@@ -512,10 +512,6 @@ IN_PROC_BROWSER_TEST_F(SpeechRecognitionServiceTest, CreateAudioSourceFetcher) {
   SetUpPrefs();
   LaunchServiceWithAudioSourceFetcher();
 
-  // TODO(crbug.com/40753481): Check implementation / sandbox policy on Mac and
-  // Windows.
-  // TODO(crbug.com/381960795): Re-enable test on Linux once bug is fixed.
-
   audio_source_fetcher_->Stop();
   base::RunLoop().RunUntilIdle();
 }

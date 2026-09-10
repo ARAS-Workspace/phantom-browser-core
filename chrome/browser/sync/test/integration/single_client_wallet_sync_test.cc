@@ -214,8 +214,6 @@ INSTANTIATE_TEST_SUITE_P(
     GetSyncTestModes(),
     testing::PrintToStringParamName());
 
-// ChromeOS does not support late signin after profile creation, so the test
-// below does not apply, at least in the current form.
 IN_PROC_BROWSER_TEST_P(SingleClientWalletSyncTest,
                        DownloadAccountStorage_Card) {
   ASSERT_TRUE(SetupClients());
@@ -329,7 +327,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientWalletSyncTest, EnabledByDefault) {
   EXPECT_FALSE(GetProfileWebDataService(0)->UsesInMemoryDatabaseForTesting());
 }
 
-// ChromeOS does not sign out, so the test below does not apply.
 IN_PROC_BROWSER_TEST_P(SingleClientWalletSyncTest, ClearOnSignOut) {
   wallet_helper::SetWalletData(
       GetFakeServer(),
@@ -906,8 +903,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientWalletSyncTest,
   WaitForNumberOfCards(1, paydm);
 }
 
-// ChromeOS doesn't support changes to the primary account after startup, so
-// these tests don't apply.
 IN_PROC_BROWSER_TEST_P(SingleClientWalletSyncTest,
                        SwitchesFromAccountToProfileStorageOnSyncOptIn) {
   wallet_helper::SetWalletData(

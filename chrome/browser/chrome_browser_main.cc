@@ -1020,7 +1020,6 @@ int ChromeBrowserMainParts::OnLocalStateLoaded(
 
 int ChromeBrowserMainParts::ApplyFirstRunPrefs() {
 // Android does first run in Java instead of native.
-// Chrome OS has its own out-of-box-experience code.
 #if !BUILDFLAG(IS_ANDROID)
   master_prefs_ = std::make_unique<first_run::MasterPrefs>();
 
@@ -1120,7 +1119,6 @@ int ChromeBrowserMainParts::PreCreateThreadsImpl() {
   browser_process_->browser_policy_connector()->OnResourceBundleCreated();
 
 // Android does first run in Java instead of native.
-// Chrome OS has its own out-of-box-experience code.
 #if !BUILDFLAG(IS_ANDROID)
   if (first_run::IsChromeFirstRun()) {
     if (!base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kApp) &&
@@ -1450,7 +1448,6 @@ void ChromeBrowserMainParts::PostProfileInit(Profile* profile,
       profile->GetPrefs()->GetString(language::prefs::kAcceptLanguages));
   translate::TranslateMetricsLoggerImpl::LogApplicationStartMetrics(
       ChromeTranslateClient::CreateTranslatePrefs(profile->GetPrefs()));
-// On ChromeOS results in a crash. https://crbug.com/40158352
   language::LanguageUsageMetrics::RecordPageLanguages(
       *UrlLanguageHistogramFactory::GetForBrowserContext(profile));
 
@@ -1802,10 +1799,8 @@ int ChromeBrowserMainParts::PreMainMessageLoopRunImpl() {
   // We are in regular browser boot sequence. Open initial tabs and enter the
   // main message loop.
   std::vector<Profile*> last_opened_profiles;
-  // On ChromeOS multiple profiles doesn't apply, and will break if we load
-  // them this early as the cryptohome hasn't yet been mounted (which happens
-  // only once we log in). And if we're launching a web app, we don't want to
-  // restore the last opened profiles.
+  // If we're launching a web app, we don't want to restore the last opened
+  // profiles.
   if (!base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kAppId)) {
     last_opened_profiles =
         g_browser_process->profile_manager()->GetLastOpenedProfiles();

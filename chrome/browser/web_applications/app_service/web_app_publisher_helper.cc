@@ -516,8 +516,6 @@ void WebAppPublisherHelper::SetWebAppShowInFields(const WebApp* web_app,
   if (web_app->chromeos_data().has_value()) {
     auto& chromeos_data = web_app->chromeos_data().value();
     bool should_show_app = true;
-    // TODO(b/201422755): Remove Web app specific hiding for demo mode once icon
-    // load fixed.
     app.show_in_launcher = chromeos_data.show_in_launcher && should_show_app;
     app.show_in_shelf = app.show_in_search =
         chromeos_data.show_in_search_and_shelf && should_show_app;

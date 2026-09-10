@@ -55,7 +55,6 @@ void ChromeBrowserMainExtraPartsMemory::PostCreateThreads() {
 }
 
 void ChromeBrowserMainExtraPartsMemory::PostBrowserStart() {
-  // The MemoryPressureMonitor might not be available in some tests.
 }
 
 void ChromeBrowserMainExtraPartsMemory::PostMainMessageLoopRun() {

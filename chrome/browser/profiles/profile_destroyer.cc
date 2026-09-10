@@ -307,8 +307,6 @@ void ProfileDestroyer::DestroyOriginalProfileNow(
   // RenderProcessHosts in --single-process mode, to avoid race conditions.
   if (!content::RenderProcessHost::run_renderer_in_process()) {
     DCHECK_EQ(profile_hosts_count, 0u);
-    // ChromeOS' system profile can be outlived by its off-the-record profile
-    // (see https://crbug.com/40569888).
     DCHECK_EQ(off_the_record_profile_hosts_count, 0u);
   }
 #endif  // DCHECK_IS_ON()

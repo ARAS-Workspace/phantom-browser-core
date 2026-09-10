@@ -252,7 +252,6 @@ TEST_F(ChildAccountServiceTest, FamilyLinkSettingsServiceActiveState) {
   // Settings service should now be active.
   EXPECT_TRUE(family_link_settings_service_.IsActive());
 
-  // Sign out not supported on ChromeOS.
   // Sign out.
   identity_test_environment_->ClearPrimaryAccount();
 

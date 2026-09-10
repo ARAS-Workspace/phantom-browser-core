@@ -118,27 +118,6 @@ class ProfileManager : public Profile::Delegate {
 #if BUILDFLAG(IS_ANDROID)
   // Get the profile for the user which created the current session.
   // Note that in case of a guest account this will return a 'suitable' profile.
-  //
-  // DEPRECATED on ChromeOS because of known issues that it may return non User
-  // Profile instance. Please use:
-  //   ash::BrowserContextHelper::Get()->GetBrowserContextByAccountId(
-  //       session_manager::SessionManager::Get()->GetPrimarySession()
-  //           ->account_id());
-  // or even simpler code if you need only limited parts of Profile.
-  // E.g., if you need only PrefService of the Profile, you can take it from
-  // user_manager::User::GetProfilePrefs(), e.g.:
-  //   user_manager::UserManager::Get()->FindUser(
-  //       session_manager::SessionManager::Get()->GetPrimarySession()
-  //           ->account_id())->GetProfilePrefs();
-  // Note that, due to the current implementation, despite of its name, this
-  // may return non-user profile or null depending on the current session
-  // state. For migration, we must take care of when this is called from the
-  // callers. Specifically, if this may be called before login or during login
-  // process, the extra check is needed. Otherwise, we may want CHECK for
-  // the session state.
-  // For the safer migration, we record the callers of unexpected use via
-  // location. It should be always called FROM_HERE as default value.
-  // TODO(crbug.com/40227502): Remove this.
   static Profile* GetPrimaryUserProfile(
   );
 
@@ -170,10 +149,8 @@ class ProfileManager : public Profile::Delegate {
 #endif
 
 #if BUILDFLAG(IS_ANDROID)
-  // Load and return the initial profile for browser. On ChromeOS, this returns
-  // either the sign-in profile or the active user profile depending on whether
-  // browser is started normally or is restarted after crash. On other
-  // platforms, this returns the default profile.
+  // Load and return the initial profile for browser. This returns the default
+  // profile.
   static Profile* CreateInitialProfile();
 #endif  // BUILDFLAG(IS_ANDROID)
 

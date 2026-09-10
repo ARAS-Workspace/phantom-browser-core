@@ -889,7 +889,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessTextInputManagerTest,
 
 // This test makes sure browser correctly tracks focused editable element inside
 // each RenderFrameHost.
-// Test is flaky on chromeOS; https://crbug.com/41309421.
 #define MAYBE_TrackingFocusedElementForAllFrames \
   TrackingFocusedElementForAllFrames
 IN_PROC_BROWSER_TEST_F(SitePerProcessTextInputManagerTest,
@@ -928,11 +927,10 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessTextInputManagerTest,
 }
 
 // This test tracks page level focused editable element tracking using
-// WebContents. In a page with multiple frames, a frame is selected and
-// focused. Then the <input> inside frame is both focused and blurred and  and
-// in both cases the test verifies that WebContents is aware whether or not a
-// focused editable element exists on the page.
-// Test is flaky on ChromeOS. crbug.com/41309482
+// WebContents. In a page with multiple frames, a frame is selected and focused.
+// Then the <input> inside frame is both focused and blurred and  and in both
+// cases the test verifies that WebContents is aware whether or not a focused
+// editable element exists on the page.
 #define MAYBE_TrackPageFocusEditableElement TrackPageFocusEditableElement
 IN_PROC_BROWSER_TEST_F(SitePerProcessTextInputManagerTest,
                        MAYBE_TrackPageFocusEditableElement) {
@@ -965,12 +963,11 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessTextInputManagerTest,
   }
 }
 
-// TODO(ekaramad): Could this become a unit test instead?
-// This test focuses <input> elements on the page and verifies that
-// WebContents knows about the focused editable element. Then it asks the
-// WebContents to clear focused element and verifies that there is no longer
-// a focused editable element on the page.
-// Test is flaky on ChromeOS; https://crbug.com/41309421.
+// TODO(ekaramad): Could this become a unit test instead? This test focuses
+// <input> elements on the page and verifies that WebContents knows about the
+// focused editable element. Then it asks the WebContents to clear focused
+// element and verifies that there is no longer a focused editable element on
+// the page.
 #define MAYBE_ClearFocusedElementOnPage ClearFocusedElementOnPage
 IN_PROC_BROWSER_TEST_F(SitePerProcessTextInputManagerTest,
                        MAYBE_ClearFocusedElementOnPage) {

@@ -650,7 +650,6 @@ bool SyncPrefs::IsTypeSupportedInTransportMode(UserSelectableType type) {
     case UserSelectableType::kApps:
       return IsReplaceSyncPromosWithSignInPromosEnabled();
     case UserSelectableType::kCookies:
-      // ChromeOS-only type.
       return false;
   }
   NOTREACHED();

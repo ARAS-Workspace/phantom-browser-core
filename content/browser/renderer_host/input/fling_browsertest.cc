@@ -476,8 +476,6 @@ IN_PROC_BROWSER_TEST_F(BrowserSideFlingBrowserTest,
   WaitForFrameScroll(GetRootNode(), 15, true /* upward */);
 }
 
-// Touchpad fling only happens on ChromeOS.
-
 // TODO(crbug.com/40230295): flaky.
 IN_PROC_BROWSER_TEST_F(BrowserSideFlingBrowserTest,
                        DISABLED_InertialGSEGetsBubbledFromOOPIF) {

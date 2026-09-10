@@ -42,10 +42,8 @@ ProfileNotification::ProfileNotification(
           notification),
       original_id_(notification.id()),
       type_(type) {
-  // These keepalives prevent the browser process from shutting down when
-  // the last browser window is closed and there are open notifications. It's
-  // not used on Chrome OS as closing the last browser window never shuts down
-  // the process or delete the Profile.
+  // These keepalives prevent the browser process from shutting down when the
+  // last browser window is closed and there are open notifications.
   keep_alive_ = std::make_unique<ScopedKeepAlive>(
       KeepAliveOrigin::NOTIFICATION, KeepAliveRestartOption::DISABLED);
   if (profile_ && !profile_->IsOffTheRecord()) {

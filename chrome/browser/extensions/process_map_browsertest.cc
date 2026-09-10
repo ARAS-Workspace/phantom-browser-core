@@ -1358,9 +1358,6 @@ IN_PROC_BROWSER_TEST_F(ProcessMapBrowserTest,
   }
 }
 
-// The following tests launch a dynamic Chrome App, which is only supported on
-// ChromeOS.
-
 IN_PROC_BROWSER_TEST_F(ProcessMapBrowserTest,
                        IsPrivilegedExtensionProcess_UserScripts) {
   const Extension* extension =

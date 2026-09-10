@@ -2301,10 +2301,6 @@ IN_PROC_BROWSER_TEST_F(ChromeNavigationBrowserTest,
 // is enabled by default.
 using NavigationConsumingTest = ChromeNavigationBrowserTest;
 
-// The fullscreen API is spec'd to require a user activation (aka user gesture),
-// so use that API to test if navigation consumes the activation.
-// https://fullscreen.spec.whatwg.org/#allowed-to-request-fullscreen
-// https://crbug.com/40813521 Flaky on ChromeOS.
 #define MAYBE_NavigationConsumesUserGesture_Fullscreen \
   NavigationConsumesUserGesture_Fullscreen
 IN_PROC_BROWSER_TEST_F(NavigationConsumingTest,

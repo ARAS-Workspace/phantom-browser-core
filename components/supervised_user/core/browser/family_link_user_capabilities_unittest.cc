@@ -132,7 +132,6 @@ TEST_F(FamilyLinkUserCapabilitiesTest, SignedInCanFetchFamilyMemberInfo) {
   identity_test_env_.UpdateAccountInfoForAccount(account_info);
 }
 
-// ChromeOS does not support sign-out in tests.
 TEST_F(FamilyLinkUserCapabilitiesTest, SignOutTriggersCapabilitiesUpdate) {
   AccountInfo account_info = identity_test_env_.MakePrimaryAccountAvailable(
       kEmail, signin::ConsentLevel::kSignin);

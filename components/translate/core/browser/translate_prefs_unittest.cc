@@ -612,11 +612,9 @@ TEST_F(TranslatePrefsTest, MoveLanguageUp) {
                                       {"it", "es"});
   accept_languages_tester_->ExpectAcceptLanguagePrefs("it,en,fr,es");
 
-  //---------------------------------------------------------------------------
-  // Move with policy-forced languages present.
-  // Forced languages should always remain at the top of the languages list and
-  // can't be reordered.
-  // Only test on non-Chrome OS platforms.
+  // ---------------------------------------------------------------------------
+  // Move with policy-forced languages present. Forced languages should always
+  // remain at the top of the languages list and can't be reordered. Only test.
 
   // Try moving forced language up.
   languages = {"it", "es", "zh"};
@@ -739,9 +737,8 @@ TEST_F(TranslatePrefsTest, MoveLanguageUp) {
                                       {"en", "fr", "it", "es", "zh"});
   accept_languages_tester_->ExpectAcceptLanguagePrefs("es,en,fr,it,zh");
 
-  //---------------------------------------------------------------------------
-  // Move with policy-forced languages present.
-  // Only test on non-Chrome OS platforms.
+  // ---------------------------------------------------------------------------
+  // Move with policy-forced languages present. Only test.
 
   // Move bottom selected language to top of all languages.
   languages = {"it", "es", "zh"};
@@ -827,9 +824,8 @@ TEST_F(TranslatePrefsTest, MoveLanguageDown) {
                                       {"fr", "it"});
   accept_languages_tester_->ExpectAcceptLanguagePrefs("en,fr,es,it");
 
-  //---------------------------------------------------------------------------
-  // Move with policy-forced languages present.
-  // Only test on non-Chrome OS platforms.
+  // ---------------------------------------------------------------------------
+  // Move with policy-forced languages present. Only test.
 
   // Try moving forced language down.
   languages = {"it", "es", "zh"};

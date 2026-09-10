@@ -580,8 +580,6 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
 // Mouse events are not routed through UnboundedSurfaceWindow on Android, as
 // native touch/pointer events are handled by the regular Android View
 // hierarchy.
-// TODO(crbug.com/508672616): Not yet working on ChromeOS due to Aura/Ash
-// popup container positioning and coordinate conversion issues.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_PopupInputEventRouting DISABLED_PopupInputEventRouting
 #else
@@ -635,8 +633,6 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
 // Mouse events are not routed through UnboundedSurfaceWindow on Android, as
 // native touch/pointer events are handled by the regular Android View
 // hierarchy.
-// TODO(crbug.com/508672616): Not yet working on ChromeOS due to Aura/Ash
-// popup container positioning and coordinate conversion issues.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_PopupOutsideViewportInputEventRouting \
   DISABLED_PopupOutsideViewportInputEventRouting
@@ -740,8 +736,6 @@ IN_PROC_BROWSER_TEST_P(UnboundedElementBrowserTest,
 // Mouse events are not routed through UnboundedSurfaceWindow on Android, as
 // native touch/pointer events are handled by the regular Android View
 // hierarchy.
-// TODO(crbug.com/508672616): Not yet working on ChromeOS due to Aura/Ash
-// popup container positioning and coordinate conversion issues.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_IframeClickEventRouting DISABLED_IframeClickEventRouting
 #else

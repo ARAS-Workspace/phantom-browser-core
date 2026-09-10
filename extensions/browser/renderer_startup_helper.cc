@@ -210,7 +210,7 @@ void RendererStartupHelper::OnRenderProcessLaunched(
     // OnRenderProcessHostCreated(), if it corresponds to the same context.
     ExtensionsBrowserClient* client = ExtensionsBrowserClient::Get();
 #if BUILDFLAG(IS_ANDROID)
-    // On Android and ChromeOS, handle race condition during process restart:
+    // On Android, handle race condition during process restart:
     // 1. OnRenderProcessHostCreated() initializes extensions and populates
     // process_mojo_map_.
     // 2. Process startup fails in some cases.

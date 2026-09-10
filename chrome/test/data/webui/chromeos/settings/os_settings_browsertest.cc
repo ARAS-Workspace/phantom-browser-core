@@ -675,7 +675,6 @@ IN_PROC_BROWSER_TEST_F(OSSettingsMochaTest, InternetPageNetworkSummary) {
   RunSettingsTest("internet_page/network_summary_test.js");
 }
 
-// TODO(crbug.com/452098595): Test is flaky on linux-chromeos-dbg.
 #define MAYBE_InternetPageNetworkSummaryItem InternetPageNetworkSummaryItem
 IN_PROC_BROWSER_TEST_F(OSSettingsMochaTest,
                        MAYBE_InternetPageNetworkSummaryItem) {

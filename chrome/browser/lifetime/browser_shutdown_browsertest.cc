@@ -34,7 +34,6 @@ class BrowserShutdownBrowserTest : public InProcessBrowserTest {
   base::HistogramTester histogram_tester_;
 };
 
-// ChromeOS has the different shutdown flow on user initiated exit process.
 // See the comment for chrome::AttemptUserExit() function declaration.
 // Mac browser shutdown is flaky: https://crbug.com/40201651
 #if BUILDFLAG(IS_MAC)

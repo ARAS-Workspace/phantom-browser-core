@@ -264,11 +264,9 @@ class AccountTrackerTest : public testing::Test {
                                                 signin::ConsentLevel::kSync);
   }
 
-// Helpers that go through a logout flow.
-// NOTE: On ChromeOS, the logout callback is never fired in production (since
-// the underlying GoogleSignedOut callback is never sent). Tests that exercise
-// functionality dependent on that callback firing are not relevant on ChromeOS
-// and should simply not run on that platform.
+// Helpers that go through a logout flow. Tests that exercise functionality
+// dependent on that callback firing are not relevant on should simply not run
+// on that platform.
   void NotifyLogoutOfAllAccounts() { identity_test_env_.ClearPrimaryAccount(); }
 
   CoreAccountInfo AddAccountWithToken(const std::string& email) {
@@ -308,7 +306,6 @@ TEST_F(AccountTrackerTest, PrimaryNoEventsBeforeLogin) {
   CoreAccountInfo account = AddAccountWithToken("me@dummy.com");
   NotifyTokenRevoked(account.account_id);
 
-// Logout is not possible on ChromeOS.
   NotifyLogoutOfAllAccounts();
 
   EXPECT_TRUE(observer()->CheckEvents());
@@ -340,7 +337,6 @@ TEST_F(AccountTrackerTest, PrimaryRevokeThenTokenAvailable) {
   EXPECT_TRUE(observer()->CheckEvents(TrackingEvent(SIGN_IN, primary_account)));
 }
 
-// These tests exercise true login/logout, which are not possible on ChromeOS.
 TEST_F(AccountTrackerTest, PrimaryTokenAvailableThenLogin) {
   AddAccountWithToken(kPrimaryAccountEmail);
   EXPECT_TRUE(observer()->CheckEvents());
@@ -450,7 +446,6 @@ TEST_F(AccountTrackerTest, MultiNoEventsBeforeLogin) {
   NotifyTokenRevoked(account2.account_id);
   NotifyTokenRevoked(account2.account_id);
 
-// Logout is not possible on ChromeOS.
   NotifyLogoutOfAllAccounts();
 
   EXPECT_TRUE(observer()->CheckEvents());
@@ -515,7 +510,6 @@ TEST_F(AccountTrackerTest, GetAccountsReturnNothingWhenPrimarySignedOut) {
   EXPECT_EQ(0ul, account.size());
 }
 
-// This test exercises true login/logout, which are not possible on ChromeOS.
 TEST_F(AccountTrackerTest, MultiLogoutRemovesAllAccounts) {
   CoreAccountInfo primary_account = SetActiveAccount(kPrimaryAccountEmail);
   NotifyTokenAvailable(primary_account.account_id);

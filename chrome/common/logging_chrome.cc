@@ -51,10 +51,6 @@ bool chrome_logging_failed_ = false;
 // InitChromeLogging() and the beginning of CleanupChromeLogging().
 bool chrome_logging_redirected_ = false;
 
-// The directory on which we do rotation of log files instead of switching
-// with symlink. Because this directory doesn't support symlinks and the logic
-// doesn't work correctly.
-
 // Assertion handler for logging errors that occur when dialogs are
 // silenced.  To record a new error, pass the log string associated
 // with that error in the str parameter.

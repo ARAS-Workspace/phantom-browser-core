@@ -4504,12 +4504,6 @@ TEST_F(WebRtcEventLogManagerTestPolicy,
   EXPECT_EQ(StartRemoteLogging(key), allow_remote_logging);
 }
 
-// Currently we only test the case of supervised child profiles for Chrome OS
-// here. Other user types for Chrome OS are tested in the unit test for
-// ProfileDefaultsToLoggingEnabledTestCase in
-// webrtc_event_log_manager_common_unittest because the test setup in this
-// class currently does not seem to allow for an easy setup of some user types.
-
 #if !BUILDFLAG(IS_ANDROID)
 TEST_F(WebRtcEventLogManagerTestPolicy,
        OnlyManagedByPlatformPoliciesDoesNotAllowRemoteLoggingByDefault) {

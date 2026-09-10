@@ -93,8 +93,6 @@ SearchUserModel::GetModelConfig() {
   // Set features.
   writer.AddFeatures<Feature>(kFeatures);
 
-// Segmentation Ukm Engine is disabled on CrOS.
-
   std::string query =
       "SELECT COUNT(id) FROM metrics WHERE metric_hash = '64BD7CCE5A95BF00'";
   const std::array<UkmMetricHash, 1> kNavigationMetric = {kNavMetricHash};

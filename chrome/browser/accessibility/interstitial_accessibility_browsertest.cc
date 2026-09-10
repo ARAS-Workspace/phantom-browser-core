@@ -47,8 +47,6 @@ class InterstitialAccessibilityBrowserTest : public InProcessBrowserTest {
   }
 };
 
-// TODO(crbug.com/1453221): flakily times out on ChromeOS MSAN builders. Deflake
-// and re-enable.
 #define MAYBE_TestSSLInterstitialAccessibility TestSSLInterstitialAccessibility
 IN_PROC_BROWSER_TEST_F(InterstitialAccessibilityBrowserTest,
                        MAYBE_TestSSLInterstitialAccessibility) {

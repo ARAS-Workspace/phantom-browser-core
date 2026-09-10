@@ -90,9 +90,6 @@ ui::ResourceBundle::FontDetails ChromeTypographyProvider::GetFontDetailsImpl(
 
   if (context == CONTEXT_TAB_COUNTER &&
       style == views::style::STYLE_SECONDARY) {
-    // Secondary font is for double-digit counts. Because we have control over
-    // system fonts on ChromeOS, we can just choose a condensed font. For other
-    // platforms we adjust size.
     details.size_delta -= 2;
   }
 

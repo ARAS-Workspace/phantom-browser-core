@@ -396,7 +396,7 @@ ChromeWebUIControllerFactory::GetFaviconResourceBytes(
   }
 
 #if !BUILDFLAG(IS_ANDROID)
-  // The chrome://apps page is not available on Android or ChromeOS.
+  // The chrome://apps page is not available on Android.
   if (page_url.host() == chrome::kChromeUIAppLauncherPageHost) {
     return webapps::AppHomeUI::GetFaviconResourceBytes(scale_factor);
   }

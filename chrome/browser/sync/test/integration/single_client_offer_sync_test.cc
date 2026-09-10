@@ -138,7 +138,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientOfferSyncTest, ClearOnSyncPaused) {
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-// ChromeOS does not sign out, so the test below does not apply.
 // Offer data should get cleared from the database when the user signs out.
 IN_PROC_BROWSER_TEST_P(SingleClientOfferSyncTest, ClearOnSignOut) {
   SetOfferData(GetFakeServer(), {CreateDefaultSyncCardLinkedOffer()});

@@ -715,10 +715,9 @@ TEST_F(GpuDataManagerImplPrivateTest,
 }
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 
-// Android and Chrome OS do not support software compositing, while Fuchsia does
-// not support falling back to software from Vulkan.
-// Explicitly disable SkiaGraphite for tests that run with Ganesh as some
-// platforms have started shipping Graphite.
+// Android does not support software compositing, while Fuchsia does not support
+// falling back to software from Vulkan. Explicitly disable SkiaGraphite for
+// tests that run with Ganesh as some platforms have started shipping Graphite.
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 TEST_F(GpuDataManagerImplPrivateTest, NoDefaultFallbackToSwiftShaderForGanesh) {
   base::test::ScopedCommandLine command_line;

@@ -435,12 +435,8 @@ class StackSamplingProfilerTest : public testing::Test {
 //
 // macOS ASAN is not yet supported - crbug.com/718628.
 //
-// TODO(crbug.com/40702833): Enable this test again for Android with
-// ASAN. This is now disabled because the android-asan bot fails.
-//
-// If we're running the ChromeOS unit tests on Linux, this test will never pass
-// because Ubuntu's libc isn't compiled with frame pointers. Skip if not a real
-// ChromeOS device.
+// TODO(crbug.com/40702833): Enable this test again for Android with ASAN. This
+// is now disabled because the android-asan bot fails.
 #if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)) || \
     (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_ANDROID))
 #define MAYBE_Basic DISABLED_Basic
@@ -495,13 +491,8 @@ class TestAuxUnwinder : public Unwinder {
 };
 
 // Checks that the profiler handles stacks containing dynamically-allocated
-// stack memory.
-// macOS ASAN is not yet supported - crbug.com/718628.
-// Android is not supported since Chrome unwind tables don't support dynamic
-// frames.
-// If we're running the ChromeOS unit tests on Linux, this test will never pass
-// because Ubuntu's libc isn't compiled with frame pointers. Skip if not a real
-// ChromeOS device.
+// stack memory. macOS ASAN is not yet supported - crbug.com/718628. Android is
+// not supported since Chrome unwind tables don't support dynamic frames.
 #if (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)) || BUILDFLAG(IS_ANDROID)
 #define MAYBE_Alloca DISABLED_Alloca
 #else

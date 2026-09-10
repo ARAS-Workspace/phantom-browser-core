@@ -384,8 +384,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiCaptureTest,
       << message_;
 }
 
-// https://crbug.com/40707203 Flaky on Linux, ChromeOS.
-// TODO(crbug.com/488154807): Flaky on desktop Android.
+// https://crbug.com/40707203 Flaky on Linux. TODO(crbug.com/488154807): Flaky
+// on desktop Android.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #define MAYBE_CaptureVisibleFile DISABLED_CaptureVisibleFile
 #else
@@ -649,7 +649,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTabPrerenderingTest, DISABLED_Prerendering) {
   ASSERT_TRUE(RunExtensionTest("tabs/prerendering")) << message_;
 }
 
-// TODO(crbug.com/497838105): Flaky.
 #define MAYBE_PrerenderingIntoANewTab PrerenderingIntoANewTab
 IN_PROC_BROWSER_TEST_F(ExtensionApiTabPrerenderingTest,
                        MAYBE_PrerenderingIntoANewTab) {

@@ -39,9 +39,6 @@ ManagementService* ManagementServiceFactory::GetForPlatform() {
         std::make_unique<LocalBrowserManagementStatusProvider>());
   }
 
-  // This has to be done here since `DeviceManagementStatusProvider` cannot be
-  // defined in `components/policy/`, also we need we need the
-  // `g_browser_process->platform_part()`.
   return instance;
 }
 

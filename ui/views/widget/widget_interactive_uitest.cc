@@ -1621,8 +1621,8 @@ TEST_F(WidgetCaptureTest, MAYBE_SystemModalWindowReleasesCapture) {
 }
 
 // Regression test for http://crbug.com/382421 (Linux-Aura issue).
-// TODO(pkotwicz): Make test pass on CrOS and Windows.
-// TODO(tapted): Investigate for toolkit-views on Mac http;//crbug.com/441064.
+// TODO(pkotwicz): Make test pass on Windows. TODO(tapted): Investigate for
+// toolkit-views on Mac http;//crbug.com/441064.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_MouseExitOnCaptureGrab DISABLED_MouseExitOnCaptureGrab
 #else

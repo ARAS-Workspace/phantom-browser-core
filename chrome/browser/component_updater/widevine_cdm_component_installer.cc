@@ -63,9 +63,9 @@ const uint8_t kWidevineSha2Hash[] = {
 static_assert(std::size(kWidevineSha2Hash) == crypto::kSHA256Length);
 
 #if !BUILDFLAG(IS_LINUX)
-// On Linux and ChromeOS the Widevine CDM is loaded at startup before the
-// zygote is locked down. As a result there is no need to register the CDM
-// with Chrome as it can't be used until Chrome is restarted.
+// On Linux the Widevine CDM is loaded at startup before the zygote is locked
+// down. As a result there is no need to register the CDM with Chrome as it
+// can't be used until Chrome is restarted.
 void RegisterWidevineCdmWithChrome(const base::Version& cdm_version,
                                    const base::FilePath& cdm_path,
                                    base::DictValue manifest) {
@@ -91,9 +91,9 @@ void RegisterWidevineCdmWithChrome(const base::Version& cdm_version,
 #endif  // !BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_LINUX)
-// On Linux and ChromeOS the Widevine CDM is loaded at startup before the
-// zygote is locked down. To locate the Widevine CDM at startup, a hint file
-// is used. Update the hint file with the new Widevine CDM path.
+// On Linux the Widevine CDM is loaded at startup before the zygote is locked
+// down. To locate the Widevine CDM at startup, a hint file is used. Update the
+// hint file with the new Widevine CDM path.
 bool UpdateHintFile(const base::FilePath& cdm_base_path) {
   // Also record the current bundled Widevine CDMs version, if a bundled
   // Widevine CDM is supported and it exists.
@@ -210,10 +210,10 @@ void WidevineCdmComponentInstallerPolicy::ComponentReady(
 bool WidevineCdmComponentInstallerPolicy::VerifyInstallation(
     const base::DictValue& manifest,
     const base::FilePath& install_dir) const {
-  // On ChromeOS, what gets downloaded is an image rather than the directory
-  // structure expected. As a result, we can not check that there is an
-  // library contained until the image is loaded. But on all other systems
-  // we can check for the library.
+  // What gets downloaded is an image rather than the directory structure
+  // expected. As a result, we can not check that there is an library contained
+  // until the image is loaded. But on all other systems we can check for the
+  // library.
   base::FilePath cdm_path = GetCdmPathFromInstallDir(install_dir);
   if (!base::PathExists(cdm_path)) {
     return false;

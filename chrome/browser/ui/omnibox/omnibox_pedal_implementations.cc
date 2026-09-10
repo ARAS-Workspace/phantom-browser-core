@@ -1963,9 +1963,6 @@ GetPedalImplementations(bool incognito, bool guest, bool testing) {
   add(new OmniboxPedalManageChromeSettings());
   add(new OmniboxPedalManageChromeDownloads());
   add(new OmniboxPedalViewChromeHistory());
-  // The sharing hub pedal is intentionally excluded
-  // on ChromeOS because the sharing hub experience on that
-  // platform is different from other desktop platforms.
   add(new OmniboxPedalShareThisPage());
   add(new OmniboxPedalManageChromeAccessibility());
   add(new OmniboxPedalSetChromeAsDefaultBrowser());

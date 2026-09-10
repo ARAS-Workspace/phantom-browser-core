@@ -16,8 +16,8 @@ namespace message_center {
 namespace {
 
 bool UseHighPriorityDelay(Notification* notification) {
-  // Web Notifications are given a longer on-screen time on non-Chrome OS
-  // platforms as there is no notification center to dismiss them to.
+  // Web Notifications are given a longer on-screen time as there is no
+  // notification center to dismiss them to.
   const bool use_high_priority_delay =
       notification->priority() > DEFAULT_PRIORITY ||
       notification->notifier_id().type == NotifierType::WEB_PAGE;

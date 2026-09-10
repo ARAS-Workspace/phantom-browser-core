@@ -10922,11 +10922,10 @@ class CommitMessageOrderReverser : public DidCommitNavigationInterceptor {
 
 }  // namespace
 
-// Create an out-of-process iframe that causes itself to be detached during
-// its layout/animate phase. See https://crbug.com/802932.
+// Create an out-of-process iframe that causes itself to be detached during its
+// layout/animate phase. See https://crbug.com/802932.
 //
-// TODO(crbug.com/40561636): Disabled on Android, Mac, and ChromeOS due to
-// flakiness.
+// TODO(crbug.com/40561636): Disabled on Android, Mac due to flakiness.
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
 #define MAYBE_OOPIFDetachDuringAnimation DISABLED_OOPIFDetachDuringAnimation
 #else
@@ -12778,7 +12777,6 @@ IN_PROC_BROWSER_TEST_P(SitePerProcessBrowserTest,
             child->current_frame_host()->GetLastCommittedURL());
 }
 
-// Touchscreen DoubleTapZoom is only supported on Android & ChromeOS at present.
 #if BUILDFLAG(IS_ANDROID)
 // A test ContentBrowserClient implementation which enforces
 // WebPreferences' |double_tap_to_zoom_enabled| to be true.

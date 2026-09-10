@@ -349,9 +349,9 @@ void GpuDataManagerImplPrivate::StartUmaTimer() {
 
 void GpuDataManagerImplPrivate::InitializeGpuModes() {
   DCHECK_EQ(gpu::GpuMode::UNKNOWN, gpu_mode_);
-  // Android and Chrome OS can't switch to software compositing. If the GPU
-  // process initialization fails or GPU process is too unstable then crash the
-  // browser process to reset everything.
+  // Android can't switch to software compositing. If the GPU process
+  // initialization fails or GPU process is too unstable then crash the browser
+  // process to reset everything.
 #if !BUILDFLAG(IS_ANDROID)
   fallback_modes_.push_back(gpu::GpuMode::DISPLAY_COMPOSITOR);
   if (SoftwareGLAllowed()) {

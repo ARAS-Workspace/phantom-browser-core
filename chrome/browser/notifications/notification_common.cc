@@ -52,8 +52,7 @@ void NotificationCommon::OpenNotificationSettings(Profile* profile,
   // settings page to toggle permission.
 
 #if BUILDFLAG(IS_ANDROID)
-  // Android settings are handled through Java. Chrome OS settings are handled
-  // through the tray's setting panel.
+  // Android settings are handled through Java.
   NOTREACHED();
 #else
   chrome::ScopedTabbedBrowserDisplayer browser_displayer(profile);

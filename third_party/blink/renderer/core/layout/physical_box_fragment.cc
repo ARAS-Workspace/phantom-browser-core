@@ -619,8 +619,6 @@ const PhysicalBoxFragment* PhysicalBoxFragment::PostLayout() const {
   if (post_layout == this)
     return this;
 
-// TODO(crbug.com/1241721): Revert https://crrev.com/c/3108806 to re-enable this
-// DCHECK on CrOS.
 #if DCHECK_IS_ON()
   DCHECK(AllowPostLayoutScope::IsAllowed());
 #endif

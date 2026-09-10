@@ -496,8 +496,6 @@ TEST_F(IdentityManagerTest, PrimaryAccountInfoAtStartup) {
   // There is no guarantee that this will be notified via callback on startup.
 }
 
-// Signin/signout tests aren't relevant and cannot build on ChromeOS, which
-// doesn't support signin/signout.
 // Test that the user signing in results in firing of the IdentityManager
 // observer callback and the IdentityManager's state being updated.
 TEST_F(IdentityManagerTest, PrimaryAccountInfoAfterSignin) {
@@ -2344,7 +2342,6 @@ TEST_F(IdentityManagerTest, FindExtendedPrimaryAccountInfo) {
   EXPECT_EQ(core_info.email, extended_info.email);
   EXPECT_EQ(core_info.gaia, extended_info.gaia);
 
-  // It's not possible to sign out on Ash.
   ClearPrimaryAccount(identity_manager());
   SetRefreshTokenForAccount(identity_manager(), core_info.account_id, "token");
   // No info found if there is no primary account.

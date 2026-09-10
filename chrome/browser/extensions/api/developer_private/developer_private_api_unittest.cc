@@ -3419,8 +3419,6 @@ TEST_F(DeveloperPrivateApiSupervisedUserUnitTest,
     EXPECT_THAT(error, testing::HasSubstr("Child account"));
 }
 
-// Signing into transport mode and Sign outs are not supported for ChromeOS
-// hence DeveloperPrivateApiTransportModeUnitTest is not run for ChromeOS.
 class DeveloperPrivateApiTransportModeUnitTest
     : public DeveloperPrivateApiUnitTest {
  public:

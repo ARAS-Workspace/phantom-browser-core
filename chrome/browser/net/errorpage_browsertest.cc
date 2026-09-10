@@ -751,8 +751,6 @@ IN_PROC_BROWSER_TEST_F(DNSErrorPageTest, Incognito) {
   // Verify that the expected error page is being displayed.
   ExpectDisplayingErrorPage(incognito_browser, net::ERR_NAME_NOT_RESOLVED);
 
-  // Can't currently show the diagnostics in incognito on any platform but
-  // ChromeOS.
   EXPECT_FALSE(WebContentsCanShowDiagnosticsTool(
       incognito_browser->tab_strip_model()->GetActiveWebContents()));
 

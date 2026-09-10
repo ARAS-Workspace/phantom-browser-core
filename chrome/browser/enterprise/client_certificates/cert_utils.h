@@ -28,8 +28,7 @@ class PrivateKeyFactory;
 std::unique_ptr<PrivateKeyFactory> CreatePrivateKeyFactory();
 
 // Creates and returns a CertificateProvisioningService for the browser
-// (machine) scope. This relies on Chrome Browser Cloud Management, which does
-// not exist on ChromeOS.
+// (machine) scope.
 std::unique_ptr<client_certificates::CertificateProvisioningService>
 CreateBrowserCertificateProvisioningService(
     PrefService* local_state,

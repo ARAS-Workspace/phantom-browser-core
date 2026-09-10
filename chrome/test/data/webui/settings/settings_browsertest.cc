@@ -100,7 +100,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, AppearancePageIndex) {
   RunTest("settings/appearance_page_index_test.js", "mocha.run()");
 }
 
-// TODO(crbug.com/40856240) Test is flaky on ChromeOS
 IN_PROC_BROWSER_TEST_F(SettingsTest, AppearancePage) {
   RunTest("settings/appearance_page_test.js", "mocha.run()");
 }
@@ -291,7 +290,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, DISABLED_MainPage) {
   RunTest("settings/settings_main_test.js", "mocha.run()");
 }
 
-// TODO(crbug.com/454213441): Flaky on Linux builds and debug ChromeOS builds.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_SettingsMain DISABLED_SettingsMain
 #else
@@ -387,7 +385,7 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, PrivacyPageIndex) {
           "runMochaSuite('PrivacyPageIndex Main')");
 }
 
-// TODO(crbug.com/533057215): Flaky on Linux and ChromeOS debug builds.
+// TODO(crbug.com/533057215): Flaky on Linux debug builds.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_PrivacyPageIndexSiteSettings DISABLED_PrivacyPageIndexSiteSettings
 #else
@@ -1605,8 +1603,6 @@ IN_PROC_BROWSER_TEST_F(SettingsRouteTest, DynamicParameters) {
   RunTest("settings/route_test.js", "runMochaSuite('DynamicParameters')");
 }
 
-// Copied from Polymer 2 test:
-// Failing on ChromiumOS dbg. https://crbug.com/263415119
 #define MAYBE_NonExistentRoute NonExistentRoute
 IN_PROC_BROWSER_TEST_F(SettingsRouteTest, MAYBE_NonExistentRoute) {
   RunTest("settings/route_test.js", "runMochaSuite('NonExistentRoute')");

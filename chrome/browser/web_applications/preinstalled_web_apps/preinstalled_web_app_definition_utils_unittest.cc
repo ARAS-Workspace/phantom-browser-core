@@ -20,7 +20,7 @@ class PreinstalledWebAppUtilsTest : public testing::Test {
 };
 
 // https://crbug.com/40177501 tracks test failures due to memory smashing on
-// Linux, ChromeOS, and the Mac.
+// Linux and the Mac.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_GetTranslatedName DISABLED_GetTranslatedName
 #else

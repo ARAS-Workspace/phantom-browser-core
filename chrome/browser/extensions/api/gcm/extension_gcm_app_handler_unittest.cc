@@ -280,8 +280,6 @@ class ExtensionGCMAppHandlerTest : public testing::Test {
     in_process_utility_thread_helper_ =
         std::make_unique<content::InProcessUtilityThreadHelper>();
 
-    // This is needed to create extension service under CrOS.
-
     // Create a new profile.
     TestingProfile::Builder builder;
     profile_ = builder.Build();
@@ -428,8 +426,6 @@ class ExtensionGCMAppHandlerTest : public testing::Test {
       in_process_utility_thread_helper_;
   std::unique_ptr<TestingProfile> profile_;
   base::ScopedTempDir temp_dir_;
-
-  // This is needed to create extension service under CrOS.
 
   Waiter waiter_;
   std::unique_ptr<FakeExtensionGCMAppHandler> gcm_app_handler_;

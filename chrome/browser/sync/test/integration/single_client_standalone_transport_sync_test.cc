@@ -141,7 +141,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientStandaloneTransportSyncTest,
   ASSERT_EQ(syncer::SyncService::TransportState::ACTIVE,
             GetSyncService(0)->GetTransportState());
   ASSERT_FALSE(GetSyncService(0)->IsSyncFeatureEnabled());
-  // History sync is enabled by default on ChromeOS.
   ASSERT_FALSE(GetSyncService(0)->GetUserSettings()->GetSelectedTypes().Has(
       syncer::UserSelectableType::kHistory));
 
@@ -165,7 +164,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientStandaloneTransportSyncTest,
   ASSERT_EQ(syncer::SyncService::TransportState::ACTIVE,
             GetSyncService(0)->GetTransportState());
   ASSERT_FALSE(GetSyncService(0)->IsSyncFeatureEnabled());
-  // History sync is enabled by default on ChromeOS.
   ASSERT_FALSE(GetSyncService(0)->GetUserSettings()->GetSelectedTypes().Has(
       syncer::UserSelectableType::kHistory));
 
@@ -289,8 +287,6 @@ IN_PROC_BROWSER_TEST_F(SingleClientStandaloneTransportSyncTest,
       GetSyncService(0)->GetActiveDataTypes().Has(syncer::CONTACT_INFO));
 }
 
-// ReplaceSyncWithSigninMigrationSyncTest is
-// disabled on CrOS as the signed in, non-syncing state does not exist.
 // A test fixture to cover migration behavior: In PRE_ tests, the
 // kReplaceSyncPromosWithSignInPromos is *dis*abled, in non-PRE_ tests it is
 // *en*abled.
@@ -449,7 +445,6 @@ IN_PROC_BROWSER_TEST_F(ReplaceSyncWithSigninMigrationSyncTest,
       syncer::UserSelectableType::kPayments));
 }
 
-// On ChromeOS, there exists no sync setup incomplete state.
 // TODO(crbug.com/40067025): Remove these tests once
 // kReplaceSyncPromosWithSignInPromos is launched.
 class SyncSetupIncompleteMigrationSyncTest : public SyncTest {

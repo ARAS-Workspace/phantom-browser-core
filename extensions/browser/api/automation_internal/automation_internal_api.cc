@@ -445,9 +445,6 @@ class AutomationWebContentsObserver
     if (web_contents()) {
       EnableOrResetWebContentsAccessibility();
 
-      // On ChromeOS Ash, the automation api is the native accessibility api.
-      // For the purposes of tracking web contents accessibility like other
-      // desktop platforms, record the same UMA metric as those platforms.
     }
   }
 

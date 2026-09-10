@@ -157,8 +157,6 @@ MediaNotificationService::MediaNotificationService(Profile* profile,
   if (!media_router::MediaRouterEnabled(profile)) {
     return;
   }
-  // CastMediaNotificationProducer is owned by
-  // CastMediaNotificationProducerKeyedService in Ash.
   // base::Unretained() is safe here because `cast_notification_producer_` is
   // deleted before `item_manager_`.
   cast_notification_producer_ = std::make_unique<CastMediaNotificationProducer>(

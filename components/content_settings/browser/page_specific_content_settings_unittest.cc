@@ -1533,8 +1533,6 @@ TEST_F(PageSpecificContentSettingsTest, MediaBlockedStateIsResetIfMediaUsed) {
       PageSpecificContentSettings::kMicrophoneBlocked));
 }
 
-// The only currently implemented object-based type is for now ChromeOS only
-
 class PageSpecificContentSettingsTestWithApproximateLocation
     : public PageSpecificContentSettingsTest {
  private:

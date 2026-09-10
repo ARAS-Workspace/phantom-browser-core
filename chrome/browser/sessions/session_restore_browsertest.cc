@@ -714,9 +714,6 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreTest,
   EXPECT_EQ(http_status_code, entry->GetHttpStatusCode());
 }
 
-// This test does not apply to ChromeOS as ChromeOS does not do session
-// restore when a new window is open.
-
 // Verifies we remember the last browser window when closing the last
 // non-incognito window while an incognito window is open.
 IN_PROC_BROWSER_TEST_F(SessionRestoreTest, IncognitotoNonIncognito) {
@@ -1846,8 +1843,7 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreTest, ActiveIndexUpdatedAtInsert) {
 }
 
 #if !BUILDFLAG(IS_MAC)
-// This test doesn't apply to Mac; see GetCommandLineForRelaunch for details. It
-// was disabled for ChromeOS a long time so might never have worked there.
+// This test doesn't apply to Mac; see GetCommandLineForRelaunch for details.
 
 // Launches an app window, closes tabbed browser, launches and makes sure
 // we restore the tabbed browser url.
@@ -2533,7 +2529,6 @@ class LoadOrderObserver : public BrowserCollectionObserver,
       browser_collection_observation_{this};
 };
 
-// PRE_CorrectLoadingOrder is flaky on ChromeOS MSAN and Mac.
 // See http://crbug.com/40420117.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_PRE_CorrectLoadingOrder DISABLED_PRE_CorrectLoadingOrder
@@ -2678,8 +2673,6 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreWithURLInCommandLineTest,
   EXPECT_EQ(GetUrl3(), tab_strip_model->GetWebContentsAt(2)->GetURL());
 }
 
-// This test does not apply to ChromeOS as ChromeOS does not consider command
-// line urls while determining startup tabs.
 IN_PROC_BROWSER_TEST_F(SessionRestoreWithURLInCommandLineTest,
                        PRE_StartupPrefSetAsLastAndURLs) {
   SessionStartupPref pref(SessionStartupPref::LAST_AND_URLS);
@@ -3532,7 +3525,6 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreTest,
   EXPECT_TRUE(helper.GetHasOpenTrackableBrowsers());
 }
 
-// Skip for ChromeOS because the keep alive is not created for ChromeOS.
 // See https://crbug.com/40167603.
 class SessionRestoreSilentLaunchTest : public SessionRestoreTest {
  protected:
@@ -3726,9 +3718,6 @@ IN_PROC_BROWSER_TEST_F(AppSessionRestoreTest, MAYBE_BasicAppSessionRestore) {
         return true;
       });
 }
-
-// This feature is only available on ChromeOS.
-// This test opens an unclosable app and ensures that it is not restored.
 
 // This is disabled on mac pending http://crbug.com/40758309
 #if BUILDFLAG(IS_MAC)

@@ -675,9 +675,6 @@ IN_PROC_BROWSER_TEST_P(DataControlsClipboardUtilsBrowserTest,
   run_loop.Run();
 }
 
-// ChromeOS requires extra boilerplate to run this test, and since copy-pasting
-// between profiles on ChromeOS isn't a meaningful test it is simply omitted
-// from running this.
 IN_PROC_BROWSER_TEST_P(DataControlsClipboardUtilsBrowserTest,
                        PasteBlockedByDataControls_SourceRule) {
   // By making a new profile for this test, we ensure we can prevent pasting to
@@ -1060,9 +1057,6 @@ IN_PROC_BROWSER_TEST_P(DataControlsClipboardUtilsBrowserTest,
   run_loop.Run();
 }
 
-// ChromeOS requires extra boilerplate to run this test, and since copy-pasting
-// between profiles on ChromeOS isn't a meaningful test it is simply omitted
-// from running this.
 IN_PROC_BROWSER_TEST_P(DataControlsClipboardUtilsBrowserTest,
                        PasteReportedByDataControls_SourceRule) {
   // By making a new profile for this test, we ensure we can prevent pasting to

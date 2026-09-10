@@ -691,13 +691,6 @@ V4L2RequestsQueue* V4L2Device::GetRequestsQueue() {
     return nullptr;
   }
 
-  // Some devices, namely the RK3399, have multiple hardware decoder blocks.
-  // We have to find and use the matching media device, or the kernel gets
-  // confused.
-  // Note that the match persists for the lifetime of V4L2Device. In practice
-  // this should be fine, since |GetRequestsQueue()| is only called after
-  // the codec format is configured, and the VD/VDA instance is always tied
-  // to a specific format, so it will never need to switch media devices.
   static const std::string kRequestDevicePrefix = "/dev/media";
 
   // We are sandboxed, so we can't query directory contents to check which

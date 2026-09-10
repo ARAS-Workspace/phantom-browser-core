@@ -286,7 +286,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest, CommitLocalDevice) {
                   .Wait());
 }
 
-// ChromeOS doesn't support sign-out.
 IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
                        ShouldDeleteDeviceInfoOnServerWhenSignedOut) {
   ASSERT_TRUE(SetupSync());
@@ -431,9 +430,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoSyncTest,
       UnorderedElementsAre(ModelEntryHasCacheGuid(GetLocalCacheGuid()),
                            ModelEntryHasCacheGuid(CacheGuidForSuffix(1))));
 }
-
-// On ChromeOS, Sync-the-feature gets started automatically once a primary
-// account is signed in and transport mode is not a thing.
 
 // TODO(crbug.com/40756482): Flaky on Android.
 #if BUILDFLAG(IS_ANDROID)
@@ -912,7 +908,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientDeviceInfoWithDeviceStatisticsSyncTest,
       /*expected_bucket_count=*/1, FROM_HERE);
 }
 
-// On ChromeOS, there is always a primary account, so this test doesn't apply.
 IN_PROC_BROWSER_TEST_P(
     SingleClientDeviceInfoWithDeviceStatisticsSyncTest,
     PRE_ShouldRecordDeviceStatisticsMetricsWithoutPrimaryAccount) {

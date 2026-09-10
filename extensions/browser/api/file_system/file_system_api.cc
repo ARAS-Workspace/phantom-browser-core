@@ -794,7 +794,6 @@ ExtensionFunction::ResponseAction FileSystemChooseEntryFunction::Run() {
       &FileSystemChooseEntryFunction::CalculateInitialPathAndShowPicker, this,
       previous_path, suggested_name, file_type_info, picker_type);
 
-// Check whether the |previous_path| is a non-native directory.
   base::ThreadPool::PostTaskAndReplyWithResult(
       FROM_HERE, {base::MayBlock(), base::TaskPriority::BEST_EFFORT},
       base::BindOnce(&base::DirectoryExists, previous_path),

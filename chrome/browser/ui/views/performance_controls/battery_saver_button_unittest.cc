@@ -83,8 +83,6 @@ class BatterySaverButtonTest : public ChromeViewsTestBase {
   base::HistogramTester histogram_tester_;
 };
 
-// Battery Saver is controlled by the OS on ChromeOS
-
 // Battery saver button should not be shown when the pref state for battery
 // saver mode is ON and shown when the pref state is ON
 TEST_F(BatterySaverButtonTest, ShouldButtonShowTest) {

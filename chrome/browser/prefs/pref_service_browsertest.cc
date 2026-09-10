@@ -42,8 +42,6 @@ IN_PROC_BROWSER_TEST_F(PreservedWindowPlacement, PRE_Test) {
   browser()->GetWindow()->SetBounds(window_frame);
 }
 
-// Fails on Chrome OS as the browser thinks it is restarting after a crash, see
-// http://crbug.com/40297793
 #define MAYBE_Test Test
 IN_PROC_BROWSER_TEST_F(PreservedWindowPlacement, MAYBE_Test) {
 #if BUILDFLAG(IS_LINUX)

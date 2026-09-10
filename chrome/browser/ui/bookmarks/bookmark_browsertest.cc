@@ -833,7 +833,6 @@ IN_PROC_BROWSER_TEST_F(BookmarkBrowsertest,
   EXPECT_THAT(1u, bookmark_model->bookmark_bar_node()->children().size());
 }
 
-// Account nodes don't exist on ChromeOS, so this test does not apply.
 IN_PROC_BROWSER_TEST_F(BookmarkBrowsertest,
                        BookmarkCurrentTab_WithAccountNodes) {
   ASSERT_TRUE(embedded_test_server()->Start());

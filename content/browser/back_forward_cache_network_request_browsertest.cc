@@ -263,7 +263,7 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // If too much data is processed while in bfcache, evict the entry.
-// TODO(crbug.com/325558875): Flaky on Mac and ChromeOS bots.
+// TODO(crbug.com/325558875): Flaky on Mac bots.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_PageWithDrainedDatapipeAsBytesConsumerCannotProcessTooMuchData \
   DISABLED_PageWithDrainedDatapipeAsBytesConsumerCannotProcessTooMuchData

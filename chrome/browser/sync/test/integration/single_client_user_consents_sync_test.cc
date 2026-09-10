@@ -133,7 +133,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientUserConsentsSyncTest, ShouldSubmit) {
   EXPECT_TRUE(ExpectUserConsents({specifics}));
 }
 
-// ChromeOS does not support signing out of a primary account.
 IN_PROC_BROWSER_TEST_P(
     SingleClientUserConsentsSyncTest,
     ShouldPreserveConsentsOnSignoutAndResubmitWhenReenabled) {
@@ -196,8 +195,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientUserConsentsSyncTest,
   EXPECT_TRUE(ExpectUserConsents({specifics1, specifics2}));
 }
 
-// ChromeOS does not support late signin after profile creation, so the test
-// below does not apply, at least in the current form.
 IN_PROC_BROWSER_TEST_P(SingleClientUserConsentsSyncTest,
                        ShouldSubmitIfSignedInAlthoughFullSyncNotEnabled) {
   if (GetSetupSyncMode() != SetupSyncMode::kSyncTransportOnly) {

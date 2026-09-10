@@ -10,8 +10,4 @@
 
 namespace web_app {
 
-// This block defines stub implementations of OS specific methods for
-// FileHandling. Currently, Windows, MacOSX and Desktop Linux (but not Chrome
-// OS) have their own implementations.
-
 }  // namespace web_app

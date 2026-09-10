@@ -200,8 +200,8 @@ void SimulateMultiClick(PDFiumEngine& engine,
                         int click_count) {
   for (int i = 0, click = 1; i < click_count; ++i, ++click) {
 #if BUILDFLAG(IS_LINUX)
-    // On both Linux and ChromeOS `click_count` is only 1, 2 or 3. On MacOS and
-    // Windows `click_count` just keeps increasing as the user keeps clicking.
+    // On Linux `click_count` is only 1, 2 or 3. On MacOS and Windows
+    // `click_count` just keeps increasing as the user keeps clicking.
     if (click > 3) {
       click = 1;
     }

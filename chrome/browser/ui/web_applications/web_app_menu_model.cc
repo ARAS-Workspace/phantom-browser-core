@@ -204,8 +204,6 @@ void WebAppMenuModel::Build() {
                                           : kBrowserLogoOldIcon);
   }
 
-// Chrome OS's app list is prominent enough to not need a separate uninstall
-// option in the app menu.
   DCHECK(app_browser_controller);
   if (app_browser_controller->IsInstalled()) {
     AddSeparator(ui::NORMAL_SEPARATOR);

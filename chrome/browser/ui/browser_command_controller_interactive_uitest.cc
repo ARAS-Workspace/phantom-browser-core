@@ -149,9 +149,9 @@ IN_PROC_BROWSER_TEST_F(BrowserCommandControllerInteractiveTest,
 // non-exiting commands, which is not the goal of this test.
 
 #if BUILDFLAG(IS_LINUX)
-// This test is flaky on ChromeOS and Linux, see http://crbug.com/41339012 and
-// http://crbug.com/41341579 respectively.
-// TODO(zijiehe): Find out the root cause.
+// This test is flaky on Linux, see http://crbug.com/41339012 and
+// http://crbug.com/41341579 respectively. TODO(zijiehe): Find out the root
+// cause.
 #define MAYBE_ShortcutsShouldTakeEffectInJsFullscreen \
   DISABLED_ShortcutsShouldTakeEffectInJsFullscreen
 #else

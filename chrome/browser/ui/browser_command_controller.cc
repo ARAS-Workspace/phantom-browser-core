@@ -523,10 +523,6 @@ void BrowserCommandController::GlicActiveInstanceChanged(
 }
 
 void BrowserCommandController::FindBarVisibilityChanged() {
-  // Block find command updates in locked fullscreen mode unless the instance is
-  // locked for OnTask (only relevant for non-web browser scenarios).
-  // TODO(crbug.com/365146870): Remove once we consolidate locked fullscreen
-  // with OnTask.
   UpdateCloseFindOrStop();
 }
 
@@ -1402,9 +1398,8 @@ void BrowserCommandController::HandleCommandWithDisposition(
       break;
     }
 
-    // Profile submenu commands
-    // This menu item is not enabled on ChromeOS and certain capabilities such
-    // as the profile picker are not available.
+    // Profile submenu commands This menu item is not enabled on certain
+    // capabilities such as the profile picker are not available.
     case IDC_CUSTOMIZE_CHROME:
       chrome::ShowSettingsSubPage(browser_, chrome::kManageProfileSubPage);
       break;
@@ -1492,11 +1487,6 @@ void BrowserCommandController::RemoveCommandObserver(
 }
 
 bool BrowserCommandController::UpdateCommandEnabled(int id, bool state) {
-  // Block individual command updates in locked fullscreen mode unless the
-  // instance is locked for OnTask (only relevant for non-web browser
-  // scenarios).
-  // TODO(crbug.com/365146870): Remove once we consolidate locked fullscreen
-  // with OnTask.
 
   return command_updater_->UpdateCommandEnabled(id, state);
 }
@@ -1918,8 +1908,6 @@ void BrowserCommandController::UpdateCommandsForIncognitoAvailability() {
 }
 
 void BrowserCommandController::UpdateCommandsForExtensionsMenu() {
-  // TODO(crbug.com/41124423): Talk with isandrk@chromium.org about whether this
-  // is necessary for the experiment or not.
 
   command_updater_->UpdateCommandEnabled(
       IDC_EXTENSIONS_SUBMENU_MANAGE_EXTENSIONS,
@@ -1931,11 +1919,6 @@ void BrowserCommandController::UpdateCommandsForExtensionsMenu() {
 }
 
 void BrowserCommandController::UpdateCommandsForTabState() {
-  // Keep commands disabled when in locked fullscreen so users cannot exit this
-  // mode. Only update navigation ones when the webapp is locked for OnTask
-  // (only relevant for non-web browser scenarios).
-  // TODO(b/365146870): Remove once we consolidate locked fullscreen with
-  // OnTask.
 
   content::WebContents* current_web_contents =
       browser_->tab_strip_model()->GetActiveWebContents();
@@ -2255,10 +2238,6 @@ void BrowserCommandController::UpdateSaveAsState() {
 
 void BrowserCommandController::UpdateReloadStopState(bool is_loading,
                                                      bool force) {
-  // Skip command updates when in locked fullscreen mode unless the instance is
-  // locked for OnTask (only relevant for non-web browser scenarios).
-  // TODO(crbug.com/365146870): Remove once we consolidate locked fullscreen
-  // with OnTask.
 
   window()->UpdateReloadStopState(is_loading, force);
   command_updater_->UpdateCommandEnabled(IDC_STOP, is_loading);

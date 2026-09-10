@@ -299,9 +299,6 @@ TEST(SigninPromoTest, IsSignInPromo_SendTabToSelf) {
 }
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
-// ChromeOS currently does not show any sign in promos.
-
-// Extensions explicit signin is not enabled in ChromeOS.
 TEST(SigninPromoTest, IsSignInPromo_ExtensionsWithExplicitSignin) {
   EXPECT_TRUE(
       IsSignInPromo(signin_metrics::AccessPoint::kExtensionInstallBubble));

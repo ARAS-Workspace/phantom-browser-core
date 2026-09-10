@@ -239,9 +239,6 @@ IN_PROC_BROWSER_TEST_F(WebAppProfileDeletionBrowserTest_WebAppPublisher,
   EXPECT_EQ(app_id_future.Get(), app_id);
 }
 
-// TODO(crbug.com/40283231): Figure out a way having this test be run on
-// ChromeOS Ash, i.e. properly trigger a browser context shutdown.
-
 using WebAppProfileDeletionTest_WebContentsGracefulShutdown =
     WebAppProfileDeletionBrowserTest;
 

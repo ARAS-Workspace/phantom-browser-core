@@ -168,8 +168,6 @@ gfx::Rect WindowSizerTestUtil::GetWindowBounds() {
 
 #if !BUILDFLAG(IS_MAC)
 
-// Passing null for the browser parameter of GetWindowBounds makes the test skip
-// all Ash-specific logic, so there's no point running this on Chrome OS.
 TEST(WindowSizerTestCommon,
      PersistedWindowOffscreenWithNonAggressiveRepositioning) {
   {  // off the left but the minimum visibility condition is barely satisfied

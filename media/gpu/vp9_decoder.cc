@@ -28,8 +28,6 @@ bool GetSpatialLayerFrameSize(const DecoderBuffer& decoder_buffer,
   }
 
   bool enable_vp9_ksvc =
-  // V4L2 stateless decoder does not support VP9 kSVC streams.
-  // See comments in media::IsVp9kSVCHWDecodingEnabled().
       media::IsVp9kSVCHWDecodingEnabled();
 
   if (!enable_vp9_ksvc) {

@@ -23,11 +23,6 @@ const ContentColorUsage kAllColorUsages[] = {
 };
 
 viz::SharedImageFormat DefaultFormat() {
-  // ChromeOS expects the default format be BGRA_8888 in several places.
-  // https://crbug.com/1057501, https://crbug.com/1073237
-  // The default format on Mac is BGRA in screen_mac.cc, so we set it here
-  // too so that it matches with --ensure-forced-color-profile.
-  // https://crbug.com/1478708
 #if BUILDFLAG(IS_MAC)
   return viz::SinglePlaneFormat::kBGRA_8888;
 #else

@@ -208,8 +208,7 @@ class ChromeBrowserMainParts : public content::BrowserMainParts {
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)
-  // Android's first run is done in Java instead of native. Chrome OS does not
-  // use master preferences.
+  // Android's first run is done in Java instead of native.
   std::unique_ptr<first_run::MasterPrefs> master_prefs_;
 #endif
 

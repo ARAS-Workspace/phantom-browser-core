@@ -34,7 +34,6 @@ class PerformanceLogSource : public SystemLogsSource {
  private:
   void PopulatePerformanceSettingLogs(SystemLogsResponse* response);
 
-  // Battery and battery saver logs are not used on ChromeOS.
   void PopulateBatteryDetailLogs(SystemLogsResponse* response);
 
   raw_ptr<performance_manager::user_tuning::BatterySaverModeManager>

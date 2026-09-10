@@ -505,7 +505,6 @@ IN_PROC_BROWSER_TEST_P(ToolbarViewTest,
   EXPECT_NE(nullptr, extensions_container);
 }
 
-// TODO(crbug.com/41474891): Setup test profiles properly for CrOS.
 #define MAYBE_ExtensionsToolbarDesktopForGuest ExtensionsToolbarDesktopForGuest
 IN_PROC_BROWSER_TEST_P(ToolbarViewTest,
                        MAYBE_ExtensionsToolbarDesktopForGuest) {
@@ -554,7 +553,7 @@ IN_PROC_BROWSER_TEST_P(ToolbarViewTest, MAYBE_BackButtonMenu) {
       WaitForHide(kToolbarBackButtonMenuElementId), Log("Menu dismissed."));
 }
 
-// TODO(crbug.com/402492418): Find workaround for Mac and ChromeOS.
+// TODO(crbug.com/402492418): Find workaround for Mac.
 #define MAYBE_SplitTabsToolbarButton SplitTabsToolbarButton
 IN_PROC_BROWSER_TEST_P(ToolbarViewTest, MAYBE_SplitTabsToolbarButton) {
   DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kWebContents1Id);

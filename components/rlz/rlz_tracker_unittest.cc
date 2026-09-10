@@ -944,8 +944,7 @@ TEST_F(RlzLibTest, GetAccessPointRlzIsCached) {
   EXPECT_STREQ(kOmniboxRlzString, base::UTF16ToUTF8(rlz).c_str());
 }
 
-// By design, on Chrome OS the RLZ string can only be set once.  Once set,
-// pings cannot change int.
+// Once set, pings cannot change int.
 TEST_F(RlzLibTest, PingUpdatesRlzCache) {
   // Set dummy RLZ string.
   rlz_lib::SetAccessPointRlz(RLZTracker::ChromeOmnibox(), kOmniboxRlzString);

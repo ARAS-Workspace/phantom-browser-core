@@ -534,8 +534,6 @@ class WebAppRegistrar {
   bool AppScopesMatchForUserLinkCapturing(const webapps::AppId& app_id1,
                                           const webapps::AppId& app_id2) const;
 
-  // ChromeOS stores the per-app capturing setting in PreferredAppsImpl, not
-  // here.
   // Returns true if a web app is set to be the default app to
   // capture links by the user. If an app is not locally installed, this returns
   // false.

@@ -330,10 +330,3 @@ TEST_F(LayoutProviderTest, ExplicitTypographyLineHeight) {
   styled_label.SizeToFit(kStyledLabelWidth);
   EXPECT_EQ(kBodyLineHeight, styled_label.height());
 }
-
-// Only run explicit font-size checks on ChromeOS. Elsewhere, font sizes can be
-// affected by bot configuration, but ChromeOS controls this in the
-// ResourceBundle. Also on other platforms font metrics change a lot across OS
-// versions, but on ChromeOS, there is only one OS version, so we can rely on
-// consistent behavior. Also ChromeOS is the only place where
-// IDS_UI_FONT_FAMILY_CROS works, which this test uses to control results.

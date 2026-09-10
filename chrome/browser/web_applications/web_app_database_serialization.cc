@@ -68,8 +68,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-// TODO(crbug.com/441959098): Consider removing chromeos includes.
-
 namespace web_app {
 
 namespace {

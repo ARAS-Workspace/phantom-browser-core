@@ -126,8 +126,6 @@ ChromeJsErrorReportProcessor::~ChromeJsErrorReportProcessor() = default;
 std::optional<JavaScriptErrorReport>
 ChromeJsErrorReportProcessor::CheckConsentAndRedact(
     JavaScriptErrorReport error_report) {
-  // Consent is handled at the OS level by crash_reporter so we don't need to
-  // check it here for Chrome OS.
   if (!crash_reporter::GetClientCollectStatsConsent()) {
     return std::nullopt;
   }

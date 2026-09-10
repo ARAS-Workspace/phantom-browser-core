@@ -95,10 +95,6 @@ IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest,
   observer.WaitForExpectedHideMetadata(true);
 }
 
-// We hide the media metadata from CrOS' media controls by replacing the
-// metadata in the MediaSessionImpl with some placeholder metadata. These
-// changes are gated to only affect ChromeOS, hence why the testing for this is
-// also ChromeOS only.
 IN_PROC_BROWSER_TEST_F(MediaSessionBrowserTest,
                        MediaSessionInfoIsNotHiddenInNonCrOSIncognito) {
   Browser* browser = CreateIncognitoBrowser();

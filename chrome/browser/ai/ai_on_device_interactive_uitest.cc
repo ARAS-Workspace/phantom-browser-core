@@ -138,7 +138,6 @@ void InjectOTToken(content::WebContents* tab, std::string_view token) {
   EXPECT_TRUE(ExecJs(tab, base::StringPrintf(kScript, token)));
 }
 
-// TODO(crbug.com/419321441): Support Built-In AI APIs on ChromeOS.
 #define MAYBE_AIOnDeviceBrowserTest AIOnDeviceBrowserTest
 class MAYBE_AIOnDeviceBrowserTest
     : public InProcessBrowserTest,

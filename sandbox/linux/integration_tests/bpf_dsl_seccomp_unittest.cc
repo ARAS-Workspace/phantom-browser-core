@@ -2157,7 +2157,6 @@ void* TsyncApplyToTwoThreadsFunc(void* cond_ptr) {
 SANDBOX_TEST(SandboxBPF, Tsync) {
   const bool supports_multi_threaded = SandboxBPF::SupportsSeccompSandbox(
       SandboxBPF::SeccompLevel::MULTI_THREADED);
-// On Chrome OS tsync is mandatory.
   if (!supports_multi_threaded) {
     return;
   }

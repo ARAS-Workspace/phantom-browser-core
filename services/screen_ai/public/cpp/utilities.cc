@@ -147,7 +147,7 @@ base::FilePath GetComponentBinaryPathForTests() {
 #endif
 
 const char* GetBinaryPathSwitch() {
-  // This is only used on Linux and ChromeOS.
+  // This is only used on Linux.
 #if BUILDFLAG(IS_LINUX)
   return kBinaryPathSwitch;
 #else

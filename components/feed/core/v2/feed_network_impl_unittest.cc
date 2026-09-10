@@ -315,7 +315,6 @@ TEST_F(FeedNetworkTest, SendQueryRequestSendsValidRequest) {
       "ContentSuggestions.Feed.Network.FeedQueryRequestSize", 165, 1);
 }
 
-// These tests need ClearPrimaryAccount() which isn't supported by ChromeOS.
 // RevokeSyncConsent() sometimes clears the account rather than just changing
 // the consent level so we may as well sign out and sign back in ourselves.
 TEST_F(FeedNetworkTest, SendQueryRequestPersonalized_AccountSignin) {

@@ -702,7 +702,7 @@ TypedResult<IconMetadataFromDisk> ReadTrustedIconsBlocking(
   TRACE_EVENT0("ui", "web_app_icon_manager::ReadTrustedIconsBlocking");
   TypedResult<IconMetadataFromDisk> result;
 
-// First check for maskable icons available on Mac and ChromeOS.
+// First check for maskable icons available on Mac.
 #if BUILDFLAG(IS_MAC)
   result = ReadIconsBlocking(utils, web_apps_directory, app_id,
                              IconPurpose::MASKABLE, icon_sizes,

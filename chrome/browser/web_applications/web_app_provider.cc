@@ -471,10 +471,6 @@ void WebAppProvider::OnSyncBridgeReady(
       return;
   }
 
-    // Perform database migrations once the sync bridge is ready, but before
-    // starting the rest of the subsystems and notifying that the registry is
-    // ready.
-
   base::ConcurrentClosures concurrent;
 
   base::OnceClosure on_web_app_policy_manager_done_callback =

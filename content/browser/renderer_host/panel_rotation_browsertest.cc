@@ -11,6 +11,4 @@
 
 namespace content {
 
-// TODO(crbug.com/41478398): Add test coverage across all platforms.
-
 }  // namespace content

@@ -145,8 +145,7 @@ class SyncActiveWithoutPasswordsChecker
   }
 };
 
-// Note: This helper applies to ChromeOS too, but is currently unused there. So
-// define it out to prevent a compile error due to the unused function.
+// So define it out to prevent a compile error due to the unused function.
 content::WebContents* GetNewTab(Browser* browser) {
   ui_test_utils::NavigateToURLWithDisposition(
       browser, GURL("data:text/html"),
@@ -869,7 +868,6 @@ IN_PROC_BROWSER_TEST_F(PasswordManagerSyncTest,
             GetClient(0)->GetEmailForAccount(SyncTestAccount::kDefaultAccount));
 }
 
-// Transport mode is not really supported on ChromeOS.
 IN_PROC_BROWSER_TEST_F(PasswordManagerSyncTest, SyncUtilApis) {
   ASSERT_TRUE(SetupSyncWithMode(SetupSyncMode::kSyncTransportOnly));
 

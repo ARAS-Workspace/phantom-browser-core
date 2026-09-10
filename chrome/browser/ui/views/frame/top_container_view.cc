@@ -56,9 +56,6 @@ bool TopContainerView::IsPositionInWindowCaption(
 }
 
 void TopContainerView::PaintChildren(const views::PaintInfo& paint_info) {
-// For ChromeOS, we don't need to manually call
-// `BrowserFrameViewChromeOS::Paint` here since it will be triggered by
-// BrowserRootView::PaintChildren() on immersive revealed.
 // TODO (b/287068468): Verify if it's needed on MacOS, once it's verified, we
 // can decide whether keep or remove this function.
   if (ImmersiveModeController::From(browser_view_->browser())->IsRevealed()) {

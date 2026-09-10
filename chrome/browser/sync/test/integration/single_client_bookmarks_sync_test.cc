@@ -2892,8 +2892,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientBookmarksThrottlingSyncTest,
   }
 }
 
-// On ChromeOS, Sync-the-feature gets started automatically once a primary
-// account is signed in and the transport mode is not a thing.
 class SingleClientBookmarksWithAccountStorageSyncTest : public SyncTest {
  public:
   SingleClientBookmarksWithAccountStorageSyncTest() : SyncTest(SINGLE_CLIENT) {}

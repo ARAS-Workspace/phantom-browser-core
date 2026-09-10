@@ -673,7 +673,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_ImageFilterScaled) {
 
 #if BUILDFLAG(IS_MAC) || defined(_MIPS_ARCH_LOONGSON) || defined(ARCH_CPU_ARM64)
 #if BUILDFLAG(IS_MAC)
-  // There's a 1 pixel error on MacOS and ChromeOS
+  // There's a 1 pixel error on MacOS
   float percentage_pixels_error = 0.0025f;  // 1px / (200*200)
   int error_allowed = 1;
 #elif defined(_MIPS_ARCH_LOONGSON)
@@ -1028,7 +1028,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, RotatedDropShadowFilter) {
   float average_error_allowed_in_bad_pixels = 5.f;
   int error_allowed = 17;
 #elif BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE)
-  // There's a 1 pixel error on MacOS and ChromeOS
+  // There's a 1 pixel error on MacOS
   float percentage_pixels_error = 0.00111112f;  // 1px / (300*300)
   float average_error_allowed_in_bad_pixels = 1.f;
   int error_allowed = 1;

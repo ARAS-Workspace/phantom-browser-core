@@ -297,9 +297,9 @@ class WebHidExtensionBrowserTest : public InProcessBrowserTestMixinHostSupport<
 
   void SimulateClickOnSystemTrayIconButton(Browser* browser,
                                            const Extension* extension) {
-    // On non-ChromeOS platforms, as they use status icon and there isn't good
-    // test infra to simulate click on the status icon button, so simulate the
-    // click event by invoking ExecuteCommand of HidConnectionTracker directly.
+    // as they use status icon and there isn't good test infra to simulate click
+    // on the status icon button, so simulate the click event by invoking
+    // ExecuteCommand of HidConnectionTracker directly.
     auto* hid_status_icon =
         static_cast<HidStatusIcon*>(g_browser_process->hid_system_tray_icon());
 

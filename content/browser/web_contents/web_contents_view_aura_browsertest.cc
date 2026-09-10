@@ -489,7 +489,7 @@ IN_PROC_BROWSER_TEST_F(WebContentsViewAuraTest,
   EXPECT_NE(OVERSCROLL_NONE, overscroll_controller->overscroll_mode());
 }
 
-// Flaky on CrOS and Linux: https://crbug.com/856079
+// Flaky on Linux: https://crbug.com/856079
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_QuickOverscrollDirectionChange \
   DISABLED_QuickOverscrollDirectionChange
@@ -797,10 +797,8 @@ IN_PROC_BROWSER_TEST_F(WebContentsViewAuraTest, ContentWindowClose) {
 }
 
 #if BUILDFLAG(IS_LINUX)
-// This appears to be flaky in the same was as the other overscroll
-// tests. See http://crbug.com/369871.
-// For linux, see http://crbug.com/381294.
-// For ChromeOS, see http://crbug.com/668128.
+// This appears to be flaky in the same was as the other overscroll tests. See
+// http://crbug.com/369871. For linux, see http://crbug.com/381294.
 #define MAYBE_RepeatedQuickOverscrollGestures \
   DISABLED_RepeatedQuickOverscrollGestures
 #else

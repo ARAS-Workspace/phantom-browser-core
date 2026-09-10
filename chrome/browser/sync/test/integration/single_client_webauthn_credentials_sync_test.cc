@@ -1157,8 +1157,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientWebAuthnCredentialsSyncTest,
       GetModel().GetPasskeys(AnyRp(), ShadowedCredentials::kInclude).empty());
 }
 
-// The unconsented primary account isn't supported on ChromeOS.
-
 class SingleClientWebAuthnCredentialsSyncParamTest
     : public SingleClientWebAuthnCredentialsSyncTestBase,
       public testing::WithParamInterface<SyncTest::SetupSyncMode> {

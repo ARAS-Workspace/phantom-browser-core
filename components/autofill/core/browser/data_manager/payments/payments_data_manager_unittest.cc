@@ -1705,7 +1705,6 @@ TEST_F(PaymentsDataManagerSyncTransportModeTest,
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // Test that ensure local data is not lost on sign-in.
-// Clearing/changing the primary account is not supported on CrOS.
 TEST_F(PaymentsDataManagerTest, KeepExistingLocalDataOnSignIn) {
   // Sign out.
   identity_test_env_.ClearPrimaryAccount();
@@ -3684,7 +3683,6 @@ TEST_F(PaymentsDataManagerSyncTransportModeTest,
   EXPECT_EQ(payments_data_manager().GetPaymentsSigninStateForMetrics(),
             AutofillMetrics::PaymentsSigninState::kSignedIn);
 
-// ClearPrimaryAccount is not supported on CrOS.
   // Check that the sync state is |SignedOut| when the account info is empty.
   {
     identity_test_env_.ClearPrimaryAccount();

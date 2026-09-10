@@ -89,9 +89,6 @@
 #include "ui/views/widget/tooltip_manager.h"
 #include "ui/views/widget/widget.h"
 
-#if defined(USE_AURA)
-#endif
-
 using base::UserMetricsAction;
 namespace {
 
@@ -1427,9 +1424,8 @@ void Tab::MaybeUpdateHoverStatus(const ui::MouseEvent& event) {
 
 #if BUILDFLAG(IS_LINUX)
   // Move the hit test area for hovering up so that it is not overlapped by tab
-  // hover cards when they are shown.
-  // TODO(crbug.com/41467565): Once Linux/CrOS widget transparency is solved,
-  // remove that case.
+  // hover cards when they are shown. TODO(crbug.com/41467565): Once Linux
+  // widget transparency is solved, remove that case.
   constexpr int kHoverCardOverlap = 6;
   if (event.location().y() >= height() - kHoverCardOverlap) {
     return;

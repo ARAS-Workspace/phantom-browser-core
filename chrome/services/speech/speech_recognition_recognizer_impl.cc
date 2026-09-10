@@ -229,8 +229,6 @@ void SpeechRecognitionRecognizerImpl::Create(
     const std::string& primary_language_name,
     const bool mask_offensive_words,
     base::WeakPtr<SpeechRecognitionServiceImpl> speech_recognition_service) {
-// On Chrome OS, CrosSpeechRecognitionRecognizerImpl will create its own
-// CrosSodaClient.
   auto receiver_ref = mojo::MakeSelfOwnedReceiver(
       std::make_unique<SpeechRecognitionRecognizerImpl>(
           std::move(remote), std::move(options), binary_path, config_paths,

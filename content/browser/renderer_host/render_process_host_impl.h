@@ -1300,9 +1300,8 @@ class CONTENT_EXPORT RenderProcessHostImpl
 #if BUILDFLAG(IS_LINUX)
   // Provides /proc/{renderer pid}/status and statm files for the renderer,
   // because the files are required to calculate the renderer's private
-  // footprint on Chromium Linux. Regarding MacOS X and Windows, we have
-  // the different way to calculate renderer's private memory footprint.
-  // So this method is implemented only when OS_LINUX or OS_CHROMEOS is defined.
+  // footprint on Chromium Linux. Regarding MacOS X and Windows, we have the
+  // different way to calculate renderer's private memory footprint.
   void ProvideStatusFileForRenderer();
 #endif
 

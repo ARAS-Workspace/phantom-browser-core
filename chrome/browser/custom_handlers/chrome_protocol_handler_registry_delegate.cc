@@ -69,10 +69,10 @@ void ChromeProtocolHandlerRegistryDelegate::CheckDefaultClientWithOS(
 // registration for a protocol is no longer Chrome.
 bool ChromeProtocolHandlerRegistryDelegate::ShouldRemoveHandlersNotInOS() {
 #if BUILDFLAG(IS_LINUX)
-  // We don't do this on Linux as the OS registration there is not reliable,
-  // and Chrome OS doesn't have any notion of OS registration.
-  // TODO(benwells): When Linux support is more reliable remove this
-  // difference (http://crbug.com/40593005).
+  // We don't do this on Linux as the OS registration there is not reliable
+  // doesn't have any notion of OS registration. TODO(benwells): When Linux
+  // support is more reliable remove this difference
+  // (http://crbug.com/40593005).
   return false;
 #else
   return shell_integration::GetDefaultSchemeClientSetPermission() !=

@@ -186,8 +186,8 @@ TEST(SupportedTypesTest, IsDecoderSupportedVideoType_VP9Profiles) {
   EXPECT_TRUE(IsDecoderSupportedVideoType(
       {VideoCodec::kVP9, VP9PROFILE_PROFILE1, kUnspecifiedLevel, kColorSpace}));
 
-// VP9 Profile2 are supported on x86, ChromeOS on ARM and Mac/Win/Linux
-// on ARM64. See third_party/libvpx/BUILD.gn.
+// VP9 Profile2 are supported on x86, on ARM and Mac/Win/Linux on ARM64. See
+// third_party/libvpx/BUILD.gn.
 #if defined(ARCH_CPU_X86_FAMILY) || \
     (defined(ARCH_CPU_ARM64) && (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)))
 
@@ -413,8 +413,8 @@ TEST(SupportedTypesTest, IsEncoderSupportedVideoType_VP9Profiles) {
       IsEncoderSupportedVideoType({VideoCodec::kVP9, VP9PROFILE_PROFILE1}),
       BUILDFLAG(ENABLE_LIBVPX));
 
-// VP9 Profile2 are supported on x86, ChromeOS on ARM and Mac/Win/Linux
-// on ARM64. See third_party/libvpx/BUILD.gn.
+// VP9 Profile2 are supported on x86, on ARM and Mac/Win/Linux on ARM64. See
+// third_party/libvpx/BUILD.gn.
 #if defined(ARCH_CPU_X86_FAMILY) || \
     (defined(ARCH_CPU_ARM64) && (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)))
 

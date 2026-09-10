@@ -17,7 +17,7 @@ namespace {
 
 constexpr int kMediaListMaxHeight = 488;
 
-// Padding for the borders and separators for non-CrOS updated UI.
+// Padding for the borders and separators updated UI.
 constexpr int kMediaListUpdatedPadding = 8;
 
 }  // anonymous namespace

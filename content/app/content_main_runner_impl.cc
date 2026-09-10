@@ -426,7 +426,6 @@ mojo::ScopedMessagePipeHandle MaybeAcceptMojoInvitation() {
 
 
 bool ShouldAllowSystemTracingConsumer() {
-// System tracing consumer support is currently only supported on ChromeOS.
   return false;
 }
 
@@ -676,7 +675,7 @@ NO_STACK_PROTECTOR int RunOtherNamedProcessTypeMain(
     unregister_thread_closure = base::HangWatcher::RegisterThread(
         base::HangWatcher::ThreadType::kMainThread);
 #if BUILDFLAG(IS_LINUX)
-    // On Linux/ChromeOS, the HangWatcher can't start until after the sandbox is
+    // On Linux/the HangWatcher can't start until after the sandbox is
     // initialized, because the sandbox can't be started with multiple threads.
     // TODO(mpdenton): start the HangWatcher after the sandbox is initialized.
     // Currently there are no sandboxed processes that aren't launched from the

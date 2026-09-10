@@ -56,8 +56,6 @@ class SupervisedUserIncognitoBrowserTest
       {.sign_in_mode = SupervisionMixin::SignInMode::kSignedOut}};
 };
 
-// ChromeOS Ash does not support the browser being signed out on a supervised
-// device.
 IN_PROC_BROWSER_TEST_F(SupervisedUserIncognitoBrowserTest,
                        UnsupervisedSignInDoesNotCloseIncognito) {
   // Create a new incognito windows (this is allowed as the user is not signed

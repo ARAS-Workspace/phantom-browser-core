@@ -994,7 +994,6 @@ IN_PROC_BROWSER_TEST_P(GlicActorPolicyCheckerBrowserTestWithManagedAccount,
               CannotActReason::kEnterpriseWithoutManagement);
   }
 
-// Note: sign-out from enterprise account is not allowed in ChromeOS.
   ClearPrimaryAccount();
   EXPECT_FALSE(GetPolicyChecker().CanActOnWeb());
 
@@ -1071,7 +1070,6 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_EQ(GetPolicyChecker().CannotActOnWebReason(),
             CannotActReason::kDisabledByPolicy);
 
-// Note: sign-out from enterprise account is not allowed in ChromeOS.
   ClearPrimaryAccount();
   // No capability because the policy is disabled.
   SimulatePrimaryAccountChangedSignIn(&kNonEnterpriseAccount);

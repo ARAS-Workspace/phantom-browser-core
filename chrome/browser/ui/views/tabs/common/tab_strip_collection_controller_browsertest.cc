@@ -191,7 +191,6 @@ IN_PROC_BROWSER_TEST_P(TabStripCollectionControllerBrowserTest,
 
 // TODO(crbug.com/539987012): Enable this test on MacOS once the flakiness is
 // fixed.
-// TODO(crbug.com/545007115): Flaky on ChromeOS.
 #if BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_P(TabStripCollectionControllerBrowserTest,
                        DISABLED_ClickTabInImmersiveMode) {

@@ -43,7 +43,6 @@ class DefaultDelegate : public RecordingDelegate {
 }  // namespace
 
 ChromeStructuredMetricsDelegate::ChromeStructuredMetricsDelegate() {
-// TODO(jongahn): Make a static factory class and pass it into ctor.
   delegate_ = std::make_unique<DefaultDelegate>();
   StructuredMetricsClient::Get()->SetDelegate(this);
 }

@@ -709,8 +709,7 @@ void ExternalProviderImpl::CreateExternalProviders(
   // `ManifestLocation::kInternal` but use the external extension installer
   // codeflow. `download_location` must be `ManifestLocation::kInternal` so the
   // Chrome Web Store requests will include `installedby=internal` and allow
-  // certain extension downloads (e.g. Docs Offline). Unused on Chrome OS, which
-  // has its own mechanism for preinstalls.
+  // certain extension downloads (e.g. Docs Offline).
   provider_list->push_back(std::make_unique<preinstalled_extensions::Provider>(
       profile, service, ManifestLocation::kInternal,
       ManifestLocation::kInternal,

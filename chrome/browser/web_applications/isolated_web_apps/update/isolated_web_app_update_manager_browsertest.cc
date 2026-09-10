@@ -1511,8 +1511,6 @@ IN_PROC_BROWSER_TEST_F(IsolatedWebAppUpdateManagerBrowserTest,
                               /*integrity_block_data=*/_)));
 }
 
-// Session restore related tests that can only be run in ChromeOS.
-
 class IsolatedWebAppUpdateManagerWithKeyRotationBrowserTest
     : public IsolatedWebAppBrowserTestHarness {
  public:

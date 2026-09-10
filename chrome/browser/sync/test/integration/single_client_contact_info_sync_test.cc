@@ -274,7 +274,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientContactInfoSyncTest, FinalizeAfterImport) {
           .Wait());
 }
 
-// ChromeOS does not support signing out of a primary account.
 IN_PROC_BROWSER_TEST_P(SingleClientContactInfoSyncTest, ClearOnSignout) {
   const AutofillProfile kProfile = BuildTestAccountProfile();
   AddSpecificsToServer(AsContactInfoSpecifics(kProfile), GetFakeServer());

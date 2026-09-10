@@ -48,9 +48,6 @@ class PriceInsightsHandlerBrowserTest : public InProcessBrowserTest {
   std::unique_ptr<PriceInsightsHandler> handler_;
 };
 
-// The feedback dialog on CrOS happens at the system level, which cannot be
-// easily tested here.
-
 IN_PROC_BROWSER_TEST_F(PriceInsightsHandlerBrowserTest, TestShowFeedback) {
   ASSERT_EQ(nullptr, FeedbackDialog::GetInstanceForTest());
 

@@ -1321,7 +1321,6 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksContextServiceTest,
       ContextDeterminationStatus::kTimedOut, 1);
 }
 
-// TODO(crbug.com/540697591): Flaky on ChromeOS MSan.
 #define MAYBE_NotValidForServerUpload NotValidForServerUpload
 IN_PROC_BROWSER_TEST_F(ContextualTasksContextServiceTest,
                        MAYBE_NotValidForServerUpload) {

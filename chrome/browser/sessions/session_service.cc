@@ -161,9 +161,6 @@ bool SessionService::IsRelevantWindowType(
 
 bool SessionService::ShouldRestore(BrowserWindowInterface* browser) {
 
-  // ChromeOS and OSX have different ideas of application lifetime than
-  // the other platforms.
-  // On ChromeOS opening a new window should never start a new session.
   if (!has_open_trackable_browsers_ &&
       !StartupBrowserCreator::InSynchronousProfileLaunch() &&
       !SessionRestore::IsRestoring(profile())

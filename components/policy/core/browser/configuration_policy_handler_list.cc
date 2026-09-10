@@ -163,7 +163,6 @@ bool ConfigurationPolicyHandlerList::IsPolicySupported(
     return false;
   }
 
-// All policies on ChromeOS are from a cloud source so we can skip this check.
   if (policy_details->source_restriction == kSourceRestrictionCloudOnly &&
       !IsCloudOnlyPolicy(entry)) {
     if (errors) {

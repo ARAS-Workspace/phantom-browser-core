@@ -207,7 +207,6 @@ IN_PROC_BROWSER_TEST_F(ExitTypeServiceTest, PRE_CloseCrashBubbleEnablesSaving) {
       ->SetWaitingForUserToAckCrashForTest(true);
 }
 
-// TODO(crbug.com/40927197): Re-enable test that flakily times out
 #define MAYBE_CloseCrashBubbleEnablesSaving CloseCrashBubbleEnablesSaving
 // Closes the crash bubble, which should enable saving.
 IN_PROC_BROWSER_TEST_F(ExitTypeServiceTest,

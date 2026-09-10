@@ -401,8 +401,6 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
 
   bool attempted_startsandbox = false;
 #if BUILDFLAG(IS_LINUX)
-  // On Chrome OS ARM Mali, GPU driver userspace creates threads when
-  // initializing a GL context, so start the sandbox early.
   // TODO(zmo): Need to collect OS version before this.
   if (gpu_preferences_.gpu_sandbox_start_early) {
     gpu_info_.sandboxed = sandbox_helper_->EnsureSandboxInitialized(

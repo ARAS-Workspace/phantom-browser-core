@@ -1954,7 +1954,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsExtensionTest,
   RunTest("testConsoleContextNames", kPageWithContentScript);
 }
 
-// TODO(crbug.com/40930033): Flaky on Linux, ChromeOS, and macOS Tests.
+// TODO(crbug.com/40930033): Flaky on Linux and macOS Tests.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_CantInspectNewTabPage DISABLED_CantInspectNewTabPage
 #else
@@ -2867,7 +2867,6 @@ class RemoteDebuggingTest : public extensions::ExtensionApiTest {
   }
 };
 
-// Fails on CrOS. crbug.com/40392997
 // TODO(crbug.com/41478279): Flaky on all platforms.
 #define MAYBE_RemoteDebugger DISABLED_RemoteDebugger
 IN_PROC_BROWSER_TEST_F(RemoteDebuggingTest, MAYBE_RemoteDebugger) {
@@ -3641,7 +3640,6 @@ IN_PROC_BROWSER_TEST_F(InProcessBrowserTest,
   observer.Wait();
 }
 
-// Skip for ChromeOS because the keep alive is not created for ChromeOS.
 // See https://crbug.com/40167603.
 class KeepAliveDevToolsTest : public InProcessBrowserTest {
  protected:

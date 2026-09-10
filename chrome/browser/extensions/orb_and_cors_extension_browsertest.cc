@@ -2205,9 +2205,6 @@ IN_PROC_BROWSER_TEST_F(OrbAndCorsExtensionBrowserTest,
   EXPECT_EQ("LOADED", content::EvalJs(active_web_contents(), kScript));
 }
 
-// The following test is executed as Chrome App, which is only supported on
-// ChromeOS.
-
 using OriginHeaderExtensionBrowserTest = OrbAndCorsExtensionBrowserTest;
 
 IN_PROC_BROWSER_TEST_F(OriginHeaderExtensionBrowserTest,

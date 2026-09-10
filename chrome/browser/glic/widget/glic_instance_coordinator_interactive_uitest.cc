@@ -419,10 +419,8 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUiTest,
       }));
 }
 
-// Note: ChromeOS maintains account auth as a part of OS User session.
-// So invalidation is not supported.
-// TODO(crbug.com/450629835): Revisit if we figure out actual flow we need
-// reauth.
+// So invalidation is not supported. TODO(crbug.com/450629835): Revisit if we
+// figure out actual flow we need reauth.
 IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUiTest,
                        InvalidatedAccountWhileLoadingGlic) {
   if (base::FeatureList::IsEnabled(features::kGlicMultiInstance)) {
@@ -641,9 +639,7 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorLocationMetricsUiTest,
 }
 #endif  // BUILDFLAG(IS_MAC)
 
-// Note: ChromeOS maintains account auth as a part of OS User session,
-// and Profile is coupled with the User. Thus, deletion Profile
-// during the use should not happen.
+// Thus, deletion Profile during the use should not happen.
 IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUiTest,
                        PermanentlyDeleteProfile) {
   if (base::FeatureList::IsEnabled(features::kGlicMultiInstance)) {

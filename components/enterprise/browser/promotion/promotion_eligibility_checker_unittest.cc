@@ -225,8 +225,6 @@ TEST_F(PromotionEligibilityCheckerTest,
   checker_invalid_locale.MaybeCheckPromotionEligibility(callback.Get());
 }
 
-// Will not test this scenario on ChromeOS because the account is very unlikely
-// to be empty.
 TEST_F(PromotionEligibilityCheckerTest,
        DeterminePromotionEligibilityNoAccount) {
   identity_test_env()->ClearPrimaryAccount();

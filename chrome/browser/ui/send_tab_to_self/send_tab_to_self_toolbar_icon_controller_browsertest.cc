@@ -130,9 +130,9 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerDisabledAutoOpenTest,
   EXPECT_TRUE(bubble_controller()->IsBubbleShowing());
 }
 
-// TODO(crbug.com/529823129): Re-enable this test on ChromeOS and Linux.
-// This test cannot work on Wayland because the platform does not allow clients
-// to position top level windows, activate them, and set focus.
+// TODO(crbug.com/529823129): Re-enable this test on Linux. This test cannot
+// work on Wayland because the platform does not allow clients to position top
+// level windows, activate them, and set focus.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_StorePendingNewEntryFromIncognitoBrowser \
   DISABLED_StorePendingNewEntryFromIncognitoBrowser
@@ -160,7 +160,6 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerDisabledAutoOpenTest,
   EXPECT_TRUE(bubble_controller()->IsBubbleShowing());
 }
 
-// TODO(crbug.com/529823129): Re-enable this test on ChromeOS.
 #define MAYBE_StorePendingNewEntryFromWebApp StorePendingNewEntryFromWebApp
 IN_PROC_BROWSER_TEST_F(SendTabToSelfToolbarIconControllerDisabledAutoOpenTest,
                        MAYBE_StorePendingNewEntryFromWebApp) {

@@ -36,7 +36,6 @@
 #include "ui/views/test/views_test_utils.h"
 #include "ui/views/widget/widget.h"
 
-// TODO(crbug.com/461140208): Re-enable failing tests on ChromeOS.
 #define MAYBE(test_name) test_name
 
 namespace {

@@ -1712,8 +1712,6 @@ TEST_F(MAYBE_PrintRenderFrameHelperTest, PrintWithIframe) {
 
 #endif  // MOCK_PRINTER_SUPPORTS_PAGE_IMAGES
 
-// These print preview tests do not work on Chrome OS yet.
-
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
 class PrintRenderFrameHelperPreviewTest
     : public PrintRenderFrameHelperTestBase {

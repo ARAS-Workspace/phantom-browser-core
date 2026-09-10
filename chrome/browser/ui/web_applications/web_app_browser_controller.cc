@@ -301,8 +301,6 @@ void WebAppBrowserController::CreateMetadataAndTriggerAppMigrationDialog(
 }
 
 bool WebAppBrowserController::IsWindowCaptureHandleAllowed() const {
-// TODO(crbug.com/510716187): Enable for other platforms once macOS native
-// window ID translation is implemented.
   return false;
 }
 

@@ -71,8 +71,7 @@ std::unique_ptr<policy::PolicyStatusProvider> GetUserPolicyStatusProvider(
   return std::make_unique<policy::PolicyStatusProvider>();
 }
 
-// Returns policy status provider for machine policies for non-ChromeOS
-// platforms.
+// Returns policy status provider for machine policies
 std::unique_ptr<policy::PolicyStatusProvider> GetMachinePolicyStatusProvider(
     policy::MachineLevelUserCloudPolicyManager* manager) {
   policy::BrowserDMTokenStorage* dmTokenStorage =

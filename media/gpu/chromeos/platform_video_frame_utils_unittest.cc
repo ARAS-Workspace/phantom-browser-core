@@ -138,9 +138,4 @@ TEST(PlatformVideoFrameUtilsTest, CreateNativePixmapDmaBuf) {
   }
 }
 
-// TODO(b/230370976): remove this #if/#endif guard. To do so, we need to be able
-// to mock/fake the allocator used by CreatePlatformVideoFrame() and
-// CreateMappableSharedImageVideoFrame() so that those functions return a
-// non-nullptr frame on platforms where allocating NV12 buffers is not
-// supported.
 }  // namespace media

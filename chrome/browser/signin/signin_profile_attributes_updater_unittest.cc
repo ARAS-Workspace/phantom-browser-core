@@ -88,7 +88,6 @@ class SigninProfileAttributesUpdaterTest : public testing::Test {
 };
 
 // Tests that the browser state info is updated on signin and signout.
-// ChromeOS does not support signout.
 TEST_F(SigninProfileAttributesUpdaterTest, SigninSignout) {
   ProfileAttributesEntry* entry =
       profile_manager_.profile_attributes_storage()

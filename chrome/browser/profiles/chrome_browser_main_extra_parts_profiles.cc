@@ -731,8 +731,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if !BUILDFLAG(IS_ANDROID)
   badging::BadgeManagerFactory::GetInstance();
 #endif
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
-#endif
   BitmapFetcherServiceFactory::GetInstance();
   BluetoothChooserContextFactory::GetInstance();
 #if defined(TOOLKIT_VIEWS)
@@ -1219,8 +1217,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(IS_ANDROID)
   RevokedPermissionsOSNotificationDisplayManagerFactory::GetInstance();
 #endif  // BUILDFLAG(IS_ANDROID)
-#if !BUILDFLAG(IS_ANDROID)
-#endif
 #if BUILDFLAG(FULL_SAFE_BROWSING)
   safe_browsing::AdvancedProtectionStatusManagerFactory::GetInstance();
 #endif

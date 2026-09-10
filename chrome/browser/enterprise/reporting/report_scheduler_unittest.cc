@@ -336,7 +336,6 @@ TEST_F(ReportSchedulerTest, NoReportWithoutPolicy) {
   EXPECT_FALSE(scheduler_->IsNextReportScheduledForTesting());
 }
 
-// Chrome OS needn't set dm token and client id in the report scheduler.
 TEST_F(ReportSchedulerTest, NoReportWithoutDMToken) {
   Init(true, "", kClientId);
   CreateScheduler();
@@ -965,7 +964,6 @@ TEST_F(ReportSchedulerTest, UploadReportSucceededForProfileReporting) {
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-// Profile security signals are not supported on ChromeOS.
 class EnabledProfileSecuritySignalsReportSchedulerTest
     : public ReportSchedulerTest {
  protected:

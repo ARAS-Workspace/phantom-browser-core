@@ -233,9 +233,8 @@ IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
   EXPECT_THAT(secure_dns_config.doh_servers().servers(), testing::IsEmpty());
 }
 
-// ChromeOS includes its own special functionality to set default policies if
-// any policies are set.  This function is not declared and cannot be invoked
-// in non-CrOS builds. Expect these enterprise user defaults to disable DoH.
+// This function is not declared and cannot be invoked in builds. Expect these
+// enterprise user defaults to disable DoH.
 
 IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
                        DisableDohByPolicy) {

@@ -328,11 +328,6 @@ void FileSystemAccessSafeMoveHelper::DidFileDoQuarantine(
     return;
   }
 
-  // The quarantine service operates on files identified by a base::FilePath. As
-  // such we can only quarantine files that are actual local files.
-  // On ChromeOS on the other hand anything that isn't in the sandboxed file
-  // system is also uniquely identifiable by its FileSystemURL::path(), and
-  // thus we accept all other FileSystemURL types.
   DCHECK(target_url.type() == storage::kFileSystemTypeLocal ||
          target_url.type() == storage::kFileSystemTypeTest)
       << target_url.type();

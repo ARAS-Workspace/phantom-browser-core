@@ -70,7 +70,7 @@ class ChromeJsErrorReportProcessor : public JsErrorReportProcessor {
   virtual variations::ExperimentListInfo GetExperimentListInfo() const;
 
   // Determines the version of the OS we are on. Virtual so that tests can
-  // override. On Chrome OS, this information is added by the crash_reporter.
+  // override.
   virtual std::string GetOsVersion();
 
   // Testing hook -- returns the URL we will send the error reports to. By

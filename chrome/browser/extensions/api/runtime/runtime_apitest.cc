@@ -601,8 +601,6 @@ IN_PROC_BROWSER_TEST_F(RuntimeAPIUpdateTest,
 
 // The bug this test reproduces can only be detected when dangling-pointer
 // checks are compiled in, so the test is built only in that case.
-// Also exclude from ChromeOS because multiple profiles aren't supported there,
-// so the test can't be set up properly.
 #if !BUILDFLAG(IS_ANDROID) && PA_BUILDFLAG(ENABLE_DANGLING_RAW_PTR_CHECKS)
 namespace {
 
@@ -1690,7 +1688,7 @@ class GetContextsWithDeveloperToolsOpened
       const GetContextsWithDeveloperToolsOpened&) = delete;
 };
 
-// TODO(crbug.com/357845909): flaky on ChromeOS and Linux MSAN.
+// TODO(crbug.com/357845909): flaky on Linux MSAN.
 #if defined(MEMORY_SANITIZER) && BUILDFLAG(IS_LINUX)
 #define MAYBE_ReturnsDevToolsContext DISABLED_ReturnsDevToolsContext
 #else

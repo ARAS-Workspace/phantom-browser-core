@@ -75,8 +75,7 @@ TEST(WebCursorTest, WebCursorCursorConstructorCustom) {
   native_cursor = webcursor.GetNativeCursor();
   EXPECT_TRUE(webcursor.has_custom_cursor_for_test());
 
-  // For non-CrOS platforms, the cursor mustn't be rotated as logical and
-  // physical location is the same.
+  // the cursor mustn't be rotated as logical and physical location is the same.
   EXPECT_EQ(gfx::Point(5, 10), native_cursor.custom_hotspot());
 
   aura::client::SetCursorShapeClient(nullptr);

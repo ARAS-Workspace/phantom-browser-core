@@ -2541,7 +2541,7 @@ class PreEstablishGpuChannelRenderProcessHostTest
 INSTANTIATE_TEST_SUITE_P(
     All,
     PreEstablishGpuChannelRenderProcessHostTest,
-// ChromeOS and Android don't support software compositing.
+// Android doesn't support software compositing.
 #if !BUILDFLAG(IS_ANDROID)
     testing::Bool(),
 #else

@@ -41,9 +41,7 @@ constexpr int kUserDemographicsMinAgeInYears = 20;
 constexpr int kUserDemographicsMaxAgeInYears = 85;
 
 // Root dictionary pref to store the user's birth year and gender that are
-// provided by the sync server. This is a read-only syncable priority pref on
-// all platforms except ChromeOS Ash, where it is a syncable OS-level priority
-// pref.
+// provided by the sync server.
 inline constexpr char kSyncDemographicsPrefName[] = "sync.demographics";
 
 // Stores a "secret" offset that is used to randomize the birth year for metrics

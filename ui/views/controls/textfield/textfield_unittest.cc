@@ -3489,7 +3489,6 @@ TEST_F(TextfieldTest, CommitEmptyComposingTextTest) {
 }
 
 #if BUILDFLAG(IS_LINUX)
-// SetCompositionFromExistingText is only available on Chrome OS.
 TEST_F(TextfieldTest, SetCompositionFromExistingTextTest) {
   InitTextfield();
   textfield_->SetText(u"abc");

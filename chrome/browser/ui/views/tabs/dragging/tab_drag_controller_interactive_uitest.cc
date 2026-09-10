@@ -1819,7 +1819,6 @@ IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTest,
   EXPECT_FALSE(IsDragSessionActive(tab_strip));
 }
 
-// Flaky. https://crbug.com/343188577
 #define MAYBE_StartDragWhileEndingPreviousDragDoesNothingTest \
   StartDragWhileEndingPreviousDragDoesNothingTest
 
@@ -2533,8 +2532,8 @@ IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTest,
             browser()->GetWindow()->GetBounds().ToString());
 }
 
-// TODO(crbug.com/40934892): ChromeOS and Wayland flakes for tests that involve
-// detaching to a new window.
+// TODO(crbug.com/40934892): Wayland flakes for tests that involve detaching to
+// a new window.
 class TabDragTargetTest : public DetachToBrowserTabDragControllerTest {
  public:
   TabDragTargetTest() {
@@ -4782,7 +4781,6 @@ IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTest,
 }
 
 #if BUILDFLAG(IS_LINUX)
-// Flaky on ChromeOS.
 #define MAYBE_DragDirectlyToSecondWindow DISABLED_DragDirectlyToSecondWindow
 #else
 #define MAYBE_DragDirectlyToSecondWindow DragDirectlyToSecondWindow

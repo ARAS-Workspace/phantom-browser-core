@@ -78,9 +78,6 @@ BASE_FEATURE(kEnableReportingFromUnmanagedDevices,
 
 ReportingServerConnector::ReportingServerConnector()
     : encrypted_reporting_client_(EncryptedReportingClient::Create()) {
-  // Initialize `ReportingServerConnector` instance. For non-Ash configurations
-  // it is initialized on the first use, but for Ash we need it to be prepared
-  // for encryption key delivery early after enrollment.
 }
 
 ReportingServerConnector::~ReportingServerConnector() {
@@ -234,8 +231,6 @@ void ReportingServerConnector::UploadEncryptedReportInternal(
 StatusOr<::policy::CloudPolicyManager*>
 ReportingServerConnector::GetUserCloudPolicyManager() {
   DCHECK_CURRENTLY_ON(::content::BrowserThread::UI);
-  // Pointer to `policy::CloudPolicyManager` is retrieved differently
-  // for ChromeOS, for Android and for all other cases.
   if (!g_browser_process || !g_browser_process->browser_policy_connector()) {
     base::UmaHistogramEnumeration(
         reporting::kUmaUnavailableErrorReason,

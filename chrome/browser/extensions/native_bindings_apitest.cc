@@ -134,9 +134,6 @@ IN_PROC_BROWSER_TEST_F(NativeBindingsApiTest, SimpleEndToEndTest) {
   ASSERT_TRUE(RunExtensionTest("native_bindings/extension")) << message_;
 }
 
-// The following test is executed as Chrome App, which is only supported on
-// ChromeOS.
-
 // Tests the declarativeContent API and declarative events.
 IN_PROC_BROWSER_TEST_F(NativeBindingsApiTest, DeclarativeEvents) {
   embedded_test_server()->ServeFilesFromDirectory(test_data_dir_);

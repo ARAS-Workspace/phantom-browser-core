@@ -300,7 +300,6 @@ TEST_F(AdvancedProtectionStatusManagerDesktopTest, StayInAdvancedProtection) {
               testing::ElementsAre(base::Bucket(true, 1)));
 }
 
-// Not applicable to Chrome OS.
 TEST_F(AdvancedProtectionStatusManagerDesktopTest, SignInAndSignOutEvent) {
   base::HistogramTester histograms;
 
@@ -418,8 +417,7 @@ TEST_F(AdvancedProtectionStatusManagerDesktopTest,
   aps_manager.UnsubscribeFromSigninEvents();
 }
 
-// On ChromeOS, there is no unconsented primary account. We can only track the
-// primary account.
+// We can only track the primary account.
 TEST_F(AdvancedProtectionStatusManagerDesktopTest,
        TracksUnconsentedPrimaryAccount) {
   base::HistogramTester histograms;

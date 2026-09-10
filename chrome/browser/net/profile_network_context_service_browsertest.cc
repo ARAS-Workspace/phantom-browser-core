@@ -755,8 +755,6 @@ class AmbientAuthenticationTestWithPolicy : public policy::PolicyTest {
                   incognito_profile),
               AmbientAuthenticationTestHelper::IsIncognitoAllowedInPolicy(
                   policy_value));
-// ChromeOS guest sessions don't have the capability to
-// do ambient authentications.
     EXPECT_EQ(
         AmbientAuthenticationTestHelper::IsAmbientAuthAllowedForProfile(
             CreateGuestBrowser()->GetProfile()),

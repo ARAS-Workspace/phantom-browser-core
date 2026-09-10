@@ -987,10 +987,6 @@ void ProfileManager::InitProfileUserPrefs(Profile* profile) {
     return;
   }
 
-  // User type can change during online sign in on Chrome OS. Propagate the
-  // change to the profile and remove stored profile attributes so they can be
-  // re-initialized later.
-
   size_t avatar_index;
   std::string profile_name;
   std::string supervised_user_id;
@@ -1959,7 +1955,6 @@ void ProfileManager::OnBrowserClosed(BrowserWindowInterface* browser) {
     base::UmaHistogramCustomCounts("Profile.Guest.OTR.Lifetime",
                                    duration.InMinutes(), 1,
                                    base::Days(28).InMinutes(), 100);
-    // ChromeOS handles guest data independently.
     // Clear all browsing data once a Guest Session completes. The Guest profile
     // has BrowserContextKeyedServices that the ProfileDestroyer can't delete
     // properly.

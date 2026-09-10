@@ -116,9 +116,8 @@ class NetworkConnectionTrackerBrowserTest : public InProcessBrowserTest {
 // Basic test to make sure NetworkConnectionTracker is set up.
 IN_PROC_BROWSER_TEST_F(NetworkConnectionTrackerBrowserTest,
                        NetworkConnectionTracker) {
-  // NetworkService on ChromeOS doesn't yet have a NetworkChangeManager
-  // implementation. OSX uses a separate binary for service processes and
-  // browser test fixture doesn't have NetworkServiceTest mojo code.
+  // OSX uses a separate binary for service processes and browser test fixture
+  // doesn't have NetworkServiceTest mojo code.
 #if !BUILDFLAG(IS_MAC)
   network::NetworkConnectionTracker* tracker =
       content::GetNetworkConnectionTracker();
@@ -152,9 +151,8 @@ IN_PROC_BROWSER_TEST_F(NetworkConnectionTrackerBrowserTest,
 // binds to the restarted network service.
 IN_PROC_BROWSER_TEST_F(NetworkConnectionTrackerBrowserTest,
                        SimulateNetworkServiceCrash) {
-  // NetworkService on ChromeOS doesn't yet have a NetworkChangeManager
-  // implementation. OSX uses a separate binary for service processes and
-  // browser test fixture doesn't have NetworkServiceTest mojo code.
+  // OSX uses a separate binary for service processes and browser test fixture
+  // doesn't have NetworkServiceTest mojo code.
 #if !BUILDFLAG(IS_MAC)
   // Out-of-process network service is not enabled, so network service's crash
   // and restart aren't applicable.

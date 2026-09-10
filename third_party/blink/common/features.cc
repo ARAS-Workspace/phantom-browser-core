@@ -1345,7 +1345,6 @@ BASE_FEATURE(kLowLatencyUsageSupportedForCanvas,
 #endif
 
 BASE_FEATURE(kLowPriorityAsyncScriptExecution,
-// TODO(crbug/429069717): Fix the high power consumption on ChromeOS.
              base::FEATURE_ENABLED_BY_DEFAULT
 );
 
@@ -1731,8 +1730,7 @@ BASE_FEATURE(kPrecompileInlineScripts, base::FEATURE_DISABLED_BY_DEFAULT);
 // Whether we should composite a PLSA (paint layer scrollable area) even if it
 // means losing lcd text.
 BASE_FEATURE(kPreferCompositingToLCDText,
-// On Android we never have LCD text. On Chrome OS we prefer composited
-// scrolling for better scrolling performance.
+// On Android we never have LCD text.
 #if BUILDFLAG(IS_ANDROID)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
@@ -2419,7 +2417,6 @@ BASE_FEATURE(kWebRtcIgnoreUnspecifiedColorSpace,
 
 // Instructs WebRTC to honor the Min/Max Video Encode Accelerator dimensions.
 BASE_FEATURE(kWebRtcUseMinMaxVEADimensions,
-// TODO(crbug.com/1008491): enable other platforms.
              base::FEATURE_DISABLED_BY_DEFAULT
 );
 

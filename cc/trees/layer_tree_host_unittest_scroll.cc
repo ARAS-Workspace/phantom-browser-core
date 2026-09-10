@@ -1293,9 +1293,8 @@ void DoGestureScroll(LayerTreeHostImpl* host_impl,
 
 // This test simulates scrolling on the impl thread such that snapping occurs
 // and ensures that the target snap area element ids are sent back to the main
-// thread.
-// TODO(crbug.com/40762489): Flaky on ChromeOS, and Linux.
-// TODO(crbug.com/342502558): Flaky on Mac
+// thread. TODO(crbug.com/40762489): Flaky on Linux. TODO(crbug.com/342502558):
+// Flaky on Mac
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_LayerTreeHostScrollTestImplOnlyScrollSnap \
   DISABLED_LayerTreeHostScrollTestImplOnlyScrollSnap
@@ -1568,7 +1567,6 @@ class LayerTreeHostScrollTestImplOnlyMultipleScrollSnap
   ElementId snap_area_b_id_;
 };
 
-// TODO(crbug.com/40787490): Test is flaky on Chrome OS (both Ash and Lacros).
 MULTI_THREAD_TEST_F(LayerTreeHostScrollTestImplOnlyMultipleScrollSnap);
 
 class LayerTreeHostScrollTestScrollZeroMaxScrollOffset
@@ -1812,8 +1810,6 @@ class LayerTreeHostScrollTestImplScrollUnderMainThreadScrollingParent
   int scroll_tree_index_ = kInvalidPropertyNodeId;
 };
 
-// This test is flaky in the single threaded configuration, only on the
-// chromeos-amd64-generic-rel bot. https://crbug.com/1093078.
 SINGLE_AND_MULTI_THREAD_TEST_F(
     LayerTreeHostScrollTestImplScrollUnderMainThreadScrollingParent);
 

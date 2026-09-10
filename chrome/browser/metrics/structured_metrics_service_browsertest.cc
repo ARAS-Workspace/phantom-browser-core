@@ -196,8 +196,6 @@ IN_PROC_BROWSER_TEST_F(TestStructuredMetricsService,
   EXPECT_EQ(sm_service->recorder()->event_storage()->RecordedEventsCount(), 0);
 }
 
-// TODO(crbug.com/40931189): Re-enable this test
-// Only flaky on chromeos-rel.
 #define MAYBE_StagedLogPurgeOnConsentRevoke StagedLogPurgeOnConsentRevoke
 IN_PROC_BROWSER_TEST_F(TestStructuredMetricsService,
                        MAYBE_StagedLogPurgeOnConsentRevoke) {

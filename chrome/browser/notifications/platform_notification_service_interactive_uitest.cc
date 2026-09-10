@@ -518,7 +518,6 @@ IN_PROC_BROWSER_TEST_F(PlatformNotificationServiceBrowserTest,
             all_options_notification.buttons()[0].type);
 }
 
-// Chrome OS shows the notification settings inline.
 IN_PROC_BROWSER_TEST_F(PlatformNotificationServiceBrowserTest,
                        WebNotificationSiteSettingsButton) {
   GrantNotificationPermissionForTest();

@@ -240,8 +240,7 @@ void KeyboardAccessTest::TestMenuKeyboardAccess(bool alternate_key_sequence,
 
   WaitForFocusedViewIDToChange(original_view_id);
 
-  // See above comment. Since we already brought up the menu, no need to do this
-  // on ChromeOS.
+  // See above comment.
   if (alternate_key_sequence) {
     SendKeyPress(browser(), ui::VKEY_DOWN);
   } else {

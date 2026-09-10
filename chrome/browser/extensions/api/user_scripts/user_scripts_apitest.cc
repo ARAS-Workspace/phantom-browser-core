@@ -252,7 +252,6 @@ IN_PROC_BROWSER_TEST_F(UserScriptsAPITest,
       *main_frame->GetProcess(), extension->id()));
 }
 
-// TODO(crbug.com/335421977): Flaky on "Linux ChromiumOS MSan Tests".
 #define MAYBE_ConfigureWorld ConfigureWorld
 IN_PROC_BROWSER_TEST_F(UserScriptsAPITest, MAYBE_ConfigureWorld) {
   ASSERT_TRUE(RunUserScriptsExtensionTest("user_scripts/configure_world"))

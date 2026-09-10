@@ -89,8 +89,7 @@ UkmConsentStateObserver::ProfileState UkmConsentStateObserver::GetProfileState(
     state.SetConsentType(EXTENSIONS);
   }
 
-  // This separation isn't actually needed for non-ChromeOS devices. But for
-  // clarity it is added.
+  // This separation isn't actually needed. But for clarity it is added.
   if (msbb_consent &&
       CanUploadUkmForType(sync_service, syncer::DataType::APPS, msbb_consent)) {
     state.SetConsentType(APPS);

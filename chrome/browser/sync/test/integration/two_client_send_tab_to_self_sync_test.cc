@@ -360,8 +360,6 @@ IN_PROC_BROWSER_TEST_P(TwoClientSendTabToSelfSyncTest,
   }));
 }
 
-// Transport mode isn't really supported on ChromeOS.
-
 class TwoClientSendTabToSelfTransportModeSyncTest : public SyncTest {
  public:
   TwoClientSendTabToSelfTransportModeSyncTest() : SyncTest(TWO_CLIENT) {}

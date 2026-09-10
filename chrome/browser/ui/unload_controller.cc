@@ -846,8 +846,8 @@ UnloadController::OkToCloseWithInProgressDownloads(
 
 bool UnloadController::CanCloseWithInProgressDownloads() {
 #if BUILDFLAG(IS_MAC)
-  // On Mac and ChromeOS, non-incognito and non-Guest downloads can still
-  // continue after window is closed.
+  // On Mac, non-incognito and non-Guest downloads can still continue after
+  // window is closed.
   if (!browser_->GetProfile()->IsOffTheRecord()) {
     return true;
   }

@@ -134,8 +134,8 @@ IN_PROC_BROWSER_TEST_F(GlicActorScrollToToolUiTest, ScrollsToValidApcNodeID) {
 }
 
 // Test scrolling to an arbitrary DOM node that is NOT in the APC observation.
-// This requires TOCTOU validation to be disabled.
-// TODO(crbug.com/460810821): Flaky on Mac and ChromeOS.
+// This requires TOCTOU validation to be disabled. TODO(crbug.com/460810821):
+// Flaky on Mac.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_ScrollsToValidNonApcNodeID DISABLED_ScrollsToValidNonApcNodeID
 #else

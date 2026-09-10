@@ -77,8 +77,6 @@ class TabDialogManagerUiTest : public InteractiveBrowserTest {
   }
 };
 
-// ChromeOS does not use desktop widgets.
-
 class TabDialogManagerDesktopWidgetUiTest : public TabDialogManagerUiTest {
  public:
   TabDialogManagerDesktopWidgetUiTest() {

@@ -2887,9 +2887,8 @@ IN_PROC_BROWSER_TEST_F(DownloadTestWithHistogramTester,
   ResetURLLoaderInterceptor();
 }
 
-// Times out often on debug ChromeOS because test is slow.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-// Flaking on Windows, macOS, Linux, ChromeOS. https://crbug.com/40727061
+// Flaking on Windows, macOS, Linux. https://crbug.com/40727061
 #define MAYBE_SaveLargeImage DISABLED_SaveLargeImage
 #else
 #define MAYBE_SaveLargeImage SaveLargeImage
@@ -5019,8 +5018,6 @@ IN_PROC_BROWSER_TEST_F(DownloadTestWithFakeSafeBrowsing,
 
 #endif  // SAFE_BROWSING_DOWNLOAD_PROTECTION
 
-// The rest of these tests rely on the download surface, which ChromeOS doesn't
-// use (crbug.com/40224714 is tracking Download Bubble on ChromeOS).
 // Test that the download surface is shown by starting a download.
 //
 // TODO(crbug.com/40266279): This test is flaky. Perhaps because it depends on

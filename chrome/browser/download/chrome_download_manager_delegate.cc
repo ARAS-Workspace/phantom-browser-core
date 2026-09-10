@@ -2173,8 +2173,7 @@ bool ChromeDownloadManagerDelegate::IsOpenInBrowserPreferredForFile(
   }
 #endif
 
-  // On Android, always prefer opening with an external app. On ChromeOS, there
-  // are no external apps so just allow all opens to be handled by the "System."
+  // On Android, always prefer opening with an external app.
 #if !BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_PLUGINS)
   // TODO(asanka): Consider other file types and MIME types.
   // http://crbug.com/41076988

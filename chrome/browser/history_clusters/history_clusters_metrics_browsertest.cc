@@ -209,8 +209,8 @@ IN_PROC_BROWSER_TEST_F(HistoryClustersMetricsBrowserTest,
                                       1);
 }
 
-// Disabled on ChromeOS and Linux due to flakes: crbug.com/40800225.
-// Disabled on Mac due to flakes: crbug.com/40817130.
+// Disabled on Linux due to flakes: crbug.com/40800225. Disabled on Mac due to
+// flakes: crbug.com/40817130.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_DirectNavigationWithToggleToBasic \
   DISABLED_DirectNavigationWithToggleToBasic

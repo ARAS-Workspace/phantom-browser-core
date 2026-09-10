@@ -171,8 +171,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientWalletCredentialSyncTest, EnabledByDefault) {
       syncer::AUTOFILL_WALLET_CREDENTIAL));
 }
 
-// ChromeOS does not support late signin after profile creation, so the test
-// below does not apply.
 // Verify card and CVC data is synced when the user signs in.
 IN_PROC_BROWSER_TEST_P(SingleClientWalletCredentialSyncTest,
                        DownloadCardCredential) {

@@ -213,13 +213,6 @@ std::string ChromeConnectedHeaderHelper::BuildRequestHeader(
         base::StringPrintf("%s=%s", kGaiaOriginAttrName,
                            GaiaUrls::GetInstance()->gaia_origin().host()));
   }
-// If we are on mobile or desktop, an empty |account_id| corresponds to the user
-// not signed into Sync. Do not enforce account consistency, unless Mice is
-// enabled on mobile (Android or iOS).
-// On Chrome OS, an empty |account_id| corresponds to Public Sessions, Guest
-// Sessions and Active Directory logins. Guest Sessions have already been
-// filtered upstream and we want to enforce account consistency in Public
-// Sessions and Active Directory logins.
 
   if (!force_account_consistency && gaia_id.empty()) {
 #if BUILDFLAG(IS_ANDROID)

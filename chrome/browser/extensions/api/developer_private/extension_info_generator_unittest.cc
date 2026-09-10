@@ -1274,14 +1274,8 @@ TEST_F(ExtensionInfoGeneratorUnitTest, RecommendedExtension) {
   EXPECT_TRUE(info->must_remain_installed);
 }
 
-// Test that extensions cannot be uploaded to the user's account if they are
-// signed out or signed in with full sync consent (automatically syncs all data
-// types including extensions).
-
 // Same test as above, except test that extensions CAN be uploaded if the user
 // is signed into transport mode with extensions sync enabled.
-// Disabled on ChromeOS since users should not be able to sign into transport
-// mode on ChromeOS.
 TEST_F(ExtensionInfoGeneratorUnitTest, UploadAsAccountExtension_TransportMode) {
   // Sign the user in without full sync with an explicit signin.
   auto identity_test_env_profile_adaptor =

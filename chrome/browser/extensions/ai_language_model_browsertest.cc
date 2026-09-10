@@ -69,7 +69,6 @@ std::string DescribeTestVariant(const testing::TestParamInfo<Variant> info) {
 
 }  // namespace
 
-// TODO(crbug.com/419321441): Support Built-In AI APIs on ChromeOS.
 #define MAYBE_ExtensionAILanguageModelBrowserTest \
   ExtensionAILanguageModelBrowserTest
 class MAYBE_ExtensionAILanguageModelBrowserTest

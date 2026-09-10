@@ -2235,7 +2235,6 @@ IN_PROC_BROWSER_TEST_P(
             syncer::SyncService::UserActionableError::kNone);
 }
 
-// ChromeOS doesn't have unconsented primary accounts.
 IN_PROC_BROWSER_TEST_P(SingleClientNigoriWithWebApiTest,
                        ShouldAcceptEncryptionKeysFromTheWebInTransportMode) {
   // Mimic the account using a trusted vault passphrase.

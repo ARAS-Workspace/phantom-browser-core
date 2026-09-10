@@ -435,7 +435,6 @@ void IdentityGetAuthTokenFunction::StartSigninFlow() {
 
 void IdentityGetAuthTokenFunction::StartMintTokenFlow(
     IdentityMintRequestQueue::MintType type) {
-  // ChromeOS in kiosk mode may start the mint token flow without account.
   DCHECK(!token_key_.account_info.IsEmpty())
       << "token_key_.account_info is empty!";
   DCHECK(IdentityManagerFactory::GetForProfile(GetProfile())

@@ -194,9 +194,6 @@ TEST_F(ImageWriterOperationTest, WriteImageToDevice) {
 }
 #endif  // BUILDFLAG(IS_LINUX)
 
-// Chrome OS doesn't support verification in the ImageBurner, so these two tests
-// are skipped.
-
 TEST_F(ImageWriterOperationTest, VerifyFileSuccess) {
   // Sets up client for simulating Operation::Progress() on
   // Operation::VerifyWrite.

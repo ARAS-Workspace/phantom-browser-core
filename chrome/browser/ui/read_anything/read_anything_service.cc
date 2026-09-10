@@ -60,8 +60,8 @@ ReadAnythingService* ReadAnythingService::Get(Profile* profile) {
 }
 
 void ReadAnythingService::OnReadAnythingShown() {
-// The TTS download extension should only be installed on non-ChromeOS devices
-// when the Read Aloud flag is enabled.
+// The TTS download extension should only be installed when the Read Aloud flag
+// is enabled.
   SetupDesktopEngine();
 
   if (!features::IsReadAnythingDocsIntegrationEnabled()) {

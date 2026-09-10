@@ -139,7 +139,6 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorBrowserTest,
       WaitForWebUiContentsVisibility(instance, content::Visibility::VISIBLE));
 }
 
-// ClearPrimaryAccount is not supported on ChromeOS.
 #define MAYBE_SignOutClosesAllInstances SignOutClosesAllInstances
 IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorBrowserTest,
                        MAYBE_SignOutClosesAllInstances) {

@@ -755,8 +755,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientThemesSyncTestWithAccountThemesSeparation,
   EXPECT_FALSE(UsingGrayscaleTheme(GetProfile(0)));
 }
 
-// Signing out is not supported on ChromeOS, thus excluded from the following
-// tests.
 IN_PROC_BROWSER_TEST_P(SingleClientThemesSyncTestWithAccountThemesSeparation,
                        ShouldReturnLocalDataDescriptions) {
   ASSERT_TRUE(SetupClients());
@@ -972,7 +970,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientThemesSyncTestWithAccountThemesSeparation,
       /*expected_bucket_count=*/1);
 }
 
-// Signing out is not supported on ChromeOS, thus excluded from this test suite.
 class SingleClientThemesSyncTestWithAccountThemesSeparationInSigninPendingState
     : public SingleClientThemesSyncTestWithAccountThemesSeparation {
  public:

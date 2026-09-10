@@ -179,7 +179,7 @@ class TestFontServiceApp : public font_data_service::mojom::FontDataService {
   bool fail_match_family_ = false;
   base::MappedReadOnlyRegion memory_map_region_;
 #if BUILDFLAG(IS_LINUX)
-  // On Linux/ChromeOS, only the shared memory fallback is supported.
+  // On Linux/only the shared memory fallback is supported.
   bool use_memory_fallback_ = true;
 #else
   bool use_memory_fallback_ = false;

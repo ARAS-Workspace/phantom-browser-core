@@ -642,8 +642,6 @@ IN_PROC_BROWSER_TEST_F(PerformanceInterventionInteractiveTest,
   EXPECT_FALSE(intervention_button->GetVisible());
 }
 
-// We can only have one non-off record profile open at a time on ChromeOS so
-// users will not encounter this case.
 IN_PROC_BROWSER_TEST_F(PerformanceInterventionInteractiveTest,
                        SuggestTabsOnlyForLastActiveProfile) {
   // Create two browser windows with tabs and ensure the second browser window

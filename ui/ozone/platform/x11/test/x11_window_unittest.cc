@@ -418,7 +418,7 @@ TEST_F(X11WindowTest, DISABLED_Shape) {
   EXPECT_FALSE(ShapeRectContainsPoint(shape_rects, 500, 500));
 }
 
-// Flaky on Linux ASAN and ChromeOS. https://crbug.com/1291868
+// Flaky on Linux ASAN. https://crbug.com/1291868
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_WindowManagerTogglesFullscreen \
   DISABLED_WindowManagerTogglesFullscreen

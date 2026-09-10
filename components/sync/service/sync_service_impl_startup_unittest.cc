@@ -199,7 +199,6 @@ class SyncServiceImplStartupTest : public testing::Test {
   const base::TimeDelta account_managed_status_finder_timeout_;
 };
 
-// ChromeOS does not support sign-in after startup
 TEST_F(SyncServiceImplStartupTest, StartFirstTime) {
   // We've never completed startup.
   ASSERT_FALSE(sync_prefs()->IsInitialSyncFeatureSetupComplete());
@@ -443,7 +442,6 @@ TEST_F(SyncServiceImplStartupTest, ResetSyncViaDashboard) {
 
 }
 
-// ChromeOS does not support sign-in after startup.
 // Verify that enabling sync honors existing values of data type preferences.
 TEST_F(SyncServiceImplStartupTest, HonorsExistingDatatypePrefs) {
   // Explicitly set Keep Everything Synced to false and have only bookmarks
@@ -556,7 +554,6 @@ TEST_F(SyncServiceImplStartupTest, StartDownloadFailed) {
             sync_service()->GetTransportState());
 }
 
-// ChromeOS does not support sign-in after startup.
 TEST_F(SyncServiceImplStartupTest, FullStartupSequenceFirstTime) {
   // We've never completed startup.
   ASSERT_FALSE(sync_prefs()->IsInitialSyncFeatureSetupComplete());
@@ -717,7 +714,6 @@ TEST_F(SyncServiceImplStartupTest, DeferredStartInterruptedByDataType) {
   EXPECT_EQ(1u, histogram_tester.GetAllSamples(kTimeDeferredHistogram).size());
 }
 
-// ChromeOS does not support sign-in after startup.
 TEST_F(SyncServiceImplStartupTest, UserTriggeredStartIsNotDeferredStart) {
   // Signed-out at first.
   base::HistogramTester histogram_tester;

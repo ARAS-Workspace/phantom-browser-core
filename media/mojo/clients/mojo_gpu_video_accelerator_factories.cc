@@ -298,8 +298,6 @@ MojoGpuVideoAcceleratorFactories::VideoFrameOutputFormat(
     return OutputFormat::NV12;
   }
 
-  // For ChromeOS, if above hardware support for NV12 is not present then
-  // fallback to pixel upload.
   if (capabilities.texture_rg) {
     // Use NV12 for Mac, Windows, Linux and CastOS platforms.
     return OutputFormat::NV12;

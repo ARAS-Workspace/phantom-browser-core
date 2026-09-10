@@ -164,8 +164,6 @@ IN_PROC_BROWSER_TEST_F(LiveCaptionControllerTest, ProfilePrefsAreRegistered) {
   EXPECT_FALSE(
       browser()->GetProfile()->GetPrefs()->GetBoolean(prefs::kLiveCaptionEnabled));
 
-  // These prefs are used for the component updater, but SODA does not use the
-  // component updater on Chrome OS.
   EXPECT_EQ(base::FilePath(), g_browser_process->local_state()->GetFilePath(
                                   prefs::kSodaBinaryPath));
   EXPECT_EQ(base::FilePath(), g_browser_process->local_state()->GetFilePath(
@@ -178,8 +176,6 @@ IN_PROC_BROWSER_TEST_F(LiveCaptionControllerTest,
   SetLiveCaptionEnabled(true);
   EXPECT_TRUE(
       browser()->GetProfile()->GetPrefs()->GetBoolean(prefs::kLiveCaptionEnabled));
-  // These prefs are used for the component updater, but SODA does not use the
-  // component updater on Chrome OS.
   EXPECT_EQ(base::FilePath(), g_browser_process->local_state()->GetFilePath(
                                   prefs::kSodaBinaryPath));
   EXPECT_EQ(base::FilePath(), g_browser_process->local_state()->GetFilePath(
@@ -190,8 +186,6 @@ IN_PROC_BROWSER_TEST_F(LiveCaptionControllerTest,
       browser()->GetProfile()->GetPrimaryOTRProfile(/*create_if_needed=*/true);
   EXPECT_TRUE(
       incognito_profile->GetPrefs()->GetBoolean(prefs::kLiveCaptionEnabled));
-  // These prefs are used for the component updater, but SODA does not use the
-  // component updater on Chrome OS.
   EXPECT_EQ(base::FilePath(), g_browser_process->local_state()->GetFilePath(
                                   prefs::kSodaBinaryPath));
   EXPECT_EQ(base::FilePath(), g_browser_process->local_state()->GetFilePath(

@@ -30,9 +30,6 @@ static_assert(kDefaultDataPipeAllocationSize >= net::kMaxBytesToSniff,
 
 uint32_t GetDataPipeDefaultAllocationSize(DataPipeAllocationSize option) {
 #if defined(ARCH_CPU_32_BITS)
-  // TODO(crbug.com/1306998): ChromeOS experiences a much higher OOM crash
-  // rate if the larger data pipe size is used.
-  //
   // On 32 bit architectures, address space and address space fragmentation are
   // both concerns. There, don't attempt to have a 2MiB buffer. See
   // crbug/385632154 for an example where this was causing crashes.

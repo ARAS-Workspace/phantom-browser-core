@@ -1373,8 +1373,6 @@ TEST_F(RootViewTest, AnnounceTextAsAlert_SetsAlertRole) {
   ui::AXNodeData data;
   announce_view->GetViewAccessibility().GetAccessibleNodeData(&data);
 
-// ChromeOS uses kStaticText; other platforms use kAlert for alert
-// announcements.
   EXPECT_EQ(data.role, ax::mojom::Role::kAlert);
 
   EXPECT_EQ(data.GetString16Attribute(ax::mojom::StringAttribute::kName),

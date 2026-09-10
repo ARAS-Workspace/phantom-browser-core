@@ -134,9 +134,6 @@ TEST_F(AppInfoDialogViewsTest, UninstallingOtherAppDoesNotCloseDialog) {
   EXPECT_TRUE(widget_);
 }
 
-// Exclude the test from ChromeOS because profile destruction does not happen
-// on ChromeOS in production.
-//
 // Tests that the dialog closes when the current profile is destroyed.
 TEST_F(AppInfoDialogViewsTest, DestroyedProfileClosesDialog) {
   ShowAppInfo(kTestExtensionId);

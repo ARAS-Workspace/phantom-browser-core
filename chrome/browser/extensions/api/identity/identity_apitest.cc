@@ -1182,7 +1182,6 @@ IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionTest, NonInteractiveNotSignedIn) {
       IdentityGetAuthTokenError::State::kUserNotSignedIn, 1);
 }
 
-// The signin flow is simply not used on ChromeOS.
 IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionTest,
                        InteractiveNotSignedInShowSigninOnlyOnce) {
   scoped_refptr<FakeGetAuthTokenFunction> func(new FakeGetAuthTokenFunction());
@@ -1406,8 +1405,6 @@ IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionTest, InteractiveLoginCanceled) {
   std::string error = utils::RunFunctionAndReturnError(
       func.get(), "[{\"interactive\": true}]", profile());
   EXPECT_EQ(std::string(errors::kUserNotSignedIn), error);
-// Ash does not support the interactive login flow, so the login UI will never
-// be shown on that platform.
   EXPECT_TRUE(func->login_ui_shown());
   EXPECT_FALSE(func->scope_ui_shown());
   histogram_tester()->ExpectUniqueSample(
@@ -1434,9 +1431,6 @@ IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionTest,
       IdentityGetAuthTokenError::State::kMintTokenAuthFailure, 1);
 }
 
-// The interactive login flow is always short-circuited out with failure on
-// Ash, so the tests of the interactive login flow being successful are not
-// relevant on that platform.
 IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionTest,
                        InteractiveLoginSuccessMintFailure) {
   scoped_refptr<FakeGetAuthTokenFunction> func(new FakeGetAuthTokenFunction());
@@ -1711,9 +1705,6 @@ class GetAuthTokenFunctionInteractivityTest
   std::unique_ptr<ui::ScopedSetIdleState> idle_state_;
 };
 
-// The interactive login flow is always short-circuited out with failure on
-// Ash, so the tests of the interactive login flow being successful are not
-// relevant on that platform.
 IN_PROC_BROWSER_TEST_P(GetAuthTokenFunctionInteractivityTest,
                        SigninInteractivityTest) {
   scoped_refptr<const Extension> extension(CreateExtension(CLIENT_ID | SCOPES));
@@ -2300,8 +2291,6 @@ IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionTest, InteractiveCacheHit) {
       1);
 }
 
-// The interactive login UI is never shown on Ash, so tests of the interactive
-// login flow being successful are not relevant on that platform.
 IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionTest, LoginInvalidatesTokenCache) {
   scoped_refptr<FakeGetAuthTokenFunction> func(new FakeGetAuthTokenFunction());
   scoped_refptr<const Extension> extension(CreateExtension(CLIENT_ID | SCOPES));
@@ -2932,7 +2921,6 @@ IN_PROC_BROWSER_TEST_F(
       2);
 }
 
-// The signin flow is simply not used on Ash.
 // TODO(crbug.com/525397809): Currently this crashes because
 // SetInvalidRefreshTokenForAccount does not work on Android. We should fix this
 // and enable this test on Android.
@@ -3358,7 +3346,6 @@ IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionSelectedUserIdTest,
       1);
 }
 
-// The signin flow is not used on Ash.
 // Tests that Chrome does not have any selected user id value if the account
 // specified by the extension is not available.
 IN_PROC_BROWSER_TEST_F(GetAuthTokenFunctionSelectedUserIdTest,

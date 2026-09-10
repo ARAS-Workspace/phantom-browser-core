@@ -794,5 +794,3 @@ IN_PROC_BROWSER_TEST_F(StatefulSSLHostStateDelegateTest,
       state->QueryPolicy("127.0.0.1", *cert, net::ERR_CERT_COMMON_NAME_INVALID,
                          tab->GetPrimaryMainFrame()->GetStoragePartition()));
 }
-
-// TODO(crbug.com/507733133): Add tests for non-extension <webview> usage.

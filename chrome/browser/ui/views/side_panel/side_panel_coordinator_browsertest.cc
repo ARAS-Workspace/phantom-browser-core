@@ -420,8 +420,6 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorTest, ChangeSidePanelWidth) {
       BrowserView::GetBrowserViewForBrowser(browser())->GetBounds());
   gfx::Rect new_bounds(original_browser_bounds);
   new_bounds.set_width(min_side_panel_width * 3);
-  // Explicitly restore the browser window on ChromeOS, as it would otherwise
-  // be maximized and the SetBounds call would be a no-op.
   BrowserView::GetBrowserViewForBrowser(browser())->SetBounds(new_bounds);
 
   coordinator()->Toggle(SidePanelEntry::Key(SidePanelEntry::Id::kBookmarks),
@@ -478,8 +476,6 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorTest,
       BrowserView::GetBrowserViewForBrowser(browser())->GetBounds());
   gfx::Rect new_bounds(original_browser_bounds);
   new_bounds.set_width(min_side_panel_width * 3);
-  // Explicitly restore the browser window on ChromeOS, as it would otherwise
-  // be maximized and the SetBounds call would be a no-op.
   BrowserView::GetBrowserViewForBrowser(browser())->SetBounds(new_bounds);
 
   // Switch to the read anything side panel and verify the width is greater than
@@ -521,8 +517,6 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorTest,
       BrowserView::GetBrowserViewForBrowser(browser())->GetBounds());
   gfx::Rect new_bounds(original_browser_bounds);
   new_bounds.set_width((min_side_panel_width - 3) * 3 / 2);
-  // Explicitly restore the browser window on ChromeOS, as it would otherwise
-  // be maximized and the SetBounds call would be a no-op.
   BrowserView::GetBrowserViewForBrowser(browser())->SetBounds(new_bounds);
 
   coordinator()->Toggle(SidePanelEntry::Key(SidePanelEntry::Id::kBookmarks),

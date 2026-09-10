@@ -83,10 +83,9 @@ void RandBytes(void* output, size_t output_length) {
   // Use `syscall(__NR_getrandom...` to avoid a dependency on
   // `third_party/linux_syscall_support.h`.
   //
-  // Here in PartitionAlloc, we don't need to look before we leap
-  // because we know that both Linux and CrOS only support kernels
-  // that do have this syscall defined. This diverges from upstream
-  // `//base` behavior both here and below.
+  // Here in PartitionAlloc, we don't need to look before we leap because we
+  // know that Linux only supports kernels that do have this syscall defined.
+  // This diverges from upstream `//base` behavior both here and below.
   const ssize_t r =
       WrapEINTR(syscall)(__NR_getrandom, output, output_length, 0);
 

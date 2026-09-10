@@ -552,11 +552,6 @@ void VaapiVideoDecoder::ApplyResolutionChange() {
   VLOGF(2);
 
   if (cdm_context_ref_ && !transcryption_) {
-    // Get the screen resolutions so we can determine if we should pre-scale
-    // content during decoding to maximize use of overlay downscaling since
-    // protected content requires overlays currently.
-    // NOTE: Only use this for protected content as other requirements for using
-    // it are tied to protected content.
   }
   ApplyResolutionChangeWithScreenSizes(std::vector<gfx::Size>());
 }

@@ -50,7 +50,7 @@ constexpr GaiaId::Literal kTestGaiaId("1111");
 
 DataTypeSet GetUserTypes() {
   DataTypeSet user_types = UserTypes();
-  // Ignore all Chrome OS types on non-Chrome OS platforms.
+  // Ignore all types.
   user_types.RemoveAll({APP_LIST, ARC_PACKAGE, OS_PREFERENCES,
                         OS_PRIORITY_PREFERENCES, PRINTERS,
                         PRINTERS_AUTHORIZATION_SERVERS, WIFI_CONFIGURATIONS});
@@ -272,8 +272,6 @@ TEST_F(SyncUserSettingsImplTest,
   // Themes is not supported on mobile.
   expected_disabled_types.Put(UserSelectableType::kThemes);
 #endif
-  // History, Tabs and Saved Tab Groups are enabled by default on ChromeOS,
-  // while they require a separate opt-in on the other platforms.
   expected_disabled_types.Put(UserSelectableType::kHistory);
   expected_disabled_types.Put(UserSelectableType::kTabs);
   expected_disabled_types.Put(UserSelectableType::kSavedTabGroups);

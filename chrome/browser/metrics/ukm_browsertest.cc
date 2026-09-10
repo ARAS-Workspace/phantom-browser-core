@@ -486,7 +486,7 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, RegularPlusGuestCheck) {
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-// ProfilePicker and System profile do not exist on ChromeOS and on Android.
+// ProfilePicker and System profile do not exist on Android.
 #if !BUILDFLAG(IS_ANDROID)
 // Displaying the ProfilePicker implicitly creates a System Profile.
 // System Profile shouldn't have any effect on the UKM Enable Status.
@@ -995,9 +995,6 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, LogsOpenerSource) {
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-// ChromeOS doesn't have the concept of sign-out so this test doesn't make sense
-// there.
-//
 // Flaky on Android: https://crbug.com/40700532.
 //
 // Make sure that UKM is disabled when the profile signs out of Sync.
@@ -1024,8 +1021,7 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, SingleSyncSignoutCheck) {
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-// ChromeOS doesn't have the concept of sign-out so this test doesn't make sense
-// there. Android doesn't have multiple profiles.
+// Android doesn't have multiple profiles.
 #if !BUILDFLAG(IS_ANDROID)
 // Make sure that UKM is disabled when any profile signs out of Sync.
 IN_PROC_BROWSER_TEST_F(UkmBrowserTest, MultiSyncSignoutCheck) {
@@ -1140,8 +1136,6 @@ IN_PROC_BROWSER_TEST_F(UkmBrowserTest, MAYBE_HistoryDeleteCheck) {
 // LINT.ThenChange(/chrome/android/javatests/src/org/chromium/chrome/browser/metrics/UkmTest.java:HistoryDeleteCheck)
 // ThenChange(/ios/chrome/browser/metrics/model/ukm_egtest.mm:HistoryDeleteCheck)
 
-// On ChromeOS, the test profile starts with a primary account already set, so
-// this test doesn't apply.
 #if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(UkmBrowserTest, NotEnabledForNonSyncingAccountSync) {
   ukm::UkmTestHelper ukm_test_helper(GetUkmService());

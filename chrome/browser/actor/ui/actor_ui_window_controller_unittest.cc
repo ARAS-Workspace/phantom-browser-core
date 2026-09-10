@@ -64,9 +64,8 @@ class ActorUiContentsContainerControllerTest
   std::unique_ptr<ActorUiContentsContainerController> controller_;
 };
 
-// TODO(crbug.com/41487832): Enable on ChromeOS when test setup in the death
-// subprocess is fixed. AshTestHelper causes ICU/Timezone crashes in the forked
-// process before the DCHECK can fire.
+// AshTestHelper causes ICU/Timezone crashes in the forked process before the
+// DCHECK can fire.
 TEST_F(ActorUiContentsContainerControllerTest,
        OverlayStateMoveAndClickDeathCheck) {
   ActorOverlayState invalid_state;

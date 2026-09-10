@@ -371,7 +371,6 @@ class RealCriticalUserJourneyServiceInteractiveTest
     ASSERT_TRUE(embedded_test_server()->Start());
   }
 
-  // The Download Bubble UI is not used on ChromeOS.
   // A helper function to trigger a real download and wait for it to complete.
   auto DownloadTestFile() {
     return Steps(Do([this]() {

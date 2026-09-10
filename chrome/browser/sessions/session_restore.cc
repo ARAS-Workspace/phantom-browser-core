@@ -1406,10 +1406,6 @@ void SessionRestore::RestoreSessionAfterCrash(BrowserWindowInterface* browser) {
            ? SessionRestore::CLOBBER_CURRENT_TAB
            : 0);
 
-  // Apps should always be restored on crash restore except on Chrome OS. In
-  // Chrome OS, apps are restored by full restore only. This function is called
-  // when the chrome browser is launched after crash, so only browser restored,
-  // apps are not restored in Chrome OS.
   behavior |= SessionRestore::RESTORE_APPS;
   SessionRestore::RestoreSession(profile, browser, behavior, StartupTabs());
 }

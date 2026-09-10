@@ -242,8 +242,8 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // Tests that iframes can't dynamically load mixed content in a regular browser
-// tab, when the iframe was created in a PWA window.
-// https://crbug.com/40694836: Flaky on CrOS and ASAN
+// tab, when the iframe was created in a PWA window. https://crbug.com/40694836:
+// Flaky on ASAN
 #if defined(ADDRESS_SANITIZER)
 #define MAYBE_IFrameDynamicMixedContentInPWAOpenInChrome \
   DISABLED_IFrameDynamicMixedContentInPWAOpenInChrome

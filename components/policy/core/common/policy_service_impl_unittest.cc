@@ -1817,7 +1817,6 @@ TEST_F(PolicyServiceTest, ListsPoliciesMerging_InvalidType) {
 }
 
 #if !BUILDFLAG(IS_IOS)
-// The cloud user policy merging metapolicy is not applicable in Chrome OS.
 TEST_F(PolicyServiceTest, ListsPoliciesMerging_CloudMetapolicy) {
   const PolicyNamespace chrome_namespace(POLICY_DOMAIN_CHROME, std::string());
 

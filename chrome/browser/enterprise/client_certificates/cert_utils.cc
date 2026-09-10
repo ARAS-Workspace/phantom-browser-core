@@ -25,8 +25,6 @@
 #include "components/enterprise/client_certificates/core/features.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-// Browser (machine) scope provisioning relies on Chrome Browser Cloud
-// Management, which is not available on ChromeOS.
 #include "components/enterprise/client_certificates/core/browser_cloud_management_delegate.h"
 #include "components/enterprise/client_certificates/core/dm_server_client.h"
 

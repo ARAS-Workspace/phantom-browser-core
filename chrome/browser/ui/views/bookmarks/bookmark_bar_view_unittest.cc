@@ -651,7 +651,7 @@ TEST_F(BookmarkBarViewTest, DropCallback_InvalidatePtrTest) {
 }
 
 // Verifies that the apps shortcut is shown or hidden following the policy
-// value. This policy (and the apps shortcut) isn't present on ChromeOS.
+// value.
 TEST_F(BookmarkBarViewTest, ManagedShowAppsShortcutInBookmarksBar) {
   // By default, the pref is not managed and the apps shortcut is not shown.
   sync_preferences::TestingPrefServiceSyncable* prefs =

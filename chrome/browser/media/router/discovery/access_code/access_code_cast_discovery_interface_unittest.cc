@@ -343,7 +343,6 @@ TEST_F(AccessCodeCastDiscoveryInterfaceTest, ServerError) {
   task_environment_.RunUntilIdle();
 }
 
-// Revoking Sync consent is not possible on ChromeOS.
 TEST_F(AccessCodeCastDiscoveryInterfaceTest, SyncError) {
   if (syncer::IsReplaceSyncPromosWithSignInPromosEnabled()) {
     GTEST_SKIP() << "RevokeSyncConsent() is no-op as Sync is deprecated";

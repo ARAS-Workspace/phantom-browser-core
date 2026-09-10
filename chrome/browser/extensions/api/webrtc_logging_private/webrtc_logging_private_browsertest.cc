@@ -18,6 +18,3 @@ IN_PROC_BROWSER_TEST_F(WebrtcLoggingPrivateExtensionApiTest,
       {.load_as_component = true}))
       << message_;
 }
-
-// The following tests are executed as Chrome Apps, which are only supported on
-// ChromeOS.

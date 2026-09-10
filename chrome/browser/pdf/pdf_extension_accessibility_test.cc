@@ -1079,7 +1079,6 @@ IN_PROC_BROWSER_TEST_P(PDFExtensionAccessibilityTreeDumpTest, XfaFields) {
 using PDFExtensionAccessibilityNavigationTest =
     PDFExtensionAccessibilityTestWithOopifOverride;
 
-// TODO(crbug.com/40934115): Fix the flakiness on ChromeOS.
 #define MAYBE_LinkNavigation LinkNavigation
 IN_PROC_BROWSER_TEST_P(PDFExtensionAccessibilityNavigationTest,
                        MAYBE_LinkNavigation) {

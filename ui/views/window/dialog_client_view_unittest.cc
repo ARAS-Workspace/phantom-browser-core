@@ -692,8 +692,7 @@ TEST_F(DialogClientViewTest, IgnorePossiblyUnintendedClicks_TouchAfterShown) {
   EXPECT_TRUE(widget()->IsClosed());
 }
 
-// TODO(crbug.com/40269697): investigate the tests on ChromeOS and
-// fuchsia
+// TODO(crbug.com/40269697): investigate the tests on fuchsia
 class DesktopDialogClientViewTest : public DialogClientViewTest {
  public:
   void SetUp() override {

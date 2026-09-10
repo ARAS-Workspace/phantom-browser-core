@@ -370,7 +370,6 @@ IN_PROC_BROWSER_TEST_F(TracingControllerTest, MAYBE_DoubleStopTracing) {
   run_loop.Run();
 }
 
-// Only CrOS supports system tracing.
 #define MAYBE_SystemTraceEvents DISABLED_SystemTraceEvents
 class SystemTraceTracingControllerTest : public TracingControllerTest {
  public:

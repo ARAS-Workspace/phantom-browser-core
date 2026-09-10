@@ -282,7 +282,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksBrowserTest, MAYBE_Composebox_Submit) {
   RunTest("contextual_tasks/composebox_submit_test.js", "mocha.run();");
 }
 
-// TODO(crbug.com/480689282): Flaky on Linux and ChromeOS.
+// TODO(crbug.com/480689282): Flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_Composebox_ZeroState DISABLED_Composebox_ZeroState
 #else

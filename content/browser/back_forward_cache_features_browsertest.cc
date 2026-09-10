@@ -5258,8 +5258,7 @@ IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
   ExpectRestored(FROM_HERE);
 }
 
-// This test is not important for Chrome OS if TTS is called in content. For
-// more details refer (content/browser/speech/tts_platform_impl.cc).
+// For more details refer (content/browser/speech/tts_platform_impl.cc).
 #define MAYBE_CacheIfUsingSpeechSynthesis CacheIfUsingSpeechSynthesis
 IN_PROC_BROWSER_TEST_F(BackForwardCacheBrowserTest,
                        MAYBE_CacheIfUsingSpeechSynthesis) {

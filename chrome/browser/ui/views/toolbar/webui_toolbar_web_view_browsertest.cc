@@ -2622,9 +2622,6 @@ IN_PROC_BROWSER_TEST_F(WebUIAppMenuBrowserTest, CheckAppMenuFocusSync) {
       base::test::RunUntil([&]() { return !app_menu_control->HasFocus(); }));
 }
 
-// WebUIAppMenuButtonStateTest is disabled on ChromeOS because update and global
-// error badging on the app menu icon is not supported on that platform (they
-// are instead handled by the system tray).
 class MockGlobalError : public GlobalError {
  public:
   explicit MockGlobalError(GlobalError::Severity severity)
@@ -5590,7 +5587,6 @@ IN_PROC_BROWSER_TEST_P(WebUIToolbarWebViewPermissionBrowserTest,
   EXPECT_FALSE(test_api.manager()->IsRequestInProgress());
 }
 
-// TODO(crbug.com/532463469): Flaky on ChromeOS.
 #define MAYBE_LocationIconSuppressionE2E LocationIconSuppressionE2E
 IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewPermissionBrowserTest,
                        MAYBE_LocationIconSuppressionE2E) {
@@ -5703,7 +5699,7 @@ class WebUIToolbarSynchronousStartupBrowserTest
 // `true` directly upon cold window display confirms that the initial window
 // dependencies accurately hydrated synchronous startup data during early
 // `BrowserView::Init()` sequences.
-// TODO(crbug.com/540971327): Test is flaky on Linux and ChromeOS.
+// TODO(crbug.com/540971327): Test is flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_ColdWindowLaunch DISABLED_ColdWindowLaunch
 #else

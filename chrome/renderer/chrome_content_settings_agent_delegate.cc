@@ -7,7 +7,6 @@
 #include "build/build_config.h"
 #include "pdf/buildflags.h"
 
-// TODO(b/197163596): Remove File Manager constants
 #include "content/public/common/url_constants.h"
 #include "content/public/renderer/render_frame.h"
 #include "third_party/blink/public/platform/web_security_origin.h"

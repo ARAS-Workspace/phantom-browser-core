@@ -136,7 +136,6 @@ IN_PROC_BROWSER_TEST_F(GlicActorTypeToolUiTest,
                       kExpectedText));
 }
 
-// TODO(crbug.com/469210106): Re-enable this test on ChromeOS.
 #define MAYBE_TypeActionOnDisabledInputFails TypeActionOnDisabledInputFails
 IN_PROC_BROWSER_TEST_F(GlicActorTypeToolUiTest,
                        MAYBE_TypeActionOnDisabledInputFails) {

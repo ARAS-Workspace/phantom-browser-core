@@ -1339,7 +1339,6 @@ TEST_F(LabelTest, GetSubstringBounds) {
             substring_bounds_with_inset[0].height());
 }
 
-// TODO(crbug.com/40725997): Enable on ChromeOS along with the DCHECK in Label.
 #define MAYBE_ChecksSubpixelRenderingOntoOpaqueSurface \
   ChecksSubpixelRenderingOntoOpaqueSurface
 // Ensures DCHECK for subpixel rendering on transparent layer is working.

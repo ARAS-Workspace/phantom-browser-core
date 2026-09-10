@@ -1588,7 +1588,6 @@ IN_PROC_BROWSER_TEST_F(ChromeComposeClientBrowserTest,
               1)));
 }
 
-// Failing consistently on CrOS. crbug.com/503432696
 #define MAYBE_TestComposeQualityLoggedOnSubsequentError \
   TestComposeQualityLoggedOnSubsequentError
 IN_PROC_BROWSER_TEST_F(ChromeComposeClientBrowserTest,

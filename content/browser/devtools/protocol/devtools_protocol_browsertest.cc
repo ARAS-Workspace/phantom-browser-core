@@ -860,11 +860,10 @@ IN_PROC_BROWSER_TEST_F(CaptureScreenshotTest,
       /*clip_scale=*/1, /*capture_beyond_viewport=*/true);
 }
 
-// ChromeOS and Android has fading out scrollbars, which makes the test flacky.
+// Android has fading out scrollbars, which makes the test flacky.
 // TODO(crbug.com/40157725) Android has a problem with changing scale.
 // TODO(crbug.com/40156819) Android Lollipop has a problem with capturing
-// screenshot.
-// TODO(crbug.com/40815512): Failing on MacOS.
+// screenshot. TODO(crbug.com/40815512): Failing on MacOS.
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
 #define MAYBE_CaptureScreenshotBeyondViewport_InnerScrollbarsAreShown \
   DISABLED_CaptureScreenshotBeyondViewport_InnerScrollbarsAreShown
@@ -907,7 +906,7 @@ IN_PROC_BROWSER_TEST_F(
       /*clip_scale=*/1, /*capture_beyond_viewport=*/true);
 }
 
-// ChromeOS and Android don't support software compositing.
+// Android doesn't support software compositing.
 #if !BUILDFLAG(IS_ANDROID)
 
 class NoGPUCaptureScreenshotTest : public CaptureScreenshotTest {

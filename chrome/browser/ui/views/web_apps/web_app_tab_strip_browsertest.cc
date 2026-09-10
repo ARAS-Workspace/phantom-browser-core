@@ -420,7 +420,7 @@ IN_PROC_BROWSER_TEST_P(WebAppTabStripBrowserTest, PopOutTabOnInstall) {
       GURL("chrome://newtab/"));
 }
 
-// TODO(crbug.com/40598974) Enabled tab strip for web apps on non-Chrome OS.
+// TODO(crbug.com/40598974) Enabled tab strip for web apps.
 
 IN_PROC_BROWSER_TEST_P(WebAppTabStripBrowserTest, AutoNewTabUrl) {
   GURL start_url = embedded_test_server()->GetURL(

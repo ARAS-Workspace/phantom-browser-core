@@ -1947,8 +1947,6 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarFocusMinimalInteractiveUiTest,
       SendKeyPress(WebUIToolbarId(), ui::VKEY_LEFT),
       ExpectFocusedView(kToolbarAppMenuButtonElementId),
 
-      // Skip for ChromeOS which has no profile button.
-
       // 13. ArrowLeft -> Profile (Views).
       SendKeyPress(kToolbarAppMenuButtonElementId, ui::VKEY_LEFT),
       ExpectFocusedView(kToolbarAvatarButtonElementId),

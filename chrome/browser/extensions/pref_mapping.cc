@@ -112,10 +112,6 @@ const PrefMappingEntry kMappings[] = {
     {"animationPolicy", prefs::kAnimationPolicy,
      APIPermissionID::kAccessibilityFeaturesRead,
      APIPermissionID::kAccessibilityFeaturesModify},
-// Below is the list of extension-controlled preferences where the underlying
-// feature being controlled exists in ash. They should be kept in sync/in order.
-// If a new extension-controlled pref of this type is added, it should be added
-// to both lists.
 };
 
 class IdentityPrefTransformer : public PrefTransformerInterface {

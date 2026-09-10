@@ -210,7 +210,6 @@ void GlicProfileManager::ShowProfilePicker() {
     current_detached_glic_->instance_coordinator().Close({});
   }
 
-  // TODO(crbug.com/450679848): Profile Picker doesn't make sense on ChromeOS.
 // Profile picker won't be used on Android.
 #if !BUILDFLAG(IS_ANDROID)
   ProfilePicker::Show(

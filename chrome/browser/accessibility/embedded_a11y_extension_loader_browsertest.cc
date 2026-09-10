@@ -194,7 +194,6 @@ IN_PROC_BROWSER_TEST_F(EmbeddedA11yExtensionLoaderTest,
       extension_misc::kReadingModeGDocsHelperExtensionId);
 }
 
-// CreateGuestBrowser() is not supported for ChromeOS out of the box.
 IN_PROC_BROWSER_TEST_F(EmbeddedA11yExtensionLoaderTest,
                        InstallsOnGuestProfile) {
   BrowserWindowInterface* guest_browser = CreateGuestBrowser();

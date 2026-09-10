@@ -854,9 +854,8 @@ IN_PROC_BROWSER_TEST_F(TabSearchPageHandlerTest,
       0, TabCloseTypes::CLOSE_CREATE_HISTORICAL_TAB);
 }
 
-// Ensure that tab model changes in a browser with a different profile
-// will not call TabsChanged().
-// TODO(crbug.com/537468010): Flaky on linux-chromeos-rel. Fix and re-enable.
+// Ensure that tab model changes in a browser with a different profile will not
+// call TabsChanged().
 #define MAYBE_TabsNotChanged TabsNotChanged
 IN_PROC_BROWSER_TEST_F(TabSearchPageHandlerTest, MAYBE_TabsNotChanged) {
   EXPECT_CALL(page_, TabsChanged(_)).Times(1);

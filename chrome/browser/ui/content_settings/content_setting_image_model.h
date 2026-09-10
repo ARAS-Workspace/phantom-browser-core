@@ -50,7 +50,6 @@ class ContentSettingImageModel {
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kSensorsElementId);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kClipboardRWElementId);
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kStorageAccessElementId);
-  // Notifications has global ID kNotificationContentSettingImageView.
 
   ContentSettingImageModel(const ContentSettingImageModel&) = delete;
   ContentSettingImageModel& operator=(const ContentSettingImageModel&) = delete;

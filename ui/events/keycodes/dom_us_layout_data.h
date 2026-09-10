@@ -417,7 +417,6 @@ const struct DomCodeToKeyboardCodeEntry {
     // DomCode::RESUME                             0x000015 Resume
     // DomCode::TURBO                              0x000016 Turbo
     {DomCode::SLEEP, VKEY_SLEEP},  // 0x010082 Sleep
-    // DomCode::WAKE_UP                            0x010083 WakeUp
 #if BUILDFLAG(IS_POSIX)
     {DomCode::MICROPHONE_MUTE_TOGGLE,
      VKEY_MICROPHONE_MUTE_TOGGLE},  // 0x0100A9 MicrophoneMuteToggle

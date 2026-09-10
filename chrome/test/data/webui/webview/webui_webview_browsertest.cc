@@ -309,7 +309,6 @@ IN_PROC_BROWSER_TEST_F(WebUIWebViewBrowserTest, DisplayNone) {
       "runMochaTest('WebviewBasicTest', 'DisplayNone')", true));
 }
 
-// TODO(crbug.com/460836171): Enable on ChromeOS.
 #define MAYBE_MediaRequestAllowOnGlic MediaRequestAllowOnGlic
 IN_PROC_BROWSER_TEST_F(WebUIWebViewBrowserTest, MAYBE_MediaRequestAllowOnGlic) {
   set_test_loader_host("glic");
@@ -317,7 +316,6 @@ IN_PROC_BROWSER_TEST_F(WebUIWebViewBrowserTest, MAYBE_MediaRequestAllowOnGlic) {
                    GetTestUrl("webview/mediarequest.html").spec());
 }
 
-// TODO(crbug.com/460836171): Enable on ChromeOS.
 #define MAYBE_MediaRequestDenyOnGlic MediaRequestDenyOnGlic
 IN_PROC_BROWSER_TEST_F(WebUIWebViewBrowserTest, MAYBE_MediaRequestDenyOnGlic) {
   set_test_loader_host("glic");
@@ -339,8 +337,6 @@ IN_PROC_BROWSER_TEST_F(WebUIWebViewBrowserPEPCTest,
                    GetTestUrl("webview/mediarequest_pepc.html").spec());
 }
 
-// TODO(crbug.com/444024595): Flaky on Linux
-// TODO(crbug.com/460836171): Enable on ChromeOS.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_MediaRequestAllowOnSignIn DISABLED_MediaRequestAllowOnSignIn
 #else
@@ -352,7 +348,6 @@ IN_PROC_BROWSER_TEST_F(WebUIWebViewBrowserTest,
                    GetTestUrl("webview/mediarequest.html").spec());
 }
 
-// TODO(crbug.com/41400417) Flaky on CrOS trybots.
 #define MAYBE_ExecuteScriptCode ExecuteScriptCode
 IN_PROC_BROWSER_TEST_F(WebUIWebViewBrowserTest, MAYBE_ExecuteScriptCode) {
   ASSERT_TRUE(RunContentScriptTestCase("ExecuteScriptCode",
@@ -430,7 +425,6 @@ IN_PROC_BROWSER_TEST_F(
       GetTestUrl("empty.html").spec()));
 }
 
-// TODO(crbug.com/41284814) Flaky on CrOS trybots.
 #define MAYBE_ContentScriptExistsAsLongAsWebViewTagExists \
   ContentScriptExistsAsLongAsWebViewTagExists
 IN_PROC_BROWSER_TEST_F(WebUIWebViewBrowserTest,

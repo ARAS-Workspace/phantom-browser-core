@@ -1423,7 +1423,6 @@ void MediaSessionImpl::GetMediaImageBitmap(
     int minimum_size_px,
     int desired_size_px,
     GetMediaImageBitmapCallback callback) {
-// We want to hide the media image from ChromeOS' media controls.
 
   // We should make sure `image` is in `images_`.
   bool found = false;
@@ -1980,10 +1979,6 @@ void MediaSessionImpl::RebuildAndNotifyMetadataChanged() {
 void MediaSessionImpl::BuildMetadata(
     media_session::MediaMetadata& metadata,
     std::vector<media_session::MediaImage>& artwork) {
-  // We need to hide the metadata for ChromeOS here because the
-  // `MediaNotificationItem` lives in //components which cannot depend on
-  // //content. For other platforms, metadata is hidden in the
-  // `SystemMediaControlsNotifier`.
 
   if (routed_service_ && routed_service_->metadata()) {
     metadata.title = routed_service_->metadata()->title;

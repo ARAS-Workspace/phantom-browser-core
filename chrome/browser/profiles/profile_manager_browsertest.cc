@@ -263,8 +263,6 @@ class ProfileManagerBrowserTest : public ProfileManagerBrowserTestBase,
   base::test::ScopedFeatureList feature_list_;
 };
 
-// CrOS multi-profiles implementation is too different for these tests.
-
 // TODO(crbug.com/40818380): Test failed on Mac.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_DeleteSingletonProfile DISABLED_DeleteSingletonProfile
@@ -464,7 +462,6 @@ IN_PROC_BROWSER_TEST_P(ProfileManagerBrowserTest, ProfileFromProfileKey) {
             profile_manager->GetProfileFromProfileKey(otr_2b->GetProfileKey()));
 }
 
-// ChromeOS doesn't support multiple profiles.
 IN_PROC_BROWSER_TEST_P(ProfileManagerBrowserTest, CreateProfileWithCallback) {
   ProfileManager* profile_manager = g_browser_process->profile_manager();
 

@@ -283,11 +283,6 @@ TEST_P(AppManagementPageHandlerTestBase, PreferredAppOverlappingScopePort) {
   handler()->SetPreferredApp(app_id2, /*is_preferred_app=*/true);
   AwaitWebAppCommandsComplete();
 
-// On Windows, Mac and Linux, nested scopes are not considered overlapping,
-// so 2 apps having nested scopes can be set as preferred at the same time,
-// while on CrOS, this cannot happen.
-// TODO(crbug.com/40279851): If CrOS decides to treat overlapping apps
-// as non-nested ones, then this will need to be modified.
   EXPECT_TRUE(IsAppPreferred(app_id1));
   EXPECT_TRUE(IsAppPreferred(app_id2));
 }
@@ -438,9 +433,6 @@ TEST_P(AppManagementPageHandlerTestBase,
   std::vector<std::string> overlapping_apps =
       GetOverlappingPreferredApps(app_id2);
 
-// TODO(crbug.com/40279851): Modify if nested scope behavior changes on CrOS.
-// On Windows, Mac and Linux, apps with nested scopes are not considered
-// overlapping, but on CrOS they are.
   EXPECT_TRUE(overlapping_apps.empty());
 }
 
@@ -669,7 +661,7 @@ TEST_P(AppManagementPageHandlerTestBase, GetScopeExtensions) {
 }
 
 // TODO(crbug.com/40279851): The overlapping nested scope based behavior is only
-// on ChromeOS, and will need to be modified if the behavior changes.
+// on will need to be modified if the behavior changes.
 
 TEST_P(AppManagementPageHandlerTestBase, NavigationCapturingUserChoice) {
   auto web_app_info = web_app::WebAppInstallInfo::CreateWithStartUrlForTesting(

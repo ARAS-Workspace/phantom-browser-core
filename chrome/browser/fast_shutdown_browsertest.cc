@@ -39,8 +39,6 @@ class FastShutdown : public InProcessBrowserTest {
 
 // This tests for a previous error where uninstalling an onbeforeunload handler
 // would enable fast shutdown even if an onunload handler still existed.
-// Flaky on all platforms, http://crbug.com/41418693
-// ChromeOS opens tabs instead of windows for popups.
 IN_PROC_BROWSER_TEST_F(FastShutdown, DISABLED_SlowTermination) {
   // Need to run these tests on http:// since we only allow cookies on that (and
   // https obviously).

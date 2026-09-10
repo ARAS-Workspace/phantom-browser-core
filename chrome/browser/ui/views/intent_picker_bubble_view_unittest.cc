@@ -218,8 +218,8 @@ class IntentPickerBubbleViewTest : public ChromeViewsTestBase {
   bool last_selection_should_persist_;
 };
 
-// This test runs only on non ChromeOS platforms, since navigation capturing has
-// not fully launched to 100% of the Stable population.
+// This test runs only on platforms, since navigation capturing has not fully
+// launched to 100% of the Stable population.
 class IntentPickerBubbleViewListTest : public IntentPickerBubbleViewTest {
  public:
   IntentPickerBubbleViewListTest() {

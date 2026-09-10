@@ -1334,8 +1334,6 @@ TEST_F(HidChooserContextLoginScreenTest, ApplyPolicyOnLoginScreen) {
         }
       ])");
 
-  // The policy has an effect only for IS_CHROMEOS build, otherwise it is
-  // ignored.
   EXPECT_FALSE(context()->HasDevicePermission(kOrigin, *device));
   EXPECT_EQ(0u, context()->GetGrantedObjects(kOrigin).size());
   EXPECT_EQ(0u, context()->GetAllGrantedObjects().size());

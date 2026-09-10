@@ -498,8 +498,6 @@ PasswordForm MakeNormalizedBlocklistedForm(
 }
 
 #if BUILDFLAG(IS_MAC)
-// TODO(crbug.com/367336383): Make the this block Ash only for
-// ChromeOS.
 bool ShouldBiometricAuthenticationForFillingToggleBeVisible(
     const PrefService* local_state) {
   return local_state->GetBoolean(

@@ -144,8 +144,8 @@ IN_PROC_BROWSER_TEST_F(LensOverlayTest, OverlayScreenshot) {
   RunOverlayTest("lens/overlay/overlay_screenshot_test.js", "mocha.run()");
 }
 
-// TODO(crbug.com/414207670,531038976,531065529): Test is failing on Linux,
-// ChromeOS and mac bots.
+// TODO(crbug.com/414207670,531038976,531065529): Test is failing on Linux, mac
+// bots.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_ManualRegionSelection DISABLED_ManualRegionSelection
 #else

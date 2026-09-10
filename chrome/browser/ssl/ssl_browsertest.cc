@@ -2200,9 +2200,8 @@ IN_PROC_BROWSER_TEST_F(SSLUITest, TestRefNavigation) {
 }
 
 // Tests that closing a page that opened a pop-up with an interstitial does not
-// crash the browser (crbug.com/40979342).
-// TODO(crbug.com/40714131, crbug.com/40848837): Test is flaky on Linux and
-// Chrome OS.
+// crash the browser (crbug.com/40979342). TODO(crbug.com/40714131,
+// crbug.com/40848837): Test is flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_TestCloseTabWithUnsafePopup DISABLED_TestCloseTabWithUnsafePopup
 #else

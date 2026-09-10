@@ -770,9 +770,6 @@ class AppMenu::ZoomView : public AppMenuView, public views::WidgetObserver {
     // standards, gets treated like a live region. Thus, it may be read out on
     // creation and mutation. Screen readers also prefixes the read out with
     // 'alert' giving zoom read outs questionable priority.
-    //
-    // Do not do this for ChromeOS and investigate whether it is possible to do
-    // so for all other platforms.
     // An accessibility role of kAlert will ensure that any updates to the zoom
     // level can be picked up by screen readers.
     zoom_label->GetViewAccessibility().SetRole(ax::mojom::Role::kAlert);

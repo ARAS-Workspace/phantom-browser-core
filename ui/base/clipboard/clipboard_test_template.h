@@ -1099,9 +1099,6 @@ TYPED_TEST(ClipboardTest, BookmarkTestWithoutTitle) {
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-// Policy controller is only intended to be used in Chrome OS, so the following
-// policy related tests are only run on Chrome OS.
-
 #if !BUILDFLAG(IS_APPLE)
 // Ensures that BookmarkEntriesType can be written to and read from the
 // clipboard.

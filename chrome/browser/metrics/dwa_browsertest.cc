@@ -427,10 +427,8 @@ IN_PROC_BROWSER_TEST_F(DwaBrowserTest, UkmConsentChangeCheck_Extensions) {
   RecordTestMetricsAndAssertMetricsRecorded();
 }
 
-// Not enabled on ChromeOS because on ChromeOS, kApps is not registered through
-// UserSelectableType but rather through OS settings. This test ensures that
-// disabling Apps UKM consent disables and purges DWA. Additionally ensures that
-// DWA is disabled until all UKM consents are enabled.
+// This test ensures that disabling Apps UKM consent disables and purges DWA.
+// Additionally ensures that DWA is disabled until all UKM consents are enabled.
 IN_PROC_BROWSER_TEST_F(DwaBrowserTest, UkmConsentChangeCheck_Apps) {
   test::MetricsConsentOverride metrics_consent(true);
   Profile* profile = ProfileManager::GetLastUsedProfileIfLoaded();
@@ -487,10 +485,9 @@ IN_PROC_BROWSER_TEST_F(DwaBrowserTest,
   RecordTestMetricsAndAssertMetricsRecorded();
 }
 
-// Not enabled on ChromeOS because on ChromeOS, kApps is not registered through
-// UserSelectableType but rather through OS settings. This test ensures that
-// disabling MSBB and Apps UKM consents disables and purges DWA. Additionally
-// ensures that DWA is disabled until all UKM consents are enabled.
+// This test ensures that disabling MSBB and Apps UKM consents disables and
+// purges DWA. Additionally ensures that DWA is disabled until all UKM consents
+// are enabled.
 IN_PROC_BROWSER_TEST_F(DwaBrowserTest, UkmConsentChangeCheck_MsbbAndApps) {
   test::MetricsConsentOverride metrics_consent(true);
   Profile* profile = ProfileManager::GetLastUsedProfileIfLoaded();

@@ -953,8 +953,6 @@ IN_PROC_BROWSER_TEST_F(WebContentsInteractionTestUtilTest,
   EXPECT_CALL_IN_SCOPE(completed, Run, sequence->RunSynchronouslyForTesting());
 }
 
-// TODO(crbug.com/40285351): Resolve flakiness on ChromeOS and re-enable the
-// test.
 #define MAYBE_StateChangeExistsTimeoutSendsEvent \
   StateChangeExistsTimeoutSendsEvent
 IN_PROC_BROWSER_TEST_F(WebContentsInteractionTestUtilTest,

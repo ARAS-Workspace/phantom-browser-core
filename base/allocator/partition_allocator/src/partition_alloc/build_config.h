@@ -75,8 +75,6 @@
 #define PA_IS_MAC
 #endif  // defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
 #elif defined(__linux__)
-// Do not define PA_IS_LINUX on Chrome OS build.
-// The IS_CHROMEOS PA_BUILDFLAG macro is defined in buildflags.h.
 #define PA_IS_LINUX
 #include <features.h>
 #if defined(__GLIBC__) && !defined(__UCLIBC__)

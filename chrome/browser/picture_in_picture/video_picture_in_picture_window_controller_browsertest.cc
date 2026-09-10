@@ -1348,7 +1348,6 @@ IN_PROC_BROWSER_TEST_F(VideoPictureInPictureWindowControllerBrowserTest,
 // changing source willproperly update the associated media player id. This is
 // checked by closing the window because the test it at a too high level to be
 // able to check the actual media player id being used.
-// TODO(crbug.com/40830975) Fix flakiness on ChromeOS and reenable this test.
 #define MAYBE_PreloadNoneSrcChangeThenLoad PreloadNoneSrcChangeThenLoad
 IN_PROC_BROWSER_TEST_F(VideoPictureInPictureWindowControllerBrowserTest,
                        MAYBE_PreloadNoneSrcChangeThenLoad) {

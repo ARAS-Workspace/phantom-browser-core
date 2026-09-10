@@ -657,7 +657,6 @@ IN_PROC_BROWSER_TEST_F(InitialWebUIMetricsMappingBrowserTest,
   EXPECT_GE(total_webium_count, 1);
 }
 
-// TODO(crbug.com/491012584): Flaky on ChromeOS MSan.
 #define MAYBE_NormalRendererMetricsAreNotMapped \
   NormalRendererMetricsAreNotMapped
 IN_PROC_BROWSER_TEST_F(InitialWebUIMetricsMappingBrowserTest,
@@ -762,7 +761,6 @@ class InitialWebUIMetricsDropBrowserTest : public InitialWebUIBrowserTestBase {
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-// TODO(crbug.com/491012584): Flaky on ChromeOS MSan and Linux MSan.
 #if BUILDFLAG(IS_LINUX) && defined(MEMORY_SANITIZER)
 #define MAYBE_WebiumRendererMetricsDroppedIfNoRule \
   DISABLED_WebiumRendererMetricsDroppedIfNoRule

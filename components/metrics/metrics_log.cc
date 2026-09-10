@@ -434,8 +434,6 @@ void MetricsLog::RecordCoreSystemProfile(
   os->set_name(GetOperatingSystemName());
   os->set_version(base::SysInfo::OperatingSystemVersion());
 
-// On ChromeOS, KernelVersion refers to the Linux kernel version and
-// OperatingSystemVersion refers to the ChromeOS release version.
 #if BUILDFLAG(IS_LINUX)
   // Linux operating system version is copied over into kernel version to be
   // consistent.

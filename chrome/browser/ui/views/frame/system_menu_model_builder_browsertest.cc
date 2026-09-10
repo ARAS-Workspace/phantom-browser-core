@@ -187,7 +187,7 @@ IN_PROC_BROWSER_TEST_F(SystemMenuModelBuilderVerticalTabsTest,
                                std::nullopt));
 
 #if BUILDFLAG(IS_MAC)
-  // Horizontal Tabs + Immersive Mode (only exists on Mac and ChromeOS).
+  // Horizontal Tabs + Immersive Mode (only exists on Mac).
   ui_test_utils::ToggleFullscreenModeAndWait(browser());
   ASSERT_TRUE(ImmersiveModeController::From(browser())->IsEnabled());
 

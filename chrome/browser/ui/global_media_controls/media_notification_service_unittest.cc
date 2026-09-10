@@ -317,8 +317,6 @@ class MediaNotificationServiceCastTest : public MediaNotificationServiceTest {
   base::MockCallback<base::OnceClosure> receiver_disconnect_handler_;
 };
 
-// CastMediaNotificationProducer is owned by
-// CastMediaNotificationProducerKeyedService in Ash.
 TEST_F(MediaNotificationServiceCastTest,
        ShowCastSessionsForPresentationRequest) {
   NiceMock<global_media_controls::test::MockMediaDialogDelegate>
@@ -389,8 +387,6 @@ TEST_F(MediaNotificationServiceCastTest, ShowMediaItemsForPresentationRequest) {
   SimulateCloseDialog();
 }
 
-// SupplementalDevicePickerProducer is not owned by MediaNotificationService
-// on Chrome OS.
 TEST_F(MediaNotificationServiceCastTest, ShowSupplementalNotifications) {
   NiceMock<global_media_controls::test::MockMediaDialogDelegate>
       dialog_delegate;

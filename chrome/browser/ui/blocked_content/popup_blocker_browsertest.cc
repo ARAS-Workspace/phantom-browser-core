@@ -259,7 +259,7 @@ IN_PROC_BROWSER_TEST_F(PopupBlockerBrowserTest, BlockWebContentsCreation) {
                kDontCheckTitle);
 }
 
-// TODO(crbug.com/40144522): Flaky on Mac ASAN and Chrome OS.
+// TODO(crbug.com/40144522): Flaky on Mac ASAN.
 #if BUILDFLAG(IS_MAC) && defined(ADDRESS_SANITIZER)
 #define MAYBE_BlockWebContentsCreationIncognito \
   DISABLED_BlockWebContentsCreationIncognito

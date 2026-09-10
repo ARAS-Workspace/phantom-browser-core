@@ -75,8 +75,7 @@ GuestViewManager::GuestViewManager(
     : context_(context), delegate_(std::move(delegate)) {}
 
 GuestViewManager::~GuestViewManager() {
-  // It seems that ChromeOS OTR profiles may still have RenderProcessHosts at
-  // this point. See https://crbug.com/828479
+  // See https://crbug.com/828479
   DCHECK(view_destruction_callback_map_.empty());
 }
 

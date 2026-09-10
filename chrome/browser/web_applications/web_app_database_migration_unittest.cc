@@ -390,7 +390,7 @@ TEST_F(WebAppDatabaseMigrationTest,
   ASSERT_TRUE(app3);
   ASSERT_TRUE(app4);
 
-  // App 1: Default UDM should remain Browser, CrOS should remain absent
+  // App 1: Default UDM should remain Browser
   EXPECT_FALSE(app1->sync_proto().has_user_display_mode_cros());
   EXPECT_TRUE(app1->sync_proto().has_user_display_mode_default());
   EXPECT_EQ(app1->sync_proto().user_display_mode_default(),

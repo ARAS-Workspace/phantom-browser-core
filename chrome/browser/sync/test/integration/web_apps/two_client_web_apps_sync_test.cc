@@ -254,8 +254,6 @@ IN_PROC_BROWSER_TEST_P(TwoClientWebAppsSyncTest, IsLocallyInstalled) {
 
   EXPECT_EQ(install_observer.Wait(), app_id);
   web_app::proto::InstallState expected_state;
-  // ChromeOS fully installs all synced apps, whereas desktop keeps them as
-  // "SUGGESTED_FROM_ANOTHER_DEVICE".
   expected_state = proto::SUGGESTED_FROM_ANOTHER_DEVICE;
   EXPECT_EQ(expected_state,
             GetRegistrar(GetProfile(1)).GetInstallState(app_id));
@@ -445,8 +443,6 @@ IN_PROC_BROWSER_TEST_P(TwoClientWebAppsSyncTest, SyncWithoutUsingNameFallback) {
   EXPECT_EQ(synced_app_id, app_id);
 
   bool should_use_fallback = true;
-  // ChromeOS always installs from the manifest, even when trusted icons are
-  // enabled.
 
   // Post trusted icons infrastructure launch, sync installs always use fallback
   // information.

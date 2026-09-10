@@ -2580,7 +2580,6 @@ void WebAppIntegrationTestDriver::SetOpenInWindowFromAppSettings(Site site) {
   ASSERT_TRUE(provider()->registrar_unsafe().GetAppById(app_id))
       << "No app installed for site: " << static_cast<int>(site);
   ;
-  // Will need to add feature flag based condition for web app settings page.
   auto app_management_page_handler = CreateAppManagementPageHandler(profile());
   app_management_page_handler.SetWindowMode(app_id, apps::WindowMode::kWindow);
   AfterStateChangeAction();

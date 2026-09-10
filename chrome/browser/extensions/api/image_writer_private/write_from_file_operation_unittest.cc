@@ -77,7 +77,6 @@ TEST_F(ImageWriterFromFileTest, WriteFromFileEndToEnd) {
                                    image_writer_api::Stage::kWrite, 100))
       .Times(AtLeast(1));
 
-  // Chrome OS doesn't verify.
   EXPECT_CALL(manager_, OnProgress(kDummyExtensionId,
                                    image_writer_api::Stage::kVerifyWrite, _))
       .Times(AnyNumber());

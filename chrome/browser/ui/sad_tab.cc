@@ -140,7 +140,7 @@ std::vector<int> SadTab::GetSubMessages() {
         message_ids.insert(message_ids.begin(), IDS_SAD_TAB_RELOAD_INCOGNITO);
       }
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-      // Note: on macOS, Linux and ChromeOS, the first bullet is either one of
+      // Note: on macOS, Linux, the first bullet is either one of
       // IDS_SAD_TAB_RELOAD_CLOSE_TABS or IDS_SAD_TAB_RELOAD_CLOSE_NOTABS
       // followed by one of the above suggestions.
       message_ids.insert(message_ids.begin(),

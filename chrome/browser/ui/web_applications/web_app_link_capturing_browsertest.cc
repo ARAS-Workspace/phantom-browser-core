@@ -700,7 +700,5 @@ INSTANTIATE_TEST_SUITE_P(
                     apps::test::LinkCapturingFeatureVersion::kV2DefaultOn),
     apps::test::LinkCapturingVersionToString);
 
-// TODO(crbug.com/376922620): Add tabbed mode support for navigation capturing.
-
 }  // namespace
 }  // namespace web_app

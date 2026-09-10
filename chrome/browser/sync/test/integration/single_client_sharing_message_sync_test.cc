@@ -239,7 +239,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSharingMessageSyncTest,
   EXPECT_TRUE(callback_checker.Wait());
 }
 
-// ChromeOS does not support signing out of a primary account.
 IN_PROC_BROWSER_TEST_P(SingleClientSharingMessageSyncTest,
                        ShouldCleanPendingMessagesUponSignout) {
   ASSERT_TRUE(SetupSync());

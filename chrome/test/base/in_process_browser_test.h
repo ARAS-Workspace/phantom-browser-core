@@ -296,9 +296,7 @@ class InProcessBrowserTest : public content::BrowserTestBase {
   Browser* CreateIncognitoBrowser(Profile* profile = nullptr);
 
 #if !BUILDFLAG(IS_ANDROID)
-  // Similar to |CreateBrowser|, but creates a Guest browser.
-  // To create a ChromeOS Guest user session, you need to add proper switches to
-  // commandline while setting up the test. For an example see
+  // Similar to |CreateBrowser|, but creates a Guest browser. For an example see
   // AppListClientGuestModeBrowserTest::SetUpCommandLine.
   Browser* CreateGuestBrowser();
 #endif

@@ -852,11 +852,6 @@ void BluetoothAdapterBlueZ::DevicePropertyChanged(
     NotifyDevicePairedChanged(device_bluez, properties->paired.value());
   }
 
-// For CrOS, when a device becomes bonded, mark it as trusted so that the
-// user does not need to approve every incoming connection
-// This is not for other OS because,for non-CrOS, Chrome is not part of the OS.
-// Leave the decision to the real OS
-
   // UMA connection counting
   if (property_name == properties->connected.name()) {
     int count = 0;

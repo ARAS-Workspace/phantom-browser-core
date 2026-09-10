@@ -127,8 +127,6 @@ class FileSystemContextTest : public testing::Test {
   };
 };
 
-// It is not valid to pass nullptr ExternalMountPoints to FileSystemContext on
-// ChromeOS.
 TEST_F(FileSystemContextTest, NullExternalMountPoints) {
   scoped_refptr<FileSystemContext> file_system_context =
       CreateFileSystemContextForTest(/*external_mount_points=*/nullptr);

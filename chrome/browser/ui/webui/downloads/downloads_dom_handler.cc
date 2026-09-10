@@ -131,8 +131,6 @@ bool CanLogWarningMetrics(download::DownloadItem* file) {
 
 void PromptForScanningInBubble(content::WebContents* web_contents,
                                download::DownloadItem* download) {
-  // ChromeOS does not have the download bubble and does not support local
-  // password prompts for deep scans.
   BrowserWindowInterface* browser =
       GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(web_contents);
   if (!browser) {

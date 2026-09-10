@@ -266,8 +266,6 @@ TEST_F(EntryPointEligibilityManagerTest,
   EXPECT_FALSE(manager_->AreEntryPointsEligible());
 }
 
-// Disable test on ChromeOS since ChromeOS does not support switching the
-// primary account without a restart.
 #define MAYBE_NotifyEntryPointEligibilityChanged \
   NotifyEntryPointEligibilityChanged
 TEST_F(EntryPointEligibilityManagerTest,

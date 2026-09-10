@@ -47,8 +47,6 @@ void BrowserReportGenerator::GenerateProfileInfo(em::BrowserReport* report) {
 
 void BrowserReportGenerator::GenerateBasicInfo(em::BrowserReport* report,
                                                ReportType report_type) {
-  // Chrome OS user session report doesn't include version and channel
-  // information.
   bool contains_version_and_channel = true;
 
   if (contains_version_and_channel) {

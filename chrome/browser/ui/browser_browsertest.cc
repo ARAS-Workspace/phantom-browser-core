@@ -2079,8 +2079,8 @@ IN_PROC_BROWSER_TEST_F(BrowserTest, FullscreenBookmarkBar) {
   chrome::ToggleFullscreenMode(browser());
   EXPECT_TRUE(browser()->GetWindow()->IsFullscreen());
 #if BUILDFLAG(IS_MAC)
-  // Mac and Chrome OS both have an "immersive style" fullscreen where the
-  // bookmark bar is visible when the top views slide down.
+  // Mac has an "immersive style" fullscreen where the bookmark bar is visible
+  // when the top views slide down.
   EXPECT_EQ(BookmarkBar::SHOW,
             BookmarkBarController::From(browser())->bookmark_bar_state());
 #else

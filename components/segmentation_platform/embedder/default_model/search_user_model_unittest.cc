@@ -20,7 +20,6 @@ TEST_F(SearchUserModelTest, InitAndFetchModel) {
   ASSERT_TRUE(fetched_metadata_);
 }
 
-// Segmentation Ukm Engine is disabled on CrOS.
 TEST_F(SearchUserModelTest, VerifyMetadata) {
   ExpectInitAndFetchModel();
   ASSERT_TRUE(fetched_metadata_);

@@ -98,9 +98,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTest, EventsAreUnregistered) {
       event_router->ExtensionHasEventListener(id, "webNavigation.onCompleted"));
 }
 
-// The following test is executed as Chrome App, which is only supported on
-// ChromeOS.
-
 // Tests that registering a listener for an event that requires a permission and
 // then removing that permission using the permissions API does not lead to a
 // crash. Regression test for crbug.com/40884929.

@@ -107,8 +107,6 @@ class ShellView : public views::BoxLayoutView,
     bounds.set_size(GetWidget()->GetRootView()->GetPreferredSize({}));
     GetWidget()->SetBounds(bounds);
 
-    // Resizing a widget on chromeos doesn't automatically resize the root, need
-    // to explicitly do that.
   }
 
   void EnableUIControl(UIControl control, bool is_enabled) {

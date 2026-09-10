@@ -103,8 +103,6 @@ TEST_F(NotebooksEligibilityServiceImplTest,
   EXPECT_EQ(observer.notification_count(), 1);
   EXPECT_EQ(observer.last_eligibility(), true);
 
-  // Sign out -> eligibility becomes false (ClearPrimaryAccount is unsupported
-  // on ChromeOS).
   identity_test_env()->ClearPrimaryAccount();
   EXPECT_FALSE(service.IsEligible());
   EXPECT_EQ(observer.notification_count(), 2);

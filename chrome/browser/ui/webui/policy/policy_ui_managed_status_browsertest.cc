@@ -221,8 +221,6 @@ class PolicyUIManagedStatusTest : public PlatformBrowserTest,
 
   void EnableProfileManagement() {
     Profile* profile = browser()->GetProfile();
-    // ChromeOS creates a client on profile creation, so we only need to setup
-    // the registration for it there.
     auto client = std::make_unique<policy::CloudPolicyClient>(
         /*service=*/g_browser_process->browser_policy_connector()
             ->device_management_service(),

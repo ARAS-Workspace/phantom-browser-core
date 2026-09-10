@@ -254,8 +254,6 @@ class GESTURE_DETECTION_EXPORT GestureConfiguration {
   // https://crbug.com/376618 for details.
   float min_scaling_span_in_pixels_ = 125;
   float min_swipe_velocity_ = 20;
-  // TODO(crbug.com/41095532): Disable and remove entirely when issues
-  // with intermittent scroll end detection on the Pixel are resolved.
   int scroll_debounce_interval_in_ms_ = 0;
   int show_press_delay_in_ms_ = 150;
 

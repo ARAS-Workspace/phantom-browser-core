@@ -125,8 +125,6 @@ GetUpdateShortcutsForAllAppsCallback() {
 }  // namespace
 
 OsIntegrationManager::ScopedSuppressForTesting::ScopedSuppressForTesting() {
-// Creating OS hooks on ChromeOS doesn't write files to disk, so it's
-// unnecessary to suppress and it provides better crash coverage.
   GetSuppressCount().Increment();
 }
 

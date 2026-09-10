@@ -104,9 +104,6 @@ TEST(AcceleratorMapTest, Iterate) {
   EXPECT_EQ(m.end(), iter);
 }
 
-// Chrome OS specific tests.
-// Only Chrome OS supports positional shortcuts.
-
 }  // namespace
 
 }  // namespace ui

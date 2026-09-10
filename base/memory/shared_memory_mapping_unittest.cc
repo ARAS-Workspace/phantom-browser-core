@@ -267,7 +267,7 @@ TEST_F(SharedMemoryMappingTest, TooBigAtomic) {
 // the creation of a 1GB shared memory region, but don't allow the region to be
 // mapped.
 #if !BUILDFLAG(IS_IOS)
-// TODO(crbug.com/40846204) Fix flakiness and re-enable on Linux and ChromeOS.
+// TODO(crbug.com/40846204) Fix flakiness and re-enable on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_TotalMappedSizeLimit DISABLED_TotalMappedSizeLimit
 #else

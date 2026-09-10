@@ -386,10 +386,7 @@ TEST_F(PrimaryAccountMutatorTest, SetPrimaryAccount_Sync) {
 }
 
 // Tests that various preconditions of SetPrimaryAccount() not being satisfied
-// should cause the setting of the primary account to fail. Not run on
-// ChromeOS, where those preconditions do not exist.
-// TODO(crbug.com/41470280): Run these tests on ChromeOS if/once we
-// enable those preconditions on that platform
+// should cause the setting of the primary account to fail.
 // Checks that setting the primary account fails if the account is not known by
 // the identity system.
 TEST_F(PrimaryAccountMutatorTest, SetPrimaryAccount_NoAccount) {

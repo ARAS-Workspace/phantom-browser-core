@@ -229,7 +229,7 @@ IN_PROC_BROWSER_TEST_F(MetricIntegrationTest, DISABLED_LargestContentfulPaint) {
       lcp_timestamps[2].value());
 }
 
-// TODO(crbug.com/40936591): This test is flaky on ChromeOS and Linux.
+// TODO(crbug.com/40936591): This test is flaky on Linux.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_LargestContentfulPaint_SubframeInput \
   DISABLED_LargestContentfulPaint_SubframeInput

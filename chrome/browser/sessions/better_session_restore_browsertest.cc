@@ -596,8 +596,6 @@ IN_PROC_BROWSER_TEST_F(ContinueWhereILeftOffTest,
 
 #endif  // BUILDFLAG(ENABLE_BACKGROUND_MODE)
 
-// ChromeOS does not override the SessionStartupPreference upon controlled
-// system restart.
 class RestartTest : public BetterSessionRestoreTest {
  public:
   RestartTest() = default;

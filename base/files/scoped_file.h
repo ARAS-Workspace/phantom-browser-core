@@ -22,8 +22,8 @@ namespace internal {
 //
 // On Android, fdsan is used.
 //
-// On ChromeOS and Linux, file descriptor lifetime is guarded with a global
-// table and a hook into libc close().
+// On Linux, file descriptor lifetime is guarded with a global table and a hook
+// into libc close().
 struct BASE_EXPORT ScopedFDCloseTraits : public ScopedGenericOwnershipTracking {
   static int InvalidValue() { return -1; }
   static void Free(int fd);

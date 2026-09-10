@@ -445,8 +445,6 @@ IN_PROC_BROWSER_TEST_P(NetworkRequestMetricsBrowserTest,
   CheckHistogramsAfterMainFrameInterruption();
 }
 
-// TODO(crbug.com/520427873): This bug is flaky on ChromeOS most likely due to
-// the comment above the PostTask. Deflake before re-enabling.
 #define MAYBE_InterruptedCancelDuringBody InterruptedCancelDuringBody
 IN_PROC_BROWSER_TEST_P(NetworkRequestMetricsBrowserTest,
                        MAYBE_InterruptedCancelDuringBody) {

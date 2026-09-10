@@ -125,8 +125,7 @@ IN_PROC_BROWSER_TEST_F(ProcessesApiTest,
   EXPECT_EQ(0, GetListenersCount());
 }
 
-// This test is flaky on Linux and ChromeOS ASan LSan Tests bot.
-// https://crbug.com/40660996
+// This test is flaky on Linux ASan LSan Tests bot. https://crbug.com/40660996
 #if BUILDFLAG(IS_LINUX) && defined(ADDRESS_SANITIZER)
 #define MAYBE_CannotTerminateBrowserProcess \
   DISABLED_CannotTerminateBrowserProcess

@@ -1074,8 +1074,6 @@ IN_PROC_BROWSER_TEST_F(
   gfx::Size expected_size(blink::kMinimumUnframedWindowSize,
                           blink::kMinimumUnframedWindowSize);
 
-// For ChromeOS the resizable borders are "outside of the window" where as for
-// Linux they are "inside of the window".
 #if BUILDFLAG(IS_LINUX)
   constexpr int kFrameInsets =
       2 * OpaqueBrowserFrameViewLayout::kFrameBorderThickness;
@@ -1585,9 +1583,7 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
   EXPECT_FALSE(bounds.IsEmpty());
 }
 
-// Test to ensure crbug.com/40858241 won't reproduce. It casts the frame_view to
-// the ChromeOS's frame_view to have access to the caption_button_container_ so
-// it cannot be run on any other platform.
+// Test to ensure crbug.com/40858241 won't reproduce.
 
 IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
                        CSSRectTestLTR) {
@@ -1776,8 +1772,6 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
   EXPECT_TRUE(helper()->browser_view()->AppUsesWindowControlsOverlay());
 }
 
-// ChromeOS (immersive) and macOS (https://crbug.com/41431787) disable WCO in
-// fullscreen.
 #if !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
                        EnabledAndClickableInFullscreen) {
@@ -1980,7 +1974,6 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
                       "getTitlebarAreaRect().height"));
 }
 
-// Extensions in  ChromeOS are not in the titlebar.
 // Regression test for https://crbug.com/40857235.
 IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
                        ExtensionsIconVisibility) {

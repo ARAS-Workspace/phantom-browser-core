@@ -370,7 +370,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest, DoesNotUploadWhilePaused) {
                            UrlIs(synced_url3.spec()))));
 }
 
-// Session total duration is not instrumented on ChromeOS.
 IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest,
                        PRE_ReportsSessionTotalDurationWhilePaused) {
   {
@@ -984,8 +983,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest,
   histograms.ExpectTotalCount(
       "Sync.NonReflectionUpdateFreshnessPossiblySkewed2.HISTORY", 1);
 }
-
-// Signing out or turning off Sync isn't possible on ChromeOS.
 
 IN_PROC_BROWSER_TEST_P(SingleClientHistorySyncTest,
                        ClearsForeignHistoryOnTurningSyncOff) {

@@ -66,8 +66,6 @@ bool HostedAppBrowserController::HasMinimalUiButtons() const {
 }
 
 ui::ImageModel HostedAppBrowserController::GetWindowAppIcon() const {
-  // TODO(calamity): Use the app name to retrieve the app icon without using the
-  // extensions tab helper to make icon load more immediate.
 
   content::WebContents* contents =
       browser()->tab_strip_model()->GetActiveWebContents();

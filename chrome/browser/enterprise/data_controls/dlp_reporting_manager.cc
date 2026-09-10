@@ -85,7 +85,7 @@ Rule::Restriction DlpEventRestriction2RuleRestriction(
 }
 
 DlpPolicyEvent_UserType GetCurrentUserType() {
-  // TODO(b/303640183): Revisit what this should return for non-CrOS platforms.
+  // TODO(b/303640183): Revisit what this should return
   return DlpPolicyEvent_UserType_UNDEFINED_USER_TYPE;
 }
 

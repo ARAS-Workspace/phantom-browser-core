@@ -870,7 +870,6 @@ IN_PROC_BROWSER_TEST_F(MultipleTabSharingUIViewsBrowserTest, CloseTabs) {
   }
 }
 
-// TODO(crbug.com/40267838): Enable on CrOS.
 #if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(
     MultipleTabSharingUIViewsBrowserTest,

@@ -87,9 +87,6 @@ crashpad::CrashpadClient& GetCrashpadClient();
 // This code is not MT-safe
 void DestroyCrashpadClient();
 
-// ChromeOS has its own, OS-level consent system; Chrome does not maintain a
-// separate Upload Consent on ChromeOS.
-
 // Enables or disables crash report upload, taking the given consent to upload
 // into account. Consent may be ignored, uploads may not be enabled even with
 // consent, but will only be enabled without consent when policy enforces crash

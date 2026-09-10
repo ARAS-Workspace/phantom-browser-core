@@ -156,8 +156,6 @@ base::DictValue ChromePolicyConversions::ToValueDict() {
   if (client()->HasUserPolicies()) {
     all_policies.Set(kChromePoliciesId, GetChromePolicies());
 
-    // Precedence policies do not apply to Chrome OS, so the Policy Precedence
-    // table is not shown in chrome://policy.
     all_policies.Set(kPrecedencePoliciesId, GetPrecedencePolicies());
   }
 

@@ -480,7 +480,6 @@ void ThemeService::UseDeviceTheme(bool follow) {
 }
 
 bool ThemeService::UsingDeviceTheme() const {
-  // Only ChromeOS and Windows have this toggle.
   return false;
 }
 

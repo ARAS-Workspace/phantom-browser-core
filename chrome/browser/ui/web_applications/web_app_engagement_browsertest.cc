@@ -598,8 +598,6 @@ IN_PROC_BROWSER_TEST_F(WebAppEngagementBrowserTest, RecordedForNonApps) {
   TestEngagementEventsAfterLaunch(histograms, browser());
 }
 
-// On Chrome OS, PWAs are launched via the app service rather than via command
-// line flags.
 // TODO(crbug.com/409686053): Flaky on windows.
 #define MAYBE_CommandLineWindowByUrl CommandLineWindowByUrl
 IN_PROC_BROWSER_TEST_F(WebAppEngagementBrowserTest,

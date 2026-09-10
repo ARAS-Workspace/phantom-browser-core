@@ -55,7 +55,6 @@ bool BrowsingDataLifetimePolicyHandler::CheckPolicySettings(
     return true;
   }
 
-// BrowserSignin policy is not available on ChromeOS.
   const auto* browser_signin_disabled = policies.GetValue(
       policy::key::kBrowserSignin, base::Value::Type::INTEGER);
   if (browser_signin_disabled && browser_signin_disabled->GetInt() == 0) {

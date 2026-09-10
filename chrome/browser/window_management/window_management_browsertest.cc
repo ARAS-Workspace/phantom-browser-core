@@ -315,7 +315,6 @@ IN_PROC_BROWSER_TEST_F(MAYBE_WindowManagementTest, OnCurrentScreenChangeEvent) {
   )";
   EXPECT_EQ(803, EvalJs(tab, await_change_width));
   EXPECT_EQ(803, EvalJs(local_child, await_change_width));
-  // TODO(crbug.com/40246863): Fix flaky timeouts on ChromeOS.
   EXPECT_EQ(803, EvalJs(remote_child, await_change_width));
 
   // Update the second display to have a height of 300.  Validate that a change
@@ -340,7 +339,6 @@ IN_PROC_BROWSER_TEST_F(MAYBE_WindowManagementTest, OnCurrentScreenChangeEvent) {
   )";
   EXPECT_EQ(300, EvalJs(tab, await_change_height));
   EXPECT_EQ(300, EvalJs(local_child, await_change_height));
-  // TODO(crbug.com/40246863): Fix flaky timeouts on ChromeOS.
   EXPECT_EQ(300, EvalJs(remote_child, await_change_height));
 }
 

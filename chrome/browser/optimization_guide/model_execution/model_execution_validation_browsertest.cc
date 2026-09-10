@@ -176,7 +176,6 @@ IN_PROC_BROWSER_TEST_F(ModelExecutionValidationBrowserTest,
       FetcherRequestStatus::kSuccess, 1);
 }
 
-// TODO(b/318433299, crbug.com/41493189): Flaky on linux-chromeos and win
 #define MAYBE_ModelExecutionFailsServerFailure ModelExecutionFailsServerFailure
 IN_PROC_BROWSER_TEST_F(ModelExecutionValidationBrowserTest,
                        MAYBE_ModelExecutionFailsServerFailure) {

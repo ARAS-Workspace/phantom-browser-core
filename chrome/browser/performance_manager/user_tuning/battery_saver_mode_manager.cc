@@ -46,14 +46,6 @@ constexpr base::TimeDelta kBatteryUsageWriteFrequency = base::Days(1);
 using BatterySaverModeState =
     performance_manager::user_tuning::prefs::BatterySaverModeState;
 
-// On certain platforms (ChromeOS), the battery level displayed to the user is
-// artificially lower than the actual battery level. Unfortunately, the battery
-// level that Battery Saver Mode looks at is the "actual" level, so users on
-// that platform may see Battery Saver Mode trigger at say 17% rather than the
-// "advertised" 20%. This parameter allows us to heuristically tweak the
-// threshold on those platforms, by being added to the 20% threshold value (so
-// setting this parameter to 3 would result in battery saver being activated at
-// 23% actual battery level).
 constexpr int kBatterySaverModeThresholdAdjustmentForDisplayLevel = 0;
 
 class FrameThrottlingDelegateImpl

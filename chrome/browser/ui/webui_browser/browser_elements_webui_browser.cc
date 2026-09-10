@@ -24,9 +24,6 @@ BrowserElementsWebUiBrowser* BrowserElementsWebUiBrowser::From(
 }
 
 void BrowserElementsWebUiBrowser::Init(views::Widget* browser_widget) {
-  // TODO(webium): Fix ChromeOS. On ChromeOS, browser_widget is null because of
-  // a memory issue in WebUIBrowserWindow::GetNativeWindow(). See the comment
-  // there.
   CHECK(browser_widget);
   browser_widget_ = browser_widget;
 }

@@ -345,7 +345,6 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest, RecordEngagement) {
   ExpectScores(1, 1);
 }
 
-// Flaky tests on CrOS: http://crbug.com/40656329.
 #define MAYBE_RecordEngagement_AudioOnly RecordEngagement_AudioOnly
 IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
                        MAYBE_RecordEngagement_AudioOnly) {
@@ -363,7 +362,6 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
   ExpectScores(1, 0);
 }
 
-// Flaky tests on CrOS: http://crbug.com/40656092.
 #define MAYBE_DoNotRecordEngagement_NotTime_AudioOnly \
   DoNotRecordEngagement_NotTime_AudioOnly
 IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
@@ -382,7 +380,6 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
   ExpectScores(1, 0);
 }
 
-// Flaky tests on CrOS: http://crbug.com/40656092.
 #define MAYBE_DoNotRecordEngagement_TabMuted_AudioOnly \
   DoNotRecordEngagement_TabMuted_AudioOnly
 IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
@@ -422,7 +419,6 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
   ExpectScores(1, 0);
 }
 
-// Flaky tests on CrOS: http://crbug.com/40656092.
 #define MAYBE_DoNotRecordEngagement_PlaybackStopped_AudioOnly \
   DoNotRecordEngagement_PlaybackStopped_AudioOnly
 IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
@@ -444,7 +440,6 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
   ExpectScores(1, 1);
 }
 
-// Flaky tests on CrOS: http://crbug.com/40656092.
 #define MAYBE_RecordEngagement_NotVisible_AudioOnly \
   RecordEngagement_NotVisible_AudioOnly
 IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
@@ -530,7 +525,6 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
   ExpectScores(1, 0);
 }
 
-// Flaky tests on CrOS: http://crbug.com/40656092.
 #define MAYBE_DoNotRecordEngagement_SilentAudioTrack_AudioOnly \
   DoNotRecordEngagement_SilentAudioTrack_AudioOnly
 IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
@@ -580,7 +574,6 @@ IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest,
   ExpectScores(1, 1);
 }
 
-// Flaky tests on CrOS: http://crbug.com/40656092.
 #define MAYBE_MultipleElements MultipleElements
 IN_PROC_BROWSER_TEST_F(MediaEngagementBrowserTest, MAYBE_MultipleElements) {
   LoadTestPageAndWaitForPlayAndAudible("engagement_test_multiple.html", false);

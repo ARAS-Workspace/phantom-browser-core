@@ -72,8 +72,6 @@ constexpr uint8_t kMaxSupportedH264TemporalLayers = 3;
 constexpr uint8_t kMaxSupportedH264TemporalLayersBySWBRC = 2;
 
 bool ShouldInsertPrefixNALU() {
-  // Insert Prefix NALU for temporal layer encoding in ChromeOS selphie.
-  // TODO(b/465812584): Enable this on all ChromeOS x86 devices.
   return false;
 }
 

@@ -70,7 +70,6 @@ using InstallStateSet = base::EnumSet<proto::InstallState,
                                       proto::InstallState_MIN,
                                       proto::InstallState_MAX>;
 
-// ChromeOS stores the per-app capturing setting in PreferredAppsImpl, not here.
 BASE_FEATURE(kDiyAppsDefaultCaptureForcedOff,
              "capture_forced_off_diy_apps",
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -81,7 +80,6 @@ struct AppStateForNavigationCapturing {
   bool client_mode_valid_and_specified = false;
 };
 
-// ChromeOS stores the per-app capturing setting in PreferredAppsImpl, not here.
 bool IsNavigationCapturingSettingOffByDefault(
     AppStateForNavigationCapturing app_state) {
   // If the app is a DIY app, capture navigations by default unless enforced via

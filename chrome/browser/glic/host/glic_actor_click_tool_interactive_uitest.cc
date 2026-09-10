@@ -65,7 +65,6 @@ IN_PROC_BROWSER_TEST_F(GlicActorUiTest, ClickActionWithCoordinatesSucceeds) {
 
 // A click on a button in a web component should work, but a click on another
 // element in the component should not.
-// TODO(b/497283367): Flaky on ChromeOS.
 #define MAYBE_ClickActionInWebComponent ClickActionInWebComponent
 IN_PROC_BROWSER_TEST_F(GlicActorUiTest, MAYBE_ClickActionInWebComponent) {
   DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kNewActorTabId);

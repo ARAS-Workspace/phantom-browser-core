@@ -56,8 +56,7 @@ TEST_F(ChromeProfileDownloadServiceTrackerTest, OneProfile) {
             GetBackgroundDownloadServiceForProfile(foo_profile));
 }
 
-// ChromeOS does not support deletion of profiles. So, skip the tests involving
-// it.
+// So, skip the tests involving it.
 #define MAYBE_TwoProfiles TwoProfiles
 
 TEST_F(ChromeProfileDownloadServiceTrackerTest, MAYBE_TwoProfiles) {

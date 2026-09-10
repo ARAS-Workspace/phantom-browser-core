@@ -110,7 +110,6 @@ class FakeDriverTest : public testing::Test {
   VADisplay display_ = nullptr;
 };
 
-// TODO(crbug.com/454136608): re-enable after fixing flake.
 #define MAYBE_VerifyQueryConfigProfiles VerifyQueryConfigProfiles
 TEST_F(FakeDriverTest, MAYBE_VerifyQueryConfigProfiles) {
   ASSERT_GT(vaMaxNumProfiles(display_), 0);

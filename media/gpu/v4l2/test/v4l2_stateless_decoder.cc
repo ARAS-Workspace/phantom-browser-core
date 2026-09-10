@@ -21,13 +21,11 @@
 #include "media/gpu/v4l2/test/vp9_decoder.h"
 #include "media/media_buildflags.h"
 
-// AV1 stateless decoding not supported upstream yet
 #include "media/gpu/v4l2/test/h264_decoder.h"
 #if BUILDFLAG(ENABLE_HEVC_PARSER_AND_HW_DECODER)
 #include "media/gpu/v4l2/test/h265_decoder.h"
 #endif
 
-// AV1 stateless decoding not supported upstream yet
 using media::v4l2_test::H264Decoder;
 #if BUILDFLAG(ENABLE_HEVC_PARSER_AND_HW_DECODER)
 using media::v4l2_test::H265Decoder;
@@ -103,8 +101,6 @@ std::unique_ptr<VideoDecoder> CreateVideoDecoder(
   CHECK(stream.IsValid());
 
   std::unique_ptr<VideoDecoder> decoder;
-
-// AV1 stateless decoding not supported upstream yet
 
   if (!decoder)
     decoder = Vp9Decoder::Create(stream);

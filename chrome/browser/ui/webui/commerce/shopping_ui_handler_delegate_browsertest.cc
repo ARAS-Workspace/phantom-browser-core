@@ -209,8 +209,6 @@ IN_PROC_BROWSER_TEST_F(ShoppingUiHandlerDelegateBrowserTest,
   EXPECT_EQ(valid_url, web_contents()->GetLastCommittedURL());
 }
 
-// The feedback dialog on CrOS happens at the system level, which cannot be
-// easily tested here.
 // When the user has the page saved locally, an account node is created instead
 // so that the feature can be used.
 IN_PROC_BROWSER_TEST_F(ShoppingUiHandlerDelegateBrowserTest,

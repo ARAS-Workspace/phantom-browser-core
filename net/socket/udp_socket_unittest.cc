@@ -939,7 +939,6 @@ TEST_F(UDPSocketTest, MAYBE_SharedMulticastAddress) {
   // Send a message via the multicast group. That message is expected be be
   // received by both receving sockets.
   //
-  // Skip on ChromeOS where it's known to sometimes not work.
   // TODO(crbug.com/898964): If possible, fix and reenable.
   const char kMessage[] = "hello!";
   ASSERT_GE(WriteSocket(&client_socket, kMessage), 0);
@@ -2241,14 +2240,14 @@ TEST_F(UDPSocketTest, ReadMultiple) {
 }
 
 // This test is only run on platforms that support the recvmmsg-based
-// implementation of ReadMultiple (Linux, Android, ChromeOS).
-// On fallback POSIX platforms (macOS, iOS, Fuchsia), ReadMultiple delegates
-// to the standard RecvFrom method, which uses a large 512-byte control buffer.
-// Because this 512-byte buffer is large enough to accommodate the IP_PKTINFO
-// control message, the kernel does not set the MSG_CTRUNC flag on those
-// platforms. Consequently, the read operation succeeds instead of failing, and
-// we cannot test the control message truncation behavior on fallback platforms
-// without modifying the general-purpose RecvFrom implementation.
+// implementation of ReadMultiple (Linux, Android). On fallback POSIX platforms
+// (macOS, iOS, Fuchsia), ReadMultiple delegates to the standard RecvFrom
+// method, which uses a large 512-byte control buffer. Because this 512-byte
+// buffer is large enough to accommodate the IP_PKTINFO control message, the
+// kernel does not set the MSG_CTRUNC flag on those platforms. Consequently, the
+// read operation succeeds instead of failing, and we cannot test the control
+// message truncation behavior on fallback platforms without modifying the
+// general-purpose RecvFrom implementation.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 TEST_F(UDPSocketTest, ReadMultipleControlTruncated) {
   // Create sender and receiver sockets.

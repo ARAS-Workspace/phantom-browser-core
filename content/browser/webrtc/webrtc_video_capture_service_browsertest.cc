@@ -948,7 +948,6 @@ IN_PROC_BROWSER_TEST_F(WebRtcVideoCaptureServiceBrowserTest,
 
 // TODO(crbug.com/40835247): Fix and enable on Fuchsia.
 // TODO(crbug.com/40781953): This test is flakey on macOS.
-// TODO(crbug.com/41484083): This test is flakey on ChromeOS.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_FramesSentThroughTextureVirtualDeviceGetDisplayedOnPage \
   DISABLED_FramesSentThroughTextureVirtualDeviceGetDisplayedOnPage

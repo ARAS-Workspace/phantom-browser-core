@@ -85,8 +85,7 @@ IN_PROC_BROWSER_TEST_F(DistilledPageJsTest, AddClassesToYTIFramesTest) {
   LoadAndExecuteTestScript("add_classes_to_yt_iframes.js");
 }
 
-// Fails on Fuchsia ASAN.
-// Falky timeout on Linux and ChromeOS MSAN, ASAN and TSAN.
+// Fails on Fuchsia ASAN. Falky timeout on Linux MSAN, ASAN and TSAN.
 #if BUILDFLAG(IS_LINUX) &&                                      \
     (defined(MEMORY_SANITIZER) || defined(ADDRESS_SANITIZER) || \
      defined(THREAD_SANITIZER))

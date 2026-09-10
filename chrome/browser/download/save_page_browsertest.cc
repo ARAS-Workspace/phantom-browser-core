@@ -765,7 +765,6 @@ IN_PROC_BROWSER_TEST_F(SavePageBrowserTest, MAYBE_SavePageAsMHTML) {
     run_loop.Run();
   }
 
-// On ChromeOS, the default should be MHTML.
   ASSERT_EQ("html",
             select_file_dialog_factory->GetLastDialog()->default_extension());
 

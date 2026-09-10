@@ -34,9 +34,6 @@ ChromeContentGpuClient::ChromeContentGpuClient() {
   sampling_profiler::ThreadProfiler::SetClient(
       std::make_unique<ChromeThreadProfilerClient>());
 
-  // The profiler can't start before the sandbox is initialized on
-  // ChromeOS due to ChromeOS's sandbox initialization code's use of
-  // AssertSingleThreaded().
   main_thread_profiler_ =
       sampling_profiler::ThreadProfiler::CreateAndStartOnMainThread();
 }

@@ -323,10 +323,9 @@ class BASE_EXPORT SysInfo {
 
 #if BUILDFLAG(IS_ANDROID)
   // Returns true for Android devices whose memory is X GB, considering
-  // carveouts. The carveouts is memory reserved by the system, e.g.
-  // for drivers, MTE, etc. It's very common for querying app to see
-  // hundreds MBs less than actual physical memory installed on the system.
-  // Addendum: This logic should also work for ChromeOS.
+  // carveouts. The carveouts is memory reserved by the system, e.g. for
+  // drivers, MTE, etc. It's very common for querying app to see hundreds MBs
+  // less than actual physical memory installed on the system.
   static bool Is3GbDevice();
   static bool Is4GbDevice();
   static bool Is6GbDevice();

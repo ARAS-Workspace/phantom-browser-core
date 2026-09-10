@@ -55,8 +55,6 @@ CONTENT_EXPORT BASE_DECLARE_FEATURE(kNetworkServiceDedicatedThread);
 // This method can only be called on the UI thread.
 CONTENT_EXPORT network::mojom::NetworkService* GetNetworkService();
 
-// Only on ChromeOS since it's only used there.
-
 // Call |FlushForTesting()| on cached |mojo::Remote<NetworkService>|. For
 // testing only. Must only be called on the UI thread.
 CONTENT_EXPORT void FlushNetworkServiceInstanceForTesting();

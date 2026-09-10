@@ -1503,7 +1503,6 @@ TEST_F(AccountSelectionBubbleViewTest, IframeTitle) {
                     kSubtitleIframeSignIn);
 }
 
-// TODO(crbug.com/420421406): Re-enable this test on ChromeOS.
 #define MAYBE_ContinueButtonFocusedWithScreenReader \
   ContinueButtonFocusedWithScreenReader
 TEST_F(AccountSelectionBubbleViewTest,

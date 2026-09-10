@@ -1207,8 +1207,7 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonWithSyncBrowserTest,
   EXPECT_TRUE(avatar_accessor.WaitForText(std::u16string()));
 }
 
-// Avatar button is not shown on Ash. No need to perform those tests as the info
-// checked might not be adapted.
+// No need to perform those tests as the info checked might not be adapted.
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonWithSyncBrowserTest,
                        BookmarksLimitExceededErrorOpensProfileMenu) {
   AvatarToolbarButtonInterface* avatar_button =
@@ -1368,8 +1367,7 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
   EXPECT_FALSE(avatar->HasExplicitButtonState());
 }
 
-// Avatar button is not shown on Ash. No need to perform those tests as the info
-// checked might not be adapted.
+// No need to perform those tests as the info checked might not be adapted.
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest, SignInOutIconEffect) {
   ASSERT_TRUE(WaitForIsSignedInImageUsed(false));
 

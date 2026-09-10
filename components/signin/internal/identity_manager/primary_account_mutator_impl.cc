@@ -92,10 +92,7 @@ PrimaryAccountMutatorImpl::SetPrimaryAccount(
   return PrimaryAccountError::kNoError;
 }
 
-// Users cannot revoke the Sync consent on Ash. They can only turn off all Sync
-// data types if they want. Revoking sync consent can lead to breakages in
-// IdentityManager dependencies like `chrome.identity` extension API - that
-// assume that an account will always be available at sync consent level in Ash.
+// They can only turn off all Sync data types if they want.
 void PrimaryAccountMutatorImpl::RevokeSyncConsent(
     signin_metrics::ProfileSignout source_metric) {
   // TODO(crbug.com/40066949): `RevokeSyncConsent` shouldn't be available on iOS

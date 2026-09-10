@@ -313,8 +313,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientIncomingPasswordSharingInvitationTest,
   EXPECT_TRUE(ServerPasswordInvitationChecker(/*expected_count=*/0).Wait());
 }
 
-// ChromeOS does not support signing out of a primary account, which these test
-// relies on to initialize Nigori.
 IN_PROC_BROWSER_TEST_P(SingleClientIncomingPasswordSharingInvitationTest,
                        ShouldHandleIncomingInvitationsAtInitialSync) {
   // First, setup sync to initialize Nigori node with a public key to be able to
@@ -408,7 +406,6 @@ IN_PROC_BROWSER_TEST_P(
       /*expected_bucket_count=*/1);
 }
 
-// The unconsented primary account isn't supported on ChromeOS.
 // TODO(crbug.com/358053884): enable on Android once transport mode for
 // Passwords is supported.
 #if !BUILDFLAG(IS_ANDROID)

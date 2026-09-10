@@ -9066,7 +9066,7 @@ class RenderFrameHostImplBrowsingContextStateNameTest
 
  protected:
   void SetUp() override {
-    // TODO(crbug.com/40840863): Flaky on Mac, Android, Linux, and ChromeOS.
+    // TODO(crbug.com/40840863): Flaky on Mac, Android, Linux.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
     GTEST_SKIP();
 #else

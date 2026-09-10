@@ -155,8 +155,6 @@ class BatterySaverModeManagerTest : public ::testing::Test {
   std::unique_ptr<BatterySaverModeManager> manager_;
 };
 
-// Battery Saver is controlled by the OS on ChromeOS
-
 TEST_F(BatterySaverModeManagerTest, TemporaryBatterySaver) {
   StartManager();
   EXPECT_FALSE(manager()->IsBatterySaverActive());

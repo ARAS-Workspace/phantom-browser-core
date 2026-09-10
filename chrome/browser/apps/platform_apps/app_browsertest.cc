@@ -584,8 +584,6 @@ IN_PROC_BROWSER_TEST_F(PlatformAppBrowserTest, MAYBE_ExtensionWindowingApis) {
   // TODO(jeremya): as above, this requires more extension functions.
 }
 
-// ChromeOS does not support passing arguments on the command line, so the tests
-// that rely on this functionality are disabled.
 // Tests that launch data is sent through if the file extension matches.
 IN_PROC_BROWSER_TEST_F(PlatformAppWithFileBrowserTest,
                        LaunchFilesWithFileExtension) {

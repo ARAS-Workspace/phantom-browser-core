@@ -708,10 +708,6 @@ SessionStartupPref StartupBrowserCreator::GetSessionStartupPref(
   const PrefService* prefs = profile->GetPrefs();
   SessionStartupPref pref = SessionStartupPref::GetStartupPref(prefs);
 
-  // IsChromeFirstRun() looks for a sentinel file to determine whether the user
-  // is starting Chrome for the first time. On Chrome OS, the sentinel is stored
-  // in a location shared by all users and the check is meaningless. Query the
-  // UserManager instead to determine whether the user is new.
   const bool is_first_run = first_run::IsChromeFirstRun();
   const bool did_restart = StartupBrowserCreator::WasRestarted();
 
@@ -1028,8 +1024,6 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
   }
 
   // This path is mostly used for Window and Linux.
-  // On Chrome OS, app launches are routed through the AppService and
-  // WebAppPublisherHelper.
   //
   // On Mac, PWA launch is normally handled in
   // web_app_shim_manager_delegate_mac.cc, but if an app shim for whatever
@@ -1037,10 +1031,10 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
   // the launch behavior here isn't quite the correct behavior for an app launch
   // on Mac OS, this behavior is better than nothing and should result in the
   // app shim getting regenerated to hopefully fix future app launches.
-  // TODO(crbug.com/40191242): Some integration tests also rely on this
-  // code. Ideally those would be fixed to test the normal app launch path on
-  // Mac instead, and this code should be changed to make it harder to
-  // accidentally write tests that don't test the normal app launch path.
+  // TODO(crbug.com/40191242): Some integration tests also rely on this code.
+  // Ideally those would be fixed to test the normal app launch path on Mac
+  // instead, and this code should be changed to make it harder to accidentally
+  // write tests that don't test the normal app launch path.
   // Try a web app launch.
   if (web_app::startup::MaybeHandleWebAppLaunch(
           command_line, cur_dir, privacy_safe_profile, is_first_run)) {
@@ -1176,7 +1170,6 @@ void StartupBrowserCreator::ProcessCommandLineWithProfile(
   }
 
   Profiles last_opened_profiles;
-  // On ChromeOS multiple profiles doesn't apply.
   // If no browser windows are open, i.e. the browser is being kept alive in
   // background mode or for other processing, restore |last_opened_profiles|.
   if (GlobalBrowserCollection::GetInstance()->GetSize() == 0) {

@@ -705,8 +705,7 @@ IN_PROC_BROWSER_TEST_F(PolicyUpdateServiceTest, MAYBE_Backoff) {
   }
 }
 
-// TODO(crbug.com/316940720): Flaky on Chrome OS MSAN bot. Also flaky on desktop
-// Android. Crashes during test shutdown in ~CrxInstaller.
+// Also flaky on desktop Android. Crashes during test shutdown in ~CrxInstaller.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_PRE_PolicyCorruptedOnStartup DISABLED_PRE_PolicyCorruptedOnStartup
 #define MAYBE_PolicyCorruptedOnStartup DISABLED_PolicyCorruptedOnStartup

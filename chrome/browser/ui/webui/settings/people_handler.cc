@@ -989,10 +989,6 @@ void PeopleHandler::CloseSyncSetup() {
   if (service) {
     auto self_weak_ptr = weak_factory_.GetWeakPtr();
 
-    // ChromeOS Ash doesn't support signing out and hence the code below
-    // cannot build (RevokeSyncConsent() doesn't exist). However, the code is
-    // unreachable on Ash because IsInitialSyncFeatureSetupComplete() in the
-    // condition below always returns true.
     syncer::SyncService* sync_service = GetSyncService();
 
     // Don't log a cancel event if the sync setup dialog is being

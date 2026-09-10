@@ -315,12 +315,6 @@ bool MatchesBool(const std::optional<bool>& boolean, bool value) {
   return !boolean || *boolean == value;
 }
 
-// Returns true if the given browser window is in locked fullscreen mode
-// (a special type of fullscreen where the user is locked into one browser
-// window).
-// TODO(https://crbug.com/432056907): Determine if we need locked-fullscreen
-// support on desktop android.
-
 // Returns the tab group ID for the tab at `index`. Returns nullopt if the index
 // is out of range, the tab is not found, or the tab is not part of a group.
 std::optional<tab_groups::TabGroupId> GetTabGroupForTab(
@@ -333,9 +327,6 @@ std::optional<tab_groups::TabGroupId> GetTabGroupForTab(
   CHECK(tab);
   return tab->GetGroup();
 }
-
-// Places the window in a special type of fullscreen where the user is locked
-// into one browser window based on `is_locked_fullscreen`.
 
 // Updates `window_bounds` from `params`. Returns true if bounds were set.
 bool UpdateWindowBoundsFromParams(const api::windows::Update::Params& params,
@@ -1572,9 +1563,6 @@ ExtensionFunction::ResponseAction WindowsRemoveFunction::Run() {
           &window_controller, &error)) {
     return RespondNow(Error(std::move(error)));
   }
-
-  // TODO(https://crbug.com/432056907): Determine if we need locked-fullscreen
-  // support on desktop android.
 
   TabListInterface* tab_list =
       TabListInterface::From(window_controller->GetBrowserWindowInterface());

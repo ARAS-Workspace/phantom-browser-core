@@ -12,8 +12,6 @@
 namespace performance_manager::power {
 
 std::unique_ptr<base::BatteryLevelProvider> CreateBatteryLevelProvider() {
-  // TODO(crbug.com/40871810): Move all of the creation code into the
-  // platform-specific implementations once they're moved to components.
   return base::BatteryLevelProvider::Create();
 }
 

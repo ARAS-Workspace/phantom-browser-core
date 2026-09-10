@@ -279,7 +279,6 @@ TEST_F(DeviceStatisticsTrackerTest, RecordsNoOutcomeWhenAllRequestsFail) {
                                     0);
 }
 
-// On ChromeOS, the primary account cannot change.
 TEST_F(DeviceStatisticsTrackerTest, RecordsNoOutcomeWhenPrimaryAccountChanges) {
   AccountInfo primary = identity_test_env_.MakePrimaryAccountAvailable(
       "test@example.com", signin::ConsentLevel::kSignin);

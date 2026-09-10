@@ -700,8 +700,6 @@ IN_PROC_BROWSER_TEST_P(HostedAppTestWithPrerendering,
       kActivationUrlHasEffectiveUrl, 1);
 }
 
-// TODO(crbug.com/40890220): Flaky test.
-
 class HostedAppTestWithAutoupgradesDisabled : public HostedOrWebAppTest {
  public:
   void SetUpCommandLine(base::CommandLine* command_line) override {

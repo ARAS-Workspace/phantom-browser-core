@@ -129,7 +129,6 @@ std::unique_ptr<ProfileOAuth2TokenService> BuildProfileOAuth2TokenService(
     std::unique_ptr<DeviceAccountsProvider> device_accounts_provider,
 #endif
     SigninClient* signin_client) {
-// On ChromeOS the device ID is not managed by the token service.
   // Ensure the device ID is not empty. This is important for Dice, because the
   // device ID is needed on the network thread, but can only be generated on the
   // main thread.

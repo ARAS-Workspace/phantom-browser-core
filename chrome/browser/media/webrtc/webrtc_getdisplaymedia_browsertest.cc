@@ -1120,8 +1120,6 @@ class GetDisplayMediaChangeSourceBrowserTest
   ~GetDisplayMediaChangeSourceBrowserTest() override = default;
 
   void SetUp() override {
-    // TODO(crbug.com/40245399): Fix GetDisplayMediaChangeSourceBrowserTest with
-    // audio requested on ChromeOS
     WebRtcTestBase::SetUp();
   }
 

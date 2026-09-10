@@ -59,10 +59,6 @@ std::unique_ptr<KeyedService> DesktopProfileSessionDurationsServiceFactory::
         content::BrowserContext* context) const {
   Profile* profile = Profile::FromBrowserContext(context);
 
-// On ChromeOS, IsGuestSession and IsRegularProfile() are not mutually
-// exclusive, which breaks `ProfileKeyedServiceFactory` logic. Therefore the
-// below check is still needed despite the proper filter already set.
-
   DCHECK(!profile->IsSystemProfile());
   DCHECK(!profile->IsGuestSession());
 

@@ -798,7 +798,6 @@ IN_PROC_BROWSER_TEST_P(CleanupOrphanedBundlesTest,
 INSTANTIATE_TEST_SUITE_P(
     /***/,
     CleanupOrphanedBundlesTest,
-    // We only test user sessions outside of ChromeOS.
     testing::ValuesIn({true})
 );
 

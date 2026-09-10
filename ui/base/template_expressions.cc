@@ -123,7 +123,6 @@ bool EscapeForJS(const std::string& in_string,
 // Checks whether the replacement has an unsubstituted placeholder, e.g. "$1".
 bool HasUnexpectedPlaceholder(const std::string& key,
                               const std::string& replacement) {
-  // TODO(crbug.com/41472975): Fix display aria labels.
   static const base::NoDestructor<re2::RE2> placeholder_regex(R"(\$\d)");
   return re2::RE2::PartialMatch(replacement, *placeholder_regex.get());
 }

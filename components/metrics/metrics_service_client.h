@@ -232,11 +232,6 @@ class MetricsServiceClient {
   // Checks if the user has forced metrics collection on via the override flag.
   bool IsMetricsReportingForceEnabled() const;
 
-// If expanding user-level metrics to other platforms, then, in addition to
-// implementing the functions below, remember to modify the callers of the
-// functions. Currently the callers have #if blocks that make them not call
-// these functions on other platforms.
-
   // Returns the country ID associated with the profile used for metrics.
   // Returns std::nullopt if it's not available.
   virtual std::optional<regional_capabilities::CountryIdHolder>

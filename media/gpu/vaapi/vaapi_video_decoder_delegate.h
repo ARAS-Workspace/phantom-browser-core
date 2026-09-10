@@ -78,16 +78,6 @@ class VaapiVideoDecoderDelegate {
     kFailed
   };
 
-  // Ensures we have a protected session setup and attached to the active
-  // |vaapi_wrapper_| we are using. We are in the corresponding state returned
-  // when this call returns. |full_sample| indicates if we are using full sample
-  // encryption or not and must remain consistent for a session. If everything
-  // is setup for a protected session, it will fill in the |crypto_params|.
-  // |segments| must retain its memory until the frame is submitted.
-  // |subsamples| is for the current slice. |size| is the size of the slice
-  // data. This should be called if IsEncrypted() is true even if the current
-  // data is not encrypted (i.e. |subsamples| is empty).
-
   // Returns true if we are handling encrypted content, in which case
   // SetupDecryptDecode() should be called for every slice. This is specifically
   // for Intel platforms.

@@ -111,7 +111,6 @@ void ChromeInternalLogSource::Fetch(SysLogsSourceCallback callback) {
   auto response = std::make_unique<SystemLogsResponse>();
   response->emplace(kChromeVersionTag, GetChromeVersionString());
 
-  // On ChromeOS, this will be pulled in from the LSB_RELEASE.
   std::string os_version = base::SysInfo::OperatingSystemName() + ": " +
                            base::SysInfo::OperatingSystemVersion();
   response->emplace(kOsVersionTag, os_version);

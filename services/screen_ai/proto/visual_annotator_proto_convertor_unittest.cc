@@ -159,7 +159,6 @@ TEST_F(ScreenAIVisualAnnotatorProtoConvertorTest, SimpleResults) {
     EXPECT_EQ(word_1->direction, mojom::Direction::DIRECTION_LEFT_TO_RIGHT);
   }
 
-// Testing conversion to AxTreeUpdate which is only used on ChromeOS.
 }
 
 TEST_F(ScreenAIVisualAnnotatorProtoConvertorTest, MultipleLanguages) {
@@ -239,7 +238,6 @@ TEST_F(ScreenAIVisualAnnotatorProtoConvertorTest, MultipleLanguages) {
     EXPECT_EQ(word_1->direction, mojom::Direction::DIRECTION_LEFT_TO_RIGHT);
   }
 
-// Testing conversion to AxTreeUpdate.
 }
 
 TEST_F(ScreenAIVisualAnnotatorProtoConvertorTest,
@@ -346,12 +344,7 @@ TEST_F(ScreenAIVisualAnnotatorProtoConvertorTest,
     EXPECT_EQ(word_1->direction, mojom::Direction::DIRECTION_RIGHT_TO_LEFT);
   }
 
-// Testing conversion to AxTreeUpdate.
 }
-
-// Character offsets are only returned in AxTreeUpdate.
-
-// Character offsets are only returned in AxTreeUpdate.
 
 TEST_F(ScreenAIVisualAnnotatorProtoConvertorTest, Paragraphs) {
   chrome_screen_ai::VisualAnnotation annotation;
@@ -411,7 +404,6 @@ TEST_F(ScreenAIVisualAnnotatorProtoConvertorTest, Paragraphs) {
     EXPECT_EQ(annot->lines[5]->paragraph_id, 0);
   }
 
-// Testing conversion to AxTreeUpdate.
 }
 
 }  // namespace screen_ai

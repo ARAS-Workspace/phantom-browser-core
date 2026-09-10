@@ -245,7 +245,6 @@ ExtensionFunction::ResponseAction AppWindowCreateFunction::Run() {
             Error(app_window_constants::kImeWindowMissingPermission));
       }
 
-      // IME window is only supported on ChromeOS.
       return RespondNow(
           Error(app_window_constants::kImeWindowUnsupportedPlatform));
     } else {

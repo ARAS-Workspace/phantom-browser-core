@@ -123,7 +123,6 @@ IN_PROC_BROWSER_TEST_F(GlicSidePanelCoordinatorTest, EntryAdded) {
       SidePanelEntry::Key(SidePanelEntry::Id::kGlic)));
 }
 
-// TODO(crbug.com/460830593): Enable for ChromeOS.
 #define MAYBE_EntryNotAdded EntryNotAdded
 IN_PROC_BROWSER_TEST_F(GlicSidePanelCoordinatorTest, MAYBE_EntryNotAdded) {
   EXPECT_FALSE(GlicEnabling::IsEnabledForProfile(profile()));
@@ -134,7 +133,6 @@ IN_PROC_BROWSER_TEST_F(GlicSidePanelCoordinatorTest, MAYBE_EntryNotAdded) {
       SidePanelEntry::Key(SidePanelEntry::Id::kGlic)));
 }
 
-// TODO(crbug.com/460830593): Enable for ChromeOS.
 #define MAYBE_EligibilityChangesReflected EligibilityChangesReflected
 IN_PROC_BROWSER_TEST_F(GlicSidePanelCoordinatorTest,
                        MAYBE_EligibilityChangesReflected) {

@@ -111,9 +111,6 @@ bool VerifyWritableTempLocation(base::FilePath* temp_dir) {
 // parameter even if it returns false.
 bool FindWritableTempLocation(const base::FilePath& extensions_dir,
                               base::FilePath* temp_dir) {
-// On ChromeOS, we will only attempt to unpack extension in cryptohome (profile)
-// directory to provide additional security/privacy and speed up the rest of
-// the extension install process.
   base::PathService::Get(base::DIR_TEMP, temp_dir);
   if (VerifyWritableTempLocation(temp_dir)) {
     return true;

@@ -310,7 +310,6 @@ IN_PROC_BROWSER_TEST_F(UtilityProcessHostBrowserTest, SkiaInitialized) {
 
 // TODO(crbug.com/40253015): Re-enable this test on Android when
 // `files_to_preload` is actually fixed there.
-// TODO(crbug.com/41484083): Re-enable this test on ChromeOS.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_FileDescriptorStore DISABLED_FileDescriptorStore
 #else

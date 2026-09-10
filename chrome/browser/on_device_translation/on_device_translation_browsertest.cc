@@ -1606,7 +1606,6 @@ IN_PROC_BROWSER_TEST_F(OnDeviceTranslationBrowserTest,
       "en", "ja", CanCreateTranslatorResult::kAfterDownloadLibraryNotReady);
 }
 
-// CreateGuestBrowser isn't available on ChromeOS
 // Tests the behavior when the Translator API is accessed from an invalid
 // storage partition.
 IN_PROC_BROWSER_TEST_F(OnDeviceTranslationBrowserTest,
@@ -2135,7 +2134,6 @@ IN_PROC_BROWSER_TEST_F(OnDeviceTranslationCrossOriginBrowserTest,
   EXPECT_EQ(CheckTranslateInIframe(iframe1), "NotAllowedError");
 }
 
-// CreateGuestBrowser isn't available on ChromeOS
 // Tests the behavior of the Translation API in a cross origin iframe using the
 // guest profile.
 IN_PROC_BROWSER_TEST_F(OnDeviceTranslationCrossOriginBrowserTest,
@@ -2159,7 +2157,6 @@ IN_PROC_BROWSER_TEST_F(OnDeviceTranslationCrossOriginBrowserTest,
   EXPECT_EQ(CheckTranslateInIframe(iframe), "en to ja: hello");
 }
 
-// CreateGuestBrowser isn't available on ChromeOS
 // TODO(crbug.com/423029203): This is timing out on a CQ bot so it is disabled
 // for now until we can resolve that issue.
 //

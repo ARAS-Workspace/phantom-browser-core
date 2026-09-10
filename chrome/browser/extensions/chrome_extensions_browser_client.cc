@@ -1169,7 +1169,6 @@ void ChromeExtensionsBrowserClient::set_did_chrome_update_for_testing(
 }
 
 ExtensionAssetsManager* ChromeExtensionsBrowserClient::GetAssetsManager() {
-  // If not Chrome OS, use trivial implementation that doesn't share anything.
   return ExtensionsBrowserClient::GetAssetsManager();
 }
 

@@ -1051,7 +1051,6 @@ TEST(XkbKeyboardLayoutEngineTest, NumpadDecimal) {
   EXPECT_EQ(ui::DomKey::FromCharacter('.'), dom_key);
   EXPECT_EQ(ui::VKEY_DECIMAL, key_code);
 
-  // NumLock off tests are skipped on ChromeOS because NumLock is always on.
   // With NumLock disabled, NUMPAD_DECIMAL should map to DomKey::DEL and
   // VKEY_DELETE.
   dom_key = DomKey::NONE;

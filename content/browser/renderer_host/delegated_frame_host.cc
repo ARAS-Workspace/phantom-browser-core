@@ -501,8 +501,6 @@ void DelegatedFrameHost::DidCopyStaleContent(
   CHECK_EQ(result->destination(),
            viz::CopyOutputResult::Destination::kSharedImage);
 
-// TODO(crbug.com/1227661): Revert https://crrev.com/c/3222541 to re-enable this
-// CHECK on CrOS.
   CHECK_NE(frame_eviction_state_, FrameEvictionState::kNotStarted);
   SetFrameEvictionStateAndNotifyObservers(FrameEvictionState::kNotStarted);
   ContinueDelegatedFrameEviction(
@@ -519,7 +517,6 @@ void DelegatedFrameHost::DidCopyStaleContent(
     client_->GetDelegatedFrameHostLayer()->Add(stale_content_layer_.get());
   }
 
-// TODO(crbug.com/40812011): This DCHECK occasionally gets hit on Chrome OS.
   CHECK(!stale_content_layer_->HasExternalContent());
   stale_content_layer_->SetVisible(true);
   stale_content_layer_->SetBounds(gfx::Rect(surface_dip_size_));

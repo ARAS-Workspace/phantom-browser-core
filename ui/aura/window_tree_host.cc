@@ -638,9 +638,6 @@ void WindowTreeHost::OnDisplayMetricsChanged(const display::Display& display,
     compositor_->SetDisplayColorSpaces(display.GetColorSpaces());
   }
 
-// Chrome OS is handled in WindowTreeHostManager::OnDisplayMetricsChanged.
-// Chrome OS requires additional handling for the bounds that we do not need to
-// do for other OSes.
   if (metrics & DISPLAY_METRIC_DEVICE_SCALE_FACTOR &&
       display.id() == GetDisplayId())
     OnHostResizedInPixels(GetBoundsInPixels().size());
@@ -765,13 +762,9 @@ void WindowTreeHost::MoveCursorToInternal(const gfx::Point& root_location,
 }
 
 void WindowTreeHost::OnCompositingAckDeprecated(ui::Compositor* compositor) {
-  // Currently, input is only throttled on ash and is not well supported on
-  // other platforms. See crbug.com/41359082.
 }
 
 void WindowTreeHost::OnCompositingChildResizing(ui::Compositor* compositor) {
-  // Currently, input is only throttled on ash and is not well supported on
-  // other platforms. See crbug.com/41359082.
 }
 
 void WindowTreeHost::OnFrameSinksToThrottleUpdated(

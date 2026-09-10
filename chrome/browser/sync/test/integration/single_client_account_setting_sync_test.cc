@@ -145,7 +145,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientAccountSettingSyncTest,
   EXPECT_TRUE(WaitForWalletSurfacingState(false));
 }
 
-// ChromeOS does not support signing out of the primary account.
 IN_PROC_BROWSER_TEST_P(SingleClientAccountSettingSyncTest,
                        Signout_DataCleared) {
   InjectSpecificsToServer(

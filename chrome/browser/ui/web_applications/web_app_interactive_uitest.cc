@@ -30,11 +30,11 @@ constexpr const char kExampleURL[] = "http://example.org/";
 
 class WebAppInteractiveUiTest : public WebAppBrowserTestBase {};
 
-// Disabled everywhere except ChromeOS and Mac because those are the only
-// platforms with functional display mocking at the moment. While a partial
-// solution is possible using display::Screen::SetScreenInstance on other
-// platforms, window placement doesn't work right with a faked Screen
-// instance. See: //docs/ui/display/multiscreen_testing.md
+// Disabled everywhere except Mac because those are the only platforms with
+// functional display mocking at the moment. While a partial solution is
+// possible using display::Screen::SetScreenInstance on other platforms, window
+// placement doesn't work right with a faked Screen instance. See:
+// //docs/ui/display/multiscreen_testing.md
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_TabOpensOnCorrectDisplayMultiScreen \
   TabOpensOnCorrectDisplayMultiScreen

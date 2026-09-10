@@ -576,8 +576,6 @@ IN_PROC_BROWSER_TEST_F(CommandsApiTest, MAYBE_ContinuePropagation) {
   ASSERT_TRUE(catcher.GetNextResult());
 }
 
-// Test is only applicable on Chrome OS.
-
 // Validate parameters sent along with an extension event, in response to
 // command being triggered.
 IN_PROC_BROWSER_TEST_F(CommandsApiTest, TabParameter) {

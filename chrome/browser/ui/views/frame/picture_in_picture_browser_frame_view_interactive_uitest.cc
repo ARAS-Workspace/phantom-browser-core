@@ -628,8 +628,7 @@ IN_PROC_BROWSER_TEST_F(PictureInPictureBrowserFrameViewTest,
 
   // Most Aura platforms clip non-desktop widgets to the parent bounds. To
   // ensure the child dialog is visible, the pip window needs to resize on those
-  // platforms. ChromeOS does not clip non-desktop widgets, so the pip window
-  // does not need to resize.
+  // platforms.
   EXPECT_NE(initial_pip_bounds, new_pip_bounds);
   EXPECT_GE(new_pip_bounds.width(), child_dialog_size.width());
   EXPECT_GE(new_pip_bounds.height(), child_dialog_size.height());
@@ -658,7 +657,6 @@ IN_PROC_BROWSER_TEST_F(PictureInPictureBrowserFrameViewTest,
   auto child_dialog =
       OpenChildDialog(child_dialog_size, ui::mojom::ModalType::kNone,
                       std::nullopt, views::Widget::InitParams::TYPE_MENU);
-  // ChromeOS always creates a non-desktop widget.
   EXPECT_TRUE(child_dialog->GetIsDesktopWidget());
 
   // The pip window should not increase in size as the child dialog can draw

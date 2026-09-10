@@ -378,7 +378,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSkillsSyncTest,
           .Wait());
 }
 
-// ChromeOS does not support signout.
 IN_PROC_BROWSER_TEST_P(SingleClientSkillsSyncTest,
                        ShouldDeleteAllDataOnDisableSync) {
   InjectSpecificsToFakeServer(CreateSkillSpecifics(

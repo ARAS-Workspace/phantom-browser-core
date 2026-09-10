@@ -166,9 +166,6 @@ int WebAppScope::GetScopeScore(const GURL& url,
     score = base::ClampAdd(score, url::kMaxURLChars);
   }
 
-  // Note: This is considered whether or not extensions are excluded due to
-  // historical reasons.
-
   if (options.exclude_scope_extensions) {
     return score;
   }

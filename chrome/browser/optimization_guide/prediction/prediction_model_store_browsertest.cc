@@ -277,7 +277,6 @@ IN_PROC_BROWSER_TEST_F(PredictionModelStoreBrowserTest,
       kSuccessfulModelVersion, 1);
 }
 
-// TODO(crbug.com/41490438): Re-enable this test
 #define MAYBE_TestIncognitoProfile TestIncognitoProfile
 IN_PROC_BROWSER_TEST_F(PredictionModelStoreBrowserTest,
                        MAYBE_TestIncognitoProfile) {

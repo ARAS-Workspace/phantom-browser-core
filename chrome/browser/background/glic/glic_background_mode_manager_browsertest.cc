@@ -67,8 +67,6 @@ IN_PROC_BROWSER_TEST_F(GlicBackgroundModeManagerBrowserTest,
   }));
 }
 
-// ChromeOS does not support creating multiple profiles without user session
-// setup.
 IN_PROC_BROWSER_TEST_F(GlicBackgroundModeManagerBrowserTest,
                        KeepAliveTransfersWhenLaunchProfileChanges) {
   auto* profile_manager = g_browser_process->profile_manager();

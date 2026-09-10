@@ -661,7 +661,6 @@ IN_PROC_BROWSER_TEST_F(GlicUiFullLoadingSequenceTest, EscapeKeyDismisses) {
       CheckEscapeKeyDismisses(kErrorPanel));
 }
 
-// Multi-profile is not supported on ChromeOS.
 class GlicWithMultipleProfilesTest : public GlicUiInteractiveUiTestBase {
  public:
   GlicWithMultipleProfilesTest() : GlicUiInteractiveUiTestBase({}) {}

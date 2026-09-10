@@ -150,9 +150,9 @@ int RendererMain(MainFunctionParams parameters) {
   InitializeSkia();
 
 #if !BUILDFLAG(IS_LINUX)
-  // On Linux and ChromeOS, the font manager is overridden or specially handled
-  // in RendererBlinkPlatformImpl(). On other platforms, initialise the default
-  // one on a thread pool, to avoid blocking on it later.
+  // On Linux, the font manager is overridden or specially handled in
+  // RendererBlinkPlatformImpl(). On other platforms, initialise the default one
+  // on a thread pool, to avoid blocking on it later.
   base::ThreadPool::PostTask(FROM_HERE,
                              base::BindOnce([] { skia::DefaultFontMgr(); }));
 #endif

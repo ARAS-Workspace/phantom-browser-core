@@ -237,8 +237,7 @@ TEST_F(PreinstalledWebAppManagerTest, ReplacementExtensionBlockedByPolicy) {
   expect_present();
 }
 
-// Only Chrome OS parses config files.
-// No app is expected for non-ChromeOS builds.
+// No app is expected
 TEST_F(PreinstalledWebAppManagerTest, NoApp) {
   set_profile(CreateProfile());
   EXPECT_TRUE(LoadApps(kUserTypesTestDir).empty());
@@ -342,8 +341,6 @@ class PreinstalledWebAppManagerBasicTest : public WebAppTest {
 
  protected:
   std::unique_ptr<ScopedTestingPreinstalledAppData> preinstalled_app_override_;
-
-// This might be good to move to the WebAppTest base class.
 
   const webapps::AppId app_id_;
   base::AutoReset<bool> bypass_awaiting_dependencies_{

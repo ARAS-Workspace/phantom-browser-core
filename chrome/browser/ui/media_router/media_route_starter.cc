@@ -57,8 +57,6 @@ void RunRouteResponseCallbacks(
 // `WebContents` initiator. On ChromeOS, this happens for example when the
 // `MediaRouteStarter` is called from the OS system tray.
 Profile* GetDefaultProfileForMediaRouteStarter() {
-// Use the main profile on ChromeOS. Desktop platforms don't have the concept
-// of a "main" profile, so pick the "last used" profile instead.
   return ProfileManager::GetLastUsedProfile();
 }
 

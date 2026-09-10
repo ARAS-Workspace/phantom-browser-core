@@ -1304,7 +1304,6 @@ class BookmarkBarViewTest11 : public BookmarkBarViewEventTestBase {
   BookmarkContextMenuNotificationObserver observer_;
 };
 
-// TODO(crbug.com/40282036): Fails on latest versions of ChromeOS.
 #define MAYBE_CloseMenuAfterClosingContextMenu CloseMenuAfterClosingContextMenu
 VIEW_TEST(BookmarkBarViewTest11, MAYBE_CloseMenuAfterClosingContextMenu)
 
@@ -1630,7 +1629,6 @@ class BookmarkBarViewTest17 : public BookmarkBarViewEventTestBase {
   std::unique_ptr<BookmarkContextMenuNotificationObserver> observer_;
 };
 
-// TODO(crbug.com/40282036): Fails on latest versions of ChromeOS.
 #define MAYBE_ContextMenus3 ContextMenus3
 VIEW_TEST(BookmarkBarViewTest17, MAYBE_ContextMenus3)
 

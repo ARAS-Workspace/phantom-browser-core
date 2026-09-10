@@ -28,7 +28,7 @@ bool IsAccessAllowed(const std::string& path,
 
 TEST(ChromeNetworkDelegateStaticTest, IsAccessAllowed) {
 #if BUILDFLAG(IS_ANDROID)
-  // Chrome OS and Android don't have access to random files.
+  // Android doesn't have access to random files.
   EXPECT_FALSE(IsAccessAllowed("/", ""));
   EXPECT_FALSE(IsAccessAllowed("/foo.txt", ""));
   // Empty path should not be allowed.

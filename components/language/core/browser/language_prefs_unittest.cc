@@ -74,7 +74,6 @@ TEST_F(LanguagePrefsTest, UpdateLanguageList) {
 }
 
 TEST_F(LanguagePrefsTest, UpdateForcedLanguageList) {
-  // Only test policy-forced languages on non-Chrome OS platforms.
   language::test::LanguagePrefTester content_languages_tester =
       language::test::LanguagePrefTester(prefs_.get());
   // Empty update.

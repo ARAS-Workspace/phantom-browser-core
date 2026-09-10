@@ -77,8 +77,6 @@ class DeviceOAuth2TokenStore {
 
   // Requests that this store persist the current service account's associated
   // email.
-  // On ChromeOS, the account email comes from CrosSettings so this should never
-  // be called.
   virtual void SetAccountEmail(const std::string& account_email) = 0;
 
   void SetObserver(Observer* observer) { observer_ = observer; }

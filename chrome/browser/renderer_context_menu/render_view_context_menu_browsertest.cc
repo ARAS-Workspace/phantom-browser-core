@@ -844,7 +844,6 @@ IN_PROC_BROWSER_TEST_F(GlicContextMenuMetricsBrowserTest,
   histogram_tester.ExpectBucketCount("Glic.WebContentsContextMenu.Page", 0, 1);
 }
 
-// TODO(crbug.com/455524503): De-flake and re-enable on ChromeOS.
 #define MAYBE_SaveLinkAsEntryIsDisabledForBlockedUrls \
   SaveLinkAsEntryIsDisabledForBlockedUrls
 // Verifies "Save link as" is not enabled for links blocked via policy.
@@ -914,7 +913,6 @@ IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest,
   EXPECT_TRUE(menu->IsCommandIdEnabled(IDC_SAVE_PAGE));
 }
 
-// TODO(crbug.com/455524503): De-flake and re-enable on ChromeOS.
 #define MAYBE_SaveImageAsEntryIsDisabledForBlockedUrls \
   SaveImageAsEntryIsDisabledForBlockedUrls
 // Verifies "Save image as" is not enabled for links blocked via policy.
@@ -1649,8 +1647,6 @@ IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest,
   menu.ExecuteCommand(IDC_CONTENT_CONTEXT_EMOJI, 0);
 }
 
-// Only Chrome OS supports emoji panel callbacks.
-
 #if BUILDFLAG(ENABLE_COMPOSE)
 struct ContextMenuForComposeTestCase {
   std::string test_name;
@@ -2285,7 +2281,6 @@ IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, OpenImageInNewTab) {
   ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_OPENIMAGENEWTAB));
 }
 
-// Functionality is not present on ChromeOS.
 IN_PROC_BROWSER_TEST_F(ContextMenuBrowserTest, OpenLinkInProfileEntryPresent) {
   {
     std::unique_ptr<TestRenderViewContextMenu> menu(

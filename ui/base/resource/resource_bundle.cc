@@ -998,8 +998,6 @@ void ResourceBundle::InitSharedInstance(Delegate* delegate) {
 #endif
   ui::SetSupportedResourceScaleFactors(supported_scale_factors);
 
-// Register Png Decoder for use by DataURIResourceProviderProxy for embedded
-// images.
 }
 
 void ResourceBundle::FreeImages() {

@@ -363,7 +363,6 @@ IN_PROC_BROWSER_TEST_F(AccountChooserControllerInteractiveUiTest,
       Do([&waiter]() { EXPECT_TRUE(waiter.Wait()); }));
 }
 
-// TODO(481839673): Re-enable on ChromeOS.
 #define MAYBE_RemoveOneAccountFromMultipleAccounts \
   RemoveOneAccountFromMultipleAccounts
 
@@ -408,8 +407,6 @@ IN_PROC_BROWSER_TEST_F(AccountChooserControllerInteractiveUiTest,
       Do([&waiter]() { EXPECT_TRUE(waiter.Wait()); }));
 }
 
-// This test doesn't make sense for ChromeOS. ChromeOS requires at least one
-// account.
 // Steps:
 // 1. Call GetAccount with one account.
 // 2. Remove the account.

@@ -139,8 +139,6 @@ void SpeechRecognitionServiceImpl::BindAudioSourceFetcher(
       default_live_caption_language_, mask_offensive_words_,
       weak_factory_.GetWeakPtr());
 
-// On Chrome OS, CrosSpeechRecognitionRecognizerImpl will create its own
-// CrosSodaClient.
   recognizer->CreateSodaClient(binary_path_);
 
   const bool is_multi_channel_supported =

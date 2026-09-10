@@ -36,8 +36,6 @@ inline constexpr char kBrowserSettingsSearchEngineURL[] =
 inline constexpr char kCastNoDestinationFoundURL[] =
     "https://support.google.com/chromecast/?p=no_cast_destination";
 
-// General help links for Chrome, opened using various actions.
-
 // The chrome-native: scheme is used show pages rendered with platform specific
 // widgets instead of using HTML.
 inline constexpr char kChromeNativeScheme[] = "chrome-native";

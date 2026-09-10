@@ -106,8 +106,6 @@ IN_PROC_BROWSER_TEST_F(PrivateAiServiceBrowserTest,
   EXPECT_TRUE(host->IsTokenFetchEnabled());
 
   // Sign out.
-  //
-  // This functionality is not available on ChromeOS.
   identity_test_env()->ClearPrimaryAccount();
 
   // Token fetch should be disabled again.

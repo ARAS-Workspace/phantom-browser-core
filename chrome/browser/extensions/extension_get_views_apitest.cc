@@ -15,7 +15,6 @@
 
 namespace extensions {
 
-// Failed run on ChromeOS CI builder. https://crbug.com/40788517
 #define MAYBE_GetViews GetViews
 IN_PROC_BROWSER_TEST_F(ExtensionApiTest, MAYBE_GetViews) {
   ASSERT_TRUE(RunExtensionTest("get_views")) << message_;

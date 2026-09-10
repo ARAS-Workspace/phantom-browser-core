@@ -78,9 +78,7 @@ class DeviceOAuth2TokenService : public OAuth2AccessTokenManager::Delegate,
 
   OAuth2AccessTokenManager* GetAccessTokenManager();
 
-  // Used on non-ChromeOS platforms to set the email associated with the
-  // current service account. On ChromeOS, this function isn't used because
-  // the service account identity comes from CrosSettings.
+  // Used to set the email associated with the current service account.
   void SetServiceAccountEmail(const std::string& account_email);
 
   // Can be used to override the robot account ID for testing purposes. Most

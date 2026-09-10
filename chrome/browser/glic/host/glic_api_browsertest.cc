@@ -602,7 +602,6 @@ class GlicApiTestGeminiEnterpriseSettingsPolicyUnset
 
 // Checks that all tests in api_test.ts have a corresponding test case in this
 // file.
-// TODO(crbug.com/460826483): Enable on CrOS.
 #define MAYBE_testAllTestsAreRegistered testAllTestsAreRegistered
 IN_PROC_BROWSER_TEST_P(GlicApiTest, MAYBE_testAllTestsAreRegistered) {
   AssertAllTestsRegistered(GetTestSuiteNames());
@@ -1180,7 +1179,6 @@ IN_PROC_BROWSER_TEST_F(GlicApiTestWithOneTab,
   ContinueJsTest();
 }
 
-// TODO(crbug.com/460826488): Enable on ChromeOS.
 #define MAYBE_testFetchInactiveTabScreenshotWhileMinimized \
   testFetchInactiveTabScreenshotWhileMinimized
 IN_PROC_BROWSER_TEST_P(GlicApiTestWithOneTab,

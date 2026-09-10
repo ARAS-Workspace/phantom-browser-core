@@ -374,7 +374,6 @@ TEST_F(SyncServiceImplTest, SuccessfulLocalBackendInitialization) {
   EXPECT_FALSE(service()->IsSyncFeatureEnabled());
 }
 
-// ChromeOS Ash sets FirstSetupComplete automatically.
 // Verify that an initialization where first setup is not complete does not
 // start up Sync-the-feature.
 TEST_F(SyncServiceImplTest, NeedsConfirmation) {
@@ -481,8 +480,6 @@ TEST_F(SyncServiceImplTest, DisabledByPolicyBeforeInitThenPolicyRemoved) {
   EXPECT_FALSE(service()->IsSyncFeatureActive());
   EXPECT_TRUE(service()->GetDisableReasons().empty());
 
-  // For any platform except ChromeOS Ash, the user needs to turn sync on
-  // manually.
   ASSERT_FALSE(
       service()->GetUserSettings()->IsInitialSyncFeatureSetupComplete());
   service()->GetUserSettings()->SetInitialSyncFeatureSetupComplete();
@@ -533,11 +530,6 @@ TEST_F(SyncServiceImplTest, AbortedByShutdown) {
   ShutdownAndReleaseService();
 }
 
-// Certain SyncServiceImpl tests don't apply to Chrome OS, for example
-// things that deal with concepts like "signing out" or "transport mode"
-// (transport mode technically does exits on ChromeOS if Sync is disabled via
-// dashboard, but the behavior is not the same as on other platforms, e.g. the
-// user cannot enable individual types).
 // Test the user signing out before the backend's initialization completes.
 TEST_F(SyncServiceImplTest, EarlySignOut) {
   // Set up a fake sync engine that will not immediately finish initialization.
@@ -1095,7 +1087,6 @@ TEST_F(SyncServiceImplTest, CredentialsRejectedByClient_StopSync) {
   service()->RemoveObserver(&observer);
 }
 
-// CrOS Ash does not support signout.
 TEST_F(SyncServiceImplTest, SignOutRevokeAccessToken) {
   PopulatePrefsForInitialSyncFeatureSetupComplete();
   SignInWithSyncConsent();
@@ -1135,7 +1126,6 @@ TEST_F(SyncServiceImplTest, SignOutRevokeAccessToken) {
 
 // Verify that sync transport data is cleared when the service is initializing
 // and account is signed out.
-// This code path doesn't exist on ChromeOS-Ash, since signout is not possible.
 TEST_F(SyncServiceImplTest, ClearTransportDataOnInitializeWhenSignedOut) {
   PopulatePrefsForInitialSyncFeatureSetupComplete();
 
@@ -2233,8 +2223,6 @@ TEST_F(SyncServiceImplTest, ShouldRecordUserActionableErrorOnSyncPaused) {
       /*expected_bucket_count=*/1);
 }
 
-// These tests cover signing in after browser startup, which isn't supported on
-// ChromeOS-Ash (where there's always a signed-in user).
 TEST_F(
     SyncServiceImplTest,
     GetTypesWithPendingDownloadForInitialSyncDuringFirstSyncInTransportMode) {

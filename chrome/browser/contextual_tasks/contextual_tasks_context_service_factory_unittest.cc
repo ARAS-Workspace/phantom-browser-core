@@ -28,8 +28,6 @@ class ContextualTasksContextServiceFactoryTest : public testing::Test {
   base::test::ScopedFeatureList feature_list_;
 };
 
-// ChromeOS requires a separate flag for the passage embedder, so just skip
-// this test on ChromeOS.
 TEST_F(ContextualTasksContextServiceFactoryTest, CreatesServiceForProfile) {
   feature_list_.InitWithFeatures(
       {kContextualTasksContext, passage_embeddings::kPassageEmbedder}, {});

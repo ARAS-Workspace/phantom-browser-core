@@ -470,7 +470,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksEphemeralButtonInteractiveTest,
           ContextualTasksCloseTabButton::kContextualTasksCloseTabButton));
 }
 
-// Immersive fullscreen mode is only supported on ChromeOS and macOS.
+// Immersive fullscreen mode is only supported on macOS.
 #if BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(ContextualTasksEphemeralButtonInteractiveTest,
                        CloseButtonHiddenInImmersiveMode) {

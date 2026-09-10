@@ -316,8 +316,6 @@ INSTANTIATE_TEST_SUITE_P(
     });
 #endif  // BUILDFLAG(ENABLE_WEBUI_GENERATE_CODE_CACHE)
 
-// ChromeOS has a different concept of guest profile, so we will only test
-// standard desktop behavior.
 #define MAYBE_GuestModeSplitViewFavicons GuestModeSplitViewFavicons
 IN_PROC_BROWSER_TEST_F(TabSearchUIBrowserTest,
                        MAYBE_GuestModeSplitViewFavicons) {

@@ -1818,5 +1818,3 @@ void ReadAnythingUntrustedPageHandler::
       DependencyParserModelLoaderFactory::GetForProfile(profile_);
   std::move(callback).Run(loader->GetDependencyParserModelFile());
 }
-
-// ash::SessionObserver

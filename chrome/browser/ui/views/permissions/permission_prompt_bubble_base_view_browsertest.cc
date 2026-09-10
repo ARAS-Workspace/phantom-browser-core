@@ -369,8 +369,6 @@ IN_PROC_BROWSER_TEST_F(PermissionPromptBubbleBaseViewBrowserTest,
   EXPECT_EQ(new_tab_observer.GetWebContents()->GetVisibleURL(), url);
 }
 
-// ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER is ChromeOS only.
-
 // Test that the quiet prompt disposition returns the same value when permission
 // is not considered abusive (currently only applicable for Notifications) vs.
 // when permission is not considered abusive.

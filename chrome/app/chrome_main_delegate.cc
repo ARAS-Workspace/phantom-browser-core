@@ -684,10 +684,6 @@ std::optional<int> ChromeMainDelegate::PostEarlyInitialization(
   // a ChromeNetworkDelegate attached that selectively allows cookies again.
   net::URLRequest::SetDefaultCookiePolicyToBlock();
 
-  // On Chrome OS, IPC (D-Bus, Crosapi) is required to create the FeatureList,
-  // which depends on policy from an OS service. So, initialize it at this
-  // timing.
-
   ChromeFeatureListCreator* chrome_feature_list_creator =
       chrome_content_browser_client_->startup_data()
           ->chrome_feature_list_creator();
@@ -715,8 +711,6 @@ std::optional<int> ChromeMainDelegate::PostEarlyInitialization(
     return CHROME_RESULT_CODE_UNSUPPORTED_PARAM;
   }
 #endif
-
-  // On Chrome OS, initialize D-Bus clients that depend on feature list.
 
 #if BUILDFLAG(IS_ANDROID)
   chrome_content_browser_client_->startup_data()->InitProfileKey();

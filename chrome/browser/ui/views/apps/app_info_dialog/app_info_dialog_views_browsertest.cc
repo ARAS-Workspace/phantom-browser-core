@@ -82,14 +82,14 @@ class AppInfoDialogBrowserTest : public DialogBrowserTest {
   scoped_refptr<const extensions::Extension> extension_;
 };
 
-// Invokes a dialog that shows details of an installed extension.
-// Flaky on ChromeOS. See https://crbug.com/40933370
+// Invokes a dialog that shows details of an installed extension. See
+// https://crbug.com/40933370
 #define MAYBE_InvokeUi_default InvokeUi_default
 IN_PROC_BROWSER_TEST_F(AppInfoDialogBrowserTest, MAYBE_InvokeUi_default) {
   ShowAndVerifyUi();
 }
 
-// Flaky on ChromeOS. See https://crbug.com/40932992
+// See https://crbug.com/40932992
 #define MAYBE_CreateShortcutsAfterExtensionUnloaded \
   CreateShortcutsAfterExtensionUnloaded
 IN_PROC_BROWSER_TEST_F(AppInfoDialogBrowserTest,

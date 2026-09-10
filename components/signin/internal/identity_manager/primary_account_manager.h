@@ -155,8 +155,6 @@ class PrimaryAccountManager : public ProfileOAuth2TokenServiceObserver {
   // Updates the primary account information from AccountTrackerService.
   void UpdatePrimaryAccountInfo();
 
-  // Signout API surfaces (not supported on ChromeOS, where signout is not
-  // permitted).
   // Clears the primary account, erasing all keys associated with the primary
   // account (also cancels all auth in progress).
   // It removes all accounts from the identity manager by revoking all refresh

@@ -350,7 +350,7 @@ IN_PROC_BROWSER_TEST_P(SingleClientValuableMetadataSyncTest,
 }
 
 // Verifies that signing out of the primary account clears all valuable entity
-// data and metadata from the local database. This test is disabled on ChromeOS.
+// data and metadata from the local database.
 IN_PROC_BROWSER_TEST_P(SingleClientValuableMetadataSyncTest, ClearOnSignOut) {
   const EntityInstance server_vehicle = CreateServerVehicleEntityInstance();
   InjectEntitiesToServer({server_vehicle});

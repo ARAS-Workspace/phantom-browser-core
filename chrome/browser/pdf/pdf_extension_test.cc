@@ -2711,7 +2711,6 @@ IN_PROC_BROWSER_TEST_P(PDFExtensionTest, CtrlWheelInvokesCustomZoom) {
                                std::move(send_ctrl_wheel));
 }
 
-// Flaky on ChromeOS (https://crbug.com/41436172)
 #define MAYBE_TouchscreenPinchInvokesCustomZoom \
   TouchscreenPinchInvokesCustomZoom
 IN_PROC_BROWSER_TEST_P(PDFExtensionTest,

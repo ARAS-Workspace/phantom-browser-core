@@ -70,8 +70,7 @@ std::string GetLoadTimeClasses(bool in_dev_mode) {
 }
 
 bool IsGlobalShortcutEnabled() {
-// Disable the global scoped shortcuts on Android and ChromeOS since they're
-// no-ops.
+// Disable the global scoped shortcuts on Android since they're no-ops.
 #if BUILDFLAG(IS_ANDROID)
   return false;
 #else

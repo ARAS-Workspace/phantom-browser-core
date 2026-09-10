@@ -302,11 +302,6 @@ void RecordHandlerImpl::ReportUploader::OnUploadComplete(
     need_encryption_key_ = false;
   }
 
-  // Handle the configuration file.
-  // The server attaches the configuration file if it was requested
-  // by the client. Adding a check to make sure to only process it if the
-  // feature is enabled on the client side.
-
   // Check if a record was unprocessable on the server.
   StatusOr<EncryptedRecord> failed_uploaded_record =
       response_parser.gap_record_for_permanent_failure();

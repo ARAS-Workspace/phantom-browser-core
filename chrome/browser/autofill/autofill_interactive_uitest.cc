@@ -3214,8 +3214,6 @@ IN_PROC_BROWSER_TEST_P(AutofillInteractiveTestShadowDom,
   EXPECT_EQ("TX", Js("getState($1)"));
 }
 
-// ChromeVox is only available on ChromeOS.
-
 class AutofillInteractiveFormSubmissionTest
     : public AutofillInteractiveTestBase {
  public:

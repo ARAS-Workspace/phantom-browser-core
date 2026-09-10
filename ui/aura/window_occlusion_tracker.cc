@@ -423,7 +423,6 @@ void WindowOcclusionTracker::MaybeComputeOcclusion() {
               Window::OcclusionState::OCCLUDED) {
             SetWindowAndDescendantsAreOccluded(
                 root_window, /* is_occluded */ true, root_window->IsVisible());
-// TODO(crbug.com/40262710): Enable for other platforms in a separate CL.
           } else {
             SkRegion occluded_region = root_window_pair.second.occluded_region;
             SkIRect root_window_clip =

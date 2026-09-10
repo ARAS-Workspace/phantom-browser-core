@@ -81,7 +81,6 @@ class GlicProfileManagerBrowserTest : public InProcessBrowserTest {
     return static_cast<MockGlicKeyedService*>(service);
   }
 
-  // In ChromeOS, each regular profile is associated with a user session.
   Profile* CreateNewProfile(bool signin_and_allow_glic) {
     auto* profile_manager = g_browser_process->profile_manager();
     auto new_path = profile_manager->GenerateNextProfileDirectoryPath();

@@ -415,8 +415,7 @@ TEST_F(UniversalOptOutServiceTest,
   EXPECT_TRUE(service->IsEligible());
 
   // User signs out; falls back to signed-out location eligibility (ineligible
-  // here since us-ny != us-fl). ClearPrimaryAccount() is unsupported on
-  // ChromeOS.
+  // here since us-ny != us-fl).
   identity_test_env_.ClearPrimaryAccount();
   EXPECT_FALSE(service->IsEligible());
 }

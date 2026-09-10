@@ -127,9 +127,6 @@ class HistoryEmbeddingsInteractiveTest
   passage_embeddings::TestEnvironment passage_embeddings_test_env_;
 };
 
-// Opening the feedback dialog on CrOS open a system level dialog, which cannot
-// be easily tested here.
-
 // TODO(crbug.com/374710231): Reenable - currently, this fails consistently on
 // Win11 ARM debug builds.
 #if BUILDFLAG(IS_MAC)

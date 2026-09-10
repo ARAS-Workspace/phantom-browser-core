@@ -1224,9 +1224,6 @@ TEST_F(WebAppRegistrarTest, TestIsDefaultManagementInstalled) {
       app_id1, WebAppFilter::InstalledByDefaultManagement()));
 }
 
-// This test uses SetLinkCapturingUserPreference, which is not appropriate for
-// ChromeOS because link capturing preferences & overlapping scopes have custom
-// behavior on CrOS.
 TEST_F(WebAppRegistrarTest, AppsDoNotOverlapIfNestedScope) {
   StartWebAppProvider();
 
@@ -1968,9 +1965,6 @@ class WebAppRegistrarParameterizedTest
   base::test::ScopedFeatureList link_capturing_feature_list_;
 };
 
-// These tests use SetLinkCapturingUserPreference, which is not appropriate for
-// ChromeOS because link capturing preferences & overlapping scopes have custom
-// behavior on CrOS.
 TEST_P(WebAppRegistrarParameterizedTest, AppsOverlapIfSharesScope) {
   StartWebAppProvider();
 

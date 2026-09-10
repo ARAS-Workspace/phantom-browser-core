@@ -40,8 +40,7 @@ IN_PROC_BROWSER_TEST_F(ContentBrowserTest, ExpectedThreadPriorities) {
   base::ThreadType expected_priority;
   // In browser main loop the kDisplayCritical thread type is set.
 #if BUILDFLAG(IS_LINUX)
-  // TODO(40230522): ChromeOS and Linux result in a kDefault priority
-  // unexpectedly.
+  // TODO(40230522): Linux result in a kDefault priority unexpectedly.
   expected_priority = base::ThreadType::kDefault;
 #else
   expected_priority = base::ThreadType::kPresentation;

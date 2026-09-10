@@ -972,7 +972,6 @@ void DevToolsUIBindings::AgentHostClosed(
 }
 
 bool DevToolsUIBindings::MayWriteLocalFiles() {
-  // Do not allow local file system access via the front-end on Chrome OS.
   return true;
 }
 

@@ -1057,8 +1057,6 @@ bool DoesProfileDefaultToLoggingEnabled(const Profile* const profile,
     return false;
   }
 
-// For Chrome OS, exclude special profiles and users.
-
   // We only want a default of true for regular (i.e. logged-in) profiles
   // receiving cloud-based user-level enterprise policies. Supervised (child)
   // profiles are considered regular and can also receive cloud policies in some

@@ -921,10 +921,6 @@ void Label::PaintText(gfx::Canvas* canvas) {
   }
 
 #if DCHECK_IS_ON()
-  // TODO(crbug.com/40725997): Enable this DCHECK on ChromeOS by fixing either
-  // this check (to correctly idenfify more paints-on-opaque cases), refactoring
-  // parents to use background() or by fixing subpixel-rendering issues that the
-  // DCHECK detects.
   if (!display_text_ || display_text_->subpixel_rendering_suppressed() ||
       skip_subpixel_rendering_opacity_check_) {
     return;

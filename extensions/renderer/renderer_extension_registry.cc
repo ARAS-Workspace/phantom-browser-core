@@ -61,7 +61,6 @@ bool RendererExtensionRegistry::Insert(
     return extensions_.Insert(extension);
   }
 
-// TODO(crbug.com/456547093): Determine if this can be enabled for ChromeOS.
   // SW based extensions should always have an activation token, except for
   // incognito processes for a spanning mode extension. The CHECK() for all
   // other worker based extension is performed in

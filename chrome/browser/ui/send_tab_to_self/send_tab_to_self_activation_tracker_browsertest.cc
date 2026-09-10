@@ -45,8 +45,6 @@ class SendTabToSelfActivationTrackerBrowserTest : public InProcessBrowserTest {
   }
 };
 
-// TODO(crbug.com/503283050): Re-enable these tests on ChromeOS. Session
-// restore behaves differently or is flaky on ChromeOS integration tests.
 IN_PROC_BROWSER_TEST_F(SendTabToSelfActivationTrackerBrowserTest,
                        PRE_RestoreTrackerOnRestart) {
   // Enable session restore.

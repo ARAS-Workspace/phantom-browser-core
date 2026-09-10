@@ -398,8 +398,8 @@ IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest, CreateTargetWithFocus) {
 }
 
 #if BUILDFLAG(IS_MAC)
-// On ChromeOS and MacOS, the tabs are not backgrounded and unloaded in the same way as
-// on other platforms.
+// On MacOS, the tabs are not backgrounded and unloaded in the same way as on
+// other platforms.
 #define MAYBE_AutoAttachToUnloadedTab DISABLED_AutoAttachToUnloadedTab
 #else
 #define MAYBE_AutoAttachToUnloadedTab AutoAttachToUnloadedTab
@@ -1820,9 +1820,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionProtocolTest,
   auto detached = WaitForNotification("Target.detachedFromTarget", true);
   EXPECT_THAT(*detached.FindString("sessionId"), Eq("sessionId"));
 }
-
-// TODO(https://crbug.com/501442926): The following tests use guest view in a
-// Chrome App, which is only supported on ChromeOS.
 
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 

@@ -298,14 +298,8 @@ class ClientCertSource : public CertificateManagerPageHandler::CertSource {
 };
 
 #if BUILDFLAG(IS_LINUX)
-// ChromeOS currently can use either Kcer or NSS for listing client certs, and
-// Linux uses NSS only. This interface provides an abstraction to hide that
-// from WritableClientCertSource. Currently this class only handles reading
-// from the database and writing is still handled directly inside
-// WritableClientCertSource (even when Kcer is enabled, the ChromeOS code still
-// writes to both NSS and Kcer). Once NSS client cert support is removed on
-// ChromeOS, consider if things should be refactored as then NSS will only be
-// used on Linux and Kcer will only be used on ChromeOS.
+// This interface provides an abstraction to hide that from
+// WritableClientCertSource.
 class WritableCertLoader : public CertificateManagerPageHandler::CertSource {
  public:
   virtual void RefreshCachedCertificateList(base::OnceClosure callback) = 0;

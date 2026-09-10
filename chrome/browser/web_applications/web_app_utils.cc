@@ -247,12 +247,6 @@ content::BrowserContext* GetBrowserContextForWebApps(
     return profile;
   }
 
-  // On ChromeOS, the system web app implementation requires that incognito
-  // profiles can be used to look up the WebAppProvider of their original
-  // profile.
-  // TODO(https://crbug.com/384063076): Stop returning for profiles on ChromeOS
-  // where `AreWebAppsEnabled` returns `false`.
-
   return nullptr;
 }
 
@@ -297,8 +291,8 @@ base::FilePath GetWebAppsTempDirectory(
 }
 
 std::string_view GetProfileCategoryForLogging(Profile* profile) {
-  // Chrome OS profiles are different from non-ChromeOS ones. Because System Web
-  // Apps are not installed on non Chrome OS, "Other" is returned here.
+  // profiles are different from ones. Because System Web Apps are not installed
+  // on non "Other" is returned here.
   return "Other";
 }
 

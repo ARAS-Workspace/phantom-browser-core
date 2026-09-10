@@ -877,9 +877,6 @@ IN_PROC_BROWSER_TEST_F(PreinstalledWebAppManagerBrowserTest,
       app_id, WebAppFilter::InstalledByDefaultManagement()));
 }
 
-// The offline manifest JSON config functionality is only available on Chrome
-// OS.
-
 class PreinstalledWebAppManagerPreferredAppForSupportedLinksBrowserTest
     : public PreinstalledWebAppManagerBrowserTest,
       public ::testing::WithParamInterface<

@@ -1320,9 +1320,8 @@ IN_PROC_BROWSER_TEST_F(ProfilePickerCreationFlowBrowserTest,
   profiles::testing::WaitForPickerUrl(GetSigninChromeSyncDiceUrl());
 }
 
-// Force signin is disabled on Linux and ChromeOS.
-// TODO(crbug.com/40235093): enable this test when enabling force sign in
-// on Linux.
+// Force signin is disabled on Linux. TODO(crbug.com/40235093): enable this test
+// when enabling force sign in on Linux.
 #if !BUILDFLAG(IS_LINUX)
 class ForceSigninProfilePickerCreationFlowBrowserTest
     : public ProfilePickerCreationFlowBrowserTest,

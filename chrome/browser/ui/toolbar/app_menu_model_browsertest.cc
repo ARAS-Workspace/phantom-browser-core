@@ -468,7 +468,6 @@ IN_PROC_BROWSER_TEST_P(ExtensionsMenuModelTest, ExtensionsMenu) {
   }
 }
 
-// Profile row does not show on ChromeOS.
 class TestAppMenuModelMetricsTest : public AppMenuModelTest,
                                     public testing::WithParamInterface<int> {
  public:

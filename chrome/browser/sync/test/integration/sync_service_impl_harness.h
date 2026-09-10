@@ -78,8 +78,7 @@ class SyncServiceImplHarness {
   // This is similar to click the reset button on chrome.google.com/data.
   [[nodiscard]] bool ResetSyncForPrimaryAccount();
 
-  // Signs out of the primary account. ChromeOS doesn't have the concept of
-  // sign-out, so this only exists on other platforms.
+  // Signs out of the primary account.
   void SignOutPrimaryAccount();
 
   // The underlying implementation for mimic-ing persistent auth errors isn't

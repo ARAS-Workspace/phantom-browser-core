@@ -101,8 +101,6 @@ void AddCaptionSubpageStrings(content::WebUIDataSource* html_source) {
       {"defaultLanguageLabel", IDS_SETTINGS_CAPTIONS_DEFAULT_LANGUAGE_LABEL},
   };
   html_source->AddLocalizedStrings(kLocalizedStrings);
-  // Add the caption subtitle string conditionally so that non-cbx chromebooks
-  // do not show live translate information.
   html_source->AddLocalizedString(
       "captionsManageLanguagesSubtitle",
       IDS_SETTINGS_CAPTIONS_MANAGE_LANGUAGES_SUBTITLE);

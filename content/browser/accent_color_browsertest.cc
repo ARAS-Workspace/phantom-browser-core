@@ -27,7 +27,7 @@ namespace content {
 
 // Test that the System AccentColor keyword is supported ONLY for installed
 // WebApps on the browser's initial ("Default") profile. Currently this test is
-// applied ONLY for ChromeOS and Mac.
+// applied ONLY for Mac.
 #if BUILDFLAG(IS_MAC)
 
 enum class AppType { WebApp, NoneWebApp };

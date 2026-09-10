@@ -50,8 +50,7 @@ VideoTestEnvironment::VideoTestEnvironment(
   if (need_task_environment) {
     TestTimeouts::Initialize();
     task_environment_ = std::make_unique<base::test::TaskEnvironment>(
-// Not sure why on CrOS this needs to be UI thread type? On Windows we use
-// the default type.
+// On Windows we use the default type.
 #if BUILDFLAG(IS_LINUX)
         base::test::TaskEnvironment::MainThreadType::UI
 #else

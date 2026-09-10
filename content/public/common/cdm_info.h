@@ -23,7 +23,6 @@
 namespace content {
 
 #if BUILDFLAG(USE_CHROMEOS_PROTECTED_MEDIA)
-// CdmType for Chrome OS.
 const CONTENT_EXPORT media::CdmType kChromeOsCdmType{0xa6ecd3fc63b3ded2ull,
                                                      0x9306d3270227ce5full};
 #endif  // BUILDFLAG(USE_CHROMEOS_PROTECTED_MEDIA)

@@ -1045,9 +1045,6 @@ void AutofillPrivateGetLocalCardFunction::ReturnCreditCard() {
 
 ExtensionFunction::ResponseAction
 AutofillPrivateCheckIfDeviceAuthAvailableFunction::Run() {
-  // TODO(crbug.com/467173735): Check with ChromeOS team on the implementation
-  // details. It is still in active discussion with the ChromeOS team on how to
-  // implement this.
 #if BUILDFLAG(IS_MAC)
   autofill::ContentAutofillClient* client =
       autofill::ContentAutofillClient::FromWebContents(GetSenderWebContents());

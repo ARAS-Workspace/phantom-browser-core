@@ -111,8 +111,7 @@ TEST_F(AccountExtensionTrackerUnitTest, AccountExtensionTypeSignedIn) {
 }
 
 // Same as the above test, except this uses transport mode (signed in but not
-// syncing) instead of sync, and an explicit user sign in. Not run for ChromeOS
-// because the user should not be able to sign into transport mode in ChromeOS.
+// syncing) instead of sync, and an explicit user sign in.
 TEST_F(AccountExtensionTrackerUnitTest, AccountExtensionTypeTransportMode) {
   // The extension's AccountExtensionType is `kLocal` because the user has not
   // explicitly signed in yet.

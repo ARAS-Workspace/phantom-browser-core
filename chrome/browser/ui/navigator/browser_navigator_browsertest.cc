@@ -1541,7 +1541,6 @@ IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
             browser()->tab_strip_model()->GetActiveWebContents()->GetURL());
 }
 
-// TODO(crbug.com/40107334): Timing out on linux-chromeos-dbg.
 #define MAYBE_NavigateFromBlankToOptionsInSameTab \
   NavigateFromBlankToOptionsInSameTab
 IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
@@ -1561,7 +1560,6 @@ IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
             browser()->tab_strip_model()->GetActiveWebContents()->GetURL());
 }
 
-// TODO(crbug.com/40107334): Timing out on linux-chromeos-dbg.
 #define MAYBE_NavigateFromNTPToOptionsInSameTab \
   NavigateFromNTPToOptionsInSameTab
 IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
@@ -1756,7 +1754,6 @@ IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
             browser()->tab_strip_model()->GetActiveWebContents()->GetURL());
 }
 
-// TODO(crbug.com/40107334): Timing out on linux-chromeos-dbg.
 #define MAYBE_CloseSingletonTab CloseSingletonTab
 IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest, MAYBE_CloseSingletonTab) {
   for (int i = 0; i < 2; ++i) {
@@ -2198,8 +2195,7 @@ IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
 // This class extends the basic logic in display::ScreenBase to allow us to mock
 // the call to `GetDisplayNearestWindow`. This provides a way to ensure that the
 // opener window is on a specific display, since the display::ScreenBase
-// implementation only ever returns the primary display. This is not needed on
-// Ash since Ash uses DisplayManagerTestApi.
+// implementation only ever returns the primary display.
 class MockScreen : public display::ScreenBase {
  public:
   MockScreen() = default;

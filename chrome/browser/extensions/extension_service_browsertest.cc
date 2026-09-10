@@ -140,8 +140,6 @@ class ExtensionServiceBrowserTest : public ExtensionBrowserTest {
   ~ExtensionServiceBrowserTest() override = default;
 };
 
-// ChromeOS does not support multiple profiles. Hence excluding this test from
-// ChromeOS.
 // Tests that ExtensionService does not observe host events after
 // ExtensionService::Shutdown() has been executed.
 IN_PROC_BROWSER_TEST_F(ExtensionServiceBrowserTest,

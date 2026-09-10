@@ -28,10 +28,6 @@ ProxyServiceFactory::CreateProxyConfigService(PrefProxyConfigTracker* tracker,
 
   std::unique_ptr<net::ProxyConfigService> base_service;
 
-  // On ChromeOS, base service is NULL; ash::ProxyConfigServiceImpl
-  // determines the effective proxy config to take effect in the network layer,
-  // be it from prefs or system (which is network shill on chromeos).
-
   // For other platforms, create a baseline service that provides proxy
   // configuration in case nothing is configured through prefs (Note: prefs
   // include command line and configuration policy).

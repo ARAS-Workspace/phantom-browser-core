@@ -3687,9 +3687,6 @@ RenderWidgetHostImpl::BindAndGenerateCreateFrameWidgetParams() {
   // pipes if this method is called again.
   initial_frame_sink_pipes_.reset();
 
-  // We currently skip the early frame sink creation optimization on ChromeOS
-  // due to issues with tab-dragging on tablet mode.
-  // TODO(crbug.com/496408117): Make this work on ChromeOS too.
   // We can't do early frame sink creation if synchronous compositor is used.
   const bool using_sync_compositing =
 #if BUILDFLAG(IS_ANDROID)

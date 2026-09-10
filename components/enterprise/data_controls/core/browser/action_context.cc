@@ -19,13 +19,6 @@ bool ActionSource::empty() const {
 }
 
 bool ActionDestination::empty() const {
-  // `ActionDestination` should represent either:
-  // - A browser tab with the `url`, `incognito` and/or `other_profile` fields.
-  //   The `url` field can be empty if the tab has no committed navigation.
-  // - The OS clipboard with `os_clipboard` set to true.
-  // - The integrated Gemini browser agent (Glic) with `gemini_in_chrome` set
-  //   to true.
-  // - A separate application represented by `component` (CrOS-only).
   return url.is_empty() && !incognito && !other_profile && !os_clipboard &&
          !gemini_in_chrome;
 }

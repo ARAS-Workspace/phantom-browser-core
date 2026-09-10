@@ -399,13 +399,10 @@ TabDragController::Liveness TabDragController::Init(
           kTabDraggingPresentationTimeMaxHistogram,
           ui::PresentationTimeRecorder::BucketParams::CreateWithMaximum(
               base::Seconds(10)));
-  // Do not release capture when transferring capture between widgets on:
-  // - Desktop Linux
-  //     Mouse capture is not synchronous on desktop Linux. Chrome makes
-  //     transferring capture between widgets without releasing capture appear
-  //     synchronous on desktop Linux, so use that.
-  // - ChromeOS Ash
-  //     Releasing capture on Ash cancels gestures so avoid it.
+  // Do not release capture when transferring capture between widgets on
+  // desktop Linux: mouse capture is not synchronous there. Chrome makes
+  // transferring capture between widgets without releasing capture appear
+  // synchronous on desktop Linux, so use that.
 #if BUILDFLAG(IS_LINUX)
   ref->can_release_capture_ = false;
 #endif
@@ -1036,9 +1033,6 @@ TabDragController::Liveness TabDragController::DragBrowserToNewTabStrip(
 #endif
 
   if (current_state_ == DragState::kDraggingWindow) {
-    // ReleaseCapture() is going to result in calling back to us (because it
-    // results in a move). That'll cause all sorts of problems.  Reset the
-    // observer so we don't get notified and process the event.
     views::Widget* browser_widget = GetAttachedBrowserWidget();
     // Disable animations so that we don't see a close animation on aero.
     browser_widget->SetVisibilityChangedAnimationsEnabled(false);
@@ -1764,10 +1758,9 @@ TabDragController::Liveness TabDragController::RunMoveLoop(
 
   move_loop_widget_ = GetAttachedBrowserWidget();
   DCHECK(move_loop_widget_);
-  // In ChromeOS, `SetBounds` is not used to avoid accidentally moving the
-  // window to a different display. `drag_offset` is used to calculate initial
-  // location in ToplevelWindowEventHandler.
-  // TODO(crbug.com/508016410): Verify if this is necessary and remove it.
+  // `drag_offset` is used to calculate initial location in
+  // ToplevelWindowEventHandler. TODO(crbug.com/508016410): Verify if this is
+  // necessary and remove it.
   move_loop_widget_->SetBounds(
       gfx::Rect(point_in_screen - drag_offset, move_loop_widget_->GetSize()));
   widget_observation_.Reset();
@@ -2664,8 +2657,7 @@ BrowserWindowInterface* TabDragController::CreateBrowserForDrag(
       ->SetCanAppearInExistingFullscreenSpaces(true);
 
   // If the window is created maximized then the bounds we supplied are ignored.
-  // We need to reset them again so they are honored. On ChromeOS, this is
-  // handled in NativeWidgetAura.
+  // We need to reset them again so they are honored.
   if (!open_as_web_app) {
     browser->GetWindow()->SetBounds(gfx::Rect(initial_size));
   }

@@ -81,7 +81,6 @@ class SyncPrefs {
   // enable sync-the-feature.
   bool IsInitialSyncFeatureSetupComplete() const;
 
-  // ChromeOS Ash, IsInitialSyncFeatureSetupComplete() always returns true.
   void SetInitialSyncFeatureSetupComplete();
   void ClearInitialSyncFeatureSetupComplete();
 

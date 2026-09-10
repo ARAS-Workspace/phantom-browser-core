@@ -168,7 +168,7 @@ BASE_FEATURE(kRemoveGPULegacyIPC, base::FEATURE_DISABLED_BY_DEFAULT);
 
 #if BUILDFLAG(IS_LINUX)
 // Feature flag to control whether SharedImageStub sequence uses high priority
-// on ChromeOS and Linux. Enabled by default.
+// on Linux. Enabled by default.
 BASE_FEATURE(kSharedImageStubHighPriority, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif
 
@@ -410,8 +410,6 @@ bool SkiaGraphiteUsesPersistentCache() {
 }
 
 BASE_FEATURE(kConditionallySkipGpuChannelFlush,
-// To enable on ChromeOS, test failures must be investigated
-// (crrev.com/c/5435673).
              base::FEATURE_ENABLED_BY_DEFAULT
 );
 

@@ -761,8 +761,6 @@ TEST_F(NotificationViewBaseTest, MAYBE_DisableSlideForcibly) {
   EXPECT_FALSE(IsRemovedAfterIdle(kDefaultNotificationId));
 }
 
-// Pinning notification is ChromeOS only feature.
-
 TEST_F(NotificationViewBaseTest, UseImageAsIcon) {
   // TODO(tetsui): Remove duplicated integer literal in CreateOrUpdateIconView.
   const int kIconSize = 30;
@@ -883,8 +881,7 @@ TEST_F(NotificationViewBaseTest, InlineSettings) {
   generator.ClickLeftButton();
   EXPECT_TRUE(notification_view()->settings_row_->GetVisible());
 
-  // By clicking settings button again, it will toggle. Skip this on ChromeOS as
-  // the control_buttons_view gets hidden when the inline settings are shown.
+  // By clicking settings button again, it will toggle.
   generator.ClickLeftButton();
   EXPECT_FALSE(notification_view()->settings_row_->GetVisible());
 

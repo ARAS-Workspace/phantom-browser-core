@@ -125,8 +125,6 @@ IN_PROC_BROWSER_TEST_F(AutocompleteBrowserTest, Basic) {
   EXPECT_FALSE(omnibox_view->IsSelectAll());
 }
 
-// Autocomplete test is flaky on ChromeOS.
-// http://crbug.com/41200172
 #define MAYBE_Autocomplete Autocomplete
 
 IN_PROC_BROWSER_TEST_F(AutocompleteBrowserTest, MAYBE_Autocomplete) {

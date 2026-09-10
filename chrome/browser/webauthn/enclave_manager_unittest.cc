@@ -3049,9 +3049,6 @@ TEST_F(OpportunisticKeyRetrievalEnclaveUVTest,
   // version is non-zero.
 }
 
-// On Chrome OS, `AreUserVerifyingKeysSupported` always returns true, thus this
-// test cannot establish its preconditions.
-
 TEST_F(OpportunisticKeyRetrievalEnclaveUVTest,
        OpportunisticStoreKeysNoUVButHasUsableGpmPin) {
   const std::string pin = "123456";

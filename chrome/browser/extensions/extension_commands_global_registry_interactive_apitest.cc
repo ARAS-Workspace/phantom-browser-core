@@ -29,8 +29,6 @@ using GlobalCommandsApiTest = ExtensionApiTest;
 // doesn't have focus. Also test that non-global commands are not treated as
 // global and that keys beyond Ctrl+Shift+[0..9] cannot be auto-assigned by an
 // extension.
-//
-// Doesn't work in CrOS builds, http://crbug.com/41258695
 #define MAYBE_GlobalCommand GlobalCommand
 IN_PROC_BROWSER_TEST_F(GlobalCommandsApiTest, MAYBE_GlobalCommand) {
   // Load the extension in the non-incognito browser.

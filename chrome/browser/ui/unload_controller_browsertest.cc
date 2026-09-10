@@ -101,7 +101,6 @@ IN_PROC_BROWSER_TEST_P(UnloadControllerPreventCloseTest,
             unload_controller->GetBrowserClosingStatus());
 }
 
-// Flaky on IS_CHROMEOS. crbug.com/369817361
 #define MAYBE_PreventCloseEnforcedByPolicyTabbedAppShallBeClosable \
   PreventCloseEnforcedByPolicyTabbedAppShallBeClosable
 IN_PROC_BROWSER_TEST_P(

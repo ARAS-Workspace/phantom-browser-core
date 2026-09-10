@@ -112,15 +112,6 @@ class WebUIUrlNoConsoleErrorsTest : public WebUIAllUrlsBrowserTest {
   base::test::ScopedFeatureList webui_omnibox_feature_list_;
 };
 
-// Verify that there's no console errors when loading any `kChromeUrls`.
-// Note: If one test case fails, move the failing WebUI URL to the
-// untested list in webui_urls_for_test.h or to the list of failures
-// in this file. DO NOT globally disable all tests in this suite, this
-// causes valuable test coverage to be lost for new and existing UIs.
-// TODO(crbug.com/544452049): Re-enable this test.
-// The failing URLs are
-// - new_tab_page
-// - newtab
 #define MAYBE_NoConsoleErrors NoConsoleErrors
 IN_PROC_BROWSER_TEST_P(WebUIUrlNoConsoleErrorsTest, MAYBE_NoConsoleErrors) {
   CheckNoConsoleErrors(GetParam());

@@ -180,10 +180,8 @@ ChromeDevToolsManagerDelegate::ChromeDevToolsManagerDelegate() {
   DCHECK(!g_instance);
   g_instance = this;
 
-  // Only create and hold keep alive for automation test for non ChromeOS.
-  // ChromeOS automation test (aka tast) manages chrome instance via session
-  // manager daemon. The extra keep alive is not needed and makes ChromeOS
-  // not able to shutdown chrome properly. See https://crbug.com/40167603.
+  // Only create and hold keep alive for automation test for non. See
+  // https://crbug.com/40167603.
   base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
   if ((command_line->HasSwitch(switches::kNoStartupWindow) ||
        command_line->HasSwitch(switches::kHeadless)) &&

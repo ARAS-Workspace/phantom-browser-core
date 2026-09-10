@@ -83,8 +83,6 @@ class MessageViewTest : public views::ViewsTestBase {
   std::unique_ptr<views::Widget> widget_;
 };
 
-// Updating control buttons visibility is a ChromeOS only feature.
-
 TEST_F(MessageViewTest, AccessibleAttributes) {
   ui::AXNodeData data;
   message_view()->GetViewAccessibility().GetAccessibleNodeData(&data);

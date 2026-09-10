@@ -1780,7 +1780,6 @@ IN_PROC_BROWSER_TEST_F(ReadAnythingUntrustedPageHandlerDistillerTest,
   handler_->OnActiveAXTreeIDChanged();
 }
 
-// TODO(crbug.com/531483974): Failing on ChromiumOS Msan.
 #define MAYBE_DistillationPopulatesContent DistillationPopulatesContent
 IN_PROC_BROWSER_TEST_F(ReadAnythingUntrustedPageHandlerDistillerTest,
                        MAYBE_DistillationPopulatesContent) {

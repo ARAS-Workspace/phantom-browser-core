@@ -718,9 +718,9 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   EXPECT_LE(style_duration, duration);
 
 #if !BUILDFLAG(IS_ANDROID)
-  // On Android emulators and ChromeOS, timing discrepancies between the LoAF
-  // API and tracing may be too large to reliably compare. Skip the
-  // tolerance-based assertions on these platforms.
+  // On Android emulators, timing discrepancies between the LoAF API and tracing
+  // may be too large to reliably compare. Skip the tolerance-based assertions
+  // on these platforms.
   TraceStyleResult trace_result = GetStyleDurationFromTrace(trace_str);
   double trace_style_duration = trace_result.total_duration_ms;
   double api_total_style = style_duration + total_forced_style_duration;
@@ -800,9 +800,9 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   EXPECT_LE(style_duration, duration);
 
 #if !BUILDFLAG(IS_ANDROID)
-  // On Android emulators and ChromeOS, timing discrepancies between the LoAF
-  // API and tracing may be too large to reliably compare. Skip the
-  // tolerance-based assertions on these platforms.
+  // On Android emulators, timing discrepancies between the LoAF API and tracing
+  // may be too large to reliably compare. Skip the tolerance-based assertions
+  // on these platforms.
   TraceStyleResult trace_result = GetStyleDurationFromTrace(trace_str);
   double trace_style_duration = trace_result.total_duration_ms;
   double api_total_style = style_duration + total_forced_style_duration;
@@ -991,9 +991,9 @@ IN_PROC_BROWSER_TEST_F(LongAnimationFrameStyleDurationBrowserTest,
   EXPECT_NEAR(sum_forced, total_forced_style_and_layout_duration, 1.0);
 
 #if !BUILDFLAG(IS_ANDROID)
-  // On Android emulators and ChromeOS, timing discrepancies between the LoAF
-  // API and tracing may be too large to reliably compare. Skip the
-  // tolerance-based assertions on these platforms.
+  // On Android emulators, timing discrepancies between the LoAF API and tracing
+  // may be too large to reliably compare. Skip the tolerance-based assertions
+  // on these platforms.
   TraceLayoutResult trace_result = GetLayoutDurationFromTrace(trace_str);
   double trace_layout_duration = trace_result.total_duration_ms;
   double api_total_layout = layout_duration + total_forced_layout_duration;

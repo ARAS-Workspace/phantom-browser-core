@@ -2200,7 +2200,6 @@ TEST_F(BlocklistedExtensionSyncServiceTest, InstallBlocklistedExtension) {
   EXPECT_TRUE(processor()->changes().empty());
 }
 
-// Users should not be able to sign into transport mode on ChromeOS.
 class ExtensionSyncServiceTransportModeTest : public ExtensionSyncServiceTest {
  public:
   ExtensionSyncServiceTransportModeTest() = default;

@@ -181,7 +181,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientExtensionsSyncTest, UninstallWinsConflicts) {
   EXPECT_EQ(0ul, server_extensions.size());
 }
 
-// TODO(crbug.com/328400930): Investigate why these tests fail on ChromeOS.
 class SingleClientExtensionsMigrateSyncingUserToSignedInSyncTest
     : public SyncTest {
  public:

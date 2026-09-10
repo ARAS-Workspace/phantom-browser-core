@@ -29,9 +29,6 @@
 #endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
-#endif
-
-#if BUILDFLAG(ENABLE_DICE_SUPPORT)
 #include "chrome/browser/ui/webui/signin/cross_device_signin_qr_bubble/cross_device_signin_qr_bubble.mojom.h"
 #include "chrome/browser/ui/webui/signin/cross_device_signin_qr_bubble_ui.h"
 #include "chrome/browser/ui/webui/signin/signout_confirmation/signout_confirmation.mojom.h"

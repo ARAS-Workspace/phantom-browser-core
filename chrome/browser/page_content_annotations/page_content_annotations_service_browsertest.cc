@@ -2488,7 +2488,6 @@ IN_PROC_BROWSER_TEST_P(PageContentAnnotationsServiceContentExtractionPdfTest,
   }
 }
 
-// TODO(crbug.com/517335503): Re-enable this test on ChromeOS.
 #define MAYBE_TwoPDFPageLoads TwoPDFPageLoads
 IN_PROC_BROWSER_TEST_P(PageContentAnnotationsServiceContentExtractionPdfTest,
                        MAYBE_TwoPDFPageLoads) {

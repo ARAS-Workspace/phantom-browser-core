@@ -144,9 +144,8 @@ TEST_F(UnifiedConsentServiceTest, EnableUrlKeyedAnonymizedDataCollection) {
       prefs::kUrlKeyedAnonymizedDataCollectionEnabled));
 }
 
-// Tests that in all cases, on non-ChromeOS, initializing the
-// UnifiedConsentService does not affect the
-// UrlKeyedAnonymizedDataCollectionEnabled state.
+// Tests that in all cases, initializing the UnifiedConsentService does not
+// affect the UrlKeyedAnonymizedDataCollectionEnabled state.
 TEST_F(UnifiedConsentServiceTest,
        ReplaceSync_InitializeNoChangeToUrlKeyedAnonymizedDataCollection) {
   base::test::ScopedFeatureList scoped_feature_list(

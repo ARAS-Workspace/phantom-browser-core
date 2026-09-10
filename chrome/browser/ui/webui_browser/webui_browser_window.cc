@@ -272,9 +272,8 @@ WebUIBrowserWindow* WebUIBrowserWindow::FromNativeWindow(
 // BrowserView::Show().
 void WebUIBrowserWindow::Show() {
   // The Browser associated with this browser window must become the active
-  // browser at the time Show() is called. This is the natural behavior under
-  // Chrome OS, but other platforms will not trigger OnWidgetActivationChanged()
-  // until we return to the runloop. Therefore any calls to
+  // browser at the time Show() is called. Other platforms will not trigger
+  // OnWidgetActivationChanged() until we return to the runloop, so any calls to
   // Browser::GetLastActive() will return the wrong result if we do not
   // explicitly set it here.
   BrowserActiveStateManager::From(browser_)->DidBecomeActive();

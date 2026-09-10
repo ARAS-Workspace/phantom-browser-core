@@ -37,7 +37,7 @@ class TabResourceUsageCollectorBrowserTest : public InProcessBrowserTest {
   TabStripModel* GetTabStripModel() { return browser()->tab_strip_model(); }
 };
 
-// TODO(crbug.com/368862390): This test fails on ChromeOS and Mac builds.
+// TODO(crbug.com/368862390): This test fails on Mac builds.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_RefreshAllTabMemory DISABLED_RefreshAllTabMemory
 #else

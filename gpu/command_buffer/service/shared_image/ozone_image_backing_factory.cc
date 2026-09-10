@@ -348,14 +348,12 @@ bool OzoneImageBackingFactory::CanVulkanSynchronizeGpuFence() {
 }
 
 bool OzoneImageBackingFactory::CanImportNativePixmapToWebGPU() {
-  // Disable all WebGPU ozone usage for non-Chromeos Ozone (Fuchsia, Linux).
-  // WebGPU on non-ChromeOS will now go through the ExternalVkImageBacking. Long
-  // term we will return to using the ozone backing on devices that have sync
-  // fences.
-  // TODO(crbug.com/330385376): Support dynamic switching of fence types in
-  // dawn and runtime extension testing.
-  // This testing in runtime can be done where graphite is enabled by checking
-  // against features in the 'dawn_context_provider' in the
+  // Disable all WebGPU ozone usage Ozone (Fuchsia, Linux). WebGPU will now go
+  // through the ExternalVkImageBacking. Long term we will return to using the
+  // ozone backing on devices that have sync fences. TODO(crbug.com/330385376):
+  // Support dynamic switching of fence types in dawn and runtime extension
+  // testing. This testing in runtime can be done where graphite is enabled by
+  // checking against features in the 'dawn_context_provider' in the
   // 'shared_context_state_'.
   return false;
 }

@@ -826,7 +826,6 @@ class ProcessingBasedContainer {
       const media::AudioParameters& device_parameters,
       bool is_full_reconfiguration_allowed) {
     BoolSet voice_isolation_set;
-    // Voice Isolation is only supported on ChromeOS.
     voice_isolation_set = BoolSet({false});
     return ProcessingBasedContainer(
         ProcessingType::kNoApmProcessed, {EchoCancellationMode::kDisabled},

@@ -685,8 +685,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientSyncInvalidationsTest,
       GURL(kSyncedBookmarkURL)));
 }
 
-// ChromeOS doesn't have the concept of sign-out.
-
 // TODO(crbug.com/40833316): Enable test on Android once signout is supported.
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_SignoutAndSignin DISABLED_SignoutAndSignin

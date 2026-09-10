@@ -199,9 +199,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientReadingListSyncTest,
           MatchesDeletionOrigin(version_info::GetVersionNumber(), kLocation)));
 }
 
-// ChromeOS doesn't have the concept of sign-out, so this only exists on other
-// platforms.
-
 IN_PROC_BROWSER_TEST_P(SingleClientReadingListSyncTest,
                        ShouldDeleteAccountDataUponSignout) {
   if (GetParam() == SyncTest::SetupSyncMode::kSyncTheFeature) {

@@ -118,8 +118,8 @@ IN_PROC_BROWSER_TEST_F(MultiContentsViewDropTargetControllerBrowserTest,
   EXPECT_FALSE(IsDropTimerRunning());
 }
 
-// On Linux  and ChromeOS there are test-only discreptencies between the screen
-// width and the maximized browser width, so these test need to be skipped.
+// On Linux there are test-only discreptencies between the screen width and the
+// maximized browser width, so these test need to be skipped.
 #if !BUILDFLAG(IS_LINUX)
 IN_PROC_BROWSER_TEST_F(MultiContentsViewDropTargetControllerBrowserTest,
                        OnTabDragUpdatedMaximizedWithStartPoint) {

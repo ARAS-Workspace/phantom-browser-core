@@ -588,12 +588,7 @@ class SegmentationPlatformUkmModelTest : public SegmentationPlatformTest {
   std::optional<ModelProvider::Request> input_feature_in_last_execution_;
 };
 
-// This test is disabled in CrOS because CrOS creates a signin profile that uses
-// incognito mode. This disables the segmentation platform data collection.
-// TODO(ssid): Fix this test for CrOS by waiting for signin profile to be
-// deleted at startup before adding metrics.
-// https://crbug.com/40276817 -- Flaky on Mac
-// https://crbug.com/40200835 -- Tests using "PRE_" don't work on Android.
+// This disables the segmentation platform data collection.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 #define MAYBE_PRE_RunUkmBasedModel DISABLED_PRE_RunUkmBasedModel
 #define MAYBE_RunUkmBasedModel DISABLED_RunUkmBasedModel

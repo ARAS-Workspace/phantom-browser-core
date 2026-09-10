@@ -100,8 +100,6 @@ AccessCodeCastIntegrationBrowserTest::~AccessCodeCastIntegrationBrowserTest() =
     default;
 
 void AccessCodeCastIntegrationBrowserTest::SetUp() {
-// This makes sure CastDeviceCache is not initialized until after the
-// MockMediaRouter is ready. (MockMediaRouter can't be constructed yet.)
   InProcessBrowserTest::SetUp();
 
   // This command removes the verify pixels switch so that our TestDialog code

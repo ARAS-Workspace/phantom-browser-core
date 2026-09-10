@@ -35,8 +35,6 @@ struct MESSAGE_CENTER_PUBLIC_EXPORT NotifierId {
   // Default constructor needed for generated mojom files and tests.
   NotifierId();
 
-// Constructor for non WEB_PAGE type. `catalog_name` is required for CrOS system
-// notifications.
   NotifierId(NotifierType type, const std::string& id);
 
   // Constructor for WEB_PAGE type.

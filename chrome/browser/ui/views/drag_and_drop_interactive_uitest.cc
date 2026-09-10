@@ -935,10 +935,8 @@ IN_PROC_BROWSER_TEST_P(DragAndDropBrowserTest, DropValidUrlFromOutside) {
   EXPECT_TRUE(ui_test_utils::IsViewFocused(browser(), VIEW_ID_TAB_CONTAINER));
 }
 
-// Scenario: drag a URL into the Omnibox.  This is a regression test for
+// Scenario: drag a URL into the Omnibox. This is a regression test for
 // https://crbug.com/40496018.
-// TODO(crbug.com/344168586): Very flaky on linux-chromeos-rel bots and
-// consistently failing on linux-chromeos-dbg.
 #define MAYBE_DropUrlIntoOmnibox DropUrlIntoOmnibox
 IN_PROC_BROWSER_TEST_P(DragAndDropBrowserTest, MAYBE_DropUrlIntoOmnibox) {
   std::string frame_site = use_cross_site_subframe() ? "b.test" : "a.test";
@@ -1193,7 +1191,6 @@ IN_PROC_BROWSER_TEST_P(DragAndDropBrowserTest, DragStartInFrame) {
 
 #if BUILDFLAG(IS_LINUX)
 // Failing to receive final drop event on linux crbug.com/40803504.
-// TODO(crbug.com/442927728): Fix failing test on ChromeOS
 #define MAYBE_DragSameOriginImageBetweenFrames \
   DISABLED_DragSameOriginImageBetweenFrames
 #else
@@ -1504,8 +1501,6 @@ void DragAndDropBrowserTest::DragImageBetweenFrames_Step3(
                    {"dragstart", "dragleave", "dragenter", "dragend"}));
 }
 
-// Disable the test on Linux due to flaky: crbug.com/40163536
-// TODO(crbug.com/40876472): Enable on ChromeOS once flakiness is fixed.
 #if BUILDFLAG(IS_LINUX)
 #define MAYBE_DragImageFromDisappearingFrame \
   DISABLED_DragImageFromDisappearingFrame
@@ -1635,7 +1630,6 @@ void DragAndDropBrowserTest::DragImageFromDisappearingFrame_Step3(
   }
 }
 
-// TODO(b:361552512): Flaky on Chrome OS
 #define MAYBE_CrossSiteDrag CrossSiteDrag
 
 // Data that needs to be shared across multiple test steps below
@@ -1843,8 +1837,6 @@ void DragAndDropBrowserTest::CrossNavCrossSiteDrag_Step3(
 }
 
 #if BUILDFLAG(IS_LINUX)
-// TODO(crbug.com/442927728): Fix failing test on Linux and ChromeOS
-// https://crbug.com/40248270: Flaky at ChromeOS ASAN and Debug builds
 #define MAYBE_CrossTabDrag DISABLED_CrossTabDrag
 #else
 #define MAYBE_CrossTabDrag CrossTabDrag
@@ -2127,7 +2119,6 @@ IN_PROC_BROWSER_TEST_P(DragAndDropBrowserTest, DragUpdateScreenCoordinates) {
 // of a drag operation, and cross-site drags should be allowed across a
 // navigation.
 
-// Injecting input with scaling works as expected on Chromeos.
 // Injecting input with non-1x scaling doesn't work correctly with x11 ozone or
 // Windows 7.
 constexpr std::initializer_list<double> ui_scaling_factors = {1.0};

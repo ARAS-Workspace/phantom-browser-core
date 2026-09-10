@@ -30,7 +30,6 @@
 #include "ui/aura/window_observer.h"
 #endif  // defined(USE_AURA)
 
-// Currently, touch is only supported on ChromeOS Ash.
 #define TOUCH_INPUT_SUPPORTED 0
 
 namespace views::test {
@@ -118,8 +117,6 @@ class InteractionTestUtilMouse::DragEnder
     if (CancelDragNow() || drag_client_observation_.IsObserving()) {
       return;
     }
-    // Only Ash actually supports observing the drag-drop client. Therefore, on
-    // other platforms, only direct cancel is possible.
   }
 
   // Stops any ongoing observation of drag start events.

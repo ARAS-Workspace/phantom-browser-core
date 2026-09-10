@@ -69,7 +69,6 @@ void RegisterComponentsForUpdate() {
 
   // CRLSetFetcher attempts to load a CRL set from either the local disk or
   // network.
-  // For Chrome OS this registration is delayed until user login.
   component_updater::RegisterCRLSetComponent(cus);
 
   MaybeRegisterPKIMetadataComponent(cus);

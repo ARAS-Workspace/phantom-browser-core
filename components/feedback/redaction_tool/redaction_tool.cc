@@ -800,9 +800,6 @@ std::string RedactionTool::RedactHashes(
 std::string RedactionTool::RedactAndroidAppStoragePaths(
     const std::string& input,
     std::map<PIIType, std::set<std::string>>* detected) {
-  // We only use this on Chrome OS and there's differences in the API for
-  // FilePath on Windows which prevents this from compiling, so only enable this
-  // code for Chrome OS.
   return input;
 }
 

@@ -31,10 +31,8 @@ ViewsDelegate::ViewsDelegate() {
   views_delegate = this;
 
 #if BUILDFLAG(ENABLE_DESKTOP_AURA)
-  // TouchSelectionMenuRunnerViews is not supported on Mac or Cast.
-  // It is also not used on Ash (the ChromeViewsDelegate() for Ash will
-  // immediately replace this). But tests running without the Chrome layer
-  // will not get the replacement.
+  // TouchSelectionMenuRunnerViews is not supported on Mac or Cast. But tests
+  // running without the Chrome layer will not get the replacement.
   touch_selection_menu_runner_ =
       std::make_unique<TouchSelectionMenuRunnerViews>();
 #endif

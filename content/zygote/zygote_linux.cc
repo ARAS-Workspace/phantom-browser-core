@@ -658,7 +658,6 @@ bool Zygote::HandleGetSandboxStatus(int fd, base::PickleIterator iter) {
 
 void Zygote::HandleReinitializeLoggingRequest(base::PickleIterator iter,
                                               std::vector<base::ScopedFD> fds) {
-  // This method should only be used in ChromeOS.
   NOTREACHED();
 }
 

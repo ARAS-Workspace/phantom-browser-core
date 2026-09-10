@@ -237,8 +237,6 @@ device::BluetoothTransport BluetoothDeviceBlueZ::GetType() const {
 
 void BluetoothDeviceBlueZ::CreateGattConnectionImpl(
     std::optional<BluetoothUUID> service_uuid) {
-// Once ConnectLE is supported on Linux, this buildflag will not be necessary
-// (this bluez code is only run on Chrome OS and Linux).
   Connect(/*pairing_delegate=*/nullptr,
           base::BindOnce(&BluetoothDeviceBlueZ::DidConnectGatt,
                          weak_ptr_factory_.GetWeakPtr()));
@@ -281,13 +279,8 @@ void BluetoothDeviceBlueZ::DisconnectGatt() {
     return;
   }
 
-// Once DisconnectLE is supported on Linux, this buildflag will not be necessary
-// (this bluez code is only run on Chrome OS and Linux).
   Disconnect(base::DoNothing(), base::DoNothing());
 }
-
-// Once DisconnectLE is supported on Linux, this buildflag will not be necessary
-// (this bluez code is only run on Chrome OS and Linux).
 
 std::string BluetoothDeviceBlueZ::GetIdentifier() const {
   // The D-Bus object path is the original Bluetooth device address. If the
@@ -395,8 +388,6 @@ bool BluetoothDeviceBlueZ::IsConnected() const {
 }
 
 bool BluetoothDeviceBlueZ::IsGattConnected() const {
-// Once the |connected_le| property is supported on Linux, this buildflag will
-// not be necessary (this bluez code is only run on Chrome OS and Linux).
   // BlueZ uses the same attribute for GATT Connections and Classic BT
   // Connections.
   return IsConnected();
@@ -948,9 +939,6 @@ void BluetoothDeviceBlueZ::OnConnect(ConnectCallback callback) {
   DCHECK(num_connecting_calls_ >= 0);
   BLUETOOTH_LOG(EVENT) << object_path_.value() << ": Connected, "
                        << num_connecting_calls_ << " still in progress";
-
-  // For CrOS, set trusted upon outgoing connection established.
-  // No-op for non-CrOS since Chrome is not part of the OS.
 
   std::move(callback).Run(/*error_code=*/std::nullopt);
 }

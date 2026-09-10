@@ -516,7 +516,6 @@ TEST_F(PrefServiceSetValueTest, SetListValue) {
   Mock::VerifyAndClearExpectations(&observer_);
 }
 
-// TODO(crbug.com/441781730): Failing on CrOS.
 #define MAYBE_GetValueWithTypeConversion GetValueWithTypeConversion
 TEST(PrefServiceTest, MAYBE_GetValueWithTypeConversion) {
   TestingPrefServiceSimple prefs;

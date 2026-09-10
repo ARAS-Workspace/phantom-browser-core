@@ -120,9 +120,7 @@ bool operator==(const BatteryLevelProvider::BatteryState& lhs,
 TEST(BatteryStateSamplerTest, GlobalInstance) {
 #if BUILDFLAG(HAS_BATTERY_LEVEL_PROVIDER_IMPL)
   // Get() DCHECKs on platforms with a battery level provider if it's called
-  // without being initialized. ChromeOS behaves the same because it has a
-  // `BatteryLevelProvider`, but it doesn't live in base so it doesn't exist in
-  // this test.
+  // without being initialized.
   EXPECT_DCHECK_DEATH(BatteryStateSampler::Get());
 #else
   // Get() returns null if the sampler doesn't exist on platforms without a

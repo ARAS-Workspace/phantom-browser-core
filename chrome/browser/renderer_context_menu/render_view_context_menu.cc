@@ -1317,7 +1317,6 @@ void RenderViewContextMenu::InitMenu() {
     }
   }
 
-  // Partial Translate is not supported on ChromeOS.
   if (content_type_->SupportsGroup(
           ContextMenuContentType::ITEM_GROUP_PARTIAL_TRANSLATE) &&
       !features::IsMenuSimplificationEnabled() &&
@@ -1850,7 +1849,6 @@ void RenderViewContextMenu::AppendLinkItems() {
     AppendOpenInWebAppLinkItems();
     AppendOpenWithLinkItems();
 
-    // ChromeOS supports multiple profiles, but only one can be open at a time.
     // g_browser_process->profile_manager() is null during unit tests.
     if (g_browser_process->profile_manager() &&
         !GetProfile()->IsOffTheRecord()) {
@@ -4964,9 +4962,6 @@ void RenderViewContextMenu::ExecPartialTranslate() {
 }
 
 void RenderViewContextMenu::ExecLanguageSettings(int event_flags) {
-// Open the browser language settings.
-// Exception: On Ash, the browser language settings consists solely of a link to
-// the OS language settings, so just open the OS settings directly.
   WindowOpenDisposition disposition = ui::DispositionFromEventFlags(
       event_flags, WindowOpenDisposition::NEW_FOREGROUND_TAB);
   GURL url = chrome::GetSettingsUrl(chrome::kLanguageOptionsSubPage);

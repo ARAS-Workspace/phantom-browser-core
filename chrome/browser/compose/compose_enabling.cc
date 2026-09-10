@@ -252,8 +252,6 @@ base::expected<void, compose::ComposeShowStatus> ComposeEnabling::CheckEnabling(
         compose::ComposeShowStatus::kUserNotAllowedByOptimizationGuide);
   }
 
-// For ChromeOS only, check whether this device is supported.
-
   DVLOG(2) << "enabled";
   return base::ok();
 }

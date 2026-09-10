@@ -649,7 +649,6 @@ void MaybeMigrateSyncingUserToSignedInInternal(
                                               std::move(blocking_operations)));
 }
 
-// On ChromeOS, there exists no sync setup incomplete state.
 SyncSetupIncompleteMigrationDecision GetSyncSetupIncompleteMigrationDecision(
     PrefService* pref_service) {
   if (pref_service->GetString(prefs::kGoogleServicesAccountId).empty()) {
@@ -727,7 +726,6 @@ SyncToSigninMigrationDataTypeDecision GetSyncToSigninMigrationDataTypeDecision(
 
 void MaybeMigrateSyncingUserToSignedIn(const base::FilePath& profile_path,
                                        PrefService* pref_service) {
-  // On ChromeOS, there exists no sync setup incomplete state.
   MaybeMigrateUserWithSyncSetupIncomplete(profile_path, pref_service);
   MaybeMigrateSyncingUserToSignedInInternal(profile_path, pref_service, {});
 }

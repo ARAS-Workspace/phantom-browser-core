@@ -92,8 +92,6 @@ IN_PROC_BROWSER_TEST_F(SubscriptionEligibilityServiceTest,
   EXPECT_EQ(*observer.new_subscription_tier(), 1);
 }
 
-// We don't run this test on ChromeOS because we can't create multiple
-// profiles.
 IN_PROC_BROWSER_TEST_F(SubscriptionEligibilityServiceTest, Metrics) {
   {
     base::HistogramTester histogram_tester;

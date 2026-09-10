@@ -421,8 +421,6 @@ TEST_F(AccountNameEmailStoreTest, OnCounterPrefUpdated) {
   EXPECT_THAT(address_data_manager().GetProfiles(), IsEmpty());
 }
 
-// ChromeOS does not support signing out
-
 // Tests that the user's gets their `kAutofillNameAndEmailProfileSignature` pref
 // cleared on signout and the kAccountNameEmail profile is removed.
 TEST_F(AccountNameEmailStoreTest, SignOut) {

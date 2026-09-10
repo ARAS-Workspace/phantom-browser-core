@@ -1186,10 +1186,6 @@ IN_PROC_BROWSER_TEST_F(NavigatingExtensionPopupInteractiveTest,
   EXPECT_TRUE(base::PathExists(
       downloads_directory.AppendASCII("download-test3-attachment.gif")));
 
-  // The test verification below is applicable only to scenarios where the
-  // download surface is supported - on ChromeOS, instead of the download
-  // surface, there is a download notification in the right-bottom corner of the
-  // screen.
   EXPECT_TRUE(IsDownloadSurfaceVisible(BrowserWindow::FromBrowser(browser())));
 }
 
@@ -1220,10 +1216,6 @@ IN_PROC_BROWSER_TEST_F(NavigatingExtensionPopupInteractiveTest,
   EXPECT_TRUE(base::PathExists(
       downloads_directory.AppendASCII("download-test3-attachment.gif")));
 
-  // The test verification below is applicable only to scenarios where the
-  // download surface is supported - on ChromeOS, instead of the download
-  // surface, there is a download notification in the right-bottom corner of the
-  // screen.
   EXPECT_TRUE(IsDownloadSurfaceVisible(BrowserWindow::FromBrowser(browser())));
 }
 

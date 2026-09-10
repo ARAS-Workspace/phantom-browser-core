@@ -627,8 +627,7 @@ TEST_F(PeopleHandlerTest,
 }
 
 // Verifies the case where the user cancels after the sync engine has
-// initialized. This isn't reachable on Ash because
-// IsInitialSyncFeatureSetupComplete() always returns true.
+// initialized.
 TEST_F(PeopleHandlerTest,
        DisplayConfigureWithEngineDisabledAndCancelAfterSigninSuccess) {
   SigninUserAndTurnSyncFeatureOn();
@@ -999,8 +998,7 @@ TEST_F(PeopleHandlerTest, ShowSetupCustomPassphraseRequired) {
 }
 
 // Verifies that the user is not prompted to enter the custom passphrase while
-// sync setup is ongoing. This isn't reachable on Ash because
-// IsInitialSyncFeatureSetupComplete() always returns true.
+// sync setup is ongoing.
 TEST_F(PeopleHandlerTest, OngoingSetupCustomPassphraseRequired) {
   SigninUserWithoutSyncFeature();
   CreatePeopleHandler();

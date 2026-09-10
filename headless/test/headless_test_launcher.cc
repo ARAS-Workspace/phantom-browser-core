@@ -61,9 +61,9 @@ int main(int argc, char** argv) {
   }
 
 #if BUILDFLAG(IS_LINUX)
-  // Set core dump limit to 0 for Linux/ChromeOS.
-  // Some tests intentionally cause renderer crashes, which may cause a core
-  // dump on unix systems, which is slow and usually causes a test to time-out.
+  // Set core dump limit to 0 for Linux. Some tests intentionally cause renderer
+  // crashes, which may cause a core dump on unix systems, which is slow and
+  // usually causes a test to time-out.
   struct rlimit limit = {0, 0};
   if (setrlimit(RLIMIT_CORE, &limit) != 0) {
     PLOG(WARNING) << "Failed to set core dump limit";

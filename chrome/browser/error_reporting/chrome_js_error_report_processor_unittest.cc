@@ -209,8 +209,6 @@ TEST_F(ChromeJsErrorReportProcessorTest, AllFields) {
   TestAllFields();
 }
 
-// On Chrome OS, consent checks are handled in the crash_reporter, not in the
-// browser.
 TEST_F(ChromeJsErrorReportProcessorTest, NoConsent) {
   endpoint_->set_consented(false);
   auto report = MakeErrorReport("Hello World");

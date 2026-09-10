@@ -233,8 +233,7 @@ MailboxVideoFrameConverter::GenerateSharedImage(
     return nullptr;
   }
 #if BUILDFLAG(IS_LINUX)
-  // If format is true multiplanar format, we prefer external sampler on
-  // ChromeOS and Linux.
+  // If format is true multiplanar format, we prefer external sampler on Linux.
   if (si_format->is_multi_plane()) {
     si_format->SetPrefersExternalSampler();
   }

@@ -673,7 +673,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
 }
 
 // Regression test for crbug.com/40066193.
-// ChromeOS does not support signing out of a primary account.
 IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
                        ShouldHandleWalletSideEffectsWhenSyncDisabled) {
   ASSERT_TRUE(SetupClients());
@@ -929,7 +928,6 @@ IN_PROC_BROWSER_TEST_P(SingleClientPreferencesWithAccountStorageSyncTest,
 // ShouldClearAccountDataOnStartupIfAccountStateChanged fail on Android
 // and it is unclear as to why they are still failing.
 #if !BUILDFLAG(IS_ANDROID)
-// ChromeOS does not support sign-in allowed flag.
 IN_PROC_BROWSER_TEST_P(
     SingleClientPreferencesWithAccountStorageSyncTest,
     PRE_ShouldClearAccountDataOnStartupIfSignInAllowedBitChanged) {

@@ -54,7 +54,6 @@ class RendererEventInjectionTest
   void SetUpCommandLine(base::CommandLine* command_line) override {
     command_line->AppendSwitch(switches::kDisableRendererBackgrounding);
     command_line->AppendSwitch(switches::kEnableGpuBenchmarking);
-    // kHostWindowBounds is unique to ChromeOS.
     embedded_test_server()->ServeFilesFromSourceDirectory("content/test/data");
     ASSERT_TRUE(embedded_test_server()->Start());
   }

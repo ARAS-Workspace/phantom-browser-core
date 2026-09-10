@@ -220,7 +220,6 @@ class RealtimeReportingClientUmaTest
 };
 
 TEST_P(RealtimeReportingClientUmaTest, TestUmaEventUploadSucceeds) {
-// Profile reporting is not supported on Ash.
 
   SetUpReportingClient(is_profile_reporting());
 
@@ -262,7 +261,6 @@ TEST_P(RealtimeReportingClientUmaTest, TestUmaEventUploadSucceeds) {
 
 TEST_P(RealtimeReportingClientUmaTest,
        TestUploadCallbackReceivesEnrichedRequest) {
-// Profile reporting is not supported on Ash.
 
   SetUpReportingClient(is_profile_reporting());
 
@@ -310,7 +308,6 @@ TEST_P(RealtimeReportingClientUmaTest,
 }
 
 TEST_P(RealtimeReportingClientUmaTest, TestUmaEventUploadFails) {
-// Profile reporting is not supported on Ash.
 
   SetUpReportingClient(is_profile_reporting());
 

@@ -329,8 +329,6 @@ class OmniboxViewViews
       const gfx::Point& point,
       ui::mojom::MenuSourceType source_type);
 
-  // ash::input_method::InputMethodManager::CandidateWindowObserver:
-
   // views::TextfieldController:
   void ContentsChanged(views::Textfield* sender,
                        const std::u16string& new_contents) override;

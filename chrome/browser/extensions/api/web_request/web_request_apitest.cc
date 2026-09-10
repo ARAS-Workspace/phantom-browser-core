@@ -1668,7 +1668,7 @@ INSTANTIATE_TEST_SUITE_P(
             BackgroundResourceFetchTestCase::kBackgroundResourceFetchDisabled)),
     ExtensionWebRequestApiTestWithContextType::PrintToStringParamName());
 
-// TODO: crbug.com/40915577 - Re-enable tests on Mac and CrOS.
+// TODO: crbug.com/40915577 - Re-enable tests on Mac.
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_WebRequestCORSWithExtraHeaders \
   DISABLED_WebRequestCORSWithExtraHeaders
@@ -2624,10 +2624,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionWebRequestApiTest, WebSocketRequestOnWorker) {
 }
 
 // Tests that a clean close from the server is not reported as an error when
-// there is a race between OnDropChannel and SendFrame.
-// Regression test for https://crbug.com/40616409.
-//
-// TODO(b:332825952): Flaky on linux-chromeos-dbg
+// there is a race between OnDropChannel and SendFrame. Regression test for
+// https://crbug.com/40616409.
 #define MAYBE_WebSocketCleanClose WebSocketCleanClose
 IN_PROC_BROWSER_TEST_F(ExtensionWebRequestApiTest, MAYBE_WebSocketCleanClose) {
   ASSERT_TRUE(StartEmbeddedTestServer());

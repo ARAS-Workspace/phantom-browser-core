@@ -680,7 +680,6 @@ DesktopMediaPickerDialogView::DesktopMediaPickerDialogView(
         DesktopMediaID::TYPE_WINDOW, widget->GetNativeWindow());
 
 #if defined(USE_AURA)
-    // Set native window ID if the windows is outside Ash.
     dialog_window_id.id = AcceleratedWidgetToDesktopMediaId(
         widget->GetNativeWindow()->GetHost()->GetAcceleratedWidget());
 #elif BUILDFLAG(IS_MAC)

@@ -140,9 +140,6 @@ int main(int argc, char** argv) {
   InProcessBrowserTest::set_global_browser_set_up_function(
       &ui_test_utils::BringBrowserWindowToFront);
 
-  // For ash chrome, it's using multiple X11 windows to host the browser.
-  // Also, {emulating|injecting} keyboard and mouse events happen at ozone
-  // level, not OS level. So it is fine to run tests in parallel.
   // Run interactive_ui_tests serially, they do not support running in parallel.
   size_t parallel_jobs = 1;
 

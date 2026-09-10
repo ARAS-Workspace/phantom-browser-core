@@ -65,7 +65,6 @@ TEST_F(ExtensionManifestKioskModeTest, KioskEnabledDefaultRequired) {
   EXPECT_FALSE(KioskModeInfo::IsKioskOnly(extension.get()));
 }
 
-// 'kiosk_only' key should be set only from ChromeOS.
 TEST_F(ExtensionManifestKioskModeTest, KioskOnlyFromNonChromeos) {
   LoadAndExpectWarning("kiosk_only_platform_app.json",
                        "'kiosk_only' is not allowed for specified platform.");

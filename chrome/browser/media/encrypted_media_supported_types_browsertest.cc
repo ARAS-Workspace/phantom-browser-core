@@ -135,8 +135,7 @@ const char16_t kUnexpectedResult16[] = u"unexpected result";
 #endif  // BUILDFLAG(BUNDLE_WIDEVINE_CDM)
 
 // For Widevine key system with software secure robustness, persistent license
-// session is supported on Mac. On ChromeOS, it is supported when the
-// protected media identifier permission is allowed. See
+// session is supported on Mac. See
 // kUnsafelyAllowProtectedMediaIdentifierForDomain used below.
 #if BUILDFLAG(IS_MAC)
 #define EXPECT_WV_SW_SECURE_PERSISTENT_SESSION EXPECT_WV
@@ -144,10 +143,6 @@ const char16_t kUnexpectedResult16[] = u"unexpected result";
 #define EXPECT_WV_SW_SECURE_PERSISTENT_SESSION EXPECT_UNSUPPORTED
 #endif
 
-// For Widevine key system with hardware secure robustness, persistent license
-// session is only supported on ChromeOS when the protected media identifier
-// permission is allowed. See kUnsafelyAllowProtectedMediaIdentifierForDomain
-// used below.
 #define EXPECT_WV_HW_SECURE_PERSISTENT_SESSION EXPECT_UNSUPPORTED
 
 #if BUILDFLAG(ENABLE_PLAYREADY)

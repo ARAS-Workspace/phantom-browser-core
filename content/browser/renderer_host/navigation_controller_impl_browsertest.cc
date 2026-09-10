@@ -12290,15 +12290,10 @@ INSTANTIATE_TEST_SUITE_P(
 
 // This test uses ASSERT_DEATH, which is not supported on Android.
 #if !BUILDFLAG(IS_ANDROID)
-// Test that if a frame's committed origin in session history is manually
-// corrupted, navigating back to it will fail a CHECK in
-// NavigationRequest::ValidateCommitOrigin due to an origin mismatch.
-//
 // This ensures that origin integrity is enforced even during history
-// navigations, and protects against session history corruption.
-// See https://crbug.com/41492620 for context.
+// navigations, and protects against session history corruption. See
+// https://crbug.com/41492620 for context.
 //
-// TODO: Disabled on ChromeOS until M140, re-enable after M140.
 // See crbug.com/422251948.
 #define MAYBE_CorruptedSessionHistoryMismatch CorruptedSessionHistoryMismatch
 IN_PROC_BROWSER_TEST_P(ValidateCommitOriginTest,
