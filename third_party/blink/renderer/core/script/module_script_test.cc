@@ -506,16 +506,8 @@ TEST_F(ModuleScriptTest, V8CodeCacheWithHashChecking) {
   }
 }
 
-#if BUILDFLAG(IS_FUCHSIA) && defined(__OPTIMIZE_SIZE__)
-// WebUI bundled cache is not used on Fuchsia, and since we disable caching
-// by default on Fuchsia size-optimized builds (overriding kDefault to kNone),
-// this test (which uses kDefault) will fail due to early return.
-#define MAYBE_LoadingSupportsWebUIBundledCodeCaching \
-  DISABLED_LoadingSupportsWebUIBundledCodeCaching
-#else
 #define MAYBE_LoadingSupportsWebUIBundledCodeCaching \
   LoadingSupportsWebUIBundledCodeCaching
-#endif
 TEST_F(ModuleScriptTest, MAYBE_LoadingSupportsWebUIBundledCodeCaching) {
   // Initialize the modulator.
   V8TestingScope scope;

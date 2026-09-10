@@ -150,13 +150,7 @@ class ScopedDrawBuffer {
 
 }  // namespace
 
-// Increase cache to avoid reallocation on fuchsia, see
-// https://crbug.com/1087941.
-#if BUILDFLAG(IS_FUCHSIA)
-const size_t DrawingBuffer::kDefaultColorBufferCacheLimit = 2;
-#else
 const size_t DrawingBuffer::kDefaultColorBufferCacheLimit = 1;
-#endif
 
 // Function defined in third_party/blink/public/web/blink.h.
 void ForceNextDrawingBufferCreationToFailForTest() {

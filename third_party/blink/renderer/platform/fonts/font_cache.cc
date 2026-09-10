@@ -140,8 +140,7 @@ void FontCache::Trace(Visitor* visitor) const {
 const FontPlatformData* FontCache::SystemFontPlatformData(
     const FontDescription& font_description) {
   const AtomicString& family = FontCache::SystemFontFamily();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA) || \
-    BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_IOS)
   if (family.empty() || family == font_family_names::kSystemUi)
     return nullptr;
 #else
@@ -334,15 +333,6 @@ FontCache::Bcp47Vector FontCache::GetBcp47LocaleForRequest(
   return result;
 }
 
-// TODO(crbug/342967843): In WebTest, Fuchsia initializes fonts by calling
-// `skia::InitializeSkFontMgrForTest();` expecting that other code doesn't
-// initialize SkFontMgr beforehand. But `FontCache::MaybePreloadSystemFonts()`
-// breaks this expectation. So we don't provide
-// `FontCache::MaybePreloadSystemFonts()` feature for Fuchsia for now.
-#if BUILDFLAG(IS_FUCHSIA)
-// static
-void FontCache::MaybePreloadSystemFonts() {}
-#else
 // static
 void FontCache::MaybePreloadSystemFonts() {
   static bool initialized = false;
@@ -414,7 +404,6 @@ void FontCache::MaybePreloadSystemFonts() {
     }
   }
 }
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 FontFallbackMap& FontCache::GetFontFallbackMap() {
   if (!font_fallback_map_) {

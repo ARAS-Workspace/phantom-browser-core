@@ -263,9 +263,7 @@ sk_sp<SkTypeface> FontCache::CreateTypeface(
     const FontDescription& font_description,
     const FontFaceCreationParams& creation_params,
     std::string& name) {
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
-  // TODO(fuchsia): Revisit this and other font code for Fuchsia.
-
+#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_ANDROID)
   if (creation_params.CreationType() == kCreateFontByFciIdAndTtcIndex) {
     if (Platform::Current()->GetSandboxSupport()) {
       return SkTypeface_Factory::FromFontConfigInterfaceIdAndTtcIndex(

@@ -3548,19 +3548,7 @@ TEST_F(ScrollingSimTest, BasicScroll) {
   EXPECT_EQ(100, box->ScrolledContentOffset().top);
 }
 
-// TODO(crbug.com/434513378) Fix flakiness on Fuchsia with enable_smooth_scroll
-// (see GetSynchronousSingleThreadLayerTreeSettings in frame_test_helpers.cc)
-// and re-enable. Note this was only caught in the "test new tests for
-// flakiness" step in fuchsia-x64-cast-receiver-rel try bot when adding this
-// test but it appears the existing BasicScroll test above can fail as well with
-// the same error. So the failure is not related to the new test, and rather an
-// existing issue with the BasicScroll test with smooth scrolling.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_BasicScrollClampedToScrollerSize \
-  DISABLED_BasicScrollClampedToScrollerSize
-#else
 #define MAYBE_BasicScrollClampedToScrollerSize BasicScrollClampedToScrollerSize
-#endif  // BUILDFLAG(IS_FUCHSIA)
 TEST_F(ScrollingSimTest, MAYBE_BasicScrollClampedToScrollerSize) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitWithFeatures({::features::kLimitScrollDeltaToScrollerSize},

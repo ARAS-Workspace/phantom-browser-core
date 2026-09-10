@@ -305,12 +305,10 @@ struct BLINK_COMMON_EXPORT WebPreferences {
 #endif  // BUILDFLAG(IS_ANDROID)
 
 // TODO(crbug.com/1284805): Remove IS_ANDROID once WebView supports WebAuthn.
-// TODO(crbug.com/1382970): Remove IS_FUCHSIA and merge with the block above
-// once all Content embedders on Fuchsia support WebAuthn.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID)
   // Disable the Web Authentication API.
   bool disable_webauthn = false;
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   // Enable forcibly modifying content rendering to result in a light on dark
   // color scheme.

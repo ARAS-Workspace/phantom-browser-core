@@ -1513,7 +1513,7 @@ TEST_F(UserMediaClientTest, NonDefaultAudioConstraintsPropagate) {
   user_media_client_impl_->RequestUserMediaForTest(request);
   blink::AudioCaptureSettings audio_capture_settings =
       user_media_processor_->AudioSettings();
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
   audio_capture_settings = user_media_processor_->EligibleAudioSettings()[0];
 #endif
 
@@ -1572,7 +1572,7 @@ TEST_F(UserMediaClientTest, CreateWithBasicIdealValidDeviceId) {
       CreateDeviceConstraints(g_empty_string, fake_ids_->video_input_1);
 
   String expected_audio_device_id =
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
       String(media::AudioDeviceDescription::kDefaultDeviceId);
 #else
       fake_ids_->audio_input_1;
@@ -1590,7 +1590,7 @@ TEST_F(UserMediaClientTest, CreateWithAdvancedExactValidDeviceId) {
       g_empty_string, g_empty_string, fake_ids_->video_input_1);
 
   String expected_audio_device_id =
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
       String(media::AudioDeviceDescription::kDefaultDeviceId);
 #else
       fake_ids_->audio_input_1;

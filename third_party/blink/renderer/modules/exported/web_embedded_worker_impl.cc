@@ -227,14 +227,8 @@ void WebEmbeddedWorkerImpl::StartWorkerThread(
       /*inherited_trial_features=*/nullptr,
       worker_start_data->devtools_worker_token, std::move(worker_settings),
   /*v8_cache_options=*/
-#if BUILDFLAG(IS_FUCHSIA) && defined(__OPTIMIZE_SIZE__)
-      // Use kDefault to avoid aggressive code caching on size-optimized
-      // builds to save storage space.
-      mojom::blink::V8CacheOptions::kDefault,
-#else
       // Generate the full code cache in the first execution of the script.
       mojom::blink::V8CacheOptions::kFullCodeWithoutHeatCheck,
-#endif
       /*module_responses_map=*/nullptr, std::move(browser_interface_broker),
       /*code_cache_host_interface=*/mojo::NullRemote(),
       /*blob_url_store=*/mojo::NullRemote(), BeginFrameProviderParams(),

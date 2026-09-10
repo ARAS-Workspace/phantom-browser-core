@@ -34,13 +34,11 @@ class ProxyCodeCacheHost : public CodeCacheHost {
   mojom::blink::CodeCacheHost* operator->() override;
 
  private:
-#if !BUILDFLAG(IS_FUCHSIA)
   class SourceKeyedCacheReader;
   void OnPendingBackend(
       std::optional<persistent_cache::PendingBackend> pending_backend);
 
   SequenceBound<SourceKeyedCacheReader> reader_;
-#endif
 
   mojo::Remote<mojom::blink::CodeCacheHost> remote_;
   base::WeakPtrFactory<ProxyCodeCacheHost> weak_factory_{this};

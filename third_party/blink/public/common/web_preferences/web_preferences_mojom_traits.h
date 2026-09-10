@@ -679,11 +679,11 @@ struct BLINK_COMMON_EXPORT StructTraits<blink::mojom::WebPreferencesDataView,
 
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID)
   static bool disable_webauthn(const blink::web_pref::WebPreferences& r) {
     return r.disable_webauthn;
   }
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   static bool force_dark_mode_enabled(
       const blink::web_pref::WebPreferences& r) {

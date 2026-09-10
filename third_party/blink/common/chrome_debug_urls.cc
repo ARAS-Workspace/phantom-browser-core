@@ -26,8 +26,6 @@
 #include "base/process/kill.h"
 #elif BUILDFLAG(IS_POSIX)
 #include <signal.h>
-#elif BUILDFLAG(IS_FUCHSIA)
-#include <zircon/syscalls.h>
 #endif
 
 
@@ -184,8 +182,6 @@ void HandleChromeDebugURL(const GURL& url) {
         base::win::kProcessKilledExitCode);
 #elif BUILDFLAG(IS_POSIX)
     PCHECK(kill(base::Process::Current().Pid(), SIGTERM) == 0);
-#elif BUILDFLAG(IS_FUCHSIA)
-    zx_process_exit(ZX_TASK_RETCODE_SYSCALL_KILL);
 #else
 #error Unsupported platform
 #endif

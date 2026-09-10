@@ -13,10 +13,6 @@
 using testing::ElementsAre;
 using testing::ElementsAreArray;
 
-#if defined(USE_MINIKIN_HYPHENATION) && BUILDFLAG(IS_FUCHSIA)
-// Fuchsia doesn't include |blink_platform_unittests_data|.
-#undef USE_MINIKIN_HYPHENATION
-#endif
 
 #if defined(USE_MINIKIN_HYPHENATION)
 #include "base/files/file_path.h"

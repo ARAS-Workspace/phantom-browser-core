@@ -1857,9 +1857,9 @@ void WebView::ApplyWebPreferences(const web_pref::WebPreferences& prefs,
       prefs.dynamic_safe_area_insets_enabled);
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID)
   RuntimeEnabledFeatures::SetWebAuthEnabled(!prefs.disable_webauthn);
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   settings->SetForceDarkModeEnabled(prefs.force_dark_mode_enabled);
 

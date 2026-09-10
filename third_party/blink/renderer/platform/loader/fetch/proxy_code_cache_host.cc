@@ -31,7 +31,6 @@
 
 namespace blink {
 
-#if !BUILDFLAG(IS_FUCHSIA)
 class ProxyCodeCacheHost::SourceKeyedCacheReader {
  public:
   SourceKeyedCacheReader() = default;
@@ -112,13 +111,11 @@ class ProxyCodeCacheHost::SourceKeyedCacheReader {
   std::unique_ptr<persistent_cache::PersistentCache> cache_
       GUARDED_BY_CONTEXT(sequence_checker_);
 };
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 ProxyCodeCacheHost::ProxyCodeCacheHost(
     mojo::Remote<mojom::blink::CodeCacheHost> remote)
     : remote_(std::move(remote)) {
   DCHECK(remote_.is_bound());
-#if !BUILDFLAG(IS_FUCHSIA)
   if (features::IsInlineScriptCacheEnabled()) {
     reader_ = SequenceBound<SourceKeyedCacheReader>(
         worker_pool::CreateSequencedTaskRunner(base::TaskTraits{
@@ -128,14 +125,12 @@ ProxyCodeCacheHost::ProxyCodeCacheHost(
         base::BindOnce(&ProxyCodeCacheHost::OnPendingBackend,
                        weak_factory_.GetWeakPtr()));
   }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 }
 
 ProxyCodeCacheHost::~ProxyCodeCacheHost() = default;
 
 mojo_base::BigBuffer ProxyCodeCacheHost::FetchInlineScriptCacheSync(
     const ParkableString& script_source) {
-#if !BUILDFLAG(IS_FUCHSIA)
   TRACE_EVENT("loading", "ProxyCodeCacheHost::FetchInlineScriptCacheSync");
 
   CHECK(reader_);
@@ -147,9 +142,6 @@ mojo_base::BigBuffer ProxyCodeCacheHost::FetchInlineScriptCacheSync(
         reader.AsyncCall(&SourceKeyedCacheReader::FetchCachedCode)
             .WithArgs(std::move(source_hash), std::move(callback));
       });
-#else
-  NOTREACHED();
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 }
 
 base::WeakPtr<CodeCacheHost> ProxyCodeCacheHost::GetWeakPtr() {
@@ -169,13 +161,11 @@ mojom::blink::CodeCacheHost* ProxyCodeCacheHost::operator->() {
   return remote_.get();
 }
 
-#if !BUILDFLAG(IS_FUCHSIA)
 void ProxyCodeCacheHost::OnPendingBackend(
     std::optional<persistent_cache::PendingBackend> pending_backend) {
   CHECK(reader_);
   reader_.AsyncCall(&SourceKeyedCacheReader::OnPendingBackend)
       .WithArgs(std::move(pending_backend));
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 }  // namespace blink

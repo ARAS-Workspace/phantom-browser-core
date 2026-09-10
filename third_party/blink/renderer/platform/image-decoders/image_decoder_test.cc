@@ -289,47 +289,8 @@ TEST(ImageDecoderTest, clearCacheExceptFramePreverveClearExceptFrame) {
   }
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-
-TEST(ImageDecoderTest, decodedSizeLimitBoundary) {
-  constexpr unsigned kWidth = 100;
-  constexpr unsigned kHeight = 200;
-  constexpr unsigned kBitDepth = 4;
-  std::unique_ptr<TestImageDecoder> decoder(std::make_unique<TestImageDecoder>(
-      ImageDecoder::kDefaultBitDepth, (kWidth * kHeight * kBitDepth)));
-
-  // Smallest allowable size, should succeed.
-  EXPECT_TRUE(decoder->SetSize(1, 1));
-  EXPECT_TRUE(decoder->IsSizeAvailable());
-  EXPECT_FALSE(decoder->Failed());
-
-  // At the limit, should succeed.
-  EXPECT_TRUE(decoder->SetSize(kWidth, kHeight));
-  EXPECT_TRUE(decoder->IsSizeAvailable());
-  EXPECT_FALSE(decoder->Failed());
-
-  // Just over the limit, should fail.
-  EXPECT_TRUE(decoder->SetSize(kWidth + 1, kHeight));
-  EXPECT_FALSE(decoder->IsSizeAvailable());
-  EXPECT_TRUE(decoder->Failed());
-}
-
-TEST(ImageDecoderTest, decodedSizeUnlimited) {
-  // Very large values for width and height should be OK.
-  constexpr unsigned kWidth = 10000;
-  constexpr unsigned kHeight = 10000;
-
-  std::unique_ptr<TestImageDecoder> decoder(std::make_unique<TestImageDecoder>(
-      ImageDecoder::kDefaultBitDepth, ImageDecoder::kNoDecodedImageByteLimit));
-  EXPECT_TRUE(decoder->SetSize(kWidth, kHeight));
-  EXPECT_TRUE(decoder->IsSizeAvailable());
-  EXPECT_FALSE(decoder->Failed());
-}
-
-#else
-
-// The limit is currently ignored on non-Fuchsia platforms (except for
-// JPEG, which would decode a down-sampled version).
+// The limit is currently ignored (except for JPEG, which would decode a
+// down-sampled version).
 TEST(ImageDecoderTest, decodedSizeLimitIsIgnored) {
   constexpr unsigned kWidth = 100;
   constexpr unsigned kHeight = 200;
@@ -343,7 +304,6 @@ TEST(ImageDecoderTest, decodedSizeLimitIsIgnored) {
   EXPECT_FALSE(decoder->Failed());
 }
 
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(ENABLE_DAV1D_DECODER)
 TEST(ImageDecoderTest, hasSufficientDataToSniffMimeTypeAvif) {

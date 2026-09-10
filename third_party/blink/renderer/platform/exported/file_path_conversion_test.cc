@@ -47,7 +47,7 @@ TEST(FilePathConversionTest, convert) {
   EXPECT_EQ(test16bit_utf16.Utf8(), FilePathToWebString(path_utf16).Utf8());
 
   // Conversions for invalid file paths should fail.
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   EXPECT_TRUE(
       FilePathToWebString(base::FilePath(FILE_PATH_LITERAL("foo\337bar")))
           .IsEmpty());

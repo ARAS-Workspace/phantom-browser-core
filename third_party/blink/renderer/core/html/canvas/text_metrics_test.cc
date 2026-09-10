@@ -156,27 +156,15 @@ struct CaretPositionForOffsetBidiTestData {
     // 6
     {u"あ1あمَ23あمَあ345",
      TextDirection::kLtr,
-#if BUILDFLAG(IS_FUCHSIA)  // Very very narrrow glyph
-     {0, 0, 0, 3, 5, 7, 7, 7, 8, 8, 8, 10, 10, 14, 14, 14},
-#else
      {0, 0, 0, 3, 5, 7, 7, 7, 7, 8, 8, 10, 10, 14, 14, 14},
-#endif
-#if BUILDFLAG(IS_FUCHSIA)
-     {-5, 0, 4, 21, 25, 35, 39, 46, 49, 50, 53, 55, 59, 84, 86, 95},
-#else
      {-5, 0, 4, 29, 33, 43, 47, 50, 53, 61, 65, 67, 71, 100, 102, 110},
-#endif
      TextMetricsTest::kArabicFont},
 
     // 7
     {u"あ1あمَ23あمَあ345",
      TextDirection::kRtl,
      {10, 10, 10, 10, 10, 8, 8, 5, 5, 3, 3, 3, 3, 3},
-#if BUILDFLAG(IS_FUCHSIA)
-     {-5, 0, 4, 27, 31, 33, 37, 55, 59, 61, 65, 84, 86, 95},
-#else
      {-5, 0, 3, 31, 35, 37, 41, 63, 67, 69, 73, 100, 102, 110},
-#endif
      TextMetricsTest::kArabicFont},
 
     // 8
