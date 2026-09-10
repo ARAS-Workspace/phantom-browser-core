@@ -317,17 +317,10 @@ TEST_F(WebContentsViewAuraTest, OccludeView) {
 
 // TODO(crbug.com/40190725): Enable these tests on Fuchsia when
 // OSExchangeDataProviderFactory::CreateProvider is implemented.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_DragDropFiles DISABLED_DragDropFiles
-#define MAYBE_DragDropFilesOriginateFromRenderer \
-  DISABLED_DragDropFilesOriginateFromRenderer
-#define MAYBE_DragDropImageFromRenderer DISABLED_DragDropImageFromRenderer
-#else
 #define MAYBE_DragDropFiles DragDropFiles
 #define MAYBE_DragDropFilesOriginateFromRenderer \
   DragDropFilesOriginateFromRenderer
 #define MAYBE_DragDropImageFromRenderer DragDropImageFromRenderer
-#endif
 
 TEST_F(WebContentsViewAuraTest, MAYBE_DragDropFiles) {
   WebContentsViewAura* view = GetView();

@@ -31,7 +31,7 @@
 #include "base/win/windows_types.h"
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include "base/test/scoped_locale.h"
 #endif
 

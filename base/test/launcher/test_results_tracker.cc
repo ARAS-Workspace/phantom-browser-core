@@ -643,29 +643,7 @@ bool TestResultsTracker::SaveSummaryAsJSON(
     return false;
   }
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // File::Flush() will call fsync(). This is important on Fuchsia to ensure
-  // that the file is written to the disk - the system running under qemu will
-  // shutdown shortly after the test completes. On Fuchsia fsync() times out
-  // after 15 seconds. Apparently this may not be enough in some cases,
-  // particularly when running net_unittests on buildbots, see
-  // https://crbug.com/796318. Try calling fsync() more than once to workaround
-  // this issue.
-  //
-  // TODO(sergeyu): Figure out a better solution.
-  int flush_attempts_left = 4;
-  while (flush_attempts_left-- > 0) {
-    if (output.Flush()) {
-      return true;
-    }
-    LOG(ERROR) << "fsync() failed when saving test output summary. "
-               << ((flush_attempts_left > 0) ? "Retrying." : " Giving up.");
-  }
-
-  return false;
-#else
   return true;
-#endif
 }
 
 TestResultsTracker::TestStatusMap

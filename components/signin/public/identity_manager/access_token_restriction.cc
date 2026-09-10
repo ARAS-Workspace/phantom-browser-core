@@ -9,9 +9,7 @@
 #include "components/signin/public/base/signin_switches.h"
 #include "google_apis/gaia/gaia_constants.h"
 
-#if !BUILDFLAG(IS_FUCHSIA)
 #include "pdf/buildflags.h"  // nogncheck
-#endif                       // !BUILDFLAG(IS_FUCHSIA)
 
 namespace signin {
 
@@ -40,11 +38,9 @@ bool IsUnrestrictedOAuth2Scopes(const std::string& scope) {
       // sign in.
       GaiaConstants::kSecureConnectOAuth2Scope,
 
-#if !BUILDFLAG(IS_FUCHSIA)
 #if BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
       GaiaConstants::kDriveOAuth2Scope,
 #endif  // BUILDFLAG(ENABLE_PDF_SAVE_TO_DRIVE)
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_ANDROID)
       // Required by cloud policy.

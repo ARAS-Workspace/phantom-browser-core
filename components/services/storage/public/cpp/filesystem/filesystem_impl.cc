@@ -81,11 +81,7 @@ class FileLockImpl : public mojom::FileLock {
       return;
     }
 
-#if BUILDFLAG(IS_FUCHSIA)
-    std::move(callback).Run(base::File::FILE_OK);
-#else
     std::move(callback).Run(file_.Unlock());
-#endif
     GetLockTable().RemoveLock(path_);
     file_.Close();
   }
@@ -265,13 +261,11 @@ base::FileErrorOr<base::File> FilesystemImpl::LockFileLocal(
     return base::unexpected(base::File::FILE_ERROR_IN_USE);
   }
 
-#if !BUILDFLAG(IS_FUCHSIA)
   base::File::Error error = file.Lock(base::File::LockMode::kExclusive);
   if (error != base::File::FILE_OK) {
     UnlockFileLocal(path);
     return base::unexpected(error);
   }
-#endif
 
   return file;
 }
@@ -293,7 +287,7 @@ mojom::PathAccessInfoPtr FilesystemImpl::GetPathAccessLocal(
     if ((attributes & FILE_ATTRIBUTE_READONLY) == 0)
       info->can_write = true;
   }
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   const char* const c_path = path.value().c_str();
   if (!access(c_path, F_OK)) {
     info = mojom::PathAccessInfo::New();

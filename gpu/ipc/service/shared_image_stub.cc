@@ -532,23 +532,6 @@ void SharedImageStub::OnUnregisterDxgiFence(const Mailbox& mailbox,
 
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(IS_FUCHSIA)
-void SharedImageStub::RegisterSysmemBufferCollection(
-    zx::eventpair service_handle,
-    zx::channel sysmem_token,
-    const viz::SharedImageFormat& format,
-    gfx::BufferUsage usage,
-    bool register_with_image_pipe) {
-  if (!service_handle || !sysmem_token) {
-    OnError();
-    return;
-  }
-
-  factory_->RegisterSysmemBufferCollection(std::move(service_handle),
-                                           std::move(sysmem_token), format,
-                                           usage, register_with_image_pipe);
-}
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 void SharedImageStub::OnRegisterSharedImageUploadBuffer(
     base::ReadOnlySharedMemoryRegion shm) {

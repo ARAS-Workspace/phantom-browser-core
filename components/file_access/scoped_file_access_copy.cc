@@ -10,7 +10,7 @@
 
 namespace file_access {
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 ScopedFileAccessCopy::ScopedFileAccessCopy(bool allowed,
                                            base::ScopedFD fd,
                                            base::OnceClosure copy_end_callback)

@@ -84,10 +84,8 @@ HistoryDatabase::HistoryDatabase(
               // this value, tells us how much memory the cache will use
               // maximum. 1000 * 4kB = 4MB
               .set_cache_size(1000)
-#if !BUILDFLAG(IS_FUCHSIA)
               .set_wal_mode(base::FeatureList::IsEnabled(
                   kHistoryDatabaseWriteAheadLogging))
-#endif  // !BUILDFLAG(IS_FUCHSIA)
               ,
           /*tag=*/"History"),
       history_metadata_db_(&db_, &meta_table_) {

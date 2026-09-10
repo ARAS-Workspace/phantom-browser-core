@@ -911,14 +911,6 @@ TEST_F(TestLauncherTest, TestChildTempDir) {
   EXPECT_FALSE(DirectoryExists(task_temp));
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// Verifies that test processes have /data, /cache and /tmp available.
-TEST_F(TestLauncherTest, ProvidesDataCacheAndTmpDirs) {
-  EXPECT_TRUE(base::DirectoryExists(base::FilePath("/data")));
-  EXPECT_TRUE(base::DirectoryExists(base::FilePath("/cache")));
-  EXPECT_TRUE(base::DirectoryExists(base::FilePath("/tmp")));
-}
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 // Unit tests to validate UnitTestLauncherDelegate implementation.
 class UnitTestLauncherDelegateTester : public testing::Test {
@@ -1306,7 +1298,6 @@ TEST(ProcessGTestOutputTest, RunMockTests) {
 
 // TODO(crbug.com/40287376): Enable the test once GetAppOutputAndError
 // can collect stdout and stderr on Fuchsia.
-#if !BUILDFLAG(IS_FUCHSIA)
 TEST(ProcessGTestOutputTest, FoundTestCaseNotEnforced) {
   ScopedTempDir dir;
   ASSERT_TRUE(dir.CreateUniqueTempDir());
@@ -1363,60 +1354,8 @@ TEST(ProcessGTestOutputTest, FoundTestCaseNotEnforced) {
   EXPECT_THAT(tests_not_enforced, testing::UnorderedElementsAre(
                                       "Test.firstTest", "Test.secondTest"));
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 // TODO(crbug.com/40135391): Enable leaked-child checks on other platforms.
-#if BUILDFLAG(IS_FUCHSIA)
-
-// Test that leaves a child process running. The test is DISABLED_, so it can
-// be launched explicitly by RunMockLeakProcessTest
-
-MULTIPROCESS_TEST_MAIN(LeakChildProcess) {
-  while (true) {
-    PlatformThread::Sleep(base::Seconds(1));
-  }
-}
-
-TEST(LeakedChildProcessTest, DISABLED_LeakChildProcess) {
-  Process child_process = SpawnMultiProcessTestChild(
-      "LeakChildProcess", GetMultiProcessTestChildBaseCommandLine(),
-      LaunchOptions());
-  ASSERT_TRUE(child_process.IsValid());
-  // Don't wait for the child process to exit.
-}
-
-// Validate that a test that leaks a process causes the batch to have an
-// error exit_code.
-TEST_F(UnitTestLauncherDelegateTester, LeakedChildProcess) {
-  CommandLine command_line(CommandLine::ForCurrentProcess()->GetProgram());
-  command_line.AppendSwitchASCII(
-      "gtest_filter", "LeakedChildProcessTest.DISABLED_LeakChildProcess");
-
-  ASSERT_TRUE(dir.CreateUniqueTempDir());
-  FilePath path = dir.GetPath().AppendASCII("SaveSummaryResult.json");
-  command_line.AppendSwitchPath("test-launcher-summary-output", path);
-  command_line.AppendSwitch("gtest_also_run_disabled_tests");
-  command_line.AppendSwitchASCII("test-launcher-retry-limit", "0");
-
-  std::string output;
-  int exit_code = 0;
-  GetAppOutputWithExitCode(command_line, &output, &exit_code);
-
-  // Validate that we actually ran a test.
-  std::optional<DictValue> root = test_launcher_utils::ReadSummary(path);
-  ASSERT_TRUE(root);
-
-  DictValue* dict = root->FindDict("test_locations");
-  ASSERT_TRUE(dict);
-  EXPECT_EQ(1u, dict->size());
-
-  EXPECT_TRUE(test_launcher_utils::ValidateTestLocations(
-      *dict, "LeakedChildProcessTest"));
-
-  // Validate that the leaked child caused the batch to error-out.
-  EXPECT_EQ(exit_code, 1);
-}
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 // Validate GetTestOutputSnippetTest assigns correct output snippet.
 TEST(TestLauncherTools, GetTestOutputSnippetTest) {

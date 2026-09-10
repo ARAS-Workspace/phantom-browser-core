@@ -7,9 +7,7 @@
 #include "build/build_config.h"
 #include "ui/base/pointer/pointer_device.h"
 
-#if !BUILDFLAG(IS_FUCHSIA)
 #error WebEngine only supports Fuchsia.
-#endif
 
 namespace ui {
 

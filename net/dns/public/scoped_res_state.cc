@@ -14,7 +14,7 @@
 namespace net {
 
 ScopedResState::ScopedResState() {
-#if BUILDFLAG(IS_OPENBSD) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_OPENBSD)
   // Note: res_ninit in glibc always returns 0 and sets RES_INIT.
   // res_init behaves the same way.
   memset(&_res, 0, sizeof(_res));
@@ -22,11 +22,11 @@ ScopedResState::ScopedResState() {
 #else
   UNSAFE_TODO(memset(&res_, 0, sizeof(res_)));
   res_init_result_ = res_ninit(&res_);
-#endif  // BUILDFLAG(IS_OPENBSD) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_OPENBSD)
 }
 
 ScopedResState::~ScopedResState() {
-#if !BUILDFLAG(IS_OPENBSD) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_OPENBSD)
 
   // Prefer res_ndestroy where available.
 #if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_FREEBSD)
@@ -35,7 +35,7 @@ ScopedResState::~ScopedResState() {
   res_nclose(&res_);
 #endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_FREEBSD)
 
-#endif  // !BUILDFLAG(IS_OPENBSD) && !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_OPENBSD)
 }
 
 bool ScopedResState::IsValid() const {
@@ -44,11 +44,11 @@ bool ScopedResState::IsValid() const {
 
 const struct __res_state& ScopedResState::state() const {
   DCHECK(IsValid());
-#if BUILDFLAG(IS_OPENBSD) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_OPENBSD)
   return _res;
 #else
   return res_;
-#endif  // BUILDFLAG(IS_OPENBSD) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_OPENBSD)
 }
 
 }  // namespace net

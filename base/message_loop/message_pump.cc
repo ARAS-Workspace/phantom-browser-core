@@ -123,16 +123,7 @@ class IOWatcherForCurrentIOThread : public IOWatcher {
       MessagePumpForIO::MachPortWatcher* delegate) override {
     return thread_.WatchMachReceivePort(port, controller, delegate);
   }
-#elif BUILDFLAG(IS_FUCHSIA)
-  bool WatchZxHandleImpl(zx_handle_t handle,
-                         bool persistent,
-                         zx_signals_t signals,
-                         MessagePumpForIO::ZxHandleWatchController* controller,
-                         MessagePumpForIO::ZxHandleWatcher* delegate) override {
-    return thread_.WatchZxHandle(handle, persistent, signals, controller,
-                                 delegate);
-  }
-#endif  // BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_IOS) && !BUILDFLAG(CRONET_BUILD) && !BUILDFLAG(IS_IOS_TVOS))
 
  private:
   CurrentIOThread thread_;

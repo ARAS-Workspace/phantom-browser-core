@@ -159,11 +159,7 @@ IN_PROC_BROWSER_TEST_F(MojoSandboxTest, IsProcessSandboxed) {
 
 // TODO(crbug.com/40126761): There is currently no way to know whether a
 // child process is sandboxed or not on Fuchsia.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_NotIsProcessSandboxed DISABLED_NotIsProcessSandboxed
-#else
 #define MAYBE_NotIsProcessSandboxed NotIsProcessSandboxed
-#endif
 IN_PROC_BROWSER_TEST_F(MojoSandboxTest, MAYBE_NotIsProcessSandboxed) {
   mojo::Remote<mojom::TestService> test_service =
       StartProcessAndBindTestInterface(/*unsandboxed=*/true);

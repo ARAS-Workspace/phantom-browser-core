@@ -67,14 +67,14 @@ class StablePortabilityDataImporter {
   // number of items successfully imported.
   void ImportReadingList(base::File file, ImportCallback reading_list_callback);
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   // Attempts to import history from the given `file`. `history_callback` is
   // called at the end of the import process to notify the caller about the
   // number of items successfully imported.
   void ImportHistory(base::File file,
                      ImportCallback history_callback,
                      const size_t import_batch_size = kHistoryBatchSize);
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
  private:
   // Object used to allow Rust History import pipeline to communicate results
@@ -121,12 +121,12 @@ class StablePortabilityDataImporter {
         user_data_importer::BookmarkParser::BookmarkParsingCallback
             bookmarks_callback);
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
     void ParseHistory(
         base::File file,
         std::unique_ptr<RustHistoryCallbackForStablePortabilityFormat> callback,
         size_t import_batch_size);
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
    private:
     std::unique_ptr<ContentBookmarkParser> bookmark_parser_;

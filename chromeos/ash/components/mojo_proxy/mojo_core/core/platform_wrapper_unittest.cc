@@ -33,15 +33,12 @@
 #if BUILDFLAG(IS_WIN)
 #define SIMPLE_PLATFORM_HANDLE_TYPE \
   MOJO_LEGACY_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 #define SIMPLE_PLATFORM_HANDLE_TYPE \
   MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FILE_DESCRIPTOR
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#define SHARED_BUFFER_PLATFORM_HANDLE_TYPE \
-  MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FUCHSIA_HANDLE
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #define SHARED_BUFFER_PLATFORM_HANDLE_TYPE \
   MOJO_LEGACY_PLATFORM_HANDLE_TYPE_MACH_PORT
 #elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
@@ -51,7 +48,7 @@
 uint64_t PlatformHandleValueFromPlatformFile(base::PlatformFile file) {
 #if BUILDFLAG(IS_WIN)
   return reinterpret_cast<uint64_t>(file);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   return static_cast<uint64_t>(file);
 #endif
 }
@@ -59,7 +56,7 @@ uint64_t PlatformHandleValueFromPlatformFile(base::PlatformFile file) {
 base::PlatformFile PlatformFileFromPlatformHandleValue(uint64_t value) {
 #if BUILDFLAG(IS_WIN)
   return reinterpret_cast<base::PlatformFile>(value);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   return static_cast<base::PlatformFile>(value);
 #endif
 }
@@ -152,7 +149,7 @@ TEST_F(PlatformWrapperTest, MAYBE_WrapPlatformSharedMemoryRegion) {
 #if BUILDFLAG(IS_WIN)
     os_buffer.value = reinterpret_cast<uint64_t>(
         platform_region.PassPlatformHandle().release());
-#elif BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_ANDROID)
+#elif BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
     os_buffer.value =
         static_cast<uint64_t>(platform_region.PassPlatformHandle().release());
 #elif BUILDFLAG(IS_POSIX)
@@ -216,9 +213,6 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReadPlatformSharedBuffer,
   ASSERT_EQ(MOJO_LEGACY_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE, os_buffer.type);
   auto platform_handle =
       base::win::ScopedHandle(reinterpret_cast<HANDLE>(os_buffer.value));
-#elif BUILDFLAG(IS_FUCHSIA)
-  ASSERT_EQ(MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FUCHSIA_HANDLE, os_buffer.type);
-  auto platform_handle = zx::vmo(static_cast<zx_handle_t>(os_buffer.value));
 #elif BUILDFLAG(IS_APPLE)
   ASSERT_EQ(MOJO_LEGACY_PLATFORM_HANDLE_TYPE_MACH_PORT, os_buffer.type);
   auto platform_handle = base::apple::ScopedMachSendRight(

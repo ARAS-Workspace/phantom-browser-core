@@ -136,9 +136,7 @@ AXPlatformNodeMemoryDumpProvider::AXPlatformNodeMemoryDumpProvider(
 const char16_t AXPlatformNodeBase::kEmbeddedCharacter = u'\xfffc';
 const std::string AXPlatformNodeBase::kAriaActionsPrefix = "custom";
 
-// TODO(fxbug.dev/91030): Remove the !BUILDFLAG(IS_FUCHSIA) condition once
-// fuchsia has native accessibility.
-#if !BUILDFLAG(HAS_NATIVE_ACCESSIBILITY) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(HAS_NATIVE_ACCESSIBILITY)
 // static
 AXPlatformNode::Pointer AXPlatformNode::Create(
     AXPlatformNodeDelegate& delegate) {

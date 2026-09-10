@@ -121,7 +121,7 @@
 // Macros for string literal initialization of FilePath::CharType[].
 #if PA_BUILDFLAG(IS_WIN)
 #define PA_FILE_PATH_LITERAL(x) L##x
-#elif PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#elif PA_BUILDFLAG(IS_POSIX)
 #define PA_FILE_PATH_LITERAL(x) x
 #endif  // PA_BUILDFLAG(IS_WIN)
 
@@ -135,7 +135,7 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) FilePath {
   // On Windows, for Unicode-aware applications, native pathnames are wchar_t
   // arrays encoded in UTF-16.
   typedef std::wstring StringType;
-#elif PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#elif PA_BUILDFLAG(IS_POSIX)
   // On most platforms, native pathnames are char arrays, and the encoding
   // may or may not be specified.  On Mac OS X, native pathnames are encoded
   // in UTF-8.

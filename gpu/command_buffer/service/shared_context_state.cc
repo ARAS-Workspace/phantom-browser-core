@@ -66,15 +66,12 @@
 #include "gpu/vulkan/vulkan_implementation.h"
 #include "gpu/vulkan/vulkan_util.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
 #include "gpu/command_buffer/service/external_semaphore_pool.h"
 #endif
 
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "gpu/vulkan/fuchsia/vulkan_fuchsia_ext.h"
-#endif
 
 #if BUILDFLAG(SKIA_USE_DAWN)
 #include "gpu/command_buffer/service/dawn_context_provider.h"
@@ -302,8 +299,7 @@ SharedContextState::SharedContextState(
 #endif
   ) {
     if (vk_context_provider_) {
-#if BUILDFLAG(ENABLE_VULKAN) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_WIN))
+#if BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN))
       external_semaphore_pool_ = std::make_unique<ExternalSemaphorePool>(this);
 #endif
     }
@@ -343,8 +339,7 @@ SharedContextState::~SharedContextState() {
     UnbindCacheFromCurrentOpenGLContext();
   }
 
-#if BUILDFLAG(ENABLE_VULKAN) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_WIN))
+#if BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN))
   external_semaphore_pool_.reset();
 #endif
 
@@ -785,10 +780,6 @@ bool SharedContextState::InitializeGLWithFeatureInfo(
     vk_supports_external_memory =
         gfx::HasExtension(device_queue->enabled_extensions(),
                           VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME);
-#elif BUILDFLAG(IS_FUCHSIA)
-    vk_supports_external_memory =
-        gfx::HasExtension(device_queue->enabled_extensions(),
-                          VK_FUCHSIA_EXTERNAL_MEMORY_EXTENSION_NAME);
 #else
     vk_supports_external_memory =
         gfx::HasExtension(device_queue->enabled_extensions(),

@@ -1754,12 +1754,7 @@ IN_PROC_BROWSER_TEST_F(TouchSelectionControllerClientAuraTest,
 
 // Tests that the select all and select word commands in the quick menu are
 // disabled for empty textfields.
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/532769409): Re-enable this test on Fuchsia.
-#define MAYBE_SelectCommandsEmptyTextfield DISABLED_SelectCommandsEmptyTextfield
-#else
 #define MAYBE_SelectCommandsEmptyTextfield SelectCommandsEmptyTextfield
-#endif
 IN_PROC_BROWSER_TEST_F(TouchSelectionControllerClientAuraTest,
                        MAYBE_SelectCommandsEmptyTextfield) {
   ASSERT_NO_FATAL_FAILURE(StartTestWithPage("/touch_selection.html"));

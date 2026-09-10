@@ -374,9 +374,9 @@ TEST_F(NetworkServiceTest, AuthDefaultParams) {
                    ->NegotiateDisableCnameLookup());
   EXPECT_FALSE(
       auth_handler_factory->http_auth_preferences()->NegotiateEnablePort());
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   EXPECT_TRUE(auth_handler_factory->http_auth_preferences()->NtlmV2Enabled());
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 #if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ("", auth_handler_factory->http_auth_preferences()
                     ->AuthAndroidNegotiateAccountType());

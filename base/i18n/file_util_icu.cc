@@ -169,7 +169,7 @@ UChar32 GetNextCodePoint(const FilePath::StringType* const file_name,
   // Windows uses UTF-16 encoding for filenames.
   UNSAFE_TODO(U16_NEXT(file_name->data(), cursor,
                        static_cast<int>(file_name->length()), code_point));
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   // Mac and Chrome OS use UTF-8 encoding for filenames.
   // Linux doesn't actually define file system encoding. Try to parse as
   // UTF-8.
@@ -297,7 +297,7 @@ bool LocaleAwareCompareFilenames(const FilePath& a, const FilePath& b) {
   return CompareString16WithCollator(*collator, AsStringPiece16(a.value()),
                                      AsStringPiece16(b.value())) == UCOL_LESS;
 
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   // On linux, the file system encoding is not defined. We assume
   // SysNativeMBToWide takes care of it.
   return CompareString16WithCollator(

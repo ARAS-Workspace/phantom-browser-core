@@ -22,12 +22,6 @@
 #include "base/debug/dump_without_crashing.h"
 #include "base/win/scoped_handle.h"
 #include "mojo/public/cpp/platform/named_platform_channel.h"
-#elif BUILDFLAG(IS_FUCHSIA)
-#include <lib/zx/channel.h>
-#include <zircon/process.h>
-#include <zircon/processargs.h>
-
-#include "base/fuchsia/fuchsia_logging.h"
 #elif BUILDFLAG(IS_POSIX)
 #include <fcntl.h>
 #include <sys/types.h>
@@ -111,18 +105,6 @@ void CreateChannel(PlatformHandle* local_endpoint,
   // GetLastError() should return ERROR_PIPE_CONNECTED.
   CHECK(!::ConnectNamedPipe(local_endpoint->GetHandle().Get(), nullptr));
   PCHECK(::GetLastError() == ERROR_PIPE_CONNECTED);
-}
-#elif BUILDFLAG(IS_FUCHSIA)
-void CreateChannel(PlatformHandle* local_endpoint,
-                   PlatformHandle* remote_endpoint) {
-  zx::channel handles[2];
-  zx_status_t result = zx::channel::create(0, &handles[0], &handles[1]);
-  ZX_CHECK(result == ZX_OK, result);
-
-  *local_endpoint = PlatformHandle(std::move(handles[0]));
-  *remote_endpoint = PlatformHandle(std::move(handles[1]));
-  DCHECK(local_endpoint->is_valid());
-  DCHECK(remote_endpoint->is_valid());
 }
 #elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
 void CreateChannel(PlatformHandle* local_endpoint,

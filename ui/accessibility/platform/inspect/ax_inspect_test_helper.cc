@@ -222,8 +222,6 @@ std::vector<AXApiType::Type> AXInspectTestHelper::TreeTestPasses() {
   return {AXApiType::kBlink, AXApiType::kMac};
 #elif BUILDFLAG(IS_ANDROID)
   return {AXApiType::kAndroid};
-#elif BUILDFLAG(IS_FUCHSIA)
-  return {AXApiType::kFuchsia};
 #else  // fallback
   return {AXApiType::kBlink};
 #endif

@@ -104,7 +104,7 @@ class LogMessageVoidify {
 
 #if PA_BUILDFLAG(IS_WIN)
 typedef unsigned long SystemErrorCode;
-#elif PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#elif PA_BUILDFLAG(IS_POSIX)
 typedef int SystemErrorCode;
 #endif
 
@@ -130,7 +130,7 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) Win32ErrorLogMessage
  private:
   SystemErrorCode err_;
 };
-#elif PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#elif PA_BUILDFLAG(IS_POSIX)
 // Appends a formatted system message of the errno type
 class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) ErrnoLogMessage
     : public LogMessage {

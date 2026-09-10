@@ -525,10 +525,6 @@ void GpuDataManagerImplPrivate::InitializeGpuModes() {
   } else {
     // On Fuchsia Vulkan must be used when it's enabled by the WebEngine
     // embedder. Falling back to SW compositing in that case is not supported.
-#if BUILDFLAG(IS_FUCHSIA)
-    fallback_modes_.clear();
-    fallback_modes_.push_back(gpu::GpuMode::HARDWARE_VULKAN);
-#else
     // Skip hardware modes if SwiftShader-for-WebGL is in use; hardware GPU is
     // not needed in that case.
     if (!features::IsSwiftShaderUsedForWebGLByCommandLine(command_line)) {
@@ -556,7 +552,6 @@ void GpuDataManagerImplPrivate::InitializeGpuModes() {
         fallback_modes_.push_back(gpu::GpuMode::HARDWARE_VULKAN);
       }
     }
-#endif  // BUILDFLAG(IS_FUCHSIA)
   }
 
   FallBackToNextGpuMode();
@@ -1155,7 +1150,6 @@ void GpuDataManagerImplPrivate::UpdateGpuFeatureInfo(
   } else {
     gpu_feature_info_ = gpu_feature_info;
   }
-#if !BUILDFLAG(IS_FUCHSIA)
   // Prune any hardware fallback whose gr_context_type the GPU process has
   // determined is unsupported, so later FallBackToNextGpuMode() calls don't
   // relaunch the GPU process into a mode it already rejected.
@@ -1180,7 +1174,6 @@ void GpuDataManagerImplPrivate::UpdateGpuFeatureInfo(
       FallBackToNextGpuMode();
     }
   }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
   if (!gpu_feature_info_for_hardware_gpu_.IsInitialized()) {
     if (gpu_feature_info_for_hardware_gpu.has_value()) {
       DCHECK(gpu_feature_info_for_hardware_gpu->IsInitialized());
@@ -1280,10 +1273,8 @@ void GpuDataManagerImplPrivate::AppendGpuCommandLine(
       break;
     case gpu::GpuMode::SOFTWARE_GL:
       // On Fuchsia, always force software GL
-#if !BUILDFLAG(IS_FUCHSIA)
       if (!gl::HasRequestedSoftwareGLImplementationFromCommandLine(
               command_line))
-#endif  // BUILDFLAG(IS_FUCHSIA)
       {
         gl::SetSoftwareWebGLCommandLineSwitches(command_line);
       }

@@ -39,14 +39,14 @@ struct GenerateFilenameCase {
 std::wstring FilePathAsWString(const base::FilePath& path) {
 #if BUILDFLAG(IS_WIN)
   return path.value();
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   return base::UTF8ToWide(path.value());
 #endif
 }
 base::FilePath WStringAsFilePath(const std::wstring& str) {
 #if BUILDFLAG(IS_WIN)
   return base::FilePath(str);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   return base::FilePath(base::WideToUTF8(str));
 #endif
 }
@@ -54,7 +54,7 @@ base::FilePath WStringAsFilePath(const std::wstring& str) {
 std::string GetLocaleWarningString() {
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
   return "";
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   // The generate filename tests can fail on certain OS_POSIX platforms when
   // LC_CTYPE is not "utf8" or "utf-8" because some of the string conversions
   // fail.
@@ -111,7 +111,7 @@ constexpr const base::FilePath::CharType* kUnsafePortableBasenames[] = {
     FILE_PATH_LITERAL("My Computer.{20D04FE0-3AEA-1069-A2D8-08002B30309D}"),
     FILE_PATH_LITERAL("harmless.scf"),
     FILE_PATH_LITERAL("harmless.url"),
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
     FILE_PATH_LITERAL("a\\a"),
 #endif
 };
@@ -191,7 +191,7 @@ TEST(FilenameUtilTest, FileURLConversion) {
      "file:///C:/foo/%F0%9F%94%92.txt"},                         // Blocked.
     {L"C:\\foo\\\u2001.txt", "file:///C:/foo/%E2%80%81.txt"},    // Blocked.
     {L"C:\\foo\\\a\tbar\n ", "file:///C:/foo/%07%09bar%0A%20"},  // Blocked.
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
     {L"/foo/bar.txt", "file:///foo/bar.txt"},
     {L"/foo/BAR.txt", "file:///foo/BAR.txt"},
     {L"/C:/foo/bar.txt", "file:///C:/foo/bar.txt"},
@@ -259,7 +259,7 @@ TEST(FilenameUtilTest, FileURLConversion) {
     // SAMBA share case.
     {L"\\\\computername\\ShareName\\Path\\Foo.txt",
      "file://computername/ShareName/Path/Foo.txt"},
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
     {L"/c:/foo/bar.txt", "file:/c:/foo/bar.txt"},
     {L"/c:/foo/bar.txt", "file:///c:/foo/bar.txt"},
     {L"/foo/bar.txt", "file:/foo/bar.txt"},
@@ -384,7 +384,7 @@ TEST(FilenameUtilTest, GenerateSafeFileName) {
       {__LINE__, "text/html", "harmless.lnk", "harmless.download"},
       {__LINE__, "text/html", "harmless.scf", "harmless.download"},
       {__LINE__, "text/html", "harmless.url", "harmless.download"},
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
       // On Posix, none of the above set is particularly dangerous.
       {__LINE__, "text/html", "con.htm", "con.htm"},
       {__LINE__, "text/html", "lpt1.htm", "lpt1.htm"},
@@ -401,7 +401,7 @@ TEST(FilenameUtilTest, GenerateSafeFileName) {
 
 #if BUILDFLAG(IS_WIN)
   base::FilePath base_path(FILE_PATH_LITERAL("C:\\foo"));
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   base::FilePath base_path("/foo");
 #endif
 
@@ -623,7 +623,7 @@ TEST(FilenameUtilTest, GenerateFileName) {
      L"evil_"},
     {__LINE__, "", "filename=. . . . .", "", "", "binary/octet-stream",
      L"download", L"download"},
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
     // Test truncation of trailing dots and spaces (non-Windows)
     {__LINE__, "", "filename=evil.exe ", "", "", "binary/octet-stream",
      L"download", L"evil.exe"},

@@ -45,9 +45,7 @@
 namespace {
 
 void RecordDiskCacheInitTime(base::TimeDelta time) {
-#if !BUILDFLAG(IS_FUCHSIA)
   base::UmaHistogramTimes("HttpCache.TimeToInitDiskCache", time);
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 }
 
 using FileEnumerator = disk_cache::BackendFileOperations::FileEnumerator;
@@ -155,7 +153,7 @@ CacheCreator::CacheCreator(
 CacheCreator::~CacheCreator() = default;
 
 void CacheCreator::Run() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID)
   static const bool kSimpleBackendIsDefault = true;
 #else
   static const bool kSimpleBackendIsDefault = false;

@@ -202,7 +202,7 @@ bool ValidAttachmentPoint(std::string_view attachment_point) {
 std::string AsUTF8ForSQL(const base::FilePath& path) {
 #if BUILDFLAG(IS_WIN)
   return base::WideToUTF8(path.value());
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   return path.value();
 #endif
 }
@@ -809,7 +809,7 @@ base::FilePath Database::DbPath() const {
   const std::string_view db_path(path);
 #if BUILDFLAG(IS_WIN)
   return base::FilePath(base::UTF8ToWide(db_path));
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   return base::FilePath(db_path);
 #else
   NOTREACHED();
@@ -858,7 +858,7 @@ std::string Database::CollectErrorInfo(int sqlite_error_code,
   if (diagnostics) {
     diagnostics->last_errno = last_errno;
   }
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   int last_errno = GetLastErrno();
   base::StringAppendF(&debug_info, "errno: %d\n", last_errno);
   if (diagnostics) {
@@ -2721,15 +2721,7 @@ bool Database::FullIntegrityCheck(std::vector<std::string>* messages) {
 }
 
 bool Database::UseWALMode() const {
-#if BUILDFLAG(IS_FUCHSIA)
-  // WAL mode is only enabled on Fuchsia for databases with exclusive
-  // locking, because this case does not require shared memory support.
-  // At the time this was implemented (May 2020), Fuchsia's shared
-  // memory support was insufficient for SQLite's needs.
-  return options_.wal_mode_ && options_.exclusive_locking_;
-#else
   return options_.wal_mode_;
-#endif  // BUILDFLAG(IS_FUCHSIA)
 }
 
 bool Database::CheckpointDatabase(bool truncate) {

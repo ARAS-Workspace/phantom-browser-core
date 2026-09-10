@@ -49,7 +49,7 @@ std::optional<std::vector<uint8_t>> DecompressSnappy(
   return decompressed;
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID)
 
 CompressedValue CompressZstd(base::span<const uint8_t> uncompressed) {
   // Compression level of -4 yields compression output similar to Snappy.
@@ -102,7 +102,7 @@ CompressedValue Compress(std::vector<uint8_t> uncompressed) {
     return {CompressionType::kUncompressed, std::move(uncompressed)};
   }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID)
   CompressedValue result = CompressZstd(uncompressed);
 #else
   CompressedValue result = CompressSnappy(uncompressed);

@@ -206,7 +206,7 @@ class StablePortabilityDataImporterTest : public testing::Test {
     ImportReadingListFile(path);
   }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   void ImportHistory(const std::string& json_data) {
     history_callback_called_ = false;
     base::ScopedTempDir dir;
@@ -215,7 +215,7 @@ class StablePortabilityDataImporterTest : public testing::Test {
     ASSERT_TRUE(base::WriteFile(path, json_data));
     ImportHistoryFile(path);
   }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
   void ImportBookmarksFile(const base::FilePath& bookmarks_file) {
     PrepareCallbacks();
@@ -256,7 +256,7 @@ class StablePortabilityDataImporterTest : public testing::Test {
         base::test::RunUntil([&]() { return reading_list_callback_called_; }));
   }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   void ImportHistoryFile(const base::FilePath& history_file) {
     PrepareCallbacks();
 
@@ -277,7 +277,7 @@ class StablePortabilityDataImporterTest : public testing::Test {
     ASSERT_TRUE(
         base::test::RunUntil([&]() { return history_callback_called_; }));
   }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
   history::QueryResults QueryAllHistory() {
     // Wait for any pending tasks to complete.
@@ -590,7 +590,7 @@ TEST_F(StablePortabilityDataImporterTest, ReadingList_EmptyInput) {
 // History parsing is only implemented on Posix systems for now, because the
 // file is passed to the Rust parser in the form of a native "fd" (file
 // descriptor).
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 // Tests parsing a simple JSON file with two history entries.
 TEST_F(StablePortabilityDataImporterTest, History_Basic) {
   base::HistogramTester histogram_tester;
@@ -813,7 +813,7 @@ TEST_F(StablePortabilityDataImporterTest, History_MixedValidAndInvalid) {
   EXPECT_THAT(results, UnorderedElementsAre(URLResultEq(expected_row1),
                                             URLResultEq(expected_row2)));
 }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 // Tests importing invalid files that do not exist.
 TEST_F(StablePortabilityDataImporterTest, CallbacksAreCalled) {
@@ -832,7 +832,7 @@ TEST_F(StablePortabilityDataImporterTest, CallbacksAreCalled) {
       kHistogramPrefix + "ReadingList.Outcome",
       DataTypeMetrics::ImportOutcome::kNotPresent, 1);
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   ImportHistoryFile(
       base::FilePath(FILE_PATH_LITERAL("/invalid/path/to/history/file")));
   EXPECT_EQ(GetNumberOfHistoryImported(), -1);
@@ -840,7 +840,7 @@ TEST_F(StablePortabilityDataImporterTest, CallbacksAreCalled) {
   histogram_tester.ExpectUniqueSample(
       kHistogramPrefix + "History.Outcome",
       DataTypeMetrics::ImportOutcome::kNotPresent, 1);
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 }
 
 }  // namespace user_data_importer

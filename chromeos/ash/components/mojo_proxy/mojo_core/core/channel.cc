@@ -58,13 +58,8 @@ static_assert(offsetof(Channel::Message::LegacyHeader, message_type) ==
 const size_t kReadBufferSize = 4096;
 const size_t kMaxUnusedReadBufferCapacity = 4096;
 
-#if BUILDFLAG(IS_FUCHSIA)
-// Fuchsia: The zx_channel_write() API supports up to 64 handles.
-const size_t kMaxAttachedHandles = 64;
-#else
 // Linux: The platform imposes a limit of 253 handles per sendmsg().
 const size_t kMaxAttachedHandles = 253;
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 static_assert(alignof(std::max_align_t) >= kChannelMessageAlignment, "");
 Channel::AlignedBuffer MakeAlignedBuffer(size_t size) {
@@ -229,8 +224,6 @@ Channel::MessagePtr Channel::Message::Deserialize(
 
 #if BUILDFLAG(IS_WIN)
   uint32_t max_handles = extra_header_size / sizeof(HandleEntry);
-#elif BUILDFLAG(IS_FUCHSIA)
-  uint32_t max_handles = extra_header_size / sizeof(HandleInfoEntry);
 #elif BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   if (extra_header_size > 0 &&
       extra_header_size < sizeof(MachPortsExtraHeader)) {
@@ -409,9 +402,6 @@ ComplexMessage::ComplexMessage(size_t capacity,
 #if BUILDFLAG(IS_WIN)
   // On Windows we serialize HANDLEs into the extra header space.
   extra_header_size = max_handles_ * sizeof(HandleEntry);
-#elif BUILDFLAG(IS_FUCHSIA)
-  // On Fuchsia we serialize handle types into the extra header space.
-  extra_header_size = max_handles_ * sizeof(HandleInfoEntry);
 #elif BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   // On OSX, some of the platform handles may be mach ports, which are
   // serialised into the message buffer. Since there could be a mix of fds and

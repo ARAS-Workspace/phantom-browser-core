@@ -19,7 +19,7 @@ namespace base {
 
 namespace env_vars {
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 // On Posix systems, this variable contains the location of the user's home
 // directory. (e.g, /home/username/).
 inline constexpr char kHome[] = "HOME";
@@ -58,7 +58,7 @@ class BASE_EXPORT Environment {
 using NativeEnvironmentString = std::wstring;
 using NativeEnvironmentStringView = std::wstring_view;
 using NativeEnvironmentCStringView = base::wcstring_view;
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 using NativeEnvironmentString = std::string;
 using NativeEnvironmentStringView = std::string_view;
 using NativeEnvironmentCStringView = base::cstring_view;

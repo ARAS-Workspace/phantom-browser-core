@@ -5079,13 +5079,8 @@ IN_PROC_BROWSER_TEST_F(NavigationBrowserTest, OriginToCommitSandboxFromFrame) {
 }
 
 // TODO(crbug.com/424764870): Fix flakiness.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_NavigateToAboutBlankWhileFirstNavigationPending \
-  DISABLED_NavigateToAboutBlankWhileFirstNavigationPending
-#else
 #define MAYBE_NavigateToAboutBlankWhileFirstNavigationPending \
   NavigateToAboutBlankWhileFirstNavigationPending
-#endif  // BUILDFLAG(IS_FUCHSIA)
 IN_PROC_BROWSER_TEST_F(NavigationBrowserTest,
                        MAYBE_NavigateToAboutBlankWhileFirstNavigationPending) {
   GURL url_a = embedded_test_server()->GetURL("a.com", "/empty.html");

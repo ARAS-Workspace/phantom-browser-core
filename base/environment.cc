@@ -19,7 +19,7 @@
 #include <windows.h>
 
 #include "base/strings/utf_string_conversions.h"
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 #include <stdlib.h>
 #endif
 
@@ -39,7 +39,7 @@ std::optional<std::string> GetVarImpl(cstring_view variable_name) {
     return std::nullopt;  // Ignore errors and excessively large values.
   }
   return WideToUTF8(std::wstring_view(value.data(), value_length));
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   const char* env_value = getenv(variable_name.c_str());
   if (!env_value) {
     return std::nullopt;
@@ -87,7 +87,7 @@ bool Environment::SetVar(cstring_view variable_name,
   // On success, a nonzero value is returned.
   return !!SetEnvironmentVariable(UTF8ToWide(variable_name).c_str(),
                                   UTF8ToWide(new_value).c_str());
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   // On success, zero is returned.
   return !setenv(variable_name.c_str(), new_value.c_str(), 1);
 #endif
@@ -97,7 +97,7 @@ bool Environment::UnSetVar(cstring_view variable_name) {
 #if BUILDFLAG(IS_WIN)
   // On success, a nonzero value is returned.
   return !!SetEnvironmentVariable(UTF8ToWide(variable_name).c_str(), nullptr);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   // On success, zero is returned.
   return !unsetenv(variable_name.c_str());
 #endif

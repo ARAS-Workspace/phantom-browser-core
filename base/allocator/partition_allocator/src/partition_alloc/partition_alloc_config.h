@@ -56,7 +56,7 @@ static_assert(sizeof(void*) != 8, "");
 
 // Need TLS support.
 #define PA_CONFIG_THREAD_CACHE_SUPPORTED() \
-  (PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_WIN) || PA_BUILDFLAG(IS_FUCHSIA))
+  (PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_WIN))
 
 // Too expensive for official builds, as it adds cache misses to all
 // allocations. On the other hand, we want wide metrics coverage to get

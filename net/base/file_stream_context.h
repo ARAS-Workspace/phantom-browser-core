@@ -40,7 +40,7 @@
 #include "net/base/file_stream.h"
 #include "net/base/net_errors.h"
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include <errno.h>
 #endif
 
@@ -55,7 +55,7 @@ class IOBuffer;
 // Implementation for a FileStream. See file_stream.h for documentation.
 #if BUILDFLAG(IS_WIN)
 class FileStream::Context : public base::MessagePumpForIO::IOHandler {
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 class FileStream::Context {
 #endif
 
@@ -71,7 +71,7 @@ class FileStream::Context {
   Context& operator=(const Context&) = delete;
 #if BUILDFLAG(IS_WIN)
   ~Context() override;
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   ~Context();
 #endif
 
@@ -216,7 +216,7 @@ class FileStream::Context {
   // the ReadFile API.
   void ReadAsyncResult(BOOL read_file_ret, DWORD bytes_read, DWORD os_error);
 
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   // ReadFileImpl() is a simple wrapper around read() that handles EINTR
   // signals and calls RecordAndMapError() to map errno to net error codes.
   IOResult ReadFileImpl(scoped_refptr<IOBuffer> buf, int buf_len);

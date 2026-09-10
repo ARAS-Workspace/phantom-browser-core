@@ -104,7 +104,7 @@ bool PageAllocator::ReleasePages(void* address,
   uint8_t* release_base =
       UNSAFE_TODO(reinterpret_cast<uint8_t*>(address) + new_length);
   size_t release_size = length - new_length;
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   // On POSIX, we can unmap the trailing pages.
   partition_alloc::FreePages(release_base, release_size);
 #elif BUILDFLAG(IS_WIN)

@@ -612,12 +612,10 @@ void FakeOnDeviceModelService::GetCapabilities(
 void FakeOnDeviceModelService::LoadTextSafetyModel(
     mojom::TextSafetyModelParamsPtr params,
     mojo::PendingReceiver<mojom::TextSafetyModel> model) {
-#if !BUILDFLAG(IS_FUCHSIA)
   TRACE_EVENT("optimization_guide",
               "FakeOnDeviceModelService::LoadTextSafetyModel",
               perfetto::Flow::FromPointer(this));
   safety_model_holder_.Reset(std::move(params), std::move(model));
-#endif
 }
 
 void FakeOnDeviceModelService::GetDeviceAndPerformanceInfo(

@@ -25,12 +25,10 @@
 #include "sandbox/policy/linux/sandbox_linux.h"
 #endif
 
-#if !BUILDFLAG(IS_FUCHSIA)
 #include "base/feature_list.h"
 #include "third_party/dawn/include/dawn/dawn_proc.h"          // nogncheck
 #include "third_party/dawn/include/dawn/native/DawnNative.h"  // nogncheck
 #include "third_party/dawn/include/dawn/webgpu_cpp.h"         // nogncheck
-#endif
 
 namespace on_device_model {
 
@@ -64,7 +62,6 @@ void UpdateSandboxOptionsForGpu(
 }
 #endif
 
-#if !BUILDFLAG(IS_FUCHSIA)
 // If this feature is enabled, a WebGPU device is created for each valid
 // adapter. This makes sure any relevant drivers or other libs are loaded before
 // enabling the sandbox.
@@ -75,12 +72,8 @@ BASE_FEATURE(kOnDeviceModelWarmDrivers,
              base::FEATURE_DISABLED_BY_DEFAULT
 #endif
 );
-#endif
 
 bool ShouldWarmDrivers() {
-#if BUILDFLAG(IS_FUCHSIA)
-  return false;
-#else
   bool is_gpu_not_blocklisted = true;
 #if BUILDFLAG(ENABLE_ML_INTERNAL)
   ml::DeviceInfo device_info =
@@ -90,7 +83,6 @@ bool ShouldWarmDrivers() {
 #endif
   return base::FeatureList::IsEnabled(kOnDeviceModelWarmDrivers) &&
          is_gpu_not_blocklisted;
-#endif
 }
 
 }  // namespace
@@ -117,7 +109,6 @@ bool PreSandboxInit() {
     // Warm any relevant drivers before attempting to bring up the sandbox. For
     // good measure we initialize a device instance for any adapter with an
     // appropriate backend on top of any integrated or discrete GPU.
-#if !BUILDFLAG(IS_FUCHSIA)
     dawnProcSetProcs(&dawn::native::GetProcs());
     auto instance = std::make_unique<dawn::native::Instance>();
     const wgpu::RequestAdapterOptions adapter_options{
@@ -144,7 +135,6 @@ bool PreSandboxInit() {
         }
       }
     }
-#endif
   }
   return true;
 }

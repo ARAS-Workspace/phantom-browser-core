@@ -109,11 +109,6 @@ TEST_F(VulkanImageTest, CreateWithExternalMemory) {
           << std::hex << " handle_types = 0x" << image->handle_types()
           << " handle_type = 0x" << handle_type;
     }
-#elif BUILDFLAG(IS_FUCHSIA)
-    EXPECT_TRUE(image->handle_types() &
-                VK_EXTERNAL_MEMORY_HANDLE_TYPE_ZIRCON_VMO_BIT_FUCHSIA);
-    zx::vmo handle = image->GetMemoryZirconHandle();
-    EXPECT_TRUE(handle);
 #endif
 
     image->Destroy();

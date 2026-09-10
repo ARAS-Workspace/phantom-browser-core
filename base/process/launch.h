@@ -30,12 +30,9 @@
 
 #if BUILDFLAG(IS_WIN)
 #include "base/win/windows_types.h"
-#elif BUILDFLAG(IS_FUCHSIA)
-#include <lib/fdio/spawn.h>
-#include <zircon/types.h>
 #endif
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include "base/posix/file_descriptor_shuffle.h"
 #endif
 
@@ -79,17 +76,6 @@ using MachPortsForRendezvous = std::map<uint32_t, MachRendezvousPort>;
 
 #if BUILDFLAG(IS_WIN)
 typedef std::vector<HANDLE> HandlesToInheritVector;
-#elif BUILDFLAG(IS_FUCHSIA)
-struct PathToTransfer {
-  base::FilePath path;
-  zx_handle_t handle;
-};
-struct HandleToTransfer {
-  uint32_t id;
-  zx_handle_t handle;
-};
-typedef std::vector<HandleToTransfer> HandlesToTransferVector;
-typedef std::vector<std::pair<int, int>> FileHandleMappingVector;
 #elif BUILDFLAG(IS_POSIX)
 typedef std::vector<std::pair<int, int>> FileHandleMappingVector;
 #endif  // BUILDFLAG(IS_WIN)
@@ -97,7 +83,7 @@ typedef std::vector<std::pair<int, int>> FileHandleMappingVector;
 // Options for launching a subprocess that are passed to LaunchProcess().
 // The default constructor constructs the object with default options.
 struct BASE_EXPORT LaunchOptions {
-#if (BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)) && !BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
   // Delegate to be run in between fork and exec in the subprocess (see
   // pre_exec_delegate below)
   class BASE_EXPORT PreExecDelegate {
@@ -223,13 +209,13 @@ struct BASE_EXPORT LaunchOptions {
   // If not supported by Windows, has no effect. This flag weakens security by
   // turning off ROP protection.
   bool disable_cetcompat = false;
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   // Remap file descriptors according to the mapping of src_fd->dest_fd to
   // propagate FDs into the child process.
   FileHandleMappingVector fds_to_remap;
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
   // Set/unset environment variables. These are applied on top of the parent
   // process environment.  Empty (the default) means to inherit the same
   // environment. See internal::AlterEnvironment().
@@ -238,7 +224,7 @@ struct BASE_EXPORT LaunchOptions {
   // Clear the environment for the new process before processing changes from
   // |environment|.
   bool clear_environment = false;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   // If non-zero, start the process using clone(), using flags as provided.
@@ -291,52 +277,6 @@ struct BASE_EXPORT LaunchOptions {
   std::optional<mac::ProcessRequirement> process_requirement;
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // If valid, launches the application in that job object.
-  zx_handle_t job_handle = ZX_HANDLE_INVALID;
-
-  // Specifies additional handles to transfer (not duplicate) to the child
-  // process. Each entry is an <id,handle> pair, with an |id| created using the
-  // PA_HND() macro. The child retrieves the handle
-  // |zx_take_startup_handle(id)|. The supplied handles are consumed by
-  // LaunchProcess() even on failure.
-  // Note that PA_USER1 ids are reserved for use by AddHandleToTransfer(), below
-  // and by convention PA_USER0 is reserved for use by the embedding
-  // application.
-  HandlesToTransferVector handles_to_transfer;
-
-  // Allocates a unique id for |handle| in |handles_to_transfer|, inserts it,
-  // and returns the generated id.
-  static uint32_t AddHandleToTransfer(
-      HandlesToTransferVector* handles_to_transfer,
-      zx_handle_t handle);
-
-  // Specifies which basic capabilities to grant to the child process.
-  // By default the child process will receive the caller's complete namespace,
-  // access to the current base::GetDefaultJob(), handles for stdio and access
-  // to the dynamic library loader.
-  // Note that the child is always provided access to the loader service.
-  uint32_t spawn_flags = FDIO_SPAWN_CLONE_NAMESPACE | FDIO_SPAWN_CLONE_STDIO |
-                         FDIO_SPAWN_CLONE_JOB;
-
-  // Specifies paths to clone from the calling process' namespace into that of
-  // the child process. If |paths_to_clone| is empty then the process will
-  // receive either a full copy of the parent's namespace, or an empty one,
-  // depending on whether FDIO_SPAWN_CLONE_NAMESPACE is set.
-  // Process launch will fail if `paths_to_clone` and `paths_to_transfer`
-  // together contain conflicting paths (e.g. overlaps or duplicates).
-  std::vector<FilePath> paths_to_clone;
-
-  // Specifies handles which will be installed as files or directories in the
-  // child process' namespace.
-  // Process launch will fail if `paths_to_clone` and `paths_to_transfer`
-  // together contain conflicting paths (e.g. overlaps or duplicates).
-  std::vector<PathToTransfer> paths_to_transfer;
-
-  // Suffix that will be added to the process name. When specified process name
-  // will be set to "<binary_name><process_suffix>".
-  std::string process_name_suffix;
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_POSIX)
   // If not empty, launch the specified executable instead of
@@ -404,7 +344,7 @@ BASE_EXPORT Process LaunchProcess(const CommandLine& cmdline,
 BASE_EXPORT Process LaunchProcess(const CommandLine::StringType& cmdline,
                                   const LaunchOptions& options);
 
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 // A POSIX-specific version of LaunchProcess that takes an argv array
 // instead of a CommandLine.  Useful for situations where you need to
 // control the command line arguments directly, but prefer the
@@ -493,7 +433,7 @@ BASE_EXPORT bool GetAppOutputWithExitCodeAndTimeout(
         [](const Process& process, std::string_view partial_output) {},
     TerminationStatus* final_status = nullptr);
 
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 // A POSIX-specific version of GetAppOutput that takes an argv array
 // instead of a CommandLine.  Useful for situations where you need to
 // control the command line arguments directly.

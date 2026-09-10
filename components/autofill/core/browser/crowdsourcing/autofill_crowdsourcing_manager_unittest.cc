@@ -1256,11 +1256,7 @@ TEST_P(AutofillServerCommunicationTest, Query) {
 }
 
 // Flaky on fuchsia bots, see crbug.com/471202285.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_Upload DISABLED_Upload
-#else
 #define MAYBE_Upload Upload
-#endif
 TEST_P(AutofillServerCommunicationTest, MAYBE_Upload) {
   AutofillCrowdsourcingManager crowdsourcing_manager(
       &autofill_client(), version_info::Channel::UNKNOWN);
@@ -1513,11 +1509,7 @@ INSTANTIATE_TEST_SUITE_P(All,
 using AutofillUploadTest = AutofillServerCommunicationTest;
 
 // Flaky on fuchsia bots, see crbug.com/446943496.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_RichMetadata DISABLED_RichMetadata
-#else
 #define MAYBE_RichMetadata RichMetadata
-#endif
 TEST_P(AutofillUploadTest, MAYBE_RichMetadata) {
   base::test::ScopedFeatureList local_feature;
 
@@ -1641,11 +1633,7 @@ TEST_P(AutofillUploadTest, MAYBE_RichMetadata) {
 }
 
 // Flaky on fuchsia bots, see crbug.com/446943496.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_Throttling DISABLED_Throttling
-#else
 #define MAYBE_Throttling Throttling
-#endif
 TEST_P(AutofillUploadTest, MAYBE_Throttling) {
   ASSERT_NE(DISABLED, GetParam());
 
@@ -1695,13 +1683,8 @@ TEST_P(AutofillUploadTest, MAYBE_Throttling) {
 }
 
 // Flaky on fuchsia bots, see crbug.com/446943496.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_ThrottlingStructuralFormSignatures \
-  DISABLED_ThrottlingStructuralFormSignatures
-#else
 #define MAYBE_ThrottlingStructuralFormSignatures \
   ThrottlingStructuralFormSignatures
-#endif
 TEST_P(AutofillUploadTest, MAYBE_ThrottlingStructuralFormSignatures) {
   ASSERT_NE(DISABLED, GetParam());
 
@@ -1760,13 +1743,8 @@ TEST_P(AutofillUploadTest, MAYBE_ThrottlingStructuralFormSignatures) {
 // `features::debug::kAutofillUploadThrottling` disabled, but metadata is
 // throttled regardless of the feature state.
 // Flaky on fuchsia bots, see crbug.com/446943496.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_SuccessfulSubmissionOnDisabledThrottling \
-  DISABLED_SuccessfulSubmissionOnDisabledThrottling
-#else
 #define MAYBE_SuccessfulSubmissionOnDisabledThrottling \
   SuccessfulSubmissionOnDisabledThrottling
-#endif
 TEST_P(AutofillUploadTest, MAYBE_SuccessfulSubmissionOnDisabledThrottling) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitWithFeatures(
@@ -1838,11 +1816,7 @@ TEST_P(AutofillUploadTest, MAYBE_SuccessfulSubmissionOnDisabledThrottling) {
 }
 
 // Flaky on fuchsia bots, see crbug.com/446943496.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_PeriodicReset DISABLED_PeriodicReset
-#else
 #define MAYBE_PeriodicReset PeriodicReset
-#endif
 TEST_P(AutofillUploadTest, MAYBE_PeriodicReset) {
   ASSERT_NE(DISABLED, GetParam());
 
@@ -1954,13 +1928,8 @@ TEST_P(AutofillUploadTest, ResetOnClearUploadHistory) {
 // Tests that password manager uploads will have metadata part of the upload
 // throttled, but the vote part of the upload will be sent to the server.
 // Flaky on fuchsia bots, see crbug.com/446943496.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_ThrottleMetadataOnPasswordManagerUploads \
-  DISABLED_ThrottleMetadataOnPasswordManagerUploads
-#else
 #define MAYBE_ThrottleMetadataOnPasswordManagerUploads \
   ThrottleMetadataOnPasswordManagerUploads
-#endif
 TEST_P(AutofillUploadTest, MAYBE_ThrottleMetadataOnPasswordManagerUploads) {
   FormStructure form_structure(
       test::GetFormData({.fields = {{.role = USERNAME}, {.role = PASSWORD}}}));

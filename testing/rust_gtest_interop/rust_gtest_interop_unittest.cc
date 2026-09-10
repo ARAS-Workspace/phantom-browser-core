@@ -10,7 +10,7 @@
 // TODO(crbug.com/543717800): Re-enable after fixing small_ctor support for
 // Fuchsia.
 // TODO(crbug.com/462501862): Rust gtest interop is disabled on Mac/iOS ASan.
-#if BUILDFLAG(IS_FUCHSIA) || (defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE))
+#if defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_APPLE)
 #define MAYBE_VerifyTestsRegistered DISABLED_VerifyTestsRegistered
 #else
 #define MAYBE_VerifyTestsRegistered VerifyTestsRegistered

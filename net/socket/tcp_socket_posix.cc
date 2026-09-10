@@ -61,7 +61,7 @@
 // Fuchsia defines TCP_INFO, but it's not implemented.
 // TODO(crbug.com/42050612): Enable TCP_INFO on Fuchsia once it's implemented
 // there (see NET-160).
-#if defined(TCP_INFO) && !BUILDFLAG(IS_FUCHSIA)
+#if defined(TCP_INFO)
 #define HAVE_TCP_INFO
 #endif
 

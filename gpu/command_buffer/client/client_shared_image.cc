@@ -119,11 +119,7 @@ uint32_t ComputeTextureTargetForSharedImage(
   // have provided a native buffer to back that SI.
   CHECK(GMBIsNative(client_gmb_type));
   // See the note at the top of this function wrt Fuchsia.
-#if BUILDFLAG(IS_FUCHSIA)
-  return 0;
-#else
   return GL_TEXTURE_EXTERNAL_OES;
-#endif  // BUILDFLAG(IS_FUCHSIA)
 #endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_ANDROID)
 }
 
@@ -418,9 +414,7 @@ ClientSharedImage::ClientSharedImage(
   // TODO(crbug.com/391788839): Create GpuMemoryBuffer from handle.
   CHECK(!mailbox.IsZero());
   CHECK(sii_holder_);
-#if !BUILDFLAG(IS_FUCHSIA)
   CHECK(texture_target);
-#endif
 }
 
 ClientSharedImage::ClientSharedImage(
@@ -445,9 +439,7 @@ ClientSharedImage::ClientSharedImage(
   }
   CHECK(!mailbox_.IsZero());
   CHECK(sii_holder_);
-#if !BUILDFLAG(IS_FUCHSIA)
   CHECK(texture_target_);
-#endif
 }
 
 ClientSharedImage::ClientSharedImage(ExportedSharedImage exported_si)
@@ -464,9 +456,7 @@ ClientSharedImage::ClientSharedImage(ExportedSharedImage exported_si)
         metadata_.format, exported_si.buffer_usage_.value(), metadata_.usage);
   }
   CHECK(!mailbox_.IsZero());
-#if !BUILDFLAG(IS_FUCHSIA)
   CHECK(texture_target_);
-#endif
 }
 
 ClientSharedImage::ClientSharedImage(
@@ -635,7 +625,6 @@ gfx::GpuMemoryBufferHandle ClientSharedImage::CloneGpuMemoryBufferHandle()
 }
 
 uint32_t ClientSharedImage::GetTextureTarget() {
-#if !BUILDFLAG(IS_FUCHSIA)
   // Check that `texture_target_` has been initialized (note that on Fuchsia it
   // is possible for `texture_target_` to be initialized to 0: Fuchsia does not
   // support import of external images to GL for usage with external sampling.
@@ -644,7 +633,6 @@ uint32_t ClientSharedImage::GetTextureTarget() {
   // which detects the lack of support *based on* on the texture target being
   // 0).
   CHECK(texture_target_);
-#endif
   return texture_target_;
 }
 

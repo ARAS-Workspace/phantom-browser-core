@@ -440,8 +440,6 @@ class PolicyTestCase {
     const std::string os("mac");
 #elif BUILDFLAG(IS_WIN)
     const std::string os("win");
-#elif BUILDFLAG(IS_FUCHSIA)
-    const std::string os("fuchsia");
 #else
 #error "Unknown platform"
 #endif

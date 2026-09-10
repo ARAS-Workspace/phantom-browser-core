@@ -90,18 +90,6 @@ struct COMPONENT_EXPORT(GFX_NATIVE_HANDLE_TYPES_SHARED_MOJOM_TRAITS)
   }
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-  static PlatformHandle buffer_collection_handle(
-      gfx::NativePixmapHandle& pixmap_handle);
-
-  static uint32_t buffer_index(gfx::NativePixmapHandle& pixmap_handle) {
-    return pixmap_handle.buffer_index;
-  }
-
-  static bool ram_coherency(gfx::NativePixmapHandle& pixmap_handle) {
-    return pixmap_handle.ram_coherency;
-  }
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
   static bool Read(gfx::mojom::NativePixmapHandleDataView data,
                    gfx::NativePixmapHandle* out);

@@ -48,14 +48,8 @@ TEST_F(DiskCacheTest, MAYBE_BlockFiles_Grow) {
   BlockFiles files(cache_path_);
   ASSERT_TRUE(files.Init(true));
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // Too slow on Fuchsia: https://crbug.com/1354793
-  const int kMaxSize = 3500;
-  const int kNumberOfFiles = 4;
-#else
   const int kMaxSize = 35000;
   const int kNumberOfFiles = 6;
-#endif
   std::array<Addr, kMaxSize> address;
 
   // Fill up the 32-byte block file (use three files).

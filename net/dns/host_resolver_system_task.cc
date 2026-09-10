@@ -148,7 +148,7 @@ base::DictValue NetLogHostResolverSystemTaskFailedParams(
                   nullptr);  // Arguments (unused).
     dict.Set("os_error_string", base::WideToUTF8(error_string));
     LocalFree(error_string);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
     dict.Set("os_error_string", gai_strerror(os_error));
 #endif
   }

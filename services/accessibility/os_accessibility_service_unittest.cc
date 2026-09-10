@@ -101,13 +101,8 @@ TEST_F(OSAccessibilityServiceTest,
 }
 
 // TODO(b/262637071) Fails on Fuchsia ASAN.
-#if BUILDFLAG(IS_FUCHSIA) && defined(ADDRESS_SANITIZER)
-#define MAYBE_BindsAssistiveTechnologyControllerWithSomeFeaturesEnabled \
-  DISABLED_BindsAssistiveTechnologyControllerWithSomeFeaturesEnabled
-#else
 #define MAYBE_BindsAssistiveTechnologyControllerWithSomeFeaturesEnabled \
   BindsAssistiveTechnologyControllerWithSomeFeaturesEnabled
-#endif  // BUILDFLAG(IS_FUCHSIA) && defined(ADDRESS_SANITIZER)
 TEST_F(OSAccessibilityServiceTest,
        MAYBE_BindsAssistiveTechnologyControllerWithSomeFeaturesEnabled) {
   mojo::PendingReceiver<mojom::AccessibilityService> receiver;

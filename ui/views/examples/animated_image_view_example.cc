@@ -105,7 +105,7 @@ class AnimationGallery : public BoxLayoutView, public TextfieldController {
   void ButtonPressed(const ui::Event& event) {
     std::string json;
     base::ScopedAllowBlockingForTesting allow_blocking;
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
     base::FilePath path(base::UTF16ToUTF8(file_chooser_->GetText()));
 #else
     base::FilePath path(base::UTF16ToWide(file_chooser_->GetText()));

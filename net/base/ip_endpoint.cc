@@ -33,7 +33,7 @@
 #include <ws2bth.h>
 
 #include "net/base/winsock_util.h"  // For kBluetoothAddressSize
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 #include <net/if.h>
 #endif
 

@@ -34,13 +34,6 @@ class GPU_IPC_CLIENT_EXPORT ClientSharedImageInterface
   void UpdateSharedImage(const SyncToken& sync_token,
                          std::unique_ptr<gfx::GpuFence> acquire_fence,
                          const Mailbox& mailbox) override;
-#if BUILDFLAG(IS_FUCHSIA)
-  void RegisterSysmemBufferCollection(zx::eventpair service_handle,
-                                      zx::channel sysmem_token,
-                                      const viz::SharedImageFormat& format,
-                                      gfx::BufferUsage usage,
-                                      bool register_with_image_pipe) override;
-#endif  // BUILDFLAG(IS_FUCHSIA)
   SyncToken GenUnverifiedSyncToken() override;
   SyncToken GenVerifiedSyncToken() override;
   void VerifySyncToken(SyncToken& sync_token) override;

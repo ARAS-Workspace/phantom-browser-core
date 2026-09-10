@@ -283,8 +283,6 @@ std::string GetUserAgentPlatform() {
   return "X11; ";  // strange, but that's what Firefox uses
 #elif BUILDFLAG(IS_ANDROID)
   return "Linux; ";
-#elif BUILDFLAG(IS_FUCHSIA)
-  return "";
 #elif BUILDFLAG(IS_IOS)
   return ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_TABLET
              ? "iPad; "
@@ -317,8 +315,6 @@ std::string GetUnifiedPlatform() {
   return "Macintosh; Intel Mac OS X 10_15_7";
 #elif BUILDFLAG(IS_WIN)
   return "Windows NT 10.0; Win64; x64";
-#elif BUILDFLAG(IS_FUCHSIA)
-  return "Fuchsia";
 #elif BUILDFLAG(IS_LINUX)
   return "X11; Linux x86_64";
 #elif BUILDFLAG(IS_IOS)
@@ -597,7 +593,7 @@ std::string GetPlatformVersion() {
 
 #if BUILDFLAG(IS_WIN)
   return GetWindowsPlatformVersion();
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_LINUX)
   return std::string();
 #elif BUILDFLAG(IS_MAC)
   return "10.15.7";
@@ -745,13 +741,6 @@ std::string GetCpuArchitecture() {
              base::StartsWith(cpu_info, "x86")) {
     return "x86";
   }
-#elif BUILDFLAG(IS_FUCHSIA)
-  std::string cpu_arch = base::SysInfo::ProcessCPUArchitecture();
-  if (base::StartsWith(cpu_arch, "x86")) {
-    return "x86";
-  } else if (base::StartsWith(cpu_arch, "ARM")) {
-    return "arm";
-  }
 #else
 #error Unsupported platform
 #endif
@@ -767,7 +756,7 @@ std::string GetCpuBitness() {
           base::win::OSInfo::X86_ARCHITECTURE)
              ? "32"
              : "64";
-#elif BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_APPLE)
   return "64";
 #elif BUILDFLAG(IS_ANDROID)
   if (base::android::device_info::is_desktop() ||
@@ -810,8 +799,6 @@ std::string BuildOSCpuInfoFromOSVersionAndCpuType(const std::string& os_version,
                       os_version.c_str()
 #elif BUILDFLAG(IS_ANDROID)
                       "Android %s", os_version.c_str()
-#elif BUILDFLAG(IS_FUCHSIA)
-                      "Fuchsia"
 #elif BUILDFLAG(IS_IOS)
                       "CPU %s OS %s like Mac OS X", cpu_type.c_str(),
                       os_version.c_str()

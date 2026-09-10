@@ -809,12 +809,7 @@ TEST_F(DownloadFileTest, RenameRemovesHiddenFlag) {
 }
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/40221273): Re-enable when RenameError works on Fuchsia.
-#define MAYBE_RenameError DISABLED_RenameError
-#else
 #define MAYBE_RenameError RenameError
-#endif
 // Test to make sure we get the proper error on failure.
 TEST_P(DownloadFileTestWithRename, MAYBE_RenameError) {
   ASSERT_TRUE(CreateDownloadFile(true));
@@ -862,13 +857,7 @@ void TestRenameCompletionCallback(base::OnceClosure closure,
 
 }  // namespace
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/40221274): Re-enable when RenameWithErrorRetry works on
-// Fuchsia.
-#define MAYBE_RenameWithErrorRetry DISABLED_RenameWithErrorRetry
-#else
 #define MAYBE_RenameWithErrorRetry RenameWithErrorRetry
-#endif
 // Test that the retry logic works. This test assumes that DownloadFileImpl will
 // post tasks to the current message loop (acting as the download sequence)
 // asynchronously to retry the renames. We will stuff RunLoop::QuitClosures()

@@ -90,10 +90,8 @@ namespace {
 
 HeadlessContentMainDelegate* g_current_headless_content_main_delegate = nullptr;
 
-#if !BUILDFLAG(IS_FUCHSIA)
 base::LazyInstance<HeadlessCrashReporterClient>::Leaky g_headless_crash_client =
     LAZY_INSTANCE_INITIALIZER;
-#endif
 
 const char kLogFileName[] = "CHROME_LOG_FILE";
 const char kHeadlessCrashKey[] = "headless";
@@ -342,13 +340,7 @@ void HeadlessContentMainDelegate::InitLogging(
 
   // Otherwise we log to where the executable is.
   if (log_path.empty()) {
-#if BUILDFLAG(IS_FUCHSIA)
-    // TODO(crbug.com/40202595): Use the same solution as used for LOG_DIR.
-    // Use -1 to allow this to compile.
-    if (base::PathService::Get(-1, &log_path)) {
-#else
     if (base::PathService::Get(base::DIR_MODULE, &log_path)) {
-#endif
       log_path = log_path.Append(log_filename);
     } else {
       log_path = log_filename;
@@ -391,11 +383,6 @@ void HeadlessContentMainDelegate::InitCrashReporter(
     return;
   }
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // TODO(crbug.com/40188745): Implement this when crash reporting is available
-  // for Fuchsia.
-  NOTIMPLEMENTED();
-#else
   crash_reporter::SetCrashReporterClient(g_headless_crash_client.Pointer());
   crash_reporter::InitializeCrashKeys();
 
@@ -411,7 +398,6 @@ void HeadlessContentMainDelegate::InitCrashReporter(
 #endif
     crash_keys::SetSwitchesFromCommandLine(command_line, nullptr);
   }
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
   // Mark any bug reports from headless mode as such.
   static crash_reporter::CrashKeyString<32> headless_key(kHeadlessCrashKey);

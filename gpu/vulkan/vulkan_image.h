@@ -26,9 +26,6 @@
 #include "base/win/scoped_handle.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <lib/zx/vmo.h>
-#endif
 
 namespace gpu {
 
@@ -109,11 +106,6 @@ class COMPONENT_EXPORT(VULKAN) VulkanImage {
   }
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-  zx::vmo GetMemoryZirconHandle() {
-    return memories_[0]->GetMemoryZirconHandle();
-  }
-#endif
 
   VulkanDeviceQueue* device_queue() const { return device_queue_; }
   const VkImageCreateInfo& create_info() const { return create_info_; }

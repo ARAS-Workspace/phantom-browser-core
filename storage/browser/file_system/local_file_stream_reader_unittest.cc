@@ -36,7 +36,7 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include "base/files/scoped_file.h"
 #endif
 
@@ -47,7 +47,7 @@ namespace {
 using ::testing::_;
 
 file_access::ScopedFileAccess CreateScopedFileAccess(bool allowed) {
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   return file_access::ScopedFileAccess(allowed, base::ScopedFD());
 #else
   return file_access::ScopedFileAccess(allowed);

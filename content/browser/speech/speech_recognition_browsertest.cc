@@ -49,7 +49,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_FUCHSIA)
 #include "base/test/scoped_feature_list.h"
 #include "components/soda/mock_soda_installer.h"  // nogncheck
 #include "components/soda/soda_util.h"
@@ -59,7 +58,6 @@
 #include "content/public/browser/storage_partition_config.h"
 #include "media/base/media_switches.h"
 #include "media/mojo/mojom/audio_data.mojom.h"
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ash/constants/ash_features.h"
@@ -68,19 +66,15 @@
 using base::RunLoop;
 using CaptureCallback = media::AudioCapturerSource::CaptureCallback;
 
-#if !BUILDFLAG(IS_FUCHSIA)
 using testing::_;
 using testing::InvokeWithoutArgs;
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 namespace content {
 
 namespace {
 
-#if !BUILDFLAG(IS_FUCHSIA)
 const char kWebSpeechExpectGoodResult1[] = "Pictures of the moon";
 const char kWebSpeechPageGoodResult1[] = "goodresult1";
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 // TODO(crbug.com/40575807) Use FakeSystemInfo instead.
 class MockAudioSystem : public media::AudioSystem {
@@ -296,7 +290,6 @@ class SpeechRecognitionBrowserTest : public ContentBrowserTest {
     kTestAudioCapturerSourceClosed,
   };
 
-#if !BUILDFLAG(IS_FUCHSIA)
   SpeechRecognitionBrowserTest() {
     // Setup the SODA On-Device feature flags.
     scoped_feature_list_.InitWithFeatures(
@@ -309,7 +302,6 @@ class SpeechRecognitionBrowserTest : public ContentBrowserTest {
         },
         /*disabled_features=*/{});
   }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
   // Helper methods used by test fixtures.
   GURL GetTestUrlFromFragment(const std::string& fragment) {
@@ -346,12 +338,10 @@ class SpeechRecognitionBrowserTest : public ContentBrowserTest {
     SpeechRecognizerImpl::SetAudioEnvironmentForTesting(nullptr, nullptr);
   }
 
-#if !BUILDFLAG(IS_FUCHSIA)
   // Set SODA On-Device speech recognition features flags.
   base::test::ScopedFeatureList scoped_feature_list_;
   // Setup mock SODA installer
   speech::MockSodaInstaller mock_soda_installer_;
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
  private:
   void OnCapturerSourceStart(const media::AudioParameters& audio_parameters,
@@ -624,7 +614,6 @@ IN_PROC_BROWSER_TEST_F(SpeechRecognitionBrowserTest,
 }
 #endif
 
-#if !BUILDFLAG(IS_FUCHSIA)
 IN_PROC_BROWSER_TEST_F(SpeechRecognitionBrowserTest,
                        OnDeviceWebSpeechRecognition) {
   // Speech On-Device not supported.
@@ -949,6 +938,5 @@ IN_PROC_BROWSER_TEST_F(SpeechRecognitionCrossOriginBrowserTest,
       nullptr);
 }
 
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 }  // namespace content

@@ -877,7 +877,6 @@ void AddSuggestionsDetails(int error_code,
   }
 
   // TODO(crbug.com/40199702): Provide meaningful strings for Fuchsia.
-#if !BUILDFLAG(IS_FUCHSIA)
   if (suggestions & SUGGEST_PROXY_CONFIG) {
     // Custom body string.
     std::u16string inner =
@@ -898,7 +897,6 @@ void AddSuggestionsDetails(int error_code,
             IDS_ERRORPAGES_SUGGESTION_PROXY_CONFIG_HEADER),
         inner);
   }
-#endif  //  !BUILDFLAG(IS_FUCHSIA)
 #endif
 
   if (suggestions & SUGGEST_CONTACT_ADMINISTRATOR &&

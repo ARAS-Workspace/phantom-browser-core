@@ -228,14 +228,8 @@ bool GetClientID(const ClientServiceMap<ClientType, ServiceType>* map,
 constexpr const char* kRequiredFunctionalityExtensions[] = {
     "GL_ANGLE_blob_cache",
     "GL_ANGLE_framebuffer_blit",
-#if BUILDFLAG(IS_FUCHSIA)
-    "GL_ANGLE_memory_object_fuchsia",
-#endif
     "GL_ANGLE_memory_size",
     "GL_ANGLE_native_id",
-#if BUILDFLAG(IS_FUCHSIA)
-    "GL_ANGLE_semaphore_fuchsia",
-#endif
     "GL_ANGLE_texture_storage_external",
     "GL_ANGLE_texture_usage",
     "GL_CHROMIUM_bind_uniform_location",

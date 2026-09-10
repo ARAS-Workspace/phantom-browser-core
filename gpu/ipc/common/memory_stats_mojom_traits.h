@@ -40,7 +40,7 @@ struct GPU_IPC_COMMON_EXPORT StructTraits<
     gpu::VideoMemoryUsageStats> {
   static std::map<int32_t, gpu::VideoMemoryUsageStats::ProcessStats>
   process_map(const gpu::VideoMemoryUsageStats& stats) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN)
     std::map<int32_t, gpu::VideoMemoryUsageStats::ProcessStats> map;
     for (const auto& pair : stats.process_map)
       map[static_cast<int32_t>(pair.first)] = pair.second;
@@ -56,7 +56,7 @@ struct GPU_IPC_COMMON_EXPORT StructTraits<
 
   static bool Read(gpu::mojom::VideoMemoryUsageStatsDataView data,
                    gpu::VideoMemoryUsageStats* out) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN)
     std::map<int32_t, gpu::VideoMemoryUsageStats::ProcessStats> process_map;
     if (!data.ReadProcessMap(&process_map))
       return false;

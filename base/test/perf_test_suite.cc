@@ -15,9 +15,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/google_benchmark/src/include/benchmark/benchmark.h"
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "base/fuchsia/file_utils.h"
-#endif
 
 namespace base {
 
@@ -35,9 +32,6 @@ void PerfTestSuite::Initialize() {
     FilePath tmp_dir;
     PathService::Get(DIR_CACHE, &tmp_dir);
     log_path = tmp_dir.Append(log_path.BaseName());
-#elif BUILDFLAG(IS_FUCHSIA)
-    log_path =
-        FilePath(kPersistedDataDirectoryPath).Append(log_path.BaseName());
 #endif
     log_path = log_path.ReplaceExtension(FILE_PATH_LITERAL("log"));
     log_path = log_path.InsertBeforeExtension(FILE_PATH_LITERAL("_perf"));

@@ -112,7 +112,6 @@ void HeadlessDevTooledBrowserTest::CustomizeHeadlessWebContents(
 // This test was implicitly disabled on Fuchsia while being part of headless
 // protocol tests before it was moved here.
 // TODO(crbug.com/40222911): Enable on Fuchsia when no longer flakily timeout.
-#if !BUILDFLAG(IS_FUCHSIA)
 
 class HeadlessAllowedVideoCodecsTest
     : public HeadlessDevTooledBrowserTest,
@@ -174,7 +173,6 @@ INSTANTIATE_TEST_SUITE_P(
 
 HEADLESS_DEVTOOLED_TEST_P(HeadlessAllowedVideoCodecsTest);
 
-#endif  // #if !BUILDFLAG(IS_FUCHSIA)
 
 class HeadlessCreatedTargetIsUsedProcessTest
     : public HeadlessDevTooledBrowserTest,

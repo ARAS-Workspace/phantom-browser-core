@@ -29,12 +29,10 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if !BUILDFLAG(IS_FUCHSIA)
 #include "components/variations/pref_names.h"                     // nogncheck
 #include "components/variations/service/google_groups_manager.h"  // nogncheck
 #include "components/variations/service/google_groups_manager_prefs.h"  // nogncheck
 #include "components/variations/variations_seed_processor.h"  // nogncheck
-#endif
 
 namespace autofill {
 
@@ -596,7 +594,6 @@ TEST_F(AtMemoryEnablementUtilsFeatureCheckedLastTest, NotEligible) {
   EXPECT_EQ(pref_store_->call_count(), 0);
 }
 
-#if !BUILDFLAG(IS_FUCHSIA)
 class AtMemoryEnablementUtilsWithGroupsTest
     : public AtMemoryEnablementUtilsTest {
  protected:
@@ -679,7 +676,6 @@ TEST_F(AtMemoryEnablementUtilsWithGroupsTest,
       AtMemoryAction::kTriggerSearchUI, autofill_client(),
       autofill_client().GetLastCommittedPrimaryMainFrameURL()));
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 }  // namespace
 }  // namespace autofill

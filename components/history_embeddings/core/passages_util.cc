@@ -69,12 +69,8 @@ std::optional<history_embeddings::proto::PassagesValue> PassagesBlobToProto(
   uint32_t uncompressed_size =
       compression::GetUncompressedSize(compressed_proto);
   constexpr uint32_t kMaxUncompressedSize = 16 * 1024 * 1024;
-#if BUILDFLAG(IS_FUCHSIA)
-  const uint32_t available_size = kMaxUncompressedSize;
-#else
   const uint32_t available_size = base::saturated_cast<uint32_t>(
       base::SysInfo::AmountOfAvailablePhysicalMemory().InBytes());
-#endif
   if (uncompressed_size > std::min(kMaxUncompressedSize, available_size)) {
     return std::nullopt;
   }

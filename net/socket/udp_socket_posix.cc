@@ -145,7 +145,7 @@ uint32_t GetInterfaceForDestination(const IPAddress& destination_address) {
 }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 // Helper for IPv4 SSM. Sets sin_len on macOS, no-op on Linux.
 group_source_req CreateIPv4SourceGroupRequest(const IPAddress& group_address,
                                               const IPAddress& source_address,
@@ -205,7 +205,7 @@ group_source_req CreateSourceGroupRequest(const IPAddress& group_address,
   return CreateIPv6SourceGroupRequest(group_address, source_address,
                                       interface_index);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 
 }  // namespace
 
@@ -1618,11 +1618,7 @@ int UDPSocketPosix::LeaveGroup(const IPAddress& group_address) const {
       if (addr_family_ != AF_INET6)
         return ERR_ADDRESS_INVALID;
       ipv6_mreq mreq;
-#if BUILDFLAG(IS_FUCHSIA)
-      mreq.ipv6mr_interface = multicast_interface_;
-#else   // BUILDFLAG(IS_FUCHSIA)
       mreq.ipv6mr_interface = 0;  // 0 indicates default multicast interface.
-#endif  // !BUILDFLAG(IS_FUCHSIA)
       mreq.ipv6mr_multiaddr = ToIn6Addr(group_address);
       int rv = setsockopt(socket_, IPPROTO_IPV6, IPV6_LEAVE_GROUP,
                           &mreq, sizeof(mreq));
@@ -1638,7 +1634,7 @@ int UDPSocketPosix::LeaveGroup(const IPAddress& group_address) const {
 int UDPSocketPosix::SetSourceGroupMembership(const IPAddress& group_address,
                                              const IPAddress& source_address,
                                              int option) const {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
   return ERR_NOT_IMPLEMENTED;
 #else
   uint32_t interface_index = multicast_interface_;

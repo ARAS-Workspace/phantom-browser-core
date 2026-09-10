@@ -5616,8 +5616,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 // Test that performing a touchpad pinch over an OOPIF offers the synthetic
 // wheel events to the child and causes the page scale factor to change for
 // the main frame (given that the child did not consume the wheel).
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
 // TODO(crbug.com/41449850): Flaky on multiple platforms.
 #define MAYBE_TouchpadPinchOverOOPIF DISABLED_TouchpadPinchOverOOPIF
 #else
@@ -5726,8 +5725,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 
 // Tests that performing a touchpad double-tap zoom over an OOPIF offers the
 // synthetic wheel event to the child.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
 // TODO(crbug.com/41449850): Flaky on multiple platforms.
 #define MAYBE_TouchpadDoubleTapZoomOverOOPIF \
   DISABLED_TouchpadDoubleTapZoomOverOOPIF
@@ -7352,8 +7350,7 @@ using SitePerProcessDelegatedInkBrowserTest = SitePerProcessHitTestBrowserTest;
 // TODO(crbug.com/40835227): Fix and enable the test on Fuchsia.
 // TODO(crbug.com/40935254): flaky on ChromeOS
 // TODO(http://b/331190208): Test failing on Linux
-#if BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
 #define MAYBE_MetadataAndPointGoThroughOOPIF \
   DISABLED_MetadataAndPointGoThroughOOPIF
 #else

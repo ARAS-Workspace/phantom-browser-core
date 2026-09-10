@@ -195,25 +195,6 @@ class GPU_IPC_SERVICE_EXPORT GpuChannelMessageFilter
       int32_t start,
       int32_t end,
       WaitForGetOffsetInRangeCallback callback) override;
-#if BUILDFLAG(IS_FUCHSIA)
-  void RegisterSysmemBufferCollection(mojo::PlatformHandle service_handle,
-                                      mojo::PlatformHandle sysmem_token,
-                                      const viz::SharedImageFormat& format,
-                                      gfx::BufferUsage usage,
-                                      bool register_with_image_pipe) override {
-    base::AutoLock lock(gpu_channel_lock_);
-    if (!gpu_channel_)
-      return;
-
-    scheduler_->ScheduleTask(Scheduler::Task(
-        gpu_channel_->shared_image_stub()->sequence(),
-        base::BindOnce(&gpu::GpuChannel::RegisterSysmemBufferCollection,
-                       gpu_channel_->AsWeakPtr(), std::move(service_handle),
-                       std::move(sysmem_token), format, usage,
-                       register_with_image_pipe),
-        std::vector<SyncToken>()));
-  }
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
   // Map of route id to scheduler sequence id.
   base::flat_map<int32_t, SequenceId> route_sequences_;
@@ -1100,19 +1081,6 @@ bool GpuChannel::CreateDCOMPTexture(
 }
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(IS_FUCHSIA)
-void GpuChannel::RegisterSysmemBufferCollection(
-    mojo::PlatformHandle service_handle,
-    mojo::PlatformHandle sysmem_token,
-    const viz::SharedImageFormat& format,
-    gfx::BufferUsage usage,
-    bool register_with_image_pipe) {
-  shared_image_stub_->RegisterSysmemBufferCollection(
-      zx::eventpair(service_handle.TakeHandle()),
-      zx::channel(sysmem_token.TakeHandle()), format, usage,
-      register_with_image_pipe);
-}
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 std::optional<gpu::GpuDiskCacheHandle> GpuChannel::GetCacheHandleForType(
     gpu::GpuDiskCacheType type) {

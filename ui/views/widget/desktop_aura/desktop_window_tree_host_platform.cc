@@ -178,9 +178,6 @@ ui::PlatformWindowInitProperties ConvertWidgetInitParamsToInitProperties(
   }
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-  properties.enable_keyboard = true;
-#endif
 
   return properties;
 }

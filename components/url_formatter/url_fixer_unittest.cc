@@ -595,7 +595,7 @@ TEST(URLFixerTest, FixupFile) {
       //   {"file:///foo:/bar", "file://foo/bar"},
       //   {"file:/\\/server\\folder/file", "file://server/folder/file"},
   };
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_APPLE)
 #define HOME "/Users/"

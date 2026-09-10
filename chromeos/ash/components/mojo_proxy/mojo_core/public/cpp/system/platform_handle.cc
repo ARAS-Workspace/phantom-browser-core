@@ -70,9 +70,6 @@ ScopedSharedBufferHandle WrapPlatformSharedMemoryRegion(
 #if BUILDFLAG(IS_WIN)
   platform_handles[0].type = MOJO_LEGACY_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE;
   platform_handles[0].value = reinterpret_cast<uint64_t>(handle.Take());
-#elif BUILDFLAG(IS_FUCHSIA)
-  platform_handles[0].type = MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FUCHSIA_HANDLE;
-  platform_handles[0].value = static_cast<uint64_t>(handle.release());
 #elif BUILDFLAG(IS_APPLE)
   platform_handles[0].type = MOJO_LEGACY_PLATFORM_HANDLE_TYPE_MACH_PORT;
   platform_handles[0].value = static_cast<uint64_t>(handle.release());
@@ -135,15 +132,6 @@ base::subtle::PlatformSharedMemoryRegion UnwrapPlatformSharedMemoryRegion(
     return base::subtle::PlatformSharedMemoryRegion();
   }
   region_handle.Set(reinterpret_cast<HANDLE>(platform_handles[0].value));
-#elif BUILDFLAG(IS_FUCHSIA)
-  if (num_platform_handles != 1) {
-    return base::subtle::PlatformSharedMemoryRegion();
-  }
-  if (platform_handles[0].type !=
-      MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FUCHSIA_HANDLE) {
-    return base::subtle::PlatformSharedMemoryRegion();
-  }
-  region_handle.reset(static_cast<zx_handle_t>(platform_handles[0].value));
 #elif BUILDFLAG(IS_APPLE)
   if (num_platform_handles != 1) {
     return base::subtle::PlatformSharedMemoryRegion();

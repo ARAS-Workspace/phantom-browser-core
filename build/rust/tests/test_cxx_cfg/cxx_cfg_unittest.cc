@@ -17,7 +17,7 @@ TEST(RustCxxCfgTest, TargetFamily) {
 //
 // So we need to `||` two conditions together to get an equivalent of Rust-side
 // `#[cfg(target_family = "unix")]` from `cxx_cfg_lib.rs`.
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   uint32_t actual = rust_test::double_unix_value(123);
 #else
   uint32_t actual = rust_test::double_non_unix_value(123);

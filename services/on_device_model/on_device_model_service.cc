@@ -159,10 +159,8 @@ void OnDeviceModelService::LoadTextSafetyModel(
     mojo::PendingReceiver<mojom::TextSafetyModel> model) {
   TRACE_EVENT("optimization_guide",
               "OnDeviceModelService::LoadTextSafetyModel");
-#if !BUILDFLAG(IS_FUCHSIA)
   safety_model_holder_.AsyncCall(&SafetyModelHolder::Reset)
       .WithArgs(std::move(params), std::move(model));
-#endif
 }
 
 void OnDeviceModelService::SetForceQueueingForTesting(bool force_queueing) {

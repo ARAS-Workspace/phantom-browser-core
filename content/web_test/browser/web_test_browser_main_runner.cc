@@ -53,24 +53,17 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
 #include <sys/socket.h>
 #include <unistd.h>
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <lib/sys/cpp/component_context.h>
-
-#include "base/fuchsia/fuchsia_logging.h"
-#include "base/fuchsia/process_context.h"
-#include "ui/ozone/public/ozone_switches.h"
-#endif
 
 namespace content {
 
 namespace {
 
-#if BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
 // Fuchsia doesn't support stdin stream for packaged apps, and stdout from
 // run-test-suite not only has extra emissions from the Fuchsia test
 // infrastructure, it also merges stderr and stdout together. Combined, these
@@ -115,7 +108,7 @@ void ConnectStdioSocket(const std::string& host_and_port) {
   PCHECK(close(fd) == 0);
 }
 
-#endif  // BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_IOS)
 
 void RunOneTest(const content::TestInfo& test_info,
                 content::WebTestControlHost* web_test_control_host,
@@ -131,12 +124,12 @@ void RunOneTest(const content::TestInfo& test_info,
 }
 
 void RunTests(content::BrowserMainRunner* main_runner) {
-#if BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
   if (auto& cmd_line = *base::CommandLine::ForCurrentProcess();
       cmd_line.HasSwitch(kStdioRedirectSwitch)) {
     ConnectStdioSocket(cmd_line.GetSwitchValueASCII(kStdioRedirectSwitch));
   }
-#endif  // BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_IOS)
   TRACE_EVENT0("shell", "WebTestBrowserMainRunner::RunTests");
   content::WebTestControlHost test_controller;
   {

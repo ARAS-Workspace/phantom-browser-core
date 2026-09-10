@@ -83,12 +83,7 @@ class ViewFocusObserverTest : public InteractiveViewsTestMixin<ViewsTestBase> {
   std::unique_ptr<Widget> widget_;
 };
 
-#if BUILDFLAG(IS_FUCHSIA) && defined(ARCH_CPU_ARM64) && !defined(NDEBUG)
-// TODO(https://crbug.com/464455929): Crash on Fuchsia on arm64 in debug.
-#define MAYBE_TracksFocus DISABLED_TracksFocus
-#else
 #define MAYBE_TracksFocus TracksFocus
-#endif
 TEST_F(ViewFocusObserverTest, MAYBE_TracksFocus) {
   RunTestSequence(
       ObserveState(kCurrentFocusedView, widget_.get()),

@@ -278,12 +278,7 @@ TEST(ProfilingJsonExporterTest, Simple) {
   EXPECT_EQ(1u, sizes->size());
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/42050458): Re-enable when MemoryMaps works on Fuchsia.
-#define MAYBE_MemoryMaps DISABLED_MemoryMaps
-#else
 #define MAYBE_MemoryMaps MemoryMaps
-#endif
 // GetProcessMemoryMaps iterates through every memory region, making allocations
 // for each one. ASAN will potentially, for each allocation, make memory
 // regions. This will cause the test to time out.

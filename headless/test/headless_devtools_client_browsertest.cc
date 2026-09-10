@@ -98,8 +98,7 @@ class HeadlessCrashObserverTest : public HeadlessDevTooledBrowserTest {
     // ASan's normal error exit code is 1, which base categorizes as the process
     // being killed.
     EXPECT_EQ(base::TERMINATION_STATUS_PROCESS_WAS_KILLED, status);
-#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     EXPECT_EQ(base::TERMINATION_STATUS_PROCESS_CRASHED, status);
 #else
     EXPECT_EQ(base::TERMINATION_STATUS_ABNORMAL_TERMINATION, status);
@@ -461,11 +460,7 @@ class DomTreeExtractionBrowserTest : public HeadlessDevTooledBrowserTest {
 
 // TODO(crbug.com/40697467): Fix this test on Fuchsia and re-enable.
 // NOTE: These macros expand to: DomTreeExtractionBrowserTest.RunAsyncTest
-#if BUILDFLAG(IS_FUCHSIA)
-DISABLED_HEADLESS_DEVTOOLED_TEST_F(DomTreeExtractionBrowserTest);
-#else
 HEADLESS_DEVTOOLED_TEST_F(DomTreeExtractionBrowserTest);
-#endif
 
 class NavigatorLanguages : public HeadlessDevTooledBrowserTest {
  public:

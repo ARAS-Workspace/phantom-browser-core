@@ -103,7 +103,7 @@ bool AngleVulkanImageBackingFactory::IsGMBSupported(
     // usage?
     case gfx::EMPTY_BUFFER:
       return HasGLES2ReadOrWriteUsage(usage);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
     case gfx::NATIVE_PIXMAP: {
       auto* vulkan_implementation =
           context_state_->vk_context_provider()->GetVulkanImplementation();

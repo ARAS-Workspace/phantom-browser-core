@@ -16,8 +16,7 @@ constexpr base::FeatureParam<ScrollbarMode>::Option kScrollbarModeOptions[] = {
     {ScrollbarMode::kClassic, "classic"},
 };
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_IOS)
 constexpr base::FeatureState kOverlayScrollbarFeatureState =
     base::FEATURE_ENABLED_BY_DEFAULT;
 #else

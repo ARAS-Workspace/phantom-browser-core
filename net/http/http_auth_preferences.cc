@@ -28,11 +28,11 @@ bool HttpAuthPreferences::NegotiateEnablePort() const {
   return negotiate_enable_port_;
 }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 bool HttpAuthPreferences::NtlmV2Enabled() const {
   return ntlm_v2_enabled_;
 }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_ANDROID)
 std::string HttpAuthPreferences::AuthAndroidNegotiateAccountType() const {

@@ -138,10 +138,8 @@ SANITIZER_HOOK_ATTRIBUTE const char *__msan_default_options() {
 const char kLsanDefaultOptions[] =
     "strip_path_prefix=/../../ use_poisoned=1 "
 
-#if !BUILDFLAG(IS_FUCHSIA)
     "external_symbolizer_path=%d/../../third_party/llvm-build/Release+Asserts/"
     "bin/llvm-symbolizer "
-#endif
 
 #if defined(ARCH_CPU_64_BITS)
     // When pointer compression in V8 is enabled the external pointers in the
@@ -158,7 +156,6 @@ SANITIZER_HOOK_ATTRIBUTE const char *__lsan_default_options() {
 
 // TODO(https://fxbug.dev/102967): Remove when Fuchsia supports
 // module-name-based and function-name-based suppression.
-#if !BUILDFLAG(IS_FUCHSIA)
 
 extern char kLSanDefaultSuppressions[];
 
@@ -166,7 +163,6 @@ SANITIZER_HOOK_ATTRIBUTE const char *__lsan_default_suppressions() {
   return kLSanDefaultSuppressions;
 }
 
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 #endif  // LEAK_SANITIZER
 
 #if defined(UNDEFINED_SANITIZER)

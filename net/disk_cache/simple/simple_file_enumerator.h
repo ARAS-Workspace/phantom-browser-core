@@ -14,7 +14,7 @@
 #include "net/base/net_export.h"
 #include "net/disk_cache/disk_cache.h"
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include <dirent.h>
 #include <sys/types.h>
 #else
@@ -41,7 +41,7 @@ class NET_EXPORT SimpleFileEnumerator final {
   std::optional<Entry> Next();
 
  private:
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   struct DirCloser {
     void operator()(DIR* dir) { closedir(dir); }
   };

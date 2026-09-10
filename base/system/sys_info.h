@@ -130,11 +130,6 @@ class BASE_EXPORT SysInfo {
   // or nullopt on failure.
   static std::optional<DiskSpaceInfo> AmountOfDiskSpace(const FilePath& path);
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // Sets the total amount of disk space to report under the specified |path|.
-  // If |bytes| is -ve then any existing entry for |path| is removed.
-  static void SetAmountOfTotalDiskSpace(const FilePath& path, int64_t bytes);
-#endif
 
   // Returns system uptime.
   static TimeDelta Uptime();

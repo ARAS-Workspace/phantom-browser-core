@@ -52,10 +52,6 @@
 #include "mojo/public/cpp/bindings/unique_receiver_set.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "media/mojo/clients/mojo_codec_factory_fuchsia.h"
-#include "media/mojo/mojom/fuchsia_media.mojom.h"
-#endif
 
 using ::testing::_;
 using ::testing::NiceMock;
@@ -322,41 +318,6 @@ class FakeInterfaceFactory : public media::mojom::InterfaceFactory {
 };
 #endif  // BUILDFLAG(ENABLE_MOJO_VIDEO_DECODER)
 
-#if BUILDFLAG(IS_FUCHSIA)
-class FakeFuchsiaMediaCodecProvide
-    : public media::mojom::FuchsiaMediaCodecProvider {
- public:
-  ~FakeFuchsiaMediaCodecProvide() override = default;
-
-  void Bind(
-      mojo::PendingReceiver<media::mojom::FuchsiaMediaCodecProvider> receiver) {
-    receiver_.Bind(std::move(receiver));
-  }
-
-  void SetSupportedVideoDecoderConfigs(
-      media::SupportedVideoDecoderConfigs configs) {
-    supported_video_decoder_configs_ = configs;
-  }
-
-  // media::mojom::FuchsiaMediaCodecProvider implementation.
-  void CreateVideoDecoder(
-      media::VideoCodec codec,
-      media::mojom::VideoDecoderSecureMemoryMode secure_mode,
-      fidl::InterfaceRequest<fuchsia::media::StreamProcessor>
-          stream_processor_request) final {
-    ADD_FAILURE() << "Not implemented.";
-  }
-
-  void GetSupportedVideoDecoderConfigs(
-      GetSupportedVideoDecoderConfigsCallback callback) final {
-    std::move(callback).Run(supported_video_decoder_configs_);
-  }
-
- private:
-  media::SupportedVideoDecoderConfigs supported_video_decoder_configs_;
-  mojo::Receiver<media::mojom::FuchsiaMediaCodecProvider> receiver_{this};
-};
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 class MojoGpuVideoAcceleratorFactoriesTest : public testing::Test {
  public:
@@ -448,16 +409,6 @@ class MojoGpuVideoAcceleratorFactoriesTest : public testing::Test {
         std::move(context_provider), enable_video_decode_accelerator,
         enable_video_encode_accelerator, std::move(vea_provider),
         std::move(interface_factory));
-#elif BUILDFLAG(IS_FUCHSIA)
-    mojo::PendingRemote<media::mojom::FuchsiaMediaCodecProvider>
-        media_codec_provider;
-    fake_media_codec_provider_.Bind(
-        media_codec_provider.InitWithNewPipeAndPassReceiver());
-    return std::make_unique<MojoCodecFactoryFuchsia>(
-        task_environment_.GetMainThreadTaskRunner(),
-        std::move(context_provider), enable_video_decode_accelerator,
-        enable_video_encode_accelerator, std::move(vea_provider),
-        std::move(media_codec_provider));
 #else
     return std::make_unique<MojoCodecFactoryDefault>(
         task_environment_.GetMainThreadTaskRunner(),
@@ -506,8 +457,6 @@ class MojoGpuVideoAcceleratorFactoriesTest : public testing::Test {
 
 #if BUILDFLAG(ENABLE_MOJO_VIDEO_DECODER)
   FakeInterfaceFactory fake_media_codec_provider_;
-#elif BUILDFLAG(IS_FUCHSIA)
-  FakeFuchsiaMediaCodecProvide fake_media_codec_provider_;
 #endif
 };
 
@@ -612,7 +561,7 @@ TEST_F(MojoGpuVideoAcceleratorFactoriesDeathTest, CreateVideoDecoderFailed) {
 }
 #endif  // GTEST_HAS_DEATH_TEST
 
-#if BUILDFLAG(ENABLE_MOJO_VIDEO_DECODER) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(ENABLE_MOJO_VIDEO_DECODER)
 TEST_F(MojoGpuVideoAcceleratorFactoriesTest, DecoderConfigIsSupported) {
   fake_media_codec_provider_.SetSupportedVideoDecoderConfigs(
       {kH264MaxSupportedVideoDecoderConfig});
@@ -711,6 +660,6 @@ TEST_F(MojoGpuVideoAcceleratorFactoriesTest, DefaultMojoCodecFactory) {
                 kH264BaseConfig),
             media::GpuVideoAcceleratorFactories::Supported::kFalse);
 }
-#endif  // BUILDFLAG(ENABLE_MOJO_VIDEO_DECODER) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(ENABLE_MOJO_VIDEO_DECODER)
 
 }  // namespace media

@@ -3388,13 +3388,9 @@ TEST_P(HistoryBackendDBTest, CantUseLockedDatabase) {
   // The database can't be opened if it's locked. In WAL mode, the failure
   // occurs at OPEN (journal mode change blocked); otherwise at COMMIT.
   EXPECT_FALSE(CreateBackendAndDatabase());
-#if !BUILDFLAG(IS_FUCHSIA)
   const auto expected_step = IsWalModeEnabled()
                                  ? HistoryDatabase::InitStep::OPEN
                                  : HistoryDatabase::InitStep::COMMIT;
-#else
-  const auto expected_step = HistoryDatabase::InitStep::COMMIT;
-#endif  // !BUILDFLAG(IS_FUCHSIA)
   EXPECT_THAT(
       histogram_tester.GetAllSamples("History.InitializationFailureStep"),
       BucketsAre(Bucket(expected_step, /*count=*/1)));
@@ -3416,7 +3412,6 @@ TEST_P(HistoryBackendDBTest, CantRazeOldDatabaseIfLocked) {
   // The old database can't be razed if it's locked. In WAL mode, the failure
   // occurs at OPEN (before version is even read); otherwise at RAZE_OLD_DB.
   EXPECT_FALSE(CreateBackendAndDatabase());
-#if !BUILDFLAG(IS_FUCHSIA)
   if (IsWalModeEnabled()) {
     EXPECT_THAT(
         histogram_tester.GetAllSamples("History.InitializationFailureStep"),
@@ -3433,17 +3428,6 @@ TEST_P(HistoryBackendDBTest, CantRazeOldDatabaseIfLocked) {
                                    /*count=*/1))),
         }));
   }
-#else
-  EXPECT_THAT(
-      histogram_tester.GetAllSamplesForPrefix("History"),
-      IsSupersetOf({
-          Pair("History.DatabaseVersion", BucketsAre(Bucket(10, /*count=*/1))),
-          Pair("History.DatabaseTooOld", BucketsAre(Bucket(10, /*count=*/1))),
-          Pair("History.InitializationFailureStep",
-               BucketsAre(Bucket(HistoryDatabase::InitStep::RAZE_OLD_DB,
-                                 /*count=*/1))),
-      }));
-#endif  // !BUILDFLAG(IS_FUCHSIA)
   EXPECT_EQ(GetDatabaseVersion(), 10);
 }
 

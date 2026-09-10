@@ -96,7 +96,7 @@ TEST(FileTest, ReadOnlyFile) {
 }
 
 // This dies only if we can interrogate the underlying platform handle.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
 #if !BUILDFLAG(IS_AIX)
 TEST(FileTest, ReadOnlyFileDeath) {
 #if defined(OFFICIAL_BUILD)
@@ -127,7 +127,7 @@ TEST(FileTest, ReadOnlyFileDeath) {
       kReadOnlyFileCheckFailedRegex);
 }
 #endif  // !BUILDFLAG(IS_AIX)
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
 
 // This should work on all platforms. This check might be relaxed in which case
 // this test can be removed. iOS without blink does not build SyncSocket, so do

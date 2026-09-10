@@ -33,10 +33,6 @@
 #include "ui/gfx/native_pixmap.h"
 #include "ui/gfx/native_pixmap_handle.h"
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <lib/zx/channel.h>
-#include <lib/zx/eventpair.h>
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 namespace gfx {
 class GpuFence;
@@ -238,24 +234,6 @@ class GPU_COMMAND_BUFFER_CLIENT_EXPORT SharedImageInterface
   virtual scoped_refptr<ClientSharedImage> ImportSharedImage(
       ExportedSharedImage exported_shared_image) = 0;
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // Registers a sysmem buffer collection. `service_handle` contains a handle
-  // for the eventpair that controls the lifetime of the collection. The
-  // collection will be destroyed when all peer handles for that eventpair are
-  // destroyed (i.e. when `ZX_EVENTPAIR_PEER_CLOSED` is signaled on that
-  // handle). The caller can use CreateSharedImage() to create shared images
-  // from the buffer in the collection by setting `buffer_collection_handle` and
-  // `buffer_index` fields in NativePixmapHandle, wrapping it in
-  // GpuMemoryBufferHandle and then creating a GpuMemoryBuffer from that handle.
-  // If `register_with_image_pipe` field is set, the collection is shared with a
-  // new ImagePipe, which allows it to display these images as overlays.
-  virtual void RegisterSysmemBufferCollection(
-      zx::eventpair service_handle,
-      zx::channel sysmem_token,
-      const viz::SharedImageFormat& format,
-      gfx::BufferUsage usage,
-      bool register_with_image_pipe) = 0;
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_WIN)
   // Update fence between processes. Register D3DSharedFence in GPU process

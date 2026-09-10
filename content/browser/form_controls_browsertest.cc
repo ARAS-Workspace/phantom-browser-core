@@ -54,8 +54,7 @@ class FormControlsBrowserTest : public ContentBrowserTest {
 #endif
   }
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN) || \
-    (OS_LINUX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN) || OS_LINUX
   typedef cc::FuzzyPixelComparator PixelComparatorType;
 #else
   typedef cc::AlphaDiscardingExactPixelComparator PixelComparatorType;
@@ -99,8 +98,6 @@ class FormControlsBrowserTest : public ContentBrowserTest {
     } else {
       platform_suffix = "_android";
     }
-#elif BUILDFLAG(IS_FUCHSIA)
-    platform_suffix = "_fuchsia";
 #elif BUILDFLAG(IS_IOS)
     platform_suffix = "_ios";
 #endif
@@ -142,7 +139,7 @@ class FormControlsBrowserTest : public ContentBrowserTest {
                           .SetErrorPixelsPercentageLimit(11.f)
                           .SetAvgAbsErrorLimit(20.f)
                           .SetAbsErrorLimit(140);
-#elif BUILDFLAG(IS_WIN) || (OS_LINUX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_WIN) || OS_LINUX
     // This also applies to different versions of other OSes.
     auto comparator = cc::FuzzyPixelComparator()
                           .DiscardAlpha()

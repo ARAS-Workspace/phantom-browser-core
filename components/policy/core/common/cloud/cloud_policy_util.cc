@@ -24,7 +24,7 @@
 #include "base/win/wincred_shim.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_APPLE)
 #include <pwd.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -93,7 +93,7 @@ const int kMinimumVersionForExtensionInstallPolicy = 146;
 }  // namespace
 
 std::string GetMachineName() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX)
   char hostname[HOST_NAME_MAX];
   if (gethostname(hostname, HOST_NAME_MAX) == 0)  // Success.
     return hostname;
@@ -148,8 +148,7 @@ std::string GetMachineName() {
 }
 
 std::string GetOSVersion() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_APPLE) || \
-    BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
   return base::SysInfo::OperatingSystemVersion();
 #elif BUILDFLAG(IS_WIN)
   base::win::OSInfo::VersionNumber version_number =
@@ -200,7 +199,7 @@ std::string GetOSUsername() {
     return std::string();
   }
   return primary_session->account_id().GetUserEmail();
-#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_ANDROID)
   // TODO(crbug.com/40200780): This should be fully implemented when there is
   // support in fuchsia.
   return std::string();

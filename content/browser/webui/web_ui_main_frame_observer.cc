@@ -26,18 +26,18 @@
 #include "content/public/common/url_constants.h"
 #include "url/gurl.h"
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID)
 #include "components/crash/content/browser/error_reporting/error_reporting_util.h"
 #include "components/crash/content/browser/error_reporting/javascript_error_report.h"
 #include "components/crash/content/browser/error_reporting/js_error_report_processor.h"
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 namespace content {
 
 namespace {
 
 bool IsWebUIJavaScriptErrorReportingSupported() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID)
   return false;
 #elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
   return true;
@@ -58,7 +58,7 @@ WebUIMainFrameObserver::WebUIMainFrameObserver(WebUIImpl* web_ui,
 
 WebUIMainFrameObserver::~WebUIMainFrameObserver() = default;
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID)
 void WebUIMainFrameObserver::OnDidAddMessageToConsole(
     RenderFrameHost* source_frame,
     blink::mojom::ConsoleMessageLevel log_level,
@@ -154,7 +154,7 @@ void WebUIMainFrameObserver::OnDidAddMessageToConsole(
   processor->SendErrorReport(std::move(report), base::DoNothing(),
                              web_contents()->GetBrowserContext());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 void WebUIMainFrameObserver::MaybeEnableWebUIJavaScriptErrorReporting(
     NavigationHandle* navigation_handle) {

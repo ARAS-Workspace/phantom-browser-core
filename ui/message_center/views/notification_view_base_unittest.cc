@@ -679,7 +679,7 @@ TEST_F(NotificationViewBaseTest, TestInlineReplyActivateWithKeyPress) {
 
 // Synthetic scroll events are not supported on Mac in the views
 // test framework.
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_SlideOut DISABLED_SlideOut
 #else
 #define MAYBE_SlideOut SlideOut
@@ -708,7 +708,7 @@ TEST_F(NotificationViewBaseTest, MAYBE_SlideOut) {
   EXPECT_TRUE(IsRemovedAfterIdle(kDefaultNotificationId));
 }
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_SlideOutNested DISABLED_SlideOutNested
 #else
 #define MAYBE_SlideOutNested SlideOutNested
@@ -736,7 +736,7 @@ TEST_F(NotificationViewBaseTest, MAYBE_SlideOutNested) {
   EXPECT_TRUE(IsRemovedAfterIdle(kDefaultNotificationId));
 }
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_DisableSlideForcibly DISABLED_DisableSlideForcibly
 #else
 #define MAYBE_DisableSlideForcibly DisableSlideForcibly
@@ -1194,7 +1194,7 @@ TEST_F(NotificationViewBaseTest, ShowTimestamp) {
                    ->GetVisible());
 }
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_SlideOutWithMessageCenterView \
   DISABLED_SlideOutWithMessageCenterView
 #else
@@ -1228,7 +1228,7 @@ TEST_F(NotificationViewBaseTest, MAYBE_SlideOutWithMessageCenterView) {
   EXPECT_FALSE(IsRemovedAfterIdle(kDefaultNotificationId));
 }
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_SlideOutByTrackpad DISABLED_SlideOutByTrackpad
 #else
 #define MAYBE_SlideOutByTrackpad SlideOutByTrackpad

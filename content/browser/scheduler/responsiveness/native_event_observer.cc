@@ -90,7 +90,7 @@ void BrowserUINativeEventObserver::DidRunNativeEvent(uintptr_t identifier) {
 }
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
 void BrowserUINativeEventObserver::RegisterObserver() {}
 void BrowserUINativeEventObserver::UnregisterObserver() {}
 #endif

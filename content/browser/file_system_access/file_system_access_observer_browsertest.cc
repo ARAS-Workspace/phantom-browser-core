@@ -36,11 +36,9 @@ namespace content {
 
 namespace {
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_FUCHSIA) && \
-    !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_MAC)
 constexpr int kBFCacheTestTimeoutMs = 3000;
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) &&
-        // !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_MAC)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_MAC)
 constexpr char kAttemptToObserveSymlinkHistogram[] =
     "Storage.FileSystemAccess.AttemptToObserveSymlinkOrJunction";
 
@@ -49,7 +47,7 @@ enum class TestFileSystemType {
   kLocal,
 };
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 enum class CreateSymbolicLinkResult {
   // The symbolic link creation failed because the platform does not support it.
   // On Windows, that may be due to the lack of the required privilege.
@@ -143,8 +141,7 @@ std::optional<base::FilePath> CreateSymlinkToBePicked(
 
   return symlink_path;
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) &&
-        // !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 
 }  // namespace
 
@@ -477,7 +474,7 @@ IN_PROC_BROWSER_TEST_F(FileSystemAccessObserveWithFlagBrowserTest,
 
 // Local file system access - including the open*Picker() methods used here
 // - is not supported on Android or iOS. Fuchsia does not support symlinks.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 IN_PROC_BROWSER_TEST_F(FileSystemAccessObserveWithFlagBrowserTest,
                        SymlinkCannotBeObserved) {
   base::HistogramTester histogram_tester;
@@ -503,8 +500,7 @@ IN_PROC_BROWSER_TEST_F(FileSystemAccessObserveWithFlagBrowserTest,
   histogram_tester.ExpectUniqueSample(kAttemptToObserveSymlinkHistogram,
                                       /*sample=*/true, 1);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) &&
-        // !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 
 class FileSystemAccessObserveWithUnobserveFlagBrowserTest
     : public FileSystemAccessObserveWithFlagBrowserTest {
@@ -560,26 +556,6 @@ class FileSystemAccessObserverBrowserTest
 // `base::FilePatchWatcher` is not implemented on Fuchsia. See
 // https://crbug.com/851641. Instead, just check that attempting to observe
 // a handle does not crash.
-#if BUILDFLAG(IS_FUCHSIA)
-IN_PROC_BROWSER_TEST_F(FileSystemAccessObserveWithFlagBrowserTest,
-                       ObservingLocalFileIsNotSupportedOnFuchsia) {
-  base::FilePath file_path = CreateFileToBePicked();
-
-  const std::string script =
-      // clang-format off
-      "(async () => {"
-         CREATE_PROMISE_AND_RESOLVERS
-         START_OBSERVING_FILE(TestFileSystemType::kLocal)
-         WRITE_TO_FILE
-         SET_CHANGE_TIMEOUT
-      "})()";
-  // clang-format on
-  auto result = EvalJs(shell(), script);
-  EXPECT_TRUE(result.ExtractError().find("did not support") !=
-              std::string::npos)
-      << result;
-}
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 IN_PROC_BROWSER_TEST_P(FileSystemAccessObserverBrowserTest, CreateObserver) {
   EXPECT_TRUE(NavigateToURL(shell(), test_url_));
@@ -1246,7 +1222,7 @@ IN_PROC_BROWSER_TEST_P(FileSystemAccessObserverBrowserTest,
 INSTANTIATE_TEST_SUITE_P(
     /* no prefix */,
     FileSystemAccessObserverBrowserTest,
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
     // Local file system access - including the open*Picker() methods used here
     // - is not supported on Android or iOS. See https://crbug.com/1011535.
     // Meanwhile, `base::FilePatchWatcher` is not implemented on Fuchsia. See
@@ -1254,14 +1230,14 @@ INSTANTIATE_TEST_SUITE_P(
     testing::Values(TestFileSystemType::kBucket)
 #else
     testing::Values(TestFileSystemType::kBucket, TestFileSystemType::kLocal)
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
 );
 
 // Local file system access - including the open*Picker() methods used here
 // - is not supported on Android or iOS. See https://crbug.com/1011535.
 // Meanwhile, `FilePathWatcher` is not implemented on Fuchsia. See
 // https://crbug.com/851641.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 class FileSystemAccessObserverWithBFCacheBrowserTest
     : public FileSystemAccessObserverBrowserTestBase {
  public:
@@ -1471,8 +1447,7 @@ IN_PROC_BROWSER_TEST_F(FileSystemAccessObserverWithBFCacheBrowserTest,
   auto records = EvalJs(shell(), script).TakeValue().TakeList();
   ASSERT_THAT(records, testing::IsEmpty());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) &&
-        // !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 
 using HandleType = FileSystemAccessPermissionContext::HandleType;
 

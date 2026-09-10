@@ -30,10 +30,6 @@
 #include "net/base/trace_constants.h"
 #include "net/traffic_annotation/network_traffic_annotation.h"
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <poll.h>
-#include <sys/ioctl.h>
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_APPLE)
 #include "net/socket/socket_apple.h"

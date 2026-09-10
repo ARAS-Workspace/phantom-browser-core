@@ -24,8 +24,6 @@
 #include "services/device/hid/hid_service_mac.h"
 #elif BUILDFLAG(IS_WIN)
 #include "services/device/hid/hid_service_win.h"
-#elif BUILDFLAG(IS_FUCHSIA)
-#include "services/device/hid/hid_service_fuchsia.h"
 #endif
 
 namespace device {
@@ -72,8 +70,6 @@ std::unique_ptr<HidService> HidService::Create() {
   return std::make_unique<HidServiceMac>();
 #elif BUILDFLAG(IS_WIN)
   return std::make_unique<HidServiceWin>();
-#elif BUILDFLAG(IS_FUCHSIA)
-  return std::make_unique<HidServiceFuchsia>();
 #else
   return nullptr;
 #endif

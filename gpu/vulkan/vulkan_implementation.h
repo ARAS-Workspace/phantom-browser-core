@@ -124,25 +124,6 @@ class COMPONENT_EXPORT(VULKAN) VulkanImplementation {
       VulkanYCbCrInfo* ycbcr_info) = 0;
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // Registers a sysmem buffer collection. `service_handle` contains a handle
-  // for the eventpair that controls the lifetime of the collection. The
-  // implementation must drop the collection when all peer handles for
-  // that eventpair are destroyed (i.e. when `ZX_EVENTPAIR_PEER_CLOSED` is
-  // signaled on that handle). Once a collection is registered the individual
-  // buffers in the collection can be referenced by using the peer of
-  // `service_handle` as `buffer_collection_handle` in `gmb_handle` passed to
-  // CreateImageFromGpuMemoryHandle().
-  virtual void RegisterSysmemBufferCollection(
-      VkDevice device,
-      zx::eventpair service_handle,
-      zx::channel sysmem_token,
-      viz::SharedImageFormat format,
-      gfx::BufferUsage usage,
-      gfx::Size size,
-      size_t min_buffer_count,
-      bool register_with_image_pipe) = 0;
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
   bool use_swiftshader() const { return use_swiftshader_; }
   bool allow_protected_memory() const { return allow_protected_memory_; }

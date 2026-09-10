@@ -60,9 +60,7 @@
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/version_info/version_info.h"
 
-#if !BUILDFLAG(IS_FUCHSIA)
 #include "components/variations/service/variations_service.h"  // nogncheck
-#endif
 
 using ::country_codes::CountryId;
 using ::regional_capabilities::SearchEngineChoiceScreenConditions;
@@ -517,15 +515,9 @@ SearchEngineChoiceService::Client::~Client() = default;
 // static
 CountryId SearchEngineChoiceService::Client::GetVariationsLatestCountry(
     variations::VariationsService* variations_service) {
-#if BUILDFLAG(IS_FUCHSIA)
-  // We can't add a dependency from Fuchsia to
-  // `//components/variations/service`.
-  return CountryId();
-#else
   return variations_service ? CountryId(base::ToUpperASCII(
                                   variations_service->GetLatestCountry()))
                             : CountryId();
-#endif
 }
 
 // -- SearchEngineChoiceService -----------------------------------------------

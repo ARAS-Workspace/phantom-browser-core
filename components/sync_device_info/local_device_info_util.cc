@@ -124,15 +124,12 @@ DeviceInfo::OsType GetLocalDeviceOSType() {
   return DeviceInfo::OsType::kMac;
 #elif BUILDFLAG(IS_WIN)
   return DeviceInfo::OsType::kWindows;
-#elif BUILDFLAG(IS_FUCHSIA)
-  return DeviceInfo::OsType::kFuchsia;
 #else
 #error Please handle your new device OS here.
 #endif
 }
 
 DeviceInfo::FormFactor GetLocalDeviceFormFactor() {
-#if !BUILDFLAG(IS_FUCHSIA)
   switch (ui::GetDeviceFormFactor()) {
     case ui::DEVICE_FORM_FACTOR_TABLET:
       return DeviceInfo::FormFactor::kTablet;
@@ -149,9 +146,6 @@ DeviceInfo::FormFactor GetLocalDeviceFormFactor() {
       return DeviceInfo::FormFactor::kUnknown;
   }
   NOTREACHED();
-#else   // !BUILDFLAG(IS_FUCHSIA)
-  return DeviceInfo::FormFactor::kUnknown;
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 }
 
 std::string GetPersonalizableDeviceNameBlocking() {

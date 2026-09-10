@@ -68,8 +68,6 @@ base::Value GetProcessValueDict(const base::Process& process) {
 #if BUILDFLAG(IS_WIN)
   ret.Set("handle",
           static_cast<int>(base::win::HandleToUint32(process.Handle())));
-#elif BUILDFLAG(IS_FUCHSIA)
-  ret.Set("handle", static_cast<int>(process.Handle()));
 #endif
 
   // Most processes are not current, so only show the outliers.

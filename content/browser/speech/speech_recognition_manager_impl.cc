@@ -54,7 +54,7 @@
 
 #if BUILDFLAG(IS_ANDROID)
 #include "content/browser/speech/speech_recognizer_impl_android.h"
-#elif !BUILDFLAG(IS_FUCHSIA)
+#else
 #include "components/soda/constants.h"
 #include "components/soda/soda_util.h"
 #include "content/browser/speech/on_device_speech_recognition_engine_impl.h"
@@ -696,7 +696,6 @@ int SpeechRecognitionManagerImpl::CreateSession(
   session->use_microphone = !audio_forwarder_config.has_value();
 
 #if !BUILDFLAG(IS_ANDROID)
-#if !BUILDFLAG(IS_FUCHSIA)
   const bool use_gemini_nano =
       base::FeatureList::IsEnabled(media::kOnDeviceWebSpeechGeminiNano) &&
       config.quality == media::mojom::SpeechRecognitionQuality::kConversation;
@@ -747,11 +746,9 @@ int SpeechRecognitionManagerImpl::CreateSession(
     // does not need to be associated with a session id in the browser.
     return 0;
   }
-#endif  //! BUILDFLAG(IS_FUCHSIA)
 
   std::unique_ptr<SpeechRecognitionEngine> speech_recognition_engine;
 
-#if !BUILDFLAG(IS_FUCHSIA)
   if (UseOnDeviceSpeechRecognition(config)) {
     if (IsOptimizationGuideSpeechModel(config)) {
       speech_recognition_engine =
@@ -765,7 +762,6 @@ int SpeechRecognitionManagerImpl::CreateSession(
       }
     }
   }
-#endif  //! BUILDFLAG(IS_FUCHSIA)
 
   if (!speech_recognition_engine) {
     // A NetworkSpeechRecognitionEngineImpl (and corresponding Config) is
@@ -847,7 +843,7 @@ SpeechRecognitionSessionContext SpeechRecognitionManagerImpl::GetSessionContext(
 
 bool SpeechRecognitionManagerImpl::UseOnDeviceSpeechRecognition(
     const SpeechRecognitionSessionConfig& config) {
-#if !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   return config.on_device &&
          (config.on_device_available || !config.allow_cloud_fallback);
 #else

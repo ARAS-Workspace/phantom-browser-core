@@ -1317,11 +1317,7 @@ TEST_F(MDnsTest, NsecConflictRemoval) {
 }
 
 // TODO(crbug.com/40807339): Flaky on fuchsia.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_RefreshQuery DISABLED_RefreshQuery
-#else
 #define MAYBE_RefreshQuery RefreshQuery
-#endif
 TEST_F(MDnsTest, MAYBE_RefreshQuery) {
   StrictMock<MockListenerDelegate> delegate_privet;
   std::unique_ptr<MDnsListener> listener_privet = test_client_->CreateListener(
@@ -1344,11 +1340,7 @@ TEST_F(MDnsTest, MAYBE_RefreshQuery) {
   RunFor(base::Seconds(6));
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_RefreshQueryMaxTTL DISABLED_RefreshQueryMaxTTL
-#else
 #define MAYBE_RefreshQueryMaxTTL RefreshQueryMaxTTL
-#endif
 TEST_F(MDnsTest, MAYBE_RefreshQueryMaxTTL) {
   StrictMock<MockListenerDelegate> delegate_privet;
   std::unique_ptr<MDnsListener> listener_privet = test_client_->CreateListener(
@@ -1604,12 +1596,7 @@ TEST_F(MDnsConnectionSendTest, SendQueued) {
   std::move(callback).Run(OK);
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// Fails on Fuchsia due to conflict with the system MDNS service.
-#define MAYBE_CreateSocket DISABLED_CreateSocket
-#else
 #define MAYBE_CreateSocket CreateSocket
-#endif
 TEST(MDnsSocketTest, MAYBE_CreateSocket) {
   // Verifies that socket creation hasn't been broken.
   auto socket = CreateAndBindMDnsSocket(AddressFamily::ADDRESS_FAMILY_IPV4, 1,

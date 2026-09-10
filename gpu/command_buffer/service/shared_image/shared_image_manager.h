@@ -217,11 +217,11 @@ class GPU_GLES2_EXPORT SharedImageManager
   scoped_refptr<base::SingleThreadTaskRunner> io_runner_;
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_CHROMEOS)
   bool supports_ycbcr_nv12_sampling_ = false;
   bool supports_ycbcr_p010_sampling_ = false;
   bool is_texture_sampling_queried_ GUARDED_BY(lock_) = false;
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_OZONE)
   bool supports_overlays_on_ozone_ = false;

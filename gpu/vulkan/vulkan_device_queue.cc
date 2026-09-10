@@ -224,11 +224,9 @@ bool VulkanDeviceQueue::Initialize(
       // On Fuchsia, some device extensions are provided by layers.
       // TODO(penghuang): checking extensions against layer device extensions
       // too.
-#if !BUILDFLAG(IS_FUCHSIA)
       DLOG(ERROR) << "Required Vulkan extension " << extension
                   << " is not supported.";
       return false;
-#endif
     }
     enabled_extensions.push_back(extension);
   }
@@ -287,8 +285,7 @@ bool VulkanDeviceQueue::Initialize(
 
   // Android, Fuchsia, Linux, and CrOS (VaapiVideoDecoder) need YCbCr sampler
   // support.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   if (!physical_device_info.feature_sampler_ycbcr_conversion) {
     LOG(ERROR) << "samplerYcbcrConversion is not supported.";
     return false;
@@ -301,8 +298,7 @@ bool VulkanDeviceQueue::Initialize(
   // of VkPhysicalDeviceFeatures2 to enable YCbCr sampler support.
   sampler_ycbcr_conversion_features_.pNext = enabled_device_features_2_.pNext;
   enabled_device_features_2_.pNext = &sampler_ycbcr_conversion_features_;
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_LINUX)
-        // || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
   if (allow_protected_memory) {
     if (!physical_device_info.feature_protected_memory) {

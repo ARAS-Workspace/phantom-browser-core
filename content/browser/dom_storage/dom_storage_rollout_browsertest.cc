@@ -119,16 +119,6 @@ INSTANTIATE_TEST_SUITE_P(
 // Verifies that a brand-new on-disk database is created with the backend the
 // rollout arm selects, and that the control arm writes the experimental tag.
 IN_PROC_BROWSER_TEST_P(DOMStorageRolloutBrowserTest, CreatesConfiguredBackend) {
-#if BUILDFLAG(IS_FUCHSIA)
-  // Fuchsia's sandboxed SQLite VFS cannot acquire file locks, so a new SQLite
-  // database cannot be opened there. The control arm uses LevelDB and is
-  // unaffected.
-  // TODO(crbug.com/488731425): Re-enable the treatment arm once the sandboxed
-  // DomStorage SQLite backend runs on Fuchsia.
-  if (!IsControlArm()) {
-    GTEST_SKIP() << "SQLite DomStorage backend unsupported on Fuchsia";
-  }
-#endif
   OpenLocalStorageDatabase();
 
   {

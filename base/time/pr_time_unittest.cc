@@ -79,7 +79,7 @@ TEST_F(PRTimeTest, ParseTimeTest1) {
 #if BUILDFLAG(IS_WIN)
   localtime_s(&local_time, &current_time);
   asctime_s(time_buf, std::size(time_buf), &local_time);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   localtime_r(&current_time, &local_time);
   asctime_r(&local_time, time_buf);
 #endif

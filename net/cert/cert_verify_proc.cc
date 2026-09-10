@@ -55,7 +55,7 @@
 #include "third_party/boringssl/src/pki/signature_algorithm.h"
 #include "url/url_canon.h"
 
-#if BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
+#if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
 #include "net/cert/cert_verify_proc_builtin.h"
 #endif
 
@@ -370,7 +370,7 @@ base::DictValue CertVerifyParams(X509Certificate* cert,
 
 }  // namespace
 
-#if !(BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(CHROME_ROOT_STORE_ONLY))
+#if !BUILDFLAG(CHROME_ROOT_STORE_ONLY)
 // static
 scoped_refptr<CertVerifyProc> CertVerifyProc::CreateSystemVerifyProc(
     scoped_refptr<CertNetFetcher> cert_net_fetcher,
@@ -386,21 +386,6 @@ scoped_refptr<CertVerifyProc> CertVerifyProc::CreateSystemVerifyProc(
 }
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-// static
-scoped_refptr<CertVerifyProc> CertVerifyProc::CreateBuiltinVerifyProc(
-    scoped_refptr<CertNetFetcher> cert_net_fetcher,
-    scoped_refptr<CRLSet> crl_set,
-    std::unique_ptr<CTVerifier> ct_verifier,
-    scoped_refptr<CTPolicyEnforcer> ct_policy_enforcer,
-    const InstanceParams instance_params,
-    std::optional<network_time::TimeTracker> time_tracker) {
-  return CreateCertVerifyProcBuiltin(
-      std::move(cert_net_fetcher), std::move(crl_set), std::move(ct_verifier),
-      std::move(ct_policy_enforcer), CreateSslSystemTrustStore(),
-      instance_params, std::move(time_tracker));
-}
-#endif
 
 #if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
 // static

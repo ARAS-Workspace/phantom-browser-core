@@ -86,8 +86,6 @@ mojo::PlatformHandle StructTraits<
     gfx::NativePixmapPlane>::buffer_handle(gfx::NativePixmapPlane& plane) {
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   return mojo::PlatformHandle(std::move(plane.fd));
-#elif BUILDFLAG(IS_FUCHSIA)
-  return mojo::PlatformHandle(std::move(plane.vmo));
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 }
 
@@ -104,23 +102,11 @@ bool StructTraits<
   if (!handle.is_fd())
     return false;
   out->fd = handle.TakeFD();
-#elif BUILDFLAG(IS_FUCHSIA)
-  if (!handle.is_handle())
-    return false;
-  out->vmo = zx::vmo(handle.TakeHandle());
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
   return true;
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-PlatformHandle
-StructTraits<gfx::mojom::NativePixmapHandleDataView, gfx::NativePixmapHandle>::
-    buffer_collection_handle(gfx::NativePixmapHandle& pixmap_handle) {
-  return mojo::PlatformHandle(
-      std::move(pixmap_handle.buffer_collection_handle));
-}
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 bool StructTraits<
     gfx::mojom::NativePixmapHandleDataView,
@@ -132,14 +118,6 @@ bool StructTraits<
       data.supports_zero_copy_webgpu_import();
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-  mojo::PlatformHandle handle = data.TakeBufferCollectionHandle();
-  if (!handle.is_handle())
-    return false;
-  out->buffer_collection_handle = zx::eventpair(handle.TakeHandle());
-  out->buffer_index = data.buffer_index();
-  out->ram_coherency = data.ram_coherency();
-#endif
 
   return data.ReadPlanes(&out->planes);
 }

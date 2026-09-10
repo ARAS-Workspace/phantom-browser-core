@@ -31,7 +31,7 @@
 #include "third_party/perfetto/include/perfetto/tracing/platform.h"
 #include "third_party/perfetto/include/perfetto/tracing/tracing.h"
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 // As per 'gn help check':
 /*
   If you have conditional includes, make sure the build conditions and the

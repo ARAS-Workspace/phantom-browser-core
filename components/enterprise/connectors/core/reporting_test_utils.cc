@@ -139,10 +139,6 @@ CreatePolicyTestServerForSecurityEvents(
     const base::flat_set<std::string>& enabled_event_names,
     const base::flat_map<std::string, std::vector<std::string>>&
         enabled_opt_in_events) {
-#if BUILDFLAG(IS_FUCHSIA)
-  // Policy is not supported for Fuchsia yet.
-  return nullptr;
-#else
   base::ListValue reporting_settings =
       base::ListValue().Append(CreateSecurityEventReportingSettings(
           enabled_event_names, enabled_opt_in_events));
@@ -165,7 +161,6 @@ CreatePolicyTestServerForSecurityEvents(
       policy::dm_protocol::kChromeMachineLevelUserCloudPolicyType,
       settings.SerializeAsString());
   return policy_server;
-#endif
 }
 
 EventReportValidatorBase::EventReportValidatorBase(

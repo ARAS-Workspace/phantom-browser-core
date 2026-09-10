@@ -259,7 +259,7 @@ ContentRootNodeForFrameActionableMode(
   return body;
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 // Helper function to generate a click on the given RenderWidgetHost. The
 // mouse event is forwarded directly to the RenderWidgetHost without any
 // hit-testing.
@@ -273,8 +273,7 @@ void SimulateMouseClickAt(content::RenderWidgetHost* rwh, gfx::PointF point) {
   rwh->ForwardMouseEvent(mouse_event);
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) &&
-        // !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 
 class PageContentProtoProviderBrowserTest : public content::ContentBrowserTest {
  public:
@@ -1779,7 +1778,7 @@ IN_PROC_BROWSER_TEST_P(PageContentProtoProviderBrowserTestMultiProcess,
 // Popups may be rendered as native OS-level widgets on Android and MacOS.
 //
 // TODO: b/450618828 - Enable on Fuchsia with proper geometry comparison.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_P(PageContentProtoProviderBrowserTestMultiProcess,
                        SelectInCrossOriginIframe) {
   LoadPage(https_server()->GetURL(
@@ -1845,8 +1844,7 @@ IN_PROC_BROWSER_TEST_P(PageContentProtoProviderBrowserTestMultiProcess,
   EXPECT_EQ(popup_window.visible_bounding_box().y(),
             select_node_geometry.visible_bounding_box().y() + 10);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) &&
-        // !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 
 class ScaledPageContentProtoProviderBrowserTest
     : public PageContentProtoProviderBrowserTest {
@@ -1896,7 +1894,7 @@ IN_PROC_BROWSER_TEST_F(ScaledPageContentProtoProviderBrowserTest, ScaleSizes) {
 // Popups may be rendered as native OS-level widgets on Android and Apple OSs.
 //
 // TODO: b/450618828 - Enable on Fuchsia with proper geometry comparison.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_APPLE)
 IN_PROC_BROWSER_TEST_F(ScaledPageContentProtoProviderBrowserTest,
                        SelectInMainFrame) {
   LoadPage(https_server()->GetURL("/open_popup.html"));
@@ -1940,8 +1938,7 @@ IN_PROC_BROWSER_TEST_F(ScaledPageContentProtoProviderBrowserTest,
   EXPECT_EQ(page_content().popup_window().visible_bounding_box().y(),
             select_node_geometry.outer_bounding_box().y() + 10 * 2);
 }
-#endif  //  !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) &&
-        //  !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_APPLE)
 
 bool ContainsRole(const optimization_guide::proto::ContentNode& node,
                   optimization_guide::proto::AnnotatedRole role) {
@@ -2563,7 +2560,6 @@ class PageContentProtoProviderPopupBrowserTest
 };
 
 // TODO: b/450618828 - Enable on Fuchsia with proper geometry comparison.
-#if !BUILDFLAG(IS_FUCHSIA)
 IN_PROC_BROWSER_TEST_F(PageContentProtoProviderPopupBrowserTest,
                        SelectInMainFrame) {
   LoadPage(https_server()->GetURL("/open_popup.html"));
@@ -2766,7 +2762,6 @@ IN_PROC_BROWSER_TEST_F(PageContentProtoProviderPopupBrowserTest,
   EXPECT_EQ(popup_window.visible_bounding_box().y(),
             select_node_geometry.outer_bounding_box().y() + 10);
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 IN_PROC_BROWSER_TEST_F(PageContentProtoProviderPopupBrowserTest, ColorPicker) {
   LoadPage(https_server()->GetURL("/open_popup.html"), nullptr);

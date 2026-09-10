@@ -164,8 +164,7 @@ IN_PROC_BROWSER_TEST_P(WebRtcMediaRecorderTest,
 // These tests are flakily timing out on emulators (https://crbug.com/716691)
 // and/or under Android ASAN (https://crbug.com/693565);
 #define MAYBE_PeerConnection DISABLED_PeerConnection
-#elif (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && \
-    defined(THREAD_SANITIZER)
+#elif (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(THREAD_SANITIZER)
 // Flaky on Linux TSan, https://crbug.com/694373.
 #define MAYBE_PeerConnection DISABLED_PeerConnection
 #elif BUILDFLAG(IS_WIN) && !defined(NDEBUG)
@@ -173,9 +172,6 @@ IN_PROC_BROWSER_TEST_P(WebRtcMediaRecorderTest,
 #define MAYBE_PeerConnection DISABLED_PeerConnection
 #elif BUILDFLAG(IS_MAC)
 // Fails on Mac, https://crbug.com/1222675
-#define MAYBE_PeerConnection DISABLED_PeerConnection
-#elif BUILDFLAG(IS_FUCHSIA) && defined(ARCH_CPU_X86_64)
-// Flaky on Fuchsia-x64, https://crbug.com/1408820
 #define MAYBE_PeerConnection DISABLED_PeerConnection
 #else
 #define MAYBE_PeerConnection PeerConnection

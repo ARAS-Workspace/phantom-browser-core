@@ -46,7 +46,7 @@ TEST(SimpleFileEnumeratorTest, NotFound) {
 
   auto entry = enumerator.Next();
   EXPECT_EQ(std::nullopt, enumerator.Next());
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   EXPECT_TRUE(enumerator.HasError());
 #endif
 }

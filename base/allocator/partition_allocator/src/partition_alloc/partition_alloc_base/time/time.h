@@ -76,9 +76,6 @@
 #include "partition_alloc/buildflags.h"
 #endif  // PA_BUILDFLAG(IS_APPLE)
 
-#if PA_BUILDFLAG(IS_FUCHSIA)
-#include <zircon/types.h>
-#endif
 
 #if PA_BUILDFLAG(IS_APPLE)
 #include <CoreFoundation/CoreFoundation.h>
@@ -91,7 +88,7 @@
 #include <jni.h>
 #endif
 
-#if PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#if PA_BUILDFLAG(IS_POSIX)
 #include <sys/time.h>
 #include <unistd.h>
 #endif
@@ -131,11 +128,8 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) TimeDelta {
   // based on absolute time
   static TimeDelta FromFileTime(FILETIME ft);
   static TimeDelta FromWinrtDateTime(ABI::Windows::Foundation::DateTime dt);
-#elif PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#elif PA_BUILDFLAG(IS_POSIX)
   static TimeDelta FromTimeSpec(const timespec& ts);
-#endif
-#if PA_BUILDFLAG(IS_FUCHSIA)
-  static TimeDelta FromZxDuration(zx_duration_t nanos);
 #endif
 #if PA_BUILDFLAG(IS_APPLE)
   static TimeDelta FromMachTime(uint64_t mach_time);
@@ -194,11 +188,8 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) TimeDelta {
   constexpr bool is_min() const { return *this == Min(); }
   constexpr bool is_inf() const { return is_min() || is_max(); }
 
-#if PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#if PA_BUILDFLAG(IS_POSIX)
   struct timespec ToTimeSpec() const;
-#endif
-#if PA_BUILDFLAG(IS_FUCHSIA)
-  zx_duration_t ToZxDuration() const;
 #endif
 #if PA_BUILDFLAG(IS_WIN)
   ABI::Windows::Foundation::DateTime ToWinrtDateTime() const;
@@ -591,7 +582,7 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) Time
   static Time FromSecondsSinceUnixEpoch(double dt);
   double InSecondsFSinceUnixEpoch() const;
 
-#if PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#if PA_BUILDFLAG(IS_POSIX)
   // Converts the timespec structure to time. MacOS X 10.8.3 (and tentatively,
   // earlier versions) will have the |ts|'s tv_nsec component zeroed out,
   // having a 1 second resolution, which agrees with
@@ -618,15 +609,11 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) Time
   static Time FromMillisecondsSinceUnixEpoch(int64_t ms_since_epoch);
   int64_t InMillisecondsSinceUnixEpoch() const;
 
-#if PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#if PA_BUILDFLAG(IS_POSIX)
   static Time FromTimeVal(struct timeval t);
   struct timeval ToTimeVal() const;
 #endif
 
-#if PA_BUILDFLAG(IS_FUCHSIA)
-  static Time FromZxTime(zx_time_t time);
-  zx_time_t ToZxTime() const;
-#endif
 
 #if PA_BUILDFLAG(IS_APPLE)
   static Time FromCFAbsoluteTime(CFAbsoluteTime t);
@@ -845,11 +832,6 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) TimeTicks
   // considered to have an ambiguous ordering.)
   [[nodiscard]] static bool IsConsistentAcrossProcesses();
 
-#if PA_BUILDFLAG(IS_FUCHSIA)
-  // Converts between TimeTicks and an ZX_CLOCK_MONOTONIC zx_time_t value.
-  static TimeTicks FromZxTime(zx_time_t nanos_since_boot);
-  zx_time_t ToZxTime() const;
-#endif
 
 #if PA_BUILDFLAG(IS_WIN)
   // Translates an absolute QPC timestamp into a TimeTicks value. The returned
@@ -934,9 +916,7 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) ThreadTicks
 
   // Returns true if ThreadTicks::Now() is supported on this system.
   [[nodiscard]] static bool IsSupported() {
-#if (defined(_POSIX_THREAD_CPUTIME) && (_POSIX_THREAD_CPUTIME >= 0)) || \
-    PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID) ||               \
-    PA_BUILDFLAG(IS_FUCHSIA)
+#if (defined(_POSIX_THREAD_CPUTIME) && _POSIX_THREAD_CPUTIME >= 0) || PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID)
     return true;
 #elif PA_BUILDFLAG(IS_WIN)
     return IsSupportedWin();

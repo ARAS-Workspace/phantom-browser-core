@@ -29,12 +29,6 @@
 #include "base/win/win_util.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <lib/zx/vmo.h>
-#include <zircon/process.h>
-
-#include "base/fuchsia/fuchsia_logging.h"
-#endif
 
 // This file supports passing a read/write histogram shared memory region
 // between a parent process and child process. The information about the

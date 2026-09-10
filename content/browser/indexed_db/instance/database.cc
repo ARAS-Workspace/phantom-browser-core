@@ -763,11 +763,6 @@ Status Database::GetAllOperation(
     // 2 file descriptors are used per shared memory buffer.
     max_shared_memory_values_in_chunk = 64;
 #endif
-#elif BUILDFLAG(IS_FUCHSIA)
-    // channel_fuchsia.cc limits the number of handles per message to 64
-    // (ZX_CHANNEL_MAX_MSG_HANDLES): crbug.com/508116627.
-    // 1 platform handle is used per shared memory buffer.
-    max_shared_memory_values_in_chunk = 64;
 #endif
   }
 

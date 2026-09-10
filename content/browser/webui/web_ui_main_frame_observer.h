@@ -40,7 +40,7 @@ class CONTENT_EXPORT WebUIMainFrameObserver : public WebContentsObserver {
   // Override from WebContentsObserver
   void PrimaryPageChanged(Page& page) override;
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID)
   // On official Google builds, capture and report JavaScript error messages on
   // WebUI surfaces back to Google. This allows us to fix JavaScript errors and
   // exceptions.
@@ -51,7 +51,7 @@ class CONTENT_EXPORT WebUIMainFrameObserver : public WebContentsObserver {
       int32_t line_no,
       const std::u16string& source_id,
       const std::optional<std::u16string>& untrusted_stack_trace) override;
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   void ReadyToCommitNavigation(NavigationHandle* navigation_handle) override;
 

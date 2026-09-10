@@ -26,7 +26,7 @@
 #include <windows.h>
 
 #include "base/win/windows_types.h"
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 #include <pthread.h>
 #endif
 
@@ -222,7 +222,7 @@ TEST_F(ThreadLocalStoragePerfTest, PlatformTls) {
             write, kCount, 4);
 }
 
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 
 TEST_F(ThreadLocalStoragePerfTest, PlatformTls) {
   pthread_key_t key;

@@ -89,8 +89,6 @@ mojom::ConnectResult LaunchAndConnectToProcess(
   base::LaunchOptions options;
 #if BUILDFLAG(IS_WIN)
   options.handles_to_inherit = handle_passing_info;
-#elif BUILDFLAG(IS_FUCHSIA)
-  options.handles_to_transfer = handle_passing_info;
 #elif BUILDFLAG(IS_MAC)
   options.mach_ports_for_rendezvous = handle_passing_info;
 #elif BUILDFLAG(IS_POSIX)

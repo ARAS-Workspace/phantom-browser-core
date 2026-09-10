@@ -18,14 +18,14 @@
 #include "net/base/network_interfaces.h"
 #include "net/base/sys_addrinfo.h"
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include <net/if.h>
 #if BUILDFLAG(IS_ANDROID)
 #include "net/android/network_library.h"
 #else  // BUILDFLAG(IS_ANDROID)
 #include <ifaddrs.h>
 #endif  // BUILDFLAG(IS_ANDROID)
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_LINUX)
 #include <linux/rtnetlink.h>
@@ -38,7 +38,7 @@ namespace net {
 
 namespace {
 
-#if (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
 bool HaveOnlyLoopbackAddressesUsingGetifaddrs() {
   base::ScopedBlockingCall scoped_blocking_call(FROM_HERE,
                                                 base::BlockingType::MAY_BLOCK);
@@ -82,8 +82,7 @@ bool HaveOnlyLoopbackAddressesUsingGetifaddrs() {
   freeifaddrs(interface_addr);
   return result;
 }
-#endif  // (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)) ||
-        // BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
 
 // This implementation will always be posted to a thread pool.
 bool HaveOnlyLoopbackAddressesSlow() {
@@ -93,7 +92,7 @@ bool HaveOnlyLoopbackAddressesSlow() {
   return false;
 #elif BUILDFLAG(IS_ANDROID)
   return android::HaveOnlyLoopbackAddresses();
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   return HaveOnlyLoopbackAddressesUsingGetifaddrs();
 #endif  // defined(various platforms)
 }

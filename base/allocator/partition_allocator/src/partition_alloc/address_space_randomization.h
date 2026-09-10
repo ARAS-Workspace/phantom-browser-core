@@ -115,7 +115,7 @@ AslrMask(uintptr_t bits) {
 #endif
     }
 
-  #elif PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+  #elif PA_BUILDFLAG(IS_POSIX)
 
     #if PA_BUILDFLAG(PA_ARCH_CPU_X86_64)
 

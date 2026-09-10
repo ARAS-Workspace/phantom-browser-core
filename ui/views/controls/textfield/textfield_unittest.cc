@@ -3506,13 +3506,8 @@ TEST_F(TextfieldTest, HitOutsideTextAreaInRTLTest) {
 
 // TODO(https://crbug.com/361276581, https://crbug.com/361247468): Flakes on
 // Fuschia cast Debug bots.
-#if BUILDFLAG(IS_FUCHSIA) && !defined(NDEBUG)
-#define MAYBE_OverflowTest DISABLED_OverflowTest
-#define MAYBE_OverflowInRTLTest DISABLED_OverflowInRTLTest
-#else
 #define MAYBE_OverflowTest OverflowTest
 #define MAYBE_OverflowInRTLTest OverflowInRTLTest
-#endif
 TEST_F(TextfieldTest, MAYBE_OverflowTest) {
   InitTextfield();
 

@@ -2168,9 +2168,6 @@ TEST_P(IndexedDBTest, QuotaErrorOnDbOpenError) {
   if (IsSqliteBackingStoreEnabled()) {
     // The mechanism used to induce errors (`MakeFileUnwritable`) doesn't work
     // on Fuchsia.
-#if BUILDFLAG(IS_FUCHSIA)
-    GTEST_SKIP();
-#endif  // BUILDFLAG(IS_FUCHSIA)
   } else {
     leveldb_env::SetDBFactoryForTesting(base::BindRepeating(
         [](const leveldb_env::Options& options, const std::string& name,

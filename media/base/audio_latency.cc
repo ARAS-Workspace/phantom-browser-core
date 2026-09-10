@@ -22,17 +22,12 @@
 #include "base/android/android_info.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "base/fuchsia/scheduler.h"
-#endif
 
 namespace media {
 
 // static
 bool AudioLatency::IsResamplingPassthroughSupported(Type type) {
 #if BUILDFLAG(IS_CHROMEOS)
-  return true;
-#elif BUILDFLAG(IS_FUCHSIA)
   return true;
 #elif BUILDFLAG(IS_ANDROID)
   // Only N MR1+ has support for OpenSLES performance modes which allow for
@@ -55,14 +50,6 @@ int AudioLatency::GetHighLatencyBufferSize(int sample_rate,
   const double eighty_ms_size = 8.0 * sample_rate / 100;
   const int high_latency_buffer_size =
       std::bit_ceil(static_cast<uint32_t>(std::round(eighty_ms_size)));
-#elif BUILDFLAG(IS_FUCHSIA)
-  // Use 80ms buffers. Doesn't need to be aligned to power of 2, but it should
-  // be a multiple of the scheduling period used for audio threads.
-  constexpr base::TimeDelta period = base::Milliseconds(80);
-  static_assert(static_cast<int>(period / base::kAudioSchedulingPeriod) ==
-                period / base::kAudioSchedulingPeriod);
-  const int high_latency_buffer_size = period.InMilliseconds() * sample_rate /
-                                       base::Time::kMillisecondsPerSecond;
 #elif BUILDFLAG(IS_WIN)
   const double twenty_ms_size = 2.0 * sample_rate / 100;
   preferred_buffer_size = std::max(preferred_buffer_size, 1);
@@ -109,8 +96,7 @@ int AudioLatency::GetRtcBufferSize(int sample_rate, int hardware_buffer_size) {
     return frames_per_buffer;
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_APPLE) || \
-    BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_APPLE)
   // On Linux, MacOS and Fuchsia, the low level IO implementations on the
   // browser side supports all buffer size the clients want. We use the native
   // peer connection buffer size (10ms) to achieve best possible performance.

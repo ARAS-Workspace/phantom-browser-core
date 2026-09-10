@@ -82,8 +82,7 @@ class AudioContextManagerTest : public content::ContentBrowserTest {
 // Flaky on Linux: crbug.com/941219
 // Flaky on Mac: crbug.com/941219
 // Flaky on Fuchsia: crbug.com/941219
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #define MAYBE_AudioContextPlaybackRecorded DISABLED_AudioContextPlaybackRecorded
 #else
 #define MAYBE_AudioContextPlaybackRecorded AudioContextPlaybackRecorded
@@ -99,8 +98,7 @@ IN_PROC_BROWSER_TEST_F(AudioContextManagerTest,
 // Flaky on Android: crbug.com/941219
 // Flaky on Mac: crbug.com/941219
 // Flaky on Fuchsia: crbug.com/941219
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_MAC) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
 #define MAYBE_AudioContextPlaybackTimeUkm DISABLED_AudioContextPlaybackTimeUkm
 #else
 #define MAYBE_AudioContextPlaybackTimeUkm AudioContextPlaybackTimeUkm

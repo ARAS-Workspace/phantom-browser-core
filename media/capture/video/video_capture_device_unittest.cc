@@ -81,7 +81,7 @@
 
 #define MAYBE_UsingRealWebcam_CheckPhotoCallbackRelease \
   UsingRealWebcam_CheckPhotoCallbackRelease
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
 // Windows test bots don't have camera.
 // Linux test bots don't have camera.
 // On Fuchsia the tests run under emulator that doesn't support camera.
@@ -229,9 +229,6 @@ constexpr auto kMainThreadType =
     // Video capture code on MacOSX must run on a CFRunLoop enabled thread
     // for interaction with AVFoundation.
     base::test::TaskEnvironment::MainThreadType::UI;
-#elif BUILDFLAG(IS_FUCHSIA)
-    // FIDL APIs on Fuchsia requires IO thread.
-    base::test::TaskEnvironment::MainThreadType::IO;
 #else
     base::test::TaskEnvironment::MainThreadType::DEFAULT;
 #endif

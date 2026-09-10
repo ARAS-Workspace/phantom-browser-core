@@ -33,9 +33,6 @@
 #include <os/lock.h>
 #endif  // PA_BUILDFLAG(IS_APPLE)
 
-#if PA_BUILDFLAG(IS_FUCHSIA)
-#include <lib/sync/mutex.h>
-#endif
 
 #if PA_CONFIG(HAS_LINUX_KERNEL) && \
     PA_BUILDFLAG(ENABLE_PARTITION_LOCK_PRIORITY_INHERITANCE)
@@ -146,8 +143,6 @@ class PA_LOCKABLE PA_COMPONENT_EXPORT(PARTITION_ALLOC) SpinningMutex {
   os_unfair_lock unfair_lock_ = OS_UNFAIR_LOCK_INIT;
 #elif PA_BUILDFLAG(IS_POSIX)
   pthread_mutex_t lock_ = PTHREAD_MUTEX_INITIALIZER;
-#elif PA_BUILDFLAG(IS_FUCHSIA)
-  sync_mutex lock_;
 #else
   std::atomic<bool> lock_{false};
 #endif
@@ -295,16 +290,6 @@ PA_ALWAYS_INLINE bool SpinningMutex::Try() {
 PA_ALWAYS_INLINE void SpinningMutex::Release() {
   int retval = pthread_mutex_unlock(&lock_);
   PA_DCHECK(retval == 0);
-}
-
-#elif PA_BUILDFLAG(IS_FUCHSIA)
-
-PA_ALWAYS_INLINE bool SpinningMutex::Try() {
-  return sync_mutex_trylock(&lock_) == ZX_OK;
-}
-
-PA_ALWAYS_INLINE void SpinningMutex::Release() {
-  sync_mutex_unlock(&lock_);
 }
 
 #else

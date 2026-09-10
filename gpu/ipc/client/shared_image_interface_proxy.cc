@@ -488,19 +488,6 @@ bool SharedImageInterfaceProxy::GetSHMForPixelData(
   return true;
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-void SharedImageInterfaceProxy::RegisterSysmemBufferCollection(
-    zx::eventpair service_handle,
-    zx::channel sysmem_token,
-    const viz::SharedImageFormat& format,
-    gfx::BufferUsage usage,
-    bool register_with_image_pipe) {
-  host_->GetGpuChannel().RegisterSysmemBufferCollection(
-      mojo::PlatformHandle(std::move(service_handle)),
-      mojo::PlatformHandle(std::move(sysmem_token)), format, usage,
-      register_with_image_pipe);
-}
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 void SharedImageInterfaceProxy::AddReferenceToSharedImage(
     const SyncToken& sync_token,

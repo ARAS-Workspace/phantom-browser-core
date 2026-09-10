@@ -30,11 +30,6 @@
 #include "base/features.h"
 #include "base/logging.h"
 #include "base/test/scoped_feature_list.h"
-#elif BUILDFLAG(IS_FUCHSIA)
-#include <lib/zx/object.h>
-#include <lib/zx/process.h>
-
-#include "base/fuchsia/fuchsia_logging.h"
 #endif
 
 using base::test::ErrorIs;
@@ -428,10 +423,6 @@ void CheckReadOnlyMapProtection(void* addr) {
                                  logging::GetLastSystemErrorCode());
   EXPECT_EQ(memory_info.AllocationProtect, static_cast<DWORD>(PAGE_READONLY));
   EXPECT_EQ(memory_info.Protect, static_cast<DWORD>(PAGE_READONLY));
-#elif BUILDFLAG(IS_FUCHSIA)
-// TODO(alexilin): We cannot call zx_object_get_info ZX_INFO_PROCESS_MAPS in
-// this process. Consider to create an auxiliary process that will read the
-// test process maps.
 #endif
 }
 
@@ -442,11 +433,6 @@ bool TryToRestoreWritablePermissions(void* addr, size_t len) {
 #elif BUILDFLAG(IS_WIN)
   DWORD old_protection;
   return VirtualProtect(addr, len, PAGE_READWRITE, &old_protection);
-#elif BUILDFLAG(IS_FUCHSIA)
-  zx_status_t status =
-      zx::vmar::root_self()->protect(ZX_VM_PERM_READ | ZX_VM_PERM_WRITE,
-                                     reinterpret_cast<uintptr_t>(addr), len);
-  return status == ZX_OK;
 #else
   return false;
 #endif

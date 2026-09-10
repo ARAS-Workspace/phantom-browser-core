@@ -16,9 +16,7 @@ bool ShouldShowPersonalContextAutofillSetting(
     const AutofillClient& client,
     personal_context::PersonalContextEligibilityService* eligibility_service) {
   return ShouldShowPersonalContextAutofillSetting(
-#if !BUILDFLAG(IS_FUCHSIA)
       client.GetGoogleGroupsManager(),
-#endif
       client.GetPrefs(), client.GetEntityDataManager(),
       client.GetIdentityManager(), client.GetSyncService(),
       client.IsWalletPublicPassStorageEnabled(), client.IsOffTheRecord(),
@@ -27,9 +25,7 @@ bool ShouldShowPersonalContextAutofillSetting(
 }
 
 bool ShouldShowPersonalContextAutofillSetting(
-#if !BUILDFLAG(IS_FUCHSIA)
     const GoogleGroupsManager* google_groups_manager,
-#endif
     const PrefService* prefs,
     const EntityDataManager* edm,
     const signin::IdentityManager* identity_manager,
@@ -45,9 +41,7 @@ bool ShouldShowPersonalContextAutofillSetting(
   }
 
   const bool ambient_autofill_enabled = MayPerformAutofillAiAction(
-#if !BUILDFLAG(IS_FUCHSIA)
       google_groups_manager,
-#endif
       prefs, edm, identity_manager, sync_service,
       is_wallet_public_pass_storage_enabled, is_off_the_record, country_code,
       subscription_service, eligibility_service->GetEligibilityState(),
@@ -56,11 +50,7 @@ bool ShouldShowPersonalContextAutofillSetting(
   const bool at_memory_enabled = MayPerformAtMemoryActionBase(
       AtMemoryAction::kShowAtMemoryInSettings, eligibility_service,
       subscription_service, prefs,
-#if !BUILDFLAG(IS_FUCHSIA)
       google_groups_manager,
-#else
-      /*google_groups_manager=*/nullptr,
-#endif
       /*decider=*/nullptr, is_off_the_record);
 
   return ambient_autofill_enabled || at_memory_enabled;

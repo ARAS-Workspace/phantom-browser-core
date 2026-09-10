@@ -60,9 +60,6 @@
 #include "media/mojo/mojom/video_decoder.mojom-forward.h"
 #endif  // BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "media/mojo/mojom/fuchsia_media.mojom-forward.h"
-#endif
 
 class GURL;
 
@@ -708,11 +705,6 @@ class CONTENT_EXPORT RenderProcessHost : public IPC::Listener,
           receiver) = 0;
   virtual void BindVideoDecodePerfHistory(
       mojo::PendingReceiver<media::mojom::VideoDecodePerfHistory> receiver) = 0;
-#if BUILDFLAG(IS_FUCHSIA)
-  virtual void BindMediaCodecProvider(
-      mojo::PendingReceiver<media::mojom::FuchsiaMediaCodecProvider>
-          receiver) = 0;
-#endif
   virtual void CreateOneShotSyncService(
       const url::Origin& origin,
       mojo::PendingReceiver<blink::mojom::OneShotBackgroundSyncService>

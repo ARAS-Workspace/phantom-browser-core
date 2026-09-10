@@ -276,7 +276,6 @@ void OverlayProcessorOzone::CheckOverlaySupportImpl(
       ConvertToOzoneOverlaySurface(*primary_plane, &(*ozone_surface_iterator));
       // TODO(crbug.com/40153057): Fuchsia claims support for presenting primary
       // plane as overlay, but does not provide a mailbox. Handle this case.
-#if !BUILDFLAG(IS_FUCHSIA)
       if (pixmap_provider_) {
         bool result = SetNativePixmapForCandidate(&(*ozone_surface_iterator),
                                                   primary_plane->mailbox,
@@ -311,7 +310,6 @@ void OverlayProcessorOzone::CheckOverlaySupportImpl(
           return;
         }
       }
-#endif
       ozone_surface_iterator++;
     }
 

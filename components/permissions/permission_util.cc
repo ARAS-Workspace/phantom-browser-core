@@ -284,8 +284,7 @@ bool PermissionUtil::GetPermissionType(ContentSettingsType type,
     case ContentSettingsType::BACKGROUND_SYNC:
       *out = PermissionType::BACKGROUND_SYNC;
       break;
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
     case ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER:
       *out = PermissionType::PROTECTED_MEDIA_IDENTIFIER;
       break;
@@ -510,8 +509,7 @@ ContentSettingsType PermissionUtil::PermissionTypeToContentSettingsTypeSafe(
     case PermissionType::GEOLOCATION_APPROXIMATE:
       return content_settings::GeolocationContentSettingsType();
     case PermissionType::PROTECTED_MEDIA_IDENTIFIER:
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
       return ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER;
 #else
       break;

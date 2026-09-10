@@ -29,8 +29,6 @@
 #include "media/capture/video/apple/video_capture_device_factory_apple.h"
 #elif BUILDFLAG(IS_ANDROID)
 #include "media/capture/video/android/video_capture_device_factory_android.h"
-#elif BUILDFLAG(IS_FUCHSIA)
-#include "media/capture/video/fuchsia/video_capture_device_factory_fuchsia.h"
 #endif
 
 namespace media {
@@ -81,8 +79,6 @@ CreatePlatformSpecificVideoCaptureDeviceFactory(
 #elif BUILDFLAG(IS_ANDROID)
   return std::make_unique<VideoCaptureDeviceFactoryAndroid>(
       gpu_workarounds ? *gpu_workarounds : gpu::GpuDriverBugWorkarounds());
-#elif BUILDFLAG(IS_FUCHSIA)
-  return std::make_unique<VideoCaptureDeviceFactoryFuchsia>();
 #elif BUILDFLAG(IS_IOS)
   return CreateFakeVideoCaptureDeviceFactory();
 #else

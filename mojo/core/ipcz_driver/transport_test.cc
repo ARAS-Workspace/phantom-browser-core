@@ -143,7 +143,7 @@ class MojoIpczTransportTest : public test::MojoTestBase {
     CHECK(wrapper);
 #if BUILDFLAG(IS_WIN)
     return base::File(wrapper->TakeHandle().TakeHandle());
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
     return base::File(wrapper->TakeHandle().TakeFD());
 #endif
   }

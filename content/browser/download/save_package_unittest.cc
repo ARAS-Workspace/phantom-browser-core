@@ -36,7 +36,7 @@ namespace content {
 #define HTML_EXTENSION ".html"
 #if BUILDFLAG(IS_WIN)
 #define FPL_HTML_EXTENSION L".html"
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 #define FPL_HTML_EXTENSION ".html"
 #endif
 
@@ -45,7 +45,7 @@ namespace {
 // This constant copied from save_package.cc.
 #if BUILDFLAG(IS_WIN)
 const uint32_t kMaxFilePathLength = MAX_PATH - 1;
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 const uint32_t kMaxFilePathLength = PATH_MAX - 1;
 #endif
 

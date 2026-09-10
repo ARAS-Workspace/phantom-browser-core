@@ -142,10 +142,6 @@ TEST_F(PathServiceTest, Get) {
       FILE_MODULE,
       // PathProviderPosix handles it but fails at some point.
       DIR_USER_DESKTOP};
-#elif BUILDFLAG(IS_FUCHSIA)
-  constexpr std::array kUnsupportedKeys = {
-      // TODO(crbug.com/42050322): Implement DIR_USER_DESKTOP.
-      DIR_USER_DESKTOP};
 #else
   constexpr std::array<BasePathKey, 0> kUnsupportedKeys = {};
 #endif  // BUILDFLAG(IS_ANDROID)
@@ -355,9 +351,7 @@ TEST_F(PathServiceTest, GetSystemTemp) {
 TEST_F(PathServiceTest, DIR_ASSETS) {
   FilePath path;
   ASSERT_TRUE(PathService::Get(DIR_ASSETS, &path));
-#if BUILDFLAG(IS_FUCHSIA)
-  EXPECT_EQ(path.value(), "/pkg");
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // This key is overridden in //base/test/test_support_android.cc.
   EXPECT_EQ(path.value(), kExpectedChromiumTestsRoot);
 #elif BUILDFLAG(IS_IOS_MACCATALYST)
@@ -375,9 +369,7 @@ TEST_F(PathServiceTest, DIR_ASSETS) {
 TEST_F(PathServiceTest, DIR_OUT_TEST_DATA_ROOT) {
   FilePath path;
   ASSERT_TRUE(PathService::Get(DIR_OUT_TEST_DATA_ROOT, &path));
-#if BUILDFLAG(IS_FUCHSIA)
-  EXPECT_EQ(path.value(), "/pkg");
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // This key is overridden in //base/test/test_support_android.cc.
   EXPECT_EQ(path.value(), kExpectedChromiumTestsRoot);
 #elif BUILDFLAG(IS_IOS)
@@ -451,15 +443,7 @@ TEST_F(PathServiceTest, SetTestDataRootAsRelativePath) {
 
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-// On Fuchsia, some keys have fixed paths that are easy to test.
-
-TEST_F(PathServiceTest, DIR_SRC_TEST_DATA_ROOT) {
-  FilePath test_binary_path;
-  EXPECT_EQ(PathService::CheckedGet(DIR_SRC_TEST_DATA_ROOT).value(), "/pkg");
-}
-
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 
 // These keys are overridden in //base/test/test_support_android.cc.
 TEST_F(PathServiceTest, AndroidTestOverrides) {
@@ -473,6 +457,6 @@ TEST_F(PathServiceTest, AndroidTestOverrides) {
             kExpectedChromiumTestsRoot);
 }
 
-#endif  // BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 }  // namespace base

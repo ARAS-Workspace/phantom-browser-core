@@ -36,9 +36,7 @@
 #include "base/system/sys_info.h"
 #endif
 
-#if !BUILDFLAG(IS_FUCHSIA)
 #include "components/variations/service/google_groups_manager.h"  // nogncheck
-#endif
 
 namespace autofill {
 
@@ -431,14 +429,10 @@ bool MayPerformAtMemoryActionBase(
 
 bool IsAtMemoryFeatureEnabled(
     const GoogleGroupsManager* google_groups_manager) {
-#if !BUILDFLAG(IS_FUCHSIA)
   return google_groups_manager
              ? google_groups_manager->IsFeatureEnabledForProfile(
                    features::kAutofillAtMemory)
              : base::FeatureList::IsEnabled(features::kAutofillAtMemory);
-#else
-  return base::FeatureList::IsEnabled(features::kAutofillAtMemory);
-#endif
 }
 
 }  // namespace autofill

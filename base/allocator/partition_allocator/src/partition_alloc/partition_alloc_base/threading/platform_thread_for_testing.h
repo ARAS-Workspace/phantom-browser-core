@@ -60,7 +60,7 @@ class PlatformThreadForTesting : public PlatformThread {
   // `thread_handle`.
   static void Join(PlatformThreadHandle thread_handle);
 
-#if PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#if PA_BUILDFLAG(IS_POSIX)
   // Returns the default thread stack size set by chrome. If we do not
   // explicitly set default size then returns 0.
   static size_t GetDefaultThreadStackSize();

@@ -41,12 +41,6 @@
 #include "base/win/windows_handle_util.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <lib/zx/vmo.h>
-#include <zircon/process.h>
-
-#include "base/fuchsia/fuchsia_logging.h"
-#endif
 
 // This file supports passing a shared memory region between a parent process
 // and child process. The information about the shared memory region is encoded
@@ -75,25 +69,6 @@ using base::subtle::ScopedPlatformSharedMemoryHandle;
 // slightly larger than the largest shared memory size used in practice.
 constexpr size_t kMaxSharedMemorySize = 8 << 20;  // 8 MiB
 
-#if BUILDFLAG(IS_FUCHSIA)
-// Return a scoped platform shared memory handle for |shmem_region|, possibly
-// with permissions reduced to make the handle read-only.
-// For Fuchsia:
-// * ScopedPlatformSharedMemoryHandle <==> zx::vmo
-zx::vmo GetFuchsiaHandle(ScopedPlatformSharedMemoryHandle shmem_handle,
-                         bool make_read_only) {
-  if (!make_read_only) {
-    return shmem_handle;
-  }
-  zx::vmo scoped_handle;
-  zx_status_t status =
-      shmem_handle.duplicate(ZX_RIGHT_READ | ZX_RIGHT_MAP | ZX_RIGHT_TRANSFER |
-                                 ZX_RIGHT_GET_PROPERTY | ZX_RIGHT_DUPLICATE,
-                             &scoped_handle);
-  ZX_CHECK(status == ZX_OK, status) << "zx_handle_duplicate";
-  return scoped_handle;
-}
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 // Serializes the shared memory region metadata to a string that can be added
 // to the command-line of a child-process.
@@ -141,15 +116,6 @@ std::string Serialize(HandleType shmem_handle,
       rendezvous_key, MachRendezvousPort(std::move(shmem_handle)));
   StrAppend(&serialized, {NumberToString(rendezvous_key), ",r,"});
 #endif
-#elif BUILDFLAG(IS_FUCHSIA)
-  // The handle is passed via the handles to transfer launch options. The child
-  // will use the returned handle_id to lookup the handle. Ownership of the
-  // handle is transferred to |launch_options|.
-  zx::vmo scoped_handle =
-      GetFuchsiaHandle(std::move(shmem_handle), is_read_only);
-  uint32_t handle_id = LaunchOptions::AddHandleToTransfer(
-      &launch_options->handles_to_transfer, scoped_handle.release());
-  StrAppend(&serialized, {NumberToString(handle_id), ",i,"});
 #elif BUILDFLAG(IS_POSIX)
   // Serialize the key by which the child can lookup the shared memory handle.
   // Ownership of the handle is transferred, via |descriptor_to_share|, to the
@@ -267,14 +233,6 @@ expected<PlatformSharedMemoryRegion, SharedMemoryError> Deserialize(
     // Note: This matches mojo behavior in content/child/child_thread_impl.cc.
     LOG(ERROR) << "Mach rendezvous failed, terminating process (parent died?)";
     base::Process::TerminateCurrentProcessImmediately(0);
-  }
-#elif BUILDFLAG(IS_FUCHSIA)
-  DCHECK_EQ(tokens[1], "i");
-  const uint32_t handle = checked_cast<uint32_t>(shmem_handle);
-  zx::vmo scoped_handle(zx_take_startup_handle(handle));
-  if (!scoped_handle.is_valid()) {
-    LOG(ERROR) << "Invalid shared mem handle: " << handle;
-    return unexpected(SharedMemoryError::kInvalidHandle);
   }
 #elif BUILDFLAG(IS_POSIX)
   DCHECK_EQ(tokens[1], "i");

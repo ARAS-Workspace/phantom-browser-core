@@ -30,8 +30,7 @@
 // __RES set to 19991006, but does not actually provide res_ninit(3). This was
 // an old musl bug that was fixed by musl c8fdcfe5, but Fuchsia's SDK doesn't
 // have that change.
-#if defined(__RES) && __RES >= 19991006 && !BUILDFLAG(IS_APPLE) && \
-    !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#if defined(__RES) && __RES >= 19991006 && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
 // We define this so we don't need to restate the complex condition here twice
 // below - it would be easy for the copies below to get out of sync.
 #define USE_RES_NINIT

@@ -367,10 +367,7 @@ VulkanImage::InitializeResult VulkanImage::InitializeWithExternalMemory(
     VkImageTiling image_tiling,
     const void* extra_image_create_info,
     const void* extra_memory_allocation_info) {
-#if BUILDFLAG(IS_FUCHSIA)
-  constexpr auto kHandleType =
-      VK_EXTERNAL_MEMORY_HANDLE_TYPE_ZIRCON_VMO_BIT_FUCHSIA;
-#elif BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_WIN)
   constexpr auto kHandleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
 #else
   constexpr auto kHandleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;

@@ -295,11 +295,7 @@
 #endif
 
 // VLOG additional statements in Fuchsia release builds.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBEVLOG VLOG
-#else
 #define MAYBEVLOG DVLOG
-#endif
 
 
 namespace content {
@@ -2854,15 +2850,6 @@ void RenderProcessHostImpl::BindPluginRegistry(
 }
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-void RenderProcessHostImpl::BindMediaCodecProvider(
-    mojo::PendingReceiver<media::mojom::FuchsiaMediaCodecProvider> receiver) {
-  if (!media_codec_provider_) {
-    media_codec_provider_ = std::make_unique<FuchsiaMediaCodecProviderImpl>();
-  }
-  media_codec_provider_->AddReceiver(std::move(receiver));
-}
-#endif
 
 void RenderProcessHostImpl::BindDomStorage(
     mojo::PendingReceiver<blink::mojom::DomStorage> receiver,
@@ -5863,8 +5850,7 @@ uint64_t RenderProcessHostImpl::GetPrivateMemoryFootprint() {
   // - Mac OS: https://crbug.com/707021 .
   // - Win: https://crbug.com/707022 .
   uint64_t total_size = 0;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   total_size = dump->platform_private_footprint->rss_anon_bytes +
                dump->platform_private_footprint->vm_swap_bytes;
 #elif BUILDFLAG(IS_APPLE)

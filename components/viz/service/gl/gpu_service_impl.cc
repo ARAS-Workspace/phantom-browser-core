@@ -633,17 +633,7 @@ void GpuServiceImpl::CreateVideoEncodeAcceleratorProvider(
   // and creating encoder might take quite some time, and they might block
   // processing of other mojo calls if executed on the current runner.
   scoped_refptr<base::SequencedTaskRunner> runner;
-#if BUILDFLAG(IS_FUCHSIA)
-  // TODO(crbug.com/40850116): Fuchsia does not support FIDL communication from
-  // ThreadPool's worker threads.
-  if (!vea_thread_) {
-    base::Thread::Options thread_options(base::MessagePumpType::IO, /*size=*/0);
-    vea_thread_ =
-        std::make_unique<base::Thread>("GpuVideoEncodeAcceleratorThread");
-    CHECK(vea_thread_->StartWithOptions(std::move(thread_options)));
-  }
-  runner = vea_thread_->task_runner();
-#elif BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_WIN)
   // Windows hardware encoder requires a COM STA thread.
   runner = base::ThreadPool::CreateCOMSTATaskRunner({base::MayBlock()});
 #else

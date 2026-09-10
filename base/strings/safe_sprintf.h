@@ -15,7 +15,7 @@
 #include "base/memory/raw_ptr_exclusion.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 // For ssize_t
 #include <unistd.h>
 #endif

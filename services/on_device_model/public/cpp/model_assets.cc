@@ -35,12 +35,6 @@ namespace {
 // (due to an apparent bug?) doesn't seem to support copy-on-write mapping of
 // file objects which are not writable. So we open as writable on Fuchsia even
 // though nothing should write through to the file.
-#if BUILDFLAG(IS_FUCHSIA)
-constexpr uint32_t kWeightsFlags =
-    base::File::AddFlagsForPassingToUntrustedProcess(
-        base::File::FLAG_OPEN | base::File::FLAG_READ | base::File::FLAG_WRITE);
-constexpr uint32_t kCacheFlags = kWeightsFlags;
-#else
 constexpr uint32_t kWeightsFlags =
     base::File::AddFlagsForPassingToUntrustedProcess(
         base::File::FLAG_OPEN | base::File::FLAG_READ | base::File::FLAG_ASYNC |
@@ -49,7 +43,6 @@ constexpr uint32_t kCacheFlags =
     base::File::AddFlagsForPassingToUntrustedProcess(
         base::File::FLAG_OPEN_ALWAYS | base::File::FLAG_READ |
         base::File::FLAG_WRITE);
-#endif
 
 // Attempts to make sure `file` will be read from disk quickly when needed.
 void PrefetchFile(const base::FilePath& path) {

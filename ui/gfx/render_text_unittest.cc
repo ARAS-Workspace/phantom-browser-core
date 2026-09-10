@@ -5394,10 +5394,6 @@ TEST_F(RenderTextTest, StringSizeBoldWidth) {
   // implemented because of test system font configuration).
   RenderText* render_text = GetRenderText();
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // Increase font size to ensure that bold and regular styles differ in width.
-  render_text->SetFontList(FontList("Arial, 20px"));
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
   render_text->SetText(u"Hello World");
 
@@ -7088,7 +7084,7 @@ bool TypefaceMayRenderColorEmojiForTest(SkTypeface* typeface) {
     return true;
   }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID)
   // No platform color-emoji font to match by name on these platforms.
   return false;
 #else
@@ -7132,10 +7128,8 @@ TEST_F(RenderTextTest, HarfBuzz_DefaultEmojiCodepointProducesGlyphs) {
     size_t total_glyphs = 0;
     for (const auto& run : run_list->runs()) {
       total_glyphs += run->shape.glyph_count;
-#if !BUILDFLAG(IS_FUCHSIA)
       // Fuchsia does not bundle a suitable font to resolve all glyphs.
       EXPECT_EQ(0U, run->CountMissingGlyphs());
-#endif
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
       // The pre-pass must have routed the run through the platform color
       // emoji typeface. On Linux/CrOS we can't reliably assert this in tests
@@ -7174,10 +7168,8 @@ TEST_F(RenderTextTest,
          "on emoji presentation, update this test and the mixed-run guard.";
   const auto& run = run_list->runs()[0];
   EXPECT_GT(run->shape.glyph_count, 0U);
-#if !BUILDFLAG(IS_FUCHSIA)
   // Fuchsia does not bundle a suitable font to resolve all glyphs.
   EXPECT_EQ(0U, run->CountMissingGlyphs());
-#endif
 }
 
 // Verifies that emoji-default codepoints followed by VS-15 (U+FE0E) route
@@ -8169,8 +8161,7 @@ TEST_F(RenderTextTest, SubpixelRenderingSuppressed) {
   render_text->SetText(u"x");
 
   DrawVisualText();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   // On Linux, whether subpixel AA is supported is determined by the platform
   // FontConfig. Force it into a particular style after computing runs. Other
   // platforms use a known default FontRenderParams from a static local.
@@ -8185,8 +8176,7 @@ TEST_F(RenderTextTest, SubpixelRenderingSuppressed) {
 
   render_text->set_subpixel_rendering_suppressed(true);
   DrawVisualText();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   // For Linux, runs shouldn't be re-calculated, and the suppression of the
   // SUBPIXEL_RENDERING_RGB set above should now take effect. But, after
   // checking, apply the override anyway to be explicit that it is suppressed.

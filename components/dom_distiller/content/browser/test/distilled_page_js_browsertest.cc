@@ -87,10 +87,7 @@ IN_PROC_BROWSER_TEST_F(DistilledPageJsTest, AddClassesToYTIFramesTest) {
 
 // Fails on Fuchsia ASAN.
 // Falky timeout on Linux and ChromeOS MSAN, ASAN and TSAN.
-#if BUILDFLAG(IS_FUCHSIA) && defined(ADDRESS_SANITIZER) ||          \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) &&              \
-        (defined(MEMORY_SANITIZER) || defined(ADDRESS_SANITIZER) || \
-         defined(THREAD_SANITIZER))
+#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && (defined(MEMORY_SANITIZER) || defined(ADDRESS_SANITIZER) || defined(THREAD_SANITIZER))
 #define MAYBE_ImageClassifierTest DISABLED_ImageClassifierTest
 #else
 #define MAYBE_ImageClassifierTest ImageClassifierTest

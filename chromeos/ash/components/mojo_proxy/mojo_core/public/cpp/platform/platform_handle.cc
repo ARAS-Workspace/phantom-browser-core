@@ -13,12 +13,6 @@
 #include <windows.h>
 
 #include "base/win/scoped_handle.h"
-#elif BUILDFLAG(IS_FUCHSIA)
-#include <lib/fdio/limits.h>
-#include <unistd.h>
-#include <zircon/status.h>
-
-#include "base/fuchsia/fuchsia_logging.h"
 #elif BUILDFLAG(IS_APPLE)
 #include <mach/vm_map.h>
 
@@ -59,17 +53,6 @@ base::win::ScopedHandle CloneHandle(const base::win::ScopedHandle& handle) {
   DCHECK_NE(dupe, INVALID_HANDLE_VALUE);
   return base::win::ScopedHandle(dupe);
 }
-#elif BUILDFLAG(IS_FUCHSIA)
-zx::handle CloneHandle(const zx::handle& handle) {
-  DCHECK(handle.is_valid());
-
-  zx::handle dupe;
-  zx_status_t result = handle.duplicate(ZX_RIGHT_SAME_RIGHTS, &dupe);
-  if (result != ZX_OK) {
-    ZX_DLOG(ERROR, result) << "zx_duplicate_handle";
-  }
-  return std::move(dupe);
-}
 #elif BUILDFLAG(IS_APPLE)
 base::apple::ScopedMachSendRight CloneMachPort(
     const base::apple::ScopedMachSendRight& mach_port) {
@@ -85,7 +68,7 @@ base::apple::ScopedMachSendRight CloneMachPort(
 }
 #endif
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 base::ScopedFD CloneFD(const base::ScopedFD& fd) {
   DCHECK(fd.is_valid());
   return base::ScopedFD(dup(fd.get()));
@@ -103,9 +86,6 @@ PlatformHandle::PlatformHandle(PlatformHandle&& other) {
 #if BUILDFLAG(IS_WIN)
 PlatformHandle::PlatformHandle(base::win::ScopedHandle handle)
     : type_(Type::kHandle), handle_(std::move(handle)) {}
-#elif BUILDFLAG(IS_FUCHSIA)
-PlatformHandle::PlatformHandle(zx::handle handle)
-    : type_(Type::kHandle), handle_(std::move(handle)) {}
 #elif BUILDFLAG(IS_APPLE)
 PlatformHandle::PlatformHandle(base::apple::ScopedMachSendRight mach_port)
     : type_(Type::kMachSend), mach_send_(std::move(mach_port)) {}
@@ -113,12 +93,9 @@ PlatformHandle::PlatformHandle(base::apple::ScopedMachReceiveRight mach_port)
     : type_(Type::kMachReceive), mach_receive_(std::move(mach_port)) {}
 #endif
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 PlatformHandle::PlatformHandle(base::ScopedFD fd)
     : type_(Type::kFd), fd_(std::move(fd)) {
-#if BUILDFLAG(IS_FUCHSIA)
-  DCHECK_LT(fd_.get(), FDIO_MAX_FD);
-#endif
 }
 #endif
 
@@ -130,14 +107,12 @@ PlatformHandle& PlatformHandle::operator=(PlatformHandle&& other) {
 
 #if BUILDFLAG(IS_WIN)
   handle_ = std::move(other.handle_);
-#elif BUILDFLAG(IS_FUCHSIA)
-  handle_ = std::move(other.handle_);
 #elif BUILDFLAG(IS_APPLE)
   mach_send_ = std::move(other.mach_send_);
   mach_receive_ = std::move(other.mach_receive_);
 #endif
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   fd_ = std::move(other.fd_);
 #endif
 
@@ -161,12 +136,6 @@ void PlatformHandle::ToMojoPlatformHandle(PlatformHandle handle,
     out_handle->value =
         static_cast<uint64_t>(HandleToLong(handle.TakeHandle().Take()));
     break;
-#elif BUILDFLAG(IS_FUCHSIA)
-    if (handle.is_handle()) {
-      out_handle->type = MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FUCHSIA_HANDLE;
-      out_handle->value = handle.TakeHandle().release();
-      break;
-    }
 #elif BUILDFLAG(IS_APPLE)
     if (handle.is_mach_send()) {
       out_handle->type = MOJO_LEGACY_PLATFORM_HANDLE_TYPE_MACH_SEND_RIGHT;
@@ -180,7 +149,7 @@ void PlatformHandle::ToMojoPlatformHandle(PlatformHandle handle,
     }
 #endif
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
     DCHECK(handle.is_fd());
     out_handle->type = MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FILE_DESCRIPTOR;
     out_handle->value = static_cast<uint64_t>(handle.TakeFD().release());
@@ -205,10 +174,6 @@ PlatformHandle PlatformHandle::FromMojoPlatformHandle(
   }
   return PlatformHandle(
       base::win::ScopedHandle(LongToHandle(static_cast<long>(handle->value))));
-#elif BUILDFLAG(IS_FUCHSIA)
-  if (handle->type == MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FUCHSIA_HANDLE) {
-    return PlatformHandle(zx::handle(handle->value));
-  }
 #elif BUILDFLAG(IS_APPLE)
   if (handle->type == MOJO_LEGACY_PLATFORM_HANDLE_TYPE_MACH_SEND_RIGHT) {
     return PlatformHandle(base::apple::ScopedMachSendRight(
@@ -220,7 +185,7 @@ PlatformHandle PlatformHandle::FromMojoPlatformHandle(
   }
 #endif
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   if (handle->type != MOJO_LEGACY_PLATFORM_HANDLE_TYPE_FILE_DESCRIPTOR) {
     return PlatformHandle();
   }
@@ -233,14 +198,12 @@ void PlatformHandle::reset() {
 
 #if BUILDFLAG(IS_WIN)
   handle_.Close();
-#elif BUILDFLAG(IS_FUCHSIA)
-  handle_.reset();
 #elif BUILDFLAG(IS_APPLE)
   mach_send_.reset();
   mach_receive_.reset();
 #endif
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   fd_.reset();
 #endif
 }
@@ -250,14 +213,12 @@ void PlatformHandle::release() {
 
 #if BUILDFLAG(IS_WIN)
   std::ignore = handle_.Take();
-#elif BUILDFLAG(IS_FUCHSIA)
-  std::ignore = handle_.release();
 #elif BUILDFLAG(IS_APPLE)
   std::ignore = mach_send_.release();
   std::ignore = mach_receive_.release();
 #endif
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   std::ignore = fd_.release();
 #endif
 }
@@ -265,11 +226,6 @@ void PlatformHandle::release() {
 PlatformHandle PlatformHandle::Clone() const {
 #if BUILDFLAG(IS_WIN)
   return PlatformHandle(CloneHandle(handle_));
-#elif BUILDFLAG(IS_FUCHSIA)
-  if (is_valid_handle()) {
-    return PlatformHandle(CloneHandle(handle_));
-  }
-  return PlatformHandle(CloneFD(fd_));
 #elif BUILDFLAG(IS_APPLE)
   if (is_valid_mach_send()) {
     return PlatformHandle(CloneMachPort(mach_send_));

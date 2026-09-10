@@ -113,7 +113,7 @@ constexpr auto kOptionalFooter = std::array<Instruction, 0u>{};
 // whichever of those functions happens to come first in the library.
 void GetTestFunctionInstructions(std::vector<Instruction>* body) {
   FilePath helper_library_path;
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID)
   // On Android M, DIR_EXE == /system/bin when running base_unittests.
   // On Fuchsia, NativeLibrary understands the native convention that libraries
   // are not colocated with the binary.

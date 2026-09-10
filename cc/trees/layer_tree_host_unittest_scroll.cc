@@ -1305,8 +1305,7 @@ void DoGestureScroll(LayerTreeHostImpl* host_impl,
 // TODO(crbug.com/40762489): Flaky on Fuchsia, ChromeOS, and Linux.
 // TODO(crbug.com/41495136): Flaky on Windows
 // TODO(crbug.com/342502558): Flaky on Mac
-#if BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
 #define MAYBE_LayerTreeHostScrollTestImplOnlyScrollSnap \
   DISABLED_LayerTreeHostScrollTestImplOnlyScrollSnap
 #else
@@ -2524,9 +2523,7 @@ class LayerTreeHostScrollTestElasticOverscroll
 };
 
 // TODO(crbug.com/433308634): Crashes on fuchsia-x64-cast-receiver-rel
-#if !BUILDFLAG(IS_FUCHSIA)
 MULTI_THREAD_TEST_F(LayerTreeHostScrollTestElasticOverscroll);
-#endif
 
 // This test makes sure that the snap animation runs after the overscroll
 // animation has finished.

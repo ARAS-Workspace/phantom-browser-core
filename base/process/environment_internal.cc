@@ -14,7 +14,7 @@
 #include "base/containers/span.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include <string.h>
 
 #if BUILDFLAG(IS_APPLE)
@@ -48,7 +48,7 @@ size_t ParseEnvLine(NativeEnvironmentCStringView input,
 
 }  // namespace
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 
 // Returns a span over the current process' environment. Each string in the
 // span is null-terminated.
@@ -210,6 +210,6 @@ NativeEnvironmentString AlterEnvironment(base::span<const wchar_t> env,
   return result;
 }
 
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 }  // namespace base::internal

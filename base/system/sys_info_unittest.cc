@@ -164,59 +164,8 @@ TEST_F(SysInfoTest, AmountOfDiskSpace) {
   EXPECT_GE(disk_space.total, disk_space.available) << tmp_path;
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// Verify that specifying total disk space for nested directories matches
-// the deepest-nested.
-TEST_F(SysInfoTest, NestedVolumesAmountOfTotalDiskSpace) {
-  constexpr int64_t kOuterVolumeQuota = 1024;
-  constexpr int64_t kInnerVolumeQuota = kOuterVolumeQuota / 2;
 
-  FilePath tmp_path;
-  ASSERT_TRUE(GetTempDir(&tmp_path));
-  SysInfo::SetAmountOfTotalDiskSpace(tmp_path, kOuterVolumeQuota);
-  const FilePath subdirectory_path = tmp_path.Append("subdirectory");
-  SysInfo::SetAmountOfTotalDiskSpace(subdirectory_path, kInnerVolumeQuota);
-
-  EXPECT_EQ(SysInfo::AmountOfTotalDiskSpace(tmp_path), kOuterVolumeQuota);
-  EXPECT_EQ(SysInfo::AmountOfTotalDiskSpace(subdirectory_path),
-            kInnerVolumeQuota);
-
-  // Remove the inner directory quota setting and check again.
-  SysInfo::SetAmountOfTotalDiskSpace(subdirectory_path, -1);
-  EXPECT_EQ(SysInfo::AmountOfTotalDiskSpace(subdirectory_path),
-            kOuterVolumeQuota);
-}
-
-// Verify that AmountOfDiskSpace returns the correct total for nested
-// directories, matching the deepest-nested quota.
-TEST_F(SysInfoTest, NestedVolumesAmountOfDiskSpace) {
-  constexpr int64_t kOuterVolumeQuota = 1024;
-  constexpr int64_t kInnerVolumeQuota = kOuterVolumeQuota / 2;
-
-  FilePath tmp_path;
-  ASSERT_TRUE(GetTempDir(&tmp_path));
-  SysInfo::SetAmountOfTotalDiskSpace(tmp_path, kOuterVolumeQuota);
-  const FilePath subdirectory_path = tmp_path.Append("subdirectory");
-  SysInfo::SetAmountOfTotalDiskSpace(subdirectory_path, kInnerVolumeQuota);
-
-  ASSERT_OK_AND_ASSIGN(SysInfo::DiskSpaceInfo outer_disk_space,
-                       SysInfo::AmountOfDiskSpace(tmp_path));
-  EXPECT_EQ(outer_disk_space.total, ByteSize(uint64_t{kOuterVolumeQuota}));
-
-  ASSERT_OK_AND_ASSIGN(SysInfo::DiskSpaceInfo inner_disk_space,
-                       SysInfo::AmountOfDiskSpace(subdirectory_path));
-  EXPECT_EQ(inner_disk_space.total, ByteSize(uint64_t{kInnerVolumeQuota}));
-
-  // Remove the inner directory quota setting and check again.
-  SysInfo::SetAmountOfTotalDiskSpace(subdirectory_path, -1);
-  ASSERT_OK_AND_ASSIGN(SysInfo::DiskSpaceInfo fallback_disk_space,
-                       SysInfo::AmountOfDiskSpace(subdirectory_path));
-  EXPECT_EQ(fallback_disk_space.total, ByteSize(uint64_t{kOuterVolumeQuota}));
-}
-#endif  // BUILDFLAG(IS_FUCHSIA)
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(SysInfoTest, OperatingSystemVersion) {
   std::string version = SysInfo::OperatingSystemVersion();
@@ -306,8 +255,7 @@ TEST_F(SysInfoTest, GetHardwareInfo) {
   EXPECT_TRUE(IsStringUTF8(hardware_info->manufacturer));
   EXPECT_TRUE(IsStringUTF8(hardware_info->model));
   bool empty_result_expected =
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
       false;
 #else
       true;

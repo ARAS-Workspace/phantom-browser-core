@@ -82,7 +82,7 @@ class LOCKABLE BASE_EXPORT Lock {
     // the maximum priority of its waiters.
     // https://github.com/MicrosoftDocs/win32/commit/a43cb3b5039c5cfc53642bfcea174003a2f1168f
     return true;
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
     // POSIX mitigates priority inversion by setting the priority of a thread
     // holding a Lock to the maximum priority of any other thread waiting on it.
     return internal::LockImpl::PriorityInheritanceAvailable();

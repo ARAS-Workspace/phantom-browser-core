@@ -55,7 +55,7 @@
 #include "gpu/command_buffer/service/shared_image/angle_vulkan_image_backing_factory.h"
 #include "gpu/vulkan/vulkan_device_queue.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
 #include "gpu/command_buffer/service/shared_image/external_vk_image_backing_factory.h"
 #endif
 
@@ -84,11 +84,6 @@
 #include "ui/gl/gl_angle_util_win.h"
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <lib/zx/channel.h>
-#include "gpu/vulkan/vulkan_device_queue.h"
-#include "gpu/vulkan/vulkan_implementation.h"
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_ANDROID)
 #include "gpu/command_buffer/service/shared_image/ahardwarebuffer_image_backing_factory.h"
@@ -123,7 +118,7 @@ const char* GmbTypeToString(gfx::GpuMemoryBufferType type) {
     case gfx::IO_SURFACE_BUFFER:
       return "platform";
 #endif
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
     case gfx::NATIVE_PIXMAP:
       return "platform";
 #endif
@@ -144,7 +139,7 @@ gfx::GpuMemoryBufferType GetNativeBufferType() {
   return gfx::GpuMemoryBufferType::IO_SURFACE_BUFFER;
 #elif BUILDFLAG(IS_ANDROID)
   return gfx::GpuMemoryBufferType::ANDROID_HARDWARE_BUFFER;
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   return gfx::GpuMemoryBufferType::NATIVE_PIXMAP;
 #elif BUILDFLAG(IS_WIN)
   return gfx::GpuMemoryBufferType::DXGI_SHARED_HANDLE;
@@ -322,7 +317,7 @@ SharedImageFactory::SharedImageFactory(
     factories_.push_back(std::move(ozone_factory));
   }
 
-#if BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_FUCHSIA))
+#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_LINUX)
   if (gr_context_type_ == GrContextType::kVulkan
 #if BUILDFLAG(USE_WEBGPU_ON_VULKAN_VIA_GL_INTEROP)
       /* We support GL context for WebGPU gl-vulkan interop (on linux).*/
@@ -335,8 +330,7 @@ SharedImageFactory::SharedImageFactory(
             gpu_preferences_.enable_webgpu_on_vk_via_gl_interop);
     factories_.push_back(std::move(external_vk_image_factory));
   }
-#endif  // BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_FUCHSIA))
+#endif  // BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_LINUX)
 #endif  // BUILDFLAG(IS_OZONE)
 
 #if BUILDFLAG(IS_APPLE)
@@ -712,23 +706,6 @@ bool SharedImageFactory::IsD3DSharedImageSupported() const {
 }
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(IS_FUCHSIA)
-void SharedImageFactory::RegisterSysmemBufferCollection(
-    zx::eventpair service_handle,
-    zx::channel sysmem_token,
-    const viz::SharedImageFormat& format,
-    gfx::BufferUsage usage,
-    bool register_with_image_pipe) {
-  auto* vulkan_context_provider = context_state_->vk_context_provider();
-  VkDevice device =
-      vulkan_context_provider->GetDeviceQueue()->GetVulkanDevice();
-  DCHECK(device != VK_NULL_HANDLE);
-  vulkan_context_provider->GetVulkanImplementation()
-      ->RegisterSysmemBufferCollection(
-          device, std::move(service_handle), std::move(sysmem_token), format,
-          usage, gfx::Size(), 0, register_with_image_pipe);
-}
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 bool SharedImageFactory::CopyToGpuMemoryBuffer(const Mailbox& mailbox) {
   auto* shared_image = GetFactoryRef(mailbox);

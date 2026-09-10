@@ -240,7 +240,7 @@ bool ContentsEqual(const FilePath& filename1, const FilePath& filename2) {
                       std::ios::in | std::ios::binary);
   std::ifstream file2(filename2.value().c_str(),
                       std::ios::in | std::ios::binary);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   std::ifstream file1(filename1.value(), std::ios::in | std::ios::binary);
   std::ifstream file2(filename2.value(), std::ios::in | std::ios::binary);
 #endif  // BUILDFLAG(IS_WIN)
@@ -276,7 +276,7 @@ bool TextContentsEqual(const FilePath& filename1, const FilePath& filename2) {
 #if BUILDFLAG(IS_WIN)
   std::ifstream file1(filename1.value().c_str(), std::ios::in);
   std::ifstream file2(filename2.value().c_str(), std::ios::in);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   std::ifstream file1(filename1.value(), std::ios::in);
   std::ifstream file2(filename2.value(), std::ios::in);
 #endif  // BUILDFLAG(IS_WIN)
@@ -436,10 +436,6 @@ bool TouchFile(const FilePath& path, Time last_accessed, Time last_modified) {
   if (DirectoryExists(path)) {
     flags |= File::FLAG_WIN_BACKUP_SEMANTICS;
   }
-#elif BUILDFLAG(IS_FUCHSIA)
-  // On Fuchsia, we need O_RDONLY for directories, or O_WRONLY for files.
-  // TODO(crbug.com/40620916): Find a cleaner workaround for this.
-  flags |= (DirectoryExists(path) ? File::FLAG_READ : File::FLAG_WRITE);
 #endif
 
   File file(path, flags);
@@ -534,7 +530,7 @@ FilePath GetUniquePathWithSuffixFormat(const FilePath& path,
   return FilePath();
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
 bool IsReservedNameOnWindows(const base::FilePath::StringType& filename) {
   // This list is taken from the MSDN article "Naming a file"
   // http://msdn2.microsoft.com/en-us/library/aa365247(VS.85).aspx
@@ -557,7 +553,7 @@ bool IsReservedNameOnWindows(const base::FilePath::StringType& filename) {
 
 #if BUILDFLAG(IS_WIN)
   std::string filename_lower = base::ToLowerASCII(base::WideToUTF8(filename));
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   std::string filename_lower = base::ToLowerASCII(filename);
 #endif
 
@@ -577,7 +573,7 @@ bool IsReservedNameOnWindows(const base::FilePath::StringType& filename) {
                              }) ||
          kMagicNames.contains(trimmed_filename);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
 
 std::optional<FilePath> GetLatestTemporaryFileWithNamePrefix(
     const FilePath& dir,

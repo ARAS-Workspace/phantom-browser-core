@@ -1067,12 +1067,7 @@ IN_PROC_BROWSER_TEST_P(SignedExchangeRequestHandlerBrowserTest,
 }
 
 // TODO(crbug.com/40890897): Re-enable this test when de-flaked.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_NotControlledByDistributorsSW \
-  DISABLED_NotControlledByDistributorsSW
-#else
 #define MAYBE_NotControlledByDistributorsSW NotControlledByDistributorsSW
-#endif
 IN_PROC_BROWSER_TEST_P(SignedExchangeRequestHandlerBrowserTest,
                        MAYBE_NotControlledByDistributorsSW) {
   // SW-scope: http://127.0.0.1:PORT/sxg/

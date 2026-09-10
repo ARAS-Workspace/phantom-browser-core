@@ -5082,7 +5082,6 @@ IN_PROC_BROWSER_TEST_P(
 // TODO(crbug.com/545647752): APG pattern third-party tests are disabled on
 // Fuchsia to avoid exceeding test runner argument limits during flakiness
 // checks.
-#if !BUILDFLAG(IS_FUCHSIA)
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
                        AccessibilityApgPatternThirdPartyAccordion) {
   RunApgPatternThirdPartyTest(
@@ -5475,6 +5474,5 @@ IN_PROC_BROWSER_TEST_P(
   RunApgPatternThirdPartyTest(
       FILE_PATH_LITERAL("treeview/examples/treeview-navigation.html"));
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 }  // namespace content

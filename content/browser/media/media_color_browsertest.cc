@@ -56,11 +56,9 @@ IN_PROC_BROWSER_TEST_F(MediaColorTest, GbrpVp9) {
 }
 
 // Fuchsia isn't able to playback 4:4:4 av1.
-#if !BUILDFLAG(IS_FUCHSIA)
 IN_PROC_BROWSER_TEST_F(MediaColorTest, GbrpAv1) {
   RunGBRPTest("av1.mp4");
 }
-#endif
 
 #if BUILDFLAG(USE_PROPRIETARY_CODECS) && BUILDFLAG(ENABLE_FFMPEG_VIDEO_DECODERS)
 

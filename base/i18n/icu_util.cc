@@ -48,16 +48,12 @@
 #include "base/apple/foundation_util.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "base/fuchsia/intl_profile_watcher.h"
-#endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID)
 #include "third_party/icu/source/common/unicode/unistr.h"
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA) || \
-    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 #include "third_party/icu/source/i18n/unicode/timezone.h"
 #endif
 
@@ -75,7 +71,7 @@ namespace {
 bool g_check_called_once = true;
 #endif  // DCHECK_IS_ON()
 
-#if (ICU_UTIL_DATA_IMPL == ICU_UTIL_DATA_FILE)
+#if ICU_UTIL_DATA_IMPL == ICU_UTIL_DATA_FILE
 
 // To debug http://crbug.com/445616.
 int g_debug_icu_last_error;
@@ -94,28 +90,6 @@ const char kIcuDataFileName[] = "icudtl.dat";
 // Time zone data loading.
 // For now, only Fuchsia has a meaningful use case for this feature, so it is
 // only implemented for OS_FUCHSIA.
-#if BUILDFLAG(IS_FUCHSIA)
-// The environment variable used to point the ICU data loader to the directory
-// containing time zone data. This is available from ICU version 54. The env
-// variable approach is antiquated by today's standards (2019), but is the
-// recommended way to configure ICU.
-//
-// See for details: http://userguide.icu-project.org/datetime/timezone
-const char kIcuTimeZoneEnvVariable[] = "ICU_TIMEZONE_FILES_DIR";
-
-// Up-to-date time zone data MUST be provided by the system as a
-// directory offered to Chromium components at /config/tzdata.  Chromium
-// components "use" the `tzdata` directory capability, specifying the
-// "/config/tzdata" path. Chromium components will crash if this capability
-// is not available.
-//
-// TimeZoneDataTest.* tests verify that external timezone data is correctly
-// loaded from the system, to alert developers if the platform and Chromium
-// versions are no longer compatible versions.
-// LINT.IfChange(icu_time_zone_data_path)
-const char kIcuTimeZoneDataDir[] = "/config/tzdata/icu/44/le";
-// LINT.ThenChange(//sandbox/policy.fuchsia/sandbox_policy_fuchsia.cc:icu_time_zone_data_path)
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_ANDROID)
 const char kAndroidAssetsIcuDataFileName[] = "assets/icudtl.dat";
@@ -128,11 +102,6 @@ PlatformFile g_icudtl_pf = kInvalidPlatformFile;
 MemoryMappedFile* g_icudtl_mapped_file = nullptr;
 MemoryMappedFile::Region g_icudtl_region;
 
-#if BUILDFLAG(IS_FUCHSIA)
-// The directory from which the ICU data loader will be configured to load time
-// zone data. It is only changed by SetIcuTimeZoneDataDirForTesting().
-const char* g_icu_time_zone_data_dir = kIcuTimeZoneDataDir;
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 void LazyInitIcuDataFile() {
   if (g_icudtl_pf != kInvalidPlatformFile) {
@@ -214,16 +183,6 @@ void LazyInitIcuDataFile() {
 
 // Configures ICU to load external time zone data, if appropriate.
 void InitializeExternalTimeZoneData() {
-#if BUILDFLAG(IS_FUCHSIA)
-  // Set the environment variable to override the location used by ICU.
-  // Loading can still fail if the directory is empty or its data is invalid.
-  std::unique_ptr<base::Environment> env = base::Environment::Create();
-  if (!base::DirectoryExists(base::FilePath(g_icu_time_zone_data_dir))) {
-    PLOG(FATAL) << "Could not open directory: '" << g_icu_time_zone_data_dir
-                << "'";
-  }
-  env->SetVar(kIcuTimeZoneEnvVariable, g_icu_time_zone_data_dir);
-#endif  // BUILDFLAG(IS_FUCHSIA)
 }
 
 int LoadIcuData(PlatformFile data_fd,
@@ -317,20 +276,7 @@ bool InitializeICUFromDataFile() {
 // On some platforms, the time zone must be explicitly initialized zone rather
 // than relying on ICU's internal initialization.
 void InitializeIcuTimeZone() {
-#if BUILDFLAG(IS_FUCHSIA)
-  // The platform-specific mechanisms used by ICU's detectHostTimeZone() to
-  // determine the default time zone will not work on Fuchsia. Therefore,
-  // proactively set the default system.
-  // This is also required by TimeZoneMonitorFuchsia::ProfileMayHaveChanged(),
-  // which uses the current default to detect whether the time zone changed in
-  // the new profile.
-  // If the system time zone cannot be obtained or is not understood by ICU,
-  // the "unknown" time zone will be returned by createTimeZone() and used.
-  std::string zone_id =
-      FuchsiaIntlProfileWatcher::GetPrimaryTimeZoneIdForIcuInitialization();
-  icu::TimeZone::adoptDefault(
-      icu::TimeZone::createTimeZone(icu::UnicodeString::fromUTF8(zone_id)));
-#elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   // To respond to the time zone change properly, the default time zone
   // cache in ICU has to be populated on starting up.
   // See TimeZoneMonitorLinux::NotifyClientsFromImpl().
@@ -392,7 +338,7 @@ bool DoCommonInitialization() {
 
 }  // namespace
 
-#if (ICU_UTIL_DATA_IMPL == ICU_UTIL_DATA_FILE)
+#if ICU_UTIL_DATA_IMPL == ICU_UTIL_DATA_FILE
 bool InitializeICUWithFileDescriptor(
     PlatformFile data_fd,
     const MemoryMappedFile::Region& data_region) {
@@ -423,17 +369,8 @@ void ResetGlobalsForTesting() {
   g_icudtl_pf = kInvalidPlatformFile;
   delete std::exchange(g_icudtl_mapped_file, nullptr);
 
-#if BUILDFLAG(IS_FUCHSIA)
-  g_icu_time_zone_data_dir = kIcuTimeZoneDataDir;
-#endif  // BUILDFLAG(IS_FUCHSIA)
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// |dir| must remain valid until ResetGlobalsForTesting() is called.
-void SetIcuTimeZoneDataDirForTesting(const char* dir) {
-  g_icu_time_zone_data_dir = dir;
-}
-#endif  // BUILDFLAG(IS_FUCHSIA)
 #endif  // (ICU_UTIL_DATA_IMPL == ICU_UTIL_DATA_FILE)
 
 bool InitializeICU() {

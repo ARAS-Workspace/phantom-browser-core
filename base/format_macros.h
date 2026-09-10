@@ -26,14 +26,12 @@
 
 #include "build/build_config.h"
 
-#if (BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)) && \
-    (defined(_INTTYPES_H) || defined(_INTTYPES_H_)) && !defined(PRId64)
+#if BUILDFLAG(IS_POSIX) && (defined(_INTTYPES_H) || defined(_INTTYPES_H_)) && !defined(PRId64)
 #error "inttypes.h has already been included before this header file, but "
 #error "without __STDC_FORMAT_MACROS defined."
 #endif
 
-#if (BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)) && \
-    !defined(__STDC_FORMAT_MACROS)
+#if BUILDFLAG(IS_POSIX) && !defined(__STDC_FORMAT_MACROS)
 #define __STDC_FORMAT_MACROS
 #endif
 

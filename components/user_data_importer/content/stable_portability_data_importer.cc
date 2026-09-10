@@ -96,7 +96,7 @@ void StablePortabilityDataImporter::BackgroundWorker::ParseBookmarks(
   bookmark_parser_->Parse(std::move(file), std::move(bookmarks_callback));
 }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 void StablePortabilityDataImporter::BackgroundWorker::ParseHistory(
     base::File file,
     std::unique_ptr<RustHistoryCallbackForStablePortabilityFormat> callback,
@@ -105,7 +105,7 @@ void StablePortabilityDataImporter::BackgroundWorker::ParseHistory(
   user_data_importer::parse_stable_portability_history(
       owned_raw_fd, std::move(callback), import_batch_size);
 }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 StablePortabilityDataImporter::StablePortabilityDataImporter(
     history::HistoryService* history_service,
@@ -187,7 +187,7 @@ void StablePortabilityDataImporter::ImportReadingList(
                 std::move(reading_list_parser_callback_on_thread));
 }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 void StablePortabilityDataImporter::ImportHistory(
     base::File file,
     ImportCallback history_callback,
@@ -231,7 +231,7 @@ void StablePortabilityDataImporter::ImportHistory(
       .WithArgs(std::move(file), std::move(rust_history_callback),
                 import_batch_size);
 }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 void StablePortabilityDataImporter::TransferHistoryEntries(
     std::vector<StablePortabilityHistoryEntry> history_entries) {

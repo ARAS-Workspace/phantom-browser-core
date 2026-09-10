@@ -33,7 +33,7 @@
 #include <windows.h>
 
 #include "base/win/winbase_shim.h"
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 #include <sys/mman.h>
 #if BUILDFLAG(IS_ANDROID)
 #include <sys/prctl.h>
@@ -1088,7 +1088,7 @@ LocalPersistentMemoryAllocator::AllocateLocalMemory(size_t size,
   if (address) {
     return Memory(address, MEM_VIRTUAL);
   }
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   // MAP_ANON is deprecated on Linux but MAP_ANONYMOUS is not universal on Mac.
   // MAP_SHARED is not available on Linux <2.4 but required on Mac.
   address = ::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_ANON | MAP_SHARED,
@@ -1130,7 +1130,7 @@ void LocalPersistentMemoryAllocator::DeallocateLocalMemory(void* memory,
 #if BUILDFLAG(IS_WIN)
   BOOL success = ::VirtualFree(memory, 0, MEM_DECOMMIT);
   DCHECK(success);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   int result = ::munmap(memory, size);
   DCHECK_EQ(0, result);
 #else
@@ -1262,7 +1262,7 @@ void FilePersistentMemoryAllocator::FlushPartial(size_t length, bool sync) {
   int result =
       ::msync(const_cast<void*>(data()), length, sync ? MS_SYNC : MS_ASYNC);
   DCHECK_NE(EINVAL, result);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   // On POSIX, "invalidate" forces _other_ processes to recognize what has
   // been written to disk and so is applicable to "flush".
   int result = ::msync(const_cast<void*>(data()), length,

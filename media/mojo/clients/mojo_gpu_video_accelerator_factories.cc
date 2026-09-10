@@ -323,12 +323,6 @@ MojoGpuVideoAcceleratorFactories::VideoFrameOutputFormat(
     return OutputFormat::UNDEFINED;
   }
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // Hardware support for NV12 GMBs is expected to be present on all supported
-  // Fuchsia devices.
-  CHECK(shared_image_capabilities.supports_ycbcr_nv12_sampling);
-  return OutputFormat::NV12;
-#else
 
   if (shared_image_capabilities.supports_ycbcr_nv12_sampling) {
     return OutputFormat::NV12;
@@ -344,7 +338,6 @@ MojoGpuVideoAcceleratorFactories::VideoFrameOutputFormat(
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 
   return OutputFormat::UNDEFINED;
-#endif  // BUILDFLAG(IS_FUCHSIA)
 }
 
 gpu::SharedImageInterface*

@@ -95,9 +95,6 @@ inline constexpr char kExternalClearKeyDifferentCdmTypeTestKeySystem[] =
 inline constexpr char kClearKeyCdmLibraryName[] = "clearkeycdm";
 
 inline constexpr char kClearKeyCdmBaseDirectory[] =
-#if BUILDFLAG(IS_FUCHSIA)
-    "lib/"
-#endif
     "ClearKeyCdm";
 
 // Display name for Clear Key CDM.

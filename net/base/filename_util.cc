@@ -41,7 +41,7 @@ GURL FilePathToFileURL(const base::FilePath& path) {
 
   for (auto c : utf8_path) {
     if (c == '%' || c == ';' || c == '#' || c == '?' ||
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
         c == '\\' ||
 #endif
         c <= ' ') {

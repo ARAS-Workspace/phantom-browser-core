@@ -10,7 +10,7 @@
 #include <ws2tcpip.h>
 
 #include "net/base/winsock_init.h"
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 #include <sys/socket.h>
 #include <sys/types.h>
 #endif
@@ -35,7 +35,7 @@ SocketDescriptor CreatePlatformSocket(int family, int type, int protocol) {
     }
   }
   return result;
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   SocketDescriptor result = ::socket(family, type, protocol);
   return result;
 #endif  // BUILDFLAG(IS_WIN)

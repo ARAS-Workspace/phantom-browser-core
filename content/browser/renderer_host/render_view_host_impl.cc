@@ -274,11 +274,6 @@ void RenderViewHostImpl::GetPlatformSpecificPrefs(
   } else {
     prefs->system_font_family_name = gfx::Font().GetFontName();
   }
-#elif BUILDFLAG(IS_FUCHSIA)
-  // Make Blink's "focus ring" invisible. The focus ring is a hairline border
-  // that's rendered around clickable targets.
-  // TODO(crbug.com/40124608): Consider exposing this as a FIDL parameter.
-  prefs->focus_ring_color = SK_AlphaTRANSPARENT;
 #endif
 #if BUILDFLAG(IS_OZONE)
   prefs->selection_clipboard_buffer_available =

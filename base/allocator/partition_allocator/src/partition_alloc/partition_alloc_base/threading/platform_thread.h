@@ -20,8 +20,6 @@
 
 #if PA_BUILDFLAG(IS_WIN)
 #include "partition_alloc/partition_alloc_base/win/windows_types.h"
-#elif PA_BUILDFLAG(IS_FUCHSIA)
-#include <zircon/types.h>
 #elif PA_BUILDFLAG(IS_APPLE)
 #include <mach/mach_types.h>
 #elif PA_BUILDFLAG(IS_POSIX)
@@ -34,8 +32,6 @@ namespace partition_alloc::internal::base {
 // Used for logging. Always an integer value.
 #if PA_BUILDFLAG(IS_WIN)
 typedef DWORD PlatformThreadId;
-#elif PA_BUILDFLAG(IS_FUCHSIA)
-typedef zx_handle_t PlatformThreadId;
 #elif PA_BUILDFLAG(IS_APPLE)
 typedef mach_port_t PlatformThreadId;
 #elif PA_BUILDFLAG(IS_POSIX)
@@ -47,7 +43,7 @@ class PlatformThreadHandle {
  public:
 #if PA_BUILDFLAG(IS_WIN)
   typedef void* Handle;
-#elif PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#elif PA_BUILDFLAG(IS_POSIX)
   typedef pthread_t Handle;
 #endif
 

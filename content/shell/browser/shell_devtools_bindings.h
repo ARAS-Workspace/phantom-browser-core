@@ -79,7 +79,7 @@ class ShellDevToolsBindings : public WebContentsObserver,
   scoped_refptr<DevToolsAgentHost> agent_host_;
   int inspect_element_at_x_;
   int inspect_element_at_y_;
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
   std::unique_ptr<DevToolsFrontendHost> frontend_host_;
 #endif
 

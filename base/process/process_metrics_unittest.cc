@@ -58,8 +58,7 @@
 #include "base/process/port_provider_mac.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
 #define ENABLE_CPU_TESTS 1
 #else
 #define ENABLE_CPU_TESTS 0
@@ -731,7 +730,7 @@ TEST_F(SystemMetricsTest, MeasureChildCpuUsage) {
 
   ASSERT_TRUE(child_launcher.TerminateChildProcess());
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN)
   // Windows and Fuchsia return final measurements of a process after it exits.
   TestCumulativeCPU(metrics.get(), cpu_usage2);
 #else
@@ -771,8 +770,7 @@ TEST_F(SystemMetricsTest, TestValidMemoryInfo) {
   EXPECT_GE(memory_info->compressed_bytes, 0U);
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   EXPECT_GT(memory_info->rss_anon_bytes, 0U);
   EXPECT_GE(memory_info->vm_swap_bytes, 0U);
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||

@@ -1616,9 +1616,6 @@ MediaStreamManager::MediaStreamManager(
     // of buggy third party Direct Show modules, http://crbug.com/428958.
     video_capture_thread_->init_com_with_mta(false);
     thread_options.message_pump_type = base::MessagePumpType::UI;
-#elif BUILDFLAG(IS_FUCHSIA)
-    // On Fuchsia IO thread is required for FIDL connections.
-    thread_options.message_pump_type = base::MessagePumpType::IO;
 #endif
     CHECK(video_capture_thread_->StartWithOptions(std::move(thread_options)));
     device_task_runner = video_capture_thread_->task_runner();

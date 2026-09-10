@@ -282,12 +282,6 @@ bool ShouldFallbackToSWIfGLES3NotSupported() {
 }
 
 #if BUILDFLAG(ENABLE_SWIFTSHADER)
-#if BUILDFLAG(IS_FUCHSIA)
-// SwiftShader is always used on Fuchsia, sometimes at the system level.
-bool IsSwiftShaderAllowedByCommandLine(const base::CommandLine* command_line) {
-  return true;
-}
-#else
 bool IsSwiftShaderAllowedByCommandLine(const base::CommandLine* command_line) {
   // If the switch to opt-into unsafe SwiftShader is present, always allow
   // SwiftShader.
@@ -316,7 +310,6 @@ bool IsSwiftShaderUsedForWebGLByCommandLine(
   return command_line->GetSwitchValueASCII(switches::kUseANGLE) ==
          gl::kANGLEImplementationSwiftShaderForWebGLName;
 }
-#endif
 
 // Allow fallback to SwfitShader without command line flags during the
 // deprecation period.

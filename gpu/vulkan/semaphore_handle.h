@@ -16,9 +16,6 @@
 #include "base/files/scoped_file.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <lib/zx/event.h>
-#endif
 
 #if BUILDFLAG(IS_WIN)
 #include "base/win/scoped_handle.h"
@@ -36,8 +33,6 @@ class COMPONENT_EXPORT(VULKAN) SemaphoreHandle {
   using PlatformHandle = base::ScopedFD;
 #elif BUILDFLAG(IS_WIN)
   using PlatformHandle = base::win::ScopedHandle;
-#elif BUILDFLAG(IS_FUCHSIA)
-  using PlatformHandle = zx::event;
 #endif
 
   SemaphoreHandle();

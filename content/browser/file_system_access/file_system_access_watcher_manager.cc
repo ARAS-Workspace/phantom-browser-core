@@ -33,10 +33,9 @@
 #include "third_party/blink/public/mojom/file_system_access/file_system_access_error.mojom-shared.h"
 #include "third_party/blink/public/mojom/file_system_access/file_system_access_observer.mojom.h"
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 #include "content/browser/file_system_access/file_system_access_local_path_watcher.h"
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) &&
-        // !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 
 namespace content {
 
@@ -569,7 +568,7 @@ FileSystemAccessWatcherManager::CreateOwnedSourceForScope(
   // https://crbug.com/1011535.
   // Meanwhile, `base::FilePatchWatcher` is not implemented on Fuchsia. See
   // https://crbug.com/851641.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
   return nullptr;
 #else
   auto new_source = std::make_unique<FileSystemAccessLocalPathWatcher>(
@@ -577,7 +576,7 @@ FileSystemAccessWatcherManager::CreateOwnedSourceForScope(
       base::PassKey<FileSystemAccessWatcherManager>());
   RegisterSource(new_source.get());
   return new_source;
-#endif  //  BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
 }
 
 }  // namespace content

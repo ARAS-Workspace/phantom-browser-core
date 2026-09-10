@@ -19,7 +19,7 @@
 
 #if BUILDFLAG(IS_WIN)
 #include "base/win/windows_types.h"
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 #include <errno.h>
 #include <pthread.h>
 #include <string.h>
@@ -61,7 +61,7 @@ class BASE_EXPORT LockImpl {
 
 #if BUILDFLAG(IS_WIN)
   using NativeHandle = CHROME_SRWLOCK;
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   using NativeHandle = pthread_mutex_t;
 #endif
 
@@ -84,7 +84,7 @@ class BASE_EXPORT LockImpl {
   // unnecessary.
   NativeHandle* native_handle() { return &native_handle_; }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   // Whether this lock will attempt to use priority inheritance.
   static bool PriorityInheritanceAvailable();
 #endif
@@ -124,7 +124,7 @@ void LockImpl::Unlock() {
   ::ReleaseSRWLockExclusive(reinterpret_cast<PSRWLOCK>(&native_handle_));
 }
 
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 
 #if DCHECK_IS_ON()
 BASE_EXPORT void dcheck_trylock_result(int rv);

@@ -8,7 +8,7 @@
 #include "base/component_export.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include "base/files/scoped_file.h"
 #endif
 
@@ -28,7 +28,7 @@ class COMPONENT_EXPORT(FILE_ACCESS) ScopedFileAccess {
 
   bool is_allowed() const { return allowed_; }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   ScopedFileAccess(bool allowed, base::ScopedFD fd);
 #else
   explicit ScopedFileAccess(bool allowed);
@@ -42,7 +42,7 @@ class COMPONENT_EXPORT(FILE_ACCESS) ScopedFileAccess {
 
  private:
   bool allowed_;
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   // Holds access token. When closed, access may be revoked.
   base::ScopedFD lifeline_fd_;
 #endif

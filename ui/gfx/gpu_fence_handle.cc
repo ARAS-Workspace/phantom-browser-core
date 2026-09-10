@@ -20,9 +20,6 @@
 #include "base/posix/eintr_wrapper.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "base/fuchsia/fuchsia_logging.h"
-#endif
 
 #if BUILDFLAG(IS_WIN)
 #include <windows.h>
@@ -44,15 +41,6 @@ gfx::GpuFenceHandle::ScopedPlatformFence PlatformDuplicate(
   g_num_clones_counter++;
 #if BUILDFLAG(IS_POSIX)
   return base::ScopedFD(HANDLE_EINTR(dup(scoped_fence.get())));
-#elif BUILDFLAG(IS_FUCHSIA)
-  zx::event temp_event;
-  zx_status_t status =
-      scoped_fence.duplicate(ZX_RIGHT_SAME_RIGHTS, &temp_event);
-  if (status != ZX_OK) {
-    ZX_DLOG(ERROR, status) << "zx_handle_duplicate";
-    return gfx::GpuFenceHandle::ScopedPlatformFence();
-  }
-  return temp_event;
 #elif BUILDFLAG(IS_WIN)
   const base::ProcessHandle process = ::GetCurrentProcess();
   HANDLE duplicated_handle = INVALID_HANDLE_VALUE;
@@ -97,7 +85,7 @@ bool GpuFenceHandle::is_null() const {
     return true;
   }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   return !smart_fence_.get()->scoped_fence_.is_valid();
 #elif BUILDFLAG(IS_WIN)
   return !smart_fence_.get()->scoped_fence_.is_valid();

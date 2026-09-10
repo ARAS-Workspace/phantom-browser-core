@@ -32,7 +32,7 @@ bool KillProcesses(const FilePath::StringType& executable_name,
   return result;
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN)
 // Common implementation for platforms under which |process| is a handle to
 // the process, rather than an identifier that must be "reaped".
 void EnsureProcessTerminated(Process process) {
@@ -59,6 +59,6 @@ void EnsureProcessTerminated(Process process) {
           std::move(process)),
       Seconds(2));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace base

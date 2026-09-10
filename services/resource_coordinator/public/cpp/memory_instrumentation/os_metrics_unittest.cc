@@ -165,8 +165,7 @@ TEST(OSMetricsTest, GivesNonZeroResults) {
   OSMetrics::MemDumpFlagSet flags = OSMetrics::MemDumpFlagSet::All();
   EXPECT_TRUE(OSMetrics::FillOSMemoryDump(handle, flags, &dump));
   EXPECT_TRUE(dump.platform_private_footprint);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   EXPECT_GT(dump.platform_private_footprint->rss_anon_bytes, 0u);
 #elif BUILDFLAG(IS_WIN)
   EXPECT_GT(dump.platform_private_footprint->private_bytes, 0u);

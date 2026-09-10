@@ -298,8 +298,7 @@ bool StackTrace::WillSymbolizeToStreamForTesting() {
   // StackTrace::OutputToStream() is not implemented under uclibc, nor AIX.
   // See https://crbug.com/706728
   return false;
-#elif defined(OFFICIAL_BUILD) && \
-    ((BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)) || BUILDFLAG(IS_FUCHSIA))
+#elif defined(OFFICIAL_BUILD) && BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
   // On some platforms stack traces require an extra data table that bloats our
   // binaries, so they're turned off for official builds.
   return false;
@@ -307,7 +306,7 @@ bool StackTrace::WillSymbolizeToStreamForTesting() {
   // Official Mac OS X builds contain enough information to unwind the stack,
   // but not enough to symbolize the output.
   return false;
-#elif BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_ANDROID)
+#elif BUILDFLAG(IS_ANDROID)
   // Under Fuchsia and Android, StackTrace emits executable build-Ids and
   // address offsets which are symbolized on the test host system, rather than
   // being symbolized in-process.

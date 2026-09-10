@@ -104,8 +104,7 @@ const ModuleCache::Module* AddNonNativeModule(
   return module_ptr;
 }
 
-#if (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_IOS) && !defined(ARCH_CPU_ARM64)) || \
-    BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_WIN)
+#if (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_IOS) && !defined(ARCH_CPU_ARM64)) || BUILDFLAG(IS_WIN)
 #define MAYBE_TEST(TestSuite, TestName) TEST(TestSuite, TestName)
 #else
 #define MAYBE_TEST(TestSuite, TestName) TEST(TestSuite, DISABLED_##TestName)

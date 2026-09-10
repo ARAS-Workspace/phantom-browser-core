@@ -105,22 +105,5 @@ void MessagePortProvider::PostMessageToFrame(
 }
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-// static
-void MessagePortProvider::PostMessageToFrame(
-    Page& page,
-    const url::Origin* source_origin,
-    const url::Origin* target_origin,
-    const std::u16string& data,
-    std::vector<blink::WebMessagePort> ports) {
-  // Extract the underlying descriptors.
-  std::vector<blink::MessagePortDescriptor> descriptors;
-  descriptors.reserve(ports.size());
-  for (size_t i = 0; i < ports.size(); ++i)
-    descriptors.push_back(ports[i].PassPort());
-  PostMessageToFrameInternal(page, source_origin, target_origin, data,
-                             std::move(descriptors));
-}
-#endif
 
 }  // namespace content

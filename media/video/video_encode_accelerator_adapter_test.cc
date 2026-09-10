@@ -335,9 +335,6 @@ TEST_F(VideoEncodeAcceleratorAdapterTest, InitializeAfterFirstFrame) {
       });
 
   VideoPixelFormat expected_input_format = PIXEL_FORMAT_NV12;
-#if BUILDFLAG(IS_FUCHSIA)
-  expected_input_format = PIXEL_FORMAT_I420;
-#endif
   vea()->SetEncodingCallback(base::BindLambdaForTesting(
       [&](BitstreamBuffer&, bool keyframe, scoped_refptr<VideoFrame> frame) {
         EXPECT_EQ(keyframe, true);
@@ -444,9 +441,6 @@ TEST_F(VideoEncodeAcceleratorAdapterTest, FlushDuringInitialize) {
       });
 
   VideoPixelFormat expected_input_format = PIXEL_FORMAT_NV12;
-#if BUILDFLAG(IS_FUCHSIA)
-  expected_input_format = PIXEL_FORMAT_I420;
-#endif
 
   vea()->SetEncodingCallback(base::BindLambdaForTesting(
       [&](BitstreamBuffer&, bool keyframe, scoped_refptr<VideoFrame> frame) {
@@ -634,9 +628,6 @@ TEST_P(VideoEncodeAcceleratorAdapterTest, TwoFramesResize) {
       CreateGreenFrame(large_size, pixel_format, base::Milliseconds(2));
 
   VideoPixelFormat expected_input_format = PIXEL_FORMAT_NV12;
-#if BUILDFLAG(IS_FUCHSIA)
-  expected_input_format = PIXEL_FORMAT_I420;
-#endif
   const gfx::ColorSpace expected_color_space =
       ExpectedColorSpace(pixel_format, expected_input_format);
   VideoEncoder::OutputCB output_cb = base::BindLambdaForTesting(
@@ -756,9 +747,6 @@ TEST_P(VideoEncodeAcceleratorAdapterTest, RunWithAllPossibleInputConversions) {
 
   VideoPixelFormat expected_input_format = PIXEL_FORMAT_NV12;
   if (input_kind != VideoEncodeAcceleratorAdapter::InputBufferKind::GpuMemBuf) {
-#if BUILDFLAG(IS_FUCHSIA)
-    expected_input_format = PIXEL_FORMAT_I420;
-#endif
   }
 
   constexpr auto get_source_format = [](int i) {
@@ -883,9 +871,6 @@ TEST_F(VideoEncodeAcceleratorAdapterTest,
       });
 
   VideoPixelFormat expected_input_format = PIXEL_FORMAT_NV12;
-#if BUILDFLAG(IS_FUCHSIA)
-  expected_input_format = PIXEL_FORMAT_I420;
-#endif
   vea()->SetEncodingCallback(base::BindLambdaForTesting(
       [&](BitstreamBuffer&, bool keyframe, scoped_refptr<VideoFrame> frame) {
         EXPECT_EQ(keyframe, true);
@@ -1018,9 +1003,6 @@ TEST_F(VideoEncodeAcceleratorAdapterTest, ConvertsCpuP010ToSessionFormat) {
       });
 
   VideoPixelFormat expected_input_format = PIXEL_FORMAT_NV12;
-#if BUILDFLAG(IS_FUCHSIA)
-  expected_input_format = PIXEL_FORMAT_I420;
-#endif
   vea()->SetEncodingCallback(base::BindLambdaForTesting(
       [&](BitstreamBuffer&, bool keyframe, scoped_refptr<VideoFrame> frame) {
         EXPECT_EQ(keyframe, true);
@@ -1073,9 +1055,6 @@ TEST_F(VideoEncodeAcceleratorAdapterTest, 10bAv1UsesP010InputFormat) {
 
 TEST_F(VideoEncodeAcceleratorAdapterTest, 8bAv1KeepsDefaultInputFormat) {
   VideoPixelFormat expected_input_format = PIXEL_FORMAT_NV12;
-#if BUILDFLAG(IS_FUCHSIA)
-  expected_input_format = PIXEL_FORMAT_I420;
-#endif
   // The default format has to be advertised as well, otherwise the adapter
   // rejects the config outright instead of falling back to it.
   SetSupportedProfile(AV1PROFILE_PROFILE_MAIN,

@@ -620,13 +620,7 @@ TEST_F(DownloadPathReservationTrackerTest, UnresolvedConflicts) {
     SetDownloadItemState(item.get(), DownloadItem::COMPLETE);
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/40221275): Re-enable when UnwriteableDirectory works on
-// Fuchsia.
-#define MAYBE_UnwriteableDirectory DISABLED_UnwriteableDirectory
-#else
 #define MAYBE_UnwriteableDirectory UnwriteableDirectory
-#endif
 // If the target directory is unwriteable, then callback should be notified that
 // verification failed.
 TEST_F(DownloadPathReservationTrackerTest, MAYBE_UnwriteableDirectory) {

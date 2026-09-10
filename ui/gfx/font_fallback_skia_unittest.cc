@@ -46,7 +46,7 @@ TEST(FontFallbackSkiaTest, FontFallback) {
   }
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID)
 // TODO(sergeyu): Fuchsia doesn't not support locale for font fallbacks.
 // TODO(etienneb): Android doesn't allow locale override, unless the language
 //                 is added in the system UI.
@@ -92,6 +92,6 @@ TEST(FontFallbackSkiaTest, CJKLocaleFallback) {
   EXPECT_NE(fallback_font_zh_cn.GetFontName(), fallback_font_ko.GetFontName());
   EXPECT_NE(fallback_font_ja.GetFontName(), fallback_font_ko.GetFontName());
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace gfx

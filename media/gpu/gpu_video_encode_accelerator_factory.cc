@@ -49,9 +49,6 @@
 #if BUILDFLAG(USE_VAAPI)
 #include "media/gpu/vaapi/vaapi_video_encode_accelerator.h"
 #endif
-#if BUILDFLAG(IS_FUCHSIA)
-#include "media/fuchsia/video/fuchsia_video_encode_accelerator.h"
-#endif
 
 namespace media {
 
@@ -153,15 +150,6 @@ std::unique_ptr<VideoEncodeAccelerator> CreateD3D12VEA(
 }
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-std::unique_ptr<VideoEncodeAccelerator> CreateFuchsiaVEA() {
-  if (!base::FeatureList::IsEnabled(kFuchsiaMediacodecVideoEncoder)) {
-    return nullptr;
-  }
-  return base::WrapUnique<VideoEncodeAccelerator>(
-      new FuchsiaVideoEncodeAccelerator());
-}
-#endif
 
 using VEAFactoryFunction =
     base::RepeatingCallback<std::unique_ptr<VideoEncodeAccelerator>()>;
@@ -201,9 +189,6 @@ std::vector<VEAFactoryFunction> CreateVEAFactoryFunctions(
       base::BindRepeating(&CreateD3D12VEA, gpu_workarounds, gpu_device));
   funcs.push_back(base::BindRepeating(
       &CreateMediaFoundationVEA, gpu_preferences, gpu_workarounds, gpu_device));
-#endif
-#if BUILDFLAG(IS_FUCHSIA)
-  funcs.push_back(base::BindRepeating(&CreateFuchsiaVEA));
 #endif
   return funcs;
 }

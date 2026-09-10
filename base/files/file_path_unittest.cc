@@ -23,7 +23,7 @@
 #include "testing/platform_test.h"
 #include "third_party/perfetto/include/perfetto/test/traced_value_test_support.h"
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include "base/test/scoped_locale.h"
 #endif
 
@@ -340,7 +340,7 @@ TEST_F(FilePathTest, Append) {
     // handle the case when AppendASCII is passed UTF8
 #if BUILDFLAG(IS_WIN)
     std::string ascii = WideToUTF8(leaf);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
     std::string ascii = leaf;
 #endif
     observed_str = root.AppendASCII(ascii);

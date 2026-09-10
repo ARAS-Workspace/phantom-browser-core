@@ -166,7 +166,7 @@ class AudioProcessorTest : public ::testing::Test {
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     EXPECT_FALSE(config.gain_controller1.enabled);
     EXPECT_TRUE(config.gain_controller2.enabled);
-#elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_CHROMEOS)
     EXPECT_FALSE(config.gain_controller1.enabled);
     EXPECT_TRUE(config.gain_controller2.enabled);
 #elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)

@@ -31,7 +31,7 @@ enum BasePathKey {
 
   // The following refer to the current application.
   FILE_EXE,  // Path and filename of the current executable.
-#if !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_IOS)
   // Prefer keys (e.g., DIR_ASSETS) that are specific to the use case as the
   // module location may not work as expected on some platforms. For this
   // reason, this key is not defined on Fuchsia. See crbug.com/1263691 for
@@ -42,7 +42,7 @@ enum BasePathKey {
                 // example).
 #endif
   DIR_EXE,  // Directory containing FILE_EXE.
-#if !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_IOS)
   // Prefer keys (e.g., DIR_ASSETS) that are specific to the use case as the
   // module location may not work as expected on some platforms. For this
   // reason, this key is not defined on Fuchsia. See crbug.com/1263691 for

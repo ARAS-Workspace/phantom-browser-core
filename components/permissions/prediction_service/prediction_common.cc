@@ -38,7 +38,7 @@ ClientFeatures_Platform GetCurrentPlatformProto() {
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
     BUILDFLAG(IS_MAC)
   return permissions::ClientFeatures_Platform_PLATFORM_DESKTOP;
-#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_ANDROID)
   return permissions::ClientFeatures_Platform_PLATFORM_MOBILE;
 #else
   return permissions::ClientFeatures_Platform_PLATFORM_UNSPECIFIED;
@@ -49,7 +49,7 @@ ClientFeatures_PlatformEnum GetCurrentPlatformEnumProto() {
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
     BUILDFLAG(IS_MAC)
   return permissions::ClientFeatures_PlatformEnum_PLATFORM_DESKTOP_V2;
-#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_ANDROID)
   return permissions::ClientFeatures_PlatformEnum_PLATFORM_MOBILE_V2;
 #else
   return permissions::ClientFeatures_PlatformEnum_PLATFORM_UNSPECIFIED_V2;

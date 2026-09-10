@@ -85,14 +85,6 @@ class MockGpuChannel : public mojom::GpuChannel {
   MOCK_METHOD5(
       WaitForGetOffsetInRange,
       bool(int32_t, uint32_t, int32_t, int32_t, CommandBuffer::State*));
-#if BUILDFLAG(IS_FUCHSIA)
-  MOCK_METHOD5(RegisterSysmemBufferCollection,
-               void(mojo::PlatformHandle,
-                    mojo::PlatformHandle,
-                    const viz::SharedImageFormat&,
-                    gfx::BufferUsage,
-                    bool));
-#endif  // BUILDFLAG(IS_FUCHSIA)
 };
 
 }  // namespace gpu

@@ -214,10 +214,6 @@
 #include "media/mojo/mojom/interface_factory.mojom.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "media/mojo/clients/mojo_codec_factory_fuchsia.h"
-#include "media/mojo/mojom/fuchsia_media.mojom.h"
-#endif
 
 #if BUILDFLAG(CLANG_PROFILING_INSIDE_SANDBOX)
 #include "base/test/clang_profiling.h"
@@ -1528,19 +1524,11 @@ RenderThreadImpl::GetMediaSequencedTaskRunner() {
   }
   if (!media_thread_) {
     media_thread_ = std::make_unique<base::Thread>("Media");
-#if BUILDFLAG(IS_FUCHSIA)
-    // Start IO thread on Fuchsia to make that thread usable for FIDL.
-    base::Thread::Options options(base::MessagePumpType::IO, 0);
-    // TODO(crbug.com/40250424): Use kDisplayCritical to address media latency
-    // on Fuchsia until alignment on new media thread types is achieved.
-    options.thread_type = base::ThreadType::kPresentation;
-#else
     base::Thread::Options options;
     if (base::FeatureList::IsEnabled(
             blink::features::kWebRtcUseMediaThreadTypes)) {
       options.thread_type = base::ThreadType::kPresentation;
     }
-#endif
     media_thread_->StartWithOptions(std::move(options));
   }
   return media_thread_->task_runner();
@@ -1748,14 +1736,6 @@ RenderThreadImpl::CreateMediaMojoCodecFactory(
       GetMediaSequencedTaskRunner(), context_provider,
       enable_video_decode_accelerator, enable_video_encode_accelerator,
       std::move(vea_provider), std::move(interface_factory));
-#elif BUILDFLAG(IS_FUCHSIA)
-  mojo::PendingRemote<media::mojom::FuchsiaMediaCodecProvider>
-      media_codec_provider;
-  BindHostReceiver(media_codec_provider.InitWithNewPipeAndPassReceiver());
-  return std::make_unique<media::MojoCodecFactoryFuchsia>(
-      GetMediaSequencedTaskRunner(), context_provider,
-      enable_video_decode_accelerator, enable_video_encode_accelerator,
-      std::move(vea_provider), std::move(media_codec_provider));
 #else
   return std::make_unique<media::MojoCodecFactoryDefault>(
       GetMediaSequencedTaskRunner(), context_provider,

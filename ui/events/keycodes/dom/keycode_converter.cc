@@ -37,9 +37,6 @@ namespace {
 #elif BUILDFLAG(IS_ANDROID)
 #define DOM_CODE(usb, evdev, xkb, win, mac, code, id) \
   { usb, evdev, code }
-#elif BUILDFLAG(IS_FUCHSIA)
-#define DOM_CODE(usb, evdev, xkb, win, mac, code, id) \
-  { usb, usb, code }
 #else
 #error Unsupported platform
 #endif

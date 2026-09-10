@@ -15,9 +15,7 @@
 #include "build/blink_buildflags.h"
 #include "build/build_config.h"
 
-#if !BUILDFLAG(IS_FUCHSIA)
 #include <sys/resource.h>
-#endif
 
 #if BUILDFLAG(IS_APPLE)
 #include <malloc/malloc.h>
@@ -40,7 +38,6 @@ int64_t TimeValToMicroseconds(const struct timeval& tv) {
   return ret;
 }
 
-#if !BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 static const rlim_t kSystemDefaultMaxFds = 8192;
@@ -106,7 +103,6 @@ void IncreaseFdLimitTo(unsigned int max_descriptors) {
   }
 }
 
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 namespace {
@@ -136,9 +132,6 @@ size_t ProcessMetrics::GetMallocUsage() {
   return stats.size_in_use;
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   return GetMallocUsageMallinfo();
-#elif BUILDFLAG(IS_FUCHSIA)
-  // TODO(fuchsia): Not currently exposed. https://crbug.com/735087.
-  return 0;
 #endif
 }
 

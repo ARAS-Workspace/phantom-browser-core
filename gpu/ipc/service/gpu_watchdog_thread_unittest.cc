@@ -133,8 +133,6 @@ void GpuWatchdogTest::SetUp() {
     timeout_type = kSlow;
   }
 
-#elif BUILDFLAG(IS_FUCHSIA)
-  timeout_type = kSlowest;
 #endif
 
   if (timeout_type == kSlow) {

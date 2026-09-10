@@ -259,11 +259,6 @@ int UtilityMain(MainFunctionParams parameters) {
   }
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // On Fuchsia always use IO threads to allow FIDL calls.
-  if (message_pump_type == base::MessagePumpType::DEFAULT)
-    message_pump_type = base::MessagePumpType::IO;
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
   // The main task executor of the utility process.
   base::SingleThreadTaskExecutor main_thread_task_executor(

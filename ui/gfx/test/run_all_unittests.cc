@@ -22,9 +22,6 @@
 #include "mojo/core/embedder/embedder.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "skia/ext/test_fonts.h"  // nogncheck
-#endif
 
 namespace {
 
@@ -56,9 +53,6 @@ class GfxTestSuite : public base::TestSuite {
         &discardable_memory_allocator);
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-    skia::InitializeSkFontMgrForTest();
-#endif
 
     gfx::InitializeFonts();
   }

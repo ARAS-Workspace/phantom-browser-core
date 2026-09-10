@@ -6,7 +6,7 @@
 
 namespace file_access {
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 ScopedFileAccess::ScopedFileAccess(bool allowed, base::ScopedFD fd)
     : allowed_(allowed), lifeline_fd_(std::move(fd)) {}
 #else
@@ -19,7 +19,7 @@ ScopedFileAccess::~ScopedFileAccess() = default;
 
 // static
 ScopedFileAccess ScopedFileAccess::Allowed() {
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   return ScopedFileAccess(/*allowed=*/true, base::ScopedFD());
 #else
   return ScopedFileAccess(/*allowed=*/true);
@@ -28,7 +28,7 @@ ScopedFileAccess ScopedFileAccess::Allowed() {
 
 // static
 ScopedFileAccess ScopedFileAccess::Denied() {
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   return ScopedFileAccess(/*allowed=*/false, base::ScopedFD());
 #else
   return ScopedFileAccess(/*allowed=*/false);

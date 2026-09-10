@@ -532,23 +532,12 @@ void DiskCachePerfTest::MaybeLoadInMemoryIndex() {
 #endif  // ENABLE_DISK_CACHE_SQL_BACKEND
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/41393579): Fix this test on Fuchsia and re-enable.
-#define MAYBE_CacheBackendPerformance DISABLED_CacheBackendPerformance
-#else
 #define MAYBE_CacheBackendPerformance CacheBackendPerformance
-#endif
 TEST_F(DiskCachePerfTest, MAYBE_CacheBackendPerformance) {
   CacheBackendPerformance("blockfile_cache");
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/41393579): Fix this test on Fuchsia and re-enable.
-#define MAYBE_SimpleCacheBackendPerformance \
-  DISABLED_SimpleCacheBackendPerformance
-#else
 #define MAYBE_SimpleCacheBackendPerformance SimpleCacheBackendPerformance
-#endif
 TEST_F(DiskCachePerfTest, MAYBE_SimpleCacheBackendPerformance) {
   SetBackendToTest(BackendToTest::kSimple);
   CacheBackendPerformance("simple_cache");
@@ -685,12 +674,7 @@ TEST_F(DiskCachePerfTest, SimpleCacheInitialReadPortion) {
                      1000 * (elapsed_late / (kIterations * kBatchSize)));
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/40222788): Fix this test on Fuchsia and re-enable.
-#define MAYBE_EvictionPerformance DISABLED_EvictionPerformance
-#else
 #define MAYBE_EvictionPerformance EvictionPerformance
-#endif
 // Measures how quickly SimpleIndex can compute which entries to evict.
 TEST(SimpleIndexPerfTest, MAYBE_EvictionPerformance) {
   const int kEntries = 10000;

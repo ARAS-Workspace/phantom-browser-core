@@ -29,7 +29,7 @@
 #include <windows.h>
 
 #include "base/win/winbase_shim.h"
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 #include <sys/mman.h>
 #endif
 
@@ -46,7 +46,7 @@ base::span<uint8_t> Map(size_t size) {
 #if BUILDFLAG(IS_WIN)
   void* ptr =
       ::VirtualAlloc(nullptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   void* ptr = ::mmap(nullptr, size, PROT_READ | PROT_WRITE,
                      MAP_PRIVATE | MAP_ANON, 0, 0);
 #endif
@@ -59,7 +59,7 @@ base::span<uint8_t> Map(size_t size) {
 void Unmap(base::span<uint8_t> span) {
 #if BUILDFLAG(IS_WIN)
   ::VirtualFree(span.data(), 0, MEM_RELEASE);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   ::munmap(span.data(), span.size());
 #else
 #error This architecture is not (yet) supported.
@@ -431,13 +431,7 @@ TEST(ProcessMemoryDumpTest, GuidsTest) {
   ASSERT_EQ(mad1->guid(), pmd1.GetDumpId("foo"));
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/42050620): Counting resident bytes is not supported on
-// Fuchsia.
-#define MAYBE_CountResidentBytes DISABLED_CountResidentBytes
-#else
 #define MAYBE_CountResidentBytes CountResidentBytes
-#endif
 TEST(ProcessMemoryDumpTest, MAYBE_CountResidentBytes) {
   const size_t page_size = ProcessMemoryDump::GetSystemPageSize();
 
@@ -485,14 +479,7 @@ TEST(ProcessMemoryDumpTest, MAYBE_CountResidentBytes) {
   Unmap(memory2);
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/42050620): Counting resident bytes is not supported on
-// Fuchsia.
-#define MAYBE_CountResidentBytesInSharedMemory \
-  DISABLED_CountResidentBytesInSharedMemory
-#else
 #define MAYBE_CountResidentBytesInSharedMemory CountResidentBytesInSharedMemory
-#endif
 TEST(ProcessMemoryDumpTest, MAYBE_CountResidentBytesInSharedMemory) {
   const size_t page_size = ProcessMemoryDump::GetSystemPageSize();
 

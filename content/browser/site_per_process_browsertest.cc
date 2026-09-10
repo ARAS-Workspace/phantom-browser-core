@@ -12477,13 +12477,8 @@ IN_PROC_BROWSER_TEST_P(SitePerProcessBrowserTest,
 // MessagePort is not cleared on the other side, resulting in Zircon killing the
 // process. See the comment referencing the same bug in
 // //mojo/core/channel_fuchsia.cc
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_RenderFrameProxyNotRecreatedDuringProcessShutdown \
-  DISABLED_RenderFrameProxyNotRecreatedDuringProcessShutdown
-#else
 #define MAYBE_RenderFrameProxyNotRecreatedDuringProcessShutdown \
   RenderFrameProxyNotRecreatedDuringProcessShutdown
-#endif
 IN_PROC_BROWSER_TEST_P(
     SitePerProcessBrowserTest,
     MAYBE_RenderFrameProxyNotRecreatedDuringProcessShutdown) {
@@ -13539,7 +13534,7 @@ IN_PROC_BROWSER_TEST_P(SitePerProcessBrowserTest,
 }
 
 // TODO(crbug.com/425866013): Fix and re-enable flaky test.
-#if BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_AccessWindowProxyOfCrashedFrameAfterNavigation \
   DISABLED_AccessWindowProxyOfCrashedFrameAfterNavigation
 #else

@@ -41,10 +41,10 @@ namespace {
 // We run all PlatformHandle once for each type of handle available on the
 // target platform.
 enum class HandleType {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN)
   kHandle,
 #endif
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   kFileDescriptor,
 #endif
 #if BUILDFLAG(IS_MAC)
@@ -73,11 +73,7 @@ class PlatformHandleTest : public testing::Test,
   void SetUp() override {
     test_type_ = TestType::kFile;
 
-#if BUILDFLAG(IS_FUCHSIA)
-    if (GetParam() == HandleType::kHandle) {
-      test_type_ = TestType::kSharedMemory;
-    }
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     if (GetParam() == HandleType::kMachPort) {
       test_type_ = TestType::kSharedMemory;
     }
@@ -86,7 +82,7 @@ class PlatformHandleTest : public testing::Test,
     if (test_type_ == TestType::kFile) {
       test_handle_ = SetUpFile();
     }
-#if BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     else {
       test_handle_ = SetUpSharedMemory();
     }
@@ -100,7 +96,7 @@ class PlatformHandleTest : public testing::Test,
     if (test_type_ == TestType::kFile) {
       return GetFileContents(handle);
     }
-#if BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     return GetSharedMemoryContents(handle);
 #else
     NOTREACHED();
@@ -155,7 +151,7 @@ class PlatformHandleTest : public testing::Test,
     return contents;
   }
 
-#if BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // Creates a shared memory region with some test data in it. Leaves the
   // handle open and returns it as a generic PlatformHandle.
   PlatformHandle SetUpSharedMemory() {
@@ -174,9 +170,7 @@ class PlatformHandleTest : public testing::Test,
   // expected. See |GetObjectContents()|.
   std::string GetSharedMemoryContents(const PlatformHandle& handle) {
     base::subtle::ScopedPlatformSharedMemoryHandle region_handle(
-#if BUILDFLAG(IS_FUCHSIA)
-        handle.GetHandle().get()
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
         handle.GetMachSendRight().get()
 #endif
     );
@@ -197,7 +191,7 @@ class PlatformHandleTest : public testing::Test,
 
     return contents;
   }
-#endif  // BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
   base::ScopedTempDir temp_dir_;
   TestType test_type_;
@@ -273,9 +267,6 @@ INSTANTIATE_TEST_SUITE_P(All,
                          PlatformHandleTest,
 #if BUILDFLAG(IS_WIN)
                          testing::Values(HandleType::kHandle)
-#elif BUILDFLAG(IS_FUCHSIA)
-                         testing::Values(HandleType::kHandle,
-                                         HandleType::kFileDescriptor)
 #elif BUILDFLAG(IS_MAC)
                          testing::Values(HandleType::kFileDescriptor,
                                          HandleType::kMachPort)

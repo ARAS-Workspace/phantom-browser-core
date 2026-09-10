@@ -141,8 +141,6 @@ std::string GetPlatformString() {
   return "chromeos";
 #elif BUILDFLAG(IS_ANDROID)
   return "android";
-#elif BUILDFLAG(IS_FUCHSIA)
-  return "fuchsia";
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD) || BUILDFLAG(IS_SOLARIS)
   // Default BSD and SOLARIS to Linux to not break those builds, although these
   // platforms are not officially supported by Chrome.

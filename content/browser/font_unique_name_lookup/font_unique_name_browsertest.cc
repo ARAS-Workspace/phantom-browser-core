@@ -113,7 +113,6 @@ class FontUniqueNameBrowserTest : public DevToolsProtocolTest {
 };
 
 // TODO(crbug.com/42050634): Make this work on Fuchsia.
-#if !BUILDFLAG(IS_FUCHSIA)
 IN_PROC_BROWSER_TEST_F(FontUniqueNameBrowserTest,
                        ContentLocalFontsMatching) {
   LoadAndWait("/font_src_local_matching.html");
@@ -160,6 +159,5 @@ IN_PROC_BROWSER_TEST_F(FontUniqueNameBrowserTest,
     ASSERT_EQ(*first_font_name, kExpectedFontFamilyNames[i]);
   }
 }
-#endif
 
 }  // namespace content

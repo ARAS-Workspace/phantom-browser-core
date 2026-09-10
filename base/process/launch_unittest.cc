@@ -23,13 +23,13 @@ TEST(LaunchTest, GetAppOutputWithInvalidExecutableShouldFail) {
   int exit_code = {};
   const bool succeeded = GetAppOutputWithExitCode(cl, &output, &exit_code);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
   ASSERT_FALSE(succeeded);
 #else
   // Other platforms return code `127` for an executable that does not exist.
   ASSERT_TRUE(succeeded);
   ASSERT_EQ(exit_code, 127);
-#endif  // #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
 #endif  // #if !BUILDFLAG(IS_IOS)
 }
 

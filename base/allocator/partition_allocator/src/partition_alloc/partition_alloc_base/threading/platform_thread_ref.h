@@ -17,7 +17,7 @@
 
 #if PA_BUILDFLAG(IS_WIN)
 #include "partition_alloc/partition_alloc_base/win/windows_types.h"
-#elif PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#elif PA_BUILDFLAG(IS_POSIX)
 #include <pthread.h>
 #endif
 
@@ -35,7 +35,7 @@ class PlatformThreadRef {
  public:
 #if PA_BUILDFLAG(IS_WIN)
   using RefType = DWORD;
-#elif PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#elif PA_BUILDFLAG(IS_POSIX)
   using RefType = pthread_t;
 #endif
 

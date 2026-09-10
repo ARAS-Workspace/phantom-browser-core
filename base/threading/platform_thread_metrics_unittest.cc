@@ -171,8 +171,7 @@ TEST_F(PlatformThreadMetricsTest, CreateFromHandle) {
 }
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
 TEST_F(PlatformThreadMetricsTest, CreateFromId) {
   EXPECT_FALSE(PlatformThreadMetrics::CreateFromId(PlatformThreadId()));
   EXPECT_FALSE(PlatformThreadMetrics::CreateFromId(kInvalidThreadId));

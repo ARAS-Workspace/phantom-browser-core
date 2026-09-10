@@ -284,7 +284,7 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, Playback_VideoOnly_MP4_VP9) {
 // TODO(crbug.com/40513452): Decide when it's supported on Android.
 #if !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_FUCHSIA) && defined(ARCH_CPU_ARM_FAMILY))
+#if BUILDFLAG(IS_MAC)
 // TODO(crbug.com/40187305): Failing on Mac.
 // TODO(crbug.com/40208879): Failing on Fuchsia arm.
 #define MAYBE_Playback_VideoOnly_WebM_VP9Profile2 \
@@ -298,7 +298,7 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest,
   TestSimplePlayback("bear-320x240-v-vp9_profile2_subsample_cenc-v.webm");
 }
 
-#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_FUCHSIA) && defined(ARCH_CPU_ARM_FAMILY))
+#if BUILDFLAG(IS_MAC)
 // TODO(crbug.com/40805145): Failing on Mac.
 // TODO(crbug.com/40208879): Failing on Fuchsia arm.
 #define MAYBE_Playback_VideoOnly_MP4_VP9Profile2 \
@@ -358,12 +358,7 @@ IN_PROC_BROWSER_TEST_P(EncryptedMediaTest, Playback_VideoOnly_MP4_AV1_10bit) {
 // Strictly speaking this is not an "encrypted" media test. Keep it here for
 // completeness.
 // TODO(crbug.com/330190697): Flaky on Fuchsia, deflake and re-enable the test.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_ConfigChangeVideo_ClearToClear \
-  DISABLED_ConfigChangeVideo_ClearToClear
-#else
 #define MAYBE_ConfigChangeVideo_ClearToClear ConfigChangeVideo_ClearToClear
-#endif
 IN_PROC_BROWSER_TEST_P(EncryptedMediaTest,
                        MAYBE_ConfigChangeVideo_ClearToClear) {
   TestConfigChange(ConfigChangeType::CLEAR_TO_CLEAR);

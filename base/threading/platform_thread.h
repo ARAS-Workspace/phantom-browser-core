@@ -31,8 +31,6 @@
 
 #if BUILDFLAG(IS_WIN)
 #include "base/win/windows_types.h"
-#elif BUILDFLAG(IS_FUCHSIA)
-#include <zircon/types.h>
 #elif BUILDFLAG(IS_POSIX)
 #include <pthread.h>
 #include <unistd.h>
@@ -63,8 +61,6 @@ class BASE_EXPORT PlatformThreadId {
  public:
 #if BUILDFLAG(IS_WIN)
   using UnderlyingType = DWORD;
-#elif BUILDFLAG(IS_FUCHSIA)
-  using UnderlyingType = zx_koid_t;
 #elif BUILDFLAG(IS_APPLE)
   using UnderlyingType = uint64_t;
 #elif BUILDFLAG(IS_POSIX)
@@ -138,7 +134,7 @@ class PlatformThreadHandle {
  public:
 #if BUILDFLAG(IS_WIN)
   typedef void* Handle;
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   typedef pthread_t Handle;
 #endif
 
@@ -147,7 +143,7 @@ class PlatformThreadHandle {
   explicit constexpr PlatformThreadHandle(Handle handle) : handle_(handle) {}
 
   bool is_equal(const PlatformThreadHandle& other) const {
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
     return pthread_equal(handle_, other.handle_);
 #else
     return handle_ == other.handle_;

@@ -83,8 +83,6 @@ GPUTestConfig::OS GetCurrentOS() {
   return GPUTestConfig::kOsUnknown;
 #elif BUILDFLAG(IS_ANDROID)
   return GPUTestConfig::kOsAndroid;
-#elif BUILDFLAG(IS_FUCHSIA)
-  return GPUTestConfig::kOsFuchsia;
 #elif BUILDFLAG(IS_IOS)
   return GPUTestConfig::kOsIOS;
 #else

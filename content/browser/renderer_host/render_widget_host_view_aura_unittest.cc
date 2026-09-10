@@ -1349,7 +1349,6 @@ TEST_F(RenderWidgetHostViewAuraTest, PopupClosesWhenParentLosesFocus) {
   EXPECT_TRUE(observer.destroyed());
 }
 
-#if !BUILDFLAG(IS_FUCHSIA)
 // Test that select boxes close when their parent window position changes.
 // This test is not relevant for Fuchsia, as the window bounds on Fuchsia does
 // not contain an offset.
@@ -1372,7 +1371,6 @@ TEST_F(RenderWidgetHostViewAuraTest, PopupClosesWhenParentMoves) {
 
   EXPECT_TRUE(observer.destroyed());
 }
-#endif
 
 // Checks that IME-composition-event state is maintained correctly.
 TEST_F(RenderWidgetHostViewAuraTest, SetCompositionText) {

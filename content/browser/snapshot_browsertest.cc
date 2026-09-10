@@ -252,8 +252,7 @@ IN_PROC_BROWSER_TEST_F(SnapshotBrowserTest, MAYBE_SingleWindowTest) {
 //   Linux TSAN Tests
 // See crbug.com/771119
 // TODO(crbug.com/40834774): Fix and enable on Fuchsia.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA) || \
-    (BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER))
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || (BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER))
 #define MAYBE_SyncMultiWindowTest DISABLED_SyncMultiWindowTest
 #else
 #define MAYBE_SyncMultiWindowTest SyncMultiWindowTest
@@ -313,8 +312,7 @@ IN_PROC_BROWSER_TEST_F(SnapshotBrowserTest, MAYBE_SyncMultiWindowTest) {
 // TODO(crbug.com/40740836): recently crashes flakily on
 // linux_chromium_asan_rel_ng and linux-rel.
 // TODO(crbug.com/40834774): Fix and enable on Fuchsia.
-#if (BUILDFLAG(IS_WIN) && !defined(NDEBUG)) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_FUCHSIA)
+#if (BUILDFLAG(IS_WIN) && !defined(NDEBUG)) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 #define MAYBE_AsyncMultiWindowTest DISABLED_AsyncMultiWindowTest
 #else
 #define MAYBE_AsyncMultiWindowTest AsyncMultiWindowTest

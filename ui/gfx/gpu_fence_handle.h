@@ -13,9 +13,6 @@
 #include "base/files/scoped_file.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <lib/zx/event.h>
-#endif
 
 #if BUILDFLAG(IS_WIN)
 #include "base/win/scoped_handle.h"
@@ -27,8 +24,6 @@ namespace gfx {
 struct COMPONENT_EXPORT(GFX) GpuFenceHandle {
 #if BUILDFLAG(IS_POSIX)
   using ScopedPlatformFence = base::ScopedFD;
-#elif BUILDFLAG(IS_FUCHSIA)
-  using ScopedPlatformFence = zx::event;
 #elif BUILDFLAG(IS_WIN)
   using ScopedPlatformFence = base::win::ScopedHandle;
 #endif

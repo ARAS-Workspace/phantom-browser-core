@@ -452,7 +452,6 @@ INSTANTIATE_TEST_SUITE_P(GpuDataManagerImplPrivateTest,
                          ::testing::Values(gpu::DomainGuilt::kKnown,
                                            gpu::DomainGuilt::kUnknown));
 
-#if !BUILDFLAG(IS_FUCHSIA)
 TEST_F(GpuDataManagerImplPrivateTest, GpuStartsWithGraphiteFeatureFlag) {
   base::CommandLine::ForCurrentProcess()->AppendSwitch(
       switches::kEnableSkiaGraphite);
@@ -492,11 +491,9 @@ TEST_F(GpuDataManagerImplPrivateTest, FallbackFromGraphite) {
     EXPECT_EQ(gpu::GpuMode::SOFTWARE_GL, manager->GetGpuMode());
   }
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 // Tests for UpdateGpuPreferences and UpdateGpuFeatureInfo.
 // These run everywhere except Fuchsia, which has different fallback semantics.
-#if !BUILDFLAG(IS_FUCHSIA)
 // Graphite mode: gr_context_type is kGraphiteDawn and fallback list contains
 // kGL for the hardware fallback.
 TEST_F(GpuDataManagerImplPrivateTest,
@@ -718,14 +715,12 @@ TEST_F(GpuDataManagerImplPrivateTest,
 }
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS) &&
         // !BUILDFLAG(IS_IOS)
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 // Android and Chrome OS do not support software compositing, while Fuchsia does
 // not support falling back to software from Vulkan.
 // Explicitly disable SkiaGraphite for tests that run with Ganesh as some
 // platforms have started shipping Graphite.
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_IOS)
-#if !BUILDFLAG(IS_FUCHSIA)
 TEST_F(GpuDataManagerImplPrivateTest, NoDefaultFallbackToSwiftShaderForGanesh) {
   base::test::ScopedCommandLine command_line;
   command_line.GetProcessCommandLine()->AppendSwitch(
@@ -832,7 +827,6 @@ TEST_F(GpuDataManagerImplPrivateTest,
   gpu::GpuMode expected_mode = gpu::GpuMode::DISPLAY_COMPOSITOR;
   EXPECT_EQ(expected_mode, manager->GetGpuMode());
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
 TEST_F(GpuDataManagerImplPrivateTest,
@@ -905,7 +899,6 @@ TEST_F(GpuDataManagerImplPrivateTest,
 }
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
 
-#if !BUILDFLAG(IS_FUCHSIA)
 TEST_F(GpuDataManagerImplPrivateTest, GpuStartsWithGpuDisabled) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitWithFeatures({}, {
@@ -925,7 +918,6 @@ TEST_F(GpuDataManagerImplPrivateTest, GpuStartsWithGpuDisabled) {
   ScopedGpuDataManagerImplPrivate manager;
   EXPECT_EQ(gpu::GpuMode::DISPLAY_COMPOSITOR, manager->GetGpuMode());
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS) &&
         // !BUILDFLAG(IS_IOS)
 
@@ -942,7 +934,6 @@ TEST_F(GpuDataManagerImplPrivateTest, GpuStartsWithVulkanFeatureFlag) {
 
 // Don't run these tests on Fuchsia, which doesn't support falling back from
 // Vulkan.
-#if !BUILDFLAG(IS_FUCHSIA)
 TEST_F(GpuDataManagerImplPrivateTest, FallbackFromVulkanToGL) {
   base::test::ScopedCommandLine command_line;
   command_line.GetProcessCommandLine()->AppendSwitch(
@@ -1027,7 +1018,6 @@ TEST_F(GpuDataManagerImplPrivateTest, FallbackFromVulkanWithGLDisabled) {
 }
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS) &&
         // !BUILDFLAG(IS_IOS)
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 #endif  // BUILDFLAG(ENABLE_VULKAN)
 
 }  // namespace content

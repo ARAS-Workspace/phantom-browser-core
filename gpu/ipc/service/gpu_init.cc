@@ -753,13 +753,7 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
         .status_values[GPU_FEATURE_TYPE_WEBGPU_ON_VK_VIA_GL_INTEROP] =
         kGpuFeatureStatusDisabled;
     if (gpu_preferences_.gr_context_type == GrContextType::kVulkan) {
-#if BUILDFLAG(IS_FUCHSIA)
-      // Fuchsia uses ANGLE for GL which requires Vulkan, so don't fall
-      // back to GL if Vulkan init fails.
-      LOG(FATAL) << "Vulkan initialization failed";
-#else
       gpu_preferences_.gr_context_type = GrContextType::kGL;
-#endif  // BUILDFLAG(IS_FUCHSIA)
     }
   } else {
     // TODO(crbug.com/40700374): It would be better to cleanly tear

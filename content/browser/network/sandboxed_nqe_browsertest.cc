@@ -83,12 +83,12 @@ class TestNetworkQualityObserver
 class SandboxedNQEBrowserTest : public ContentBrowserTest {
  public:
   SandboxedNQEBrowserTest() {
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_MAC)
       // Network Service Sandboxing is unconditionally enabled on these
       // platforms.
     scoped_feature_list_.InitAndEnableFeature(
         sandbox::policy::features::kNetworkServiceSandbox);
-#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_MAC)
     ForceOutOfProcessNetworkService();
   }
 

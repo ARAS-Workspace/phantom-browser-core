@@ -495,8 +495,6 @@ Channel::MessagePtr Channel::Message::Deserialize(
 
 #if BUILDFLAG(IS_WIN)
   uint32_t max_handles = extra_header_size / sizeof(HandleEntry);
-#elif BUILDFLAG(IS_FUCHSIA)
-  uint32_t max_handles = extra_header_size / sizeof(HandleInfoEntry);
 #elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
   if (extra_header_size > 0 &&
       extra_header_size < sizeof(MachPortsExtraHeader)) {
@@ -687,9 +685,6 @@ ComplexMessage::ComplexMessage(size_t capacity,
 #if BUILDFLAG(IS_WIN)
   // On Windows we serialize HANDLEs into the extra header space.
   extra_header_size = max_handles_ * sizeof(HandleEntry);
-#elif BUILDFLAG(IS_FUCHSIA)
-  // On Fuchsia we serialize handle types into the extra header space.
-  extra_header_size = max_handles_ * sizeof(HandleInfoEntry);
 #elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
   // On OSX, some of the platform handles may be mach ports, which are
   // serialised into the message buffer. Since there could be a mix of fds and

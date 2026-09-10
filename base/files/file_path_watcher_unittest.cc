@@ -353,11 +353,6 @@ class TestDelegate final : public TestDelegateBase {
 
 }  // namespace
 
-#if BUILDFLAG(IS_FUCHSIA)
-// FilePatchWatcherImpl is not implemented (see crbug.com/851641).
-// Disable all tests.
-#define FilePathWatcherTest DISABLED_FilePathWatcherTest
-#endif
 
 class FilePathWatcherTest : public testing::Test {
  public:
@@ -1650,7 +1645,6 @@ TEST_F(FilePathWatcherTest, InotifyLimitInUpdateRecursive) {
 
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
-// TODO(fxbug.dev/60109): enable BUILDFLAG(IS_FUCHSIA) when implemented.
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 
 TEST_F(FilePathWatcherTest, ReturnFullPath_RecursiveInRootFolder) {

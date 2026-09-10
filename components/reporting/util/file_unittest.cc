@@ -56,7 +56,6 @@ TEST(FileTest, DeleteFileWarnIfFailed) {
   // Delete an existing file with no permission.
   // Don't test on Fuchsia: No file permission support. See
   // base/files/file_util_unittest.cc for some similar tests being skipped.
-#if !BUILDFLAG(IS_FUCHSIA)
   {
     // On Windows, we open the file to prevent it from being deleted. Otherwise,
     // we modify the directory permission to prevent it from being deleted.
@@ -74,7 +73,6 @@ TEST(FileTest, DeleteFileWarnIfFailed) {
     ASSERT_FALSE(DeleteFileWarnIfFailed(file_path))
         << "Deletion of an existing file without permission should fail";
   }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
   {
     // Delete with permission

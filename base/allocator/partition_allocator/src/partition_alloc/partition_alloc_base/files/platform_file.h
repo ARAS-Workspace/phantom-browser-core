@@ -26,7 +26,7 @@ using PlatformFile = HANDLE;
 // disallowed in constexpr. Visual Studio accepts this, however.
 const PlatformFile kInvalidPlatformFile = INVALID_HANDLE_VALUE;
 
-#elif PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#elif PA_BUILDFLAG(IS_POSIX)
 
 using PlatformFile = int;
 

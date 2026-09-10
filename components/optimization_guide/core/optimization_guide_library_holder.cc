@@ -29,7 +29,7 @@ constexpr std::string_view kSharedLibraryName = "optimization_guide_internal";
 
 base::FilePath GetSharedLibraryPath() {
   base::FilePath base_dir;
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 #if BUILDFLAG(IS_MAC)
   if (base::apple::AmIBundled()) {
     base_dir = base::apple::FrameworkBundlePath().Append("Libraries");
@@ -39,8 +39,7 @@ base::FilePath GetSharedLibraryPath() {
 #if BUILDFLAG(IS_MAC)
   }
 #endif  // BUILDFLAG(IS_MAC)
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) &&
-        // !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 
   return base_dir.AppendASCII(base::GetNativeLibraryName(kSharedLibraryName));
 }

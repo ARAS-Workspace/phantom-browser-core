@@ -69,8 +69,7 @@ HEADLESS_COMPOSITOR_TEST(CompositorImageAnimation,
                          "virtual-time/compositor-image-animation-test.js")
 
 // Flaky on all platforms. TODO(crbug.com/41471823): Re-enable.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_CompositorCssAnimation DISABLED_CompositorCssAnimation
 #else
 #define MAYBE_CompositorCssAnimation CompositorCssAnimation

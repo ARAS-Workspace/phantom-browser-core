@@ -137,10 +137,6 @@
 #include "ui/aura/test/event_generator_delegate_aura.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "base/fuchsia/system_info.h"
-#include "ui/platform_window/fuchsia/initialize_presenter_api_view.h"
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_WIN)
 #include <shlobj.h>
@@ -465,20 +461,6 @@ void BrowserTestBase::SetUp() {
   use_software_gl = false;
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // GPU support is not available to tests.
-  // TODO(crbug.com/40797662): Enable GPU support.
-  command_line->AppendSwitch(switches::kDisableGpu);
-
-  ui::fuchsia::IgnorePresentCallsForTest();
-
-  // Clear the per-process cached system info, which was initialized by
-  // TestSuite::Initialize(), to prevent a DCHECK for multiple calls during
-  // in-process browser tests. There is not a single TestSuite for all browser
-  // tests and some use the cached values, so skipping the earlier
-  // initialization is not an option.
-  base::ClearCachedSystemInfoForTesting();
-#endif
 
   if (use_software_gl && !use_software_compositing_)
     command_line->AppendSwitch(switches::kOverrideUseSoftwareGLForTests);
@@ -1157,7 +1139,6 @@ void BrowserTestBase::AssertThatNetworkServiceDidNotCrash() {
 
   // TODO(https://crbug.com/1169431#c2): Enable NetworkService crash detection
   // on Fuchsia.
-#if !BUILDFLAG(IS_FUCHSIA)
   if (initialized_network_process_ && network_service_test_.is_bound()) {
     // If there was a crash, then |network_service_test_| will receive an error
     // notification, but it's not guaranteed to have arrived at this point.
@@ -1167,7 +1148,6 @@ void BrowserTestBase::AssertThatNetworkServiceDidNotCrash() {
     EXPECT_TRUE(network_service_test_.is_connected())
         << "Expecting no NetworkService crashes";
   }
-#endif
 }
 
 void BrowserTestBase::ForceInitializeNetworkProcess() {

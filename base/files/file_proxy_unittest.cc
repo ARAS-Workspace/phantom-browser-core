@@ -383,11 +383,9 @@ TEST_F(FileProxyTest, MAYBE_SetTimes) {
   EXPECT_EQ(static_cast<int>(last_modified_time.InSecondsFSinceUnixEpoch()),
             static_cast<int>(info.last_modified.InSecondsFSinceUnixEpoch()));
 
-#if !BUILDFLAG(IS_FUCHSIA)
   // On Fuchsia, /tmp is noatime
   EXPECT_EQ(static_cast<int>(last_accessed_time.InSecondsFSinceUnixEpoch()),
             static_cast<int>(info.last_accessed.InSecondsFSinceUnixEpoch()));
-#endif  // BUILDFLAG(IS_FUCHSIA)
 }
 
 TEST_F(FileProxyTest, SetLength_Shrink) {

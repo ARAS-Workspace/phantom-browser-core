@@ -98,15 +98,7 @@ namespace {
 
 using BackendToTest = DiskCacheTestWithCache::BackendToTest;
 
-#if BUILDFLAG(IS_FUCHSIA)
-// Load tests with large numbers of file descriptors perform poorly on
-// virtualized test execution environments.
-// TODO(crbug.com/40560856): Remove this workaround when virtualized test
-// performance improves.
-const int kLargeNumEntries = 100;
-#else
 const int kLargeNumEntries = 512;
-#endif
 
 // The size of the HTTP cache is multiplied by 4 by default on non-Windows.
 constexpr bool kHTTPCacheSizeIsIncreased =
@@ -6202,7 +6194,6 @@ INSTANTIATE_TEST_SUITE_P(
       return DiskCacheTestWithCache::BackendToTestName(info.param);
     });
 
-#if !BUILDFLAG(IS_FUCHSIA)
 TEST_F(DiskCacheTest, TimeToInitDiskCache) {
   base::HistogramTester histogram_tester;
   TestBackendResultCompletionCallback cb;
@@ -6214,4 +6205,3 @@ TEST_F(DiskCacheTest, TimeToInitDiskCache) {
   ASSERT_THAT(rv.net_error, IsOk());
   histogram_tester.ExpectTotalCount("HttpCache.TimeToInitDiskCache", 1);
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA)

@@ -51,15 +51,6 @@ bool IOWatcher::WatchMachReceivePort(
     MessagePumpForIO::MachPortWatcher* delegate) {
   return WatchMachReceivePortImpl(port, controller, delegate);
 }
-#elif BUILDFLAG(IS_FUCHSIA)
-bool IOWatcher::WatchZxHandle(
-    zx_handle_t handle,
-    bool persistent,
-    zx_signals_t signals,
-    MessagePumpForIO::ZxHandleWatchController* controller,
-    MessagePumpForIO::ZxHandleWatcher* delegate) {
-  return WatchZxHandleImpl(handle, persistent, signals, controller, delegate);
-}
 #endif
 
 }  // namespace base

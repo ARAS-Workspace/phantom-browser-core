@@ -259,10 +259,6 @@
 #include "third_party/blink/public/mojom/smart_card/smart_card.mojom.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "content/browser/renderer_host/media/fuchsia_media_cdm_provider_impl.h"
-#include "media/mojo/mojom/fuchsia_media.mojom.h"
-#endif
 
 #if BUILDFLAG(ENABLE_VRP_FLAGS)
 #include "components/vrp_flags/vrp_flags.h"                    // nogncheck
@@ -1347,14 +1343,6 @@ void PopulateBinderMapWithContext(
       },
       base::Unretained(GetContentClient()->browser())));
 
-#if BUILDFLAG(IS_FUCHSIA)
-  map->Add<media::mojom::FuchsiaMediaCodecProvider>(base::BindRepeating(
-      [](RenderFrameHost* host,
-         mojo::PendingReceiver<media::mojom::FuchsiaMediaCodecProvider>
-             receiver) {
-        host->GetProcess()->BindMediaCodecProvider(std::move(receiver));
-      }));
-#endif
 
   map->Add<blink::mojom::TranslationManager>(base::BindRepeating(
       [](RenderFrameHost* host,
@@ -1404,7 +1392,7 @@ void PopulateBinderMapWithContext(
                                          ProcessInternalsUI>(map);
   RegisterWebUIControllerInterfaceBinder<storage::mojom::QuotaInternalsHandler,
                                          QuotaInternalsUI>(map);
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
   RegisterWebUIControllerInterfaceBinder<
       traces_internals::mojom::TracesInternalsHandlerFactory,
       TracesInternalsUI>(map);
@@ -1454,10 +1442,6 @@ void PopulateBinderMapWithContext(
   }
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-  map->Add<media::mojom::FuchsiaMediaCdmProvider>(
-      &FuchsiaMediaCdmProviderImpl::Bind);
-#endif
 
 #if BUILDFLAG(ENABLE_VRP_FLAGS)
   if (vrp_flags::IsEnabled()) {
@@ -1591,10 +1575,6 @@ void PopulateDedicatedWorkerBinders(DedicatedWorkerHost* host,
       &RenderProcessHostImpl::BindVideoDecodePerfHistory, host));
   map->Add<media::mojom::WebrtcVideoPerfHistory>(BindWorkerReceiver(
       &RenderProcessHostImpl::BindWebrtcVideoPerfHistory, host));
-#if BUILDFLAG(IS_FUCHSIA)
-  map->Add<media::mojom::FuchsiaMediaCodecProvider>(
-      BindWorkerReceiver(&RenderProcessHostImpl::BindMediaCodecProvider, host));
-#endif
 
   // RenderProcessHost binders taking a StorageKey
   map->Add<blink::mojom::FileSystemManager>(BindWorkerReceiverForStorageKey(

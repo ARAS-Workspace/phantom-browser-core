@@ -4797,13 +4797,8 @@ IN_PROC_BROWSER_TEST_F(ParallelDownloadTest, ResumptionNoPartialResponse) {
 // Verify that if a temporary error happens to one of the parallel request,
 // resuming a parallel download should still complete.
 // Flaky on fuchsia: https://crbug.com/1492656
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_ResumptionMiddleSliceTemporaryError \
-  DISABLED_ResumptionMiddleSliceTemporaryError
-#else
 #define MAYBE_ResumptionMiddleSliceTemporaryError \
   ResumptionMiddleSliceTemporaryError
-#endif
 IN_PROC_BROWSER_TEST_F(ParallelDownloadTest,
                        MAYBE_ResumptionMiddleSliceTemporaryError) {
   // Create the received slices data.

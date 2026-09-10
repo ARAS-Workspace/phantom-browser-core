@@ -281,11 +281,7 @@ TEST_P(InteractionSequenceViewsTest,
 // The tests are failing on debug swiftshader on arm64, see
 // https://ci.chromium.org/ui/p/chromium/builders/ci/fuchsia-fyi-arm64-dbg/9234/overview
 // TODO(crbug.com/42050042): Re-enable the tests once we get rid of swiftshader.
-#if BUILDFLAG(IS_FUCHSIA) && !defined(NDEBUG) && defined(ARCH_CPU_ARM64)
-#define MAYBE_TransitionToBubble DISABLED_TransitionToBubble
-#else
 #define MAYBE_TransitionToBubble TransitionToBubble
-#endif
 TEST_P(InteractionSequenceViewsTest, MAYBE_TransitionToBubble) {
   UNCALLED_MOCK_CALLBACK(ui::InteractionSequence::AbortedCallback, aborted);
   UNCALLED_MOCK_CALLBACK(ui::InteractionSequence::CompletedCallback, completed);
@@ -334,11 +330,7 @@ TEST_P(InteractionSequenceViewsTest, MAYBE_TransitionToBubble) {
 // The tests are failing on debug swiftshader on arm64, see
 // https://ci.chromium.org/ui/p/chromium/builders/ci/fuchsia-fyi-arm64-dbg/9234/overview
 // TODO(crbug.com/42050042): Re-enable the tests once we get rid of swiftshader.
-#if BUILDFLAG(IS_FUCHSIA) && !defined(NDEBUG) && defined(ARCH_CPU_ARM64)
-#define MAYBE_TransitionToBubbleThenAbort DISABLED_TransitionToBubbleThenAbort
-#else
 #define MAYBE_TransitionToBubbleThenAbort TransitionToBubbleThenAbort
-#endif
 TEST_P(InteractionSequenceViewsTest, MAYBE_TransitionToBubbleThenAbort) {
   UNCALLED_MOCK_CALLBACK(ui::InteractionSequence::AbortedCallback, aborted);
   UNCALLED_MOCK_CALLBACK(ui::InteractionSequence::CompletedCallback, completed);
@@ -386,12 +378,7 @@ TEST_P(InteractionSequenceViewsTest, MAYBE_TransitionToBubbleThenAbort) {
 // The tests are failing on debug swiftshader on arm64, see
 // https://ci.chromium.org/ui/p/chromium/builders/ci/fuchsia-fyi-arm64-dbg/9234/overview
 // TODO(crbug.com/42050042): Re-enable the tests once we get rid of swiftshader.
-#if BUILDFLAG(IS_FUCHSIA) && !defined(NDEBUG) && defined(ARCH_CPU_ARM64)
-#define MAYBE_NameView_NameViewWithIdentifier \
-  DISABLED_NameView_NameViewWithIdentifier
-#else
 #define MAYBE_NameView_NameViewWithIdentifier NameView_NameViewWithIdentifier
-#endif
 TEST_P(InteractionSequenceViewsTest, MAYBE_NameView_NameViewWithIdentifier) {
   UNCALLED_MOCK_CALLBACK(ui::InteractionSequence::AbortedCallback, aborted);
   UNCALLED_MOCK_CALLBACK(ui::InteractionSequence::CompletedCallback, completed);
@@ -444,13 +431,8 @@ TEST_P(InteractionSequenceViewsTest, MAYBE_NameView_NameViewWithIdentifier) {
 // The tests are failing on debug swiftshader on arm64, see
 // https://ci.chromium.org/ui/p/chromium/builders/ci/fuchsia-fyi-arm64-dbg/9234/overview
 // TODO(crbug.com/42050042): Re-enable the tests once we get rid of swiftshader.
-#if BUILDFLAG(IS_FUCHSIA) && !defined(NDEBUG) && defined(ARCH_CPU_ARM64)
-#define MAYBE_NameView_NameViewWithNoIdentifier \
-  DISABLED_NameView_NameViewWithNoIdentifier
-#else
 #define MAYBE_NameView_NameViewWithNoIdentifier \
   NameView_NameViewWithNoIdentifier
-#endif
 TEST_P(InteractionSequenceViewsTest, MAYBE_NameView_NameViewWithNoIdentifier) {
   UNCALLED_MOCK_CALLBACK(ui::InteractionSequence::AbortedCallback, aborted);
   UNCALLED_MOCK_CALLBACK(ui::InteractionSequence::CompletedCallback, completed);

@@ -106,12 +106,7 @@ void HandleRendererErrorTestParameters(const base::CommandLine& command_line) {
 
 std::unique_ptr<base::MessagePump> CreateMainThreadMessagePump() {
   std::unique_ptr<base::MessagePump> message_pump;
-#if BUILDFLAG(IS_FUCHSIA)
-  // Allow FIDL APIs on renderer main thread.
-  message_pump = base::MessagePump::Create(base::MessagePumpType::IO);
-#else
   message_pump = base::MessagePump::Create(base::MessagePumpType::DEFAULT);
-#endif
   return message_pump;
 }
 

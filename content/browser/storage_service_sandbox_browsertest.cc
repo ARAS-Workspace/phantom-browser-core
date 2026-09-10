@@ -99,11 +99,7 @@ IN_PROC_BROWSER_TEST_F(StorageServiceSandboxBrowserTest, DomStorage) {
 }
 
 // TODO(crbug.com/40835229): Fix and enable the test on Fuchsia.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_CompactDatabase DISABLED_CompactDatabase
-#else
 #define MAYBE_CompactDatabase CompactDatabase
-#endif
 IN_PROC_BROWSER_TEST_F(StorageServiceSandboxBrowserTest,
                        MAYBE_CompactDatabase) {
   // Tests that the sandboxed service can execute a LevelDB database compaction

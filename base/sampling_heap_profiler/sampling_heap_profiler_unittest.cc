@@ -422,11 +422,7 @@ TEST_F(SamplingHeapProfilerTest, HookedAllocatorMuted) {
 }
 
 // Counting resident bytes is not implemented on Fuchsia.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_GetSamplesWithResidency DISABLED_GetSamplesWithResidency
-#else
 #define MAYBE_GetSamplesWithResidency GetSamplesWithResidency
-#endif
 TEST_F(SamplingHeapProfilerTest, MAYBE_GetSamplesWithResidency) {
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndEnableFeature(

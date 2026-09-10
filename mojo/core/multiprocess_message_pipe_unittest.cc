@@ -133,7 +133,7 @@ class MultiprocessMessagePipeTestWithPeerSupport
 
     const bool is_peer_launch =
         GetParam() == test::MojoTestBase::LaunchType::PEER;
-#if BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
     const bool is_named_peer_launch = false;
 #else
     const bool is_named_peer_launch =
@@ -1427,12 +1427,12 @@ INSTANTIATE_TEST_SUITE_P(
                     test::MojoTestBase::LaunchType::CHILD_WITHOUT_CAPABILITIES,
                     test::MojoTestBase::LaunchType::PEER,
                     test::MojoTestBase::LaunchType::ASYNC
-#if !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_IOS)
                     // Fuchsia has no named pipe support.
                     ,
                     test::MojoTestBase::LaunchType::NAMED_CHILD,
                     test::MojoTestBase::LaunchType::NAMED_PEER
-#endif  // !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_IOS)
                     ));
 }  // namespace
 }  // namespace core

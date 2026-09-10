@@ -24,7 +24,7 @@
 // because it allocates memory.
 namespace partition_alloc::internal {
 
-#if PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#if PA_BUILDFLAG(IS_POSIX)
 using PartitionTlsKey = pthread_key_t;
 
 // Only on x86_64, the implementation is not stable on ARM64. For instance, in

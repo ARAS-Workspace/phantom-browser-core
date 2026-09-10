@@ -129,10 +129,6 @@ BASE_FEATURE(kRemoveRedirectionBitmap, base::FEATURE_ENABLED_BY_DEFAULT);
 // WebView.
 BASE_FEATURE(kVizFrameSubmissionForWebView, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_FUCHSIA)
-// Enables SkiaOutputDeviceBufferQueue instead of Vulkan swapchain on Fuchsia.
-BASE_FEATURE(kUseSkiaOutputDeviceBufferQueue, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 // Whether we should log extra debug information to webrtc native log.
 BASE_FEATURE(kWebRtcLogCapturePipeline, base::FEATURE_DISABLED_BY_DEFAULT);

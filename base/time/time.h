@@ -78,9 +78,6 @@
 #include "base/numerics/clamped_math.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <zircon/types.h>
-#endif
 
 #if BUILDFLAG(IS_APPLE)
 #include <CoreFoundation/CoreFoundation.h>
@@ -93,7 +90,7 @@
 #include <jni.h>
 #endif
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include <sys/time.h>
 #include <unistd.h>
 #endif
@@ -147,11 +144,8 @@ class BASE_EXPORT TimeDelta {
   static TimeDelta FromFileTime(FILETIME ft);
   static TimeDelta FromWinrtDateTime(ABI::Windows::Foundation::DateTime dt);
   static TimeDelta FromWinrtTimeSpan(ABI::Windows::Foundation::TimeSpan ts);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   static TimeDelta FromTimeSpec(const timespec& ts);
-#endif
-#if BUILDFLAG(IS_FUCHSIA)
-  static TimeDelta FromZxDuration(zx_duration_t nanos);
 #endif
 #if BUILDFLAG(IS_APPLE)
   static TimeDelta FromMachTime(uint64_t mach_time);
@@ -210,15 +204,12 @@ class BASE_EXPORT TimeDelta {
   constexpr bool is_min() const { return *this == Min(); }
   constexpr bool is_inf() const { return is_min() || is_max(); }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   // According to https://en.cppreference.com/w/c/chrono/timespec, negative
   // timespecs are invalid, so this function clamps negative TimeDeltas to 0.
   // In addition, this function clamps the upper bound of TimeDelta values to
   // what a `time_t` can hold.
   struct timespec ToTimeSpec() const;
-#endif
-#if BUILDFLAG(IS_FUCHSIA)
-  zx_duration_t ToZxDuration() const;
 #endif
 #if BUILDFLAG(IS_WIN)
   ABI::Windows::Foundation::DateTime ToWinrtDateTime() const;
@@ -675,7 +666,7 @@ class BASE_EXPORT Time : public time_internal::TimeBase<Time> {
   static constexpr Time FromSecondsSinceUnixEpoch(double dt);
   constexpr double InSecondsFSinceUnixEpoch() const;
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   // Converts the timespec structure to time. MacOS X 10.8.3 (and tentatively,
   // earlier versions) will have the |ts|'s tv_nsec component zeroed out,
   // having a 1 second resolution, which agrees with
@@ -712,15 +703,11 @@ class BASE_EXPORT Time : public time_internal::TimeBase<Time> {
   constexpr double InMillisecondsFSinceUnixEpoch() const;
   constexpr double InMillisecondsFSinceUnixEpochIgnoringNull() const;
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   static Time FromTimeVal(struct timeval t);
   struct timeval ToTimeVal() const;
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-  static Time FromZxTime(zx_time_t time);
-  zx_time_t ToZxTime() const;
-#endif
 
 #if BUILDFLAG(IS_APPLE)
   static Time FromCFAbsoluteTime(CFAbsoluteTime t);
@@ -1119,7 +1106,7 @@ constexpr double Time::InSecondsFSinceUnixEpoch() const {
                    : std::numeric_limits<double>::infinity();
 }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 // static
 constexpr Time Time::FromTimeSpec(const timespec& ts) {
   return FromSecondsSinceUnixEpoch(ts.tv_sec + static_cast<double>(ts.tv_nsec) /
@@ -1221,11 +1208,6 @@ class BASE_EXPORT TimeTicks : public time_internal::TimeBase<TimeTicks> {
   // considered to have an ambiguous ordering.)
   [[nodiscard]] static bool IsConsistentAcrossProcesses();
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // Converts between TimeTicks and an ZX_CLOCK_MONOTONIC zx_time_t value.
-  static TimeTicks FromZxTime(zx_time_t nanos_since_boot);
-  zx_time_t ToZxTime() const;
-#endif
 
 #if BUILDFLAG(IS_WIN)
   // Translates an absolute QPC timestamp into a TimeTicks value. The returned
@@ -1365,8 +1347,7 @@ class BASE_EXPORT ThreadTicks : public time_internal::TimeBase<ThreadTicks> {
 
   // Returns true if ThreadTicks::Now() is supported on this system.
   [[nodiscard]] static bool IsSupported() {
-#if (defined(_POSIX_THREAD_CPUTIME) && (_POSIX_THREAD_CPUTIME >= 0)) || \
-    BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#if (defined(_POSIX_THREAD_CPUTIME) && _POSIX_THREAD_CPUTIME >= 0) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
     return true;
 #elif BUILDFLAG(IS_WIN)
     return IsSupportedWin();

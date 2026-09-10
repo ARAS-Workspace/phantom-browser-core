@@ -13,7 +13,7 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/snappy/src/snappy.h"
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID)
 #include "third_party/zstd/src/lib/zstd.h"
 #endif
 
@@ -70,7 +70,7 @@ TEST(CompressionTest, DecompressUncompressedData) {
   EXPECT_EQ(result, original);
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID)
 
 // Verifies that ZSTD-compressed data can be decompressed correctly.
 TEST(CompressionTest, DecompressZstdData) {
@@ -90,7 +90,7 @@ TEST(CompressionTest, DecompressZstdData) {
   EXPECT_EQ(result, original);
 }
 
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // Verifies that Snappy-compressed data can be decompressed correctly.
 TEST(CompressionTest, DecompressSnappyData) {

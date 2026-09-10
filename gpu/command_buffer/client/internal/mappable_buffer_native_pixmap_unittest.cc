@@ -12,11 +12,9 @@ namespace {
 
 // On Fuchsia NativePixmap depends on Vulkan, which is not initialized in tests.
 // See crbug.com/957700
-#if !BUILDFLAG(IS_FUCHSIA)
 INSTANTIATE_TYPED_TEST_SUITE_P(MappableBufferNativePixmap,
                                MappableBufferTest,
                                MappableBufferNativePixmap);
-#endif
 
 }  // namespace
 }  // namespace gpu

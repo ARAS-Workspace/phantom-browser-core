@@ -46,9 +46,6 @@
 #include "ui/platform_window/fuchsia/view_ref_pair.h"
 #include "ui/platform_window/platform_window_init_properties.h"
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "ui/platform_window/fuchsia/initialize_presenter_api_view.h"
-#endif
 
 namespace ui {
 

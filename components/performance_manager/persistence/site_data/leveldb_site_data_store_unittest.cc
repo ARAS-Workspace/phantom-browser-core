@@ -246,13 +246,7 @@ TEST_F(LevelDBSiteDataStoreTest, DatabaseRecoveryTest) {
   // manifest files.
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/40221281): Re-enable when DatabaseOpeningFailure works on
-// Fuchsia.
-#define MAYBE_DatabaseOpeningFailure DISABLED_DatabaseOpeningFailure
-#else
 #define MAYBE_DatabaseOpeningFailure DatabaseOpeningFailure
-#endif
 // Ensure that there's no fatal failures if we try using the data store after
 // failing to open it (all the events will be ignored).
 TEST_F(LevelDBSiteDataStoreTest, MAYBE_DatabaseOpeningFailure) {

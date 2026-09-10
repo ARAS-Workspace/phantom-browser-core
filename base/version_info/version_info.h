@@ -76,8 +76,6 @@ constexpr std::string_view GetOSType() {
   return "OpenBSD";
 #elif BUILDFLAG(IS_SOLARIS)
   return "Solaris";
-#elif BUILDFLAG(IS_FUCHSIA)
-  return "Fuchsia";
 #else
   return "Unknown";
 #endif

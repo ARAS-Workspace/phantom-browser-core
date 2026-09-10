@@ -33,8 +33,6 @@
 #include "net/base/features.h"
 #include "net/cert/internal/trust_store_mac.h"
 #include "net/cert/x509_util_apple.h"
-#elif BUILDFLAG(IS_FUCHSIA)
-#include "third_party/boringssl/src/include/openssl/pool.h"
 #elif BUILDFLAG(IS_WIN)
 #include "net/cert/internal/trust_store_win.h"
 #elif BUILDFLAG(IS_ANDROID)
@@ -281,71 +279,6 @@ void InitializeTrustStoreMacCache() {
       FROM_HERE,
       {base::MayBlock(), base::TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN},
       base::BindOnce(&InitializeTrustCacheForCRSOnWorkerThread));
-}
-
-#elif BUILDFLAG(IS_FUCHSIA)
-
-namespace {
-
-constexpr char kRootCertsFileFuchsia[] = "/config/ssl/cert.pem";
-
-class FuchsiaSystemCerts {
- public:
-  FuchsiaSystemCerts() {
-    base::FilePath filename(kRootCertsFileFuchsia);
-    std::string certs_file;
-    if (!base::ReadFileToString(filename, &certs_file)) {
-      LOG(ERROR) << "Can't load root certificates from " << filename;
-      return;
-    }
-
-    CertificateList certs = X509Certificate::CreateCertificateListFromBytes(
-        base::as_byte_span(certs_file), X509Certificate::FORMAT_AUTO);
-
-    for (const auto& cert : certs) {
-      bssl::CertErrors errors;
-      auto parsed = bssl::ParsedCertificate::Create(
-          bssl::UpRef(cert->cert_buffer()),
-          x509_util::DefaultParseCertificateOptions(), &errors);
-      CHECK(parsed) << errors.ToDebugString();
-      system_trust_store_.AddTrustAnchor(std::move(parsed));
-    }
-  }
-
-  bssl::TrustStoreInMemory* system_trust_store() {
-    return &system_trust_store_;
-  }
-
- private:
-  bssl::TrustStoreInMemory system_trust_store_;
-};
-
-FuchsiaSystemCerts& GetFuchsiaRootCerts() {
-  static base::NoDestructor<FuchsiaSystemCerts> certs;
-  return *certs;
-}
-
-}  // namespace
-
-class SystemTrustStoreFuchsia : public SystemTrustStore {
- public:
-  SystemTrustStoreFuchsia() = default;
-
-  bssl::TrustStore* GetTrustStore() override {
-    return GetFuchsiaRootCerts().system_trust_store();
-  }
-
-  bool IsKnownRoot(const bssl::ParsedCertificate* trust_anchor) const override {
-    return GetFuchsiaRootCerts().system_trust_store()->Contains(trust_anchor);
-  }
-
-  bool IsKnownMtcAnchor(const bssl::MTCAnchor* anchor) const override {
-    return false;
-  }
-};
-
-std::unique_ptr<SystemTrustStore> CreateSslSystemTrustStore() {
-  return std::make_unique<SystemTrustStoreFuchsia>();
 }
 
 #elif BUILDFLAG(IS_WIN)

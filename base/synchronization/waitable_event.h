@@ -27,7 +27,7 @@
 
 #include "base/apple/scoped_mach_port.h"
 #include "base/memory/ref_counted.h"
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 #include <utility>
 
 #include "base/memory/ref_counted.h"
@@ -239,7 +239,7 @@ class BASE_EXPORT WaitableEvent {
   apple::ScopedMachSendRight send_right_;
 
   mutable std::atomic<bool> signal_estimate_{false};
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   // On Windows, you must not close a HANDLE which is currently being waited on.
   // The MSDN documentation says that the resulting behaviour is 'undefined'.
   // To solve that issue each WaitableEventWatcher duplicates the given event

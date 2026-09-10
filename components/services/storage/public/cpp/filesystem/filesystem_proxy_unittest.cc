@@ -270,12 +270,7 @@ TEST_P(FilesystemProxyTest, OpenFileReadOnly) {
   EXPECT_EQ(kFile1Contents, ReadFileContents(&file));
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/40221280): Re-enable when OpenFileWriteOnly works on Fuchsia.
-#define MAYBE_OpenFileWriteOnly DISABLED_OpenFileWriteOnly
-#else
 #define MAYBE_OpenFileWriteOnly OpenFileWriteOnly
-#endif
 TEST_P(FilesystemProxyTest, MAYBE_OpenFileWriteOnly) {
   ASSERT_OK_AND_ASSIGN(base::File file,
                        proxy().OpenFile(kFile2, base::File::FLAG_CREATE_ALWAYS |
@@ -294,12 +289,7 @@ TEST_P(FilesystemProxyTest, MAYBE_OpenFileWriteOnly) {
   EXPECT_EQ(kData, ReadFileContentsAtPath(kFile2));
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/40221278): Re-enable when OpenFileAppendOnly works on Fuchsia.
-#define MAYBE_OpenFileAppendOnly DISABLED_OpenFileAppendOnly
-#else
 #define MAYBE_OpenFileAppendOnly OpenFileAppendOnly
-#endif
 TEST_P(FilesystemProxyTest, MAYBE_OpenFileAppendOnly) {
   const base::FilePath kFile3{FILE_PATH_LITERAL("file3")};
   ASSERT_OK_AND_ASSIGN(base::File file,

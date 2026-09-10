@@ -301,7 +301,6 @@ TEST_F(LocalFileUtilTest, EnsureFileExists) {
 // which breaks this test that relies on it. Since PPAPI is being deprecated,
 // this test is excluded from the Fuchsia build.
 // See https://crbug.com/1077456 for details.
-#if !BUILDFLAG(IS_FUCHSIA)
 TEST_F(LocalFileUtilTest, TouchFile) {
   const char* file_name = "test_file";
   base::File file = CreateFile(file_name);
@@ -345,7 +344,6 @@ TEST_F(LocalFileUtilTest, TouchDirectory) {
   EXPECT_EQ(new_accessed, info.last_accessed);
   EXPECT_EQ(new_modified, info.last_modified);
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 TEST_F(LocalFileUtilTest, Truncate) {
   const char* file_name = "truncated";

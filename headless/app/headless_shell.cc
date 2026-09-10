@@ -245,10 +245,6 @@ int HeadlessShellMain(content::ContentMainParams params) {
   command_line.AppendSwitch(os_crypt::switches::kUseMockKeychain);
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // TODO(fuchsia): Remove this when GPU accelerated compositing is ready.
-  command_line.AppendSwitch(::switches::kDisableGpu);
-#endif
 
   if (command_line.HasSwitch(switches::kVersion)) {
     UNSAFE_TODO(printf("%s %s\n", version_info::GetProductName().data(),

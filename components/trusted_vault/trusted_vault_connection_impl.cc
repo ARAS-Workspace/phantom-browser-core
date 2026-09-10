@@ -115,9 +115,6 @@ GetLocalPhysicalDeviceType() {
   return trusted_vault_pb::PhysicalDeviceMetadata::DEVICE_TYPE_MAC_OS;
 #elif BUILDFLAG(IS_WIN)
   return trusted_vault_pb::PhysicalDeviceMetadata::DEVICE_TYPE_WINDOWS;
-#elif BUILDFLAG(IS_FUCHSIA)
-  // Not used in Fuchsia.
-  return trusted_vault_pb::PhysicalDeviceMetadata::DEVICE_TYPE_UNKNOWN;
 #else
 #error Please handle your new device OS here.
 #endif

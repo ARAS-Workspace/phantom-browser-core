@@ -109,13 +109,6 @@ class SharedImageInterfaceProxy {
   void VerifyFlush();
   void WaitSyncToken(const SyncToken& sync_token);
 
-#if BUILDFLAG(IS_FUCHSIA)
-  void RegisterSysmemBufferCollection(zx::eventpair service_handle,
-                                      zx::channel sysmem_token,
-                                      const viz::SharedImageFormat& format,
-                                      gfx::BufferUsage usage,
-                                      bool register_with_image_pipe);
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
   void NotifyMailboxAdded(const Mailbox& mailbox,
                           gpu::SharedImageUsageSet usage);

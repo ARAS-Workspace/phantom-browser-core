@@ -40,9 +40,7 @@ bool ShouldShowPersonalContextAutofillSetting(
     personal_context::PersonalContextEligibilityService* eligibility_service);
 
 bool ShouldShowPersonalContextAutofillSetting(
-#if !BUILDFLAG(IS_FUCHSIA)
     const GoogleGroupsManager* google_groups_manager,
-#endif
     const PrefService* prefs,
     const EntityDataManager* edm,
     const signin::IdentityManager* identity_manager,

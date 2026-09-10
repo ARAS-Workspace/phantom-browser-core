@@ -38,7 +38,7 @@ struct NativeLibraryStruct {
   };
 };
 using NativeLibrary = NativeLibraryStruct*;
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 using NativeLibrary = void*;
 #endif  // OS_*
 
@@ -52,7 +52,7 @@ struct BASE_EXPORT NativeLibraryLoadError {
 
 #if BUILDFLAG(IS_WIN)
   DWORD code;
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   std::string message;
 #endif  // BUILDFLAG(IS_WIN)
 };

@@ -639,7 +639,6 @@ TEST_F(SQLiteFeaturesTest, TimeMachine) {
 }
 #endif
 
-#if !BUILDFLAG(IS_FUCHSIA)
 // SQLite WAL mode defaults to checkpointing the WAL on close.  This would push
 // additional work into Chromium shutdown.  Verify that SQLite supports a config
 // option to not checkpoint on close.
@@ -669,6 +668,5 @@ TEST_F(SQLiteFeaturesTest, WALNoClose) {
   db_.Close();
   ASSERT_TRUE(base::PathExists(wal_path));
 }
-#endif
 
 }  // namespace sql

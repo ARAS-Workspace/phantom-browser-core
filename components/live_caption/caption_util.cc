@@ -23,7 +23,7 @@
 #include "base/win/windows_version.h"
 #endif
 
-#if !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
 #endif
 
 namespace {

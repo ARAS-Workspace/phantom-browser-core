@@ -81,19 +81,12 @@
 #endif
 
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "media/cdm/fuchsia/fuchsia_cdm_factory.h"
-#include "media/fuchsia/video/fuchsia_decoder_factory.h"
-#include "media/mojo/clients/mojo_fuchsia_cdm_provider.h"
-#elif BUILDFLAG(ENABLE_MOJO_CDM)
+#if BUILDFLAG(ENABLE_MOJO_CDM)
 #include "media/mojo/clients/mojo_cdm_factory.h"  // nogncheck
 #else
 #include "media/cdm/default_cdm_factory.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA) && BUILDFLAG(ENABLE_MOJO_CDM)
-#error "MojoCdm should be disabled for Fuchsia."
-#endif
 
 #if BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) || BUILDFLAG(ENABLE_MOJO_VIDEO_DECODER)
 #include "media/mojo/clients/mojo_decoder_factory.h"  // nogncheck
@@ -686,14 +679,6 @@ void MediaFactory::EnsureDecoderFactory() {
         GetMediaInterfaceFactory();
     external_decoder_factory =
         std::make_unique<media::MojoDecoderFactory>(interface_factory);
-#elif BUILDFLAG(IS_FUCHSIA)
-    mojo::PendingRemote<media::mojom::FuchsiaMediaCodecProvider>
-        media_codec_provider;
-    GetInterfaceBroker().GetInterface(
-        media_codec_provider.InitWithNewPipeAndPassReceiver());
-
-    external_decoder_factory = std::make_unique<media::FuchsiaDecoderFactory>(
-        std::move(media_codec_provider), /*allow_overlay=*/true);
 #endif
     decoder_factory_ = std::make_unique<media::DefaultDecoderFactory>(
         std::move(external_decoder_factory));
@@ -730,11 +715,7 @@ media::CdmFactory* MediaFactory::GetCdmFactory() {
   if (cdm_factory_)
     return cdm_factory_.get();
 
-#if BUILDFLAG(IS_FUCHSIA)
-  cdm_factory_ = std::make_unique<media::FuchsiaCdmFactory>(
-      std::make_unique<media::MojoFuchsiaCdmProvider>(&GetInterfaceBroker()),
-      GetKeySystems());
-#elif BUILDFLAG(ENABLE_MOJO_CDM)
+#if BUILDFLAG(ENABLE_MOJO_CDM)
   cdm_factory_ = std::make_unique<media::MojoCdmFactory>(
       GetMediaInterfaceFactory(), GetKeySystems());
 #else

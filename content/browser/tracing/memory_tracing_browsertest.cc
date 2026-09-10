@@ -346,9 +346,7 @@ IN_PROC_BROWSER_TEST_F(SingleProcessMemoryTracingTest, DISABLED_QueuedDumps) {
 // Failing on Android ASAN. crbug.com/1041392
 // TODO(crbug.com/40720107): OSMetrics::GetProcessMemoryMaps is not
 // implemented on Fuchsia
-#if BUILDFLAG(IS_MAC) ||                                     \
-    (BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER)) || \
-    BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_ANDROID) && defined(ADDRESS_SANITIZER))
 #define MAYBE_BrowserInitiatedDump DISABLED_BrowserInitiatedDump
 #else
 #define MAYBE_BrowserInitiatedDump BrowserInitiatedDump

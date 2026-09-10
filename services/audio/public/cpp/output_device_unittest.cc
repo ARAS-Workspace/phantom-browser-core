@@ -91,12 +91,6 @@ struct DataFlowTestEnvironment {
     CHECK(reader->IsValid());
     time_stamp = base::TimeTicks::Now();
 
-#if BUILDFLAG(IS_FUCHSIA)
-    // TODO(crbug.com/40574274): Fuchsia bots use nested virtualization,
-    // which can result in unusually long scheduling delays, so allow a longer
-    // timeout.
-    reader->set_max_wait_timeout_for_test(base::Milliseconds(250));
-#endif
   }
 
   base::CancelableSyncSocket client_socket;

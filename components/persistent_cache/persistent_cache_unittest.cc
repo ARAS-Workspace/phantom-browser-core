@@ -120,7 +120,6 @@ TEST_F(PersistentCacheMockedBackendTest, CacheInsertCallsBackendInsert) {
       HasValue());
 }
 
-#if !BUILDFLAG(IS_FUCHSIA)
 
 class PersistentCacheTest : public testing::Test,
                             public testing::WithParamInterface<BackendType> {
@@ -662,6 +661,5 @@ TEST_P(PersistentCacheTest, RecoveryFromTransientError) {
 INSTANTIATE_TEST_SUITE_P(All,
                          PersistentCacheTest,
                          testing::Values(BackendType::kSqlite));
-#endif
 
 }  // namespace persistent_cache

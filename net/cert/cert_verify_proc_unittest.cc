@@ -222,14 +222,6 @@ scoped_refptr<CertVerifyProc> CreateCertVerifyProc(
     case CERT_VERIFY_PROC_IOS:
       return base::MakeRefCounted<CertVerifyProcIOS>(std::move(crl_set));
 #endif
-#if BUILDFLAG(IS_FUCHSIA)
-    case CERT_VERIFY_PROC_BUILTIN:
-      return CreateCertVerifyProcBuiltin(
-          std::move(cert_net_fetcher), std::move(crl_set),
-          std::make_unique<DoNothingCTVerifier>(),
-          base::MakeRefCounted<DefaultCTPolicyEnforcer>(),
-          CreateSslSystemTrustStore(), instance_params, std::nullopt);
-#endif
 #if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
     case CERT_VERIFY_PROC_BUILTIN_CHROME_ROOTS:
       return CreateCertVerifyProcBuiltin(
@@ -253,8 +245,6 @@ constexpr CertVerifyProcType kAllCertVerifiers[] = {
     CERT_VERIFY_PROC_ANDROID,
 #elif BUILDFLAG(IS_IOS)
     CERT_VERIFY_PROC_IOS,
-#elif BUILDFLAG(IS_FUCHSIA)
-    CERT_VERIFY_PROC_BUILTIN,
 #endif
 #if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
     CERT_VERIFY_PROC_BUILTIN_CHROME_ROOTS,

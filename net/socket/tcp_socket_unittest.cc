@@ -1300,7 +1300,7 @@ TEST_P(TCPSocketTest, BeforeConnectCallback) {
 // Unfortunately, Apple platform behavior doesn't seem to be documented, and
 // doesn't match behavior on any other platforms.
 // Fuchsia doesn't currently implement SO_RCVBUF.
-#elif !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_FUCHSIA)
+#elif !BUILDFLAG(IS_APPLE)
   EXPECT_EQ(kReceiveBufferSize, actual_size);
 #endif
 }

@@ -409,7 +409,7 @@ void FormatStringWithHyphens(std::u16string* text) {
 
 // Replace CR/LF with just LF on POSIX and Fuchsia.
 void FormatStringForOS(std::u16string* text) {
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   static constexpr char16_t kCr[] = {L'\r', L'\0'};
   static constexpr char16_t kBlank[] = {L'\0'};
   base::ReplaceChars(*text, kCr, kBlank, text);

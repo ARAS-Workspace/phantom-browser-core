@@ -46,8 +46,6 @@
 #include "device/bluetooth/test/bluetooth_test_cast.h"
 #elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 #include "device/bluetooth/test/bluetooth_test_bluez.h"
-#elif BUILDFLAG(IS_FUCHSIA)
-#include "device/bluetooth/test/bluetooth_test_fuchsia.h"
 #endif
 
 #if BUILDFLAG(IS_CHROMEOS)

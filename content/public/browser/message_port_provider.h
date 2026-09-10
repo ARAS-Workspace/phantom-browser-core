@@ -18,9 +18,6 @@
 #include "base/android/scoped_java_ref.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "third_party/blink/public/common/messaging/message_port_channel.h"
-#endif
 
 namespace content {
 class Page;
@@ -58,14 +55,6 @@ class CONTENT_EXPORT MessagePortProvider {
 #endif  // BUILDFLAG(IS_ANDROID)
 
 // Fuchsia WebEngine always uses this version.
-#if BUILDFLAG(IS_FUCHSIA)
-  // If |target_origin| is unset, then no origin scoping is applied.
-  static void PostMessageToFrame(Page& page,
-                                 const url::Origin* source_origin,
-                                 const url::Origin* target_origin,
-                                 const std::u16string& data,
-                                 std::vector<blink::WebMessagePort> ports);
-#endif
 };
 
 }  // namespace content

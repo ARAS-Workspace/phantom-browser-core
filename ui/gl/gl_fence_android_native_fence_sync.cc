@@ -13,7 +13,7 @@
 #include "ui/gfx/gpu_fence_handle.h"
 #include "ui/gl/gl_surface_egl.h"
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include <unistd.h>
 
 #include "base/posix/eintr_wrapper.h"

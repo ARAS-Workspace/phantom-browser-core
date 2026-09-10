@@ -57,9 +57,7 @@
 #include "content/shell/android/shell_descriptors.h"
 #endif
 
-#if !BUILDFLAG(IS_FUCHSIA)
 #include "components/crash/core/app/crashpad.h"  // nogncheck
-#endif
 
 #if BUILDFLAG(IS_APPLE)
 #include "content/shell/app/paths_apple.h"
@@ -104,13 +102,11 @@ enum class LoggingDest {
 #endif
 };
 
-#if !BUILDFLAG(IS_FUCHSIA)
 content::ShellCrashReporterClient& GetShellCrashReporterClient() {
   static base::NoDestructor<content::ShellCrashReporterClient>
       shell_crash_client;
   return *shell_crash_client;
 }
-#endif
 
 #if BUILDFLAG(IS_WIN)
 // If "Content Shell" doesn't show up in your list of trace providers in
@@ -165,7 +161,7 @@ void InitLogging(const base::CommandLine& command_line) {
   if (dest == LoggingDest::kFile) {
     log_filename = command_line.GetSwitchValuePath(switches::kLogFile);
     if (log_filename.empty()) {
-#if BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
       base::PathService::Get(base::DIR_TEMP, &log_filename);
 #else
       base::PathService::Get(base::DIR_EXE, &log_filename);
@@ -295,7 +291,6 @@ void ShellMainDelegate::PreSandboxStartup() {
 // Disable platform crash handling and initialize the crash reporter, if
 // requested.
 // TODO(crbug.com/40188745): Implement crash reporter integration for Fuchsia.
-#if !BUILDFLAG(IS_FUCHSIA)
   if (base::CommandLine::ForCurrentProcess()->HasSwitch(
           switches::kEnableCrashReporter)) {
     std::string process_type =
@@ -311,7 +306,6 @@ void ShellMainDelegate::PreSandboxStartup() {
 #endif
     }
   }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
   crash_reporter::InitializeCrashKeys();
 

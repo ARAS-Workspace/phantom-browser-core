@@ -437,7 +437,7 @@ void PlatformThreadLocalStorage::OnThreadExit() {
   }
   OnThreadExitInternal(tls_vector);
 }
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 void PlatformThreadLocalStorage::OnThreadExit(void* value) {
   // On posix this function may be called twice. The first pass calls dtors and
   // sets state to kDestroyed. The second pass sets kDestroyed to

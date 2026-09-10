@@ -13,7 +13,7 @@
 
 namespace disk_cache {
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 
 SimpleFileEnumerator::SimpleFileEnumerator(const base::FilePath& path)
     : path_(path), dir_(opendir(path.value().c_str())), has_error_(!dir_) {
@@ -90,6 +90,6 @@ std::optional<SimpleFileEnumerator::Entry> SimpleFileEnumerator::Next() {
                                    /*last_accessed=*/base::Time(),
                                    info.GetLastModifiedTime());
 }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 }  // namespace disk_cache

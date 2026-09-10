@@ -228,7 +228,7 @@ void ChannelProxy::Init(mojo::ScopedMessagePipeHandle channel_handle,
                         bool create_pipe_now) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   DCHECK(!did_init_);
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   // When we are creating a server on POSIX, we need its file descriptor
   // to be created immediately so that it can be accessed and passed
   // to other processes. Forcing it to be created immediately avoids
@@ -236,7 +236,7 @@ void ChannelProxy::Init(mojo::ScopedMessagePipeHandle channel_handle,
   if (mode & Channel::MODE_SERVER_FLAG) {
     create_pipe_now = true;
   }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
   if (create_pipe_now) {
     // Create the channel immediately.  This effectively sets up the

@@ -26,8 +26,7 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "testing/perf/perf_result_reporter.h"
 
-#if PA_BUILDFLAG(IS_ANDROID) || PA_BUILDFLAG(PA_ARCH_CPU_32_BITS) || \
-    PA_BUILDFLAG(IS_FUCHSIA)
+#if PA_BUILDFLAG(IS_ANDROID) || PA_BUILDFLAG(PA_ARCH_CPU_32_BITS)
 // Some tests allocate many GB of memory, which can cause issues on Android and
 // address-space exhaustion for any 32-bit process.
 #define MEMORY_CONSTRAINED

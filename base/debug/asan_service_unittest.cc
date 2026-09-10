@@ -36,21 +36,14 @@ bool ExitedCleanly(int exit_status) {
 
 // TODO(crbug.com/40884672): ASAN death test is not picking up the failure
 // in the emulator logs. Disabling to keep ASAN queue clear.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_ErrorCallback DISABLED_ErrorCallback
-#define MAYBE_CrashInErrorCallback DISABLED_CrashInErrorCallback
-#define MAYBE_ShouldExitCleanly DISABLED_ShouldExitCleanly
-#define MAYBE_TaskTraceCallback DISABLED_TaskTraceCallback
-#else
 #define MAYBE_ErrorCallback ErrorCallback
 #define MAYBE_CrashInErrorCallback CrashInErrorCallback
 #define MAYBE_ShouldExitCleanly ShouldExitCleanly
 #define MAYBE_TaskTraceCallback TaskTraceCallback
-#endif
 
 // TODO(crbug.com/447520906): Fix the test on Mac-ASan and merge this back with
 // the Fuchsia issue above.
-#if BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_ShouldAbort DISABLED_ShouldAbort
 #else
 #define MAYBE_ShouldAbort ShouldAbort

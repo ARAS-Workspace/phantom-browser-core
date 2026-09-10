@@ -53,7 +53,7 @@ using FileEnumerationEntry =
 
 // On Mac and Fuchsia, sandboxing is always enabled, so we don't need to test
 // the non-sandboxing configuration.
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_MAC)
 
 class NonSandboxedNetworkServiceBrowserTest : public ContentBrowserTest {
  public:
@@ -103,7 +103,7 @@ class SandboxedHttpCacheBrowserTest : public ContentBrowserTest {
   SandboxedHttpCacheBrowserTest() {
     std::vector<base::test::FeatureRef> enabled_features = {
       features::kBrokerFileOperationsOnDiskCacheInNetworkService,
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_MAC)
       // Network Service Sandboxing is unconditionally enabled on these
       // platforms.
       sandbox::policy::features::kNetworkServiceSandbox,

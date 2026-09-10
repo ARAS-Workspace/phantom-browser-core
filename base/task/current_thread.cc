@@ -154,7 +154,7 @@ MessagePumpForUI* CurrentUIThread::GetMessagePumpForUI() const {
   return static_cast<MessagePumpForUI*>(current_->GetMessagePump());
 }
 
-#if BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_WIN)
 bool CurrentUIThread::WatchFileDescriptor(
     int fd,
     bool persistent,
@@ -231,7 +231,7 @@ bool CurrentIOThread::RegisterJobObject(HANDLE job,
   return GetMessagePumpForIO()->RegisterJobObject(job, handler);
 }
 
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 bool CurrentIOThread::WatchFileDescriptor(
     int fd,
     bool persistent,
@@ -256,18 +256,5 @@ bool CurrentIOThread::WatchMachReceivePort(
 }
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-// Additional watch API for native platform resources.
-bool CurrentIOThread::WatchZxHandle(
-    zx_handle_t handle,
-    bool persistent,
-    zx_signals_t signals,
-    MessagePumpForIO::ZxHandleWatchController* controller,
-    MessagePumpForIO::ZxHandleWatcher* delegate) {
-  DCHECK(current_->IsBoundToCurrentThread());
-  return GetMessagePumpForIO()->WatchZxHandle(handle, persistent, signals,
-                                              controller, delegate);
-}
-#endif
 
 }  // namespace base

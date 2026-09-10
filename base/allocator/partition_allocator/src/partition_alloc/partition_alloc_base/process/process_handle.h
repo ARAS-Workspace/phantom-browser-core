@@ -16,9 +16,6 @@
 #include "partition_alloc/partition_alloc_base/win/windows_types.h"
 #endif
 
-#if PA_BUILDFLAG(IS_FUCHSIA)
-#include <zircon/types.h>
-#endif
 
 namespace partition_alloc::internal::base {
 
@@ -28,9 +25,6 @@ namespace partition_alloc::internal::base {
 #if PA_BUILDFLAG(IS_WIN)
 typedef DWORD ProcessId;
 const ProcessId kNullProcessId = 0;
-#elif PA_BUILDFLAG(IS_FUCHSIA)
-typedef zx_koid_t ProcessId;
-const ProcessId kNullProcessId = ZX_KOID_INVALID;
 #elif PA_BUILDFLAG(IS_POSIX)
 // On POSIX, our ProcessHandle will just be the PID.
 typedef pid_t ProcessId;

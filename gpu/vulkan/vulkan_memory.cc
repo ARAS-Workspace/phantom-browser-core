@@ -167,25 +167,5 @@ base::win::ScopedHandle VulkanMemory::GetMemoryHandle(
 }
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(IS_FUCHSIA)
-zx::vmo VulkanMemory::GetMemoryZirconHandle() {
-  VkMemoryGetZirconHandleInfoFUCHSIA get_handle_info = {
-      .sType = VK_STRUCTURE_TYPE_MEMORY_GET_ZIRCON_HANDLE_INFO_FUCHSIA,
-      .memory = device_memory(),
-      .handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_ZIRCON_VMO_BIT_FUCHSIA,
-  };
-
-  VkDevice device = device_queue_->GetVulkanDevice();
-  zx::vmo vmo;
-  VkResult result = vkGetMemoryZirconHandleFUCHSIA(device, &get_handle_info,
-                                                   vmo.reset_and_get_address());
-  if (result != VK_SUCCESS) {
-    DLOG(ERROR) << "vkGetMemoryFuchsiaHandleKHR failed: " << result;
-    vmo.reset();
-  }
-
-  return vmo;
-}
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 }  // namespace gpu

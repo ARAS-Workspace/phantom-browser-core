@@ -27,9 +27,7 @@
 #include <cerrno>
 #endif  // PA_CONFIG(HAS_LINUX_KERNEL)
 
-#if !PA_CONFIG(HAS_LINUX_KERNEL) && !PA_BUILDFLAG(IS_WIN) && \
-    !PA_BUILDFLAG(IS_APPLE) && !PA_BUILDFLAG(IS_POSIX) &&    \
-    !PA_BUILDFLAG(IS_FUCHSIA)
+#if !PA_CONFIG(HAS_LINUX_KERNEL) && !PA_BUILDFLAG(IS_WIN) && !PA_BUILDFLAG(IS_APPLE) && !PA_BUILDFLAG(IS_POSIX)
 #include "partition_alloc/partition_alloc_base/threading/platform_thread.h"
 
 #if PA_BUILDFLAG(IS_POSIX)
@@ -331,12 +329,6 @@ void SpinningMutex::LockSlow() {
 void SpinningMutex::LockSlow() {
   int retval = pthread_mutex_lock(&lock_);
   PA_DCHECK(retval == 0);
-}
-
-#elif PA_BUILDFLAG(IS_FUCHSIA)
-
-void SpinningMutex::LockSlow() {
-  sync_mutex_lock(&lock_);
 }
 
 #else

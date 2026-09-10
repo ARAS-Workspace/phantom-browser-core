@@ -550,7 +550,7 @@ void MediaDevicesDispatcherHost::SelectAudioOutput(
     return;
   }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID)
   auto result = blink::mojom::SelectAudioOutputResult::New();
   result->status = blink::mojom::AudioOutputStatus::kUnknown;
   std::move(select_audio_output_callback).Run(std::move(result));

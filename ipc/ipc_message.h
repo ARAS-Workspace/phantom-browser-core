@@ -63,7 +63,7 @@ class IPC_MESSAGE_SUPPORT_EXPORT Message : public base::Pickle {
     int32_t pad_routing;
     uint32_t pad_type;
     uint32_t pad_flags;
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
     uint16_t num_fds;
     uint16_t pad;
 #endif

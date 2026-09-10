@@ -178,13 +178,8 @@ TEST_F(HelpBubbleFactoryViewsTest,
 
 // TODO(https://crbug.com/502638609): In Fuchsia, this test causes an unrelated
 // crash on the GPU thread.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_HelpBubbleDismissedOnAnchorHidden \
-  DISABLED_HelpBubbleDismissedOnAnchorHidden
-#else
 #define MAYBE_HelpBubbleDismissedOnAnchorHidden \
   HelpBubbleDismissedOnAnchorHidden
-#endif
 TEST_F(HelpBubbleFactoryViewsTest, MAYBE_HelpBubbleDismissedOnAnchorHidden) {
   UNCALLED_MOCK_CALLBACK(HelpBubble::ClosingCallback, closing);
   UNCALLED_MOCK_CALLBACK(HelpBubble::ClosedCallback, closed);
@@ -330,13 +325,8 @@ TEST_F(HelpBubbleFactoryViewsSubregionAnchorTest,
 
 // TODO(https://crbug.com/502638609): In Fuchsia, this test causes an unrelated
 // crash on the GPU thread.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_HelpBubbleDismissedOnAnchorHidden \
-  DISABLED_HelpBubbleDismissedOnAnchorHidden
-#else
 #define MAYBE_HelpBubbleDismissedOnAnchorHidden \
   HelpBubbleDismissedOnAnchorHidden
-#endif
 TEST_F(HelpBubbleFactoryViewsSubregionAnchorTest,
        MAYBE_HelpBubbleDismissedOnAnchorHidden) {
   UNCALLED_MOCK_CALLBACK(HelpBubble::ClosingCallback, closing);

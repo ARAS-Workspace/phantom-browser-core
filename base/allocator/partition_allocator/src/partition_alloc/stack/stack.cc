@@ -51,7 +51,7 @@ void* GetStackTop() {
   return pthread_get_stackaddr_np(pthread_self());
 }
 
-#elif PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#elif PA_BUILDFLAG(IS_POSIX)
 
 void* GetStackTop() {
   pthread_attr_t attr;

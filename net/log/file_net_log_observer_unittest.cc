@@ -803,11 +803,6 @@ TEST_P(FileNetLogObserverTest, AddEventsFromMultipleThreads) {
   const size_t kNumThreads = 10;
   std::vector<std::unique_ptr<base::Thread>> threads(kNumThreads);
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // TODO(crbug.com/40625862): Diagnosting logging to determine where
-  // this test sometimes hangs.
-  LOG(ERROR) << "Create and start threads.";
-#endif
 
   // Start all the threads. Waiting for them to start is to hopefuly improve
   // the odds of hitting interesting races once events start being added.
@@ -818,17 +813,11 @@ TEST_P(FileNetLogObserverTest, AddEventsFromMultipleThreads) {
     threads[i]->WaitUntilThreadStarted();
   }
 
-#if BUILDFLAG(IS_FUCHSIA)
-  LOG(ERROR) << "Create and start observing.";
-#endif
 
   CreateAndStartObserving(nullptr);
 
   const size_t kNumEventsAddedPerThread = 200;
 
-#if BUILDFLAG(IS_FUCHSIA)
-  LOG(ERROR) << "Posting tasks.";
-#endif
 
   // Add events in parallel from all the threads.
   for (size_t i = 0; i < kNumThreads; ++i) {
@@ -837,25 +826,16 @@ TEST_P(FileNetLogObserverTest, AddEventsFromMultipleThreads) {
                                   kNumEventsAddedPerThread, kDummyEventSize));
   }
 
-#if BUILDFLAG(IS_FUCHSIA)
-  LOG(ERROR) << "Joining all threads.";
-#endif
 
   // Join all the threads.
   threads.clear();
 
-#if BUILDFLAG(IS_FUCHSIA)
-  LOG(ERROR) << "Stop observing.";
-#endif
 
   // Stop observing.
   TestClosure closure;
   logger_->StopObserving(nullptr, closure.closure());
   closure.WaitForResult();
 
-#if BUILDFLAG(IS_FUCHSIA)
-  LOG(ERROR) << "Read log from disk and verify.";
-#endif
 
   // Verify the written log.
   ASSERT_OK_AND_ASSIGN(std::unique_ptr<ParsedNetLog> log,
@@ -863,9 +843,6 @@ TEST_P(FileNetLogObserverTest, AddEventsFromMultipleThreads) {
   // Check that the expected number of events were written to disk.
   EXPECT_EQ(kNumEventsAddedPerThread * kNumThreads, log->events->size());
 
-#if BUILDFLAG(IS_FUCHSIA)
-  LOG(ERROR) << "Teardown.";
-#endif
 }
 
 // Sends enough events to the observer to completely fill one file, but not

@@ -1189,16 +1189,9 @@ base::OnceCallback<void(bool)> DatabaseConnection::GetCleanupTask() && {
     // `Transaction`s, `Connection`s and `Database`s. When the last
     // `BackingStore::Database` is deleted, `this` is deleted, at which point
     // recovery is attempted if `sql_error_` warrants it.
-#if BUILDFLAG(IS_FUCHSIA)
-    // Recovery is not supported with WAL mode DBs in Fuchsia.
-    if (had_sql_error && sql::IsErrorCatastrophic(*sql_error_)) {
-      should_delete_db = true;
-    }
-#else
     should_attempt_recovery =
         had_sql_error &&
         sql::Recovery::ShouldAttemptRecovery(db_.get(), *sql_error_);
-#endif
 
     // Determine whether to vacuum.
     if (!had_sql_error && !should_delete_db) {
@@ -2156,7 +2149,7 @@ StatusOr<BackingStore::RecordIdentifier> DatabaseConnection::PutRecord(
 
     // Maybe compress, updating `bits_span` and `bits_copy` as appropriate.
     if (bits_span.size() >= kMinimumCompressionSize.InBytes()) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID)
       size_t max_compressed_size = ZSTD_compressBound(bits_span.size());
       std::vector<uint8_t> compressed_bits(max_compressed_size);
 

@@ -256,9 +256,6 @@ bool CheckVulkanCompatibilities(
 #if BUILDFLAG(IS_WIN)
   constexpr char kMemoryObjectExtension[] = "GL_EXT_memory_object_win32";
   constexpr char kSemaphoreExtension[] = "GL_EXT_semaphore_win32";
-#elif BUILDFLAG(IS_FUCHSIA)
-  constexpr char kMemoryObjectExtension[] = "GL_ANGLE_memory_object_fuchsia";
-  constexpr char kSemaphoreExtension[] = "GL_ANGLE_semaphore_fuchsia";
 #else
   constexpr char kMemoryObjectExtension[] = "GL_EXT_memory_object_fd";
   constexpr char kSemaphoreExtension[] = "GL_EXT_semaphore_fd";
@@ -445,8 +442,6 @@ bool IsVkExternalSemaphoreHandleTypeSupported(
                          VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME
 #elif BUILDFLAG(IS_POSIX)
                          VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME
-#elif BUILDFLAG(IS_FUCHSIA)
-                         VK_FUCHSIA_EXTERNAL_SEMAPHORE_EXTENSION_NAME
 #endif
                          )) {
     return false;

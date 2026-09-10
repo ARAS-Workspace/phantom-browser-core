@@ -129,13 +129,13 @@
 #include "net/base/winsock_init.h"
 #endif
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include <net/if.h>
 #include "net/base/sys_addrinfo.h"
 #if !BUILDFLAG(IS_ANDROID)
 #include <ifaddrs.h>
 #endif  // !BUILDFLAG(IS_ANDROID)
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/android_info.h"
@@ -462,8 +462,7 @@ HostResolverManager::HostResolverManager(
 #if BUILDFLAG(IS_WIN)
   EnsureWinsockInit();
 #endif
-#if (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)) || \
-    BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
   RunLoopbackProbeJob();
 #endif
   // Network-bound HostResolverManagers don't need to act on network changes.
@@ -1799,8 +1798,7 @@ void HostResolverManager::OnIPAddressChanged(
   // Abandon all ProbeJobs.
   probe_weak_ptr_factory_.InvalidateWeakPtrs();
   InvalidateCaches();
-#if (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)) || \
-    BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
   RunLoopbackProbeJob();
 #endif
   AbortJobsWithoutTargetNetwork(true /* in_progress_only */);

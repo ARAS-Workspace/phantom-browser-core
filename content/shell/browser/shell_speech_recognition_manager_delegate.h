@@ -34,13 +34,13 @@ class ShellSpeechRecognitionManagerDelegate
       base::OnceCallback<void(bool ask_user, bool is_allowed)> callback)
       override;
   SpeechRecognitionEventListener* GetEventListener() override;
-#if !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   // It is empty in this delegate.
   void BindSpeechRecognitionContext(
       mojo::PendingReceiver<media::mojom::SpeechRecognitionContext> receiver,
       const std::string& language,
       const GlobalRenderFrameHostId& render_frame_host_id) override;
-#endif  //! BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_ANDROID)
+#endif  // !BUILDFLAG(IS_ANDROID)
 };
 
 }  // namespace content

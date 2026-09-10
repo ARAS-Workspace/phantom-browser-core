@@ -101,9 +101,6 @@ class BASE_EXPORT PlatformSharedMemoryRegion {
 #if BUILDFLAG(IS_APPLE)
     kVmMapFailed,
 #endif
-#if BUILDFLAG(IS_FUCHSIA)
-    kNotVmo,
-#endif
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
     kFcntlFailed,
     kReadOnlyFdNotReadOnly,

@@ -181,9 +181,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_BackdropFilterBlurRadius) {
   gfx::RRectF backdrop_filter_bounds(gfx::RectF(gfx::SizeF(blur->bounds())), 0);
   blur->SetBackdropFilterBounds(backdrop_filter_bounds);
 
-#if BUILDFLAG(IS_FUCHSIA)
-  pixel_comparator_ = std::make_unique<FuzzyPixelOffByOneComparator>();
-#elif BUILDFLAG(IS_WIN) || defined(ARCH_CPU_ARM64)
+#if BUILDFLAG(IS_WIN) || defined(ARCH_CPU_ARM64)
   // Windows and ARM64 have 436 pixels off by 1 or 2: crbug.com/259915
   float percentage_pixels_error = 1.09f;  // 436px / (200*200)
   pixel_comparator_ = std::make_unique<FuzzyPixelComparator>(
@@ -679,12 +677,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_ImageFilterScaled) {
   filter->SetBackdropFilters(filters);
   filter->ClearBackdropFilterBounds();
 
-#if BUILDFLAG(IS_FUCHSIA)
-  if (renderer_type() == viz::RendererType::kSkiaVk) {
-    pixel_comparator_ = std::make_unique<FuzzyPixelOffByOneComparator>();
-  }
-#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || \
-    defined(_MIPS_ARCH_LOONGSON) || defined(ARCH_CPU_ARM64)
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || defined(_MIPS_ARCH_LOONGSON) || defined(ARCH_CPU_ARM64)
 #if BUILDFLAG(IS_WIN)
   // Windows has 153 pixels off by at most 2: crbug.com/225027
   float percentage_pixels_error = 0.3825f;  // 153px / (200*200)
@@ -990,8 +983,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_RotatedFilter) {
 
   background->AddChild(child);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_APPLE) || \
-    BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 #if defined(ARCH_CPU_ARM64)
   // Windows, macOS, iOS, Fuchsia and Linux on ARM64 has some pixels difference
   // crbug.com/1029728, crbug.com/1048249, crbug.com/1128443
@@ -1014,7 +1006,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_RotatedFilter) {
           .SetErrorPixelsPercentageLimit(percentage_pixels_error)
           .SetAvgAbsErrorLimit(average_error_allowed_in_bad_pixels)
           .SetAbsErrorLimit(error_allowed));
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_APPLE)
+#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
   RunPixelTest(background,
                base::FilePath(FILE_PATH_LITERAL("rotated_filter_.png"))
@@ -1050,8 +1042,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, RotatedDropShadowFilter) {
 
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || \
     defined(ARCH_CPU_ARM64) || BUILDFLAG(IS_OZONE)
-#if defined(ARCH_CPU_ARM64) && (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA) || \
-                                BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX))
+#if defined(ARCH_CPU_ARM64) && (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX))
 
   // Windows, macOS, Fuchsia and Linux on ARM64 has some pixels difference.
   // crbug.com/1029728, crbug.com/1128443

@@ -20,7 +20,7 @@ class ScopedFileAccessCopyTest : public ::testing::Test {
 
 TEST_F(ScopedFileAccessCopyTest, EndCallbackTest) {
   base::test::TestFuture<void> future;
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   auto file_access = std::make_unique<file_access::ScopedFileAccessCopy>(
       true, base::ScopedFD(), future.GetCallback());
 #else

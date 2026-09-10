@@ -136,7 +136,6 @@ TEST_F(CookieControlsUtilTest, Past) {
 }
 
 // On Fuchsia posix local time functions always use UTC.
-#if !BUILDFLAG(IS_FUCHSIA)
 // For 2023 DST for New York timezone is from March 12 to November 5.
 TEST_F(CookieControlsUtilTest, DSTOverlap) {
   ScopedMockTimezone scoped_timezone(kNewYorkTime);
@@ -170,7 +169,6 @@ TEST_F(CookieControlsUtilTest, DSTOverlap) {
                 Eq(5));
   }
 }
-#endif
 
 TEST_F(CookieControlsUtilTest, NoDSTOverlapOutsideDST) {
   base::test::ScopedRestoreDefaultTimezone scoped_timezone(kNewYorkTime);

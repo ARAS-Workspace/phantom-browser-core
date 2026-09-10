@@ -15,9 +15,7 @@
 #include "build/build_config.h"
 #include "content/shell/common/shell_switches.h"
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "base/fuchsia/file_utils.h"
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include "base/nix/xdg_util.h"
 #endif
 
@@ -40,9 +38,6 @@ bool GetDefaultUserDataDirectory(base::FilePath* result) {
 #elif BUILDFLAG(IS_ANDROID)
   CHECK(base::PathService::Get(base::DIR_ANDROID_APP_DATA, result));
   *result = result->Append(FILE_PATH_LITERAL("content_shell"));
-#elif BUILDFLAG(IS_FUCHSIA)
-  *result = base::FilePath(base::kPersistedDataDirectoryPath)
-                .Append(FILE_PATH_LITERAL("content_shell"));
 #else
   NOTIMPLEMENTED();
   return false;

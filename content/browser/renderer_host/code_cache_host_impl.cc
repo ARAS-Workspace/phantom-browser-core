@@ -368,15 +368,11 @@ class CodeCacheWithSourceKeyedCacheHost : public CodeCacheHostImpl {
     // because `CodeCacheWithPersistentCacheHost` can use this function even
     // when source-keyed cache is disabled.
 
-#if !BUILDFLAG(IS_FUCHSIA)
     ASSIGN_OR_RETURN(std::string cache_id, GetCacheId(cache_type),
                      [&callback] { std::move(callback).Run(std::nullopt); });
 
     std::move(callback).Run(
         generated_code_cache_context()->ShareReadOnlyConnection(cache_id));
-#else
-    NOTREACHED();
-#endif  // !BUILDFLAG(IS_FUCHSIA)
   }
 
   void DidGenerateSourceKeyedCacheableMetadata(
@@ -395,7 +391,6 @@ class CodeCacheWithSourceKeyedCacheHost : public CodeCacheHostImpl {
       return;
     }
 
-#if !BUILDFLAG(IS_FUCHSIA)
     ASSIGN_OR_RETURN(std::string cache_id,
                      GetCacheId(blink::mojom::CodeCacheType::kJavascript),
                      []{});
@@ -403,14 +398,12 @@ class CodeCacheWithSourceKeyedCacheHost : public CodeCacheHostImpl {
     generated_code_cache_context()->InsertIntoPersistentCacheCollection(
         cache_id, /*cache_key=*/blink::ComposeSourceKeyedCacheKey(source_hash),
         std::move(data), /*metadata=*/{});
-#endif  // !BUILDFLAG(IS_FUCHSIA)
   }
 
   void FetchSourceKeyedCachedCodeForTesting(
       base::span<const uint8_t> source_hash,
       base::OnceCallback<void(mojo_base::BigBuffer)> callback) override {
     DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-#if !BUILDFLAG(IS_FUCHSIA)
     CHECK_EQ(source_hash.size(), 32u);
     if (!is_source_keyed_cache_enabled()) {
       std::move(callback).Run({});
@@ -433,9 +426,6 @@ class CodeCacheWithSourceKeyedCacheHost : public CodeCacheHostImpl {
       // Cache miss or error.
       std::move(callback).Run(mojo_base::BigBuffer());
     }
-#else
-    NOTREACHED();
-#endif  // !BUILDFLAG(IS_FUCHSIA)
   }
 
  protected:
@@ -443,7 +433,6 @@ class CodeCacheWithSourceKeyedCacheHost : public CodeCacheHostImpl {
     return is_source_keyed_cache_enabled_;
   }
 
-#if !BUILDFLAG(IS_FUCHSIA)
   static GeneratedCodeCache::CodeCacheType MojoCacheTypeToCodeCacheType(
       blink::mojom::CodeCacheType type) {
     switch (type) {
@@ -514,7 +503,6 @@ class CodeCacheWithSourceKeyedCacheHost : public CodeCacheHostImpl {
                ? kSharedContextKeyForRelaxedIsolationWebUi
                : kSharedContextKeyForRelaxedIsolation;
   }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
  private:
   const bool is_source_keyed_cache_enabled_;
@@ -723,7 +711,6 @@ class LocalCodeCacheHost : public CodeCacheWithSourceKeyedCacheHost {
   base::WeakPtrFactory<LocalCodeCacheHost> weak_ptr_factory_{this};
 };
 
-#if !BUILDFLAG(IS_FUCHSIA)
 // CodeCacheWithPersistentCacheHost --------------------------------------------
 
 // An implementation of CodeCacheHostImpl that uses PersistentCache. Inserts
@@ -820,7 +807,6 @@ class CodeCacheWithPersistentCacheHost
     // rather than delete individual entries.
   }
 };
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 }  // namespace
 
@@ -882,13 +868,9 @@ std::unique_ptr<CodeCacheHostImpl> CodeCacheHostImpl::Create(
         storage_key);
   }
   if (blink::features::IsPersistentCacheForCodeCacheEnabled()) {
-#if !BUILDFLAG(IS_FUCHSIA)
     return std::make_unique<CodeCacheWithPersistentCacheHost>(
         render_process_id, std::move(generated_code_cache_context), nik,
         storage_key);
-#else
-    NOTREACHED();
-#endif  // !BUILDFLAG(IS_FUCHSIA)
   }
   return std::make_unique<LocalCodeCacheHost>(
       render_process_id, std::move(generated_code_cache_context), nik,

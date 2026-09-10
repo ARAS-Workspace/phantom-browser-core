@@ -53,8 +53,7 @@ PlatformThreadMetrics::CreateForCurrentThread() {
   return CreateFromHandle(PlatformThread::CurrentHandle());
 }
 
-#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_LINUX)
+#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 
 // static
 std::unique_ptr<PlatformThreadMetrics>
@@ -71,8 +70,7 @@ std::unique_ptr<PlatformThreadMetrics> PlatformThreadMetrics::CreateFromId(
   return WrapUnique(new PlatformThreadMetrics(tid));
 }
 
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
 
 PlatformThreadMetrics::~PlatformThreadMetrics() = default;
 

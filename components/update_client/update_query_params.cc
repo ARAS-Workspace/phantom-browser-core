@@ -35,8 +35,6 @@ constexpr std::string_view kOs =
     "cros";
 #elif BUILDFLAG(IS_LINUX)
     "linux";
-#elif BUILDFLAG(IS_FUCHSIA)
-    "fuchsia";
 #elif BUILDFLAG(IS_OPENBSD)
     "openbsd";
 #else

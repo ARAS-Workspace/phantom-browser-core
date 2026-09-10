@@ -127,7 +127,7 @@ TEST(AudioLatency, HighLatencyBufferSizes) {
 #if BUILDFLAG(IS_WIN)
     EXPECT_EQ(2 * (i / 100),
               AudioLatency::GetHighLatencyBufferSize(i, i / 100));
-#elif BUILDFLAG(USE_CRAS) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(USE_CRAS)
     EXPECT_EQ(8 * (i / 100), AudioLatency::GetHighLatencyBufferSize(i, 32));
 #else
     EXPECT_EQ(2 * (i / 100), AudioLatency::GetHighLatencyBufferSize(i, 32));

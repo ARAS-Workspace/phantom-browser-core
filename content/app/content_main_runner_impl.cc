@@ -147,7 +147,7 @@
 #endif  // !BUILDFLAG(IS_IOS_TVOS)
 #endif  // BUILDFLAG(IS_IOS)
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include <signal.h>
 
 #include "base/file_descriptor_store.h"
@@ -159,7 +159,7 @@
 #include "content/public/common/zygote/zygote_fork_delegate_linux.h"
 #endif
 
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include "base/environment.h"
@@ -199,9 +199,6 @@
 #include "content/common/android/cpu_time_metrics.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "base/fuchsia/system_info.h"
-#endif
 
 #if BUILDFLAG(BUILD_TFLITE_WITH_XNNPACK)
 #include "third_party/cpuinfo/src/include/cpuinfo.h"
@@ -889,16 +886,6 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
   }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // Cache the system info for this process.
-  // This avoids requiring that all callers of certain base:: functions first
-  // ensure the cache is populated.
-  // Making the blocking call now also avoids the potential for blocking later
-  // in when it might be user-visible.
-  if (!base::FetchAndCacheSystemInfo()) {
-    return TerminateForFatalInitializationError();
-  }
-#endif
 
   if (!GetContentClient())
     ContentClientCreator::Create(delegate_);
@@ -931,7 +918,7 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
   // absence has security implications.
   CHECK(base::allocator::IsAllocatorInitialized());
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   if (!process_type.empty()) {
     // When you hit Ctrl-C in a terminal running the browser
     // process, a SIGINT is delivered to the entire process group.

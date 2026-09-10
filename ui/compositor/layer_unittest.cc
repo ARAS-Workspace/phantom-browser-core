@@ -2189,12 +2189,7 @@ TEST_P(LayerWithRealCompositorTest, ModifyHierarchy) {
                              cc::AlphaDiscardingExactPixelComparator()));
 }
 
-#if BUILDFLAG(IS_FUCHSIA) && defined(ARCH_CPU_ARM64) && !defined(NDEBUG)
-// This test triggers LLVM 10.0 crashes in swiftshader on arm64 debug builds.
-#define MAYBE_BackgroundInvert DISABLED_BackgroundInvert
-#else
 #define MAYBE_BackgroundInvert BackgroundInvert
-#endif
 TEST_P(LayerWithRealCompositorTest, MAYBE_BackgroundInvert) {
   viz::ParentLocalSurfaceIdAllocator allocator;
   allocator.GenerateId();
@@ -2229,11 +2224,7 @@ TEST_P(LayerWithRealCompositorTest, MAYBE_BackgroundInvert) {
 }
 
 // TODO(crbug.com/40280155): Flaky on fuchsia-arm64 builds. Re-enable this test.
-#if BUILDFLAG(IS_FUCHSIA) && defined(ARCH_CPU_ARM64)
-#define MAYBE_BackgroundBlur DISABLED_BackgroundBlur
-#else
 #define MAYBE_BackgroundBlur BackgroundBlur
-#endif
 // Checks that basic background blur is working.
 TEST_P(LayerWithRealCompositorTest, MAYBE_BackgroundBlur) {
 #if defined(THREAD_SANITIZER)
@@ -2285,12 +2276,7 @@ TEST_P(LayerWithRealCompositorTest, MAYBE_BackgroundBlur) {
 }
 
 // TODO(crbug.com/40280155): Flaky on fuchsia-arm64 builds. Re-enable this test.
-#if BUILDFLAG(IS_FUCHSIA) && defined(ARCH_CPU_ARM64)
-#define MAYBE_BackgroundBlurChangeDeviceScale \
-  DISABLED_BackgroundBlurChangeDeviceScale
-#else
 #define MAYBE_BackgroundBlurChangeDeviceScale BackgroundBlurChangeDeviceScale
-#endif
 // Checks that background blur bounds rect gets properly updated when device
 // scale changes.
 TEST_P(LayerWithRealCompositorTest, MAYBE_BackgroundBlurChangeDeviceScale) {

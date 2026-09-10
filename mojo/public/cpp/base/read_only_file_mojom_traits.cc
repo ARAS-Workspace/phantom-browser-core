@@ -7,11 +7,11 @@
 #include "base/files/file.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_WIN)
 #include <windows.h>
@@ -39,7 +39,7 @@ bool IsReadOnlyFile(base::File& file) {
   is_readonly = !(flags.value() &
                   (FILE_APPEND_DATA | FILE_WRITE_ATTRIBUTES | FILE_WRITE_DATA |
                    FILE_WRITE_EA | WRITE_DAC | WRITE_OWNER | DELETE));
-#elif BUILDFLAG(IS_FUCHSIA) || (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_AIX))
+#elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_AIX)
   is_readonly =
       (fcntl(file.GetPlatformFile(), F_GETFL) & O_ACCMODE) == O_RDONLY;
 #endif

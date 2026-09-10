@@ -54,7 +54,7 @@ namespace viz {
 
 namespace {
 
-#if BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_OZONE)
 namespace {
 constexpr int kGpuProcessHostId = 1;
 }  // namespace
@@ -221,7 +221,7 @@ TestGpuServiceHolder::TestGpuServiceHolder(
                        base::Unretained(this), gpu_preferences, &completion));
     completion.Wait();
 
-#if BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_OZONE)
     if (auto* gpu_platform_support_host =
             ui::OzonePlatform::GetInstance()->GetGpuPlatformSupportHost()) {
       auto interface_binder = base::BindRepeating(
@@ -233,7 +233,7 @@ TestGpuServiceHolder::TestGpuServiceHolder(
 }
 
 TestGpuServiceHolder::~TestGpuServiceHolder() {
-#if BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_OZONE)
   if (auto* gpu_platform_support_host =
           ui::OzonePlatform::GetInstance()->GetGpuPlatformSupportHost()) {
     gpu_platform_support_host->OnChannelDestroyed(kGpuProcessHostId);
@@ -296,7 +296,7 @@ void TestGpuServiceHolder::InitializeOnGpuThread(
     base::WaitableEvent* completion) {
   DCHECK(gpu_main_thread_.task_runner()->BelongsToCurrentThread());
 
-#if BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_OZONE)
   ui::OzonePlatform::GetInstance()->AddInterfaces(&binders_);
 #endif
 
@@ -398,7 +398,7 @@ void TestGpuServiceHolder::DeleteOnGpuThread() {
   gpu_service_.reset();
 }
 
-#if BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_OZONE)
 void TestGpuServiceHolder::BindInterface(
     const std::string& interface_name,
     mojo::ScopedMessagePipeHandle interface_pipe) {
@@ -419,6 +419,6 @@ void TestGpuServiceHolder::BindInterfaceOnGpuThread(
   CHECK(binders_.TryBind(&receiver))
       << "Unable to find mojo interface " << interface_name;
 }
-#endif  // BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_OZONE)
 
 }  // namespace viz

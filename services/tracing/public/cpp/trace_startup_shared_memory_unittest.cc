@@ -63,7 +63,7 @@ MULTIPROCESS_TEST_MAIN(InitFromLaunchParameters) {
   // only be done once and subsequent calls `UnsafeSharedMemoryRegionFrom()`
   // calls will not get a valid `shmem_region`. So we skip tracing init, to
   // avoid `ConnectProducer()` grabbing the shmem first.
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_WIN)
   base::FeatureList::InitInstance("", "");
   base::ThreadPoolInstance::CreateAndStartWithDefaultParams("StartupTraceTest");
   tracing::InitTracingPostFeatureList(/*enable_consumer=*/false,
@@ -72,7 +72,7 @@ MULTIPROCESS_TEST_MAIN(InitFromLaunchParameters) {
   // Simulate launching with the serialized parameters.
   EXPECT_TRUE(IsTracingInitialized());
   EXPECT_TRUE(base::TrackEvent::IsEnabled());
-#endif  // !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_WIN)
 
   auto* command_line = base::CommandLine::ForCurrentProcess();
   base::UnsafeSharedMemoryRegion unsafe_shm;

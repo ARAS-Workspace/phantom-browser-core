@@ -14,7 +14,7 @@
 
 namespace sandbox::policy::features {
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_MAC)
 // Enables network service sandbox.
 // (Only causes an effect when feature kNetworkServiceInProcess is disabled.)
 BASE_FEATURE(kNetworkServiceSandbox, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -33,7 +33,7 @@ BASE_FEATURE(kNetworkServiceSyscallFilter, base::FEATURE_ENABLED_BY_DEFAULT);
 // allow everything.
 BASE_FEATURE(kNetworkServiceFileAllowlist, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_WIN)
 // Enables the Windows speech recognition sandbox hardening.
@@ -169,7 +169,7 @@ bool IsNetworkSandboxSupported() {
 #endif  // BUILDFLAG(IS_WIN)
 
 bool IsNetworkSandboxEnabled() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_MAC)
   return true;
 #else
 #if BUILDFLAG(IS_WIN)
@@ -179,7 +179,7 @@ bool IsNetworkSandboxEnabled() {
 #endif  // BUILDFLAG(IS_WIN)
   // Check feature status.
   return base::FeatureList::IsEnabled(kNetworkServiceSandbox);
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_MAC)
 }
 
 }  // namespace sandbox::policy::features

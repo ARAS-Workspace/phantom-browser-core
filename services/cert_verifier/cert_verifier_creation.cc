@@ -24,10 +24,6 @@
 #include "net/cert/multi_log_ct_verifier.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "net/cert/cert_verify_proc_builtin.h"
-#include "net/cert/internal/system_trust_store.h"
-#endif
 
 #if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
 #include "net/cert/cert_verify_proc_builtin.h"
@@ -100,15 +96,8 @@ class CertVerifyProcFactoryImpl : public net::CertVerifyProcFactory {
       scoped_refptr<net::CTPolicyEnforcer> ct_policy_enforcer,
       const net::CertVerifyProc::InstanceParams& instance_params,
       std::optional<network_time::TimeTracker> time_tracker) {
-#if BUILDFLAG(IS_FUCHSIA)
-    return net::CreateCertVerifyProcBuiltin(
-        std::move(cert_net_fetcher), std::move(crl_set), std::move(ct_verifier),
-        std::move(ct_policy_enforcer), net::CreateSslSystemTrustStore(),
-        instance_params, std::move(time_tracker));
-#else
     return net::CertVerifyProc::CreateSystemVerifyProc(
         std::move(cert_net_fetcher), std::move(crl_set));
-#endif
   }
 #endif  // !BUILDFLAG(CHROME_ROOT_STORE_ONLY)
 
@@ -197,8 +186,7 @@ ConvertMojoListToInternalList(
 }  // namespace
 
 bool IsUsingCertNetFetcher() {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA) ||      \
-    BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
   return true;
 #else
   return false;

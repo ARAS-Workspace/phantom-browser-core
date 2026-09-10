@@ -630,7 +630,6 @@ IN_PROC_BROWSER_TEST_F(NetworkServiceBrowserTest, FactoryOverride) {
 }
 
 // Cache data migration is not used for Fuchsia.
-#if !BUILDFLAG(IS_FUCHSIA)
 class NetworkServiceBrowserCacheResetTest : public NetworkServiceBrowserTest {
  public:
   NetworkServiceBrowserCacheResetTest() {
@@ -1608,7 +1607,6 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::Combine(::testing::Values(false),
                        ::testing::ValuesIn(kFailureTypes)));
 
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 class NetworkServiceInProcessBrowserTest : public ContentBrowserTest {
  public:
@@ -1710,7 +1708,7 @@ class NetworkServiceBoundedNetLogBrowserTest
     : public NetworkServiceNetLogBrowserTest {
  public:
   NetworkServiceBoundedNetLogBrowserTest() {
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_MAC)
     // Network sandboxing disallows the creation of a temp directory needed by
     // bounded net-logs. Disable it for this test.
     scoped_feature_list_.InitAndDisableFeature(
@@ -1736,7 +1734,6 @@ class NetworkServiceBoundedNetLogBrowserTest
 
 // Skip for Fuchsia. Fuchsia's file size operation isn't fully supported yet,
 // making the file size meaningless and therefore these checks.
-#if !BUILDFLAG(IS_FUCHSIA)
     base::File::Info file_info;
     log_file_read.GetInfo(&file_info);
 
@@ -1765,7 +1762,6 @@ class NetworkServiceBoundedNetLogBrowserTest
 
     EXPECT_GT(file_info.size, kMaxSizeLower);
     EXPECT_LT(file_info.size, kMaxSizeUpper);
-#endif
   }
 
   // For testing, have a max log size of 1 MB. 1024*1024 == 2^20 == left shift

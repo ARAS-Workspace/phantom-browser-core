@@ -42,8 +42,6 @@ bool PathProviderMac(int key, FilePath* result);
 bool PathProviderIOS(int key, FilePath* result);
 #elif BUILDFLAG(IS_ANDROID)
 bool PathProviderAndroid(int key, FilePath* result);
-#elif BUILDFLAG(IS_FUCHSIA)
-bool PathProviderFuchsia(int key, FilePath* result);
 #elif BUILDFLAG(IS_POSIX)
 // PathProviderPosix is the default path provider on POSIX OSes other than
 // Mac and Android.
@@ -114,13 +112,6 @@ Provider base_provider_android = {PathProviderAndroid, &base_provider,
                                   true};
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-Provider base_provider_fuchsia = {PathProviderFuchsia, &base_provider,
-#ifndef NDEBUG
-                                  0, 0,
-#endif
-                                  true};
-#endif
 
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
 Provider posix_provider = {PathProviderPosix, &base_provider,
@@ -151,8 +142,6 @@ struct PathData {
     providers = &base_provider_ios;
 #elif BUILDFLAG(IS_ANDROID)
     providers = &base_provider_android;
-#elif BUILDFLAG(IS_FUCHSIA)
-    providers = &base_provider_fuchsia;
 #elif BUILDFLAG(IS_POSIX)
     providers = &base_provider_posix;
 #endif

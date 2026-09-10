@@ -43,11 +43,6 @@
 #include <Psapi.h>
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <tuple>
-
-#include "base/notreached.h"
-#endif
 
 using ProcessSnapshot =
     ::perfetto::protos::pbzero::MemoryTrackerSnapshot_ProcessSnapshot;
@@ -121,7 +116,7 @@ std::optional<size_t> ProcessMemoryDump::CountResidentBytes(
       max_page_count);
 #elif BUILDFLAG(IS_APPLE)
   auto vec = base::HeapArray<char>::WithSize(max_page_count);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   auto vec = base::HeapArray<unsigned char>::WithSize(max_page_count);
 #endif
 
@@ -161,13 +156,6 @@ std::optional<size_t> ProcessMemoryDump::CountResidentBytes(
     for (size_t i = 0; i < page_count; i++) {
       accumulate_page_if_resident(i, vec[i].VirtualAttributes.Valid);
     }
-#elif BUILDFLAG(IS_FUCHSIA)
-    // TODO(crbug.com/42050620): Implement counting resident bytes.
-    // For now, log and avoid unused variable warnings.
-    NOTIMPLEMENTED_LOG_ONCE();
-    std::ignore = chunk_start;
-    std::ignore = page_count;
-    std::ignore = accumulate_page_if_resident;
 #elif BUILDFLAG(IS_APPLE)
     // mincore in MAC does not fail with EAGAIN.
     failure =

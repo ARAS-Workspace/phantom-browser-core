@@ -121,13 +121,6 @@ class GPU_GLES2_EXPORT SharedImageFactory {
   bool HasImages() const { return !shared_images_.empty(); }
   void DestroyAllSharedImages(bool have_context);
 
-#if BUILDFLAG(IS_FUCHSIA)
-  void RegisterSysmemBufferCollection(zx::eventpair service_handle,
-                                      zx::channel sysmem_token,
-                                      const viz::SharedImageFormat& format,
-                                      gfx::BufferUsage usage,
-                                      bool register_with_image_pipe);
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
   bool RegisterBacking(std::unique_ptr<SharedImageBacking> backing,
                        std::optional<SharedImagePoolId> pool_id = std::nullopt);

@@ -150,11 +150,7 @@ TEST_F(HelpBubbleViewsCustomBubbleTest, CloseHelpBubble) {
 
 // TODO(https://crbug.com/502638609): In Fuchsia, this test causes an unrelated
 // crash on the GPU thread.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_CloseHelpBubbleWidget DISABLED_CloseHelpBubbleWidget
-#else
 #define MAYBE_CloseHelpBubbleWidget CloseHelpBubbleWidget
-#endif
 TEST_F(HelpBubbleViewsCustomBubbleTest, MAYBE_CloseHelpBubbleWidget) {
   auto info = CreateBubble();
   auto* const bubble = GetBubble(info);
@@ -177,11 +173,7 @@ TEST_F(HelpBubbleViewsCustomBubbleTest, MAYBE_CloseHelpBubbleWidget) {
 
 // TODO(https://crbug.com/502638609): In Fuchsia, this test causes an unrelated
 // crash on the GPU thread.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_AnchorViewHidden DISABLED_AnchorViewHidden
-#else
 #define MAYBE_AnchorViewHidden AnchorViewHidden
-#endif
 TEST_F(HelpBubbleViewsCustomBubbleTest, MAYBE_AnchorViewHidden) {
   auto info = CreateBubble();
   auto help_bubble = BuildHelpBubble(std::move(info));

@@ -48,9 +48,6 @@
 #include "ui/events/ozone/events_ozone.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "ui/platform_window/fuchsia/initialize_presenter_api_view.h"
-#endif
 
 namespace aura {
 namespace test {
@@ -73,9 +70,6 @@ AuraTestHelper::AuraTestHelper(ui::ContextFactory* context_factory) {
   ui::DisableNativeUiEventDispatchForTest();
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-  ui::fuchsia::IgnorePresentCallsForTest();
-#endif
 
   ui::InitializeInputMethodForTesting();
 

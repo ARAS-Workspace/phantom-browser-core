@@ -23,9 +23,6 @@
 #include <atomic>
 #endif
 
-#if PA_BUILDFLAG(IS_FUCHSIA)
-#include <zircon/process.h>
-#endif
 
 namespace partition_alloc::internal::base {
 
@@ -52,8 +49,6 @@ PlatformThreadId PlatformThread::CurrentId() {
   // - gettid() is fast, since its return value is cached in pthread (in the
   //   thread control block of pthread). See gettid.c in bionic.
   return gettid();
-#elif PA_BUILDFLAG(IS_FUCHSIA)
-  return zx_thread_self();
 #elif PA_BUILDFLAG(IS_ASMJS)
   return pthread_self();
 #elif PA_BUILDFLAG(IS_SOLARIS) || PA_BUILDFLAG(IS_QNX)

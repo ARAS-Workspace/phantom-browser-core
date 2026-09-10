@@ -18,9 +18,6 @@
 #include "base/win/windows_types.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <zircon/types.h>
-#endif
 
 namespace base {
 
@@ -35,11 +32,6 @@ typedef DWORD ProcessId;
 typedef HANDLE UserTokenHandle;
 const ProcessHandle kNullProcessHandle = NULL;
 const ProcessId kNullProcessId = 0;
-#elif BUILDFLAG(IS_FUCHSIA)
-typedef zx_handle_t ProcessHandle;
-typedef zx_koid_t ProcessId;
-const ProcessHandle kNullProcessHandle = ZX_HANDLE_INVALID;
-const ProcessId kNullProcessId = ZX_KOID_INVALID;
 #elif BUILDFLAG(IS_POSIX)
 // On POSIX, our ProcessHandle will just be the PID.
 typedef pid_t ProcessHandle;
@@ -51,7 +43,7 @@ const ProcessId kNullProcessId = 0;
 // To print ProcessIds portably use CrPRIdPid (based on PRIuS and friends from
 // C99 and format_macros.h) like this:
 // base::StringPrintf("PID is %" CrPRIdPid ".\n", pid);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN)
 #define CrPRIdPid "ld"
 #else
 #define CrPRIdPid "d"
@@ -108,12 +100,10 @@ BASE_EXPORT ProcessHandle GetCurrentProcessHandle();
 // processes.
 BASE_EXPORT ProcessId GetProcId(ProcessHandle process);
 
-#if !BUILDFLAG(IS_FUCHSIA)
 // Returns the ID for the parent of the given process. Not available on Fuchsia.
 // Returning a negative value indicates an error, such as if the |process| does
 // not exist. Returns 0 when |process| has no parent process.
 BASE_EXPORT ProcessId GetParentProcessId(ProcessHandle process);
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_POSIX)
 // Returns the path to the executable of the given process.

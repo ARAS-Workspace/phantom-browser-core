@@ -26,8 +26,6 @@ class COMPONENT_EXPORT(MOJO_CPP_PLATFORM) PlatformChannelEndpoint {
 // data pipe, so we have this.
 #if BUILDFLAG(IS_WIN)
   using HandlePassingInfo = base::HandlesToInheritVector;
-#elif BUILDFLAG(IS_FUCHSIA)
-  using HandlePassingInfo = base::HandlesToTransferVector;
 #elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
   using HandlePassingInfo = base::MachPortsForRendezvous;
 #elif BUILDFLAG(IS_POSIX)

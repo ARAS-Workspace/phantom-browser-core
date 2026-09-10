@@ -9,7 +9,7 @@
 // and link with Android implementations of Chrome which do not have
 // notification systems yet. This is to avoid spreading compile-time flags
 // everywhere in the code.
-#if !(BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA))
+#if !BUILDFLAG(IS_ANDROID)
 #error This file should only be used in Android and Fuchsia.
 #endif
 

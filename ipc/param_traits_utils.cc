@@ -39,15 +39,11 @@
 #include <tchar.h>
 
 #include "ipc/handle_win.h"
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 #include "base/file_descriptor_posix.h"
 #include "ipc/ipc_platform_file_attachment_posix.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "base/fuchsia/fuchsia_logging.h"
-#include "ipc/handle_attachment_fuchsia.h"
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/scoped_hardware_buffer_handle.h"
@@ -405,7 +401,7 @@ bool ParamTraits<base::DictValue>::Read(const base::Pickle* m,
   return ReadDictValue(m, iter, 0, r);
 }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 void ParamTraits<base::FileDescriptor>::Write(base::Pickle* m,
                                               const param_type& p) {
   // This serialization must be kept in sync with
@@ -505,7 +501,7 @@ bool ParamTraits<base::ScopedFD>::Read(const base::Pickle* m,
           ->TakePlatformFile());
   return true;
 }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_WIN)
 void ParamTraits<base::win::ScopedHandle>::Write(base::Pickle* m,
@@ -543,98 +539,6 @@ bool ParamTraits<base::win::ScopedHandle>::Read(const base::Pickle* m,
 }
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(IS_FUCHSIA)
-void ParamTraits<zx::vmo>::Write(base::Pickle* m, const param_type& p) {
-  // This serialization must be kept in sync with
-  // nacl_message_scanner.cc:WriteHandle().
-  const bool valid = p.is_valid();
-  WriteParam(m, valid);
-
-  if (!valid) {
-    return;
-  }
-
-  if (!m->WriteAttachment(new internal::HandleAttachmentFuchsia(
-          std::move(const_cast<param_type&>(p))))) {
-    NOTREACHED();
-  }
-}
-
-bool ParamTraits<zx::vmo>::Read(const base::Pickle* m,
-                                base::PickleIterator* iter,
-                                param_type* r) {
-  r->reset();
-
-  bool valid;
-  if (!ReadParam(m, iter, &valid)) {
-    return false;
-  }
-
-  if (!valid) {
-    return true;
-  }
-
-  scoped_refptr<base::Pickle::Attachment> attachment;
-  if (!m->ReadAttachment(iter, &attachment)) {
-    return false;
-  }
-
-  if (static_cast<MessageAttachment*>(attachment.get())->GetType() !=
-      MessageAttachment::Type::FUCHSIA_HANDLE) {
-    return false;
-  }
-
-  *r = zx::vmo(static_cast<internal::HandleAttachmentFuchsia*>(attachment.get())
-                   ->Take());
-  return true;
-}
-
-void ParamTraits<zx::channel>::Write(base::Pickle* m, const param_type& p) {
-  // This serialization must be kept in sync with
-  // nacl_message_scanner.cc:WriteHandle().
-  const bool valid = p.is_valid();
-  WriteParam(m, valid);
-
-  if (!valid) {
-    return;
-  }
-
-  if (!m->WriteAttachment(new internal::HandleAttachmentFuchsia(
-          std::move(const_cast<param_type&>(p))))) {
-    NOTREACHED();
-  }
-}
-
-bool ParamTraits<zx::channel>::Read(const base::Pickle* m,
-                                    base::PickleIterator* iter,
-                                    param_type* r) {
-  r->reset();
-
-  bool valid;
-  if (!ReadParam(m, iter, &valid)) {
-    return false;
-  }
-
-  if (!valid) {
-    return true;
-  }
-
-  scoped_refptr<base::Pickle::Attachment> attachment;
-  if (!m->ReadAttachment(iter, &attachment)) {
-    return false;
-  }
-
-  if (static_cast<MessageAttachment*>(attachment.get())->GetType() !=
-      MessageAttachment::Type::FUCHSIA_HANDLE) {
-    return false;
-  }
-
-  *r = zx::channel(
-      static_cast<internal::HandleAttachmentFuchsia*>(attachment.get())
-          ->Take());
-  return true;
-}
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_ANDROID)
 void ParamTraits<base::android::ScopedHardwareBufferHandle>::Write(
@@ -791,9 +695,6 @@ void ParamTraits<base::subtle::PlatformSharedMemoryRegion>::Write(
   base::win::ScopedHandle h = const_cast<param_type&>(p).PassPlatformHandle();
   HandleWin handle_win(h.Get());
   WriteParam(m, handle_win);
-#elif BUILDFLAG(IS_FUCHSIA)
-  zx::vmo vmo = const_cast<param_type&>(p).PassPlatformHandle();
-  WriteParam(m, vmo);
 #elif BUILDFLAG(IS_APPLE)
   base::apple::ScopedMachSendRight h =
       const_cast<param_type&>(p).PassPlatformHandle();
@@ -844,13 +745,6 @@ bool ParamTraits<base::subtle::PlatformSharedMemoryRegion>::Read(
   }
   *r = base::subtle::PlatformSharedMemoryRegion::Take(
       base::win::ScopedHandle(handle_win.get_handle()), mode, size, guid);
-#elif BUILDFLAG(IS_FUCHSIA)
-  zx::vmo vmo;
-  if (!ReadParam(m, iter, &vmo)) {
-    return false;
-  }
-  *r = base::subtle::PlatformSharedMemoryRegion::Take(std::move(vmo), mode,
-                                                      size, guid);
 #elif BUILDFLAG(IS_APPLE)
   MachPortMac mach_port_mac;
   if (!ReadParam(m, iter, &mach_port_mac)) {
@@ -1067,7 +961,7 @@ bool ParamTraits<base::UnguessableToken>::Read(const base::Pickle* m,
 }
 
 void ParamTraits<Message>::Write(base::Pickle* m, const Message& p) {
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   // We don't serialize the file descriptors in the nested message, so there
   // better not be any.
   DCHECK(!p.HasAttachments());

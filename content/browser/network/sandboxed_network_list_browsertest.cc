@@ -65,7 +65,7 @@ class SandboxedNetworkListBrowserTest : public ContentBrowserTest {
 
     disabled_features.push_back(features::kNetworkServiceInProcess);
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_MAC)
     if (sandbox_enabled) {
       enabled_features.push_back(
           sandbox::policy::features::kNetworkServiceSandbox);
@@ -73,7 +73,7 @@ class SandboxedNetworkListBrowserTest : public ContentBrowserTest {
       disabled_features.push_back(
           sandbox::policy::features::kNetworkServiceSandbox);
     }
-#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_WIN)
     if (lpac_enabled) {

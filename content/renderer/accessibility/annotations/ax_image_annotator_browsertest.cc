@@ -148,11 +148,7 @@ class AXImageAnnotatorTest : public RenderAccessibilityImplTest {
 
 // TODO(crbug.com/1477047, fuchsia:132924): Reenable test on Fuchsia once
 // post-lifecycle serialization is turned on.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_OnImageAdded DISABLED_OnImageAdded
-#else
 #define MAYBE_OnImageAdded OnImageAdded
-#endif
 TEST_F(AXImageAnnotatorTest, MAYBE_OnImageAdded) {
   LoadHTMLAndRefreshAccessibilityTree(base::StringPrintf(R"HTML(
       <body>

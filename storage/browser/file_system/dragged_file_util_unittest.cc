@@ -508,7 +508,6 @@ TEST_F(DraggedFileUtilTest, CopyOutDirectoryTest) {
 // which breaks this test that relies on it. Since PPAPI is being deprecated,
 // this test is excluded from the Fuchsia build.
 // See https://crbug.com/1077456 for details.
-#if !BUILDFLAG(IS_FUCHSIA)
 TEST_F(DraggedFileUtilTest, TouchTest) {
   for (const auto& test_case : kRegularFileSystemTestCases) {
     if (test_case.is_directory)
@@ -533,7 +532,6 @@ TEST_F(DraggedFileUtilTest, TouchTest) {
     EXPECT_EQ(last_modified_time.ToTimeT(), info.last_modified.ToTimeT());
   }
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 TEST_F(DraggedFileUtilTest, TruncateTest) {
   for (const auto& test_case : kRegularFileSystemTestCases) {

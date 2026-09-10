@@ -921,7 +921,6 @@ TEST_F(DeviceStatisticsTrackerTest,
 
 // This test doesn't work on Fuchsia, because Fuchsia is not among the platforms
 // recognized/tracked by the DeviceStatisticsTracker.
-#if !BUILDFLAG(IS_FUCHSIA)
 TEST_F(DeviceStatisticsTrackerTest,
        RecordsHistoryMetricsWhenThisPlatformButNotThisDeviceOptedIn) {
   AccountInfo primary = identity_test_env_.MakePrimaryAccountAvailable(
@@ -990,7 +989,6 @@ TEST_F(DeviceStatisticsTrackerTest,
           kThisPlatformYesOtherPlatformsNo,
       /*expected_count=*/1);
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 TEST_F(DeviceStatisticsTrackerTest,
        RecordsHistoryMetricsWhenOnlyOtherDevicesOptedIn) {

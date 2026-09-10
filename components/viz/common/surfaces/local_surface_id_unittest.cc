@@ -39,9 +39,8 @@ TEST(LocalSurfaceIdTest, VerifyToString) {
   int previous_log_lvl = logging::GetMinLogLevel();
 
   // TODO(crbug.com/405151792): Switching the logging level to verbose in the
-  // test isn't working correctly on Chrome OS or Fuchsia. Fix logging and
-  // enable again.
-  if constexpr (!BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_FUCHSIA)) {
+  // test isn't working correctly on Chrome OS. Fix logging and enable again.
+  if constexpr (!BUILDFLAG(IS_CHROMEOS)) {
     // When |g_min_log_level| is set to LOGGING_VERBOSE we expect verbose
     // versions of local_surface_id::ToString().
     logging::SetMinLogLevel(logging::LOGGING_VERBOSE);

@@ -39,10 +39,8 @@
 #include "ui/ozone/public/ozone_platform.h"
 #endif
 
-#if !BUILDFLAG(IS_FUCHSIA)
 #include "ui/aura/window_tree_host_platform.h"    // nogncheck
 #include "ui/platform_window/stub/stub_window.h"  // nogncheck
-#endif
 
 namespace views {
 
@@ -558,7 +556,6 @@ TEST_F(DesktopWindowTreeHostPlatformTest, CanFullscreen) {
   EXPECT_FALSE(host_platform->CanFullscreen());
 }
 
-#if !BUILDFLAG(IS_FUCHSIA)
 class ScopedPlatformWindowFactoryDelegate
     : public aura::WindowTreeHostPlatform::
           PlatformWindowFactoryDelegateForTesting {
@@ -706,7 +703,6 @@ TEST_F(DesktopWindowTreeHostPlatformTest, OnPaintAsActiveChanged) {
   EXPECT_FALSE(widget->ShouldPaintAsActive());
 }
 
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 class VisibilityObserver : public aura::WindowObserver {
  public:
@@ -741,7 +737,6 @@ TEST_F(DesktopWindowTreeHostPlatformTest, ContentWindowShownOnce) {
   host_platform->GetContentWindow()->RemoveObserver(&observer);
 }
 
-#if !BUILDFLAG(IS_FUCHSIA)
 class MaximizeBoundsChangeStubWindow : public ui::StubWindow {
  public:
   explicit MaximizeBoundsChangeStubWindow(ui::PlatformWindowDelegate* delegate,
@@ -857,6 +852,5 @@ TEST_F(DesktopWindowTreeHostPlatformTest,
   // This should not crash or trigger UAF.
   host_platform->Restore();
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 }  // namespace views

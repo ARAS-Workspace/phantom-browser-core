@@ -72,12 +72,10 @@
 #include "ui/gl/gl_switches.h"
 #include "ui/shell_dialogs/select_file_dialog.h"
 
-#if !BUILDFLAG(IS_FUCHSIA)
 #include "third_party/crashpad/crashpad/client/crash_report_database.h"  // nogncheck
 #include "third_party/crashpad/crashpad/handler/minidump_to_upload_parameters.h"  // nogncheck
 #include "third_party/crashpad/crashpad/snapshot/minidump/process_snapshot_minidump.h"  // nogncheck
 #include "third_party/crashpad/crashpad/util/file/file_reader.h"  // nogncheck
-#endif
 
 #if BUILDFLAG(IS_APPLE)
 #include "base/mac/mac_util.h"
@@ -243,12 +241,7 @@ class HeadlessBrowserTestWithProxy : public HeadlessBrowserTest {
   net::EmbeddedTestServer proxy_server_;
 };
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/40697469): Fix this test on Fuchsia and re-enable.
-#define MAYBE_SetProxyConfig DISABLED_SetProxyConfig
-#else
 #define MAYBE_SetProxyConfig SetProxyConfig
-#endif
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTestWithProxy, MAYBE_SetProxyConfig) {
   std::unique_ptr<net::ProxyConfig> proxy_config(new net::ProxyConfig);
   proxy_config->proxy_rules().ParseFromString(
@@ -357,11 +350,9 @@ class HeadlessBrowserRendererCommandPrefixTest : public HeadlessBrowserTest {
             launcher_stamp_.value().c_str());
     fprintf(launcher_file.get(), "exec $@\n");
     launcher_file.reset();
-#if !BUILDFLAG(IS_FUCHSIA)
     base::SetPosixFilePermissions(launcher_script_,
                                   base::FILE_PERMISSION_READ_BY_USER |
                                       base::FILE_PERMISSION_EXECUTE_BY_USER);
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
     HeadlessBrowserTest::SetUp();
   }
@@ -445,7 +436,7 @@ class CrashReporterTest : public HeadlessBrowserTest,
   base::FilePath crash_dumps_dir_;
 };
 
-#if !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_F(CrashReporterTest, GenerateMinidump) {
   content::ScopedAllowRendererCrashes scoped_allow_renderer_crashes;
 
@@ -514,7 +505,7 @@ IN_PROC_BROWSER_TEST_F(CrashReporterTest, GenerateMinidump) {
     bc.Close();
   }
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_WIN)
+#endif  // !BUILDFLAG(IS_WIN)
 
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, PermissionManagerAlwaysASK) {
   GURL url("https://example.com");
@@ -648,12 +639,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserAllowInsecureLocalhostTest,
   EXPECT_TRUE(WaitForLoad(web_contents));
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/40697469): Fix this test on Fuchsia and re-enable.
-#define MAYBE_ServerWantsClientCertificate DISABLED_ServerWantsClientCertificate
-#else
 #define MAYBE_ServerWantsClientCertificate ServerWantsClientCertificate
-#endif
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest,
                        MAYBE_ServerWantsClientCertificate) {
   net::SSLServerConfig server_config;

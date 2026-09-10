@@ -57,9 +57,6 @@ constexpr char kProxyResolverSandbox[] = "proxy_resolver";
 constexpr char kWebNNModelCompilationSandbox[] = "webnn_model_compilation";
 #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_FUCHSIA)
-constexpr char kVideoCaptureSandbox[] = "video_capture";
-#endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 constexpr char kShapeDetectionSandbox[] = "shape_detection";
@@ -129,9 +126,6 @@ void SetCommandLineFlagsForSandboxType(base::CommandLine* command_line,
     case Sandbox::kCdm:
     case Sandbox::kPrintCompositor:
     case Sandbox::kAudio:
-#if BUILDFLAG(IS_FUCHSIA)
-    case Sandbox::kVideoCapture:
-#endif
 #if BUILDFLAG(IS_WIN)
     case Sandbox::kNoSandboxAndElevatedPrivileges:
     case Sandbox::kXrCompositing:
@@ -247,10 +241,6 @@ std::string StringFromUtilitySandboxType(Sandbox sandbox_type) {
       return kUtilitySandbox;
     case Sandbox::kAudio:
       return kAudioSandbox;
-#if BUILDFLAG(IS_FUCHSIA)
-    case Sandbox::kVideoCapture:
-      return kVideoCaptureSandbox;
-#endif
     case Sandbox::kService:
       return kServiceSandbox;
     case Sandbox::kServiceWithJit:
@@ -401,11 +391,6 @@ sandbox::mojom::Sandbox UtilitySandboxTypeFromString(
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
   if (sandbox_string == kOnDeviceTranslationSandbox) {
     return Sandbox::kOnDeviceTranslation;
-  }
-#endif
-#if BUILDFLAG(IS_FUCHSIA)
-  if (sandbox_string == kVideoCaptureSandbox) {
-    return Sandbox::kVideoCapture;
   }
 #endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)

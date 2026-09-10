@@ -41,7 +41,7 @@ struct NativeLibraryStruct {
   };
 };
 using NativeLibrary = NativeLibraryStruct*;
-#elif PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#elif PA_BUILDFLAG(IS_POSIX)
 using NativeLibrary = void*;
 #endif  // OS_*
 
@@ -55,7 +55,7 @@ struct PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) NativeLibraryLoadError {
 
 #if PA_BUILDFLAG(IS_WIN)
   DWORD code;
-#elif PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_FUCHSIA)
+#elif PA_BUILDFLAG(IS_POSIX)
   std::string message;
 #endif  // PA_BUILDFLAG(IS_WIN)
 };

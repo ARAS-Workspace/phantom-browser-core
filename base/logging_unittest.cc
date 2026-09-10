@@ -47,15 +47,6 @@
 #include <excpt.h>
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <lib/zx/channel.h>
-#include <lib/zx/event.h>
-#include <lib/zx/exception.h>
-#include <lib/zx/thread.h>
-#include <zircon/syscalls/debug.h>
-#include <zircon/syscalls/exception.h>
-#include <zircon/types.h>
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 #include <optional>
 
@@ -239,7 +230,7 @@ TEST_F(LoggingTest, LogToStdErrFlag) {
 // Check that messages with severity ERROR or higher are always logged to
 // stderr if no log-destinations are set, other than LOG_TO_FILE.
 // This test is currently only POSIX-compatible.
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 namespace {
 void TestForLogToStderr(int log_destinations,
                         bool* did_log_info,
@@ -289,7 +280,6 @@ TEST_F(LoggingTest, AlwaysLogErrorsToStderr) {
   bool did_log_error = false;
 
   // Fuchsia only logs to stderr when explicitly specified.
-#if !BUILDFLAG(IS_FUCHSIA)
   // When no destinations are specified, ERRORs should still log to stderr.
   TestForLogToStderr(LOG_NONE, &did_log_info, &did_log_error);
   EXPECT_FALSE(did_log_info);
@@ -299,7 +289,6 @@ TEST_F(LoggingTest, AlwaysLogErrorsToStderr) {
   TestForLogToStderr(LOG_TO_FILE, &did_log_info, &did_log_error);
   EXPECT_FALSE(did_log_info);
   EXPECT_TRUE(did_log_error);
-#endif
 
   // ERRORs should not be logged to stderr if any destination besides FILE is
   // set.
@@ -312,7 +301,7 @@ TEST_F(LoggingTest, AlwaysLogErrorsToStderr) {
   EXPECT_TRUE(did_log_info);
   EXPECT_TRUE(did_log_error);
 }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_CHROMEOS)
 TEST_F(LoggingTest, InitWithFileDescriptor) {
@@ -424,157 +413,7 @@ TEST_F(LoggingTest, CheckCausesDistinctBreakpoints) {
   EXPECT_NE(addr1, addr3);
   EXPECT_NE(addr2, addr3);
 }
-#elif BUILDFLAG(IS_FUCHSIA)
-
-// CHECK causes a direct crash (without jumping to another function) only in
-// official builds. Unfortunately, continuous test coverage on official builds
-// is lower. Furthermore, since the Fuchsia implementation uses threads, it is
-// not possible to rely on an implementation of CHECK that calls abort(), which
-// takes down the whole process, preventing the thread exception handler from
-// handling the exception. DO_CHECK here falls back on base::ImmediateCrash() in
-// non-official builds, to catch regressions earlier in the CQ.
-#if !CHECK_WILL_STREAM()
-#define DO_CHECK CHECK
-#else
-#define DO_CHECK(cond)      \
-  if (!(cond)) {            \
-    base::ImmediateCrash(); \
-  }
-#endif
-
-struct thread_data_t {
-  // For signaling the thread ended properly.
-  zx::event event;
-  // For catching thread exceptions. Created by the crashing thread.
-  zx::channel channel;
-  // Location where the thread is expected to crash.
-  int death_location;
-};
-
-// Indicates the exception channel has been created successfully.
-constexpr zx_signals_t kChannelReadySignal = ZX_USER_SIGNAL_0;
-
-// Indicates an error setting up the crash thread.
-constexpr zx_signals_t kCrashThreadErrorSignal = ZX_USER_SIGNAL_1;
-
-void* CrashThread(void* arg) {
-  thread_data_t* data = (thread_data_t*)arg;
-  int death_location = data->death_location;
-
-  // Register the exception handler.
-  zx_status_t status =
-      zx::thread::self()->create_exception_channel(0, &data->channel);
-  if (status != ZX_OK) {
-    data->event.signal(0, kCrashThreadErrorSignal);
-    return nullptr;
-  }
-  data->event.signal(0, kChannelReadySignal);
-
-  DO_CHECK(death_location != 1);
-  DO_CHECK(death_location != 2);
-  DO_CHECK(death_location != 3);
-
-  // We should never reach this point, signal the thread incorrectly ended
-  // properly.
-  data->event.signal(0, kCrashThreadErrorSignal);
-  return nullptr;
-}
-
-// Helper function to call pthread_exit(nullptr).
-_Noreturn __NO_SAFESTACK void exception_pthread_exit() {
-  pthread_exit(nullptr);
-}
-
-// Runs the CrashThread function in a separate thread.
-void SpawnCrashThread(int death_location, uintptr_t* child_crash_addr) {
-  zx::event event;
-  zx_status_t status = zx::event::create(0, &event);
-  ASSERT_EQ(status, ZX_OK);
-
-  // Run the thread.
-  thread_data_t thread_data = {std::move(event), zx::channel(), death_location};
-  pthread_t thread;
-  int ret = pthread_create(&thread, nullptr, CrashThread, &thread_data);
-  ASSERT_EQ(ret, 0);
-
-  // Wait for the thread to set up its exception channel.
-  zx_signals_t signals = 0;
-  status =
-      thread_data.event.wait_one(kChannelReadySignal | kCrashThreadErrorSignal,
-                                 zx::time::infinite(), &signals);
-  ASSERT_EQ(status, ZX_OK);
-  ASSERT_EQ(signals, kChannelReadySignal);
-
-  // Wait for the exception and read it out of the channel.
-  status =
-      thread_data.channel.wait_one(ZX_CHANNEL_READABLE | ZX_CHANNEL_PEER_CLOSED,
-                                   zx::time::infinite(), &signals);
-  ASSERT_EQ(status, ZX_OK);
-  // Check the thread did crash and not terminate.
-  ASSERT_FALSE(signals & ZX_CHANNEL_PEER_CLOSED);
-
-  zx_exception_info_t exception_info;
-  zx::exception exception;
-  status = thread_data.channel.read(
-      0, &exception_info, exception.reset_and_get_address(),
-      sizeof(exception_info), 1, nullptr, nullptr);
-  ASSERT_EQ(status, ZX_OK);
-
-  // Get the crash address and point the thread towards exiting.
-  zx::thread zircon_thread;
-  status = exception.get_thread(&zircon_thread);
-  ASSERT_EQ(status, ZX_OK);
-  zx_thread_state_general_regs_t buffer;
-  status = zircon_thread.read_state(ZX_THREAD_STATE_GENERAL_REGS, &buffer,
-                                    sizeof(buffer));
-  ASSERT_EQ(status, ZX_OK);
-#if defined(ARCH_CPU_X86_64)
-  *child_crash_addr = static_cast<uintptr_t>(buffer.rip);
-  buffer.rip = reinterpret_cast<uintptr_t>(exception_pthread_exit);
-#elif defined(ARCH_CPU_ARM64)
-  *child_crash_addr = static_cast<uintptr_t>(buffer.pc);
-  buffer.pc = reinterpret_cast<uintptr_t>(exception_pthread_exit);
-#else
-#error Unsupported architecture
-#endif
-  ASSERT_EQ(zircon_thread.write_state(ZX_THREAD_STATE_GENERAL_REGS, &buffer,
-                                      sizeof(buffer)),
-            ZX_OK);
-
-  // Clear the exception so the thread continues.
-  uint32_t state = ZX_EXCEPTION_STATE_HANDLED;
-  ASSERT_EQ(
-      exception.set_property(ZX_PROP_EXCEPTION_STATE, &state, sizeof(state)),
-      ZX_OK);
-  exception.reset();
-
-  // Join the exiting pthread.
-  ASSERT_EQ(pthread_join(thread, nullptr), 0);
-}
-
-TEST_F(LoggingTest, CheckCausesDistinctBreakpoints) {
-  uintptr_t child_crash_addr_1 = 0;
-  uintptr_t child_crash_addr_2 = 0;
-  uintptr_t child_crash_addr_3 = 0;
-
-  SpawnCrashThread(1, &child_crash_addr_1);
-  SpawnCrashThread(2, &child_crash_addr_2);
-  SpawnCrashThread(3, &child_crash_addr_3);
-
-  ASSERT_NE(0u, child_crash_addr_1);
-  ASSERT_NE(0u, child_crash_addr_2);
-  ASSERT_NE(0u, child_crash_addr_3);
-#if defined(OFFICIAL_BUILD)
-  // In unofficial builds, we'll end up in std::abort
-  // for each crash. In official builds, we should get a different
-  // crash address for each location.
-  ASSERT_NE(child_crash_addr_1, child_crash_addr_2);
-  ASSERT_NE(child_crash_addr_1, child_crash_addr_3);
-  ASSERT_NE(child_crash_addr_2, child_crash_addr_3);
-#endif  // defined(OFFICIAL_BUILD)
-}
-#elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_IOS) && \
-    (defined(ARCH_CPU_X86_FAMILY) || defined(ARCH_CPU_ARM_FAMILY))
+#elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_IOS) && (defined(ARCH_CPU_X86_FAMILY) || defined(ARCH_CPU_ARM_FAMILY))
 
 int g_child_crash_pipe;
 

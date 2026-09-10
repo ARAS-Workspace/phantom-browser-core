@@ -113,7 +113,6 @@ TEST_F(HistoryEmbeddingsMlAnswererTest, ComputeAnswerNoSession) {
   EXPECT_EQ(ComputeAnswerStatus::kModelUnavailable, result.status);
 }
 
-#if !BUILDFLAG(IS_FUCHSIA)
 TEST_F(HistoryEmbeddingsMlAnswererTest, ComputeAnswerExecutionFailure) {
   ON_CALL(model_executor_, StartSession(_, _, _)).WillByDefault([&] {
     return std::make_unique<NiceMock<MockSession>>(&session_1_);
@@ -152,7 +151,6 @@ TEST_F(HistoryEmbeddingsMlAnswererTest, ComputeAnswerExecutionFailure) {
   AnswererResult result = result_future.Take();
   EXPECT_EQ(ComputeAnswerStatus::kExecutionFailure, result.status);
 }
-#endif
 
 TEST_F(HistoryEmbeddingsMlAnswererTest, ComputeAnswerSingleUrl) {
   ON_CALL(model_executor_, StartSession(_, _, _)).WillByDefault([&] {

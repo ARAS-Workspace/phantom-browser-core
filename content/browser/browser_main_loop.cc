@@ -230,12 +230,6 @@
 #include "media/device_monitors/device_monitor_udev.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <lib/zx/job.h>
-
-#include "base/fuchsia/default_job.h"
-#include "base/fuchsia/fuchsia_logging.h"
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
 #include "content/browser/sandbox_host_linux.h"
@@ -323,16 +317,6 @@ enum WorkerPoolType : size_t {
   WORKER_POOL_COUNT  // Always last.
 };
 
-#if BUILDFLAG(IS_FUCHSIA)
-// Create and register the job which will contain all child processes
-// of the browser process as well as their descendents.
-void InitDefaultJob() {
-  zx::job job;
-  zx_status_t result = zx::job::create(*zx::job::default_job(), 0, &job);
-  ZX_CHECK(ZX_OK == result, result) << "zx_job_create";
-  base::SetDefaultJob(std::move(job));
-}
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 #if defined(ENABLE_IPC_FUZZER)
 bool GetBuildDirectory(base::FilePath* result) {
@@ -377,8 +361,7 @@ CreateMemoryPressureMonitor(const base::CommandLine& command_line) {
 
   std::unique_ptr<memory_pressure::MultiSourceMemoryPressureMonitor> monitor;
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA) || \
-    BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   monitor =
       std::make_unique<memory_pressure::MultiSourceMemoryPressureMonitor>();
 #endif
@@ -599,15 +582,6 @@ int BrowserMainLoop::EarlyInitialization() {
   crypto::EnsureNSPRInit();
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-  InitDefaultJob();
-
-  // Have child processes & jobs terminate automatically if the browser process
-  // exits, by marking the browser process as "critical" to its job.
-  zx_status_t result =
-      zx::job::default_job()->set_critical(0, *zx::process::self());
-  ZX_CHECK(ZX_OK == result, result) << "zx_job_set_critical";
-#endif
 
   if (parsed_command_line_->HasSwitch(switches::kRendererProcessLimit)) {
     std::string limit_string = parsed_command_line_->GetSwitchValueASCII(

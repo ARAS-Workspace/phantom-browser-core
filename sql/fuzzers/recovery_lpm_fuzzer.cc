@@ -140,7 +140,7 @@ class Environment {
 
  private:
   static base::ScopedTempDir MakeTempDir() {
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
     base::CommandLine::Init(0, nullptr);
     base::FilePath shmem_temp_dir;
     if (char* env_shmdir = std::getenv("SQL_RECOVERY_FUZZER_TEMP_DIR")) {

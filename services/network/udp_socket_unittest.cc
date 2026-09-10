@@ -279,13 +279,8 @@ TEST_F(UDPSocketTest, TestSendToWithConnect) {
 }
 
 // TODO(crbug.com/40653437): These two tests are very flaky on Fuchsia.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_TestReadSendTo DISABLED_TestReadSendTo
-#define MAYBE_TestUnexpectedSequences DISABLED_TestUnexpectedSequences
-#else
 #define MAYBE_TestReadSendTo TestReadSendTo
 #define MAYBE_TestUnexpectedSequences TestUnexpectedSequences
-#endif
 
 // Tests that the sequence of calling Bind()/Connect() and setters is
 // important.

@@ -56,18 +56,6 @@ void ClientSharedImageInterface::UpdateSharedImage(
   proxy_->UpdateSharedImage(sync_token, std::move(acquire_fence), mailbox);
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-void ClientSharedImageInterface::RegisterSysmemBufferCollection(
-    zx::eventpair service_handle,
-    zx::channel sysmem_token,
-    const viz::SharedImageFormat& format,
-    gfx::BufferUsage usage,
-    bool register_with_image_pipe) {
-  proxy_->RegisterSysmemBufferCollection(std::move(service_handle),
-                                         std::move(sysmem_token), format, usage,
-                                         register_with_image_pipe);
-}
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 SyncToken ClientSharedImageInterface::GenUnverifiedSyncToken() {
   return proxy_->GenUnverifiedSyncToken();

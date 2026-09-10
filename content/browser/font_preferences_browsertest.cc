@@ -78,15 +78,6 @@ class FontPreferencesBrowserTest : public DevToolsProtocolTest {
     const std::string non_default_system_font = "Monaco";
 #elif BUILDFLAG(IS_IOS)
     const std::string non_default_system_font = "Verdana";
-#elif BUILDFLAG(IS_FUCHSIA)
-    // Fuchsia platforms don't seem to have many pre-installed fonts besides the
-    // default Roboto families. Let's instead choose the default monospace
-    // family or, if 'monospace' is tested, the default sans-serif family.
-    const char* default_system_font_sans_serif = "Roboto";
-    const char* default_system_font_monospace = "Roboto Mono";
-    const std::string non_default_system_font =
-        generic_family == "monospace" ? default_system_font_sans_serif
-                                      : default_system_font_monospace;
 #else
     const std::string non_default_system_font = "Ahem";
 #endif

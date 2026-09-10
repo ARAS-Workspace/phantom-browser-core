@@ -23,7 +23,7 @@ Note that we have to support the full range from JellyBean to the latest
 dessert.
 */
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 inline constexpr char kTestFontName[] = "Arimo";
 #elif BUILDFLAG(IS_ANDROID)
 inline constexpr char kTestFontName[] = "sans-serif";
@@ -31,7 +31,7 @@ inline constexpr char kTestFontName[] = "sans-serif";
 inline constexpr char kTestFontName[] = "Arial";
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 inline constexpr char kSymbolFontName[] = "DejaVu Sans";
 #elif BUILDFLAG(IS_ANDROID)
 inline constexpr char kSymbolFontName[] = "monospace";
@@ -41,7 +41,7 @@ inline constexpr char kSymbolFontName[] = "Segoe UI Symbol";
 inline constexpr char kSymbolFontName[] = "Symbol";
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 inline constexpr char kCJKFontName[] = "Noto Sans CJK JP";
 #elif BUILDFLAG(IS_ANDROID)
 inline constexpr char kCJKFontName[] = "serif";

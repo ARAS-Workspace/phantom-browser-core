@@ -222,11 +222,6 @@ base::ProcessId ServiceProcessLauncher::ProcessState::LaunchInBackground(
       options.stdout_handle != options.stderr_handle) {
     options.handles_to_inherit.push_back(options.stderr_handle);
   }
-#elif BUILDFLAG(IS_FUCHSIA)
-  // LaunchProcess will share stdin/out/err with the child process by default.
-  if (!sandbox::policy::IsUnsandboxedSandboxType(sandbox_type))
-    NOTIMPLEMENTED();
-  options.handles_to_transfer = std::move(handle_passing_info);
 #elif BUILDFLAG(IS_POSIX)
   const base::FileHandleMappingVector fd_mapping{
       {STDIN_FILENO, STDIN_FILENO},

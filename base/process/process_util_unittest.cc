@@ -61,7 +61,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #endif
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -77,22 +77,6 @@
 #endif
 #if BUILDFLAG(IS_ANDROID)
 #include "third_party/lss/linux_syscall_support.h"
-#endif
-#if BUILDFLAG(IS_FUCHSIA)
-#include <lib/fdio/fdio.h>
-#include <lib/fdio/limits.h>
-#include <lib/fdio/spawn.h>
-#include <lib/sys/cpp/component_context.h>
-#include <zircon/process.h>
-#include <zircon/processargs.h>
-#include <zircon/syscalls.h>
-
-#include "base/files/scoped_temp_dir.h"
-#include "base/fuchsia/file_utils.h"
-#include "base/fuchsia/filtered_service_directory.h"
-#include "base/fuchsia/fuchsia_logging.h"
-#include "base/fuchsia/process_context.h"
-#include "base/test/bind.h"
 #endif
 
 #if BUILDFLAG(IS_MAC)
@@ -115,15 +99,11 @@ const char kTestHelper[] = "test_child_process";
 const char kSignalFileTerm[] = "TerminatedChildProcess.die";
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-const char kSignalFileClone[] = "ClonedDir.die";
-const char kFooDirHasStaged[] = "FooDirHasStaged.die";
-#endif
 
 #if BUILDFLAG(IS_WIN)
 const int kExpectedStillRunningExitCode = 0x102;
 const int kExpectedKilledExitCode = 1;
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 const int kExpectedStillRunningExitCode = 0;
 #endif
 
@@ -175,7 +155,7 @@ class ProcessUtilTest : public MultiProcessTest {
     test_helper_path_ = test_helper_path_.AppendASCII(kTestHelper);
   }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   // Spawn a child process that counts how many file descriptors are open.
   int CountOpenFDsInChild();
 #endif
@@ -188,7 +168,7 @@ class ProcessUtilTest : public MultiProcessTest {
 };
 
 std::string ProcessUtilTest::GetSignalFilePath(const char* filename) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID)
   FilePath tmp_dir;
   PathService::Get(DIR_TEMP, &tmp_dir);
   // Ensure the directory exists to avoid harder to debug issues later.
@@ -231,11 +211,7 @@ TEST_F(ProcessUtilTest, KillSlowChild) {
 }
 
 // Times out on Linux and Win, flakes on other platforms, http://crbug.com/95058
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_GetTerminationStatusExit GetTerminationStatusExit
-#else
 #define MAYBE_GetTerminationStatusExit DISABLED_GetTerminationStatusExit
-#endif
 TEST_F(ProcessUtilTest, MAYBE_GetTerminationStatusExit) {
   const std::string signal_file = GetSignalFilePath(kSignalFileSlow);
   remove(signal_file.c_str());
@@ -256,269 +232,6 @@ TEST_F(ProcessUtilTest, MAYBE_GetTerminationStatusExit) {
   remove(signal_file.c_str());
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-MULTIPROCESS_TEST_MAIN(ShouldNotBeLaunched) {
-  return 1;
-}
-
-// Test that duplicate transfer & cloned paths cause the launch to fail.
-// TODO(fxbug.dev/124840): Re-enable once the platform behaviour is fixed.
-TEST_F(ProcessUtilTest, DISABLED_DuplicateTransferAndClonePaths_Fail) {
-  // Create a tempdir to transfer a duplicate "/data".
-  ScopedTempDir tmpdir;
-  ASSERT_TRUE(tmpdir.CreateUniqueTempDir());
-
-  LaunchOptions options;
-  options.spawn_flags = FDIO_SPAWN_CLONE_STDIO;
-
-  // Attach the tempdir to "data", but also try to duplicate the existing "data"
-  // directory.
-  options.paths_to_clone.push_back(FilePath(kPersistedDataDirectoryPath));
-  options.paths_to_clone.push_back(FilePath("/tmp"));
-  options.paths_to_transfer.push_back(
-      {FilePath(kPersistedDataDirectoryPath),
-       OpenDirectoryHandle(tmpdir.GetPath()).TakeChannel().release()});
-
-  // Verify that the process fails to launch.
-  Process process(SpawnChildWithOptions("ShouldNotBeLaunched", options));
-  ASSERT_FALSE(process.IsValid());
-}
-
-// Test that attempting to transfer/clone to a path (e.g. "/data"), and also to
-// a sub-path of that path (e.g. "/data/staged"), causes the process launch to
-// fail.
-// TODO(fxbug.dev/124840): Re-enable once the platform behaviour is fixed.
-TEST_F(ProcessUtilTest, DISABLED_OverlappingPaths_Fail) {
-  // Create a tempdir to transfer to a sub-directory path.
-  ScopedTempDir tmpdir;
-  ASSERT_TRUE(tmpdir.CreateUniqueTempDir());
-
-  LaunchOptions options;
-  options.spawn_flags = FDIO_SPAWN_CLONE_STDIO;
-
-  // Attach the tempdir to "data", but also try to duplicate the existing "data"
-  // directory.
-  options.paths_to_clone.push_back(FilePath(kPersistedDataDirectoryPath));
-  options.paths_to_clone.push_back(FilePath("/tmp"));
-  options.paths_to_transfer.push_back(
-      {FilePath(kPersistedDataDirectoryPath).Append("staged"),
-       OpenDirectoryHandle(tmpdir.GetPath()).TakeChannel().release()});
-
-  // Verify that the process fails to launch.
-  Process process(SpawnChildWithOptions("ShouldNotBeLaunched", options));
-  ASSERT_FALSE(process.IsValid());
-}
-
-MULTIPROCESS_TEST_MAIN(CheckMountedDir) {
-  if (!PathExists(FilePath("/foo/staged"))) {
-    return 1;
-  }
-  WaitToDie(ProcessUtilTest::GetSignalFilePath(kFooDirHasStaged).c_str());
-  return kSuccess;
-}
-
-// Test that we can install an opaque handle in the child process' namespace.
-TEST_F(ProcessUtilTest, TransferHandleToPath) {
-  const std::string signal_file = GetSignalFilePath(kFooDirHasStaged);
-  remove(signal_file.c_str());
-
-  // Create a tempdir with "staged" as its contents.
-  ScopedTempDir new_tmpdir;
-  ASSERT_TRUE(new_tmpdir.CreateUniqueTempDir());
-  FilePath staged_file_path = new_tmpdir.GetPath().Append("staged");
-  File staged_file(staged_file_path, File::FLAG_CREATE | File::FLAG_WRITE);
-  ASSERT_TRUE(staged_file.created());
-  staged_file.Close();
-
-  // Mount the tempdir to "/foo".
-  zx::channel tmp_channel =
-      OpenDirectoryHandle(new_tmpdir.GetPath()).TakeChannel();
-
-  ASSERT_TRUE(tmp_channel.is_valid());
-  LaunchOptions options;
-  options.paths_to_clone.push_back(FilePath("/tmp"));
-  options.paths_to_transfer.push_back(
-      {FilePath("/foo"), tmp_channel.release()});
-  options.spawn_flags = FDIO_SPAWN_CLONE_STDIO;
-
-  // Verify from that "/foo/staged" exists from the child process' perspective.
-  Process process(SpawnChildWithOptions("CheckMountedDir", options));
-  ASSERT_TRUE(process.IsValid());
-  SignalChildren(signal_file.c_str());
-
-  int exit_code = 42;
-  EXPECT_TRUE(process.WaitForExit(&exit_code));
-  EXPECT_EQ(kSuccess, exit_code);
-}
-
-// Look through the filesystem to ensure that no other directories
-// besides |expected_path| are in the namespace.
-// Since GetSignalFilePath() uses "/tmp", tests for paths other than this must
-// include two paths. "/tmp" must always be last.
-int CheckOnlyOnePathExists(std::string_view expected_path) {
-  bool is_expected_path_tmp = expected_path == "/tmp";
-  std::vector<FilePath> paths;
-
-  FileEnumerator enumerator(
-      FilePath("/"), false,
-      FileEnumerator::FILES | FileEnumerator::DIRECTORIES);
-  for (auto path = enumerator.Next(); !path.empty(); path = enumerator.Next()) {
-    paths.push_back(std::move(path));
-  }
-
-  EXPECT_EQ(paths.size(), is_expected_path_tmp ? 1u : 2u);
-  EXPECT_EQ(paths[0], FilePath(expected_path))
-      << "Clone policy violation: found non-tmp directory "
-      << paths[0].MaybeAsASCII();
-
-  if (!is_expected_path_tmp) {
-    EXPECT_EQ(paths[1], FilePath("/tmp"));
-  }
-
-  WaitToDie(ProcessUtilTest::GetSignalFilePath(kSignalFileClone).c_str());
-  return kSuccess;
-}
-
-MULTIPROCESS_TEST_MAIN(CheckOnlyTmpExists) {
-  return CheckOnlyOnePathExists("/tmp");
-}
-
-TEST_F(ProcessUtilTest, CloneTmp) {
-  const std::string signal_file = GetSignalFilePath(kSignalFileClone);
-  remove(signal_file.c_str());
-
-  LaunchOptions options;
-  options.paths_to_clone.push_back(FilePath("/tmp"));
-  options.spawn_flags = FDIO_SPAWN_CLONE_STDIO;
-
-  Process process(SpawnChildWithOptions("CheckOnlyTmpExists", options));
-  ASSERT_TRUE(process.IsValid());
-
-  SignalChildren(signal_file.c_str());
-
-  int exit_code = 42;
-  EXPECT_TRUE(process.WaitForExit(&exit_code));
-  EXPECT_EQ(kSuccess, exit_code);
-}
-
-MULTIPROCESS_TEST_MAIN(NeverCalled) {
-  NOTREACHED() << "Process should not have been launched.";
-}
-
-TEST_F(ProcessUtilTest, TransferInvalidHandleFails) {
-  LaunchOptions options;
-  options.paths_to_clone.push_back(FilePath("/tmp"));
-  options.paths_to_transfer.push_back({FilePath("/foo"), ZX_HANDLE_INVALID});
-  options.spawn_flags = FDIO_SPAWN_CLONE_STDIO;
-
-  // Verify that the process is never constructed.
-  Process process(SpawnChildWithOptions("NeverCalled", options));
-  EXPECT_FALSE(process.IsValid());
-}
-
-TEST_F(ProcessUtilTest, CloneInvalidDirFails) {
-  const std::string signal_file = GetSignalFilePath(kSignalFileClone);
-  remove(signal_file.c_str());
-
-  LaunchOptions options;
-  options.paths_to_clone.push_back(FilePath("/tmp"));
-  options.paths_to_clone.push_back(FilePath("/definitely_not_a_dir"));
-  options.spawn_flags = FDIO_SPAWN_CLONE_STDIO;
-
-  Process process(SpawnChildWithOptions("NeverCalled", options));
-  EXPECT_FALSE(process.IsValid());
-}
-
-MULTIPROCESS_TEST_MAIN(CheckOnlyDataExists) {
-  return CheckOnlyOnePathExists("/data");
-}
-
-TEST_F(ProcessUtilTest, CloneAlternateDir) {
-  const std::string signal_file = GetSignalFilePath(kSignalFileClone);
-  remove(signal_file.c_str());
-
-  LaunchOptions options;
-  options.paths_to_clone.push_back(FilePath("/data"));
-  // The DIR_TEMP path is used by GetSignalFilePath().
-  options.paths_to_clone.push_back(FilePath("/tmp"));
-  options.spawn_flags = FDIO_SPAWN_CLONE_STDIO;
-
-  Process process(SpawnChildWithOptions("CheckOnlyDataExists", options));
-  ASSERT_TRUE(process.IsValid());
-
-  SignalChildren(signal_file.c_str());
-
-  int exit_code = 42;
-  EXPECT_TRUE(process.WaitForExit(&exit_code));
-  EXPECT_EQ(kSuccess, exit_code);
-}
-
-TEST_F(ProcessUtilTest, HandlesToTransferClosedOnSpawnFailure) {
-  zx::handle handles[2];
-  zx_status_t result = zx_channel_create(0, handles[0].reset_and_get_address(),
-                                         handles[1].reset_and_get_address());
-  ZX_CHECK(ZX_OK == result, result) << "zx_channel_create";
-
-  LaunchOptions options;
-  options.handles_to_transfer.push_back({0, handles[0].get()});
-
-  // Launch a non-existent binary, causing fdio_spawn() to fail.
-  CommandLine command_line(FilePath(
-      FILE_PATH_LITERAL("💩magical_filename_that_will_never_exist_ever")));
-  Process process(LaunchProcess(command_line, options));
-  ASSERT_FALSE(process.IsValid());
-
-  // If LaunchProcess did its job then handles[0] is no longer valid, and
-  // handles[1] should observe a channel-closed signal.
-  EXPECT_EQ(
-      zx_object_wait_one(handles[1].get(), ZX_CHANNEL_PEER_CLOSED, 0, nullptr),
-      ZX_OK);
-  EXPECT_EQ(ZX_ERR_NOT_FOUND, zx_handle_check_valid(handles[0].get()));
-  std::ignore = handles[0].release();
-}
-
-TEST_F(ProcessUtilTest, HandlesToTransferClosedOnBadPathToMapFailure) {
-  zx::handle handles[2];
-  zx_status_t result = zx_channel_create(0, handles[0].reset_and_get_address(),
-                                         handles[1].reset_and_get_address());
-  ZX_CHECK(ZX_OK == result, result) << "zx_channel_create";
-
-  LaunchOptions options;
-  options.handles_to_transfer.push_back({0, handles[0].get()});
-  options.spawn_flags = options.spawn_flags & ~FDIO_SPAWN_CLONE_NAMESPACE;
-  options.paths_to_clone.emplace_back(
-      "💩magical_path_that_will_never_exist_ever");
-
-  // LaunchProces should fail to open() the path_to_map, and fail before
-  // fdio_spawn().
-  Process process(LaunchProcess(CommandLine(FilePath()), options));
-  ASSERT_FALSE(process.IsValid());
-
-  // If LaunchProcess did its job then handles[0] is no longer valid, and
-  // handles[1] should observe a channel-closed signal.
-  EXPECT_EQ(
-      zx_object_wait_one(handles[1].get(), ZX_CHANNEL_PEER_CLOSED, 0, nullptr),
-      ZX_OK);
-  EXPECT_EQ(ZX_ERR_NOT_FOUND, zx_handle_check_valid(handles[0].get()));
-  std::ignore = handles[0].release();
-}
-
-TEST_F(ProcessUtilTest, FuchsiaProcessNameSuffix) {
-  LaunchOptions options;
-  options.process_name_suffix = "#test";
-  Process process(SpawnChildWithOptions("SimpleChildProcess", options));
-
-  char name[256] = {};
-  size_t name_size = sizeof(name);
-  zx_status_t status =
-      zx_object_get_property(process.Handle(), ZX_PROP_NAME, name, name_size);
-  ASSERT_EQ(status, ZX_OK);
-  EXPECT_EQ(std::string(name),
-            CommandLine::ForCurrentProcess()->GetProgram().BaseName().value() +
-                "#test");
-}
-
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 // On Android SpawnProcess() doesn't use LaunchProcess() and doesn't support
 // LaunchOptions::current_directory.
@@ -707,8 +420,6 @@ MULTIPROCESS_TEST_MAIN(KilledChildProcess) {
 #elif BUILDFLAG(IS_POSIX)
   // Send a SIGKILL to this process, just like the OOM killer would.
   ::kill(getpid(), SIGKILL);
-#elif BUILDFLAG(IS_FUCHSIA)
-  zx_task_kill(zx_process_self());
 #endif
   return 1;
 }
@@ -720,7 +431,7 @@ MULTIPROCESS_TEST_MAIN(TerminatedChildProcess) {
   ::kill(getpid(), SIGTERM);
   return 1;
 }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 TEST_F(ProcessUtilTest, GetTerminationStatusSigKill) {
   const std::string signal_file = GetSignalFilePath(kSignalFileKill);
@@ -954,16 +665,13 @@ TEST_F(ProcessUtilTest, GetAppOutputWithExitCode) {
   EXPECT_EQ(kExpectedExitCode, exit_code);
 }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 
 namespace {
 
 // Returns the maximum number of files that a process can have open.
 // Returns 0 on error.
 int GetMaxFilesOpenInProcess() {
-#if BUILDFLAG(IS_FUCHSIA)
-  return FDIO_MAX_FD;
-#else
   struct rlimit rlim;
   if (getrlimit(RLIMIT_NOFILE, &rlim) != 0) {
     return 0;
@@ -977,7 +685,6 @@ int GetMaxFilesOpenInProcess() {
   }
 
   return rlim.rlim_cur;
-#endif  // BUILDFLAG(IS_FUCHSIA)
 }
 
 const int kChildPipe = 20;  // FD # for write end of pipe in child process.
@@ -1107,11 +814,7 @@ TEST_F(ProcessUtilTest, FDRemapping) {
 
   // Open some dummy fds to make sure they don't propagate over to the
   // child process.
-#if BUILDFLAG(IS_FUCHSIA)
-  ScopedFD dev_null(fdio_fd_create_null());
-#else
   ScopedFD dev_null(open("/dev/null", O_RDONLY));
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
   DPCHECK(dev_null.get() > 0);
   int sockets[2];
@@ -1141,20 +844,7 @@ MULTIPROCESS_TEST_MAIN(ProcessUtilsVerifyStdio) {
 }
 
 TEST_F(ProcessUtilTest, FDRemappingIncludesStdio) {
-#if BUILDFLAG(IS_FUCHSIA)
-  // The fd obtained from fdio_fd_create_null cannot be cloned while spawning a
-  // child proc, so open a true file in a transient temp dir.
-  ScopedTempDir temp_dir;
-  ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
-  FilePath temp_file_path;
-  ASSERT_TRUE(CreateTemporaryFileInDir(temp_dir.GetPath(), &temp_file_path));
-  File temp_file(temp_file_path,
-                 File::FLAG_CREATE_ALWAYS | File::FLAG_READ | File::FLAG_WRITE);
-  ASSERT_TRUE(temp_file.IsValid());
-  ScopedFD some_fd(temp_file.TakePlatformFile());
-#else   // BUILDFLAG(IS_FUCHSIA)
   ScopedFD some_fd(open("/dev/null", O_RDONLY));
-#endif  // BUILDFLAG(IS_FUCHSIA)
   ASSERT_LT(2, some_fd.get());
 
   // Backup stdio and replace it with the write end of a pipe, for our
@@ -1201,73 +891,14 @@ TEST_F(ProcessUtilTest, FDRemappingIncludesStdio) {
   EXPECT_EQ(0, exit_code);
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-
-const uint16_t kStartupHandleId = 43;
-MULTIPROCESS_TEST_MAIN(ProcessUtilsVerifyHandle) {
-  zx_handle_t handle =
-      zx_take_startup_handle(PA_HND(PA_USER0, kStartupHandleId));
-  CHECK_NE(ZX_HANDLE_INVALID, handle);
-
-  // Write to the pipe so the parent process can observe output.
-  size_t bytes_written = 0;
-  zx_status_t result = zx_socket_write(handle, 0, &kPipeValue,
-                                       sizeof(kPipeValue), &bytes_written);
-  CHECK_EQ(ZX_OK, result);
-  CHECK_EQ(1u, bytes_written);
-
-  CHECK_EQ(ZX_OK, zx_handle_close(handle));
-  return 0;
-}
-
-TEST_F(ProcessUtilTest, LaunchWithHandleTransfer) {
-  // Create a pipe to pass to the child process.
-  zx_handle_t handles[2];
-  zx_status_t result =
-      zx_socket_create(ZX_SOCKET_STREAM, &handles[0], &handles[1]);
-  ASSERT_EQ(ZX_OK, result);
-
-  // Launch the test process, and pass it one end of the pipe.
-  LaunchOptions options;
-  options.handles_to_transfer.push_back(
-      {PA_HND(PA_USER0, kStartupHandleId), handles[0]});
-  Process process = SpawnChildWithOptions("ProcessUtilsVerifyHandle", options);
-  ASSERT_TRUE(process.IsValid());
-
-  // Read from the pipe to verify that the child received it.
-  zx_signals_t signals = 0;
-  result = zx_object_wait_one(
-      handles[1], ZX_SOCKET_READABLE | ZX_SOCKET_PEER_CLOSED,
-      (TimeTicks::Now() + TestTimeouts::action_timeout()).ToZxTime(), &signals);
-  ASSERT_EQ(ZX_OK, result);
-  ASSERT_TRUE(signals & ZX_SOCKET_READABLE);
-
-  size_t bytes_read = 0;
-  char buf[16] = {};
-  result = zx_socket_read(handles[1], 0, buf, sizeof(buf), &bytes_read);
-  EXPECT_EQ(ZX_OK, result);
-  EXPECT_EQ(1u, bytes_read);
-  EXPECT_EQ(kPipeValue, buf[0]);
-
-  CHECK_EQ(ZX_OK, zx_handle_close(handles[1]));
-
-  int exit_code;
-  ASSERT_TRUE(process.WaitForExitWithTimeout(TestTimeouts::action_timeout(),
-                                             &exit_code));
-  EXPECT_EQ(0, exit_code);
-}
-
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 // There's no such thing as a parent process id on Fuchsia.
-#if !BUILDFLAG(IS_FUCHSIA)
 TEST_F(ProcessUtilTest, GetParentProcessId) {
   ProcessId ppid = GetParentProcessId(GetCurrentProcessHandle());
   EXPECT_EQ(ppid, static_cast<ProcessId>(getppid()));
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_APPLE)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_APPLE)
 class WriteToPipeDelegate : public LaunchOptions::PreExecDelegate {
  public:
   explicit WriteToPipeDelegate(int fd) : fd_(fd) {}
@@ -1308,12 +939,11 @@ TEST_F(ProcessUtilTest, PreExecHook) {
   EXPECT_TRUE(process.WaitForExit(&exit_code));
   EXPECT_EQ(0, exit_code);
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_APPLE)
 
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 // There's no such thing as a parent process id on Fuchsia.
-#if !BUILDFLAG(IS_FUCHSIA)
 TEST_F(ProcessUtilTest, GetParentProcessId2) {
   ProcessId id1 = GetCurrentProcId();
   Process process = SpawnChild("SimpleChildProcess");
@@ -1321,7 +951,6 @@ TEST_F(ProcessUtilTest, GetParentProcessId2) {
   ProcessId ppid = GetParentProcessId(process.Handle());
   EXPECT_EQ(ppid, id1);
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 namespace {
 

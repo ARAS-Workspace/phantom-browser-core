@@ -10,9 +10,7 @@
 #include "base/feature_list.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "components/memory_pressure/system_memory_pressure_evaluator_fuchsia.h"
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #include "components/memory_pressure/system_memory_pressure_evaluator_mac.h"
 #elif BUILDFLAG(IS_WIN)
 #include "components/memory_pressure/system_memory_pressure_evaluator_win.h"
@@ -27,11 +25,7 @@ const base::TimeDelta SystemMemoryPressureEvaluator::kRenotifyVotePeriod =
 std::unique_ptr<SystemMemoryPressureEvaluator>
 SystemMemoryPressureEvaluator::CreateDefaultSystemEvaluator(
     MultiSourceMemoryPressureMonitor* monitor) {
-#if BUILDFLAG(IS_FUCHSIA)
-  return std::make_unique<
-      memory_pressure::SystemMemoryPressureEvaluatorFuchsia>(
-      monitor->CreateVoter());
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   return std::make_unique<memory_pressure::mac::SystemMemoryPressureEvaluator>(
       monitor->CreateVoter());
 #elif BUILDFLAG(IS_WIN)

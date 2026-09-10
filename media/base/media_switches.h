@@ -84,12 +84,6 @@ MEDIA_EXPORT extern const char kAudioCodecsFromEDID[];
 MEDIA_EXPORT extern const char kAllowRAInDevMode[];
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_FUCHSIA)
-MEDIA_EXPORT extern const char kAudioCapturerWithEchoCancellation[];
-MEDIA_EXPORT extern const char kEnableProtectedVideoBuffers[];
-MEDIA_EXPORT extern const char kForceProtectedVideoOutputBuffers[];
-MEDIA_EXPORT extern const char kMinVideoDecoderOutputBufferSize[];
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FREEBSD) || \
     BUILDFLAG(IS_SOLARIS)
@@ -443,10 +437,6 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(kUseOutOfProcessVideoEncoding);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kV4L2H264TemporalLayerHWEncoding);
 #endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_FUCHSIA)
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kFuchsiaCdmStoragePathMigration);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kFuchsiaMediacodecVideoEncoder);
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_LINUX)
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kAcceleratedVideoDecodeLinux);

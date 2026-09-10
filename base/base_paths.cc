@@ -64,7 +64,7 @@ bool PathProvider(int key, FilePath* result) {
       }
       *result = result->DirName();
       return true;
-#if !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_IOS)
     case DIR_MODULE:
       if (!PathService::Get(FILE_MODULE, result)) {
         return false;
@@ -73,7 +73,7 @@ bool PathProvider(int key, FilePath* result) {
       return true;
     case DIR_ASSETS:
       return PathService::Get(DIR_MODULE, result);
-#endif  // !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_IOS)
     case DIR_TEMP:
       return GetTempDir(result);
     case DIR_HOME:
@@ -82,12 +82,12 @@ bool PathProvider(int key, FilePath* result) {
     case base::DIR_SRC_TEST_DATA_ROOT:
       // This is only used by tests and overridden by each platform.
       NOTREACHED();
-#if !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_IOS)
     case DIR_OUT_TEST_DATA_ROOT:
       // On most platforms test binaries are run directly from the build-output
       // directory, so return the directory containing the executable.
       return PathService::Get(DIR_MODULE, result);
-#endif  // !BUILDFLAG(IS_FUCHSIA)  && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_IOS)
     case DIR_GEN_TEST_DATA_ROOT:
       if (!PathService::Get(DIR_OUT_TEST_DATA_ROOT, result)) {
         return false;

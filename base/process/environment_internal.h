@@ -17,7 +17,7 @@
 namespace base {
 namespace internal {
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 // Returns a modified environment vector constructed from the given environment
 // and the list of changes given in |changes|. Each key in the environment is
 // matched against the first element of the pairs. In the event of a match, the

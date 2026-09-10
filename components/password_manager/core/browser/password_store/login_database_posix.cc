@@ -48,7 +48,6 @@ EncryptionResult LoginDatabase::EncryptedString(
 EncryptionResult LoginDatabase::DecryptedString(
     const std::string& cipher_text,
     std::u16string* plain_text) const {
-#if !BUILDFLAG(IS_FUCHSIA)
 #if BUILDFLAG(IS_CHROMEOS)
   // On ChromeOS, we have a mix of obfuscated and plain-text
   // passwords. Obfuscated passwords always start with "v10", therefore anything
@@ -66,7 +65,6 @@ EncryptionResult LoginDatabase::DecryptedString(
         PasswordDecryptionResult::kSucceededBySkipping);
     return EncryptionResult::kSuccess;
   }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
   bool decryption_success =
       encryptor_ && encryptor_->DecryptString16(cipher_text, plain_text);
@@ -92,7 +90,6 @@ EncryptionResult LoginDatabase::DecryptedString(
 EncryptionResult LoginDatabase::DecryptedString(
     const std::string& cipher_text,
     PasswordString* decrypted_text) const {
-#if !BUILDFLAG(IS_FUCHSIA)
 #if BUILDFLAG(IS_CHROMEOS)
   // On ChromeOS, we have a mix of obfuscated and plain-text
   // passwords. Obfuscated passwords always start with "v10", therefore anything
@@ -110,7 +107,6 @@ EncryptionResult LoginDatabase::DecryptedString(
         PasswordDecryptionResult::kSucceededBySkipping);
     return EncryptionResult::kSuccess;
   }
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
   bool decryption_success =
       DecryptStringToPasswordString(cipher_text, decrypted_text);

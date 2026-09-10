@@ -353,12 +353,7 @@ TEST_F(BaseFileTest, RenameWhileInProgress) {
   ExpectHashValue(kHashOfTestData1To3, base_file_->Finish());
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/40221266): Re-enable when RenameWithError works on Fuchsia.
-#define MAYBE_RenameWithError DISABLED_RenameWithError
-#else
 #define MAYBE_RenameWithError RenameWithError
-#endif
 // Test that a failed rename reports the correct error.
 TEST_F(BaseFileTest, MAYBE_RenameWithError) {
   ASSERT_TRUE(InitializeFile());
@@ -380,13 +375,7 @@ TEST_F(BaseFileTest, MAYBE_RenameWithError) {
   base_file_->Finish();
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/40221266): Re-enable when RenameWithErrorInProgress works on
-// Fuchsia.
-#define MAYBE_RenameWithErrorInProgress DISABLED_RenameWithErrorInProgress
-#else
 #define MAYBE_RenameWithErrorInProgress RenameWithErrorInProgress
-#endif
 // Test that if a rename fails for an in-progress BaseFile, it remains writeable
 // and renameable.
 TEST_F(BaseFileTest, MAYBE_RenameWithErrorInProgress) {
@@ -428,12 +417,7 @@ TEST_F(BaseFileTest, MAYBE_RenameWithErrorInProgress) {
   ExpectHashValue(kHashOfTestData1To3, base_file_->Finish());
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/40221270): Re-enable when WriteWithError works on Fuchsia.
-#define MAYBE_WriteWithError DISABLED_WriteWithError
-#else
 #define MAYBE_WriteWithError WriteWithError
-#endif
 // Test that a failed write reports an error.
 TEST_F(BaseFileTest, MAYBE_WriteWithError) {
   base::FilePath path;
@@ -503,12 +487,7 @@ TEST_F(BaseFileTest, AppendToBaseFile) {
   expect_file_survives_ = true;
 }
 
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/40221265): Re-enable when ReadonlyBaseFile works on Fuchsia.
-#define MAYBE_ReadonlyBaseFile DISABLED_ReadonlyBaseFile
-#else
 #define MAYBE_ReadonlyBaseFile ReadonlyBaseFile
-#endif
 // Create a read-only file and attempt to write to it.
 TEST_F(BaseFileTest, MAYBE_ReadonlyBaseFile) {
   // Create a new file.
@@ -767,14 +746,8 @@ TEST_F(BaseFileTest, CreatedInSystemTempDirectory) {
 
 // Test that a temporary file is created in the system temporary directory
 // when the default directory is unwritable (fallback mechanism).
-#if BUILDFLAG(IS_FUCHSIA)
-// TODO(crbug.com/40221266): Re-enable when MakeFileUnwritable works on Fuchsia.
-#define MAYBE_CreatedInSystemTempDirectoryFallback \
-  DISABLED_CreatedInSystemTempDirectoryFallback
-#else
 #define MAYBE_CreatedInSystemTempDirectoryFallback \
   CreatedInSystemTempDirectoryFallback
-#endif
 TEST_F(BaseFileTest, MAYBE_CreatedInSystemTempDirectoryFallback) {
   base::FilePath unwritable_dir(
       temp_dir_.GetPath().AppendASCII("UnwritableDir"));

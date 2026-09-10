@@ -1785,8 +1785,7 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
 // TODO(crbug.com/40835208): This test is consistently failing in Fuchsia.
 // Similar to the test `ControlsIdsForDateTimePopup`, we should try to re-enable
 // it when content_browsertests runs in non-headless mode.
-#if !BUILDFLAG(IS_ANDROID) && !(BUILDFLAG(IS_IOS) && BUILDFLAG(USE_BLINK)) && \
-    !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !(BUILDFLAG(IS_IOS) && BUILDFLAG(USE_BLINK))
 IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
                        GetBoundsRectIframesForColorPicker) {
   LoadInitialAccessibilityTreeFromHtml(std::string(R"HTML(
@@ -2067,7 +2066,6 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
 // Fuchsia WebEngine (currently the only content embedder on the platform)
 // does not use or include these localization strings,
 // see: https://crbug.com/358567091 for more details.
-#if !BUILDFLAG(IS_FUCHSIA)
 IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
                        LocalizedLandmarkType) {
   LoadInitialAccessibilityTreeFromHtml(R"HTML(
@@ -2259,7 +2257,6 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
         mark_text_node, ax::mojom::Role::kStaticText, u"highlight");
   }
 }
-#endif  // #if !BUILDFLAG(IS_FUCHSIA)
 
 IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
                        TooltipStringAttributeMutuallyExclusiveOfNameFromTitle) {
@@ -2440,11 +2437,7 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
 
 // TODO(crbug.com/40835208): Enable on Fuchsia when content_browsertests
 // runs in non-headless mode.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_ControlsIdsForDateTimePopup DISABLED_ControlsIdsForDateTimePopup
-#else
 #define MAYBE_ControlsIdsForDateTimePopup ControlsIdsForDateTimePopup
-#endif
 IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
                        MAYBE_ControlsIdsForDateTimePopup) {
   LoadInitialAccessibilityTreeFromHtml(R"HTML(

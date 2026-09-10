@@ -30,9 +30,6 @@ class CallbackRegistration;
 class Decryptor;
 class MediaCryptoContext;
 
-#if BUILDFLAG(IS_FUCHSIA)
-class FuchsiaCdmContext;
-#endif
 
 // An interface representing the context that a media player needs from a
 // content decryption module (CDM) to decrypt (and decode) encrypted buffers.
@@ -113,11 +110,6 @@ class MEDIA_EXPORT CdmContext {
   virtual MediaCryptoContext* GetMediaCryptoContext();
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-  // Returns FuchsiaCdmContext interface when the context is backed by Fuchsia
-  // CDM. Otherwise returns nullptr.
-  virtual FuchsiaCdmContext* GetFuchsiaCdmContext();
-#endif
 
 #if BUILDFLAG(IS_CHROMEOS)
   // Returns a ChromeOsCdmContext interface when the context is backed by the

@@ -21,7 +21,7 @@ namespace file_access {
 class COMPONENT_EXPORT(FILE_ACCESS) ScopedFileAccessCopy
     : public ScopedFileAccess {
  public:
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   ScopedFileAccessCopy(bool allowed,
                        base::ScopedFD fd,
                        base::OnceClosure copy_end_callback);

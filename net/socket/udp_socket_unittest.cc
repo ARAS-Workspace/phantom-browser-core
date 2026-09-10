@@ -85,8 +85,7 @@ namespace net {
 namespace {
 
 // Whether Source-Specific Multicast (SSM) is expected to work on this platform.
-#if defined(MCAST_JOIN_SOURCE_GROUP) && !BUILDFLAG(IS_ANDROID) && \
-    !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_FUCHSIA)
+#if defined(MCAST_JOIN_SOURCE_GROUP) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 constexpr bool kExpectSSMToWork = true;
 #else
 constexpr bool kExpectSSMToWork = false;
@@ -832,7 +831,7 @@ TEST_F(UDPSocketTest, ClientSetDoNotFragment) {
     EXPECT_THAT(rv, IsOk());
 
     rv = client.SetDoNotFragment();
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_IOS)
     // TODO(crbug.com/42050633): IP_MTU_DISCOVER is not implemented on Fuchsia.
     EXPECT_THAT(rv, IsError(ERR_NOT_IMPLEMENTED));
 #else
@@ -854,7 +853,7 @@ TEST_F(UDPSocketTest, ServerSetDoNotFragment) {
     EXPECT_THAT(rv, IsOk());
 
     rv = server.SetDoNotFragment();
-#if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_IOS)
     // TODO(crbug.com/42050633): IP_MTU_DISCOVER is not implemented on Fuchsia.
     EXPECT_THAT(rv, IsError(ERR_NOT_IMPLEMENTED));
 #else
@@ -898,11 +897,11 @@ TEST_F(UDPSocketTest, JoinMulticastGroup) {
   EXPECT_TRUE(group_ip.AssignFromIPLiteral(kGroup));
 // TODO(https://github.com/google/gvisor/issues/3839): don't guard on
 // OS_FUCHSIA.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN)
   IPEndPoint bind_address(IPAddress::AllZeros(group_ip.size()), 0 /* port */);
 #else
   IPEndPoint bind_address(group_ip, 0 /* port */);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_WIN)
 
   UDPSocket socket(DatagramSocket::DEFAULT_BIND, nullptr, NetLogSource());
   EXPECT_THAT(socket.Open(bind_address.GetFamily()), IsOk());
@@ -932,12 +931,12 @@ TEST_F(UDPSocketTest, MAYBE_SharedMulticastAddress) {
   ASSERT_TRUE(group_ip.AssignFromIPLiteral(kGroup));
 // TODO(https://github.com/google/gvisor/issues/3839): don't guard on
 // OS_FUCHSIA.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN)
   IPEndPoint receive_address(IPAddress::AllZeros(group_ip.size()),
                              0 /* port */);
 #else
   IPEndPoint receive_address(group_ip, 0 /* port */);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_WIN)
 
   NetworkInterfaceList interfaces;
   ASSERT_TRUE(GetNetworkList(&interfaces, 0));
@@ -2618,7 +2617,7 @@ TEST_F(UDPSocketTest, SSMSourceFilteringMultiNICIPv6) {
 // On POSIX platforms that do not support recvmmsg (e.g., macOS, iOS, or
 // Fuchsia), the implementation falls back to calling recvmsg (via
 // InternalRecvFrom).
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 TEST_F(UDPSocketTest, ReadMultiple) {
   // Create sender and receiver sockets.
   UDPSocket sender(DatagramSocket::DEFAULT_BIND, nullptr, NetLogSource());
@@ -3201,6 +3200,6 @@ TEST_F(UDPSocketGroTest, ReadMultipleGroUnequalSegments) {
 }
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
         // BUILDFLAG(IS_ANDROID)
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 }  // namespace net

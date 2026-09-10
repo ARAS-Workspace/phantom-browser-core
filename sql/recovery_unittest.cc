@@ -103,12 +103,7 @@ class SqlRecoveryTest : public testing::Test,
   base::HistogramTester histogram_tester_;
 };
 
-#if BUILDFLAG(IS_FUCHSIA)
-// WAL + recovery is not supported on Fuchsia, so only test without WAL mode.
-INSTANTIATE_TEST_SUITE_P(All, SqlRecoveryTest, testing::Values(false));
-#else
 INSTANTIATE_TEST_SUITE_P(All, SqlRecoveryTest, testing::Bool());
-#endif
 
 TEST_P(SqlRecoveryTest, ShouldAttemptRecovery) {
   // Attempt to recover from corruption.

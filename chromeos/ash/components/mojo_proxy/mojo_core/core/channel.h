@@ -154,11 +154,6 @@ class MOJO_LEGACY_SYSTEM_IMPL_EXPORT Channel
     };
     static_assert(sizeof(MachPortsExtraHeader) == 2,
                   "sizeof(MachPortsExtraHeader) must be 2 bytes");
-#elif BUILDFLAG(IS_FUCHSIA)
-    struct HandleInfoEntry {
-      // True if the handle represents an FDIO file-descriptor, false otherwise.
-      bool is_file_descriptor;
-    };
 #elif BUILDFLAG(IS_WIN)
     struct HandleEntry {
       // The windows HANDLE. HANDLEs are guaranteed to fit inside 32-bits.

@@ -30,17 +30,10 @@ EGL_GetProcAddress(const char* procname);
 namespace ui {
 namespace {
 
-#if BUILDFLAG(IS_FUCHSIA)
-const base::FilePath::CharType kDefaultEglSoname[] =
-    FILE_PATH_LITERAL("libEGL.so");
-const base::FilePath::CharType kDefaultGlesSoname[] =
-    FILE_PATH_LITERAL("libGLESv2.so");
-#else  // BUILDFLAG(IS_FUCHSIA)
 const base::FilePath::CharType kDefaultEglSoname[] =
     FILE_PATH_LITERAL("libEGL.so.1");
 const base::FilePath::CharType kDefaultGlesSoname[] =
     FILE_PATH_LITERAL("libGLESv2.so.2");
-#endif
 
 const base::FilePath::CharType kAngleEglSoname[] =
     FILE_PATH_LITERAL("libEGL.so");
@@ -153,11 +146,9 @@ bool LoadDefaultEGLGLES2Bindings(
 #endif  // BUILDFLAG(USE_STATIC_ANGLE)
 
     base::FilePath module_path;
-#if !BUILDFLAG(IS_FUCHSIA)
     if (!base::PathService::Get(base::DIR_MODULE, &module_path)) {
       return false;
     }
-#endif
 
     glesv2_path = module_path.Append(kAngleGlesSoname);
     egl_path = module_path.Append(kAngleEglSoname);

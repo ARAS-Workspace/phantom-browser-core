@@ -9,7 +9,7 @@
 
 #if BUILDFLAG(IS_WIN)
 #include "ui/events/keycodes/keyboard_codes_win.h" // IWYU pragma: export
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 #include "ui/events/keycodes/keyboard_codes_posix.h" // IWYU pragma: export
 #endif
 

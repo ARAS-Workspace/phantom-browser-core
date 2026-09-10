@@ -29,41 +29,11 @@
 #include "media/base/media_switches.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <fuchsia/media/cpp/fidl_test_base.h>
-
-#include "base/fuchsia/scoped_service_binding.h"
-#include "base/fuchsia/test_component_context_for_process.h"
-#include "media/fuchsia/audio/fake_audio_capturer.h"
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 namespace media {
 
 using Error = AudioInputStream::AudioInputCallback::Error;
 
-#if BUILDFLAG(IS_FUCHSIA)
-class FakeAudio : public fuchsia::media::testing::Audio_TestBase {
- public:
-  FakeAudio()
-      : audio_binding_(test_component_context_.additional_services(), this) {}
-
-  // fuchsia::media::testing::Audio_TestBase
-  void CreateAudioCapturer(
-      fidl::InterfaceRequest<fuchsia::media::AudioCapturer> request,
-      bool is_loopback) override {
-    capturer_.push_back(
-        std::make_unique<FakeAudioCapturer>(std::move(request)));
-  }
-  void NotImplemented_(const std::string& name) override {
-    FAIL() << "Unexpected call to: " << name;
-  }
-
- private:
-  base::TestComponentContextForProcess test_component_context_;
-  base::ScopedServiceBinding<fuchsia::media::Audio> audio_binding_;
-  std::vector<std::unique_ptr<FakeAudioCapturer>> capturer_;
-};
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 // This class allows to find out if the callbacks are occurring as
 // expected and if any error has been reported.
@@ -128,17 +98,7 @@ class AudioInputTest : public testing::TestWithParam<bool> {
 
  protected:
   bool InputDevicesAvailable() {
-#if BUILDFLAG(IS_FUCHSIA)
-    if (AudioDeviceInfoAccessorForTests(audio_manager_.get())
-            .HasAudioInputDevices()) {
-      return true;
-    }
-    // If the device has no audio input device, fake it.
-    if (!fake_audio_) {
-      fake_audio_ = std::make_unique<FakeAudio>();
-    }
-    return true;
-#elif BUILDFLAG(IS_MAC) && defined(ARCH_CPU_ARM64)
+#if BUILDFLAG(IS_MAC) && defined(ARCH_CPU_ARM64)
     // TODO(crbug.com/40719640): macOS on ARM64 says it has devices, but won't
     // let any of them be opened or listed.
     return false;
@@ -277,9 +237,6 @@ class AudioInputTest : public testing::TestWithParam<bool> {
   void OnLogMessage(const std::string& message) {}
 
   base::TestMessageLoop message_loop_;
-#if BUILDFLAG(IS_FUCHSIA)
-  std::unique_ptr<FakeAudio> fake_audio_;
-#endif  // BUILDFLAG(IS_FUCHSIA)
   std::unique_ptr<AudioManager> audio_manager_;
   raw_ptr<AudioInputStream> audio_input_stream_;
 #if BUILDFLAG(IS_ANDROID)

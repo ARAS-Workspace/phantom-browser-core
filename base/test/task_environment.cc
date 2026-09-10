@@ -53,7 +53,7 @@
 #include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include <optional>
 
 #include "base/files/file_descriptor_watcher_posix.h"
@@ -552,12 +552,12 @@ void TaskEnvironment::CompleteInitialization() {
     sequence_manager_->SetTimeDomain(mock_time_domain_.get());
   }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   if (main_thread_type() == MainThreadType::IO) {
     file_descriptor_watcher_ =
         std::make_unique<FileDescriptorWatcher>(GetMainThreadTaskRunner());
   }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 }
 
 TaskEnvironment::TaskEnvironment(TaskEnvironment&& other) = default;

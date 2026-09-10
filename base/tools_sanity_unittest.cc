@@ -178,8 +178,7 @@ TEST(ToolsSanityTest, AccessesToStack) {
 // alloc_dealloc_mismatch defaults to
 // !SANITIZER_MAC && !SANITIZER_WINDOWS && !SANITIZER_ANDROID,
 // in the sanitizer runtime upstream.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
 #define MAYBE_SingleElementDeletedWithBraces \
   DISABLED_SingleElementDeletedWithBraces
 #define MAYBE_ArrayDeletedWithoutBraces DISABLED_ArrayDeletedWithoutBraces

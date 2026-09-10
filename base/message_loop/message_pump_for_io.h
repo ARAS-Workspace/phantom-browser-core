@@ -17,8 +17,6 @@
 #include "base/message_loop/message_pump_io_ios.h"
 #elif BUILDFLAG(IS_APPLE)
 #include "base/message_loop/message_pump_kqueue.h"
-#elif BUILDFLAG(IS_FUCHSIA)
-#include "base/message_loop/message_pump_fuchsia.h"
 #elif BUILDFLAG(IS_POSIX)
 #include "base/message_loop/message_pump_epoll.h"
 #endif
@@ -32,8 +30,6 @@ using MessagePumpForIO = MessagePumpForIO;
 using MessagePumpForIO = MessagePumpIOSForIO;
 #elif BUILDFLAG(IS_APPLE)
 using MessagePumpForIO = MessagePumpKqueue;
-#elif BUILDFLAG(IS_FUCHSIA)
-using MessagePumpForIO = MessagePumpFuchsia;
 #elif BUILDFLAG(IS_POSIX)
 using MessagePumpForIO = MessagePumpEpoll;
 #else

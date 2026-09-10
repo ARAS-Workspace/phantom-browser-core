@@ -656,7 +656,7 @@ TEST_F(MessagePumpDefaultTest, BusyLoopPredictionAccuracyHistogram) {
 }
 #endif  // !BUILDFLAG(IS_IOS)
 
-#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_APPLE)
+#if !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_APPLE)
 class MessagePumpWakeupCounterTest : public ::testing::Test {
  protected:
   void SetUp() override {
@@ -713,6 +713,6 @@ TEST_F(MessagePumpWakeupCounterTest, BusyLoopSkipsRecordingSample) {
   histogram_tester.ExpectBucketCount(
       "Scheduling.MessagePump.WakeupCount.BusyLoopThread", 1, 0);
 }
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_APPLE)
+#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_APPLE)
 
 }  // namespace base

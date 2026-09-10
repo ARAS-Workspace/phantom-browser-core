@@ -61,7 +61,7 @@ struct TestDirectory {
 
 void CheckModificationTime(const FileEnumerator::FileInfo& actual,
                            Time expected_last_modified_time) {
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   // On POSIX, GetLastModifiedTime() rounds down to the second, but
   // File::GetInfo() does not.
   Time::Exploded exploded;
@@ -674,10 +674,7 @@ TEST(FileEnumerator, VirtualDocumentPath) {
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_FUCHSIA)
-// FileEnumerator::GetInfo does not work correctly with INCLUDE_DOT_DOT.
-// https://crbug.com/1106172
-#elif BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_WIN)
 // Windows has a bug in their handling of ".."; they always report the file
 // modification time of the current directory, not the parent directory. This is
 // a bug in Windows, not us -- you can see it with the "dir" command (notice
@@ -735,7 +732,7 @@ TEST(FileEnumerator, GetInfoDotDot) {
         << "File " << file.path.value() << " was not returned";
   }
 }
-#endif  // !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_WIN)
 
 TEST(FileEnumerator, OnlyName) {
   ScopedTempDir temp_dir;

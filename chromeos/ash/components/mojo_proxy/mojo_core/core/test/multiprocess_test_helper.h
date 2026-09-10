@@ -35,7 +35,7 @@ class MultiprocessTestHelper {
     // Same as CHILD but uses the newer async channel handshake.
     ASYNC,
 
-#if !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_IOS)
     // Launch the child process as a child in the mojo system, using a named
     // pipe.
     NAMED_CHILD,
@@ -43,9 +43,7 @@ class MultiprocessTestHelper {
     // Launch the child process as an unrelated peer process in the mojo
     // system, using a named pipe.
     NAMED_PEER,
-#endif  //  !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_IOS)
-    // This is the same as child; however, it will never advertise any
-    // capabilities.
+#endif  // !BUILDFLAG(IS_IOS)
     CHILD_WITHOUT_CAPABILITIES
   };
 

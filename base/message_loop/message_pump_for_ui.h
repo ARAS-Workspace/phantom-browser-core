@@ -22,8 +22,6 @@
 #include "base/message_loop/message_pump_glib.h"
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_BSD)
 #include "base/message_loop/message_pump_epoll.h"
-#elif BUILDFLAG(IS_FUCHSIA)
-#include "base/message_loop/message_pump_fuchsia.h"
 #endif
 
 namespace base {
@@ -45,8 +43,6 @@ using MessagePumpForUI = MessagePump;
 using MessagePumpForUI = MessagePumpGlib;
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_BSD)
 using MessagePumpForUI = MessagePumpEpoll;
-#elif BUILDFLAG(IS_FUCHSIA)
-using MessagePumpForUI = MessagePumpFuchsia;
 #else
 #error Platform does not define MessagePumpForUI
 #endif

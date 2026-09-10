@@ -250,9 +250,6 @@ mojo::IncomingInvitation InitializeMojoIPCChannel() {
         *base::CommandLine::ForCurrentProcess());
     flags |= MOJO_ACCEPT_INVITATION_FLAG_ELEVATED;
   }
-#elif BUILDFLAG(IS_FUCHSIA)
-  endpoint = mojo::PlatformChannel::RecoverPassedEndpointFromCommandLine(
-      *base::CommandLine::ForCurrentProcess());
 #elif BUILDFLAG(IS_APPLE)
 #if BUILDFLAG(IS_IOS_TVOS)
   endpoint = mojo::PlatformChannel::RecoverPassedEndpointFromCommandLine(

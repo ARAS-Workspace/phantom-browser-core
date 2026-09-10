@@ -18,9 +18,9 @@
 #include "base/task/current_thread.h"
 #include "base/threading/platform_thread.h"
 
-#if !BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_OZONE)
 #include "base/notimplemented.h"
-#endif  // !BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_FUCHSIA)
+#endif  // !BUILDFLAG(IS_OZONE)
 
 namespace base {
 
@@ -302,7 +302,7 @@ class IOWatcherImpl : public IOWatcher {
     // guard prevents a compile error. Please note that while libchrome is
     // ChromeOS specific and is used extensively by various components within
     // ChromeOS, libchrome is not part of Ash-chrome.
-#if BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_OZONE)
     MessagePumpForIO::Mode io_mode;
     switch (mode) {
       case FdWatchMode::kRead:
@@ -325,7 +325,7 @@ class IOWatcherImpl : public IOWatcher {
 #else
     NOTIMPLEMENTED();
     return nullptr;
-#endif  // BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_OZONE)
   }
 
  private:

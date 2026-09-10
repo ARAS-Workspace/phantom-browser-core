@@ -2396,8 +2396,7 @@ std::optional<FeatureConfig> GetClientSideFeatureConfig(
 // CONFIGURATION_ANDROID_END
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 
   if (kIPHAutofillCreditCardBenefitFeature.name == feature->name) {
     // The credit card benefit IPH appears up to three times over 10 years and
@@ -2504,9 +2503,7 @@ std::optional<FeatureConfig> GetClientSideFeatureConfig(
     return config;
   }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) ||
-  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) ||
-  // BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_IOS)
   if (kIPHiOSLensOverlayEntrypointTipFeature.name == feature->name) {

@@ -12,7 +12,7 @@
 #if BUILDFLAG(IS_WIN)
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
 #include <sys/socket.h>
 #include <sys/types.h>
 #endif

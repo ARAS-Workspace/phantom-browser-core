@@ -319,12 +319,6 @@ void RenderProcessHostImpl::RegisterMojoInterfaces() {
       base::BindRepeating(&RenderProcessHostImpl::BindAecDumpManager,
                           instance_weak_factory_.GetWeakPtr()));
 
-#if BUILDFLAG(IS_FUCHSIA)
-  AddUIThreadInterface(
-      registry.get(),
-      base::BindRepeating(&RenderProcessHostImpl::BindMediaCodecProvider,
-                          instance_weak_factory_.GetWeakPtr()));
-#endif
 
   // ---- Please do not register interfaces below this line ------
   //

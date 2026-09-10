@@ -543,11 +543,7 @@ class IndexedDBBrowserTestWithSqliteErrorInjector
     : public IndexedDBBrowserTestWithSqlite {
  public:
   void SetUp() override {
-#if BUILDFLAG(IS_FUCHSIA)
-    GTEST_SKIP() << "TODO(crbug.com/488755563): test doesn't work on Fuchsia";
-#else
     IndexedDBBrowserTestBase::SetUp();
-#endif
   }
 
   void SetUpOnMainThread() override {
@@ -1161,22 +1157,13 @@ IN_PROC_BROWSER_TEST_F(IndexedDBBrowserTestWithSqliteErrorInjector,
 
 // Fuchsia deletes the database rather than recovering it, so these recovery
 // tests are disabled there.
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_CorruptIndexRecovers DISABLED_CorruptIndexRecovers
-#else
 #define MAYBE_CorruptIndexRecovers CorruptIndexRecovers
-#endif
 IN_PROC_BROWSER_TEST_F(IndexedDBBrowserTestWithSqlite,
                        MAYBE_CorruptIndexRecovers) {
   RunCorruptIndexRecoveryTest(/*concurrent_rw_txn=*/false);
 }
-#if BUILDFLAG(IS_FUCHSIA)
-#define MAYBE_CorruptIndexRecoversUnderConcurrentTransaction \
-  DISABLED_CorruptIndexRecoversUnderConcurrentTransaction
-#else
 #define MAYBE_CorruptIndexRecoversUnderConcurrentTransaction \
   CorruptIndexRecoversUnderConcurrentTransaction
-#endif
 IN_PROC_BROWSER_TEST_F(IndexedDBBrowserTestWithSqlite,
                        MAYBE_CorruptIndexRecoversUnderConcurrentTransaction) {
   RunCorruptIndexRecoveryTest(/*concurrent_rw_txn=*/true);

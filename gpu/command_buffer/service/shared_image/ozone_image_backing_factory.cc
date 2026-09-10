@@ -309,21 +309,6 @@ bool OzoneImageBackingFactory::IsSupported(
     }
   }
 
-#if BUILDFLAG(IS_FUCHSIA)
-  if (gr_context_type != GrContextType::kVulkan) {
-    return false;
-  }
-
-  // For now just use OzoneImageBacking for primary plane buffers.
-  // TODO(crbug.com/40219694): When Vulkan/GL interop is supported on Fuchsia
-  // OzoneImageBacking should be used for all scanout buffers.
-  constexpr auto kPrimaryPlaneUsageFlags = SHARED_IMAGE_USAGE_DISPLAY_READ |
-                                           SHARED_IMAGE_USAGE_DISPLAY_WRITE |
-                                           SHARED_IMAGE_USAGE_SCANOUT;
-  if (usage != kPrimaryPlaneUsageFlags || gmb_type != gfx::EMPTY_BUFFER) {
-    return false;
-  }
-#endif
 
   return true;
 }
@@ -345,13 +330,8 @@ bool OzoneImageBackingFactory::CanImportNativePixmapToVulkan() {
 
 bool OzoneImageBackingFactory::CanVulkanSynchronizeGpuFence() {
 #if BUILDFLAG(ENABLE_VULKAN)
-#if BUILDFLAG(IS_FUCHSIA)
-  constexpr auto kGpuFenceExternalSemaphoreHandleType =
-      VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_ZIRCON_EVENT_BIT_FUCHSIA;
-#else
   constexpr auto kGpuFenceExternalSemaphoreHandleType =
       VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_SYNC_FD_BIT;
-#endif
   if (!shared_context_state_->vk_context_provider()) {
     return false;
   }

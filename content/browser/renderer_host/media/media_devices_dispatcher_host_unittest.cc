@@ -1008,7 +1008,7 @@ TEST_P(MediaDevicesDispatcherHostTest, SelectAudioOutputNoFeature) {
   host_->SelectAudioOutput(kDefaultAudioDeviceID, base::DoNothing());
 }
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID)
 class SelectAudioOutputTest : public MediaDevicesDispatcherHostTest {
  public:
   SelectAudioOutputTest()

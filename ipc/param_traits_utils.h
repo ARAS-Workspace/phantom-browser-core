@@ -44,10 +44,6 @@
 #include "base/android/scoped_hardware_buffer_handle.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include <lib/zx/channel.h>
-#include <lib/zx/vmo.h>
-#endif
 
 #if BUILDFLAG(IS_WIN)
 #include "base/strings/string_util_win.h"
@@ -173,9 +169,7 @@ struct ParamTraits<unsigned int> {
 //   3) Android 64 bit and Fuchsia also have int64_t typedef'd to long.
 // Since we want to support Android 32<>64 bit IPC, as long as we don't have
 // these traits for 32 bit ARM then that'll catch any errors.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_FUCHSIA) ||                                              \
-    (BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_64_BITS))
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || (BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_64_BITS))
 template <>
 struct ParamTraits<long> {
   typedef long param_type;
@@ -496,7 +490,7 @@ struct COMPONENT_EXPORT(IPC) ParamTraits<base::DictValue> {
                    param_type* r);
 };
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 // FileDescriptors may be serialised over IPC channels on POSIX. On the
 // receiving side, the FileDescriptor is a valid duplicate of the file
 // descriptor which was transmitted: *it is not just a copy of the integer like
@@ -530,7 +524,7 @@ struct COMPONENT_EXPORT(IPC) ParamTraits<base::ScopedFD> {
                    param_type* r);
 };
 
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_WIN)
 template <>
@@ -543,25 +537,6 @@ struct COMPONENT_EXPORT(IPC) ParamTraits<base::win::ScopedHandle> {
 };
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-template <>
-struct COMPONENT_EXPORT(IPC) ParamTraits<zx::vmo> {
-  typedef zx::vmo param_type;
-  static void Write(base::Pickle* m, const param_type& p);
-  static bool Read(const base::Pickle* m,
-                   base::PickleIterator* iter,
-                   param_type* r);
-};
-
-template <>
-struct COMPONENT_EXPORT(IPC) ParamTraits<zx::channel> {
-  typedef zx::channel param_type;
-  static void Write(base::Pickle* m, const param_type& p);
-  static bool Read(const base::Pickle* m,
-                   base::PickleIterator* iter,
-                   param_type* r);
-};
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 #if BUILDFLAG(IS_ANDROID)
 template <>

@@ -137,9 +137,6 @@
 #include "gpu/command_buffer/service/dawn_platform.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "components/viz/service/display_embedder/output_presenter_fuchsia.h"
-#endif
 
 namespace viz {
 
@@ -2091,17 +2088,12 @@ bool SkiaOutputSurfaceImplOnGpu::InitializeForVulkan() {
 
 #if !BUILDFLAG(IS_WIN)
   std::unique_ptr<OutputPresenter> output_presenter;
-#if BUILDFLAG(IS_FUCHSIA)
-  output_presenter =
-      OutputPresenterFuchsia::Create(window_surface_.get(), dependency_);
-#else
   scoped_refptr<gl::Presenter> presenter = dependency_->CreatePresenter();
   presenter_ = presenter.get();
   if (presenter_) {
     output_presenter =
         std::make_unique<OutputPresenterGL>(std::move(presenter), dependency_);
   }
-#endif
   if (output_presenter) {
     output_device_ = std::make_unique<SkiaOutputDeviceBufferQueue>(
         std::move(output_presenter), dependency_,

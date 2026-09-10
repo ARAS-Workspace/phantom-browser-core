@@ -26,8 +26,6 @@
 #include "partition_alloc/page_allocator_internals_win.h"
 #elif PA_BUILDFLAG(IS_POSIX)
 #include "partition_alloc/page_allocator_internals_posix.h"
-#elif PA_BUILDFLAG(IS_FUCHSIA)
-#include "partition_alloc/page_allocator_internals_fuchsia.h"
 #else
 #error Platform not supported.
 #endif

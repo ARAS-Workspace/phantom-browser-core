@@ -1270,13 +1270,7 @@ TEST_F(GpuRasterPixelTest, DrawImageWithSourceAndTargetColorSpace) {
                comparator);
 }
 
-#if BUILDFLAG(IS_FUCHSIA) && defined(ARCH_CPU_ARM64)
-// SwiftShader crashes when running this test on ARM64 on Fuchsia,
-// see b/369849405.
-#define MAYBE_DrawImageReinterpretedAsSRGB DISABLED_DrawImageReinterpretedAsSRGB
-#else
 #define MAYBE_DrawImageReinterpretedAsSRGB DrawImageReinterpretedAsSRGB
-#endif
 TEST_F(GpuRasterPixelTest, MAYBE_DrawImageReinterpretedAsSRGB) {
   constexpr gfx::Rect rect(100, 100);
 

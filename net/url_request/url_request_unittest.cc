@@ -10657,7 +10657,7 @@ class HTTPSOCSPTest : public HTTPSCertNetFetchingTest {
 };
 
 static bool UsingBuiltinCertVerifier() {
-#if BUILDFLAG(IS_FUCHSIA) || BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
+#if BUILDFLAG(CHROME_ROOT_STORE_SUPPORTED)
   return true;
 #else
   return false;

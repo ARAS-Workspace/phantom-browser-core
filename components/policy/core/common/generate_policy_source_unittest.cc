@@ -135,7 +135,7 @@ TEST(GeneratePolicySource, ChromeSchemaData) {
   EXPECT_TRUE(next == kExpectedProperties.end());
 #endif  // !BUILDFLAG(IS_IOS)
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
   subschema = schema.GetProperty(key::kExtensionSettings);
   ASSERT_TRUE(subschema.valid());
   ASSERT_EQ(base::Value::Type::DICT, subschema.type());

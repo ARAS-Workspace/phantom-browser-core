@@ -9,8 +9,6 @@
 
 #if BUILDFLAG(USE_MESSAGE_PORT_CORE)
 #include "components/cast/message_port/cast_core/create_message_port_core.h"  // nogncheck
-#elif BUILDFLAG(IS_FUCHSIA)
-#include "components/cast/message_port/fuchsia/message_port_fuchsia.h"  // nogncheck
 #else
 #include "components/cast/message_port/cast/message_port_cast.h"  // nogncheck
 #endif
@@ -22,8 +20,6 @@ void CreatePlatformMessagePortPair(std::unique_ptr<MessagePort>* client,
                                    std::unique_ptr<MessagePort>* server) {
 #if BUILDFLAG(USE_MESSAGE_PORT_CORE)
   return CreateMessagePortCorePair(client, server);
-#elif BUILDFLAG(IS_FUCHSIA)
-  return MessagePortFuchsia::CreatePair(client, server);
 #else
   return MessagePortCast::CreatePair(client, server);
 #endif

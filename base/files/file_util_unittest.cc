@@ -75,7 +75,7 @@
 #include "base/win/windows_handle_util.h"
 #endif
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -95,9 +95,6 @@
 #include "base/test/android/content_uri_test_utils.h"
 #endif
 
-#if BUILDFLAG(IS_FUCHSIA)
-#include "base/test/scoped_dev_zero_fuchsia.h"
-#endif
 
 // This macro helps avoid wrapped lines in the test structs.
 #define FPL(x) FILE_PATH_LITERAL(x)
@@ -148,7 +145,6 @@ void ChangePosixFilePermissions(const FilePath& path,
 #endif  // BUILDFLAG(IS_MAC)
 
 // Fuchsia doesn't support file permissions.
-#if !BUILDFLAG(IS_FUCHSIA)
 // Sets the source file to read-only.
 void SetReadOnly(const FilePath& path, bool read_only) {
 #if BUILDFLAG(IS_WIN)
@@ -192,7 +188,6 @@ bool IsReadOnly(const FilePath& path) {
 #endif  // BUILDFLAG(IS_WIN)
 }
 
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
 const wchar_t bogus_content[] = L"I'm cannon fodder.";
 
@@ -283,7 +278,7 @@ void CreateTextFile(const FilePath& filename, const std::wstring& contents) {
   std::wofstream file;
 #if BUILDFLAG(IS_WIN)
   file.open(filename.value().c_str());
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   file.open(filename.value());
 #endif  // BUILDFLAG(IS_WIN)
   ASSERT_TRUE(file.is_open());
@@ -297,7 +292,7 @@ std::wstring ReadTextFile(const FilePath& filename) {
   std::wifstream file;
 #if BUILDFLAG(IS_WIN)
   file.open(filename.value().c_str());
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   file.open(filename.value());
 #endif  // BUILDFLAG(IS_WIN)
   EXPECT_TRUE(file.is_open());
@@ -319,7 +314,7 @@ void GetIsInheritable(FILE* stream, bool* is_inheritable) {
   DWORD info = 0;
   ASSERT_EQ(TRUE, ::GetHandleInformation(handle, &info));
   *is_inheritable = ((info & HANDLE_FLAG_INHERIT) != 0);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   int fd = fileno(stream);
   ASSERT_NE(-1, fd);
   int flags = fcntl(fd, F_GETFD, 0);
@@ -1664,7 +1659,6 @@ TEST_F(FileUtilTest, CopyFileExecutablePermission) {
 
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if !BUILDFLAG(IS_FUCHSIA)
 
 TEST_F(FileUtilTest, CopyFileACL) {
   // While FileUtilTest.CopyFile asserts the content is correctly copied over,
@@ -1718,7 +1712,6 @@ TEST_F(FileUtilTest, CopyDirectoryACL) {
   ASSERT_FALSE(IsReadOnly(src_subdir));
 }
 
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
 TEST_F(FileUtilTest, DeleteNonExistent) {
   FilePath non_existent =
@@ -1762,7 +1755,7 @@ TEST_F(FileUtilTest, DeleteFile) {
   EXPECT_FALSE(PathExists(file_name));
 }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 TEST_F(FileUtilTest, DeleteDeep) {
   // Create deeply nested directories.
   const FilePath dir_path = temp_dir_.GetPath().AppendASCII("deep");
@@ -1783,11 +1776,9 @@ TEST_F(FileUtilTest, DeleteDeep) {
       ASSERT_TRUE(fd.is_valid()) << strerror(errno);
     }
 
-#if !BUILDFLAG(IS_FUCHSIA)
     // Create a symlink at the bottom of the deep tree.
     ASSERT_EQ(HANDLE_EINTR(symlinkat("..", fd.get(), "up")), 0)
         << strerror(errno);
-#endif  // !BUILDFLAG(IS_FUCHSIA)
 
     // Create a file at the bottom of the deep tree.
     fd = ScopedFD(HANDLE_EINTR(openat(
@@ -2901,7 +2892,7 @@ TEST_F(FileUtilTest, CopyDirectoryWithTrailingSeparators) {
 #if BUILDFLAG(IS_WIN)
   FilePath from_path =
       temp_dir_.GetPath().Append(FILE_PATH_LITERAL("Copy_From_Subdir\\\\\\"));
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   FilePath from_path =
       temp_dir_.GetPath().Append(FILE_PATH_LITERAL("Copy_From_Subdir///"));
 #endif
@@ -3814,7 +3805,7 @@ TEST_F(FileUtilTest, GetSecureTempDirectory) {
 }
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 TEST_F(FileUtilTest, GetShmemTempDirTest) {
   FilePath dir;
   EXPECT_TRUE(GetShmemTempDir(false, &dir));
@@ -3909,7 +3900,7 @@ TEST_F(FileUtilTest, CreateDirectoryTest) {
 #if BUILDFLAG(IS_WIN)
   FilePath test_path =
       test_root.Append(FILE_PATH_LITERAL("dir\\tree\\likely\\doesnt\\exist\\"));
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   FilePath test_path =
       test_root.Append(FILE_PATH_LITERAL("dir/tree/likely/doesnt/exist/"));
 #endif
@@ -4269,11 +4260,6 @@ TEST_F(FileUtilTest, ReadFileToString) {
 
 #if !BUILDFLAG(IS_WIN)
 TEST_F(FileUtilTest, ReadFileToStringWithUnknownFileSize) {
-#if BUILDFLAG(IS_FUCHSIA)
-  test::TaskEnvironment task_environment;
-  auto dev_zero = ScopedDevZero::Get();
-  ASSERT_TRUE(dev_zero);
-#endif
   FilePath file_path("/dev/zero");
   std::string data = "temp";
 
@@ -4296,7 +4282,7 @@ TEST_F(FileUtilTest, ReadFileToStringWithUnknownFileSize) {
 }
 #endif  // !BUILDFLAG(IS_WIN)
 
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_IOS)
 #define ChildMain WriteToPipeChildMain
 #define ChildMainString "WriteToPipeChildMain"
 
@@ -4443,7 +4429,7 @@ TEST_F(FileUtilTest, ReadFileToStringWithNamedPipe) {
 
   ASSERT_EQ(0, unlink(pipe_path.value().c_str()));
 }
-#endif  // !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_IOS)
 
 #if BUILDFLAG(IS_WIN)
 #define ChildMain WriteToPipeChildMain
@@ -4757,11 +4743,9 @@ TEST_F(FileUtilTest, TouchFile) {
   ASSERT_TRUE(TouchFile(foobar, access_time, modification_time));
   File::Info file_info;
   ASSERT_TRUE(GetFileInfo(foobar, &file_info));
-#if !BUILDFLAG(IS_FUCHSIA)
   // Access time is not supported on Fuchsia, see https://crbug.com/735233.
   EXPECT_EQ(access_time.ToInternalValue(),
             file_info.last_accessed.ToInternalValue());
-#endif
   EXPECT_EQ(modification_time.ToInternalValue(),
             file_info.last_modified.ToInternalValue());
 }
@@ -4828,7 +4812,7 @@ TEST_F(FileUtilTest, IsDirectoryEmpty) {
   EXPECT_FALSE(IsDirectoryEmpty(empty_dir));
 }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 
 TEST_F(FileUtilTest, SetNonBlocking) {
   const int kBogusFd = 99999;
@@ -5336,12 +5320,7 @@ TEST_F(FileUtilTest, MAYBE_PreReadFileWithSequentialAccess) {
 // threads). Mimics file operations in DoLaunchChildTestProcess() to rule out
 // thread-safety issues @ https://crbug.com/826408#c17.
 TEST(FileUtilMultiThreadedTest, MultiThreadedTempFiles) {
-#if BUILDFLAG(IS_FUCHSIA)
-  // TODO(crbug.com/40577019): Too slow to run on infra due to QEMU overhead.
-  constexpr int kNumThreads = 8;
-#else
   constexpr int kNumThreads = 64;
-#endif
   constexpr int kNumWritesPerThread = 32;
 
   std::unique_ptr<Thread> threads[kNumThreads];
@@ -5397,7 +5376,7 @@ TEST(FileUtilMultiThreadedTest, MultiThreadedTempFiles) {
   }
 }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 
 TEST(ScopedFD, ScopedFDDoesClose) {
   int fds[2];
@@ -5436,7 +5415,7 @@ TEST(ScopedFD, ScopedFDCrashesOnCloseFailure) {
 #endif
 }
 
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 TEST_F(FileUtilTest, CopyFileContentsWithSendfile) {
@@ -5631,7 +5610,7 @@ TEST_F(FileUtilTest, CreatingFileWithSameNameAfterDelete) {
   ASSERT_EQ(second_file.GetLength(), 0);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
 TEST_F(FileUtilTest, IsReservedNameOnWindows) {
   static constexpr auto kAllowedBasenames =
       std::to_array<const base::FilePath::CharType*>({
@@ -5668,7 +5647,7 @@ TEST_F(FileUtilTest, IsReservedNameOnWindows) {
     EXPECT_TRUE(IsReservedNameOnWindows(basename)) << basename;
   }
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
 
 }  // namespace
 

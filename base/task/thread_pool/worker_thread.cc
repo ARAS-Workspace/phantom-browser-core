@@ -30,7 +30,7 @@
 #include "partition_alloc/partition_alloc_config.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
 #include "base/files/file_descriptor_watcher_posix.h"
 #endif
 
@@ -167,7 +167,7 @@ bool WorkerThread::Start(
   CheckedAutoLock auto_lock(thread_lock_);
   DCHECK(thread_handle_.is_null());
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   DCHECK(io_thread_task_runner);
   io_thread_task_runner_ = std::move(io_thread_task_runner);
 #endif
@@ -305,7 +305,7 @@ bool WorkerThread::ShouldExit() const {
 }
 
 void WorkerThread::ThreadMain() {
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_POSIX)
   DCHECK(io_thread_task_runner_);
   FileDescriptorWatcher file_descriptor_watcher(io_thread_task_runner_);
 #endif

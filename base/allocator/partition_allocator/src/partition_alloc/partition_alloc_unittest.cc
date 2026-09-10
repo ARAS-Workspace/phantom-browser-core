@@ -88,9 +88,7 @@
 #endif
 
 // Headers for the AmountOfPhysicalMemory() function.
-#if PA_BUILDFLAG(IS_FUCHSIA)
-#include <zircon/syscalls.h>
-#elif PA_BUILDFLAG(IS_WIN)
+#if PA_BUILDFLAG(IS_WIN)
 #include <windows.h>
 #elif PA_BUILDFLAG(IS_APPLE)
 #include <sys/sysctl.h>
@@ -117,9 +115,7 @@ namespace {
 // Best effort to get the amount of physical memory available to the system.
 // Returns 0 on failure.
 uint64_t AmountOfPhysicalMemory() {
-#if PA_BUILDFLAG(IS_FUCHSIA)
-  return zx_system_get_physmem();
-#elif PA_BUILDFLAG(IS_WIN)
+#if PA_BUILDFLAG(IS_WIN)
   MEMORYSTATUSEX mem_status = {.dwLength = sizeof(mem_status)};
   if (GlobalMemoryStatusEx(&mem_status)) {
     return mem_status.ullTotalPhys;
@@ -2721,11 +2717,7 @@ TEST_P(PartitionAllocTest, CheckMetadataIntegrityPass) {
 //
 // Disable these test on Windows, since they run slower, so tend to timeout and
 // cause flake.
-#if !PA_BUILDFLAG(IS_WIN) &&                                         \
-        (!PA_BUILDFLAG(PA_ARCH_CPU_64_BITS) ||                       \
-         (PA_BUILDFLAG(IS_POSIX) &&                                  \
-          !(PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID)))) || \
-    PA_BUILDFLAG(IS_FUCHSIA)
+#if !PA_BUILDFLAG(IS_WIN) && (!PA_BUILDFLAG(PA_ARCH_CPU_64_BITS) || (PA_BUILDFLAG(IS_POSIX) && !(PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID))))
 #define MAYBE_RepeatedAllocReturnNullDirect RepeatedAllocReturnNullDirect
 #define MAYBE_RepeatedReallocReturnNullDirect RepeatedReallocReturnNullDirect
 #else

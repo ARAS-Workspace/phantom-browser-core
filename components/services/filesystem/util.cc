@@ -99,7 +99,7 @@ base::File::Error ValidatePath(const std::string& raw_path,
 
 #if BUILDFLAG(IS_WIN)
   base::FilePath::StringType path = base::UTF8ToWide(raw_path);
-#elif BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_POSIX)
   base::FilePath::StringType path = raw_path;
 #endif
 

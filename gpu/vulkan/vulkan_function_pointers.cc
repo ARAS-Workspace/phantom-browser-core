@@ -410,21 +410,6 @@ bool VulkanFunctionPointers::BindInstanceFunctionPointers(
   }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_FUCHSIA)
-  if (gfx::HasExtension(enabled_extensions,
-                        VK_FUCHSIA_IMAGEPIPE_SURFACE_EXTENSION_NAME)) {
-    constexpr char kvkCreateImagePipeSurfaceFUCHSIA[] =
-        "vkCreateImagePipeSurfaceFUCHSIA";
-    vkCreateImagePipeSurfaceFUCHSIA =
-        reinterpret_cast<PFN_vkCreateImagePipeSurfaceFUCHSIA>(
-            vkGetInstanceProcAddr(vk_instance,
-                                  kvkCreateImagePipeSurfaceFUCHSIA));
-    if (!vkCreateImagePipeSurfaceFUCHSIA) {
-      LogGetProcError(kvkCreateImagePipeSurfaceFUCHSIA);
-      return false;
-    }
-  }
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
   return true;
 }
@@ -1167,93 +1152,8 @@ bool VulkanFunctionPointers::BindDeviceFunctionPointers(
   }
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(IS_FUCHSIA)
-  if (gfx::HasExtension(enabled_extensions,
-                        VK_FUCHSIA_EXTERNAL_SEMAPHORE_EXTENSION_NAME)) {
-    constexpr char kvkImportSemaphoreZirconHandleFUCHSIA[] =
-        "vkImportSemaphoreZirconHandleFUCHSIA";
-    vkImportSemaphoreZirconHandleFUCHSIA =
-        reinterpret_cast<PFN_vkImportSemaphoreZirconHandleFUCHSIA>(
-            vkGetDeviceProcAddr(vk_device,
-                                kvkImportSemaphoreZirconHandleFUCHSIA));
-    if (!vkImportSemaphoreZirconHandleFUCHSIA) {
-      LogGetProcError(kvkImportSemaphoreZirconHandleFUCHSIA);
-      return false;
-    }
 
-    constexpr char kvkGetSemaphoreZirconHandleFUCHSIA[] =
-        "vkGetSemaphoreZirconHandleFUCHSIA";
-    vkGetSemaphoreZirconHandleFUCHSIA =
-        reinterpret_cast<PFN_vkGetSemaphoreZirconHandleFUCHSIA>(
-            vkGetDeviceProcAddr(vk_device, kvkGetSemaphoreZirconHandleFUCHSIA));
-    if (!vkGetSemaphoreZirconHandleFUCHSIA) {
-      LogGetProcError(kvkGetSemaphoreZirconHandleFUCHSIA);
-      return false;
-    }
-  }
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
-#if BUILDFLAG(IS_FUCHSIA)
-  if (gfx::HasExtension(enabled_extensions,
-                        VK_FUCHSIA_EXTERNAL_MEMORY_EXTENSION_NAME)) {
-    constexpr char kvkGetMemoryZirconHandleFUCHSIA[] =
-        "vkGetMemoryZirconHandleFUCHSIA";
-    vkGetMemoryZirconHandleFUCHSIA =
-        reinterpret_cast<PFN_vkGetMemoryZirconHandleFUCHSIA>(
-            vkGetDeviceProcAddr(vk_device, kvkGetMemoryZirconHandleFUCHSIA));
-    if (!vkGetMemoryZirconHandleFUCHSIA) {
-      LogGetProcError(kvkGetMemoryZirconHandleFUCHSIA);
-      return false;
-    }
-  }
-#endif  // BUILDFLAG(IS_FUCHSIA)
-
-#if BUILDFLAG(IS_FUCHSIA)
-  if (gfx::HasExtension(enabled_extensions,
-                        VK_FUCHSIA_BUFFER_COLLECTION_EXTENSION_NAME)) {
-    constexpr char kvkCreateBufferCollectionFUCHSIA[] =
-        "vkCreateBufferCollectionFUCHSIA";
-    vkCreateBufferCollectionFUCHSIA =
-        reinterpret_cast<PFN_vkCreateBufferCollectionFUCHSIA>(
-            vkGetDeviceProcAddr(vk_device, kvkCreateBufferCollectionFUCHSIA));
-    if (!vkCreateBufferCollectionFUCHSIA) {
-      LogGetProcError(kvkCreateBufferCollectionFUCHSIA);
-      return false;
-    }
-
-    constexpr char kvkSetBufferCollectionImageConstraintsFUCHSIA[] =
-        "vkSetBufferCollectionImageConstraintsFUCHSIA";
-    vkSetBufferCollectionImageConstraintsFUCHSIA =
-        reinterpret_cast<PFN_vkSetBufferCollectionImageConstraintsFUCHSIA>(
-            vkGetDeviceProcAddr(vk_device,
-                                kvkSetBufferCollectionImageConstraintsFUCHSIA));
-    if (!vkSetBufferCollectionImageConstraintsFUCHSIA) {
-      LogGetProcError(kvkSetBufferCollectionImageConstraintsFUCHSIA);
-      return false;
-    }
-
-    constexpr char kvkGetBufferCollectionPropertiesFUCHSIA[] =
-        "vkGetBufferCollectionPropertiesFUCHSIA";
-    vkGetBufferCollectionPropertiesFUCHSIA =
-        reinterpret_cast<PFN_vkGetBufferCollectionPropertiesFUCHSIA>(
-            vkGetDeviceProcAddr(vk_device,
-                                kvkGetBufferCollectionPropertiesFUCHSIA));
-    if (!vkGetBufferCollectionPropertiesFUCHSIA) {
-      LogGetProcError(kvkGetBufferCollectionPropertiesFUCHSIA);
-      return false;
-    }
-
-    constexpr char kvkDestroyBufferCollectionFUCHSIA[] =
-        "vkDestroyBufferCollectionFUCHSIA";
-    vkDestroyBufferCollectionFUCHSIA =
-        reinterpret_cast<PFN_vkDestroyBufferCollectionFUCHSIA>(
-            vkGetDeviceProcAddr(vk_device, kvkDestroyBufferCollectionFUCHSIA));
-    if (!vkDestroyBufferCollectionFUCHSIA) {
-      LogGetProcError(kvkDestroyBufferCollectionFUCHSIA);
-      return false;
-    }
-  }
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
   if (gfx::HasExtension(enabled_extensions, VK_KHR_SWAPCHAIN_EXTENSION_NAME)) {
     constexpr char kvkAcquireNextImageKHR[] = "vkAcquireNextImageKHR";
@@ -1371,9 +1271,6 @@ void VulkanFunctionPointers::ResetForTesting() {
   vkCreateAndroidSurfaceKHR = nullptr;
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_FUCHSIA)
-  vkCreateImagePipeSurfaceFUCHSIA = nullptr;
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
   vkAllocateCommandBuffers = nullptr;
   vkAllocateDescriptorSets = nullptr;
@@ -1476,21 +1373,8 @@ void VulkanFunctionPointers::ResetForTesting() {
   vkGetMemoryWin32HandlePropertiesKHR = nullptr;
 #endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(IS_FUCHSIA)
-  vkImportSemaphoreZirconHandleFUCHSIA = nullptr;
-  vkGetSemaphoreZirconHandleFUCHSIA = nullptr;
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
-#if BUILDFLAG(IS_FUCHSIA)
-  vkGetMemoryZirconHandleFUCHSIA = nullptr;
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
-#if BUILDFLAG(IS_FUCHSIA)
-  vkCreateBufferCollectionFUCHSIA = nullptr;
-  vkSetBufferCollectionImageConstraintsFUCHSIA = nullptr;
-  vkGetBufferCollectionPropertiesFUCHSIA = nullptr;
-  vkDestroyBufferCollectionFUCHSIA = nullptr;
-#endif  // BUILDFLAG(IS_FUCHSIA)
 
   vkAcquireNextImageKHR = nullptr;
   vkCreateSwapchainKHR = nullptr;

@@ -481,7 +481,7 @@ void NodeChannel::Broadcast(Channel::MessagePtr message) {
 }
 
 void NodeChannel::BindBrokerHost(PlatformHandle broker_host_handle) {
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_APPLE)
   DCHECK(broker_host_handle.is_valid());
   BindBrokerHostData* data;
   std::vector<PlatformHandle> handles;
@@ -565,7 +565,7 @@ NodeChannel::~NodeChannel() {
 
 void NodeChannel::CreateAndBindLocalBrokerHost(
     PlatformHandle broker_host_handle) {
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_FUCHSIA)
+#if !BUILDFLAG(IS_APPLE)
   // Self-owned.
   ConnectionParams connection_params(
       PlatformChannelEndpoint(std::move(broker_host_handle)));

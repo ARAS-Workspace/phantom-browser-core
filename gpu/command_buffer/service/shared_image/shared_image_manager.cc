@@ -650,7 +650,7 @@ bool SharedImageManager::SupportsScanoutImages() {
   return true;
 #elif BUILDFLAG(IS_ANDROID)
   return true;
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   return supports_overlays_on_ozone_;
 #elif BUILDFLAG(IS_WIN)
   return gl::DirectCompositionTextureSupported();
@@ -660,7 +660,7 @@ bool SharedImageManager::SupportsScanoutImages() {
 }
 
 void SharedImageManager::QueryMultiplanarTextureSamplingSupport() {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_CHROMEOS)
   auto* ozone_platform = ui::OzonePlatform::GetInstance();
   auto* surface_factory = ozone_platform->GetSurfaceFactoryOzone();
   supports_ycbcr_nv12_sampling_ =
@@ -673,11 +673,11 @@ void SharedImageManager::QueryMultiplanarTextureSamplingSupport() {
       surface_factory->IsFormatSupportedForTexturing(
           viz::MultiPlaneFormat::kP010);
   is_texture_sampling_queried_ = true;
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 bool SharedImageManager::SupportsNV12TextureSampling() {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_CHROMEOS)
   AutoLock autolock(this);
   if (!is_texture_sampling_queried_) {
     QueryMultiplanarTextureSamplingSupport();
@@ -691,7 +691,7 @@ bool SharedImageManager::SupportsNV12TextureSampling() {
 }
 
 bool SharedImageManager::SupportsP010TextureSampling() {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_FUCHSIA)
+#if BUILDFLAG(IS_CHROMEOS)
   AutoLock autolock(this);
   if (!is_texture_sampling_queried_) {
     QueryMultiplanarTextureSamplingSupport();
