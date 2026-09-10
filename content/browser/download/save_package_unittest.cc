@@ -34,18 +34,14 @@ namespace content {
 
 #define FPL FILE_PATH_LITERAL
 #define HTML_EXTENSION ".html"
-#if BUILDFLAG(IS_WIN)
-#define FPL_HTML_EXTENSION L".html"
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #define FPL_HTML_EXTENSION ".html"
 #endif
 
 namespace {
 
 // This constant copied from save_package.cc.
-#if BUILDFLAG(IS_WIN)
-const uint32_t kMaxFilePathLength = MAX_PATH - 1;
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 const uint32_t kMaxFilePathLength = PATH_MAX - 1;
 #endif
 
@@ -216,11 +212,7 @@ TEST_F(SavePackageTest, TestUnSuccessfullyGenerateSavePackageFilename) {
 }
 
 // Crashing on Windows, see http://crbug.com/79365
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TestLongSavePackageFilename DISABLED_TestLongSavePackageFilename
-#else
 #define MAYBE_TestLongSavePackageFilename TestLongSavePackageFilename
-#endif
 TEST_F(SavePackageTest, MAYBE_TestLongSavePackageFilename) {
   const std::string base_url("http://www.google.com/");
   const base::FilePath::StringType long_file_name =
@@ -251,11 +243,7 @@ TEST_F(SavePackageTest, MAYBE_TestLongSavePackageFilename) {
 }
 
 // Crashing on Windows, see http://crbug.com/79365
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TestLongSafePureFilename DISABLED_TestLongSafePureFilename
-#else
 #define MAYBE_TestLongSafePureFilename TestLongSafePureFilename
-#endif
 TEST_F(SavePackageTest, MAYBE_TestLongSafePureFilename) {
   const base::FilePath save_dir(FPL("test_dir"));
   const base::FilePath::StringType ext(FPL_HTML_EXTENSION);
@@ -352,13 +340,8 @@ TEST_F(SavePackageTest, TestUTF8FilenameTruncation) {
 
   // Create a filename with multibyte UTF-8 characters.
   base::FilePath::StringType utf8_name;
-#if BUILDFLAG(IS_WIN)
-  // On Windows, use UTF-16.
-  utf8_name = L"файл测试テスト";
-#else
   // On POSIX, use UTF-8.
   utf8_name = "файл测试テスト";
-#endif
 
   // Make the name very long to force truncation.
   for (int i = 0; i < 20; ++i) {
@@ -379,11 +362,9 @@ TEST_F(SavePackageTest, TestUTF8FilenameTruncation) {
       save_dir.value().length() + 1 + utf8_name.length() + ext.length();
   EXPECT_LE(total_length, max_path);
 
-#if !BUILDFLAG(IS_WIN)
   // On POSIX, verify the truncated string is valid UTF-8.
   std::string utf8_result = base::FilePath(utf8_name).AsUTF8Unsafe();
   EXPECT_FALSE(utf8_result.empty());
-#endif
 }
 
 // Test directory with trailing separator.

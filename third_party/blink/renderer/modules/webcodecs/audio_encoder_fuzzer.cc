@@ -39,12 +39,6 @@
 #include "third_party/blink/renderer/platform/wtf/vector.h"
 #include "third_party/protobuf/src/google/protobuf/text_format.h"
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_PROPRIETARY_CODECS)
-#include "base/win/scoped_com_initializer.h"
-#include "media/gpu/windows/mf_audio_encoder.h"
-#define HAS_AAC_ENCODER 1
-#endif
-
 #if BUILDFLAG(IS_MAC) && BUILDFLAG(USE_PROPRIETARY_CODECS)
 #include "media/filters/mac/audio_toolbox_audio_encoder.h"
 #define HAS_AAC_ENCODER 1
@@ -80,10 +74,6 @@ class TestInterfaceFactory : public media::mojom::InterfaceFactory {
 #if BUILDFLAG(IS_MAC)
     auto platform_audio_encoder =
         std::make_unique<media::AudioToolboxAudioEncoder>();
-#elif BUILDFLAG(IS_WIN)
-    CHECK(com_initializer_.Succeeded());
-    auto platform_audio_encoder = std::make_unique<media::MFAudioEncoder>(
-        blink::scheduler::GetSequencedTaskRunnerForTesting());
 #else
 #error "Unknown platform encoder."
 #endif
@@ -116,18 +106,7 @@ class TestInterfaceFactory : public media::mojom::InterfaceFactory {
                             media::CreateCdmStatus::kCdmNotSupported);
   }
 
-#if BUILDFLAG(IS_WIN)
-  void CreateMediaFoundationRenderer(
-      mojo::PendingRemote<media::mojom::MediaLog> media_log_remote,
-      mojo::PendingReceiver<media::mojom::Renderer> receiver,
-      mojo::PendingReceiver<media::mojom::MediaFoundationRendererExtension>
-          renderer_extension_receiver) override {}
-#endif  // BUILDFLAG(IS_WIN)
  private:
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedCOMInitializer com_initializer_;
-#endif  // BUILDFLAG(IS_WIN)
-  // media::MojoCdmServiceContext cdm_service_context_;
   mojo::Receiver<media::mojom::InterfaceFactory> receiver_{this};
   mojo::UniqueReceiverSet<media::mojom::AudioEncoder> audio_encoder_receivers_;
 };

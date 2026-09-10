@@ -23,11 +23,7 @@
 
 namespace optimization_guide {
 
-#if BUILDFLAG(IS_WIN)
-const char kTestAbsoluteFilePath[] = "C:\\absolute\\file\\path";
-#else
 const char kTestAbsoluteFilePath[] = "/absolutefilepath";
-#endif
 
 FakeBaseModelAsset::FakeBaseModelAsset()
     : FakeBaseModelAsset(FakeBaseModelAsset::Content{}) {}

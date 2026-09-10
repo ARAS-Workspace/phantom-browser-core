@@ -13,12 +13,7 @@
 #include "net/base/mime_util.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#define CONVERT_IF_NEEDED(x) base::UTF8ToWide((x))
-#else
 #define CONVERT_IF_NEEDED(x) x
-#endif
 
 namespace content {
 

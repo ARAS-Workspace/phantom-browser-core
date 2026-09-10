@@ -209,7 +209,7 @@ HEADLESS_PROTOCOL_TEST(VirtualTimeInterrupt,
                        "emulation/virtual-time-interrupt.js")
 
 // Flaky on Linux, Mac & Win. TODO(crbug.com/41440558): Re-enable.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #define MAYBE_VirtualTimeCrossProcessNavigation \
   DISABLED_VirtualTimeCrossProcessNavigation
 #else
@@ -382,9 +382,8 @@ class HeadlessProtocolBrowserTestWithAllowedCrashes
 // Some platforms take very long time to handle crashes, and the test depends
 // on a large number of simulated crashes. See https://crbug.com/517040374 for
 // additional context.
-#define PLATFORM_SUPPORTS_CRASH_TEST()                                       \
-  !(BUILDFLAG(IS_WIN) && !defined(NDEBUG)) && !defined(ADDRESS_SANITIZER) && \
-      !defined(THREAD_SANITIZER)
+#define PLATFORM_SUPPORTS_CRASH_TEST() \
+  !defined(ADDRESS_SANITIZER) && !defined(THREAD_SANITIZER)
 
 #if PLATFORM_SUPPORTS_CRASH_TEST()
 #define MAYBE_HiddenTargetSyncClose HiddenTargetSyncClose

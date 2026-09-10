@@ -107,12 +107,8 @@ std::string CurrentAppShortcutsArch() {
 std::string CurrentAppShortcutsOsVersion() {
   return "";
 }
-#if BUILDFLAG(IS_WIN)
-const int kCurrentAppShortcutsVersion = 1;
-#else
 // Non-mac/win platforms do not update shortcuts.
 const int kCurrentAppShortcutsVersion = 0;
-#endif  // BUILDFLAG(IS_WIN)
 #endif  // BUILDFLAG(IS_MAC)
 
 // Delay in seconds before running UpdateShortcutsForAllApps.

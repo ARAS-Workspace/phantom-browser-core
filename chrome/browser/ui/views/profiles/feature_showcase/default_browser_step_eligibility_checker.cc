@@ -15,17 +15,6 @@
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-bool IsDefaultBrowserDisabledByPolicy() {
-  const PrefService::Preference* pref =
-      g_browser_process->local_state()->FindPreference(
-          prefs::kDefaultBrowserSettingEnabled);
-  CHECK(pref);
-  CHECK(pref->GetValue()->is_bool());
-  return pref->IsManaged() && !pref->GetValue()->GetBool();
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 }  // namespace
 
 DefaultBrowserStepEligibilityChecker::DefaultBrowserStepEligibilityChecker() =
@@ -37,22 +26,8 @@ DefaultBrowserStepEligibilityChecker::~DefaultBrowserStepEligibilityChecker() =
 void DefaultBrowserStepEligibilityChecker::CheckEligibility(
     Profile& profile,
     base::OnceCallback<void(bool)> callback) {
-#if BUILDFLAG(IS_WIN)
-  if (IsDefaultBrowserDisabledByPolicy() ||
-      !shell_integration::CanSetAsDefaultBrowser()) {
-    base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
-        FROM_HERE, base::BindOnce(std::move(callback), false));
-    return;
-  }
-
-  // Check if browser is already set as default.
-  StartCheckIsDefault(
-      base::BindOnce(&DefaultBrowserStepEligibilityChecker::OnCheckFinished,
-                     weak_ptr_factory_.GetWeakPtr(), std::move(callback)));
-#else
   base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
       FROM_HERE, base::BindOnce(std::move(callback), false));
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 void DefaultBrowserStepEligibilityChecker::StartCheckIsDefault(

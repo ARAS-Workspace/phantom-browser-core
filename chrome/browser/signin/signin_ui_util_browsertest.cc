@@ -872,7 +872,7 @@ IN_PROC_BROWSER_TEST_F(
       ShouldShowAnimatedIdentityOnOpeningWindow(*browser()->GetProfile()));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 class SigninUiUtilTest_HistorySyncOptinTest : public SigninUiUtilTestBase {
  public:
@@ -1030,6 +1030,6 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_TRUE(sync_service()->GetUserSettings()->GetSelectedTypes().Has(
       syncer::UserSelectableType::kSavedTabGroups));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 }  // namespace signin_ui_util

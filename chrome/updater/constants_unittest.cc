@@ -18,9 +18,7 @@ TEST(ConstantsTest, PolicyManagerSourcesStable) {
   EXPECT_EQ(kSourceDefaultValuesPolicyManager, std::string("Default"));
   EXPECT_EQ(kSourceDictValuesPolicyManager, std::string("DictValuePolicy"));
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(kSourcePlatformPolicyManager, std::string("Group Policy"));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_EQ(kSourcePlatformPolicyManager, std::string("Managed Preferences"));
 #else
   EXPECT_EQ(kSourcePlatformPolicyManager, std::string("not-defined"));

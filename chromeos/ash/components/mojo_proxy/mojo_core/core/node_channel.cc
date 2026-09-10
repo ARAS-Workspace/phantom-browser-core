@@ -37,13 +37,7 @@ enum class MessageType : uint32_t {
   REQUEST_PORT_MERGE,
   REQUEST_INTRODUCTION,
   INTRODUCE,
-#if BUILDFLAG(IS_WIN)
-  RELAY_EVENT_MESSAGE,
-#endif
   BROADCAST_EVENT,
-#if BUILDFLAG(IS_WIN)
-  EVENT_MESSAGE_FROM_RELAY,
-#endif
   ACCEPT_PEER,
   BIND_BROKER_HOST,
 };
@@ -92,19 +86,15 @@ using AcceptPeerData = AcceptPeerDataV0;
 // This message may include a process handle on platforms that require it.
 struct alignas(8) AddBrokerClientDataV0 {
   ports::NodeName client_name;
-#if !BUILDFLAG(IS_WIN)
   uint32_t process_handle;
-#endif
 };
 
 using AddBrokerClientData = AddBrokerClientDataV0;
 
-#if !BUILDFLAG(IS_WIN)
 static_assert(sizeof(base::ProcessHandle) == sizeof(uint32_t),
               "Unexpected pid size");
 static_assert(sizeof(AddBrokerClientData) % kChannelMessageAlignment == 0,
               "Invalid AddBrokerClientData size.");
-#endif
 
 // This data is followed by a platform channel handle to the broker.
 struct alignas(8) BrokerClientAddedDataV0 {
@@ -154,24 +144,6 @@ using IntroductionData = IntroductionDataV1;
 struct alignas(8) BindBrokerHostDataV0 {};
 
 using BindBrokerHostData = BindBrokerHostDataV0;
-
-#if BUILDFLAG(IS_WIN)
-// This struct alignas(8) is followed by the full payload of a message to be
-// relayed.
-// NOTE: Because this field is variable length it cannot be versioned.
-struct alignas(8) RelayEventMessageData {
-  ports::NodeName destination;
-};
-
-// This struct alignas(8) is followed by the full payload of a relayed
-// message.
-struct alignas(8) EventMessageFromRelayDataV0 {
-  ports::NodeName source;
-};
-
-using EventMessageFromRelayData = EventMessageFromRelayDataV0;
-
-#endif
 
 #pragma pack(pop)
 
@@ -381,19 +353,14 @@ void NodeChannel::AddBrokerClient(const ports::NodeName& client_name,
                                   base::Process process_handle) {
   AddBrokerClientData* data;
   std::vector<PlatformHandle> handles;
-#if BUILDFLAG(IS_WIN)
-  handles.emplace_back(base::win::ScopedHandle(process_handle.Release()));
-#endif
   Channel::MessagePtr message =
       CreateMessage(MessageType::ADD_BROKER_CLIENT, sizeof(AddBrokerClientData),
                     handles.size(), &data);
   message->SetHandles(std::move(handles));
   data->client_name = client_name;
-#if !BUILDFLAG(IS_WIN)
   // Older clients treat this as a real process handle, but don't actually need
   // it, so send a valid null handle.
   data->process_handle = base::kNullProcessHandle;
-#endif
   WriteChannelMessage(std::move(message));
 }
 
@@ -494,55 +461,6 @@ void NodeChannel::BindBrokerHost(PlatformHandle broker_host_handle) {
 #endif
 }
 
-#if BUILDFLAG(IS_WIN)
-void NodeChannel::RelayEventMessage(const ports::NodeName& destination,
-                                    Channel::MessagePtr message) {
-  DCHECK(message->has_handles());
-
-  // Note that this is only used on Windows, and on Windows all platform
-  // handles are included in the message data. We blindly copy all the data
-  // here and the relay node (the broker) will duplicate handles as needed.
-  size_t num_bytes = sizeof(RelayEventMessageData) + message->data_num_bytes();
-  RelayEventMessageData* data;
-  Channel::MessagePtr relay_message =
-      CreateMessage(MessageType::RELAY_EVENT_MESSAGE, num_bytes, 0, &data);
-  data->destination = destination;
-  UNSAFE_TODO(memcpy(data + 1, message->data(), message->data_num_bytes()));
-
-  // When the handles are duplicated in the broker, the source handles will
-  // be closed. If the broker never receives this message then these handles
-  // will leak, but that means something else has probably broken and the
-  // sending process won't likely be around much longer.
-  //
-  // TODO(crbug.com/40563346): We would like to be able to violate the
-  // above stated assumption. We should not leak handles in cases where we
-  // outlive the broker, as we may continue existing and eventually accept a new
-  // broker invitation.
-  std::vector<PlatformHandleInTransit> handles = message->TakeHandles();
-  for (auto& handle : handles) {
-    handle.TakeHandle().release();
-  }
-
-  WriteChannelMessage(std::move(relay_message));
-}
-
-void NodeChannel::EventMessageFromRelay(const ports::NodeName& source,
-                                        Channel::MessagePtr message) {
-  size_t num_bytes =
-      sizeof(EventMessageFromRelayData) + message->payload_size();
-  EventMessageFromRelayData* data;
-  auto relayed_message =
-      CreateMessage(MessageType::EVENT_MESSAGE_FROM_RELAY, num_bytes,
-                    message->num_handles(), &data);
-  data->source = source;
-  if (message->payload_size()) {
-    UNSAFE_TODO(memcpy(data + 1, message->payload(), message->payload_size()));
-  }
-  relayed_message->SetHandles(message->TakeHandles());
-  WriteChannelMessage(std::move(relayed_message));
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 NodeChannel::NodeChannel(
     Delegate* delegate,
     ConnectionParams connection_params,
@@ -618,21 +536,12 @@ void NodeChannel::OnChannelMessage(const void* payload,
     case MessageType::ADD_BROKER_CLIENT: {
       AddBrokerClientData data;
       if (GetMessagePayload(payload, payload_size, &data)) {
-#if BUILDFLAG(IS_WIN)
-        if (handles.size() != 1) {
-          DLOG(ERROR) << "Dropping invalid AddBrokerClient message.";
-          break;
-        }
-        delegate_->OnAddBrokerClient(remote_node_name_, data.client_name,
-                                     handles[0].ReleaseHandle());
-#else
         if (!handles.empty()) {
           DLOG(ERROR) << "Dropping invalid AddBrokerClient message.";
           break;
         }
         delegate_->OnAddBrokerClient(remote_node_name_, data.client_name,
                                      base::kNullProcessHandle);
-#endif
         return;
       }
       break;
@@ -736,53 +645,6 @@ void NodeChannel::OnChannelMessage(const void* payload,
       break;
     }
 
-#if BUILDFLAG(IS_WIN)
-    case MessageType::RELAY_EVENT_MESSAGE: {
-      base::ProcessHandle from_process;
-      {
-        base::AutoLock lock(remote_process_handle_lock_);
-        // NOTE: It's safe to retain a weak reference to this process handle
-        // through the extent of this call because |this| is kept alive and
-        // |remote_process_handle_| is never reset once set.
-        from_process = remote_process_handle_.Handle();
-
-        // If we don't have a handle to the remote process, we should not be
-        // receiving relay requests from them because we're not the broker.
-        if (from_process == base::kNullProcessHandle) {
-          break;
-        }
-      }
-      RelayEventMessageData data;
-      if (GetMessagePayload(payload, payload_size, &data)) {
-        // Don't try to relay an empty message.
-        if (payload_size <= sizeof(Header) + sizeof(data)) {
-          break;
-        }
-
-        Channel::HandlePolicy handle_policy;
-        {
-          base::AutoLock lock(channel_lock_);
-          handle_policy = channel_->handle_policy();
-        }
-
-        const void* message_start =
-            UNSAFE_TODO(reinterpret_cast<const uint8_t*>(payload) +
-                        sizeof(Header) + sizeof(data));
-        Channel::MessagePtr message = Channel::Message::Deserialize(
-            message_start, payload_size - sizeof(Header) - sizeof(data),
-            handle_policy, from_process);
-        if (!message) {
-          DLOG(ERROR) << "Dropping invalid relay message.";
-          break;
-        }
-        delegate_->OnRelayEventMessage(remote_node_name_, from_process,
-                                       data.destination, std::move(message));
-        return;
-      }
-      break;
-    }
-#endif
-
     case MessageType::BROADCAST_EVENT: {
       if (payload_size <= sizeof(Header)) {
         break;
@@ -799,33 +661,6 @@ void NodeChannel::OnChannelMessage(const void* payload,
       delegate_->OnBroadcast(remote_node_name_, std::move(message));
       return;
     }
-
-#if BUILDFLAG(IS_WIN)
-    case MessageType::EVENT_MESSAGE_FROM_RELAY: {
-      EventMessageFromRelayData data;
-      if (GetMessagePayload(payload, payload_size, &data)) {
-        if (payload_size < (sizeof(Header) + sizeof(data))) {
-          break;
-        }
-
-        size_t num_bytes = payload_size - sizeof(data) - sizeof(Header);
-
-        Channel::MessagePtr message =
-            Channel::Message::CreateMessage(num_bytes, handles.size());
-        message->SetHandles(std::move(handles));
-        if (num_bytes) {
-          UNSAFE_TODO(memcpy(message->mutable_payload(),
-                             static_cast<const uint8_t*>(payload) +
-                                 sizeof(Header) + sizeof(data),
-                             num_bytes));
-        }
-        delegate_->OnEventMessageFromRelay(remote_node_name_, data.source,
-                                           std::move(message));
-        return;
-      }
-      break;
-    }
-#endif  // BUILDFLAG(IS_WIN)
 
     case MessageType::ACCEPT_PEER: {
       AcceptPeerData data;

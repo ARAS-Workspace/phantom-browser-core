@@ -87,11 +87,11 @@
 #include "components/user_manager/user_names.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "components/policy/core/browser/browser_policy_connector.h"
 #include "components/policy/core/common/mock_configuration_policy_provider.h"
 #include "components/policy/policy_constants.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 namespace web_app {
 namespace {
@@ -2002,7 +2002,7 @@ IN_PROC_BROWSER_TEST_F(WebInstallFromManifestGuestModeTest,
 // Policy disabled: installs should show the "not supported" dialog.
 ///////////////////////////////////////////////////////////////////////////////
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class WebInstallFromManifestPolicyDisabledTest
     : public WebInstallFromManifestBrowserTest {
  public:
@@ -2085,7 +2085,7 @@ IN_PROC_BROWSER_TEST_F(WebInstallFromManifestPolicyDisabledTest,
   EXPECT_EQ(ukm::GetSourceIdType(entries[1]->source_id),
             ukm::SourceIdType::APP_ID);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Install dialog contents.

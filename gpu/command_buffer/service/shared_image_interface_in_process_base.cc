@@ -269,7 +269,7 @@ SharedImageInterfaceInProcessBase::CreateSharedImage(
     gfx::GpuMemoryBufferHandle buffer_handle) {
   DCHECK(gpu::IsValidClientUsage(si_info.usage));
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE)
   CHECK(!si_info.format.PrefersExternalSampler());
 #endif
 
@@ -302,7 +302,7 @@ SharedImageInterfaceInProcessBase::CreateSharedImage(
     gfx::GpuMemoryBufferHandle buffer_handle) {
   DCHECK(gpu::IsValidClientUsage(si_info.usage));
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE)
   CHECK(!si_info.format.PrefersExternalSampler());
 #endif
 

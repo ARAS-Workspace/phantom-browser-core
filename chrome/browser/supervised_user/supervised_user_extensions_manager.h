@@ -147,7 +147,7 @@ class SupervisedUserExtensionsManager : public ExtensionRegistryObserver,
   // launched.
   bool ShouldBlockExtension(const std::string& extension_id) const;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Triggers an one-time migration of the present extensions as parent-approved
   // when the feature
   // `kEnableSupervisedUserSkipParentApprovalToInstallExtensions` becomes
@@ -157,7 +157,7 @@ class SupervisedUserExtensionsManager : public ExtensionRegistryObserver,
   // Marks the extensions available to the child user as locally parent-approved
   // on a preference on this device.
   void DoExtensionsMigrationToParentApproved();
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   // Returns true if the given `extension_id` has been marked locally parent
   // approved.

@@ -141,30 +141,3 @@ TEST(Blit, ScrollCanvas) {
   VerifyCanvasValues(canvas.get(), scroll_diagonal_expected);
 }
 
-#if BUILDFLAG(IS_WIN)
-
-TEST(Blit, WithSharedMemory) {
-  const int kCanvasWidth = 5;
-  const int kCanvasHeight = 5;
-  base::subtle::PlatformSharedMemoryRegion section =
-      base::subtle::PlatformSharedMemoryRegion::CreateWritable(kCanvasWidth *
-                                                               kCanvasHeight);
-  ASSERT_TRUE(section.IsValid());
-  std::unique_ptr<SkCanvas> canvas =
-      skia::CreatePlatformCanvasWithSharedSection(
-          kCanvasWidth, kCanvasHeight, false, section.GetPlatformHandle(),
-          skia::RETURN_NULL_ON_FAILURE);
-  ASSERT_TRUE(canvas);
-  // Closes a HANDLE associated with |section|, |canvas| must remain valid.
-  section = base::subtle::PlatformSharedMemoryRegion();
-
-  const TestPixelMap initial_values({0x00, 0x01, 0x02, 0x03, 0x04, 0x10, 0x11,
-                                     0x12, 0x13, 0x14, 0x20, 0x21, 0x22, 0x23,
-                                     0x24, 0x30, 0x31, 0x32, 0x33, 0x34, 0x40,
-                                     0x41, 0x42, 0x43, 0x44});
-  SetToCanvas(canvas.get(), initial_values);
-  VerifyCanvasValues(canvas.get(), initial_values);
-}
-
-#endif
-

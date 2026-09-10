@@ -195,12 +195,6 @@ class PageInfoMainView : public views::View,
   raw_ptr<PageInfoSecurityContentView, AcrossTasksDanglingUntriaged>
       security_content_view_ = nullptr;
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_VR)
-  // The view that contains ui related to features on a page, like a presenting
-  // VR page.
-  raw_ptr<views::View> page_feature_info_view_ = nullptr;
-#endif
-
   // These rows bundle together all the |View|s involved in a single row of the
   // permissions section, and keep those views updated when the underlying
   // |Permission| changes.

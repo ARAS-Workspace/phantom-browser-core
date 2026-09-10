@@ -41,14 +41,7 @@
 #include "base/profiler/core_unwinders.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-// Windows doesn't provide an alloca function like Linux does.
-// Fortunately, it provides _alloca, which functions identically.
-#include <malloc.h>
-#define alloca _alloca
-#else
 #include <alloca.h>
-#endif
 
 extern "C" {
 // The address of |__executable_start| gives the start address of the

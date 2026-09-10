@@ -75,13 +75,8 @@ PagePresence StartupMaintenanceTaskTest::CheckPagePresence(
 
 // This test is affected by https://crbug.com/725685, which only affects windows
 // platform.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TestDeletePageInLegacyArchivesDir \
-  DISABLED_TestDeletePageInLegacyArchivesDir
-#else
 #define MAYBE_TestDeletePageInLegacyArchivesDir \
   TestDeletePageInLegacyArchivesDir
-#endif
 TEST_F(StartupMaintenanceTaskTest, MAYBE_TestDeletePageInLegacyArchivesDir) {
   // |temporary_page| will be removed since it's temporary and its archive file
   // is in private directory.
@@ -112,11 +107,7 @@ TEST_F(StartupMaintenanceTaskTest, MAYBE_TestDeletePageInLegacyArchivesDir) {
 
 // This test is affected by https://crbug.com/725685, which only affects windows
 // platform.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TestDeleteFileWithoutDbEntry DISABLED_TestDeleteFileWithoutDbEntry
-#else
 #define MAYBE_TestDeleteFileWithoutDbEntry TestDeleteFileWithoutDbEntry
-#endif
 TEST_F(StartupMaintenanceTaskTest, MAYBE_TestDeleteFileWithoutDbEntry) {
   // |temporary_page1| will not be affected.
   // |temporary_page2| will have the file deleted since the file doesn't have a
@@ -157,11 +148,7 @@ TEST_F(StartupMaintenanceTaskTest, MAYBE_TestDeleteFileWithoutDbEntry) {
 
 // This test is affected by https://crbug.com/725685, which only affects windows
 // platform.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TestDeleteDbEntryWithoutFile DISABLED_TestDeleteDbEntryWithoutFile
-#else
 #define MAYBE_TestDeleteDbEntryWithoutFile TestDeleteDbEntryWithoutFile
-#endif
 TEST_F(StartupMaintenanceTaskTest, MAYBE_TestDeleteDbEntryWithoutFile) {
   // |temporary_page1| will not be affected.
   // |temporary_page2| will be deleted from DB since it has no file associated.
@@ -200,11 +187,7 @@ TEST_F(StartupMaintenanceTaskTest, MAYBE_TestDeleteDbEntryWithoutFile) {
 
 // This test is affected by https://crbug.com/725685, which only affects windows
 // platform.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CombinedTest DISABLED_CombinedTest
-#else
 #define MAYBE_CombinedTest CombinedTest
-#endif
 TEST_F(StartupMaintenanceTaskTest, MAYBE_CombinedTest) {
   // Adding a bunch of pages with different setups for temporary pages.
   // |temporary_page1| will not be affected.

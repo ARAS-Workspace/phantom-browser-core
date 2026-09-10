@@ -17,11 +17,6 @@
 #include "media/capture/video/video_capture_device_descriptor.h"
 #include "media/capture/video/video_capture_device_factory.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#include "media/base/win/dxgi_device_manager.h"
-#endif
-
 namespace media {
 
 struct CAPTURE_EXPORT FakeVideoCaptureDeviceSettings {
@@ -92,21 +87,12 @@ class CAPTURE_EXPORT FakeVideoCaptureDeviceFactory
     return static_cast<int>(devices_config_.size());
   }
 
-#if BUILDFLAG(IS_WIN)
-  void OnGpuInfoUpdate(const CHROME_LUID& luid) override;
-  scoped_refptr<DXGIDeviceManager> GetDxgiDeviceManager() override;
-#endif
-
  private:
   // Helper used in GetDevicesInfo().
   VideoCaptureFormats GetSupportedFormats(const std::string& device_id);
 
   std::vector<FakeVideoCaptureDeviceSettings> devices_config_;
 
-#if BUILDFLAG(IS_WIN)
-  scoped_refptr<DXGIDeviceManager> dxgi_device_manager_;
-  CHROME_LUID luid_ = {0, 0};
-#endif
 };
 
 }  // namespace media

@@ -24,27 +24,9 @@
 #include "base/files/file_descriptor_watcher_posix.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#endif
-
 namespace remoting {
 
 namespace {
-
-#if BUILDFLAG(IS_WIN)
-std::unique_ptr<base::win::ScopedCOMInitializer> CreateComInitializer(
-    AutoThread::ComInitType type) {
-  std::unique_ptr<base::win::ScopedCOMInitializer> initializer;
-  if (type == AutoThread::COM_INIT_MTA) {
-    initializer = std::make_unique<base::win::ScopedCOMInitializer>(
-        base::win::ScopedCOMInitializer::kMTA);
-  } else if (type == AutoThread::COM_INIT_STA) {
-    initializer = std::make_unique<base::win::ScopedCOMInitializer>();
-  }
-  return initializer;
-}
-#endif
 
 }  // namespace
 
@@ -97,29 +79,8 @@ scoped_refptr<AutoThreadTaskRunner> AutoThread::Create(
   return CreateWithType(name, joiner, base::MessagePumpType::DEFAULT);
 }
 
-#if BUILDFLAG(IS_WIN)
-// static
-scoped_refptr<AutoThreadTaskRunner> AutoThread::CreateWithLoopAndComInitTypes(
-    const char* name,
-    scoped_refptr<base::SequencedTaskRunner> joiner,
-    base::MessagePumpType pump_type,
-    ComInitType com_init_type) {
-  AutoThread* thread = new AutoThread(name, joiner.get());
-  thread->SetComInitType(com_init_type);
-  scoped_refptr<AutoThreadTaskRunner> task_runner =
-      thread->StartWithType(pump_type);
-  if (!task_runner.get()) {
-    delete thread;
-  }
-  return task_runner;
-}
-#endif
-
 AutoThread::AutoThread(const char* name)
     : startup_data_(nullptr),
-#if BUILDFLAG(IS_WIN)
-      com_init_type_(COM_INIT_NONE),
-#endif
       thread_(),
       name_(name),
       was_quit_properly_(false) {
@@ -129,9 +90,6 @@ AutoThread::AutoThread(const char* name)
 AutoThread::AutoThread(const char* name,
                        scoped_refptr<base::SequencedTaskRunner> joiner)
     : startup_data_(nullptr),
-#if BUILDFLAG(IS_WIN)
-      com_init_type_(COM_INIT_NONE),
-#endif
       thread_(),
       name_(name),
       was_quit_properly_(false),
@@ -153,9 +111,6 @@ AutoThread::~AutoThread() {
 scoped_refptr<AutoThreadTaskRunner> AutoThread::StartWithType(
     base::MessagePumpType type) {
   DCHECK(thread_.is_null());
-#if BUILDFLAG(IS_WIN)
-  DCHECK(com_init_type_ != COM_INIT_STA || type == base::MessagePumpType::UI);
-#endif
 
   StartupData startup_data(type);
   startup_data_ = &startup_data;
@@ -181,13 +136,6 @@ scoped_refptr<AutoThreadTaskRunner> AutoThread::StartWithType(
   DCHECK(startup_data.task_runner.get());
   return startup_data.task_runner;
 }
-
-#if BUILDFLAG(IS_WIN)
-void AutoThread::SetComInitType(ComInitType com_init_type) {
-  DCHECK_EQ(com_init_type_, COM_INIT_NONE);
-  com_init_type_ = com_init_type;
-}
-#endif
 
 void AutoThread::QuitThread(base::OnceClosure quit_when_idle_closure) {
   DCHECK(thread_checker_.CalledOnValidThread());
@@ -240,10 +188,6 @@ void AutoThread::ThreadMain() {
     file_descriptor_watcher = std::make_unique<base::FileDescriptorWatcher>(
         single_thread_task_executor.task_runner());
   }
-#elif BUILDFLAG(IS_WIN)
-  // Initialize COM on the thread, if requested.
-  std::unique_ptr<base::win::ScopedCOMInitializer> com_initializer(
-      CreateComInitializer(com_init_type_));
 #endif
 
   run_loop.Run();

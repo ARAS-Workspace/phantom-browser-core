@@ -48,15 +48,6 @@
 #include "remoting/host/pairing_registry_delegate_linux.h"
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/process/process_info.h"
-#include "base/win/registry.h"
-#include "remoting/base/crash/crash_reporting_breakpad.h"
-#include "remoting/host/pairing_registry_delegate_win.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if defined(USE_GLIB) && !BUILDFLAG(IS_CHROMEOS)
 #include <glib-object.h>
 #endif  // defined(USE_GLIB) && !BUILDFLAG(IS_CHROMEOS)
@@ -107,8 +98,6 @@ int Me2MeNativeMessagingHostMain(int argc, char** argv) {
   if (IsUsageStatsAllowed()) {
 #if BUILDFLAG(IS_LINUX)
     InitializeCrashpadReporting();
-#elif BUILDFLAG(IS_WIN)
-    InitializeBreakpadReporting();
 #endif  // BUILDFLAG(IS_LINUX)
   }
 #endif  // defined(REMOTING_ENABLE_CRASH_REPORTING)
@@ -163,57 +152,7 @@ int Me2MeNativeMessagingHostMain(int argc, char** argv) {
   base::File read_file;
   base::File write_file;
 
-#if BUILDFLAG(IS_WIN)
-  if (command_line->HasSwitch(kElevateSwitchName)) {
-    // The "elevate" switch is always accompanied by the "input" and "output"
-    // switches whose values name named pipes that should be used in place of
-    // stdin and stdout.
-    DCHECK(command_line->HasSwitch(kInputSwitchName));
-    DCHECK(command_line->HasSwitch(kOutputSwitchName));
-
-    // presubmit: allow wstring
-    std::wstring input_pipe_name =
-        command_line->GetSwitchValueNative(kInputSwitchName);
-    // presubmit: allow wstring
-    std::wstring output_pipe_name =
-        command_line->GetSwitchValueNative(kOutputSwitchName);
-
-    // A NULL SECURITY_ATTRIBUTES signifies that the handle can't be inherited.
-    read_file =
-        base::File(CreateFile(input_pipe_name.c_str(), GENERIC_READ, 0, nullptr,
-                              OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr));
-    if (!read_file.IsValid()) {
-      PLOG(ERROR) << "CreateFile failed on '" << input_pipe_name << "'";
-      return kInitializationFailed;
-    }
-
-    write_file = base::File(CreateFile(output_pipe_name.c_str(), GENERIC_WRITE,
-                                       0, nullptr, OPEN_EXISTING,
-                                       FILE_ATTRIBUTE_NORMAL, nullptr));
-    if (!write_file.IsValid()) {
-      PLOG(ERROR) << "CreateFile failed on '" << output_pipe_name << "'";
-      return kInitializationFailed;
-    }
-  } else {
-    // GetStdHandle() returns pseudo-handles for stdin and stdout even if
-    // the hosting executable specifies "Windows" subsystem. However the
-    // returned handles are invalid in that case unless standard input and
-    // output are redirected to a pipe or file.
-    read_file = base::File(GetStdHandle(STD_INPUT_HANDLE));
-    write_file = base::File(GetStdHandle(STD_OUTPUT_HANDLE));
-
-    // After the native messaging channel starts, the native messaging reader
-    // will keep doing blocking read operations on the input named pipe.
-    // If any other thread tries to perform any operation on STDIN, it will also
-    // block because the input named pipe is synchronous (non-overlapped).
-    // It is pretty common for a DLL to query the device info (GetFileType) of
-    // the STD* handles at startup. So any LoadLibrary request can potentially
-    // be blocked. To prevent that from happening we close STDIN and STDOUT
-    // handles as soon as we retrieve the corresponding file handles.
-    SetStdHandle(STD_INPUT_HANDLE, nullptr);
-    SetStdHandle(STD_OUTPUT_HANDLE, nullptr);
-  }
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   PipeMessagingChannel::OpenAndBlockStdio(read_file, write_file);
 #else
 #error Not implemented.
@@ -230,50 +169,7 @@ int Me2MeNativeMessagingHostMain(int argc, char** argv) {
   // Create the pairing registry.
   scoped_refptr<PairingRegistry> pairing_registry;
 
-#if BUILDFLAG(IS_WIN)
-  base::win::RegKey root;
-  LONG result =
-      root.Open(HKEY_LOCAL_MACHINE, kPairingRegistryKeyName, KEY_READ);
-  if (result != ERROR_SUCCESS) {
-    SetLastError(result);
-    PLOG(ERROR) << "Failed to open HKLM\\" << kPairingRegistryKeyName;
-    return kInitializationFailed;
-  }
-
-  base::win::RegKey unprivileged;
-  result = unprivileged.Open(
-      root.Handle(), kPairingRegistryClientsKeyName,
-      daemon_controller->is_privileged() ? KEY_READ | KEY_WRITE : KEY_READ);
-  if (result != ERROR_SUCCESS) {
-    SetLastError(result);
-    PLOG(ERROR) << "Failed to open HKLM\\" << kPairingRegistryKeyName << "\\"
-                << kPairingRegistryClientsKeyName;
-    return kInitializationFailed;
-  }
-
-  // Only try to open the privileged key if the current process is elevated.
-  base::win::RegKey privileged;
-  if (daemon_controller->is_privileged()) {
-    result = privileged.Open(root.Handle(), kPairingRegistrySecretsKeyName,
-                             KEY_READ | KEY_WRITE);
-    if (result != ERROR_SUCCESS) {
-      SetLastError(result);
-      PLOG(ERROR) << "Failed to open HKLM\\" << kPairingRegistryKeyName << "\\"
-                  << kPairingRegistrySecretsKeyName;
-      return kInitializationFailed;
-    }
-  }
-
-  // Initialize the pairing registry delegate and set the root keys.
-  std::unique_ptr<PairingRegistryDelegateWin> delegate(
-      new PairingRegistryDelegateWin());
-  if (!delegate->SetRootKeys(privileged.Take(), unprivileged.Take())) {
-    return kInitializationFailed;
-  }
-
-  pairing_registry =
-      new PairingRegistry(io_thread.task_runner(), std::move(delegate));
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   if (daemon_controller->is_multi_process()) {
     pairing_registry = base::MakeRefCounted<PairingRegistry>(
         io_thread.task_runner(),
@@ -284,7 +180,7 @@ int Me2MeNativeMessagingHostMain(int argc, char** argv) {
   } else {
     pairing_registry = CreatePairingRegistry(io_thread.task_runner());
   }
-#else  // !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_LINUX)
+#else
   pairing_registry = CreatePairingRegistry(io_thread.task_runner());
 #endif
 

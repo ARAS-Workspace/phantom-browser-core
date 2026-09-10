@@ -146,8 +146,7 @@ IN_PROC_BROWSER_TEST_F(LensOverlayTest, OverlayScreenshot) {
 
 // TODO(crbug.com/414207670,531038976,531065529): Test is failing on Linux,
 // ChromeOS, mac and Win bots.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_ManualRegionSelection DISABLED_ManualRegionSelection
 #else
 #define MAYBE_ManualRegionSelection ManualRegionSelection
@@ -161,13 +160,8 @@ IN_PROC_BROWSER_TEST_F(LensOverlayTest, ObjectSelection) {
 }
 
 // TODO(crbug.com/502264102): Test is failing on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SelectionOverlayWithoutWordsOrObjects \
-  DISABLED_SelectionOverlayWithoutWordsOrObjects
-#else
 #define MAYBE_SelectionOverlayWithoutWordsOrObjects \
   SelectionOverlayWithoutWordsOrObjects
-#endif
 IN_PROC_BROWSER_TEST_F(LensOverlayTest,
                        MAYBE_SelectionOverlayWithoutWordsOrObjects) {
   RunOverlayTest(

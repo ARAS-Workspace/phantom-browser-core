@@ -200,9 +200,6 @@ const auto kGLSwitchesCopiedFromGpuProcessHostArray = std::to_array({
     kTintDcLayer,
     kEnableUnsafeSwiftShader,
     kDisableD3D11Warp,
-#if BUILDFLAG(IS_WIN)
-    kFakeVsyncRate,
-#endif
 });
 // An external span to the array above, so that it can be exposed from the
 // header file without specifying the size of the array manually.
@@ -219,26 +216,6 @@ const base::span<const char* const> kGLSwitchesCopiedFromGpuProcessHost =
 // is fixed.
 const char kDisableAndroidNativeFenceSyncForTesting[] =
     "disable-android-native-fence-sync-for-testing";
-#endif
-
-#if BUILDFLAG(IS_WIN)
-const char kFakeVsyncRate[] = "fake-vsync-rate";
-
-std::optional<base::TimeDelta> GetFakeVsyncIntervalFromCommandLine() {
-  static const std::optional<base::TimeDelta> fake_interval = [] {
-    const base::CommandLine* command_line =
-        base::CommandLine::ForCurrentProcess();
-    double fake_hz = 0;
-    if (command_line->HasSwitch(kFakeVsyncRate) &&
-        base::StringToDouble(command_line->GetSwitchValueASCII(kFakeVsyncRate),
-                             &fake_hz) &&
-        fake_hz > 0) {
-      return std::optional<base::TimeDelta>(base::Seconds(1.0 / fake_hz));
-    }
-    return std::optional<base::TimeDelta>();
-  }();
-  return fake_interval;
-}
 #endif
 
 }  // namespace switches
@@ -456,7 +433,7 @@ const base::FeatureParam<int> kDXGIWaitableSwapChainMaxQueuedFrames{
 BASE_FEATURE(kDXGISwapChainPresentInterval0, base::FEATURE_DISABLED_BY_DEFAULT);
 
 bool SupportsEGLDualGPURendering() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return base::FeatureList::IsEnabled(kEGLDualGPURendering);
 #else
   return false;

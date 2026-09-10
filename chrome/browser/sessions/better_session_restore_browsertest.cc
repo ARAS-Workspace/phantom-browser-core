@@ -489,12 +489,7 @@ IN_PROC_BROWSER_TEST_F(ContinueWhereILeftOffTest, PRE_Post) {
   PostFormWithPage("post.html", false);
 }
 
-#if BUILDFLAG(IS_WIN)
-//  TODO(crbug.com/491665404): This test is flaky.
-#define MAYBE_Post DISABLED_Post
-#else
 #define MAYBE_Post Post
-#endif
 IN_PROC_BROWSER_TEST_F(ContinueWhereILeftOffTest, MAYBE_Post) {
   CheckFormRestored(true, false);
 }
@@ -503,12 +498,7 @@ IN_PROC_BROWSER_TEST_F(ContinueWhereILeftOffTest, PRE_PostWithPassword) {
   PostFormWithPage("post_with_password.html", true);
 }
 
-#if BUILDFLAG(IS_WIN)
-//  TODO(crbug.com/491665404): This test is flaky.
-#define MAYBE_PostWithPassword DISABLED_PostWithPassword
-#else
 #define MAYBE_PostWithPassword PostWithPassword
-#endif
 IN_PROC_BROWSER_TEST_F(ContinueWhereILeftOffTest, MAYBE_PostWithPassword) {
   CheckReloadedPageRestored();
   // The form data contained passwords, so it's removed completely.
@@ -525,12 +515,7 @@ IN_PROC_BROWSER_TEST_F(ContinueWhereILeftOffTest, SessionCookiesBrowserClose) {
   CheckReloadedPageRestored(new_browser);
 }
 
-#if BUILDFLAG(IS_WIN)
-//  TODO(crbug.com/491665404): This test is flaky.
-#define MAYBE_PostBrowserClose DISABLED_PostBrowserClose
-#else
 #define MAYBE_PostBrowserClose PostBrowserClose
-#endif
 IN_PROC_BROWSER_TEST_F(ContinueWhereILeftOffTest, MAYBE_PostBrowserClose) {
   PostFormWithPage("post.html", false);
   BrowserWindowInterface* new_browser = QuitBrowserAndRestore(browser(), false);
@@ -573,13 +558,7 @@ IN_PROC_BROWSER_TEST_F(ContinueWhereILeftOffTest, PostCloseAllBrowsers) {
 }
 
 // Check that form data with a password field is cleared after wrench menu quit.
-#if BUILDFLAG(IS_WIN)
-//  TODO(crbug.com/491665404): This test is flaky.
-#define MAYBE_PostWithPasswordCloseAllBrowsers \
-  DISABLED_PostWithPasswordCloseAllBrowsers
-#else
 #define MAYBE_PostWithPasswordCloseAllBrowsers PostWithPasswordCloseAllBrowsers
-#endif
 IN_PROC_BROWSER_TEST_F(ContinueWhereILeftOffTest,
                        MAYBE_PostWithPasswordCloseAllBrowsers) {
   PostFormWithPage("post_with_password.html", true);
@@ -748,13 +727,8 @@ IN_PROC_BROWSER_TEST_F(RestartTest, Post) {
 }
 
 // TODO(crbug.com/509692227): Re-enable this test on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_Restart_PostWithPassword DISABLED_PostWithPassword
-#define MAYBE_Restart_PRE_PostWithPassword DISABLED_PRE_PostWithPassword
-#else
 #define MAYBE_Restart_PostWithPassword PostWithPassword
 #define MAYBE_Restart_PRE_PostWithPassword PRE_PostWithPassword
-#endif
 
 IN_PROC_BROWSER_TEST_F(RestartTest, MAYBE_Restart_PRE_PostWithPassword) {
   PostFormWithPage("post_with_password.html", true);

@@ -2195,107 +2195,6 @@ TEST_P(SQLDatabaseTest, ReOpenWithDifferentJournalMode) {
   EXPECT_EQ(base::PathExists(wal_path), options.wal_mode_);
 }
 
-#if BUILDFLAG(IS_WIN)
-
-class SQLDatabaseTestExclusiveFileLockMode
-    : public Test,
-      public WithParamInterface<std::tuple<bool, bool>> {
- public:
-  ~SQLDatabaseTestExclusiveFileLockMode() override = default;
-
-  void SetUp() override {
-    db_ = std::make_unique<Database>(GetDBOptions(), test::kTestTag);
-    ASSERT_TRUE(temp_dir_.CreateUniqueTempDir());
-    db_path_ = temp_dir_.GetPath().AppendASCII("maybelocked.sqlite");
-    ASSERT_TRUE(db_->Open(db_path_));
-  }
-
-  DatabaseOptions GetDBOptions() {
-    return DatabaseOptions()
-        .set_wal_mode(IsWALEnabled())
-        .set_exclusive_database_file_lock(IsExclusivelockEnabled());
-  }
-
-  bool IsWALEnabled() { return std::get<0>(GetParam()); }
-  bool IsExclusivelockEnabled() { return std::get<1>(GetParam()); }
-
- protected:
-  base::ScopedTempDir temp_dir_;
-  base::FilePath db_path_;
-  std::unique_ptr<Database> db_;
-};
-
-TEST_P(SQLDatabaseTestExclusiveFileLockMode, BasicStatement) {
-  ASSERT_TRUE(db_->Execute("CREATE TABLE data(contents TEXT)"));
-  EXPECT_EQ(SQLITE_OK, db_->GetErrorCode());
-
-  ASSERT_TRUE(base::PathExists(db_path_));
-  base::File open_db(db_path_, base::File::Flags::FLAG_OPEN_ALWAYS |
-                                   base::File::Flags::FLAG_READ);
-
-  // If exclusive lock is enabled, then the test should not be able to re-open
-  // the database file, on Windows only.
-  EXPECT_EQ(IsExclusivelockEnabled(), !open_db.IsValid());
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    SQLDatabaseTestExclusiveFileLockMode,
-    Combine(Bool(), Bool()),
-    [](const auto& info) {
-      return base::StrCat(
-          {std::get<0>(info.param) ? "WALEnabled" : "WALDisabled",
-           std::get<1>(info.param) ? "ExclusiveLock" : "NoExclusiveLock"});
-    });
-
-class SQLDatabaseTestExclusiveFileLockWithSpecialChars
-    : public Test,
-      public WithParamInterface<base::FilePath::StringViewType> {
- public:
-  ~SQLDatabaseTestExclusiveFileLockWithSpecialChars() override = default;
-
-  void SetUp() override {
-    db_ = std::make_unique<Database>(
-        DatabaseOptions().set_exclusive_database_file_lock(true),
-        test::kTestTag);
-    ASSERT_TRUE(temp_dir_.CreateUniqueTempDir(GetParam()));
-    db_path_ = temp_dir_.GetPath().AppendASCII("database_test_locked.sqlite");
-  }
-
- protected:
-  base::ScopedTempDir temp_dir_;
-  base::FilePath db_path_;
-  std::unique_ptr<Database> db_;
-};
-
-TEST_P(SQLDatabaseTestExclusiveFileLockWithSpecialChars, OpenDb) {
-  ASSERT_FALSE(base::PathExists(db_path_));
-  ASSERT_TRUE(db_->Open(db_path_));
-  ASSERT_TRUE(base::PathExists(db_path_));
-}
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         SQLDatabaseTestExclusiveFileLockWithSpecialChars,
-                         Values(FILE_PATH_LITERAL("!"),
-                                FILE_PATH_LITERAL("#"),
-                                FILE_PATH_LITERAL("$"),
-                                FILE_PATH_LITERAL("&"),
-                                FILE_PATH_LITERAL("'"),
-                                FILE_PATH_LITERAL("()"),
-                                FILE_PATH_LITERAL("+"),
-                                FILE_PATH_LITERAL(","),
-                                FILE_PATH_LITERAL(";"),
-                                FILE_PATH_LITERAL("="),
-                                FILE_PATH_LITERAL("@"),
-                                FILE_PATH_LITERAL("[]"),
-                                FILE_PATH_LITERAL("%"),
-                                FILE_PATH_LITERAL("%21"),
-                                FILE_PATH_LITERAL("%23"),
-                                FILE_PATH_LITERAL("%3f"),
-                                FILE_PATH_LITERAL("_"),
-                                FILE_PATH_LITERAL(" ")));
-#else
-
 TEST(SQLInvalidDatabaseFlagsDeathTest, ExclusiveDatabaseLock) {
   base::ScopedTempDir temp_dir;
   ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
@@ -2308,8 +2207,6 @@ TEST(SQLInvalidDatabaseFlagsDeathTest, ExclusiveDatabaseLock) {
       { std::ignore = db.Open(db_path); },
       "exclusive_database_file_lock is only supported on Windows");
 }
-
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_P(SQLDatabaseTest, NonExclusiveLockingMode) {
 
@@ -2472,9 +2369,6 @@ TEST_P(SQLDatabaseTest, WALCommitCallback) {
 
   std::optional<int> wal_callback_pages;
   Database db(DatabaseOptions()
-#if BUILDFLAG(IS_WIN)
-                  .set_exclusive_database_file_lock(true)
-#endif  // IS_WIN
                   .set_wal_mode(true)
                   .set_wal_commit_callback(base::BindLambdaForTesting(
                       [&](int pages) { wal_callback_pages = pages; })),
@@ -2588,74 +2482,6 @@ TEST_P(SQLDatabaseTest, WalAutocheckpoint) {
                   "Sql.Database.AutoCheckpoint.FrameCount.Test"),
               Not(IsEmpty()));
 }
-
-#if BUILDFLAG(IS_WIN)
-
-TEST_P(SQLDatabaseTest, OpenFails_WindowsExclusiveReadMode) {
-  db_->Close();
-
-  base::File file(db_path_, base::File::FLAG_OPEN | base::File::FLAG_READ |
-                                // Do not allow others to read from the file.
-                                base::File::FLAG_WIN_EXCLUSIVE_READ);
-  ASSERT_TRUE(file.IsValid());
-
-  base::HistogramTester tester;
-  sql::test::ScopedErrorExpecter expecter;
-  expecter.ExpectError(SQLITE_CANTOPEN);
-  ASSERT_FALSE(db_->Open(db_path_));
-  ASSERT_TRUE(expecter.SawExpectedErrors());
-  tester.ExpectTotalCount("Sql.Database.Open.FailureReason.Test", 1);
-  db_->Close();
-
-  file.Close();
-
-  ASSERT_TRUE(db_->Open(db_path_));
-}
-
-TEST_P(SQLDatabaseTest, OpenFails_WindowsExclusiveWriteMode) {
-  db_->Close();
-
-  base::File file(db_path_, base::File::FLAG_OPEN | base::File::FLAG_READ |
-                                // Do not allow others to write to the file.
-                                base::File::FLAG_WIN_EXCLUSIVE_WRITE);
-  ASSERT_TRUE(file.IsValid());
-
-  base::HistogramTester tester;
-  sql::test::ScopedErrorExpecter expecter;
-  expecter.ExpectError(SQLITE_READONLY);
-  ASSERT_FALSE(db_->Open(db_path_));
-  ASSERT_TRUE(expecter.SawExpectedErrors());
-  tester.ExpectTotalCount("Sql.Database.Open.FailureReason.Test", 1);
-  db_->Close();
-
-  file.Close();
-
-  ASSERT_TRUE(db_->Open(db_path_));
-}
-
-TEST_P(SQLDatabaseTest, OpenFails_ExclusiveLock) {
-  db_->Close();
-
-  base::File file(db_path_, base::File::FLAG_OPEN | base::File::FLAG_READ);
-  ASSERT_TRUE(file.IsValid());
-  ASSERT_EQ(base::File::FILE_OK, file.Lock(base::File::LockMode::kExclusive));
-
-  {
-    base::HistogramTester tester;
-    sql::test::ScopedErrorExpecter expecter;
-    expecter.ExpectError(SQLITE_IOERR_READ);
-    ASSERT_FALSE(db_->Open(db_path_));
-    ASSERT_TRUE(expecter.SawExpectedErrors());
-    tester.ExpectTotalCount("Sql.Database.Open.FailureReason.Test", 1);
-    db_->Close();
-  }
-
-  ASSERT_EQ(base::File::FILE_OK, file.Unlock());
-
-  ASSERT_TRUE(db_->Open(db_path_));
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_P(SQLDatabaseTest, OpenHistograms) {
   static constexpr char kCreateSql[] = "CREATE TABLE foo (id INTEGER UNIQUE)";

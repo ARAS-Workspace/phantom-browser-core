@@ -36,12 +36,6 @@
 #include "chrome/common/webui_url_constants.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/base_paths_win.h"
-#include "base/path_service.h"
-#include "base/win/windows_version.h"
-#endif
-
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"

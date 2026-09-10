@@ -39,11 +39,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#include "chrome/updater/util/win_util.h"
-#endif
-
 namespace updater::test {
 namespace {
 
@@ -358,56 +353,6 @@ void AppTestHelper::FirstTaskRun() {
        WithSystemScope(Wrap(&ExpectCandidateUninstalled))},
       {"expect_clean", WithSystemScope(Wrap(&ExpectClean))},
       {"expect_installed", WithSystemScope(Wrap(&ExpectInstalled))},
-#if BUILDFLAG(IS_WIN)
-      {"expect_interfaces_registered",
-       WithSystemScope(Wrap(&ExpectInterfacesRegistered))},
-      {"expect_marshal_interface_succeeds",
-       WithSystemScope(Wrap(&ExpectMarshalInterfaceSucceeds))},
-      {"expect_legacy_update3web_succeeds",
-       WithSwitch(
-           "cancel_when_downloading",
-           WithSwitch(
-               "expected_error_code",
-               WithSwitch(
-                   "expected_final_state",
-                   WithSwitch(
-                       "app_bundle_web_create_mode",
-                       WithSwitch("app_id",
-                                  WithSystemScope(Wrap(
-                                      &ExpectLegacyUpdate3WebSucceeds)))))))},
-      {"expect_legacy_process_launcher_succeeds",
-       WithSystemScope(Wrap(&ExpectLegacyProcessLauncherSucceeds))},
-      {"expect_process_launcher_launch_cmd_line_succeeds",
-       WithSystemScope(Wrap(&ExpectProcessLauncherLaunchCmdLineSucceeds))},
-      {"expect_legacy_app_command_web_succeeds",
-       WithSwitch(
-           "expected_exit_code",
-           WithSwitch(
-               "parameters",
-               WithSwitch(
-                   "command_id",
-                   WithSwitch("app_id",
-                              WithSystemScope(Wrap(
-                                  &ExpectLegacyAppCommandWebSucceeds))))))},
-      {"expect_legacy_policy_status_succeeds",
-       WithSwitch("updater_version",
-                  WithSystemScope(Wrap(&ExpectLegacyPolicyStatusSucceeds)))},
-      {"legacy_install_app",
-       WithSwitch(
-           "app_version",
-           WithSwitch("app_id", WithSystemScope(Wrap(&LegacyInstallApp))))},
-      {"run_uninstall_cmd_line", WithSystemScope(Wrap(&RunUninstallCmdLine))},
-      {"run_handoff", WithSwitch("app_id", WithSystemScope(Wrap(&RunHandoff)))},
-      {"install_scheduled_task",
-       WithSwitch("use_task_subfolders",
-                  WithSwitch("task_name", Wrap(&InstallScheduledTask)))},
-      {"is_scheduled_task_registered",
-       WithSwitch("use_task_subfolders",
-                  WithSwitch("task_name", Wrap(&IsScheduledTaskRegistered)))},
-      {"delete_scheduled_task",
-       WithSwitch("use_task_subfolders",
-                  WithSwitch("task_name", Wrap(&DeleteScheduledTask)))},
-#endif  // BUILDFLAG(IS_WIN)
       {"expect_version_active",
        WithSwitch("updater_version",
                   WithSystemScope(Wrap(&ExpectVersionActive)))},
@@ -508,9 +453,6 @@ void AppTestHelper::FirstTaskRun() {
                                                Wrap(&CallServiceUpdate)))))},
       {"setup_fake_legacy_updater",
        WithSystemScope(Wrap(&SetupFakeLegacyUpdater))},
-#if BUILDFLAG(IS_WIN)
-      {"run_fake_legacy_updater", WithSystemScope(Wrap(&RunFakeLegacyUpdater))},
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_MAC)
       {"privileged_helper_install",
        WithSystemScope(Wrap(&PrivilegedHelperInstall))},
@@ -664,14 +606,6 @@ int IntegrationTestsHelperMain(int argc, char** argv) {
   base::TestSuite test_suite(argc, argv);
   updater::test::InitLoggingForUnitTest(
       base::FilePath(FILE_PATH_LITERAL("updater_test_system.log")));
-#if BUILDFLAG(IS_WIN)
-  auto scoped_com_initializer =
-      std::make_unique<base::win::ScopedCOMInitializer>(
-          base::win::ScopedCOMInitializer::kMTA);
-  // Failing to disable COM exception handling is a critical error.
-  CHECK(SUCCEEDED(DisableCOMExceptionHandling()))
-      << "Failed to disable COM exception handling.";
-#endif
   chrome::RegisterPathProvider();
   TestEventListeners& listeners = UnitTest::GetInstance()->listeners();
   delete listeners.Release(listeners.default_result_printer());

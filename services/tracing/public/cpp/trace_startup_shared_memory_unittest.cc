@@ -63,7 +63,6 @@ MULTIPROCESS_TEST_MAIN(InitFromLaunchParameters) {
   // only be done once and subsequent calls `UnsafeSharedMemoryRegionFrom()`
   // calls will not get a valid `shmem_region`. So we skip tracing init, to
   // avoid `ConnectProducer()` grabbing the shmem first.
-#if !BUILDFLAG(IS_WIN)
   base::FeatureList::InitInstance("", "");
   base::ThreadPoolInstance::CreateAndStartWithDefaultParams("StartupTraceTest");
   tracing::InitTracingPostFeatureList(/*enable_consumer=*/false,
@@ -72,7 +71,6 @@ MULTIPROCESS_TEST_MAIN(InitFromLaunchParameters) {
   // Simulate launching with the serialized parameters.
   EXPECT_TRUE(IsTracingInitialized());
   EXPECT_TRUE(base::TrackEvent::IsEnabled());
-#endif  // !BUILDFLAG(IS_WIN)
 
   auto* command_line = base::CommandLine::ForCurrentProcess();
   base::UnsafeSharedMemoryRegion unsafe_shm;
@@ -97,10 +95,6 @@ class TraceStartupSharedMemoryTest : public ::testing::TestWithParam<bool> {
 INSTANTIATE_TEST_SUITE_P(All,
                          TraceStartupSharedMemoryTest,
                          ::testing::Values(/*launch_options.elevated=*/false
-#if BUILDFLAG(IS_WIN)
-                                           ,
-                                           /*launch_options.elevated=*/true
-#endif
                                            ));
 
 TEST_P(TraceStartupSharedMemoryTest, PassSharedMemoryRegion) {
@@ -119,10 +113,6 @@ TEST_P(TraceStartupSharedMemoryTest, PassSharedMemoryRegion) {
   base::LaunchOptions launch_options;
 
   // On windows, check both the elevated and non-elevated launches.
-#if BUILDFLAG(IS_WIN)
-  launch_options.start_hidden = true;
-  launch_options.elevated = GetParam();
-#endif
 
   // Update the launch parameters.
   base::shared_memory::SharedMemorySwitch shared_memory_switch(

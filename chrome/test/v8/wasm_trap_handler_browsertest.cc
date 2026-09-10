@@ -28,8 +28,6 @@ namespace {
 #if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && \
     (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64))
 constexpr bool kIsTrapHandlerSupported = true;
-#elif BUILDFLAG(IS_WIN) && defined(ARCH_CPU_X86_64)
-constexpr bool kIsTrapHandlerSupported = true;
 #elif BUILDFLAG(IS_MAC) && (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64))
 constexpr bool kIsTrapHandlerSupported = true;
 #else

@@ -64,9 +64,7 @@ enum class PlatformType {
 };
 
 PlatformType GetPlatformInput() {
-#if BUILDFLAG(IS_WIN)
-  return PlatformType::kWindows;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return PlatformType::kMac;
 #elif BUILDFLAG(IS_LINUX)
   return PlatformType::kLinux;

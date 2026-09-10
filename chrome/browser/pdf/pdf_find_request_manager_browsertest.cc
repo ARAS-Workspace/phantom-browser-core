@@ -105,11 +105,7 @@ class PdfFindRequestManagerTestWithPdfPartialLoading
 
 // Tests searching in a full-page PDF.
 // Flaky on Windows ASAN: crbug.com/40109961.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_FindInPDF DISABLED_FindInPDF
-#else
 #define MAYBE_FindInPDF FindInPDF
-#endif
 IN_PROC_BROWSER_TEST_F(PdfFindRequestManagerTest, MAYBE_FindInPDF) {
   ASSERT_TRUE(embedded_test_server()->Start());
   LoadAndWait("/find_in_pdf_page.pdf");

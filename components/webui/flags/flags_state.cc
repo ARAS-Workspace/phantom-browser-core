@@ -541,11 +541,7 @@ void FlagsState::RemoveFlagsSwitches(
 
     // The below is either a std::string or a std::u16string based on platform.
     const auto& existing_value = (*switch_list)[switch_name];
-#if BUILDFLAG(IS_WIN)
-    const std::string existing_value_utf8 = base::WideToUTF8(existing_value);
-#else
     const std::string& existing_value_utf8 = existing_value;
-#endif
 
     std::vector<std::string_view> features =
         base::FeatureList::SplitFeatureListString(existing_value_utf8);
@@ -564,11 +560,7 @@ void FlagsState::RemoveFlagsSwitches(
       switch_list->erase(switch_name);
     } else {
       std::string switch_value = base::JoinString(remaining_features, ",");
-#if BUILDFLAG(IS_WIN)
-      (*switch_list)[switch_name] = base::UTF8ToWide(switch_value);
-#else
       (*switch_list)[switch_name] = std::move(switch_value);
-#endif
     }
   }
 }
@@ -790,8 +782,6 @@ unsigned short FlagsState::GetCurrentPlatform() {
   return kOsIos;
 #elif BUILDFLAG(IS_MAC)
   return kOsMac;
-#elif BUILDFLAG(IS_WIN)
-  return kOsWin;
 #elif BUILDFLAG(IS_CHROMEOS)
   return kOsCrOS;
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OPENBSD)

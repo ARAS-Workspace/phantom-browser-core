@@ -12,15 +12,11 @@
 
 namespace updater {
 
-#if !BUILDFLAG(IS_WIN)
-
 // Linux and macOS don't have mechanisms to detect if a connection is metered.
 void ShouldBlockUpdateForMeteredNetwork(
     UpdateService::Priority,
     base::OnceCallback<void(bool)> callback) {
   std::move(callback).Run(false);
 }
-
-#endif
 
 }  // namespace updater

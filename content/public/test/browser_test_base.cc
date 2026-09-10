@@ -138,11 +138,6 @@
 #endif
 
 
-#if BUILDFLAG(IS_WIN)
-#include <shlobj.h>
-
-#include "base/test/test_reg_util_win.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 namespace content {
 
@@ -283,28 +278,9 @@ BrowserTestBase::BrowserTestBase() {
   handle_sigterm_ = true;
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  // Disallow overriding HKLM during browser test startup. This is because it
-  // will interfere with process launches, which rely on there being a valid
-  // HKLM. This functionality is restored just before the test fixture itself
-  // starts in ProxyRunTestOnMainThreadLoop, after browser startup has been
-  // completed.
-  registry_util::RegistryOverrideManager::
-      SetAllowHKLMRegistryOverrideForIntegrationTests(/*allow=*/false);
-#endif
 
   embedded_test_server_ = std::make_unique<net::EmbeddedTestServer>();
 
-#if BUILDFLAG(IS_WIN)
-  // Even if running as admin, browser tests should not write temp files to
-  // secure temp, otherwise any left-over files cannot be cleaned up by the test
-  // runner.
-  if (::IsUserAnAdmin()) {
-    system_temp_override_.emplace(base::DIR_SYSTEM_TEMP,
-                                  base::PathService::CheckedGet(base::DIR_TEMP),
-                                  /*is_absolute=*/true, /*create=*/false);
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
 #if defined(USE_AURA)
   ui::test::EventGeneratorDelegate::SetFactoryFunction(
@@ -973,12 +949,6 @@ void BrowserTestBase::ProxyRunTestOnMainThreadLoop() {
 
     SetUpOnMainThread();
 
-#if BUILDFLAG(IS_WIN)
-    // Now that most of process startup is complete, including launching the
-    // network service process, HKLM override can be safely permitted again.
-    registry_util::RegistryOverrideManager::
-        SetAllowHKLMRegistryOverrideForIntegrationTests(/*allow=*/true);
-#endif  // BUILDFLAG(IS_WIN)
 
     if (!IsSkipped()) {
       initial_navigation_observer.reset();

@@ -761,9 +761,7 @@ TEST_F(ClientSidePhishingModelTest, FlatbufferOnFollowingUpdate) {
   // around.
   // Can remove this if flaky.
   // Windows ASAN flake: crbug.com/1234652
-#if !(BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER))
   BASE_EXPECT_DEATH(memory_span[0] = 'G', "");
-#endif
 }
 
 class ClientSidePhishingModelFeatureTest

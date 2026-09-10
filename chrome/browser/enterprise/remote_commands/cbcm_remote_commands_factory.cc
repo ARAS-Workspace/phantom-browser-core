@@ -12,12 +12,12 @@
 #include "chrome/browser/profiles/profile_manager.h"
 #include "components/policy/core/common/remote_commands/remote_command_job.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "chrome/browser/enterprise/remote_commands/rotate_attestation_credential_job.h"
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "components/enterprise/browser/controller/chrome_browser_cloud_management_controller.h"
 #include "components/enterprise/device_trust/core/device_trust_key_manager.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 namespace enterprise_commands {
 
@@ -31,7 +31,7 @@ CBCMRemoteCommandsFactory::BuildJobForType(
         g_browser_process->profile_manager());
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   if (type == enterprise_management::
                   RemoteCommand_Type_BROWSER_EXTENSION_UPDATE_CHECK) {
     return std::make_unique<ExtensionUpdateCheckJob>(
@@ -45,7 +45,7 @@ CBCMRemoteCommandsFactory::BuildJobForType(
             ->chrome_browser_cloud_management_controller()
             ->GetDeviceTrustKeyManager());
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
   NOTREACHED() << "Received an unsupported remote command type: " << type;
 }

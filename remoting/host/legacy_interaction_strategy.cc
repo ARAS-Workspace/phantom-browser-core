@@ -47,10 +47,6 @@
 #include "remoting/host/chromeos/mouse_cursor_monitor_aura.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "remoting/host/win/mouse_cursor_monitor_win.h"
-#endif
-
 namespace remoting {
 
 LegacyInteractionStrategy::~LegacyInteractionStrategy() {
@@ -158,9 +154,6 @@ LegacyInteractionStrategy::CreateMouseCursorMonitor() {
 
   auto display_monitor = std::make_unique<DelegatingDesktopDisplayInfoMonitor>(
       display_info_monitor_.GetWeakPtr());
-#if BUILDFLAG(IS_WIN)
-  return std::make_unique<MouseCursorMonitorWin>(std::move(display_monitor));
-#else  // !BUILDFLAG(IS_WIN)
   auto creator = base::BindOnce(
       [](webrtc::DesktopCaptureOptions options)
           -> std::unique_ptr<webrtc::MouseCursorMonitor> {
@@ -175,7 +168,6 @@ LegacyInteractionStrategy::CreateMouseCursorMonitor() {
       std::make_unique<MouseCursorMonitorProxy>(video_capture_task_runner_,
                                                 std::move(creator)),
       std::move(display_monitor));
-#endif  // !BUILDFLAG(IS_WIN)
 }
 
 std::unique_ptr<KeyboardLayoutMonitor>

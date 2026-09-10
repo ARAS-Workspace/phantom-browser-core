@@ -42,21 +42,6 @@ GLuint ImportSemaphoreHandleToGLSemaphore(SemaphoreHandle handle) {
                                 fd.release());
 
   return gl_semaphore;
-#elif BUILDFLAG(IS_WIN)
-  if (handle.vk_handle_type() !=
-      VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT) {
-    DLOG(ERROR) << "Importing semaphore handle of unexpected type:"
-                << handle.vk_handle_type();
-    return 0;
-  }
-  auto win32_handle = handle.TakeHandle();
-  gl::GLApi* api = gl::g_current_gl_context;
-  GLuint gl_semaphore;
-  api->glGenSemaphoresEXTFn(1, &gl_semaphore);
-  api->glImportSemaphoreWin32HandleEXTFn(
-      gl_semaphore, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, win32_handle.Take());
-
-  return gl_semaphore;
 #else
 #error Unsupported OS
 #endif

@@ -84,13 +84,8 @@ class CastInternalMessageUtilDeathTest : public testing::Test {
 }  // namespace
 
 // TODO(crbug.com/1377730): This test sometimes times out on the Win bot.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CastInternalMessageFromAppMessageString \
-  DISABLED_CastInternalMessageFromAppMessageString
-#else
 #define MAYBE_CastInternalMessageFromAppMessageString \
   CastInternalMessageFromAppMessageString
-#endif
 TEST_F(CastInternalMessageUtilDeathTest,
        MAYBE_CastInternalMessageFromAppMessageString) {
   constexpr char message_str[] = R"({
@@ -151,7 +146,7 @@ TEST_F(CastInternalMessageUtilDeathTest,
 }
 
 // TODO(crbug.com/1378312): This test sometimes times out on the Win debug bot.
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_CastInternalMessageFromClientConnectString \
   DISABLED_CastInternalMessageFromClientConnectString
 #else

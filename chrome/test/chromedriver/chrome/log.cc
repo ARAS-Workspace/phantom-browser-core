@@ -80,9 +80,6 @@ std::string PrettyPrintValue(base::ValueView value) {
   std::string json;
   base::JSONWriter::WriteWithOptions(
       value, base::JSONWriter::OPTIONS_PRETTY_PRINT, &json);
-#if BUILDFLAG(IS_WIN)
-  base::RemoveChars(json, "\r", &json);
-#endif
   // Remove the trailing newline.
   if (json.length())
     json.resize(json.length() - 1);

@@ -328,16 +328,11 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementTest, DisableEnable) {
   EXPECT_TRUE(manager->GetBackgroundHostForExtension(extension_id));
 }
 
-#if BUILDFLAG(IS_WIN)
-// Fails consistently on Windows XP, see: http://crbug.com/40765075.
-#define MAYBE_AutoUpdate DISABLED_AutoUpdate
-#else
 // See http://crbug.com/40111471 and http://crbug.com/40765075.
 #if defined(ADDRESS_SANITIZER)
 #define MAYBE_AutoUpdate DISABLED_AutoUpdate
 #else
 #define MAYBE_AutoUpdate AutoUpdate
-#endif
 #endif
 
 // Tests extension autoupdate.
@@ -429,15 +424,10 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementTest, MAYBE_AutoUpdate) {
   ASSERT_EQ("2.0", extension->VersionString());
 }
 
-#if BUILDFLAG(IS_WIN)
-// Fails consistently on Windows XP, see: http://crbug.com/40765075.
-#define MAYBE_AutoUpdateDisabledExtensions DISABLED_AutoUpdateDisabledExtensions
-#else
 #if defined(ADDRESS_SANITIZER)
 #define MAYBE_AutoUpdateDisabledExtensions DISABLED_AutoUpdateDisabledExtensions
 #else
 #define MAYBE_AutoUpdateDisabledExtensions AutoUpdateDisabledExtensions
-#endif
 #endif
 
 // Tests extension autoupdate.
@@ -669,7 +659,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementTest, ExternalPolicyRefresh) {
 
 // Tests that non-CWS extensions are disabled when force-installed in a low
 // trust environment. See https://b/283274398.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(ExtensionManagementTest,
                        NonCWSForceInstalledDisabledInLowTrustEnvironment) {
   // Mark enterprise management authority for platform as COMPUTER_LOCAL, and
@@ -806,7 +796,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionManagementTest,
 #endif
 
 // See http://crbug.com/40111471 and http://crbug.com/40765075.
-#if defined(ADDRESS_SANITIZER) || BUILDFLAG(IS_WIN)
+#if defined(ADDRESS_SANITIZER)
 #define MAYBE_PolicyOverridesUserInstall DISABLED_PolicyOverridesUserInstall
 #else
 #define MAYBE_PolicyOverridesUserInstall PolicyOverridesUserInstall

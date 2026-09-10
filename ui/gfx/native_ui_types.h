@@ -29,10 +29,6 @@
 #include <variant>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#endif
-
 // This file provides cross platform typedefs for native ui types.
 //   NativeWindow: this is a handle to a native, top-level window
 //   NativeView: this is a handle to a native UI element. It may be the
@@ -80,9 +76,7 @@ enum class CursorType;
 
 #endif  // defined(USE_AURA)
 
-#if BUILDFLAG(IS_WIN)
-struct IAccessible;
-#elif BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
 #ifdef __OBJC__
 @class UIImage;
 #else
@@ -189,9 +183,7 @@ using NativeEvent = base::android::ScopedJavaGlobalRef<jobject>;
 #error Unknown build environment.
 #endif
 
-#if BUILDFLAG(IS_WIN)
-using NativeViewAccessible = IAccessible*;
-#elif BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
 // UIAccessibility is an informal protocol on NSObject, so make accessible
 // objects owned NSObjects. Do not use as a general object wrapper.
 using NativeViewAccessible = base::apple::OwnedNSObject;
@@ -215,15 +207,7 @@ using NativeViewAccessible = UnimplementedNativeViewAccessible*;
 using NativeViewId = intptr_t;
 
 // AcceleratedWidget provides a surface to compositors to paint pixels.
-#if BUILDFLAG(IS_WIN)
-using AcceleratedWidget = HWND;
-// The compiler doesn't realize that a const nullptr can't point to anything
-// mutable, so it's okay for this pointer to be duplicated.
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunique-object-duplication"
-inline constexpr AcceleratedWidget kNullAcceleratedWidget = nullptr;
-#pragma clang diagnostic pop
-#elif BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
 using AcceleratedWidget = uint64_t;
 inline constexpr AcceleratedWidget kNullAcceleratedWidget = 0;
 #elif BUILDFLAG(IS_MAC)

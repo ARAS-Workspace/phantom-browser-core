@@ -55,14 +55,6 @@ class PrefsTabHelperBrowserTest : public PlatformBrowserTest {
       return false;
     }
 
-#if BUILDFLAG(IS_WIN)
-    // Make the copy writable.  On POSIX we assume the umask allows files
-    // we create to be writable.
-    if (!::SetFileAttributesW(default_pref_file.value().c_str(),
-                              FILE_ATTRIBUTE_NORMAL)) {
-      return false;
-    }
-#endif
     return true;
   }
 };

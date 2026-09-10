@@ -220,18 +220,10 @@ IN_PROC_BROWSER_TEST_F(UpdateProtocolHandlerApprovalCommandTest,
 #endif
 
   if (AreProtocolsRegisteredWithOs()) {
-#if BUILDFLAG(IS_WIN)
-    EXPECT_THAT(
-        OsIntegrationTestOverrideImpl::Get()->protocol_scheme_registrations(),
-        testing::ElementsAre(
-            std::make_tuple(app_id, std::vector({protocol_handler.protocol})),
-            std::make_tuple(app_id, std::vector<std::string>())));
-#else
     EXPECT_THAT(
         OsIntegrationTestOverrideImpl::Get()->protocol_scheme_registrations(),
         testing::ElementsAre(
             std::make_tuple(app_id, std::vector({protocol_handler.protocol}))));
-#endif  // BUILDFLAG(IS_WIN)
   }
 }
 
@@ -267,18 +259,10 @@ IN_PROC_BROWSER_TEST_F(UpdateProtocolHandlerApprovalCommandTest,
 #endif
 
   if (AreProtocolsRegisteredWithOs()) {
-#if BUILDFLAG(IS_WIN)
-    EXPECT_THAT(
-        OsIntegrationTestOverrideImpl::Get()->protocol_scheme_registrations(),
-        testing::ElementsAre(
-            std::make_tuple(app_id, std::vector({protocol_handler.protocol})),
-            std::make_tuple(app_id, std::vector<std::string>())));
-#else
     EXPECT_THAT(
         OsIntegrationTestOverrideImpl::Get()->protocol_scheme_registrations(),
         testing::ElementsAre(
             std::make_tuple(app_id, std::vector({protocol_handler.protocol}))));
-#endif  // BUILDFLAG(IS_WIN)
   }
 }
 
@@ -317,18 +301,10 @@ IN_PROC_BROWSER_TEST_F(UpdateProtocolHandlerApprovalCommandTest,
 #endif
 
   if (AreProtocolsRegisteredWithOs()) {
-#if BUILDFLAG(IS_WIN)
-    EXPECT_THAT(
-        OsIntegrationTestOverrideImpl::Get()->protocol_scheme_registrations(),
-        testing::ElementsAre(
-            std::make_tuple(app_id, std::vector({protocol_handler.protocol})),
-            std::make_tuple(app_id, std::vector<std::string>())));
-#else
     EXPECT_THAT(
         OsIntegrationTestOverrideImpl::Get()->protocol_scheme_registrations(),
         testing::ElementsAre(
             std::make_tuple(app_id, std::vector({protocol_handler.protocol}))));
-#endif  // BUILDFLAG(IS_WIN)
   }
 }
 
@@ -375,9 +351,6 @@ IN_PROC_BROWSER_TEST_F(UpdateProtocolHandlerApprovalCommandTest,
         OsIntegrationTestOverrideImpl::Get()->protocol_scheme_registrations(),
         testing::ElementsAre(
             std::make_tuple(app_id, std::vector({protocol_handler.protocol})),
-#if BUILDFLAG(IS_WIN)
-            std::make_tuple(app_id, std::vector<std::string>()),
-#endif  // BUILDFLAG(IS_WIN)
             std::make_tuple(app_id, std::vector({protocol_handler.protocol}))));
   }
 }
@@ -424,9 +397,6 @@ IN_PROC_BROWSER_TEST_F(UpdateProtocolHandlerApprovalCommandTest,
         OsIntegrationTestOverrideImpl::Get()->protocol_scheme_registrations(),
         testing::ElementsAre(
             std::make_tuple(app_id, std::vector({protocol_handler.protocol})),
-#if BUILDFLAG(IS_WIN)
-            std::make_tuple(app_id, std::vector<std::string>()),
-#endif  // BUILDFLAG(IS_WIN)
             std::make_tuple(app_id, std::vector({protocol_handler.protocol}))));
   }
 }

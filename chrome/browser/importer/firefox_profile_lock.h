@@ -7,10 +7,6 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 #include "base/files/file_path.h"
 #include "base/gtest_prod_util.h"
 
@@ -93,9 +89,7 @@ class FirefoxProfileLock {
   base::FilePath lock_file_;
 
   // The handle of the lock file.
-#if BUILDFLAG(IS_WIN)
-  HANDLE lock_handle_;
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   int lock_fd_;
 
   // On Posix systems Firefox apparently first tries to put a fcntl lock

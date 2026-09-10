@@ -10,11 +10,7 @@
 #include "base/component_export.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <stdint.h>
-
-#include <array>
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include <sys/types.h>
 #endif
 
@@ -27,13 +23,7 @@ namespace sqlite_vfs {
 enum class Client;
 
 struct COMPONENT_EXPORT(SQLITE_VFS) FileSystemId {
-#if BUILDFLAG(IS_WIN)
-  uint64_t volume_serial_number;
-
-  // Either a 128-bit `FILE_ID_128` for ReFS or a 64-bit file index with zeros
-  // in the high-order bytes.
-  std::array<uint8_t, 16> file_id;
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   dev_t dev;
   ino_t ino;
 #endif

@@ -9,11 +9,7 @@
 #include "base/logging.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/scoped_handle.h"
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #include <mach/vm_map.h>
 
 #include "base/apple/mach_logging.h"
@@ -30,30 +26,7 @@ namespace mojo_legacy {
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-base::win::ScopedHandle CloneHandle(const base::win::ScopedHandle& handle) {
-  DCHECK(handle.is_valid());
-
-  // If a caller does not correctly check the handle returned by file and pipe
-  // creation APIs, or directly provides a pseudo handle value like
-  // ::GetCurrentThread(), then it would result in the destination process
-  // getting full control over the calling process (see http://crbug.com/243339
-  // for an example of this vulnerability). HandleTraits for Windows rejects
-  // pseudo handle values, but check again here for defense-in-depth.
-  if (!handle.is_valid()) {
-    return base::win::ScopedHandle();
-  }
-
-  HANDLE dupe = nullptr;
-  if (!::DuplicateHandle(::GetCurrentProcess(), handle.Get(),
-                         ::GetCurrentProcess(), &dupe, 0, FALSE,
-                         DUPLICATE_SAME_ACCESS)) {
-    return base::win::ScopedHandle();
-  }
-  DCHECK_NE(dupe, INVALID_HANDLE_VALUE);
-  return base::win::ScopedHandle(dupe);
-}
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 base::apple::ScopedMachSendRight CloneMachPort(
     const base::apple::ScopedMachSendRight& mach_port) {
   DCHECK(mach_port.is_valid());
@@ -83,10 +56,7 @@ PlatformHandle::PlatformHandle(PlatformHandle&& other) {
   *this = std::move(other);
 }
 
-#if BUILDFLAG(IS_WIN)
-PlatformHandle::PlatformHandle(base::win::ScopedHandle handle)
-    : type_(Type::kHandle), handle_(std::move(handle)) {}
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 PlatformHandle::PlatformHandle(base::apple::ScopedMachSendRight mach_port)
     : type_(Type::kMachSend), mach_send_(std::move(mach_port)) {}
 PlatformHandle::PlatformHandle(base::apple::ScopedMachReceiveRight mach_port)
@@ -105,9 +75,7 @@ PlatformHandle& PlatformHandle::operator=(PlatformHandle&& other) {
   type_ = other.type_;
   other.type_ = Type::kNone;
 
-#if BUILDFLAG(IS_WIN)
-  handle_ = std::move(other.handle_);
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   mach_send_ = std::move(other.mach_send_);
   mach_receive_ = std::move(other.mach_receive_);
 #endif
@@ -131,12 +99,7 @@ void PlatformHandle::ToMojoPlatformHandle(PlatformHandle handle,
   }
 
   do {
-#if BUILDFLAG(IS_WIN)
-    out_handle->type = MOJO_LEGACY_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE;
-    out_handle->value =
-        static_cast<uint64_t>(HandleToLong(handle.TakeHandle().Take()));
-    break;
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
     if (handle.is_mach_send()) {
       out_handle->type = MOJO_LEGACY_PLATFORM_HANDLE_TYPE_MACH_SEND_RIGHT;
       out_handle->value = static_cast<uint64_t>(handle.ReleaseMachSendRight());
@@ -168,13 +131,7 @@ PlatformHandle PlatformHandle::FromMojoPlatformHandle(
     return PlatformHandle();
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (handle->type != MOJO_LEGACY_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE) {
-    return PlatformHandle();
-  }
-  return PlatformHandle(
-      base::win::ScopedHandle(LongToHandle(static_cast<long>(handle->value))));
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   if (handle->type == MOJO_LEGACY_PLATFORM_HANDLE_TYPE_MACH_SEND_RIGHT) {
     return PlatformHandle(base::apple::ScopedMachSendRight(
         static_cast<mach_port_t>(handle->value)));
@@ -196,9 +153,7 @@ PlatformHandle PlatformHandle::FromMojoPlatformHandle(
 void PlatformHandle::reset() {
   type_ = Type::kNone;
 
-#if BUILDFLAG(IS_WIN)
-  handle_.Close();
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   mach_send_.reset();
   mach_receive_.reset();
 #endif
@@ -211,9 +166,7 @@ void PlatformHandle::reset() {
 void PlatformHandle::release() {
   type_ = Type::kNone;
 
-#if BUILDFLAG(IS_WIN)
-  std::ignore = handle_.Take();
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   std::ignore = mach_send_.release();
   std::ignore = mach_receive_.release();
 #endif
@@ -224,9 +177,7 @@ void PlatformHandle::release() {
 }
 
 PlatformHandle PlatformHandle::Clone() const {
-#if BUILDFLAG(IS_WIN)
-  return PlatformHandle(CloneHandle(handle_));
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   if (is_valid_mach_send()) {
     return PlatformHandle(CloneMachPort(mach_send_));
   }

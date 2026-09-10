@@ -1303,11 +1303,6 @@ void OmniboxEditModel::OnKillFocus() {
   SetFocusState(OMNIBOX_FOCUS_NONE, OMNIBOX_FOCUS_CHANGE_EXPLICIT);
   paste_state_ = PasteState::kNone;
   control_key_state_ = ControlKeyState::kUp;
-#if BUILDFLAG(IS_WIN)
-  if (view_) {
-    view_->HideImeIfNeeded();
-  }
-#endif
 }
 
 bool OmniboxEditModel::OnEscapeKeyPressed() {

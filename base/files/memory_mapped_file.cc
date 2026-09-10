@@ -40,12 +40,6 @@ bool MemoryMappedFile::Initialize(const FilePath& file_name, Access access) {
     case READ_WRITE_EXTEND:
       // Can't open with "extend" because no maximum size is known.
       NOTREACHED();
-#if BUILDFLAG(IS_WIN)
-    case READ_CODE_IMAGE:
-      flags |= File::FLAG_OPEN | File::FLAG_READ |
-               File::FLAG_WIN_EXCLUSIVE_WRITE | File::FLAG_WIN_EXECUTE;
-      break;
-#endif
   }
   file_.Initialize(file_name, flags);
 
@@ -91,11 +85,6 @@ bool MemoryMappedFile::Initialize(File file,
         return false;
       }
       break;
-#if BUILDFLAG(IS_WIN)
-    case READ_CODE_IMAGE:
-      DCHECK(Region::kWholeFile == region);
-      break;
-#endif
   }
 
   if (IsValid()) {

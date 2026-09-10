@@ -47,10 +47,6 @@ GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kUseAutomaticSyncTokenManagement);
 
 GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kEnableMSAAOnNewIntelGPUs);
 
-#if BUILDFLAG(IS_WIN)
-GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kNoUndamagedOverlayPromotion);
-#endif
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_IOS)
 GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kAdjustGpuProcessPriority);
 #endif
@@ -91,28 +87,11 @@ struct GPU_CONFIG_EXPORT SkiaGraphiteFeatureParams {
   // Whether to enable deferred submissions optimization (if possible). If it's
   // false, every SI's access will require a Graphite's Context::submit() call
   // before EndAccess().
-  bool enable_deferred_submit = BUILDFLAG(IS_WIN);
+  bool enable_deferred_submit = false;
 
   // Enables MSAA on newer Intel GPUs (Gen 11+).
   bool enable_msaa_on_newer_intel = true;
 
-#if BUILDFLAG(IS_WIN)
-  // Whether we should DumpWithoutCrashing when D3D related errors are detected.
-  bool dawn_dumpwc_d3d_errors = false;
-
-  // Whether to disable D3D shader optimizations.
-  bool dawn_disable_d3d_shader_optimizations = false;
-
-  // Whether the Dawn D3D11 flush should be delayed until the end of the frame.
-  bool dawn_d3d11_delay_flush = true;
-
-  // If this param is enabled, FlushTileRasterGraphiteCommandsCHROMIUM will
-  // also flush the D3D11 commands to the driver (if delay flush is enabled).
-  bool flush_d3d11_tile_raster_commands_to_driver = false;
-
-  // Whether to use triple buffering for DirectComposition root surface.
-  bool triple_buffered_dcomp_root_surface = false;
-#endif
 };
 
 static_assert(std::is_trivially_destructible_v<SkiaGraphiteFeatureParams>);
@@ -152,25 +131,6 @@ inline bool SkiaGraphiteEnableMSAAOnNewerIntel() {
   return GetSkiaGraphiteFeatureParams().enable_msaa_on_newer_intel;
 }
 
-#if BUILDFLAG(IS_WIN)
-inline bool SkiaGraphiteDawnDumpWCOnD3DError() {
-  return GetSkiaGraphiteFeatureParams().dawn_dumpwc_d3d_errors;
-}
-inline bool SkiaGraphiteDawnDisableD3DShaderOptimizations() {
-  return GetSkiaGraphiteFeatureParams().dawn_disable_d3d_shader_optimizations;
-}
-inline bool SkiaGraphiteDawnD3D11DelayFlush() {
-  return GetSkiaGraphiteFeatureParams().dawn_d3d11_delay_flush;
-}
-inline bool SkiaGraphiteFlushD3D11TileRasterCommandsToDriver() {
-  return GetSkiaGraphiteFeatureParams()
-      .flush_d3d11_tile_raster_commands_to_driver;
-}
-inline bool SkiaGraphiteTripleBufferedDCompRootSurface() {
-  return GetSkiaGraphiteFeatureParams().triple_buffered_dcomp_root_surface;
-}
-#endif
-
 GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kSkiaGraphiteSmallPathAtlas);
 GPU_CONFIG_EXPORT extern const base::FeatureParam<int>
     kSkiaGraphiteMinPathSizeForMsaa;
@@ -205,9 +165,6 @@ GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kWebGPUUseSpirv14);
 GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kWebGPUDecomposeUniformBuffers);
 GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kWebGPUUseHLSL2021);
 GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kWebGPUUseSpirvReconvergenceMode);
-#if BUILDFLAG(IS_WIN)
-GPU_CONFIG_EXPORT BASE_DECLARE_FEATURE(kWebGPUQualcommWindows);
-#endif
 GPU_CONFIG_EXPORT extern const base::FeatureParam<std::string>
     kWebGPUDisabledToggles;
 GPU_CONFIG_EXPORT extern const base::FeatureParam<std::string>

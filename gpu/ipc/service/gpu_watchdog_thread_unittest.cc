@@ -52,7 +52,7 @@ constexpr auto kExtraGPUJobTimeForTesting = base::Milliseconds(500);
 // out by the OS scheduler. The task on windows is simiulated by reading
 // TimeTicks instead of Sleep().
 void SimpleTask(base::TimeDelta duration, base::TimeDelta extra_time) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   auto start_timetick = base::TimeTicks::Now();
   do {
   } while ((base::TimeTicks::Now() - start_timetick) < duration);
@@ -142,10 +142,6 @@ void GpuWatchdogTest::SetUp() {
     timeout_ = kGpuWatchdogTimeoutForTestingSlowest;
     extra_gpu_job_time_ = kExtraGPUJobTimeForTestingSlowest;
   }
-
-#if BUILDFLAG(IS_WIN)
-  full_thread_time_on_windows_ = timeout_ * kMaxCountOfMoreGpuThreadTimeAllowed;
-#endif
 
   watchdog_thread_ = gpu::GpuWatchdogThread::Create(
       /*start_backgrounded=*/false,

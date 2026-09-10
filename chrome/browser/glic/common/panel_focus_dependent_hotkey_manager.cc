@@ -19,9 +19,6 @@ static constexpr std::array kSupportedCommands = {
     glic::LocalHotkeyManager::Command::kZoomIn,
     glic::LocalHotkeyManager::Command::kZoomOut,
     glic::LocalHotkeyManager::Command::kZoomReset,
-#if BUILDFLAG(IS_WIN)
-    glic::LocalHotkeyManager::Command::kTitleBarContextMenu,
-#endif
 };
 
 }  // namespace
@@ -68,11 +65,6 @@ bool PanelFocusDependentHotkeyManager::AcceleratorPressed(
     case LocalHotkeyManager::Command::kZoomReset:
       panel_->Zoom(mojom::ZoomAction::kReset);
       return true;
-#if BUILDFLAG(IS_WIN)
-    case LocalHotkeyManager::Command::kTitleBarContextMenu:
-      panel_->ShowTitleBarContextMenuAt(gfx::Point());
-      return true;
-#endif  //  BUILDFLAG(IS_WIN)
 
     default:
       NOTREACHED() << "no handling implemented for "

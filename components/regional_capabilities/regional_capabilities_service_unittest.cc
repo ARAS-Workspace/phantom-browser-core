@@ -1160,7 +1160,7 @@ TEST_F(RegionalCapabilitiesServiceTest,
   }
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST(ClientIsInSearchEngineChoiceScreenRegionTest, FetchedCountryInRegion) {
   AsyncRegionalCapabilitiesServiceClient client;
   client.SetFetchedCountry(CountryId("FR"));
@@ -1192,7 +1192,7 @@ TEST(ClientIsInSearchEngineChoiceScreenRegionTest, FallbackCountryNotInRegion) {
       RegionalCapabilitiesService::IsInAnySearchEngineChoiceScreenRegion(
           client));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 }  // namespace
 }  // namespace regional_capabilities

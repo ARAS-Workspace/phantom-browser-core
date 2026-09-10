@@ -429,7 +429,6 @@ TEST_P(LogFileWriterTest, DeleteRemovesClosedFile) {
   EXPECT_FALSE(base::PathExists(path_));
 }
 
-#if !BUILDFLAG(IS_WIN)  // Deleting the open file does not work on Windows.
 TEST_P(LogFileWriterTest, WriteDoesNotCrashIfFileRemovedExternally) {
   Init(GetParam());
 
@@ -468,7 +467,6 @@ TEST_P(LogFileWriterTest, DeleteDoesNotCrashIfFileRemovedExternally) {
   // It's up to the OS whether this will succeed or fail, but it must not crash.
   writer->Delete();
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 TEST_P(LogFileWriterTest, PathReturnsTheCorrectPath) {
   Init(GetParam());

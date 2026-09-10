@@ -12,10 +12,6 @@
 #include "partition_alloc/partition_alloc_base/compiler_specific.h"
 #include "partition_alloc/partition_alloc_base/component_export.h"
 
-#if PA_BUILDFLAG(IS_WIN)
-#include "partition_alloc/partition_alloc_base/win/windows_types.h"
-#endif
-
 namespace partition_alloc {
 
 // Terminates process. Should be called only for out of memory errors.
@@ -29,20 +25,6 @@ namespace partition_alloc {
 // consumption by Breakpad.
 // TODO: this can be removed when Breakpad is no longer supported.
 PA_COMPONENT_EXPORT(PARTITION_ALLOC) extern size_t g_oom_size;
-
-#if PA_BUILDFLAG(IS_WIN)
-namespace win {
-
-// Custom Windows exception code chosen to indicate an out of memory error.
-// See https://msdn.microsoft.com/en-us/library/het71c37.aspx.
-// "To make sure that you do not define a code that conflicts with an existing
-// exception code" ... "The resulting error code should therefore have the
-// highest four bits set to hexadecimal E."
-// 0xe0000008 was chosen arbitrarily, as 0x00000008 is ERROR_NOT_ENOUGH_MEMORY.
-const DWORD kOomExceptionCode = 0xe0000008;
-
-}  // namespace win
-#endif
 
 namespace internal {
 

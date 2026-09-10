@@ -1906,12 +1906,7 @@ IN_PROC_BROWSER_TEST_P(DeclarativeNetRequestBrowserTest, MAYBE_AllowRedirect) {
 }
 
 // Test is flaky on win. http://crbug.com/40786216.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_Enable_Disable_Reload_Uninstall \
-  DISABLED_Enable_Disable_Reload_Uninstall
-#else
 #define MAYBE_Enable_Disable_Reload_Uninstall Enable_Disable_Reload_Uninstall
-#endif
 // Tests that the extension ruleset is active only when the extension is
 // enabled.
 IN_PROC_BROWSER_TEST_P(DeclarativeNetRequestBrowserTest,

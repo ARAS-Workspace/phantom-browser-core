@@ -29,7 +29,7 @@
 #include "ash/constants/ash_features.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/accessibility/caption_settings_dialog.h"
 #endif
 
@@ -116,7 +116,7 @@ void CaptionsHandler::HandleLiveCaptionSectionReady(
 
 void CaptionsHandler::HandleOpenSystemCaptionsDialog(
     const base::ListValue& args) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   captions::CaptionSettingsDialog::ShowCaptionSettingsDialog();
 #endif
 }

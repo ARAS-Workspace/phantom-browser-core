@@ -293,11 +293,7 @@ TEST_F(WebRtcRtpDumpWriterTest, WriteAndFlushSmallSizeDump) {
 }
 
 // Flaky test disabled on Windows (https://crbug.com/40669633).
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_WriteOverMaxLimit DISABLED_WriteOverMaxLimit
-#else
 #define MAYBE_WriteOverMaxLimit WriteOverMaxLimit
-#endif
 TEST_F(WebRtcRtpDumpWriterTest, MAYBE_WriteOverMaxLimit) {
   // Reset the writer with a small max size limit.
   writer_ = std::make_unique<WebRtcRtpDumpWriter>(

@@ -591,7 +591,7 @@ TEST_F(CloudPolicyRefreshSchedulerSteadyStateTest, OnConnectionChanged) {
   EXPECT_EQ(GetLastDelay(), base::TimeDelta());
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_F(CloudPolicyRefreshSchedulerSteadyStateTest,
        SignatureValidationFailedAndRetry) {
   MockUserCloudPolicyStore store{dm_protocol::GetChromeUserPolicyType()};
@@ -626,7 +626,7 @@ TEST_F(CloudPolicyRefreshSchedulerSteadyStateTest,
 
   refresh_scheduler_.reset();
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 struct ClientErrorTestParam {
   DeviceManagementStatus client_error;

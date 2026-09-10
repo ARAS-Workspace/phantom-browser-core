@@ -172,60 +172,6 @@ void UpdateAllKeywordHashes(sql::Database* db,
 
   // See the comment in `GetKeywordDataFromStatement` as to why this code is
   // only enabled for Windows.
-#if BUILDFLAG(IS_WIN)
-  // If there is no platform encryption, nothing left to do, since the
-  // `url_hash` column will just be NULL.
-  if (!encryptor->IsEncryptionAvailable()) {
-    return;
-  }
-
-  // Read in all the urls, keywords, and ids and create hashes for each one.
-  sql::Statement query_statement(
-      db->GetCachedStatement(SQL_FROM_HERE,
-                             "SELECT id, url, keyword, starter_pack_id, "
-                             "enforced_by_policy FROM keywords"));
-
-  while (query_statement.Step()) {
-    TemplateURLData data;
-    data.id = query_statement.ColumnInt64(0);
-    const auto maybe_url = query_statement.ColumnString(1);
-
-    // Due to past bugs, there might be persisted entries with empty URLs. Avoid
-    // reading these out. GetKeywords() will delete these entries when they are
-    // read after migration.
-    if (maybe_url.empty()) {
-      all_rows_migrated = false;
-      continue;
-    }
-
-    // Populate the data to be hashed into the TemplateURLData. If any new
-    // values are being hashed in future, they must be added here.
-    data.SetURL(maybe_url);
-    data.SetKeyword(query_statement.ColumnString16(2));
-    data.starter_pack_id = query_statement.ColumnInt(3);
-    data.enforced_by_policy = query_statement.ColumnBool(4);
-
-    const std::vector<uint8_t> url_hash = data.GenerateHash();
-    const std::optional<std::vector<uint8_t>> encrypted_hash =
-        encryptor->EncryptString(std::string(url_hash.begin(), url_hash.end()));
-    if (!encrypted_hash) {
-      all_rows_migrated = false;
-      continue;
-    }
-
-    // Update each row in turn with the generated hash.
-    sql::Statement update_statement(db->GetCachedStatement(
-        SQL_FROM_HERE, "UPDATE keywords SET url_hash=? WHERE id=?"));
-
-    update_statement.BindBlob(0, *std::move(encrypted_hash));
-    update_statement.BindInt64(1, data.id);
-
-    if (!update_statement.Run()) {
-      all_rows_migrated = false;
-      continue;
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 WebDatabaseTable::TypeKey GetKey() {
@@ -671,49 +617,7 @@ std::optional<TemplateURLData> KeywordTable::GetKeywordDataFromStatement(
 // `false` if no encryption backend is available, and the backend can change
 // for various reasons including command line options or desktop window
 // manager.
-#if BUILDFLAG(IS_WIN)
-  if (!encryptor()->IsDecryptionAvailable()) {
-    status = HashValidationStatus::kNotVerifiedNoCrypto;
-  } else {
-    os_crypt_async::Encryptor::DecryptFlags flags;
-    const auto encrypted_hash = s.ColumnBlob(27);
-    const auto hash = encryptor()->DecryptData(encrypted_hash, &flags);
-    if (!hash) {
-      status = HashValidationStatus::kDecryptFailed;
-      return std::nullopt;
-    }
-    if (base::FeatureList::IsEnabled(switches::kRejectWeakKeywordHashes) &&
-        flags.should_reencrypt) {
-      // This must be true, since if decryption succeeded the data must contain
-      // header + nonce which is at least 15 bytes.
-      CHECK_GE(encrypted_hash.size(), 2u);
-      // Check for v10 encrypted data - if encrypted with v10 but a better
-      // cipher is available, it's considered invalid. This should never happen
-      // as v20 was shipped in crrev.com/c/5825155 (M130 - Aug 2024) and hashes
-      // were added in crrev.com/c/6040381 (M133 - Dec 2024).
-      if (encrypted_hash[1] == '1') {
-        status = HashValidationStatus::kWeakAlgorithmUsed;
-        return std::nullopt;
-      }
-    }
-
-    const auto expected_hash = data.GenerateHash();
-
-    if (expected_hash.size() != hash->size()) {
-      status = HashValidationStatus::kInvalidHash;
-      return std::nullopt;
-    }
-
-    if (!std::ranges::equal(hash.value(), expected_hash, [](char c, uint8_t b) {
-          return static_cast<uint8_t>(c) == b;
-        })) {
-      status = HashValidationStatus::kIncorrectHash;
-      return std::nullopt;
-    }
-  }
-#else
   status = HashValidationStatus::kNotVerifiedFeatureDisabled;
-#endif  // BUILDFLAG(IS_WIN)
   return data;
 }
 

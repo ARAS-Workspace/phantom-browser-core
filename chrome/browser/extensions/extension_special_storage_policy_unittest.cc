@@ -105,9 +105,7 @@ class ExtensionSpecialStoragePolicyTest : public testing::Test {
   }
 
   scoped_refptr<Extension> CreateProtectedApp() {
-#if BUILDFLAG(IS_WIN)
-    base::FilePath path(FILE_PATH_LITERAL("c:\\foo"));
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
     base::FilePath path(FILE_PATH_LITERAL("/foo"));
 #endif
     base::DictValue manifest;
@@ -128,9 +126,7 @@ class ExtensionSpecialStoragePolicyTest : public testing::Test {
   }
 
   scoped_refptr<Extension> CreateUnlimitedApp() {
-#if BUILDFLAG(IS_WIN)
-    base::FilePath path(FILE_PATH_LITERAL("c:\\bar"));
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
     base::FilePath path(FILE_PATH_LITERAL("/bar"));
 #endif
     base::DictValue manifest;
@@ -154,9 +150,7 @@ class ExtensionSpecialStoragePolicyTest : public testing::Test {
   }
 
   scoped_refptr<Extension> CreateRegularApp() {
-#if BUILDFLAG(IS_WIN)
-    base::FilePath path(FILE_PATH_LITERAL("c:\\app"));
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
     base::FilePath path(FILE_PATH_LITERAL("/app"));
 #endif
     base::DictValue manifest;

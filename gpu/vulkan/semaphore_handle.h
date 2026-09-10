@@ -17,9 +17,6 @@
 #endif
 
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_handle.h"
-#endif
 
 namespace gpu {
 
@@ -31,8 +28,6 @@ class COMPONENT_EXPORT(VULKAN) SemaphoreHandle {
  public:
 #if BUILDFLAG(IS_POSIX)
   using PlatformHandle = base::ScopedFD;
-#elif BUILDFLAG(IS_WIN)
-  using PlatformHandle = base::win::ScopedHandle;
 #endif
 
   SemaphoreHandle();

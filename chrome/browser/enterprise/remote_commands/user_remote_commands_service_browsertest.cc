@@ -50,9 +50,9 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/extensions/updater/extension_updater.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 using ::testing::_;
 using ::testing::InvokeWithoutArgs;
@@ -262,7 +262,7 @@ IN_PROC_BROWSER_TEST_P(UserRemoteCommandsServiceTest, Success) {
   EXPECT_EQ(em::RemoteCommandResult_ResultType_RESULT_SUCCESS, result.result());
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 IN_PROC_BROWSER_TEST_P(UserRemoteCommandsServiceTest, ExtensionUpdateCheck) {
   em::RemoteCommand command;
   command.set_type(em::RemoteCommand_Type_BROWSER_EXTENSION_UPDATE_CHECK);
@@ -293,7 +293,7 @@ IN_PROC_BROWSER_TEST_P(UserRemoteCommandsServiceTest, ExtensionUpdateCheck) {
   EXPECT_EQ(em::RemoteCommandResult_ResultType_RESULT_SUCCESS, result.result());
   EXPECT_TRUE(update_started.IsReady());
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 INSTANTIATE_TEST_SUITE_P(
     /* no prefix */,

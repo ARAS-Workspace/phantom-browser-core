@@ -54,17 +54,6 @@ class AutoThread : base::PlatformThread::Delegate {
       const char* name,
       scoped_refptr<base::SequencedTaskRunner> joiner);
 
-#if BUILDFLAG(IS_WIN)
-  // Create an AutoThread initialized for COM.  |com_init_type| specifies the
-  // type of COM apartment to initialize.
-  enum ComInitType { COM_INIT_NONE, COM_INIT_STA, COM_INIT_MTA };
-  static scoped_refptr<AutoThreadTaskRunner> CreateWithLoopAndComInitTypes(
-      const char* name,
-      scoped_refptr<base::SequencedTaskRunner> joiner,
-      base::MessagePumpType pump_type,
-      ComInitType com_init_type);
-#endif
-
   // Construct the AutoThread.  |name| identifies the thread for debugging.
   explicit AutoThread(const char* name);
 
@@ -86,12 +75,6 @@ class AutoThread : base::PlatformThread::Delegate {
   // thread will exit when no references to the TaskRunner remain.
   scoped_refptr<AutoThreadTaskRunner> StartWithType(base::MessagePumpType type);
 
-#if BUILDFLAG(IS_WIN)
-  // Configures the thread to initialize the specified COM apartment type.
-  // SetComInitType() must be called before Start().
-  void SetComInitType(ComInitType com_init_type);
-#endif
-
  private:
   AutoThread(const char* name, scoped_refptr<base::SequencedTaskRunner> joiner);
 
@@ -106,11 +89,6 @@ class AutoThread : base::PlatformThread::Delegate {
   raw_ptr<StartupData> startup_data_;
 
   base::OnceClosure pre_init_callback_;
-
-#if BUILDFLAG(IS_WIN)
-  // Specifies which kind of COM apartment to initialize, if any.
-  ComInitType com_init_type_;
-#endif
 
   // The thread's handle.
   base::PlatformThreadHandle thread_;

@@ -64,12 +64,6 @@ using ::testing::SizeIs;
 using ::testing::TestWithParam;
 using ::testing::ValuesIn;
 
-#if BUILDFLAG(IS_WIN)
-#include "base/test/scoped_os_info_override_win.h"
-#include "media/gpu/windows/mf_audio_encoder.h"
-#define HAS_AAC_ENCODER 1
-#endif
-
 #if (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)) && \
     BUILDFLAG(USE_PROPRIETARY_CODECS)
 #define HAS_AAC_ENCODER 1
@@ -1216,27 +1210,6 @@ TEST_F(MediaRecorderHandlerIsSupportedTypeTestForMp4,
 #endif
 }
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_PROPRIETARY_CODECS)
-TEST_F(MediaRecorderHandlerIsSupportedTypeTestForMp4,
-       CanSupportAacCodecForWinNSku) {
-  if (!IsTargetAudioCodecSupported("mp4a.40.2")) {
-    return;
-  }
-
-  {
-    base::test::ScopedOSInfoOverride scoped_os_info_override(
-        base::test::ScopedOSInfoOverride::Type::kWin11Home);
-    EXPECT_TRUE(CanSupportMimeType("audio/mp4", "mp4a.40.2"));
-  }
-
-  {
-    base::test::ScopedOSInfoOverride scoped_os_info_override(
-        base::test::ScopedOSInfoOverride::Type::kWin11HomeN);
-    EXPECT_FALSE(CanSupportMimeType("audio/mp4", "mp4a.40.2"));
-  }
-}
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_PROPRIETARY_CODECS)
-
 class MediaRecorderHandlerAudioVideoBase : public MediaRecorderHandlerFixture {
  public:
   MediaRecorderHandlerAudioVideoBase()
@@ -1527,49 +1500,6 @@ INSTANTIATE_TEST_SUITE_P(All,
                          MediaRecorderHandlerH264ProfileTest,
                          ValuesIn(kH264ProfileTestParams));
 
-#if BUILDFLAG(IS_WIN)
-class MediaRecorderHandlerWinAacCodecTest : public TestWithParam<unsigned int>,
-                                            public MediaRecorderHandlerFixture {
- public:
-  MediaRecorderHandlerWinAacCodecTest()
-      : MediaRecorderHandlerFixture(false, true) {}
-
-  MediaRecorderHandlerWinAacCodecTest(
-      const MediaRecorderHandlerWinAacCodecTest&) = delete;
-  MediaRecorderHandlerWinAacCodecTest& operator=(
-      const MediaRecorderHandlerWinAacCodecTest&) = delete;
-};
-
-TEST_P(MediaRecorderHandlerWinAacCodecTest, AudioBitsPerSeconds) {
-  const String codecs("mp4a.40.2");
-  if (!IsTargetAudioCodecSupported(codecs)) {
-    return;
-  }
-
-  AddTracks();
-
-  V8TestingScope scope;
-  auto* recorder = MakeGarbageCollected<MockMediaRecorder>(scope);
-
-  const String mime_type("audio/mp4");
-  EXPECT_TRUE(media_recorder_handler_->Initialize(
-      recorder, registry_.test_stream(), mime_type, codecs,
-      AudioTrackRecorder::BitrateMode::kVariable));
-  media_recorder_handler_->Start(0, mime_type, GetParam(), 0);
-
-  EXPECT_EQ(media::MFAudioEncoder::ClampAccCodecBitrate(GetParam()),
-            recorder->audioBitsPerSecond());
-
-  media_recorder_handler_->Stop();
-  media_recorder_handler_ = nullptr;
-}
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         MediaRecorderHandlerWinAacCodecTest,
-                         ValuesIn({5000u, 96000u, 128000u, 160000u, 192000u,
-                                   256000u, 300000u}));
-
-#endif  // BUILDFLAG(IS_WIN)
 #endif  // BUILDFLAG(USE_PROPRIETARY_CODECS)
 
 struct MediaRecorderPassthroughTestParams {

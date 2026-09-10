@@ -197,7 +197,7 @@ class COMPONENT_EXPORT(STARTUP_METRIC_UTILS)
   // Only permit construction from within GetBrowser().
   BrowserStartupMetricRecorder();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Returns the hard fault count of the current process, or nullopt if it can't
   // be determined.
   std::optional<uint32_t> GetHardFaultCountForCurrentProcess();

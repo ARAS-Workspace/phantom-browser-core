@@ -470,26 +470,4 @@ TEST(CheckExitCodeAfterSignalHandlerDeathTest, CheckSIGILL) {
 
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-TEST(StackTraceTest, EnabledStackTraces) {
-  // This is slightly pointless as this is also enabled by the test harness, but
-  // it ensures we are exercising the enabled path.
-  EXPECT_TRUE(base::debug::EnableInProcessStackDumping());
-  EXPECT_TRUE(base::debug::InProcessStackDumpingEnabledForTesting());
-}
-
-TEST(StackTraceTest, UnsymbolizedStackTraces) {
-  EXPECT_TRUE(base::debug::DisableInProcessStackDumpingForTesting());
-  EXPECT_FALSE(base::debug::InProcessStackDumpingEnabledForTesting());
-
-  StackTrace trace;
-  auto as_string = trace.ToString();
-  EXPECT_THAT(as_string,
-              ::testing::ContainsRegex("Dumping unresolved backtrace"));
-
-  // Restore global state.
-  EXPECT_TRUE(base::debug::EnableInProcessStackDumping());
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 }  // namespace base::debug

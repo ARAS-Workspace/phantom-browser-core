@@ -52,9 +52,7 @@ constexpr char kManifestTemplate[] = R"({
 // Get another command platform, which is used for simulating a command has been
 // assigned with a shortcut on another platform.
 std::string GetAnotherCommandPlatform() {
-#if BUILDFLAG(IS_WIN)
-  return ui::kKeybindingPlatformMac;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return ui::kKeybindingPlatformChromeOs;
 #elif BUILDFLAG(IS_CHROMEOS)
   return ui::kKeybindingPlatformLinux;

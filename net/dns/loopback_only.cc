@@ -86,11 +86,7 @@ bool HaveOnlyLoopbackAddressesUsingGetifaddrs() {
 
 // This implementation will always be posted to a thread pool.
 bool HaveOnlyLoopbackAddressesSlow() {
-#if BUILDFLAG(IS_WIN)
-  // TODO(wtc): implement with the GetAdaptersAddresses function.
-  NOTIMPLEMENTED();
-  return false;
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   return android::HaveOnlyLoopbackAddresses();
 #elif BUILDFLAG(IS_POSIX)
   return HaveOnlyLoopbackAddressesUsingGetifaddrs();

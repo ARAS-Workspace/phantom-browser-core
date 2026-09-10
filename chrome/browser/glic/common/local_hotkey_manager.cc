@@ -67,11 +67,6 @@ constexpr std::array kCloseAccelerators = {
 #endif
 };
 
-#if BUILDFLAG(IS_WIN)
-constexpr std::array kTitleBarContextMenuAccelerators = {
-    ui::Accelerator{ui::VKEY_SPACE, ui::EF_ALT_DOWN}};
-#endif
-
 #if BUILDFLAG(IS_MAC)
 constexpr int kZoomModifier = ui::EF_COMMAND_DOWN;
 #else
@@ -103,10 +98,6 @@ constexpr auto kCommandToStaticAcceleratorsMap =
         {LocalHotkeyManager::Command::kZoomIn, kZoomInAccelerators},
         {LocalHotkeyManager::Command::kZoomOut, kZoomOutAccelerators},
         {LocalHotkeyManager::Command::kZoomReset, kZoomResetAccelerators},
-#if BUILDFLAG(IS_WIN)
-        {LocalHotkeyManager::Command::kTitleBarContextMenu,
-         kTitleBarContextMenuAccelerators},
-#endif
     });
 
 // Compile-time helper to check if the keys in two maps are disjoint.

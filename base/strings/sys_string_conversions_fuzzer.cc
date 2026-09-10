@@ -25,12 +25,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   std::ignore = SysWideToNativeMB(wide_text);
   std::ignore = SysNativeMBToWide(text);
 
-#if BUILDFLAG(IS_WIN)
-  const uint32_t code_page = provider.ConsumeIntegral<uint32_t>();
-  std::ignore = SysMultiByteToWide(text, code_page);
-  std::ignore = SysWideToMultiByte(wide_text, code_page);
-#endif
-
   return 0;
 }
 

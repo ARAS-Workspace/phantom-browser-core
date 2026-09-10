@@ -81,13 +81,6 @@
 #include "ui/wm/core/window_util.h"
 #include "ui/wm/public/activation_client.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/base/win/shell.h"
-#include "ui/gfx/win/hwnd_util.h"
-#include "ui/views/widget/desktop_aura/desktop_native_cursor_manager_win.h"
-#include "ui/wm/core/window_properties.h"
-#endif
-
 DEFINE_EXPORTED_UI_CLASS_PROPERTY_TYPE(VIEWS_EXPORT,
                                        views::DesktopNativeWidgetAura*)
 
@@ -123,13 +116,6 @@ class DesktopNativeWidgetTopLevelHandler : public aura::WindowObserver {
         : is_menu   ? Widget::InitParams::TYPE_MENU
                     : Widget::InitParams::TYPE_POPUP);
 
-#if BUILDFLAG(IS_WIN)
-    // For menus, on Windows versions that support drop shadow remove
-    // the standard frame in order to keep just the shadow.
-    if (init_params.type == Widget::InitParams::TYPE_MENU) {
-      init_params.remove_standard_frame = true;
-    }
-#endif
     // If the window should be transparent, then ensure the top level widget
     // is also not opaque.
     if (child_window->GetTransparent()) {
@@ -579,19 +565,6 @@ void DesktopNativeWidgetAura::InitNativeWidget(Widget::InitParams params) {
   widget_type_ = params.type;
   name_ = params.name;
 
-#if BUILDFLAG(IS_WIN)
-  // Inherit the exclusion from screen capture property from the parent or
-  // context aura::Window.
-  aura::Window* const inheritance_source =
-      params.parent ? params.parent : params.context;
-
-  if (inheritance_source &&
-      inheritance_source->GetProperty(wm::kExcludeFromScreenCaptureKey)) {
-    params.init_properties_container.SetProperty(
-        wm::kExcludeFromScreenCaptureKey, true);
-  }
-#endif
-
   if (ownership_ == Widget::InitParams::NATIVE_WIDGET_OWNS_WIDGET) {
     owned_native_widget_delegate =
         base::WrapUnique(native_widget_delegate_.get());
@@ -616,11 +589,6 @@ void DesktopNativeWidgetAura::InitNativeWidget(Widget::InitParams params) {
   }
   host_->window()->SetProperty(kDesktopNativeWidgetAuraKey, this);
   desktop_window_tree_host_->Init(params);
-
-#if BUILDFLAG(IS_WIN)
-  desktop_window_tree_host_->SetExcludeFromScreenCapture(
-      content_window_->GetProperty(wm::kExcludeFromScreenCaptureKey));
-#endif
 
   host_->window()->AddChild(content_window_);
   host_->window()->AddObserver(new RootWindowDestructionObserver(this));
@@ -1030,15 +998,6 @@ bool DesktopNativeWidgetAura::IsVisibleOnScreen() const {
   // Determine if the window is hidden in some other way, such as on a different
   // desktop.
   // TODO(crbug.com/410938804): implement workspace handling on other platforms.
-#if BUILDFLAG(IS_WIN)
-  // If a window is cloaked, it is not visible on screen because e.g., it is
-  // on an invisible virtual desktop.
-  // https://devblogs.microsoft.com/oldnewthing/20200302-00/?p=103507
-  aura::WindowTreeHost* host = desktop_window_tree_host_->AsWindowTreeHost();
-  if (gfx::IsWindowCloaked(host->GetAcceleratedWidget())) {
-    return false;
-  }
-#endif
 
   // All checks pass, the window is visible on screen.
   return true;
@@ -1338,20 +1297,6 @@ bool DesktopNativeWidgetAura::AreScreenshotsAllowed() {
              : true;
 }
 
-#if BUILDFLAG(IS_WIN)
-void DesktopNativeWidgetAura::SetExcludeFromScreenCapture(bool exclude) {
-  if (content_window_->GetProperty(wm::kExcludeFromScreenCaptureKey) ==
-      exclude) {
-    return;
-  }
-
-  content_window_->SetProperty(wm::kExcludeFromScreenCaptureKey, exclude);
-  if (desktop_window_tree_host_) {
-    desktop_window_tree_host_->SetExcludeFromScreenCapture(exclude);
-  }
-}
-#endif
-
 bool DesktopNativeWidgetAura::IsDesktopNativeWidget() const {
   return true;
 }
@@ -1474,19 +1419,6 @@ void DesktopNativeWidgetAura::OnKeyEvent(ui::KeyEvent* event) {
 
 void DesktopNativeWidgetAura::OnMouseEvent(ui::MouseEvent* event) {
   DCHECK(content_window_->IsVisible());
-
-#if BUILDFLAG(IS_WIN)
-  if (event->type() == ui::EventType::kMouseMoved) {
-    // Showing a tooltip causes Windows to generate a MOUSE_MOVED
-    // event to the same location it was already at; when that happens,
-    // we need to throw the event away rather than acting as if someone
-    // moved the mouse and showing a new tooltip.
-    if (event->location() == last_mouse_loc_) {
-      return;
-    }
-    last_mouse_loc_ = event->location();
-  }
-#endif
 
   if (tooltip_manager_.get()) {
     tooltip_manager_->UpdateTooltip();

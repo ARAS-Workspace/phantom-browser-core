@@ -91,11 +91,7 @@ void TestNetLogManager::Start(NetLog* net_log, NetLogCaptureMode capture_mode) {
   client_info.Set("name", "net_unittests");
   base::CommandLine::StringType command_line_string =
       command_line->GetCommandLineString();
-#if BUILDFLAG(IS_WIN)
-  client_info.Set("command_line", base::WideToUTF8(command_line_string));
-#else
   client_info.Set("command_line", command_line_string);
-#endif
   constants->Set("clientInfo", std::move(client_info));
 
   file_net_log_observer_ = FileNetLogObserver::CreateUnboundedPreExisting(

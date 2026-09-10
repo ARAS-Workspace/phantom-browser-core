@@ -59,10 +59,6 @@
 #include "chrome/browser/chromeos/policy/dlp/dlp_rules_manager_factory.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/views/widget/native_widget_aura.h"
-#endif
-
 namespace {
 
 using TabRole = ::TabSharingInfoBarDelegate::TabRole;

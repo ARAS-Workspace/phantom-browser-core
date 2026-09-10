@@ -52,9 +52,6 @@
 #include "ui/android/dummy_screen_android.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/base/win/scoped_ole_initializer.h"
-#endif
 
 #if defined(USE_AURA)
 #include "ui/aura/test/aura_test_helper.h"
@@ -206,9 +203,6 @@ void RenderViewHostTestHarness::SetContents(
 std::unique_ptr<WebContents>
 RenderViewHostTestHarness::CreateTestWebContents() {
 // Make sure we ran SetUp() already.
-#if BUILDFLAG(IS_WIN)
-  DCHECK(ole_initializer_);
-#endif
 #if defined(USE_AURA)
   DCHECK(aura_test_helper_);
 #endif
@@ -240,9 +234,6 @@ void RenderViewHostTestHarness::SetUp() {
   if (factory_)
     rvh_test_enabler_->rvh_factory_->set_render_process_host_factory(factory_);
 
-#if BUILDFLAG(IS_WIN)
-  ole_initializer_ = std::make_unique<ui::ScopedOleInitializer>();
-#endif
 #if BUILDFLAG(IS_APPLE)
   screen_ = std::make_unique<display::ScopedNativeScreen>();
 #endif
@@ -279,9 +270,6 @@ void RenderViewHostTestHarness::TearDown() {
   dbus_thread_linux::ShutdownOnDBusThreadAndBlock();
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  ole_initializer_.reset();
-#endif
 
   // Delete any RenderProcessHosts before the BrowserContext goes away.
   if (rvh_test_enabler_->rph_factory_) {

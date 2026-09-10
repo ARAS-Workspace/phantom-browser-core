@@ -165,13 +165,7 @@ IN_PROC_BROWSER_TEST_P(IOSPromoBubbleBrowserTest, ShowQRCode_NoPageAction) {
                  kScreenshotBaselineCL));
 }
 
-#if BUILDFLAG(IS_WIN)
-// Disabled by gardener on 02/10/2026.
-// https://crbug.com/483422434.
-#define MAYBE_ShowReminder DISABLED_ShowReminder
-#else
 #define MAYBE_ShowReminder ShowReminder
-#endif
 IN_PROC_BROWSER_TEST_P(IOSPromoBubbleBrowserTest, MAYBE_ShowReminder) {
   if (GetPromoType() == PromoType::kAddress ||
       GetPromoType() == PromoType::kPayment) {

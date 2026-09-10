@@ -505,9 +505,6 @@ void OfflinePageRequestHandler::OpenFile(
 
   int flags =
       base::File::FLAG_OPEN | base::File::FLAG_READ | base::File::FLAG_ASYNC;
-#if BUILDFLAG(IS_WIN)
-  flags |= base::File::FLAG_WIN_EXCLUSIVE_READ;
-#endif  // BUILDFLAG(IS_WIN)
   int result =
       stream_->Open(file_path, flags,
                     base::BindOnce([](base::RepeatingCallback<void(int)> cb,

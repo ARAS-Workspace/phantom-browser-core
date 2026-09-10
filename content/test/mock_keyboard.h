@@ -9,10 +9,6 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "content/test/mock_keyboard_driver_win.h"
-#endif
-
 namespace content {
 
 // A mock keyboard interface.
@@ -99,11 +95,6 @@ class MockKeyboard {
                     std::u16string* output);
 
  private:
-#if BUILDFLAG(IS_WIN)
-  Layout keyboard_layout_ = LAYOUT_NULL;
-  Modifiers keyboard_modifiers_ = INVALID;
-  MockKeyboardDriverWin driver_;
-#endif
 };
 
 }  // namespace content

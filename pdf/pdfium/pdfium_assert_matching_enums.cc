@@ -14,10 +14,6 @@
 #include "third_party/pdfium/public/fpdfview.h"
 #include "ui/events/keycodes/keyboard_codes.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "pdf/pdf.h"
-#endif
-
 namespace chrome_pdf {
 
 #define STATIC_ASSERT_ENUM(a, b)                            \
@@ -218,16 +214,5 @@ STATIC_ASSERT_ENUM(FormType::kAcroForm, FORMTYPE_ACRO_FORM);
 STATIC_ASSERT_ENUM(FormType::kXFAFull, FORMTYPE_XFA_FULL);
 STATIC_ASSERT_ENUM(FormType::kXFAForeground, FORMTYPE_XFA_FOREGROUND);
 STATIC_ASSERT_ENUM(FormType::kMaxValue, FORMTYPE_COUNT - 1);
-
-#if BUILDFLAG(IS_WIN)
-STATIC_ASSERT_ENUM(kEmf, FPDF_PRINTMODE_EMF);
-STATIC_ASSERT_ENUM(kTextOnly, FPDF_PRINTMODE_TEXTONLY);
-STATIC_ASSERT_ENUM(kPostScript2, FPDF_PRINTMODE_POSTSCRIPT2);
-STATIC_ASSERT_ENUM(kPostScript3, FPDF_PRINTMODE_POSTSCRIPT3);
-STATIC_ASSERT_ENUM(kEmfWithReducedRasterization,
-                   FPDF_PRINTMODE_EMF_IMAGE_MASKS);
-STATIC_ASSERT_ENUM(kPostScript3WithType42Fonts,
-                   FPDF_PRINTMODE_POSTSCRIPT3_TYPE42);
-#endif
 
 }  // namespace chrome_pdf

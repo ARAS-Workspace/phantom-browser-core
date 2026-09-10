@@ -28,9 +28,6 @@ class AXPlatformForTest : public AXPlatform::Delegate {
   // AXPlatform::Delegate:
   AXMode GetAccessibilityMode() override;
   void OnInlineTextBoxesUsedInWebContent() override;
-#if BUILDFLAG(IS_WIN)
-  AXPlatform::ProductStrings GetProductStrings() override;
-#endif
 
   int inline_text_boxes_used_in_web_content_count() const {
     return inline_text_boxes_used_in_web_content_count_;

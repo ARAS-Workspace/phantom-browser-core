@@ -2537,12 +2537,7 @@ TEST_P(CacheStorageCacheTestP, VerifySerialScheduling) {
   EXPECT_EQ(2, sequence_out);
 }
 
-#if BUILDFLAG(IS_WIN)
-// TODO(crbug.com/41443751): Flaky on Windows.
-#define MAYBE_KeysWithManyCacheEntries DISABLED_KeysWithManyCacheEntries
-#else
 #define MAYBE_KeysWithManyCacheEntries KeysWithManyCacheEntries
-#endif
 TEST_P(CacheStorageCacheTestP, MAYBE_KeysWithManyCacheEntries) {
   // Use a smaller list in disk mode to reduce test runtime.
   const int kNumEntries = MemoryOnly() ? 1000 : 250;

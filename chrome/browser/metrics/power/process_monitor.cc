@@ -41,10 +41,6 @@
 #include "extensions/common/manifest_handlers/background_info.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "sandbox/policy/mojom/sandbox.mojom-shared.h"
-#endif
-
 using content::BrowserThread;
 
 namespace {
@@ -235,12 +231,6 @@ ProcessInfo::ProcessInfo(
   // meaningful data.
   SampleMetrics(*this->process_metrics);
 
-#if BUILDFLAG(IS_WIN) && !defined(ARCH_CPU_ARM64)
-  // Record the value of HasConstantRateTSC to get a feel of the proportion of
-  // users that don't record the average CPU usage histogram.
-  base::UmaHistogramBoolean("PerformanceMonitor.HasPreciseCPUUsage",
-                            base::time_internal::HasConstantRateTSC());
-#endif
 }
 ProcessInfo::~ProcessInfo() = default;
 
@@ -415,14 +405,6 @@ void ProcessMonitor::RenderProcessHostDestroyed(
 void ProcessMonitor::BrowserChildProcessLaunchedAndConnected(
     const content::ChildProcessData& data) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
-#if BUILDFLAG(IS_WIN)
-  // Cannot gather process metrics for elevated process as browser has no
-  // access to them.
-  if (data.sandbox_type.value() ==
-      sandbox::mojom::Sandbox::kNoSandboxAndElevatedPrivileges) {
-    return;
-  }
-#endif
 
   ProcessInfo::Key key =
       GetMonitoredProcessInfoKeyForNonRendererChildProcess(data);
@@ -467,14 +449,6 @@ void ProcessMonitor::OnBrowserChildProcessExited(
     const content::ChildProcessData& data,
     const content::ChildProcessTerminationInfo& info) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
-#if BUILDFLAG(IS_WIN)
-  // Cannot gather process metrics for elevated process as browser has no
-  // access to them.
-  if (data.sandbox_type.value() ==
-      sandbox::mojom::Sandbox::kNoSandboxAndElevatedPrivileges) {
-    return;
-  }
-#endif
   auto it = browser_child_process_infos_.find(data.id);
   if (it == browser_child_process_infos_.end()) {
     // It is possible to receive this notification without a launch-and-connect

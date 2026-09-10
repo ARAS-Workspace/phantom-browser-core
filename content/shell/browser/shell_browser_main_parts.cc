@@ -84,11 +84,7 @@ GURL GetStartupURL() {
   if (args.empty())
     return GURL("https://www.google.com/");
 
-#if BUILDFLAG(IS_WIN)
-  GURL url(base::WideToUTF16(args[0]));
-#else
   GURL url(args[0]);
-#endif
   if (url.is_valid() && url.has_scheme())
     return url;
 

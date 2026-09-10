@@ -148,13 +148,6 @@ struct StructTraits<printing::mojom::PrintSettingsDataView,
     return s.landscape();
   }
 
-#if BUILDFLAG(IS_WIN)
-  static printing::mojom::PrinterLanguageType printer_language_type(
-      const printing::PrintSettings& s) {
-    return s.printer_language_type();
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   static bool is_modifiable(const printing::PrintSettings& s) {
     return s.is_modifiable();
   }

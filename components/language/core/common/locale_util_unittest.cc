@@ -122,7 +122,7 @@ TEST_F(LocaleUtilTest, ConvertToActualUILocale) {
 //---------------------------------------------------------------------------
 // This only matters for ChromeOS and Windows, as they are the only systems
 // where users can set the display UI.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
   locale = "sd";  // Sindhi
   is_ui = ConvertToActualUILocale(&locale);
   EXPECT_FALSE(is_ui);

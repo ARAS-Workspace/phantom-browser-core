@@ -51,10 +51,6 @@ class BASE_EXPORT ThreadPoolInstance {
     enum class CommonThreadPoolEnvironment {
       // Use the default environment (no environment).
       DEFAULT,
-#if BUILDFLAG(IS_WIN)
-      // Place the pool's workers in a COM MTA.
-      COM_MTA,
-#endif  // BUILDFLAG(IS_WIN)
     };
 
     InitParams(size_t max_num_foreground_threads_in);

@@ -9,10 +9,6 @@
 #include "base/time/time.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/com_init_util.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include "base/process/set_process_title_linux.h"
 #endif
@@ -20,31 +16,6 @@
 namespace base {
 
 namespace {
-
-#if BUILDFLAG(IS_WIN)
-class ComLeakCheck : public testing::EmptyTestEventListener {
- public:
-  void OnTestEnd(const testing::TestInfo& test) override {
-    // Verify that COM has been reset to defaults by the test.
-    EXPECT_EQ(win::GetComApartmentTypeForThread(), win::ComApartmentType::NONE);
-  }
-};
-
-class HistogramAllocatorCheck : public testing::EmptyTestEventListener {
- public:
-  void OnTestEnd(const testing::TestInfo& test) override {
-    // Verify that the histogram allocator was released by the test.
-    CHECK(!GlobalHistogramAllocator::Get());
-  }
-};
-
-class TimerCheck : public testing::EmptyTestEventListener {
- public:
-  void OnTestEnd(const testing::TestInfo& test_info) override {
-    EXPECT_FALSE(Time::IsHighResolutionTimerInUse());
-  }
-};
-#endif  // BUILDFLAG(IS_WIN)
 
 class BaseUnittestSuite : public TestSuite {
  public:
@@ -54,14 +25,6 @@ class BaseUnittestSuite : public TestSuite {
   void Initialize() override {
     TestSuite::Initialize();
 
-#if BUILDFLAG(IS_WIN)
-    // Add TestEventListeners to enforce certain properties across tests.
-    testing::TestEventListeners& listeners =
-        testing::UnitTest::GetInstance()->listeners();
-    listeners.Append(new ComLeakCheck);
-    listeners.Append(new HistogramAllocatorCheck);
-    listeners.Append(new TimerCheck);
-#endif  // BUILDFLAG(IS_WIN)
   }
 };
 

@@ -135,11 +135,7 @@ void WebDialogBrowserTest::SimulateEscapeKey() {
 
 // Windows has some issues resizing windows. An off by one problem, and a
 // minimum size that seems too big. See http://crbug.com/41198181.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SizeWindow DISABLED_SizeWindow
-#else
 #define MAYBE_SizeWindow SizeWindow
-#endif
 IN_PROC_BROWSER_TEST_F(WebDialogBrowserTest, MAYBE_SizeWindow) {
 #if BUILDFLAG(IS_MAC)
   // On macOS, the new mechanism for sheets, which are used for window modals

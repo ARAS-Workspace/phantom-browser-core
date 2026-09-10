@@ -53,13 +53,7 @@ std::unique_ptr<TestInfo> GetTestInfoFromWebTestName(
   if (!(test_url.is_valid() && test_url.has_scheme())) {
     // We're outside of the message loop here, and this is a test.
     base::ScopedAllowBlockingForTesting allow_blocking;
-#if BUILDFLAG(IS_WIN)
-    base::FilePath::StringType wide_path_or_url =
-        base::SysNativeMBToWide(path_or_url);
-    base::FilePath local_file(wide_path_or_url);
-#else
     base::FilePath local_file(path_or_url);
-#endif
     if (!base::PathExists(local_file) &&
         !base::FilePath(local_file).IsAbsolute()) {
       base::FilePath base_path;
@@ -74,11 +68,7 @@ std::unique_ptr<TestInfo> GetTestInfoFromWebTestName(
   base::FilePath local_path;
   base::FilePath current_working_directory;
 
-#if BUILDFLAG(IS_WIN)
-  base::FilePath trace_file_path(base::SysNativeMBToWide(trace_file));
-#else
   base::FilePath trace_file_path(trace_file);
-#endif
 
   // We're outside of the message loop here, and this is a test.
   base::ScopedAllowBlockingForTesting allow_blocking;
@@ -128,11 +118,7 @@ std::unique_ptr<TestInfo> TestInfoExtractor::GetNextTest() {
     } while (test_string.empty());
     protocol_mode = true;
   } else {
-#if BUILDFLAG(IS_WIN)
-    test_string = base::WideToUTF8(cmdline_args_[cmdline_position_++]);
-#else
     test_string = cmdline_args_[cmdline_position_++];
-#endif
   }
 
   DCHECK(!test_string.empty());

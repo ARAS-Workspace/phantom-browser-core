@@ -18,10 +18,6 @@
 #include "base/memory/weak_ptr.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace image_writer {
 
 class ImageWriterHandler;
@@ -86,10 +82,6 @@ class ImageWriter final {
   base::File device_file_;
   int64_t bytes_processed_;
   bool running_;
-
-#if BUILDFLAG(IS_WIN)
-  std::vector<HANDLE> volume_handles_;
-#endif
 
 #if BUILDFLAG(IS_MAC)
   friend class DiskUnmounterMac;

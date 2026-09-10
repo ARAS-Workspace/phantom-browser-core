@@ -4623,7 +4623,7 @@ IN_PROC_BROWSER_TEST_P(SitePerProcessBrowserTest, OpenerSetLocation) {
 }
 
 // crbug.com/1281755
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_NavigateProxyAndDetachBeforeProvisionalFrameCreation \
   DISABLED_NavigateProxyAndDetachBeforeProvisionalFrameCreation
 #else
@@ -11175,7 +11175,7 @@ IN_PROC_BROWSER_TEST_P(SitePerProcessBrowserTest, FrameDepthTest) {
 }
 
 // Disabled due to flakiness. crbug.com/1146083
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_VisibilityFrameDepthTest DISABLED_VisibilityFrameDepthTest
 #else
 #define MAYBE_VisibilityFrameDepthTest VisibilityFrameDepthTest
@@ -12602,7 +12602,7 @@ IN_PROC_BROWSER_TEST_P(SitePerProcessBrowserTest,
 // (typically during session restore when many navigations would be happening in
 // backgrounded processes).
 // TODO(crbug.com/40196588): Flaky on Mac and Windows.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_NoCommitTimeoutForInvisibleWebContents \
   DISABLED_NoCommitTimeoutForInvisibleWebContents
 #else

@@ -26,10 +26,6 @@
 #include "ui/gfx/geometry/decomposed_transform.h"
 #include "ui/gfx/geometry/transform.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#endif
-
 namespace content {
 namespace {
 bool IsValidTransform(const gfx::Transform& transform) {
@@ -464,11 +460,5 @@ std::vector<device::mojom::XRSessionFeature>
 BrowserXRRuntimeImpl::GetSupportedFeatures() {
   return device_data_->supported_features;
 }
-
-#if BUILDFLAG(IS_WIN)
-std::optional<CHROME_LUID> BrowserXRRuntimeImpl::GetLuid() const {
-  return device_data_->luid;
-}
-#endif
 
 }  // namespace content

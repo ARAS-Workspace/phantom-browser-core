@@ -67,7 +67,7 @@ std::string_view ToString(permissions::RequestType request_type) {
           {RequestType::kKeyboardLock, "KeyboardLock"},
           {RequestType::kPointerLock, "PointerLock"},
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
           {RequestType::kProtectedMediaIdentifier, "ProtectedMediaIdentifier"},
 #endif
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)

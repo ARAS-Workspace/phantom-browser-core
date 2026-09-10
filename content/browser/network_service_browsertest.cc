@@ -91,21 +91,6 @@
 #include "base/android/application_status_listener.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <dbghelp.h>
-
-#include <algorithm>
-
-#include "base/files/memory_mapped_file.h"
-#include "base/files/scoped_temp_file.h"
-#include "base/memory/scoped_refptr.h"
-#include "base/rand_util.h"
-#include "content/browser/network/network_service_process_tracker_win.h"
-#include "content/common/features.h"
-#include "sandbox/policy/features.h"
-#endif
 
 namespace content {
 
@@ -878,33 +863,6 @@ CreateNetworkContextForPaths(network::mojom::NetworkContextFilePathsPtr paths,
   context_params->http_cache_enabled = true;
   context_params->file_paths->http_cache_directory = cache_path;
 
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/377940976): Remove this once the background sequence runner
-  // can be fully drained of tasks during network context shutdown.
-  {
-    base::RunLoop run_loop;
-    // The remote for the test network service needs to stay alive until the
-    // RunLoop has finished.
-    std::optional<mojo::Remote<network::mojom::NetworkServiceTest>>
-        maybe_network_service_test;
-    if (content::IsOutOfProcessNetworkService()) {
-      maybe_network_service_test.emplace();
-      GetNetworkService()->BindTestInterfaceForTesting(
-          maybe_network_service_test->BindNewPipeAndPassReceiver());
-      (*maybe_network_service_test)
-          ->DisableExclusiveCookieDatabaseLockingForTesting(
-              run_loop.QuitClosure());
-    } else {
-      content::GetNetworkTaskRunner()->PostTaskAndReply(
-          FROM_HERE, base::BindOnce([]() {
-            network::NetworkService::GetNetworkServiceForTesting()
-                ->disable_exclusive_cookie_database_locking_for_testing();
-          }),
-          run_loop.QuitClosure());
-    }
-    run_loop.Run();
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   mojo::PendingRemote<network::mojom::NetworkContext> network_context;
   content::CreateNetworkContextInNetworkService(
@@ -923,19 +881,6 @@ enum class FailureType {
   // A file called 'TestCookies' already exists in the migration target
   // directory.
   kCookieFileAlreadyThere = 3,
-#if BUILDFLAG(IS_WIN)
-  // The 'TestCookies' file in the destination directory is locked and cannot be
-  // written to. This is only valid on Windows where files can actually be
-  // locked.
-  kDestCookieFileIsLocked = 4,
-  // The 'TestCookies' file in the source directory is locked and cannot be read
-  // from (during the migration). This failure is only valid on Windows where
-  // files can actually be locked.
-  kSourceCookieFileIsLocked = 5,
-#endif  // BUILDFLAG(IS_WIN)
-  // A file exists with the same name as the Cache dir. This will cause the
-  // creation of the cache dir to fail, and cache to not function either
-  // (although we don't test for that here).
   kCacheDirIsAFile = 6,
 };
 
@@ -944,10 +889,6 @@ static const FailureType kFailureTypes[] = {
     FailureType::kDirIsAFile,
     FailureType::kDirAlreadyThere,
     FailureType::kCookieFileAlreadyThere,
-#if BUILDFLAG(IS_WIN)
-    FailureType::kDestCookieFileIsLocked,
-    FailureType::kSourceCookieFileIsLocked,
-#endif  // BUILDFLAG(IS_WIN)
     FailureType::kCacheDirIsAFile};
 
 static const base::FilePath::CharType kCookieDatabaseName[] =
@@ -973,14 +914,6 @@ static const base::FilePath::CharType kNetworkSubpath[] =
 class MAYBE_NetworkServiceDataMigrationBrowserTest : public ContentBrowserTest {
  public:
   MAYBE_NetworkServiceDataMigrationBrowserTest() {
-#if BUILDFLAG(IS_WIN)
-    // On Windows, the network sandbox needs to be disabled. This is because the
-    // code that performs the migration on Windows DCHECKs if network sandbox is
-    // enabled and migration is not requested, but this is used in the tests to
-    // verify this behavior.
-    win_network_sandbox_feature_.InitAndDisableFeature(
-        sandbox::policy::features::kNetworkServiceSandbox);
-#endif
     // In this experiment, we created a DB file
     // user_data/xxx/yyyy/Cache/Cache_Data/sqldb1-wal, which we can not copy.
     // TODO(crbug.com/460304696): Fix this. Might be by shutting down sql?
@@ -988,10 +921,6 @@ class MAYBE_NetworkServiceDataMigrationBrowserTest : public ContentBrowserTest {
         net::kHttpCacheInitializeDiskCacheBackendEarly);
   }
 
-#if BUILDFLAG(IS_WIN)
- private:
-  base::test::ScopedFeatureList win_network_sandbox_feature_;
-#endif
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
@@ -1089,9 +1018,6 @@ void MigrationTestInternal(const base::FilePath& tempdir_one,
 
   // Verify cookie file is there, copied across from the tempdir 'one'.
   EXPECT_TRUE(base::PathExists(tempdir_two.Append(kCookieDatabaseName)));
-#if BUILDFLAG(IS_WIN)
-  base::File longer_lived_file;
-#endif
 
   switch (failure_type) {
     case FailureType::kNoFailures:
@@ -1116,31 +1042,6 @@ void MigrationTestInternal(const base::FilePath& tempdir_one,
           base::File::FLAG_CREATE_ALWAYS | base::File::FLAG_WRITE);
       EXPECT_TRUE(scoped_file.IsValid());
     } break;
-#if BUILDFLAG(IS_WIN)
-    case FailureType::kDestCookieFileIsLocked:
-      // Create a file called 'TestCookies' in the destination path and hold a
-      // write lock on it so it can't be written to.
-      EXPECT_TRUE(base::CreateDirectory(tempdir_two.Append(kNetworkSubpath)));
-      longer_lived_file = base::File(
-          tempdir_two.Append(kNetworkSubpath).Append(kCookieDatabaseName),
-          base::File::FLAG_CREATE_ALWAYS | base::File::FLAG_WRITE |
-              base::File::FLAG_WIN_EXCLUSIVE_WRITE |
-              base::File::FLAG_WIN_EXCLUSIVE_READ);
-      EXPECT_TRUE(longer_lived_file.IsValid());
-      break;
-    case FailureType::kSourceCookieFileIsLocked:
-      // Lock the Cookie file so it can't be read. This causes cookies to break
-      // entirely, both the migration and the normal operation. The test can
-      // merely verify that the migration fails and the failure is reported
-      // correctly.
-      longer_lived_file =
-          base::File(tempdir_two.Append(kCookieDatabaseName),
-                     base::File::FLAG_OPEN_ALWAYS | base::File::FLAG_WRITE |
-                         base::File::FLAG_WIN_EXCLUSIVE_WRITE |
-                         base::File::FLAG_WIN_EXCLUSIVE_READ);
-      EXPECT_TRUE(longer_lived_file.IsValid());
-      break;
-#endif  // BUILDFLAG(IS_WIN)
     case FailureType::kCacheDirIsAFile: {
       // Make the cache directory invalid by deleting it and making it a file,
       // so it can't be created or used.
@@ -1214,50 +1115,6 @@ void MigrationTestInternal(const base::FilePath& tempdir_one,
           /*sample=kFailedToCreateDataDirectory=*/2,
           /*expected_bucket_count=*/1);
       break;
-#if BUILDFLAG(IS_WIN)
-    case FailureType::kDestCookieFileIsLocked:
-      // Cookie file should still be in the original `unsandboxed_data_path` as
-      // it could not be moved as the destination was locked or not writable.
-      EXPECT_TRUE(base::PathExists(tempdir_two.Append(kCookieDatabaseName)));
-      // Source file is there, but locked.
-      EXPECT_TRUE(base::PathExists(tempdir_two.Append(kCookieDatabaseName)));
-      // And locked destination file is there, but cookies are working so they
-      // must be backed by the original file.
-      EXPECT_TRUE(
-          base::PathExists(tempdir_two.Append(FILE_PATH_LITERAL("Network"))
-                               .Append(kCookieDatabaseName)));
-      EXPECT_FALSE(base::PathExists(
-          tempdir_two.Append(kNetworkSubpath).Append(kCheckpointFileName)));
-      {
-        base::File attempt_to_open_locked_file(
-            tempdir_two.Append(kNetworkSubpath).Append(kCookieDatabaseName),
-            base::File::FLAG_OPEN_ALWAYS | base::File::FLAG_READ);
-        // Check that the file really is locked, so the cookies must be running
-        // from the unsandboxed directory.
-        EXPECT_FALSE(attempt_to_open_locked_file.IsValid());
-      }
-      histogram_tester.ExpectUniqueSample("NetworkService.GrantSandboxResult",
-                                          /*sample=kFailedToCopyData=*/3,
-                                          /*expected_bucket_count=*/1);
-      break;
-    case FailureType::kSourceCookieFileIsLocked:
-      // Cookie file should still be in the original `unsandboxed_data_path` as
-      // it could not be moved as the destination was locked or not writable.
-      EXPECT_TRUE(base::PathExists(tempdir_two.Append(kCookieDatabaseName)));
-      // File hasn't moved, so cookies must be backed by the original file.
-      EXPECT_FALSE(base::PathExists(
-          tempdir_two.Append(kNetworkSubpath).Append(kCookieDatabaseName)));
-      EXPECT_FALSE(base::PathExists(
-          tempdir_two.Append(kNetworkSubpath).Append(kCheckpointFileName)));
-      histogram_tester.ExpectUniqueSample("NetworkService.GrantSandboxResult",
-                                          /*sample=kFailedToCopyData=*/3,
-                                          /*expected_bucket_count=*/1);
-      // In this case the source cookie file can't be read by anything including
-      // the migration code and the network context, so cookies should be
-      // totally broken. :(
-      cookies_should_work = false;
-      break;
-#endif  // BUILDFLAG(IS_WIN)
     case FailureType::kCacheDirIsAFile:
       histogram_tester.ExpectUniqueSample("NetworkService.GrantSandboxResult",
                                           /*sample=kSuccess=*/0,
@@ -1903,69 +1760,8 @@ IN_PROC_BROWSER_TEST_F(NetworkServiceCookieEncryptionBrowserTest,
   // This part of the test does not work with Address Sanitizer as it takes
   // copies of the memory in shadow memory. In debug mode, the size of the
   // memory is too large and it takes too long (>45s) on bots, and times out.
-#if BUILDFLAG(IS_WIN) && !defined(ADDRESS_SANITIZER) && defined(NDEBUG)
-  if (IsInProcessNetworkService()) {
-    return;
-  }
-  {
-    base::ScopedAllowBlockingForTesting allow_blocking;
-    base::FilePath temp_path;
-    ASSERT_TRUE(base::CreateTemporaryFile(&temp_path));
-
-    base::File temp_file;
-    temp_file.Initialize(
-        temp_path, base::File::FLAG_CREATE_ALWAYS | base::File::FLAG_READ |
-                       base::File::FLAG_WRITE | base::File::FLAG_WIN_TEMPORARY |
-                       base::File::FLAG_DELETE_ON_CLOSE);
-    ASSERT_TRUE(temp_file.IsValid());
-    base::Process peer_process = base::Process::OpenWithExtraPrivileges(
-        GetNetworkServiceProcessForTesting().Pid());
-    const auto minidump_type = static_cast<MINIDUMP_TYPE>(
-        MiniDumpWithFullMemory | MiniDumpIgnoreInaccessibleMemory);
-    ASSERT_TRUE(::MiniDumpWriteDump(peer_process.Handle(), peer_process.Pid(),
-                                    temp_file.GetPlatformFile(), minidump_type,
-                                    nullptr, nullptr, nullptr));
-    base::MemoryMappedFile map;
-    ASSERT_TRUE(map.Initialize(std::move(temp_file)));
-
-    auto it = map.bytes().begin();
-    size_t occurrences = 0;
-    while ((it = std::search(it, map.bytes().end(), key_data.begin(),
-                             key_data.end())) != map.bytes().end()) {
-      ++occurrences;
-      it += key_data.size();
-    }
-
-    // No instances of the key should be present in the full memory dump of the
-    // network service process as it's encrypted.
-    EXPECT_EQ(0u, occurrences);
-  }
-#endif  // BUILDFLAG(IS_WIN) && !defined(ADDRESS_SANITIZER) && defined(NDEBUG)
 }
 
-#if BUILDFLAG(IS_WIN)
-class NetworkServiceCodeIntegrityTest : public NetworkServiceBrowserTest {
- public:
-  NetworkServiceCodeIntegrityTest() {
-    scoped_feature_list_.InitWithFeatures(
-        {sandbox::policy::features::kNetworkServiceCodeIntegrity,
-         sandbox::policy::features::kNetworkServiceSandbox},
-        {});
-    ForceOutOfProcessNetworkService();
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-// This test verifies that the NetworkServiceCodeIntegrity feature works when
-// used in conjunction with the network service sandbox on Windows.
-IN_PROC_BROWSER_TEST_F(NetworkServiceCodeIntegrityTest, Enabled) {
-  // Verify pages load.
-  EXPECT_TRUE(
-      NavigateToURL(shell(), embedded_test_server()->GetURL("/empty.html")));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 class NetworkServiceObserverBeforeLaunchTest
     : public ContentBrowserTest,

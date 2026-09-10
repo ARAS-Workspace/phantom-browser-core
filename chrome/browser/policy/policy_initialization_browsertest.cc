@@ -16,18 +16,7 @@
 #include "components/prefs/pref_service.h"
 #include "content/public/test/browser_test.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/test/test_reg_util_win.h"
-#include "base/win/registry.h"
-#endif
-
 namespace {
-
-#if BUILDFLAG(IS_WIN)
-const char kMockPolicyName[] = "AllowFileSelectionDialogs";
-#endif
 
 void VerifyLocalState() {
   const PrefService* prefs = g_browser_process->local_state();
@@ -77,29 +66,6 @@ class PolicyInitializationBrowserTest : public InProcessBrowserTest {
   }
 
  private:
-#if BUILDFLAG(IS_WIN)
-  // Set up policy value for windows platform
-  void SetUpPlatformPolicyValue() {
-    HKEY root = HKEY_CURRENT_USER;
-    ASSERT_NO_FATAL_FAILURE(registry_override_manager_.OverrideRegistry(root));
-
-    base::win::RegKey key;
-
-    ASSERT_EQ(ERROR_SUCCESS, key.Create(root, policy::kRegistryChromePolicyKey,
-                                        KEY_SET_VALUE | KEY_WOW64_32KEY));
-    ASSERT_EQ(ERROR_SUCCESS,
-              key.WriteValue(base::ASCIIToWide(kMockPolicyName).c_str(), 1));
-  }
-
-  registry_util::RegistryOverrideManager registry_override_manager_;
-#else
   // This test hasn't supported other platform yet.
   void SetUpPlatformPolicyValue() {}
-#endif
 };
-
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(PolicyInitializationBrowserTest, VerifyLocalState) {
-  VerifyLocalState();
-}
-#endif

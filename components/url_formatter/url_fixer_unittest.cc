@@ -269,20 +269,7 @@ constexpr auto kSegmentCases = std::to_array<SegmentCase>({
         .query = url::Component(),
         .ref = url::Component(27, 3),
     },
-#if BUILDFLAG(IS_WIN)
-    {
-        .input = "c:/notahost/path/file#ref",
-        .result = "file",
-        .scheme = url::Component(),
-        .username = url::Component(),
-        .password = url::Component(),
-        .host = url::Component(),
-        .port = url::Component(),
-        .path = url::Component(0, 21),
-        .query = url::Component(),
-        .ref = url::Component(22, 3),
-    },
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
     {
         .input = "~/notahost/path/file#ref",
         .result = "file",
@@ -560,42 +547,7 @@ TEST(URLFixerTest, FixupFile) {
   EXPECT_EQ(golden, fixedup);
 
   // TODO(port): Make some equivalent tests for posix.
-#if BUILDFLAG(IS_WIN)
-  // c|/foo\bar.txt -> file:///c:/foo/bar.txt (pipe allowed instead of colon)
-  std::string cur(base::WideToUTF8(original.value()));
-  EXPECT_EQ(':', cur[1]);
-  cur[1] = '|';
-  EXPECT_EQ(golden, FixupURL(cur, ""));
-
-  FixupCase cases[] = {
-      {"c:\\Non-existent%20file.txt", "file:///C:/Non-existent%2520file.txt"},
-
-      // \\foo\bar.txt -> file://foo/bar.txt
-      // UNC paths, this file won't exist, but since there are no escapes, it
-      // should be returned just converted to a file: URL.
-      {"\\\\NonexistentHost\\foo\\bar.txt",
-       "file://nonexistenthost/foo/bar.txt"},
-      // We do this strictly, like IE8, which only accepts this form using
-      // backslashes and not forward ones.  Turning "//foo" into "http" matches
-      // Firefox and IE, silly though it may seem (it falls out of adding "http"
-      // as the default protocol if you haven't entered one).
-      {"//NonexistentHost\\foo/bar.txt", "http://nonexistenthost/foo/bar.txt"},
-      {"file:///C:/foo/bar", "file:///C:/foo/bar"},
-
-      // Much of the work here comes from GURL's canonicalization stage.
-      {"file://C:/foo/bar", "file:///C:/foo/bar"},
-      {"file:c:", "file:///C:"},
-      {"file:c:WINDOWS", "file:///C:/WINDOWS"},
-      {"file:c|Program Files", "file:///C:/Program%20Files"},
-      {"file:/file", "file://file/"},
-      {"file:////////c:\\foo", "file:///C:/foo"},
-      {"file://server/folder/file", "file://server/folder/file"},
-
-      // These are fixups we don't do, but could consider:
-      //   {"file:///foo:/bar", "file://foo/bar"},
-      //   {"file:/\\/server\\folder/file", "file://server/folder/file"},
-  };
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_APPLE)
 #define HOME "/Users/"

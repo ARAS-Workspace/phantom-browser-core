@@ -30,12 +30,6 @@
 #include "remoting/base/crash/crash_reporting_crashpad.h"
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "remoting/base/crash/crash_reporting_breakpad.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace remoting {
 
 int RemoteWebAuthnMain(int argc, char** argv) {
@@ -51,8 +45,6 @@ int RemoteWebAuthnMain(int argc, char** argv) {
   if (IsUsageStatsAllowed()) {
 #if BUILDFLAG(IS_LINUX)
     InitializeCrashpadReporting();
-#elif BUILDFLAG(IS_WIN)
-    InitializeBreakpadReporting();
 #endif  // BUILDFLAG(IS_LINUX)
   }
 #endif  // defined(REMOTING_ENABLE_CRASH_REPORTING)
@@ -71,24 +63,6 @@ int RemoteWebAuthnMain(int argc, char** argv) {
 
 #if BUILDFLAG(IS_POSIX)
   PipeMessagingChannel::OpenAndBlockStdio(read_file, write_file);
-#elif BUILDFLAG(IS_WIN)
-  // GetStdHandle() returns pseudo-handles for stdin and stdout even if
-  // the hosting executable specifies "Windows" subsystem. However the
-  // returned handles are invalid in that case unless standard input and
-  // output are redirected to a pipe or file.
-  read_file = base::File(GetStdHandle(STD_INPUT_HANDLE));
-  write_file = base::File(GetStdHandle(STD_OUTPUT_HANDLE));
-
-  // After the native messaging channel starts, the native messaging reader
-  // will keep doing blocking read operations on the input named pipe.
-  // If any other thread tries to perform any operation on STDIN, it will also
-  // block because the input named pipe is synchronous (non-overlapped).
-  // It is pretty common for a DLL to query the device info (GetFileType) of
-  // the STD* handles at startup. So any LoadLibrary request can potentially
-  // be blocked. To prevent that from happening we close STDIN and STDOUT
-  // handles as soon as we retrieve the corresponding file handles.
-  SetStdHandle(STD_INPUT_HANDLE, nullptr);
-  SetStdHandle(STD_OUTPUT_HANDLE, nullptr);
 #endif
 
   base::RunLoop run_loop;

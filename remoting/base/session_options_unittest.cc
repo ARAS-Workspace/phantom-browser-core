@@ -24,9 +24,6 @@ TEST(SessionOptionsTest, ParseAllSupportedFields) {
 #if BUILDFLAG(IS_MAC)
   dict.Set(kSessionOptionEnableSckCapturer, "1");
 #endif  // BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_WIN)
-  dict.Set(kSessionOptionAllowDxgiCapturer, "TRUE");
-#endif  // BUILDFLAG(IS_WIN)
 
   SessionOptions options = SessionOptions::Parse(dict);
   EXPECT_EQ(options.detect_updated_region, true);
@@ -38,9 +35,6 @@ TEST(SessionOptionsTest, ParseAllSupportedFields) {
 #if BUILDFLAG(IS_MAC)
   EXPECT_EQ(options.enable_sck_capturer, true);
 #endif  // BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(options.allow_dxgi_capturer, true);
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 TEST(SessionOptionsTest, ParseIgnoresUnsupportedField) {
@@ -72,9 +66,7 @@ TEST(SessionOptionsTest, IgnoreNonApplicableOsKeys) {
 #if !BUILDFLAG(IS_MAC)
   dict.Set("Enable-Sck-Capturer", "true");
 #endif  // !BUILDFLAG(IS_MAC)
-#if !BUILDFLAG(IS_WIN)
   dict.Set("Allow-Dxgi-Capturer", "true");
-#endif  // !BUILDFLAG(IS_WIN)
 
   SessionOptions options = SessionOptions::Parse(dict);
   EXPECT_EQ(options.detect_updated_region, true);

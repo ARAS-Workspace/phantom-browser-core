@@ -40,13 +40,6 @@
 #include "ui/linux/linux_ui.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#include "printing/backend/win_helper.h"
-#include "printing/printed_page_win.h"
-#include "ui/views/win/hwnd_util.h"
-#endif
-
 namespace printing {
 
 namespace {
@@ -88,11 +81,7 @@ void MaybeCloneOrCopy(
 // TODO(crbug.com/40561724):  Update for other platforms as they are made able
 // to support modal dialogs from OOP.
 uint32_t NativeViewToUint(gfx::NativeView view) {
-#if BUILDFLAG(IS_WIN)
-  return base::win::HandleToUint32(views::HWNDForNativeView(view));
-#else
   NOTREACHED();
-#endif
 }
 #endif
 
@@ -319,30 +308,6 @@ void PrintBackendServiceManager::GetPrinterSemanticCapsAndDefaults(
 }
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-void PrintBackendServiceManager::GetPaperPrintableArea(
-    const std::string& printer_name,
-    const PrintSettings::RequestedMedia& media,
-    mojom::PrintBackendService::GetPaperPrintableAreaCallback callback) {
-  ServiceAndCallbackContext result =
-      GetServiceAndCallbackContextForQuery(printer_name);
-  SaveCallback(
-      GetRemoteSavedGetPaperPrintableAreaCallbacks(result.context.is_sandboxed),
-      result.context.remote_id, result.context.saved_callback_id,
-      std::move(callback));
-
-  SetCrashKeys(printer_name);
-
-  LogCallToRemote("GetPaperPrintableArea", result.context);
-  // Safe to use base::Unretained(this) since `this` is a global singleton
-  // which never goes away.
-  result.service.get()->GetPaperPrintableArea(
-      printer_name, media,
-      base::BindOnce(&PrintBackendServiceManager::OnDidGetPaperPrintableArea,
-                     base::Unretained(this), std::move(result.context)));
-}
-#endif
-
 PrintBackendServiceManager::ContextId
 PrintBackendServiceManager::EstablishPrintingContext(
     ClientId client_id,
@@ -491,40 +456,6 @@ void PrintBackendServiceManager::StartPrinting(
                      base::Unretained(this), std::move(result.context)));
 }
 
-#if BUILDFLAG(IS_WIN)
-void PrintBackendServiceManager::RenderPrintedPage(
-    ClientId client_id,
-    const std::string& printer_name,
-    int document_cookie,
-    const PrintedPage& page,
-    mojom::MetafileDataType page_data_type,
-    base::ReadOnlySharedMemoryRegion serialized_page_data,
-    mojom::PrintBackendService::RenderPrintedPageCallback callback) {
-  ServiceAndCallbackContext result =
-      GetServiceAndCallbackContextForPrintDocumentClient(client_id,
-                                                         printer_name);
-  SaveCallback(
-      GetRemoteSavedRenderPrintedPageCallbacks(result.context.is_sandboxed),
-      result.context.remote_id, result.context.saved_callback_id,
-      std::move(callback));
-
-  SetCrashKeys(printer_name);
-
-  // Page numbers are 0-based for the printing context.
-  const uint32_t page_index = page.page_number() - 1;
-
-  LogCallToRemote("RenderPrintedPage", result.context);
-  // Safe to use base::Unretained(this) since `this` is a global singleton
-  // which never goes away.
-  result.service.get()->RenderPrintedPage(
-      document_cookie, page_index, page_data_type,
-      std::move(serialized_page_data), page.page_size(),
-      page.page_content_rect(), page.shrink_factor(),
-      base::BindOnce(&PrintBackendServiceManager::OnDidRenderPrintedPage,
-                     base::Unretained(this), std::move(result.context)));
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 void PrintBackendServiceManager::RenderPrintedDocument(
     ClientId client_id,
     const std::string& printer_name,
@@ -662,23 +593,6 @@ void PrintBackendServiceManager::ResetForTesting() {
 PrintBackendServiceManager::RemoteId
 PrintBackendServiceManager::GetRemoteIdForPrinterName(
     const std::string& printer_name) {
-#if BUILDFLAG(IS_WIN)
-  if (!sandboxed_service_remote_for_test_ &&
-      !features::kEnableOopPrintDriversSingleProcess.Get()) {
-    // Windows drivers are not thread safe.  Use a process per driver to prevent
-    // bad interactions when interfacing to multiple drivers in parallel.
-    // https://crbug.com/41455488
-    auto iter = remote_id_map_.find(printer_name);
-    if (iter != remote_id_map_.end()) {
-      return iter->second;
-    }
-
-    // No remote yet for this printer so make one.
-    return remote_id_map_
-        .insert({printer_name, RemoteId(++remote_id_sequence_)})
-        .first->second;
-  }
-#endif
 
   // Just a single process that services all printers.
   return RemoteId(1);
@@ -780,27 +694,6 @@ size_t PrintBackendServiceManager::GetClientsRegisteredCount() const {
   return clients_count;
 }
 
-#if BUILDFLAG(IS_WIN)
-bool PrintBackendServiceManager::PrinterDriverKnownToRequireElevatedPrivilege(
-    const std::string& printer_name,
-    ClientType client_type) const {
-  // Any Windows printer driver which causes a UI dialog to be displayed does
-  // not work if printing is started from within a sandboxed environment.
-  // crbug.com/40787526
-  switch (client_type) {
-    case ClientType::kQuery:
-      return false;
-    case ClientType::kQueryWithUi:
-      // Guaranteed to display the system print dialog.
-      return true;
-    case ClientType::kPrintDocument:
-      // Drivers with a print port that results in saving to a file will cause
-      // a system dialog to be displayed.
-      return DoesDriverDisplayFileDialogForPrinting(printer_name);
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 bool PrintBackendServiceManager::ShouldServiceBeSandboxed(
     const std::string& printer_name,
     ClientType client_type) const {
@@ -809,12 +702,6 @@ bool PrintBackendServiceManager::ShouldServiceBeSandboxed(
   bool should_sandbox =
       features::kEnableOopPrintDriversSandbox.Get() &&
       !PrinterDriverFoundToRequireElevatedPrivilege(printer_name);
-#if BUILDFLAG(IS_WIN)
-  if (should_sandbox) {
-    should_sandbox = !PrinterDriverKnownToRequireElevatedPrivilege(printer_name,
-                                                                   client_type);
-  }
-#endif
   DVLOG(1) << "Print Backend service for " << ClientTypeToString(client_type)
            << " use to printer `" << printer_name << "` should"
            << (should_sandbox ? "" : " not") << " be sandboxed";
@@ -1155,10 +1042,6 @@ void PrintBackendServiceManager::OnRemoteDisconnected(
       GetRemoteSavedGetPrinterSemanticCapsAndDefaultsCallbacks(sandboxed),
       remote_id, base::unexpected(mojom::ResultCode::kFailed));
 #endif
-#if BUILDFLAG(IS_WIN)
-  RunSavedCallbacks(GetRemoteSavedGetPaperPrintableAreaCallbacks(sandboxed),
-                    remote_id, gfx::Rect());
-#endif
   RunSavedResultCallbacks(GetRemoteSavedUseDefaultSettingsCallbacks(sandboxed),
                           remote_id,
                           base::unexpected(mojom::ResultCode::kFailed));
@@ -1172,10 +1055,6 @@ void PrintBackendServiceManager::OnRemoteDisconnected(
                           base::unexpected(mojom::ResultCode::kFailed));
   RunSavedCallbacks(GetRemoteSavedStartPrintingCallbacks(sandboxed), remote_id,
                     mojom::ResultCode::kFailed, PrintingContext::kNoPrintJobId);
-#if BUILDFLAG(IS_WIN)
-  RunSavedCallbacks(GetRemoteSavedRenderPrintedPageCallbacks(sandboxed),
-                    remote_id, mojom::ResultCode::kFailed);
-#endif
   RunSavedCallbacks(GetRemoteSavedRenderPrintedDocumentCallbacks(sandboxed),
                     remote_id, mojom::ResultCode::kFailed);
   RunSavedCallbacks(GetRemoteSavedDocumentDoneCallbacks(sandboxed), remote_id,
@@ -1216,16 +1095,6 @@ PrintBackendServiceManager::
 }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-PrintBackendServiceManager::RemoteSavedGetPaperPrintableAreaCallbacks&
-PrintBackendServiceManager::GetRemoteSavedGetPaperPrintableAreaCallbacks(
-    bool sandboxed) {
-  return sandboxed ? sandboxed_saved_get_paper_printable_area_callbacks_
-                   : unsandboxed_saved_get_paper_printable_area_callbacks_;
-}
-
-#endif
-
 PrintBackendServiceManager::RemoteSavedUseDefaultSettingsCallbacks&
 PrintBackendServiceManager::GetRemoteSavedUseDefaultSettingsCallbacks(
     bool sandboxed) {
@@ -1255,15 +1124,6 @@ PrintBackendServiceManager::GetRemoteSavedStartPrintingCallbacks(
   return sandboxed ? sandboxed_saved_start_printing_callbacks_
                    : unsandboxed_saved_start_printing_callbacks_;
 }
-
-#if BUILDFLAG(IS_WIN)
-PrintBackendServiceManager::RemoteSavedRenderPrintedPageCallbacks&
-PrintBackendServiceManager::GetRemoteSavedRenderPrintedPageCallbacks(
-    bool sandboxed) {
-  return sandboxed ? sandboxed_saved_render_printed_page_callbacks_
-                   : unsandboxed_saved_render_printed_page_callbacks_;
-}
-#endif
 
 PrintBackendServiceManager::RemoteSavedRenderPrintedDocumentCallbacks&
 PrintBackendServiceManager::GetRemoteSavedRenderPrintedDocumentCallbacks(
@@ -1396,17 +1256,6 @@ void PrintBackendServiceManager::OnDidGetPrinterSemanticCapsAndDefaults(
 }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-void PrintBackendServiceManager::OnDidGetPaperPrintableArea(
-    const CallbackContext& context,
-    const gfx::Rect& printable_area_um) {
-  LogCallbackFromRemote("GetPaperPrintableArea", context);
-  ServiceCallbackDone(
-      GetRemoteSavedGetPaperPrintableAreaCallbacks(context.is_sandboxed),
-      context.remote_id, context.saved_callback_id, printable_area_um);
-}
-#endif
-
 void PrintBackendServiceManager::OnDidUseDefaultSettings(
     const CallbackContext& context,
     PrintSettingsResult settings) {
@@ -1445,17 +1294,6 @@ void PrintBackendServiceManager::OnDidStartPrinting(
       GetRemoteSavedStartPrintingCallbacks(context.is_sandboxed),
       context.remote_id, context.saved_callback_id, result, job_id);
 }
-
-#if BUILDFLAG(IS_WIN)
-void PrintBackendServiceManager::OnDidRenderPrintedPage(
-    const CallbackContext& context,
-    mojom::ResultCode result) {
-  LogCallbackFromRemote("RenderPrintedPage", context);
-  ServiceCallbackDone(
-      GetRemoteSavedRenderPrintedPageCallbacks(context.is_sandboxed),
-      context.remote_id, context.saved_callback_id, result);
-}
-#endif
 
 void PrintBackendServiceManager::OnDidRenderPrintedDocument(
     const CallbackContext& context,

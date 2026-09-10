@@ -65,13 +65,6 @@ void CreateResourceUsageReporter(
 void ExposeUtilityInterfacesToBrowser(mojo::BinderMap* binders) {
 #if !BUILDFLAG(IS_ANDROID)
   bool bind_usage_reporter = true;
-#if BUILDFLAG(IS_WIN)
-  auto& cmd_line = *base::CommandLine::ForCurrentProcess();
-  if (sandbox::policy::SandboxTypeFromCommandLine(cmd_line) ==
-      sandbox::mojom::Sandbox::kNoSandboxAndElevatedPrivileges) {
-    bind_usage_reporter = false;
-  }
-#endif  // BUILDFLAG(IS_WIN)
   if (bind_usage_reporter) {
     binders->Add<mojom::ResourceUsageReporter>(
         &CreateResourceUsageReporter,

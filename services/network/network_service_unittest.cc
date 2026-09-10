@@ -1429,11 +1429,6 @@ TEST_P(NetworkServiceCookieTest, CookieEncryptionProvider) {
   params->enable_encrypted_cookies = IsEncryptionEnabled();
   params->file_paths->data_directory = temp_dir.GetPath();
   params->file_paths->cookie_database_name = cookie_path;
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/377940976): Remove this once the background sequence runner
-  // can be fully drained of tasks during network context shutdown.
-  service()->disable_exclusive_cookie_database_locking_for_testing();
-#endif  // BUILDFLAG(IS_WIN)
 
   mojo::Remote<mojom::NetworkContext> network_context;
   service()->CreateNetworkContext(network_context.BindNewPipeAndPassReceiver(),
@@ -1479,8 +1474,7 @@ TEST_P(NetworkServiceCookieTest, CookieEncryptionProvider) {
       // cookie_config::GetCookieCryptoDelegate only returns a valid OSCrypt
       // crypto delegate on some platforms. On other platforms, there is no
       // cookie crypto as it's handled by the OS.
-#if !(BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-      BUILDFLAG(IS_CHROMEOS))
+#if !(BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
       expect_encrypted_data = false;
 #endif
     }

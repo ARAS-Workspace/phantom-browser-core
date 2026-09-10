@@ -52,12 +52,10 @@ const FirstRunTestParam kTestParams[] = {
                           .use_dark_theme = true},
      .decline_signin_cta_experiment_enabled = true},
 
-#if !BUILDFLAG(IS_WIN)
     // TODO(https://crbug.com/40261456): The following test has been frequently
     // flaking on "Win10 Tests x64" since 2024-05-09:
     // FirstRunIntroPixelTest.InvokeUi_default/LightTheme
     {.pixel_test_param = {.test_suffix = "LightTheme"}},
-#endif
     {.pixel_test_param = {.test_suffix = "LongerStringsFixedSize"},
      .use_fixed_size = true,
      .use_longer_strings = true,

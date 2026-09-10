@@ -167,10 +167,6 @@
 #include "chrome/browser/profiles/profile_statistics_factory.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_DICE_SUPPORT)
-#include "chrome/browser/signin/signin_util_win.h"
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_DICE_SUPPORT)
-
 #if BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
 #include "chrome/browser/signin/bound_session_credentials/bound_session_cookie_refresh_service_factory.h"
 #endif  // BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
@@ -1147,11 +1143,7 @@ base::FilePath ProfileManager::GetNextExpectedProfileDirectoryPath() {
   std::string profile_name = chrome::kMultiProfileDirPrefix;
   profile_name.append(base::NumberToString(next_directory));
   base::FilePath new_path = user_data_dir_;
-#if BUILDFLAG(IS_WIN)
-  new_path = new_path.Append(base::ASCIIToWide(profile_name));
-#else
   new_path = new_path.Append(profile_name);
-#endif
   return new_path;
 }
 
@@ -1635,10 +1627,6 @@ void ProfileManager::DoFinalInitForServices(Profile* profile,
   // Initialization needs to happen after the browser context is available
   // because SyncService needs the URL context getter.
   UnifiedConsentServiceFactory::GetForProfile(profile);
-
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_DICE_SUPPORT)
-  signin_util::SigninWithCredentialProviderIfPossible(profile);
-#endif
 
   // TODO(accessibility): Dynamically create AccessibilityLabelsService when
   // needed and destroy it when no longer needed.

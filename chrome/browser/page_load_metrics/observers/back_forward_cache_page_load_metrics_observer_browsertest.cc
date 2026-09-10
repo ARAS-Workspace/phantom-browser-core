@@ -355,13 +355,8 @@ IN_PROC_BROWSER_TEST_F(BackForwardCachePageLoadMetricsObserverBrowserTest,
 }
 
 // TODO(crbug.com/334416161): Re-enble this test.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CumulativeLayoutShiftAfterBackForwardCacheRestore \
-  DISABLED_CumulativeLayoutShiftAfterBackForwardCacheRestore
-#else
 #define MAYBE_CumulativeLayoutShiftAfterBackForwardCacheRestore \
   CumulativeLayoutShiftAfterBackForwardCacheRestore
-#endif
 IN_PROC_BROWSER_TEST_F(
     BackForwardCachePageLoadMetricsObserverBrowserTest,
     MAYBE_CumulativeLayoutShiftAfterBackForwardCacheRestore) {
@@ -520,13 +515,8 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // TODO(crbug.com/334416161): Re-enble this test.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_LayoutShiftNormalization_AfterBackForwardCacheRestore \
-  DISABLED_LayoutShiftNormalization_AfterBackForwardCacheRestore
-#else
 #define MAYBE_LayoutShiftNormalization_AfterBackForwardCacheRestore \
   LayoutShiftNormalization_AfterBackForwardCacheRestore
-#endif
 IN_PROC_BROWSER_TEST_F(
     BackForwardCachePageLoadMetricsObserverBrowserTest,
     MAYBE_LayoutShiftNormalization_AfterBackForwardCacheRestore) {
@@ -694,7 +684,7 @@ IN_PROC_BROWSER_TEST_F(
 
 // TODO(crbug.com/40937315): Test is flaky on MSAN.
 // TODO(https://crbug.com/40799125): Test is flaky on Windows and Mac.
-#if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_MAC)
 #define MAYBE_InteractionToNextPaintCalculatorWithSendingAllLatencies \
   DISABLED_InteractionToNextPaintCalculatorWithSendingAllLatencies
 #else

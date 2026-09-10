@@ -1726,13 +1726,8 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // TODO(crbug.com/394322967): Flaky. Re-enable when fixed.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_VideoConferencing_TotalPipTimeForSessionRecorded \
-  DISABLED_VideoConferencing_TotalPipTimeForSessionRecorded
-#else
 #define MAYBE_VideoConferencing_TotalPipTimeForSessionRecorded \
   VideoConferencing_TotalPipTimeForSessionRecorded
-#endif
 IN_PROC_BROWSER_TEST_F(AutoPictureInPictureTabHelperBrowserTest,
                        MAYBE_VideoConferencing_TotalPipTimeForSessionRecorded) {
   // Load a page that registers for autopip and starts using camera/microphone.
@@ -2019,7 +2014,7 @@ IN_PROC_BROWSER_TEST_F(AutoPictureInPictureWithVideoPlaybackBrowserTest,
 }
 
 // TODO(crbug.com/335565116): Re-enable this test.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_OverlaySettingViewIsShownForVideoPip \
   DISABLED_OverlaySettingViewIsShownForVideoPip
 #else
@@ -2134,11 +2129,7 @@ IN_PROC_BROWSER_TEST_F(AutoPictureInPictureTabHelperBrowserTest,
 }
 
 // TODO(https://crbug.com/371850487): failing on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ShowsMostRecentlyHiddenTab DISABLED_ShowsMostRecentlyHiddenTab
-#else
 #define MAYBE_ShowsMostRecentlyHiddenTab ShowsMostRecentlyHiddenTab
-#endif
 IN_PROC_BROWSER_TEST_F(AutoPictureInPictureTabHelperBrowserTest,
                        MAYBE_ShowsMostRecentlyHiddenTab) {
   // Load a page that registers for autopip.
@@ -2568,7 +2559,7 @@ IN_PROC_BROWSER_TEST_F(AutoPictureInPictureWithVideoPlaybackBrowserTest,
 
 // TODO(crbug.com/372777367): Test failing on Windows
 // TODO(crbug.com/409069588): Re-enable this test on Mac.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_DoesNotCloseAutomaticallyOpenedPip \
   DISABLED_DoesNotCloseAutomaticallyOpenedPip
 #else
@@ -2963,13 +2954,8 @@ IN_PROC_BROWSER_TEST_F(AutoPictureInPictureWithVideoPlaybackBrowserTest,
 }
 
 // TODO(crbug.com/394322967): Flaky. Re-enable when fixed.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_MediaPlayback_TotalPipTimeForSessionRecorded \
-  DISABLED_MediaPlayback_TotalPipTimeForSessionRecorded
-#else
 #define MAYBE_MediaPlayback_TotalPipTimeForSessionRecorded \
   MediaPlayback_TotalPipTimeForSessionRecorded
-#endif
 IN_PROC_BROWSER_TEST_F(AutoPictureInPictureWithVideoPlaybackBrowserTest,
                        MAYBE_MediaPlayback_TotalPipTimeForSessionRecorded) {
   // Load a page that registers for autopip and start video playback.
@@ -3003,13 +2989,8 @@ IN_PROC_BROWSER_TEST_F(AutoPictureInPictureWithVideoPlaybackBrowserTest,
 }
 
 // TODO(crbug.com/394322967): Flaky. Re-enable when fixed.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_VideoConferencingAndMediaPlayback_TotalPipTimeForSessionRecorded \
-  DISABLED_VideoConferencingAndMediaPlayback_TotalPipTimeForSessionRecorded
-#else
 #define MAYBE_VideoConferencingAndMediaPlayback_TotalPipTimeForSessionRecorded \
   VideoConferencingAndMediaPlayback_TotalPipTimeForSessionRecorded
-#endif
 IN_PROC_BROWSER_TEST_F(
     AutoPictureInPictureWithVideoPlaybackBrowserTest,
     MAYBE_VideoConferencingAndMediaPlayback_TotalPipTimeForSessionRecorded) {

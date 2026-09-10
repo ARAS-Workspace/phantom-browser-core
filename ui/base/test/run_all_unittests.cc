@@ -17,10 +17,6 @@
 #include "base/test/mock_chrome_application_mac.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/display/win/dpi.h"
-#endif
-
 namespace {
 
 class UIBaseTestSuite : public base::TestSuite {
@@ -41,10 +37,6 @@ UIBaseTestSuite::UIBaseTestSuite(int argc, char** argv)
 
 void UIBaseTestSuite::Initialize() {
   base::TestSuite::Initialize();
-
-#if BUILDFLAG(IS_WIN)
-  display::win::SetDefaultDeviceScaleFactor(1.0);
-#endif
 
   ui::RegisterPathProvider();
 

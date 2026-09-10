@@ -244,11 +244,7 @@ TEST_F(FileOperationProxyImplTest, FileExistsUnexpectedAbsolutePath) {
   std::vector<base::ScopedTempDir> dirs;
   dirs.emplace_back(SetupDataDir({{"filename", "test"}}));
   auto remote = CreateFileOperationProxy(std::move(dirs));
-#if BUILDFLAG(IS_WIN)
-  TestFileExistsReportBadMessage(remote, 0u, "X:\\filename");
-#else
   TestFileExistsReportBadMessage(remote, 0u, "/filename");
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 // Tests of calling FileExists method for an unexpected path that references
@@ -311,11 +307,7 @@ TEST_F(FileOperationProxyImplTest, OpenUnexpectedAbsolutePath) {
   std::vector<base::ScopedTempDir> dirs;
   dirs.emplace_back(SetupDataDir({{"filename", "test"}}));
   auto remote = CreateFileOperationProxy(std::move(dirs));
-#if BUILDFLAG(IS_WIN)
-  TestOpenReportBadMessage(remote, 0u, "X:\\filename");
-#else
   TestOpenReportBadMessage(remote, 0u, "/filename");
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 // Tests of calling Open method for an unexpected path that references the

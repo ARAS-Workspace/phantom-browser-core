@@ -645,9 +645,7 @@ BASE_EXPORT std::u16string ReplaceStringPlaceholders(
 
 }  // namespace base
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/string_util_win.h"
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include "base/strings/string_util_posix.h"
 #else
 #error Define string operations appropriately for your platform

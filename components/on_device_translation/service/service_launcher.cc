@@ -18,10 +18,6 @@
 #include "mojo/public/cpp/bindings/remote.h"
 #include "mojo/public/cpp/bindings/self_owned_receiver.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#endif
-
 namespace on_device_translation {
 namespace {
 
@@ -34,12 +30,7 @@ constexpr std::string_view kOnDeviceTranslationServiceDisplayNamePrefix =
     "On-device Translation Service: ";
 
 std::string ToString(const base::FilePath& path) {
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/362123222): Get rid of conditional decoding.
-  return path.AsUTF8Unsafe();
-#else
   return path.value();
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 std::vector<base::FilePath> GetLanguagePackInfo(
@@ -98,11 +89,6 @@ class OnDeviceTranslationServiceLauncherImpl
                 base::StrCat({kOnDeviceTranslationServiceDisplayNamePrefix,
                               service_display_name_suffix}))
             .WithExtraCommandLineSwitches(extra_switches)
-#if BUILDFLAG(IS_WIN)
-            .WithPreloadedLibraries(
-                {binary_path},
-                content::ServiceProcessHostPreloadLibraries::GetPassKey())
-#endif
             .Pass());
 
     auto config = OnDeviceTranslationServiceConfig::New();

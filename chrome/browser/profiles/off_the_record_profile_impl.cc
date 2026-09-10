@@ -689,9 +689,3 @@ OffTheRecordProfileImpl::GetFederatedIdentityAutoReauthnPermissionContext() {
   return FederatedIdentityAutoReauthnPermissionContextFactory::GetForProfile(
       this);
 }
-
-#if BUILDFLAG(IS_WIN)
-void OffTheRecordProfileImpl::AckCrashForTracking() {
-  profile_->AckCrashForTracking();
-}
-#endif

@@ -326,7 +326,6 @@ IN_PROC_BROWSER_TEST_F(MessagingApiTest, MessagingBackgroundOnly) {
 
 // TODO(kalman): Most web messaging tests disabled on windows due to extreme
 // flakiness. See http://crbug.com/40354939.
-#if !BUILDFLAG(IS_WIN)
 
 IN_PROC_BROWSER_TEST_F(MessagingApiTest, MessagingUserGesture) {
   const char kManifest[] = "{"
@@ -550,8 +549,6 @@ IN_PROC_BROWSER_TEST_F(MessagingApiTest,
           sender->id(), send_and_consume_script,
           extensions::browsertest_util::ScriptUserActivation::kActivate));
 }
-
-#endif  // !BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 

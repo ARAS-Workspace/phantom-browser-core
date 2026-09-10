@@ -19,11 +19,6 @@
 #include "chrome/test/chromedriver/net/pipe_connection.h"
 #include "chrome/test/chromedriver/net/sync_websocket.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/windows_handle_util.h"
-#endif
 
 namespace {
 #if BUILDFLAG(IS_POSIX)
@@ -38,7 +33,7 @@ const char PipeBuilder::kAsciizProtocolMode[] = "asciiz";
 const char PipeBuilder::kCborProtocolMode[] = "cbor";
 
 bool PipeBuilder::PlatformIsSupported() {
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_POSIX)
   return true;
 #else
   return false;
@@ -64,7 +59,7 @@ Status PipeBuilder::BuildSocket() {
   if (protocol_mode_ != kAsciizProtocolMode) {
     return Status{kUnknownError, "only ASCIIZ protocol mode is supported"};
   }
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_POSIX)
   if (!read_file_.is_valid() || !write_file_.is_valid()) {
     return Status{kUnknownError, "pipes are not initialized"};
   }
@@ -77,7 +72,7 @@ Status PipeBuilder::BuildSocket() {
 }
 
 Status PipeBuilder::CloseChildEndpoints() {
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_POSIX)
   for (base::ScopedPlatformFile& file : child_ends_) {
     file = base::ScopedPlatformFile();
   }
@@ -108,41 +103,6 @@ Status PipeBuilder::SetUpPipes(base::LaunchOptions* options,
 
   options->fds_to_remap.emplace_back(child_read.get(), kReadFD);
   options->fds_to_remap.emplace_back(child_write.get(), kWriteFD);
-
-  read_file_ = std::move(parent_read);
-  write_file_ = std::move(parent_write);
-  child_ends_[0] = std::move(child_read);
-  child_ends_[1] = std::move(child_write);
-
-  return Status{kOk};
-#elif BUILDFLAG(IS_WIN)
-  HANDLE child_read_handle;
-  HANDLE parent_write_handle;
-  HANDLE parent_read_handle;
-  HANDLE child_write_handle;
-  if (!CreatePipe(&child_read_handle, &parent_write_handle, nullptr, 0)) {
-    return Status{kUnknownError, "unable to setup a pipe"};
-  }
-  base::win::ScopedHandle child_read(child_read_handle);
-  base::win::ScopedHandle parent_write(parent_write_handle);
-  if (!CreatePipe(&parent_read_handle, &child_write_handle, nullptr, 0)) {
-    return Status{kUnknownError, "unable to setup a pipe"};
-  }
-  base::win::ScopedHandle parent_read(parent_read_handle);
-  base::win::ScopedHandle child_write(child_write_handle);
-
-  std::string in_pipe_name =
-      base::NumberToString(base::win::HandleToUint32(child_read.get()));
-  std::string out_pipe_name =
-      base::NumberToString(base::win::HandleToUint32(child_write.get()));
-  // We use the fact that inherited handles in the child process have the same
-  // value and access rights as in the parent process.
-  // See:
-  // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessa
-  command->AppendSwitchASCII("remote-debugging-io-pipes",
-                             in_pipe_name + "," + out_pipe_name);
-  options->handles_to_inherit.push_back(child_read.get());
-  options->handles_to_inherit.push_back(child_write.get());
 
   read_file_ = std::move(parent_read);
   write_file_ = std::move(parent_write);

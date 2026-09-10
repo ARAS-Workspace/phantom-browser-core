@@ -34,12 +34,6 @@
 #include "services/audio/service.h"
 #include "services/audio/service_factory.h"
 
-#if BUILDFLAG(ENABLE_PASSTHROUGH_AUDIO_CODECS) && BUILDFLAG(IS_WIN)
-#define PASS_EDID_ON_COMMAND_LINE 1
-#include "ui/display/util/edid_parser.h"
-#include "ui/display/win/audio_edid_scan.h"
-#endif  // BUILDFLAG(ENABLE_PASSTHROUGH_AUDIO_CODECS) && BUILDFLAG(IS_WIN)
-
 namespace content {
 
 namespace {
@@ -124,10 +118,7 @@ void LaunchAudioServiceOutOfProcess(
   // UI MessageLoop type, to run AVFoundation and CoreAudio code.
   // See https://crbug.com/834581.
   switches.push_back(switches::kMessageLoopTypeUi);
-#elif BUILDFLAG(IS_WIN)
-  if (GetContentClient()->browser()->ShouldEnableAudioProcessHighPriority())
-    switches.push_back(switches::kAudioProcessHighPriority);
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 #ifdef PASS_EDID_ON_COMMAND_LINE
   switches.push_back(base::StrCat({switches::kAudioCodecsFromEDID, "=",
                                    base::NumberToString(codec_bitmask)}));

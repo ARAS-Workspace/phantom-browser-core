@@ -32,9 +32,6 @@
 #include "media/gpu/test/video_test_environment.h"
 #include "media/gpu/test/video_test_helpers.h"
 #include "testing/gtest/include/gtest/gtest.h"
-#if BUILDFLAG(IS_WIN)
-#include "media/gpu/windows/mf_video_encoder_switches.h"
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_ANDROID)
 #include "media/gpu/android/ndk_media_codec_wrapper.h"
 #endif
@@ -429,36 +426,6 @@ TEST_F(VideoEncoderTest, ForceKeyFrame) {
   EXPECT_TRUE(encoder->WaitForBitstreamProcessors());
 }
 
-#if BUILDFLAG(IS_WIN)
-// Test key frame request when a new GOP is started.
-TEST_F(VideoEncoderTest, KeyFrameOnFirstFrameOfGOP) {
-  if (g_env->SpatialLayers().size() > 1) {
-    GTEST_SKIP() << "Skip SHMEM input test cases in spatial SVC encoding";
-  }
-
-  auto config = GetDefaultConfig();
-  // The start of the next GOP sequence should be before the end of the encoded
-  // stream.
-  config.gop_length = 3 * config.num_frames_to_encode / 2;
-  config.num_frames_to_encode *= 2;
-  auto encoder = CreateVideoEncoder(g_env->Video(), config);
-
-  // Check whether the first frame is a key frame.
-  encoder->EncodeUntil(VideoEncoder::kBitstreamReady, 1u);
-  EXPECT_TRUE(encoder->WaitUntilIdle());
-  EXPECT_EQ(encoder->GetEventCount(VideoEncoder::kKeyFrame), 1u);
-
-  // Encode until the end of stream.
-  encoder->Encode();
-  EXPECT_TRUE(encoder->WaitForFlushDone());
-  // Check if there are two key frames - each one at the start of GOP.
-  EXPECT_EQ(encoder->GetEventCount(VideoEncoder::kKeyFrame), 2u);
-  EXPECT_EQ(encoder->GetFlushDoneCount(), 1u);
-  EXPECT_EQ(encoder->GetFrameReleasedCount(), config.num_frames_to_encode);
-  EXPECT_TRUE(encoder->WaitForBitstreamProcessors());
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 // Test forcing key frame to the first and second frames.
 #if !BUILDFLAG(IS_ANDROID)
 // Forcing keyframe is best-effort on Android and having 2 keyframes in a
@@ -661,90 +628,6 @@ TEST_F(VideoEncoderTest, BitrateCheck) {
   EXPECT_EQ(encoder->GetFrameReleasedCount(), config.num_frames_to_encode);
   EXPECT_TRUE(encoder->WaitForBitstreamProcessors());
 }
-
-#if BUILDFLAG(IS_WIN)
-// Test delta frame dropping by the software bitrate controller for H.264
-// camera video encoding.
-TEST_F(VideoEncoderTest, CameraDropFrameCheck) {
-  if (g_env->SpatialLayers().size() > 1) {
-    GTEST_SKIP() << "Skip SHMEM input test cases in spatial SVC encoding";
-  }
-  const VideoCodec codec = VideoCodecProfileToVideoCodec(g_env->Profile());
-  if (codec != media::VideoCodec::kH264) {
-    GTEST_SKIP()
-        << "VideoEncodeAccelerator on this device doesn't support drop "
-        << "frame with codec=" << GetCodecName(codec);
-  }
-  if (g_env->BitrateAllocation().GetMode() == Bitrate::Mode::kVariable) {
-    GTEST_SKIP() << "Drop frame doesn't support in VBR encoding";
-  }
-
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeature(
-      kMediaFoundationUseSWBRCForH264Camera);
-
-  auto config = GetDefaultConfig();
-  config.content_type = VideoEncodeAccelerator::Config::ContentType::kCamera;
-  constexpr uint8_t kDropFrameThreshold = 80;
-  config.drop_frame_thresh = kDropFrameThreshold;
-  config.bitrate_allocation = AllocateDefaultBitrateForTesting(
-      config.num_spatial_layers, config.num_temporal_layers,
-      Bitrate::ConstantBitrate(config.bitrate_allocation.GetSumBps() / 10));
-  auto encoder = CreateVideoEncoder(g_env->Video(), config);
-
-  encoder->Encode();
-  EXPECT_TRUE(encoder->WaitForFlushDone());
-  EXPECT_EQ(encoder->GetFlushDoneCount(), 1u);
-  EXPECT_EQ(encoder->GetFrameReleasedCount(), g_env->Video()->NumFrames());
-  EXPECT_TRUE(encoder->WaitForBitstreamProcessors());
-
-  auto stats = encoder->GetStats();
-  VLOG(1) << "Dropped frames: " << stats.num_dropped_frames << " / "
-          << stats.total_num_encoded_frames;
-  EXPECT_GT(stats.num_dropped_frames, 0u);
-}
-
-// Test delta frame dropping by the software bitrate controller for H.264
-// desktop video encoding.
-TEST_F(VideoEncoderTest, DesktopDropFrameCheck) {
-  if (g_env->SpatialLayers().size() > 1) {
-    GTEST_SKIP() << "Skip SHMEM input test cases in spatial SVC encoding";
-  }
-  const VideoCodec codec = VideoCodecProfileToVideoCodec(g_env->Profile());
-  if (codec != media::VideoCodec::kH264) {
-    GTEST_SKIP()
-        << "VideoEncodeAccelerator on this device doesn't support drop "
-        << "frame with codec=" << GetCodecName(codec);
-  }
-  if (g_env->BitrateAllocation().GetMode() == Bitrate::Mode::kVariable) {
-    GTEST_SKIP() << "Drop frame doesn't support in VBR encoding";
-  }
-
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeature(
-      kMediaFoundationUseSWBRCForH264Desktop);
-
-  auto config = GetDefaultConfig();
-  config.content_type = VideoEncodeAccelerator::Config::ContentType::kDisplay;
-  constexpr uint8_t kDropFrameThreshold = 80;
-  config.drop_frame_thresh = kDropFrameThreshold;
-  config.bitrate_allocation = AllocateDefaultBitrateForTesting(
-      config.num_spatial_layers, config.num_temporal_layers,
-      Bitrate::ConstantBitrate(config.bitrate_allocation.GetSumBps() / 10));
-  auto encoder = CreateVideoEncoder(g_env->Video(), config);
-
-  encoder->Encode();
-  EXPECT_TRUE(encoder->WaitForFlushDone());
-  EXPECT_EQ(encoder->GetFlushDoneCount(), 1u);
-  EXPECT_EQ(encoder->GetFrameReleasedCount(), g_env->Video()->NumFrames());
-  EXPECT_TRUE(encoder->WaitForBitstreamProcessors());
-
-  auto stats = encoder->GetStats();
-  VLOG(1) << "Dropped frames: " << stats.num_dropped_frames << " / "
-          << stats.total_num_encoded_frames;
-  EXPECT_GT(stats.num_dropped_frames, 0u);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 // TODO(https://crbugs.com/350994517): NV12 DMABuf test does not apply to

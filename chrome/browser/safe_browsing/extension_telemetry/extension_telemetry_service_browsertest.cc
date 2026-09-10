@@ -965,13 +965,8 @@ IN_PROC_BROWSER_TEST_F(ExtensionTelemetryServiceBrowserTest,
 }
 
 // TODO(crbug.com/444572871) Fix test
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DetectsAndReportsSearchHijackingSignal \
-  DISABLED_DetectsAndReportsSearchHijackingSignal
-#else
 #define MAYBE_DetectsAndReportsSearchHijackingSignal \
   DetectsAndReportsSearchHijackingSignal
-#endif
 IN_PROC_BROWSER_TEST_F(ExtensionTelemetryServiceBrowserTest,
                        MAYBE_DetectsAndReportsSearchHijackingSignal) {
   SetSafeBrowsingState(browser()->GetProfile()->GetPrefs(),

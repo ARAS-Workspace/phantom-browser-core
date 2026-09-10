@@ -31,7 +31,7 @@ bool IsOnDeviceStorageEnabled() {
 #endif
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 BASE_FEATURE(kEsbDownloadRowPromoFeature,
              "EsbDownloadRowPromo",
@@ -312,7 +312,7 @@ BASE_FEATURE(kIPHBackNavigationMenuFeature,
 BASE_FEATURE(kIPHBookmarkBarSimplifiedFeature,
              "IPH_BookmarkBarSimplified",
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 BASE_FEATURE(kIPHExtensionsPinnedByDefaultFeature,
@@ -973,7 +973,8 @@ BASE_FEATURE(kIPHiOSActiveDaysTrackingFeature,
 
 #endif  // BUILDFLAG(IS_IOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
+    BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kIPHAutofillAtMemoryFeature,
              "IPH_AutofillAtMemory",
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -1022,7 +1023,8 @@ BASE_FEATURE(kIPHAutofillEnableLoyaltyCardsFeature,
 BASE_FEATURE(kIPHAutofillOmniboxPaymentChipFeature,
              "IPH_AutofillOmniboxPaymentChip",
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+        // || BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_CHROMEOS)
 BASE_FEATURE(kIPHGrowthFramework,
@@ -1036,8 +1038,7 @@ BASE_FEATURE(kIPHLauncherSearchHelpUiFeature,
              base::FEATURE_ENABLED_BY_DEFAULT);
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // This can be enabled by default, as the DesktopPWAsLinkCapturing
 // flag is needed for the IPH linked to this feature to work, and
 // use-cases to show the IPH are guarded by that flag.
@@ -1051,10 +1052,9 @@ BASE_FEATURE(kIPHDesktopPWAsLinkCapturingLaunch,
 BASE_FEATURE(kIPHDesktopPWAsLinkCapturingLaunchAppInTab,
              "IPH_DesktopPWAsLinkCapturingLaunchAppInTab",
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 BASE_FEATURE(kIPHSignInBenefitsFeature,
              "IPH_SignInBenefits",
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -1066,7 +1066,7 @@ BASE_FEATURE(kIPHSignInBenefitsNewSigninFeature,
 BASE_FEATURE(kIPHSupervisedUserProfileSigninFeature,
              "IPH_SupervisedUserProfileSignin",
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if !BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kIPHiOSPasswordPromoDesktopFeature,
@@ -1097,26 +1097,5 @@ BASE_FEATURE(kIPHResumptionRailFeature,
              "IPH_ResumptionRail",
              base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // !BUILDFLAG(IS_IOS)
-
-#if BUILDFLAG(IS_WIN)
-BASE_FEATURE(kIPHSearchPromotionFeature,
-             "IPH_SearchPromotionFeature",
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-constinit const base::FeatureParam<std::string> kSearchPromotionArm{
-    &kIPHSearchPromotionFeature, "arm", kSearchPromotionArmDefault};
-constinit const base::FeatureParam<std::string> kSearchPromotionStoreUrl{
-    &kIPHSearchPromotionFeature, "store_url",
-    "https://microsoftedge.microsoft.com/addons/detail/google-search-for-edge/"
-    "dakcooigljlhlgibgdfadgphfnoooacj"};
-constinit const base::FeatureParam<std::string> kSearchPromotionExtensionId{
-    &kIPHSearchPromotionFeature, "extension_id",
-    "dakcooigljlhlgibgdfadgphfnoooacj"};
-constinit const base::FeatureParam<std::string> kSearchPromotionInstructionsUrl{
-    &kIPHSearchPromotionFeature, "instructions_url",
-    "https://www.google.com/chrome/landing/google-search-extension-edge/"};
-constinit const base::FeatureParam<std::string> kSearchPromotionMinPehVersion{
-    &kIPHSearchPromotionFeature, "min_peh_version", "153.0.8001.0"};
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace feature_engagement

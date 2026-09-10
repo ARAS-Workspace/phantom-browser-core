@@ -873,11 +873,6 @@ class BrowserView : public BrowserWindow,
   void LoadingAnimationTimerCallback();
   void LoadingAnimationCallback(base::TimeTicks timestamp);
 
-#if BUILDFLAG(IS_WIN)
-  // Creates the JumpList.
-  void CreateJumpList();
-#endif
-
   // Helper method, returns if we should show the IPHs anchored on the avatar
   // toolbar.
   bool ShouldShowAvatarToolbarIPH();
@@ -1348,10 +1343,6 @@ class BrowserView : public BrowserWindow,
   // True if the browser window has been shown at least once.
   bool window_has_shown_ = false;
 
-#if BUILDFLAG(IS_WIN)
-  class PipExclusionObserverImpl;
-  std::unique_ptr<PipExclusionObserverImpl> pip_exclusion_observer_;
-#endif
   std::optional<content::PermissionController::SubscriptionId>
       window_management_subscription_id_;
 

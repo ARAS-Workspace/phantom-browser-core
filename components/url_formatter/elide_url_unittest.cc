@@ -261,11 +261,6 @@ TEST(TextEliderTest, TestTrailingEllipsisSlashEllipsisHack) {
 
 // Test eliding of empty strings, URLs with ports, passwords, queries, etc.
 TEST(TextEliderTest, TestElisionSpecialCases) {
-#if BUILDFLAG(IS_WIN)
-  // Needed to bypass DCHECK in GetFallbackFont.
-  base::test::SingleThreadTaskEnvironment task_environment(
-      base::test::SingleThreadTaskEnvironment::MainThreadType::UI);
-#endif
   const std::string kEllipsisStr(gfx::kEllipsis);
   const std::vector<Testcase> testcases = {
       // URL with "www" subdomain (gets removed specially).
@@ -322,17 +317,6 @@ TEST(TextEliderTest, TestFileURLEliding) {
            /* clang-format on */
        }},
 // GURL parses "file:///C:path" differently on windows than it does on posix.
-#if BUILDFLAG(IS_WIN)
-      {"file:///C:path1/path2/path3/filename",
-       {
-           /* clang-format off */
-         "C:/path1/path2/path3/filename",
-         "C:/path1/path2/" + kEllipsisStr + "/filename",
-         "C:/path1/" + kEllipsisStr + "/filename",
-         "C:/" + kEllipsisStr + "/filename",
-           /* clang-format on */
-       }},
-#endif  // BUILDFLAG(IS_WIN)
       {"file://filer/foo/bar/file",
        {
            /* clang-format off */

@@ -32,8 +32,6 @@ using ::testing::ElementsAreArray;
 
 #if BUILDFLAG(IS_MAC)
 const uint64_t kTestDeviceIds[] = {0, 1, 2, 3};
-#elif BUILDFLAG(IS_WIN)
-const wchar_t* const kTestDeviceIds[] = {L"0", L"1", L"2", L"3"};
 #else
 constexpr auto kTestDeviceIds =
     std::to_array<const char*>({"0", "1", "2", "3"});

@@ -437,7 +437,7 @@ IN_PROC_BROWSER_TEST_P(TabStripCollectionControllerInteractiveUiTest,
 // TODO(crbug.com/505768540): Investigate why test fails to show the duplicate
 // menu item on windows.
 // TODO(crbug.com/547746068): Re-enable on mac.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_TabOpenedWhileUsingTabContextMenu \
   DISABLED_TabOpenedWhileUsingTabContextMenu
 #else
@@ -626,12 +626,7 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // TODO(crbug.com/481392191) Fix these flaky hovercard tests.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_VerticalTabHoverCardShowUnpinned \
-  DISABLED_VerticalTabHoverCardShowUnpinned
-#else
 #define MAYBE_VerticalTabHoverCardShowUnpinned VerticalTabHoverCardShowUnpinned
-#endif  // BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_P(TabStripCollectionControllerInteractiveUiTest,
                        MAYBE_VerticalTabHoverCardShowUnpinned) {
   RunTestSequence(
@@ -642,11 +637,7 @@ IN_PROC_BROWSER_TEST_P(TabStripCollectionControllerInteractiveUiTest,
       WaitForShow(TabHoverCardBubbleView::kHoverCardBubbleElementId));
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ScrollingHidesHoverCard DISABLED_ScrollingHidesHoverCard
-#else
 #define MAYBE_ScrollingHidesHoverCard ScrollingHidesHoverCard
-#endif  // BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_P(TabStripCollectionControllerInteractiveUiTest,
                        MAYBE_ScrollingHidesHoverCard) {
   RunTestSequence(
@@ -693,11 +684,7 @@ IN_PROC_BROWSER_TEST_P(TabStripCollectionControllerInteractiveUiTest,
       WaitForHide(kTabGroupEditorBubbleId));
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_MousePressHidesHoverCard DISABLED_MousePressHidesHoverCard
-#else
 #define MAYBE_MousePressHidesHoverCard MousePressHidesHoverCard
-#endif  // BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_P(TabStripCollectionControllerInteractiveUiTest,
                        MAYBE_MousePressHidesHoverCard) {
   RunTestSequence(

@@ -6458,7 +6458,7 @@ TEST_F(WebViewTest, ResizeWithFixedPosCrash) {
   frame->PrintEnd();
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 class OverlayScrollbarWebViewTest : public WebViewTest {
  protected:
   void SetUp() override {
@@ -6544,7 +6544,7 @@ TEST_F(OverlayScrollbarWebViewTest,
   ASSERT_NE(nullptr, layout_viewport->VerticalScrollbar());
   EXPECT_TRUE(layout_viewport->VerticalScrollbar()->IsOverlayScrollbar());
 }
-#endif  // (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN))
+#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 
 TEST_F(WebViewTest, DeviceEmulationResetScrollbars) {
   WebViewImpl* web_view = web_view_helper_.Initialize();
@@ -7587,7 +7587,6 @@ TEST_F(WebViewTest, DragAndDropUnknownHistogramsTest) {
   histogram_tester.ExpectTotalCount("Event.DragDrop.Tool", 1);
 }
 
-#if !BUILDFLAG(IS_WIN)
 // Verifies that the histogram `Event.DragDrop.Tool` gets fired with the
 // correct enum values when the drag and drop is started by pressing the pen's
 // button. This manner of drag and drop is not enabled in Windows.
@@ -7660,7 +7659,6 @@ TEST_F(WebViewTest, DragAndDropPenButtonHistogramsTest) {
                                      /*expected_count=*/2);
   histogram_tester.ExpectTotalCount("Event.DragDrop.Tool", 2);
 }
-#endif  // BUILDFLAG(IS_WIN)
 
 INSTANTIATE_TEST_SUITE_P(
     All,

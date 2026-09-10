@@ -27,7 +27,7 @@ static constexpr media::AudioProcessingSettings kDummyWebrtcSettings{
 // disable the system NS independently. TODO(crbug.com/417413190): delete if not
 // relevant any more.
 constexpr bool IsIndependentSystemNsAllowed() {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
   return false;
 #else
   return true;
@@ -55,7 +55,6 @@ int ConfigureEchoCancellationEffects(const EchoCanceller& echo_canceller,
   // TODO(crbug.com/405165917): CHECK(platform_effects &
   // media::AudioParameters::ECHO_CANCELLER);
 
-#if !BUILDFLAG(IS_WIN)
   // On Windows  can only disable platform NS and AGC effects if platform
   // AEC effect is disabled.
 
@@ -71,7 +70,6 @@ int ConfigureEchoCancellationEffects(const EchoCanceller& echo_canceller,
   if (!agc_requested) {
     enabled_platform_effects &= ~media::AudioParameters::AUTOMATIC_GAIN_CONTROL;
   }
-#endif
 
   return enabled_platform_effects;
 }

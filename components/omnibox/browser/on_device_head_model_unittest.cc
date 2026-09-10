@@ -65,11 +65,7 @@ class OnDeviceHeadModelTest : public testing::Test {
   void SetUp() override {
     base::FilePath file_path = GetTestModelPath();
     ASSERT_TRUE(base::PathExists(file_path));
-#if BUILDFLAG(IS_WIN)
-    model_filename_ = base::WideToUTF8(file_path.value());
-#else
     model_filename_ = file_path.value();
-#endif
     ASSERT_FALSE(model_filename_.empty());
   }
 
@@ -177,11 +173,7 @@ TEST(OnDeviceHeadDeepModelTest, SearchSuggestions) {
       "components/test/data/omnibox/on_device_head_test_deep_model.bin");
   ASSERT_TRUE(base::PathExists(file_path));
   std::string model_filename;
-#if BUILDFLAG(IS_WIN)
-  model_filename = base::WideToUTF8(file_path.value());
-#else
   model_filename = file_path.value();
-#endif
 
   std::vector<std::pair<std::string, uint32_t>> reference_suggestions{
       {"ping 11", 1008}, {"pong 11", 1007}, {"ping 12", 1006},

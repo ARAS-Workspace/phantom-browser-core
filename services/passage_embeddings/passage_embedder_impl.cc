@@ -158,13 +158,8 @@ bool PassageEmbedderImpl::BuildExecutionTask() {
           std::move(op_resolver));
 
   base::ElapsedTimer embeddings_timer;
-#if BUILDFLAG(IS_WIN)
-  absl::Status model_load_status = tflite_engine->BuildModelFromFileHandle(
-      embeddings_model_file_.GetPlatformFile());
-#else
   absl::Status model_load_status = tflite_engine->BuildModelFromFileDescriptor(
       embeddings_model_file_.GetPlatformFile());
-#endif
   base::UmaHistogramBoolean(
       execute_for_gemma_
           ? "AI.SemanticEmbedder.EmbeddingsModelLoadSucceeded"

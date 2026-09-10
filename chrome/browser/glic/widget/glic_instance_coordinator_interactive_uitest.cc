@@ -244,29 +244,6 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUiTest,
   RunTestSequence(SimulateGlicHotkey(), WaitForGlicOpen());
 }
 
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUiTest,
-                       HotkeyOpensDetachedWithNonActiveBrowser) {
-  if (base::FeatureList::IsEnabled(features::kGlicMultiInstance)) {
-    // TODO(b/453696965): Broken in multi-instance.
-    GTEST_SKIP() << "Skipping for kGlicMultiInstance";
-  }
-  RunTestSequence(
-      // Glic should open attached to active browser.
-      SetOnIncompatibleAction(OnIncompatibleAction::kSkipTest,
-                              kActivateSurfaceIncompatibilityNotice),
-      ActivateSurface(kBrowserViewElementId));
-
-  // This will make some other window the foreground window.
-  browser()->GetWindow()->Deactivate();
-
-  RunTestSequence(
-      SimulateGlicHotkey(),
-      InAnyContext(WaitForShow(kGlicViewElementId).SetMustRemainVisible(false)),
-      CheckControllerWidgetMode(GlicWindowMode::kDetached));
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUiTest,
                        ESCWhenDetachedActiveCloses) {
   RunTestSequence(
@@ -309,21 +286,6 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUiTest, MAYBE_OpenMenuItemShows) {
                     CloseGlicWindow());
   }
 }
-
-#if BUILDFLAG(IS_WIN)
-// On Windows, the OsButton toggles opening and closing floaty, because floaty
-// will never be active when the os button is clicked.
-IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUiTest, OsButtonToggles) {
-  if (base::FeatureList::IsEnabled(features::kGlicMultiInstance)) {
-    // TODO(b/453696965): Broken in multi-instance.
-    GTEST_SKIP() << "Skipping for kGlicMultiInstance";
-  }
-  RunTestSequence(SimulateOsButton(),
-                  WaitForAndInstrumentGlic(kHostAndContents),
-                  CheckControllerWidgetMode(GlicWindowMode::kDetached),
-                  SimulateOsButton(), WaitForHide(kGlicHostElementId));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUiTest,
                        OpenMenuItemWhenAttachedToActiveBrowserDoesNotClose) {

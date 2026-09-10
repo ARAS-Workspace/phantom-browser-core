@@ -731,20 +731,16 @@ TEST_F(DownloadPathReservationTrackerTest, UpdatesToTargetPath) {
 
 // Tests for long name truncation. On other platforms automatic truncation
 // is not performed (yet).
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(DownloadPathReservationTrackerTest, BasicTruncation) {
   int real_max_length =
       base::GetMaximumPathComponentLength(default_download_path());
   ASSERT_NE(-1, real_max_length);
 
-#if BUILDFLAG(IS_WIN)
-  const size_t max_length = real_max_length - strlen(":Zone.Identifier");
-#else
   // TODO(kinaba): the current implementation leaves spaces for appending
   // ".crdownload". So take it into account. Should be removed in the future.
   const size_t max_length = real_max_length - 11;
-#endif  // BUILDFLAG(IS_WIN)
 
   std::unique_ptr<MockDownloadItem> item = CreateDownloadItem(1);
   base::FilePath path(GetLongNamePathInDownloadsDirectory(
@@ -771,11 +767,7 @@ TEST_F(DownloadPathReservationTrackerTest, TruncationConflict) {
   int real_max_length =
       base::GetMaximumPathComponentLength(default_download_path());
   ASSERT_NE(-1, real_max_length);
-#if BUILDFLAG(IS_WIN)
-  const size_t max_length = real_max_length - strlen(":Zone.Identifier");
-#else
   const size_t max_length = real_max_length - 11;
-#endif  // BUILDFLAG(IS_WIN)
 
   std::unique_ptr<MockDownloadItem> item = CreateDownloadItem(1);
   base::FilePath path(GetLongNamePathInDownloadsDirectory(
@@ -810,11 +802,7 @@ TEST_F(DownloadPathReservationTrackerTest, TruncationFail) {
   int real_max_length =
       base::GetMaximumPathComponentLength(default_download_path());
   ASSERT_NE(-1, real_max_length);
-#if BUILDFLAG(IS_WIN)
-  const size_t max_length = real_max_length - strlen(":Zone.Identifier");
-#else
   const size_t max_length = real_max_length - 11;
-#endif  // BUILDFLAG(IS_WIN)
 
   std::unique_ptr<MockDownloadItem> item = CreateDownloadItem(1);
   base::FilePath path(GetPathInDownloadsDirectory(

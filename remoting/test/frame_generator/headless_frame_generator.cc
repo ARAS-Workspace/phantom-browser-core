@@ -23,10 +23,7 @@ namespace remoting {
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-constexpr base::FilePath::CharType kChromeBinaryName[] =
-    FILE_PATH_LITERAL("chrome.exe");
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 constexpr base::FilePath::CharType kChromeBinaryName[] =
     FILE_PATH_LITERAL("Google Chrome.app/Contents/MacOS/Google Chrome");
 #else

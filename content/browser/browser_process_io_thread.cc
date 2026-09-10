@@ -26,10 +26,6 @@
 #include "base/android/jni_android.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#endif
-
 namespace content {
 
 BrowserProcessIOThread::BrowserProcessIOThread(
@@ -60,10 +56,6 @@ void BrowserProcessIOThread::AllowBlockingForTesting() {
 void BrowserProcessIOThread::Init() {
   DCHECK_CALLED_ON_VALID_THREAD(browser_thread_checker_);
 
-#if BUILDFLAG(IS_WIN)
-  com_initializer_ = std::make_unique<base::win::ScopedCOMInitializer>();
-#endif
-
   if (!is_blocking_allowed_for_testing_) {
     base::DisallowUnresponsiveTasks();
   }
@@ -87,9 +79,6 @@ void BrowserProcessIOThread::Run(base::RunLoop* run_loop) {
 void BrowserProcessIOThread::CleanUp() {
   DCHECK_CALLED_ON_VALID_THREAD(browser_thread_checker_);
 
-#if BUILDFLAG(IS_WIN)
-  com_initializer_.reset();
-#endif
 }
 
 void BrowserProcessIOThread::IOThreadRun(base::RunLoop* run_loop) {

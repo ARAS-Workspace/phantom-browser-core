@@ -550,15 +550,7 @@ void Display::InitializeRenderer() {
             : SurfaceAggregator::ExtraPassForReadbackOption::
                   kAddPassForReadback;
   }
-#if BUILDFLAG(IS_WIN)
-  const bool prevent_merging_surfaces_to_root_pass =
-      IsDelegatedCompositingSupportedAndEnabled(
-          output_surface_->capabilities().dc_support_level) &&
-      features::kDelegatedCompositingModeParam.Get() ==
-          features::DelegatedCompositingMode::kLimitToUi;
-#else
   const bool prevent_merging_surfaces_to_root_pass = false;
-#endif
   aggregator_ = std::make_unique<SurfaceAggregator>(
       surface_manager_, resource_provider_.get(),
       overlay_processor_->NeedsSurfaceDamageRectList(), extra_pass_option,

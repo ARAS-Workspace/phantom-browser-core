@@ -260,26 +260,6 @@ void OpenXrRenderLoop::SetStageParameters(
   current_stage_parameters_ = std::move(stage_parameters);
 }
 
-#if BUILDFLAG(IS_WIN)
-void OpenXrRenderLoop::SubmitFrameWithTextureHandle(
-    int16_t frame_index,
-    mojo::PlatformHandle texture_handle,
-    const gpu::SyncToken& sync_token) {
-  DVLOG(3) << __func__ << " frame_index=" << frame_index;
-  TRACE_EVENT1("xr", "OpenXrRenderLoop::SubmitFrameWithTextureHandle",
-               "frameIndex", frame_index);
-  if (!MarkFrameSubmitted(frame_index)) {
-    return;
-  }
-
-  graphics_binding_->SetWebXrTexture(std::move(texture_handle), sync_token,
-                                     left_webxr_bounds_, right_webxr_bounds_);
-
-  // Regardless of success - try to composite what we have.
-  MaybeCompositeAndSubmit();
-}
-#endif
-
 void OpenXrRenderLoop::CleanUp() {
   DVLOG(1) << __func__;
   submit_client_.reset();
@@ -364,9 +344,6 @@ void OpenXrRenderLoop::StartRuntimeFinish(
   if (graphics_binding_->IsUsingSharedImages()) {
     transport_options->transport_method =
         device::mojom::XRPresentationTransportMethod::DRAW_INTO_TEXTURE_MAILBOX;
-  } else if constexpr (BUILDFLAG(IS_WIN)) {
-    transport_options->transport_method =
-        device::mojom::XRPresentationTransportMethod::SUBMIT_AS_TEXTURE_HANDLE;
   } else {
     // TODO(crbug.com/476100354): Verify that this path is not taken and remove
     // it.

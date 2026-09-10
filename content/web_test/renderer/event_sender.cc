@@ -64,10 +64,6 @@
 #include "v8/include/v8-cppgc.h"
 #include "v8/include/v8.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 using blink::ContextMenuData;
 using blink::DragOperationsMask;
 using blink::MenuItemInfo;
@@ -647,32 +643,6 @@ class EventSenderBindings final : public gin::Wrappable<EventSenderBindings> {
   bool IsDragMode() const;
   void SetIsDragMode(bool drag_mode);
 
-#if BUILDFLAG(IS_WIN)
-  int WmKeyDown() const;
-  void SetWmKeyDown(int key_down);
-
-  int WmKeyUp() const;
-  void SetWmKeyUp(int key_up);
-
-  int WmChar() const;
-  void SetWmChar(int wm_char);
-
-  int WmDeadChar() const;
-  void SetWmDeadChar(int dead_char);
-
-  int WmSysKeyDown() const;
-  void SetWmSysKeyDown(int key_down);
-
-  int WmSysKeyUp() const;
-  void SetWmSysKeyUp(int key_up);
-
-  int WmSysChar() const;
-  void SetWmSysChar(int sys_char);
-
-  int WmSysDeadChar() const;
-  void SetWmSysDeadChar(int sys_dead_char);
-#endif
-
   // Is notified when the local root frame the EventSender is attached to is
   // destroyed.
   void OnFrameDestroyed() { sender_ = nullptr; }
@@ -770,24 +740,6 @@ gin::ObjectTemplateBuilder EventSenderBindings::GetObjectTemplateBuilder(
       .SetProperty("forceLayoutOnEvents",
                    &EventSenderBindings::ForceLayoutOnEvents,
                    &EventSenderBindings::SetForceLayoutOnEvents)
-#if BUILDFLAG(IS_WIN)
-      .SetProperty("WM_KEYDOWN", &EventSenderBindings::WmKeyDown,
-                   &EventSenderBindings::SetWmKeyDown)
-      .SetProperty("WM_KEYUP", &EventSenderBindings::WmKeyUp,
-                   &EventSenderBindings::SetWmKeyUp)
-      .SetProperty("WM_CHAR", &EventSenderBindings::WmChar,
-                   &EventSenderBindings::SetWmChar)
-      .SetProperty("WM_DEADCHAR", &EventSenderBindings::WmDeadChar,
-                   &EventSenderBindings::SetWmDeadChar)
-      .SetProperty("WM_SYSKEYDOWN", &EventSenderBindings::WmSysKeyDown,
-                   &EventSenderBindings::SetWmSysKeyDown)
-      .SetProperty("WM_SYSKEYUP", &EventSenderBindings::WmSysKeyUp,
-                   &EventSenderBindings::SetWmSysKeyUp)
-      .SetProperty("WM_SYSCHAR", &EventSenderBindings::WmSysChar,
-                   &EventSenderBindings::SetWmSysChar)
-      .SetProperty("WM_SYSDEADCHAR", &EventSenderBindings::WmSysDeadChar,
-                   &EventSenderBindings::SetWmSysDeadChar)
-#endif
       .SetProperty("dragMode", &EventSenderBindings::IsDragMode,
                    &EventSenderBindings::SetIsDragMode);
 }
@@ -1158,96 +1110,6 @@ void EventSenderBindings::SetIsDragMode(bool drag_mode) {
     sender_->set_is_drag_mode(drag_mode);
 }
 
-#if BUILDFLAG(IS_WIN)
-int EventSenderBindings::WmKeyDown() const {
-  if (sender_)
-    return sender_->wm_key_down();
-  return 0;
-}
-
-void EventSenderBindings::SetWmKeyDown(int key_down) {
-  if (sender_)
-    sender_->set_wm_key_down(key_down);
-}
-
-int EventSenderBindings::WmKeyUp() const {
-  if (sender_)
-    return sender_->wm_key_up();
-  return 0;
-}
-
-void EventSenderBindings::SetWmKeyUp(int key_up) {
-  if (sender_)
-    sender_->set_wm_key_up(key_up);
-}
-
-int EventSenderBindings::WmChar() const {
-  if (sender_)
-    return sender_->wm_char();
-  return 0;
-}
-
-void EventSenderBindings::SetWmChar(int wm_char) {
-  if (sender_)
-    sender_->set_wm_char(wm_char);
-}
-
-int EventSenderBindings::WmDeadChar() const {
-  if (sender_)
-    return sender_->wm_dead_char();
-  return 0;
-}
-
-void EventSenderBindings::SetWmDeadChar(int dead_char) {
-  if (sender_)
-    sender_->set_wm_dead_char(dead_char);
-}
-
-int EventSenderBindings::WmSysKeyDown() const {
-  if (sender_)
-    return sender_->wm_sys_key_down();
-  return 0;
-}
-
-void EventSenderBindings::SetWmSysKeyDown(int key_down) {
-  if (sender_)
-    sender_->set_wm_sys_key_down(key_down);
-}
-
-int EventSenderBindings::WmSysKeyUp() const {
-  if (sender_)
-    return sender_->wm_sys_key_up();
-  return 0;
-}
-
-void EventSenderBindings::SetWmSysKeyUp(int key_up) {
-  if (sender_)
-    sender_->set_wm_sys_key_up(key_up);
-}
-
-int EventSenderBindings::WmSysChar() const {
-  if (sender_)
-    return sender_->wm_sys_char();
-  return 0;
-}
-
-void EventSenderBindings::SetWmSysChar(int sys_char) {
-  if (sender_)
-    sender_->set_wm_sys_char(sys_char);
-}
-
-int EventSenderBindings::WmSysDeadChar() const {
-  if (sender_)
-    return sender_->wm_sys_dead_char();
-  return 0;
-}
-
-void EventSenderBindings::SetWmSysDeadChar(int sys_dead_char) {
-  if (sender_)
-    sender_->set_wm_sys_dead_char(sys_dead_char);
-}
-#endif
-
 // EventSender -----------------------------------------------------------------
 
 WebMouseEvent::Button EventSender::last_button_type_ =
@@ -1275,17 +1137,6 @@ void EventSender::Reset() {
   current_pointer_state_.clear();
   is_drag_mode_ = true;
   force_layout_on_events_ = true;
-
-#if BUILDFLAG(IS_WIN)
-  wm_key_down_ = WM_KEYDOWN;
-  wm_key_up_ = WM_KEYUP;
-  wm_char_ = WM_CHAR;
-  wm_dead_char_ = WM_DEADCHAR;
-  wm_sys_key_down_ = WM_SYSKEYDOWN;
-  wm_sys_key_up_ = WM_SYSKEYUP;
-  wm_sys_char_ = WM_SYSCHAR;
-  wm_sys_dead_char_ = WM_SYSDEADCHAR;
-#endif
 
   last_click_time_ = base::TimeTicks();
   last_click_pos_ = gfx::PointF();
@@ -1790,22 +1641,6 @@ std::vector<std::string> EventSender::ContextClick() {
                  click_count_, &event);
   HandleInputEventOnViewOrPopup(event);
 
-#if BUILDFLAG(IS_WIN)
-  current_pointer_state_[kRawMousePointerId].current_buttons_ &=
-      ~GetWebMouseEventModifierForButton(WebMouseEvent::Button::kRight);
-  current_pointer_state_[kRawMousePointerId].pressed_button_ =
-      WebMouseEvent::Button::kNoButton;
-
-  WebMouseEvent mouseUpEvent(WebInputEvent::Type::kMouseUp,
-                             ModifiersForPointer(kRawMousePointerId),
-                             GetCurrentEventTime());
-  InitMouseEvent(WebMouseEvent::Button::kRight,
-                 current_pointer_state_[kRawMousePointerId].current_buttons_,
-                 current_pointer_state_[kRawMousePointerId].last_pos_,
-                 click_count_, &mouseUpEvent);
-  HandleInputEventOnViewOrPopup(mouseUpEvent);
-#endif
-
   std::vector<std::string> menu_items =
       MakeMenuItemStringsFor(last_context_menu_data_.get());
   last_context_menu_data_.reset();
@@ -1893,12 +1728,7 @@ void EventSender::DumpFilenameBeingDragged(blink::WebLocalFrame* frame) {
                                 std::string(),   // suggested_name
                                 std::string(),   // mime_type
                                 std::string());  // default_name
-#if BUILDFLAG(IS_WIN)
-      filename = filename.ReplaceExtension(
-          base::UTF8ToWide(filename_extension.Utf8()));
-#else
       filename = filename.ReplaceExtension(filename_extension.Utf8());
-#endif
       test_runner_->PrintMessage(std::string("Filename being dragged: ") +
                                      filename.AsUTF8Unsafe() + "\n",
                                  *frame_proxy);

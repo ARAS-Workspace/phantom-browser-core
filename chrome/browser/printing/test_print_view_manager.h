@@ -30,12 +30,6 @@ class TestPrintViewManager : public PrintViewManager {
   TestPrintViewManager& operator=(const TestPrintViewManager&) = delete;
   ~TestPrintViewManager() override;
 
-#if BUILDFLAG(IS_WIN)
-  void set_simulate_pdf_conversion_error_on_page_index(uint32_t page_index) {
-    simulate_pdf_conversion_error_on_page_index_ = page_index;
-  }
-#endif
-
   bool StartPrinting(content::WebContents* contents);
 
   void WaitUntilPreviewIsShownOrCancelled();
@@ -70,9 +64,6 @@ class TestPrintViewManager : public PrintViewManager {
   base::OnceClosure quit_closure_;
   mojom::PrintPagesParamsPtr snooped_params_;
   std::optional<bool> print_now_result_;
-#if BUILDFLAG(IS_WIN)
-  std::optional<uint32_t> simulate_pdf_conversion_error_on_page_index_;
-#endif
   OnDidCreatePrintJobCallback on_did_create_print_job_;
 };
 

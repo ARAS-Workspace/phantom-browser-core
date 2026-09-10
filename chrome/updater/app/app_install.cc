@@ -44,7 +44,6 @@
 
 namespace updater {
 
-#if !BUILDFLAG(IS_WIN)
 namespace {
 
 class AppInstallControllerImpl : public AppInstallController {
@@ -108,7 +107,6 @@ scoped_refptr<App> MakeAppInstall(bool /*is_silent_install*/) {
         return base::MakeRefCounted<AppInstallControllerImpl>();
       }));
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 AppInstall::AppInstall(AppInstallController::Maker app_install_controller_maker)
     : app_install_controller_maker_(app_install_controller_maker),

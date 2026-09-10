@@ -10,12 +10,6 @@
 #include "gpu/config/gpu_feature_info.h"
 #include "ui/gl/gpu_preference.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-// Must be included after windows.h.
-#include <psapi.h>
-#endif  // BUILDFLAG(IS_WIN)
-
 #include <vulkan/vulkan.h>
 
 #include <memory>
@@ -72,57 +66,6 @@
 namespace gpu {
 
 namespace {
-
-#if BUILDFLAG(IS_WIN)
-// These values are persistent to logs. Entries should not be renumbered and
-// numeric values should never be reused.
-// This should match enum D3D11FeatureLevel in
-//  \tools\metrics\histograms\enums.xml
-enum class D3D11FeatureLevel {
-  kUnknown = 0,
-  k9_1 = 4,
-  k9_2 = 5,
-  k9_3 = 6,
-  k10_0 = 7,
-  k10_1 = 8,
-  k11_0 = 9,
-  k11_1 = 10,
-  k12_0 = 11,
-  k12_1 = 12,
-  k12_2 = 13,
-  kMaxValue = k12_2,
-};
-
-inline D3D11FeatureLevel ConvertToHistogramD3D11FeatureLevel(
-    D3D_FEATURE_LEVEL d3d11_feature_level) {
-  switch (d3d11_feature_level) {
-    case D3D_FEATURE_LEVEL_1_0_CORE:
-      return D3D11FeatureLevel::kUnknown;
-    case D3D_FEATURE_LEVEL_9_1:
-      return D3D11FeatureLevel::k9_1;
-    case D3D_FEATURE_LEVEL_9_2:
-      return D3D11FeatureLevel::k9_2;
-    case D3D_FEATURE_LEVEL_9_3:
-      return D3D11FeatureLevel::k9_3;
-    case D3D_FEATURE_LEVEL_10_0:
-      return D3D11FeatureLevel::k10_0;
-    case D3D_FEATURE_LEVEL_10_1:
-      return D3D11FeatureLevel::k10_1;
-    case D3D_FEATURE_LEVEL_11_0:
-      return D3D11FeatureLevel::k11_0;
-    case D3D_FEATURE_LEVEL_11_1:
-      return D3D11FeatureLevel::k11_1;
-    case D3D_FEATURE_LEVEL_12_0:
-      return D3D11FeatureLevel::k12_0;
-    case D3D_FEATURE_LEVEL_12_1:
-      return D3D11FeatureLevel::k12_1;
-    case D3D_FEATURE_LEVEL_12_2:
-      return D3D11FeatureLevel::k12_2;
-    default:
-      NOTREACHED();
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 GpuFeatureStatus GetVulkanFeatureStatus(
     const std::set<int>& blocklisted_features,
@@ -318,9 +261,6 @@ GpuFeatureStatus GetSkiaGraphiteFeatureStatus(
 #if BUILDFLAG(IS_APPLE)
     constexpr gl::ANGLEImplementation kRequired =
         gl::ANGLEImplementation::kMetal;
-#elif BUILDFLAG(IS_WIN)
-    constexpr gl::ANGLEImplementation kRequired =
-        gl::ANGLEImplementation::kD3D11;
 #else
     constexpr gl::ANGLEImplementation kRequired =
         gl::ANGLEImplementation::kNone;
@@ -343,9 +283,6 @@ GpuFeatureStatus GetSkiaGraphiteFeatureStatus(
   }
 #if BUILDFLAG(SKIA_USE_DAWN)
   bool is_win_intel = false;
-#if BUILDFLAG(IS_WIN)
-  is_win_intel = (gpu_info.active_gpu().vendor_id == 0x8086);
-#endif
 
   bool is_graphite_enabled = false;
   if (is_win_intel &&
@@ -404,11 +341,6 @@ void SetProcessGlWorkaroundsFromGpuFeatures(
   gl::GlWorkarounds workarounds = {
       .disable_d3d11 = is_enabled(DISABLE_D3D11),
       .disable_metal = is_enabled(DISABLE_METAL),
-#if BUILDFLAG(IS_WIN)
-      .disable_direct_composition_video_overlays =
-          is_enabled(DISABLE_DIRECT_COMPOSITION_VIDEO_OVERLAYS),
-      .disable_vp_auto_hdr = is_enabled(DISABLE_VP_AUTO_HDR),
-#endif
   };
 
   gl::SetGlWorkarounds(workarounds);
@@ -495,19 +427,6 @@ void RecordNpuHistogram(uint32_t vendor_id, uint32_t device_id) {
       break;
   }
 }
-
-#if BUILDFLAG(IS_WIN)
-uint32_t GetSystemCommitLimitMb() {
-  PERFORMANCE_INFORMATION perf_info = {sizeof(perf_info)};
-  if (::GetPerformanceInfo(&perf_info, sizeof(perf_info))) {
-    uint64_t limit = perf_info.CommitLimit;
-    limit *= perf_info.PageSize;
-    limit /= 1024 * 1024;
-    return static_cast<uint32_t>(limit);
-  }
-  return 0u;
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
 GPUInfo* g_gpu_info_cache = nullptr;
@@ -857,11 +776,6 @@ void SetKeysForCrashLogging(const GPUInfo& gpu_info) {
 #if !BUILDFLAG(IS_ANDROID)
   crash_keys::gpu_count.Set(base::StringPrintf("%d", gpu_info.GpuCount()));
 #endif  // !BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_WIN)
-  crash_keys::gpu_sub_sys_id.Set(
-      base::StringPrintf("0x%08x", active_gpu.sub_sys_id));
-  crash_keys::gpu_revision.Set(base::StringPrintf("%u", active_gpu.revision));
-#endif  // BUILDFLAG(IS_WIN)
   crash_keys::gpu_driver_version.Set(active_gpu.driver_version);
   crash_keys::gpu_pixel_shader_version.Set(gpu_info.pixel_shader_version);
   crash_keys::gpu_vertex_shader_version.Set(gpu_info.vertex_shader_version);
@@ -957,7 +871,7 @@ bool EnableSwiftShaderIfNeeded(base::CommandLine* command_line,
                                const GpuFeatureInfo& gpu_feature_info,
                                bool disable_software_rasterizer,
                                bool blocklist_needs_more_info) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (gpu_feature_info.IsWorkaroundEnabled(FORCE_PHYSICAL_GPU_FOR_TESTING)) {
     return false;
   }
@@ -1182,18 +1096,6 @@ void CollectDevicePerfInfo(DevicePerfInfo* device_perf_info,
   device_perf_info->hardware_concurrency =
       static_cast<uint32_t>(std::thread::hardware_concurrency());
 
-#if BUILDFLAG(IS_WIN)
-  device_perf_info->system_commit_limit_mb = GetSystemCommitLimitMb();
-  if (!in_browser_process) {
-    D3D_FEATURE_LEVEL d3d11_feature_level = D3D_FEATURE_LEVEL_1_0_CORE;
-    bool has_discrete_gpu = false;
-    if (CollectD3D11FeatureInfo(&d3d11_feature_level, &has_discrete_gpu)) {
-      device_perf_info->d3d11_feature_level = d3d11_feature_level;
-      device_perf_info->has_discrete_gpu =
-          has_discrete_gpu ? HasDiscreteGpu::kYes : HasDiscreteGpu::kNo;
-    }
-  }
-#endif
 }
 
 void RecordDevicePerfInfoHistograms() {
@@ -1202,15 +1104,6 @@ void RecordDevicePerfInfoHistograms() {
     return;
   UMA_HISTOGRAM_COUNTS_1000("Hardware.TotalDiskSpace",
                             device_perf_info->total_disk_space_mb / 1024);
-#if BUILDFLAG(IS_WIN)
-  UMA_HISTOGRAM_COUNTS_100("Memory.Total.SystemCommitLimit",
-                           device_perf_info->system_commit_limit_mb / 1024);
-  UMA_HISTOGRAM_ENUMERATION("GPU.D3D11FeatureLevel",
-                            ConvertToHistogramD3D11FeatureLevel(
-                                device_perf_info->d3d11_feature_level));
-  UMA_HISTOGRAM_ENUMERATION("GPU.HasDiscreteGpu",
-                            device_perf_info->has_discrete_gpu);
-#endif  // BUILDFLAG(IS_WIN)
   UMA_HISTOGRAM_ENUMERATION("GPU.IntelGpuGeneration",
                             device_perf_info->intel_gpu_generation);
   UMA_HISTOGRAM_BOOLEAN("GPU.SoftwareRendering",
@@ -1233,65 +1126,7 @@ void RecordNpuHistograms(const GPUInfo& gpu_info) {
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-unsigned int DirectCompositionRootSurfaceBufferCount(
-    GrContextType gr_context_type) {
-  if (switches::GetFakeVsyncIntervalFromCommandLine().has_value()) {
-    // We assume 2 swapchain buffers are intended for a standard 60Hz display.
-    // If we are simulating a high refresh rate, we increase the buffer count
-    // to 10 to prevent blocking on presentation if the actual hardware
-    // display refresh rate is slower.
-    // Note: The simulated refresh rate is used here as a heuristic for
-    // debugging high refresh rate behaviors and does not need to be exact.
-    return 10u;
-  }
-  if (gr_context_type == GrContextType::kGraphiteDawn &&
-      features::SkiaGraphiteTripleBufferedDCompRootSurface()) {
-    return 3u;
-  }
-  return 2u;
-}
-
-std::string DirectMLFeatureLevelToString(uint32_t directml_feature_level) {
-  if (directml_feature_level == 0) {
-    return "Not supported";
-  } else {
-    return base::StringPrintf("%d.%d", (directml_feature_level >> 12) & 0xF,
-                              (directml_feature_level >> 8) & 0xF);
-  }
-}
-
-std::string D3DFeatureLevelToString(uint32_t d3d_feature_level) {
-  if (d3d_feature_level == 0) {
-    return "Not supported";
-  } else {
-    return base::StringPrintf("D3D %d.%d", (d3d_feature_level >> 12) & 0xF,
-                              (d3d_feature_level >> 8) & 0xF);
-  }
-}
-
-std::string D3DFeatureLevelToNumberString(uint32_t d3d_feature_level) {
-  if (d3d_feature_level == 0) {
-    return "0.0";
-  }
-  return base::StringPrintf("%d.%d", (d3d_feature_level >> 12) & 0xF,
-                            (d3d_feature_level >> 8) & 0xF);
-}
-
-std::string VulkanVersionToString(uint32_t vulkan_version) {
-  if (vulkan_version == 0) {
-    return "Not supported";
-  } else {
-    // Vulkan version number VK_MAKE_VERSION(major, minor, patch)
-    // (((major) << 22) | ((minor) << 12) | (patch))
-    return base::StringPrintf(
-        "Vulkan API %d.%d.%d", (vulkan_version >> 22) & 0x3FF,
-        (vulkan_version >> 12) & 0x3FF, vulkan_version & 0xFFF);
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // GPU picking is only effective with ANGLE/Metal backend on Mac and
 // on Windows with EGL.
 void TrySetNonSoftwareDevicePreferenceForTesting(

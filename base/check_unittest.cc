@@ -32,10 +32,6 @@
 #include <errno.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace {
 
 int g_dump_without_crashing_count = 0;
@@ -252,17 +248,10 @@ TEST(CheckDeathTest, CheckOpPointers) {
   auto arr = std::to_array<uint8_t>({3, 2, 1, 0});
   uint8_t* arr_start = &arr[0];
   // Print pointers and not the binary data in `arr`.
-#if BUILDFLAG(IS_WIN)
-  EXPECT_CHECK(
-      "=~Check failed: arr_start != arr_start \\([0-9A-F]+ vs. "
-      "[0-9A-F]+\\)",
-      CHECK_NE(arr_start, arr_start));
-#else
   EXPECT_CHECK(
       "=~Check failed: arr_start != arr_start \\(0x[0-9a-f]+ vs. "
       "0x[0-9a-f]+\\)",
       CHECK_NE(arr_start, arr_start));
-#endif
 }
 
 TEST(CheckTest, CheckStreamsAreLazy) {
@@ -795,11 +784,7 @@ TEST(CheckDeathTest, CorrectSystemErrorUsed) {
       base::StrCat({" NOTREACHED hit. ", base::NumberToString(kTestError)});
 
   auto set_last_error = [](logging::SystemErrorCode error) {
-#if BUILDFLAG(IS_WIN)
-    ::SetLastError(error);
-#else
     errno = error;
-#endif
   };
 
   // Test that the last system error code was used as expected.

@@ -106,10 +106,6 @@ DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ContentSettingImageModel,
 DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ContentSettingImageModel,
                                       kSmartCardIconElementId);
 #endif
-#if BUILDFLAG(IS_WIN)
-DEFINE_CLASS_ELEMENT_IDENTIFIER_VALUE(ContentSettingImageModel,
-                                      kProtectedMediaElementId);
-#endif
 
 // The image models hierarchy:
 //
@@ -335,21 +331,6 @@ class ContentSettingStorageAccessImageModel
   bool UpdateAndGetVisibility(WebContents* web_contents) override;
 };
 
-#if BUILDFLAG(IS_WIN)
-class ContentSettingProtectedMediaIdentifierImageModel
-    : public ContentSettingSimpleImageModel {
- public:
-  ContentSettingProtectedMediaIdentifierImageModel();
-
-  ContentSettingProtectedMediaIdentifierImageModel(
-      const ContentSettingProtectedMediaIdentifierImageModel&) = delete;
-  ContentSettingProtectedMediaIdentifierImageModel& operator=(
-      const ContentSettingProtectedMediaIdentifierImageModel&) = delete;
-
-  bool UpdateAndGetVisibility(WebContents* web_contents) override;
-};
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace {
 
 struct ContentSettingsImageDetails {
@@ -535,16 +516,6 @@ void GetIconChromeRefresh(ContentSettingsType type,
                     : vector_icons::kSmartCardReaderOldIcon);
       return;
 #endif
-#if BUILDFLAG(IS_WIN)
-    case ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER:
-      *icon = blocked ? &(features::IsRoundedIconsEnabled()
-                              ? vector_icons::kSyncSavedLocallyOffIcon
-                              : vector_icons::kSyncSavedLocallyOffOldIcon)
-                      : &(features::IsRoundedIconsEnabled()
-                              ? vector_icons::kSyncSavedLocallyIcon
-                              : vector_icons::kSyncSavedLocallyOldIcon);
-      return;
-#endif  // BUILDFLAG(IS_WIN)
     default:
       NOTREACHED();
   }
@@ -631,11 +602,6 @@ ContentSettingImageModel::CreateForContentType(ImageType image_type) {
     case ImageType::kSmartCard:
       return std::make_unique<ContentSettingSmartCardImageModel>();
 #endif
-#if BUILDFLAG(IS_WIN)
-    case ImageType::kProtectedMediaIdentifier:
-      return std::make_unique<
-          ContentSettingProtectedMediaIdentifierImageModel>();
-#endif  // BUILDFLAG(IS_WIN)
   }
   NOTREACHED();
 }
@@ -817,7 +783,7 @@ bool ContentSettingGeolocationImageModel::UpdateAndGetVisibility(
           "ContentSettings.Geolocation.BlockedIconShown"));
       set_tooltip(l10n_util::GetStringUTF16(IDS_BLOCKED_GEOLOCATION_MESSAGE));
       if (content_settings->geolocation_was_just_granted_on_site_level()) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
         if (system_permission_settings::CanPrompt(
                 ContentSettingsType::GEOLOCATION)) {
           // Ask the system to display a permission prompt for location access.
@@ -830,7 +796,7 @@ bool ContentSettingGeolocationImageModel::UpdateAndGetVisibility(
         }
 #else
         set_should_auto_open_bubble(true);
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
       }
       // At this point macOS may not have told us whether location permission
       // has been allowed or blocked. Wait until the permission state is
@@ -1412,43 +1378,6 @@ ContentSettingNotificationsImageModel::CreateBubbleModelImpl(
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-// Protected media identifiers
-// -------------------------------------------------------------------
-
-ContentSettingProtectedMediaIdentifierImageModel::
-    ContentSettingProtectedMediaIdentifierImageModel()
-    : ContentSettingSimpleImageModel(
-          ImageType::kProtectedMediaIdentifier,
-          ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER,
-          /*image_type_should_notify_accessibility=*/true) {}
-
-bool ContentSettingProtectedMediaIdentifierImageModel::UpdateAndGetVisibility(
-    WebContents* web_contents) {
-  PageSpecificContentSettings* content_settings =
-      PageSpecificContentSettings::GetForFrame(
-          web_contents->GetPrimaryMainFrame());
-  if (!content_settings) {
-    return false;
-  }
-  ContentSettingsType content_type =
-      ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER;
-  bool blocked = content_settings->IsContentBlocked(content_type);
-  bool allowed = content_settings->IsContentAllowed(content_type);
-  if (!blocked && !allowed) {
-    return false;
-  }
-
-  SetIcon(ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER,
-          /*blocked=*/!allowed);
-  auto message_id = allowed ? IDS_ALLOWED_PROTECTED_CONTENT_IDENTIFIERS_MESSAGE
-                            : IDS_BLOCKED_PROTECTED_CONTENT_IDENTIFIERS_MESSAGE;
-  set_tooltip(l10n_util::GetStringUTF16(message_id));
-  set_accessibility_string_id(message_id);
-  return true;
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 // Base class ------------------------------------------------------------------
 
 gfx::Image ContentSettingImageModel::GetIcon(SkColor icon_color) const {
@@ -1501,10 +1430,6 @@ ui::ElementIdentifier ContentSettingImageModel::GetElementIdentifier() const {
 #if BUILDFLAG(IS_CHROMEOS)
     case ImageType::kSmartCard:
       return kSmartCardIconElementId;
-#endif
-#if BUILDFLAG(IS_WIN)
-    case ImageType::kProtectedMediaIdentifier:
-      return kProtectedMediaElementId;
 #endif
   }
   NOTREACHED();
@@ -1560,20 +1485,10 @@ ContentSettingImageModel::GenerateContentSettingImageModels() {
 #if BUILDFLAG(IS_CHROMEOS)
       ImageType::kSmartCard,
 #endif
-#if BUILDFLAG(IS_WIN)
-      ImageType::kProtectedMediaIdentifier,
-#endif
   };
 
   std::vector<std::unique_ptr<ContentSettingImageModel>> result;
   for (auto type : kContentSettingImageOrder) {
-#if BUILDFLAG(IS_WIN)
-    if (type == ImageType::kProtectedMediaIdentifier &&
-        !base::FeatureList::IsEnabled(
-            media::kProtectedMediaIdentifierIndicator)) {
-      continue;
-    }
-#endif
     result.push_back(CreateForContentType(type));
   }
 

@@ -349,14 +349,6 @@ class WebRtcScreenCaptureBrowserTestWithPicker
     }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-    if (!test_config_.should_prefer_current_tab) {
-      // Win bots don't usually have GPU adapter, therefore DXGI capturers
-      // aren't available. WGC capturers aren't available on older platforms.
-      // Therefore we can't capture screens.
-      GTEST_SKIP() << "Skipping desktop capture tests";
-    }
-#endif
   }
 
   void SetUpCommandLine(base::CommandLine* command_line) override {
@@ -405,7 +397,7 @@ INSTANTIATE_TEST_SUITE_P(
 #define MAYBE_ScreenCaptureVideo DISABLED_ScreenCaptureVideo
 #else
 #define MAYBE_ScreenCaptureVideo ScreenCaptureVideo
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_LINUX) &&
+#endif  // BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_LINUX) &&
         // defined(MEMORY_SANITIZER))
 IN_PROC_BROWSER_TEST_P(WebRtcScreenCaptureBrowserTestWithPicker,
                        MAYBE_ScreenCaptureVideo) {
@@ -485,7 +477,7 @@ IN_PROC_BROWSER_TEST_P(WebRtcScreenCaptureBrowserTestWithPicker,
 #define MAYBE_ScreenCaptureVideoAndAudio DISABLED_ScreenCaptureVideoAndAudio
 #else
 #define MAYBE_ScreenCaptureVideoAndAudio ScreenCaptureVideoAndAudio
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_P(WebRtcScreenCaptureBrowserTestWithPicker,
                        MAYBE_ScreenCaptureVideoAndAudio) {
   if (!test_config_.should_prefer_current_tab &&
@@ -675,11 +667,7 @@ INSTANTIATE_TEST_SUITE_P(
     });
 
 // Flaky on Win bots http://crbug.com/40800993
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ScreenShareFromEmbedded DISABLED_ScreenShareFromEmbedded
-#else
 #define MAYBE_ScreenShareFromEmbedded ScreenShareFromEmbedded
-#endif
 IN_PROC_BROWSER_TEST_P(WebRtcScreenCapturePermissionPolicyBrowserTest,
                        MAYBE_ScreenShareFromEmbedded) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -2846,7 +2834,7 @@ IN_PROC_BROWSER_TEST_P(WebRtcScreenCaptureBrowserTestUserRejection,
 }
 
 // RestrictOwnAudio is only supported on macOS and Windows.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 class GetDisplayMediaRestrictOwnAudioTest
     : public WebRtcTestBase,
       public testing::WithParamInterface<std::tuple<bool, bool>> {
@@ -2889,8 +2877,6 @@ class GetDisplayMediaRestrictOwnAudioTest
                                     media::kMacCatapLoopbackAudioForScreenShare,
                                     blink::features::kRestrictOwnAudio},
                                    {media::kUseSCContentSharingPicker});
-#elif BUILDFLAG(IS_WIN)
-    feature_list_.InitWithFeatures({blink::features::kRestrictOwnAudio}, {});
 #endif
 
     WebRtcTestBase::SetUpInProcessBrowserTestFixture();
@@ -2993,4 +2979,4 @@ IN_PROC_BROWSER_TEST_P(GetDisplayMediaRestrictOwnAudioTest,
   }
 }
 
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)

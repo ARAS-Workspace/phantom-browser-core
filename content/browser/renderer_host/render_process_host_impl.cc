@@ -260,17 +260,7 @@
 #include "content/browser/v8_snapshot_files.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#include "base/win/windows_version.h"
-#include "components/app_launch_prefetch/app_launch_prefetch.h"
-#include "content/browser/renderer_host/dwrite_font_proxy_impl_win.h"
-#include "content/public/common/font_cache_dispatcher_win.h"
-#include "content/public/common/font_cache_win.mojom.h"
-#include "ui/display/win/dpi.h"
-#endif
-
-#if BUILDFLAG(ENABLE_LIBRARY_CDMS) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_LIBRARY_CDMS) || BUILDFLAG(IS_ANDROID)
 #include "content/browser/media/key_system_support_impl.h"
 #endif
 
@@ -331,12 +321,6 @@ RenderProcessHost::AnalyzeHungRendererFunction g_analyze_hung_renderer =
 // https://crbug.com/4348963. Can be overridden in tests.
 uint64_t g_subframe_process_reuse_memory_threshold = 512 * 1024 * 1024u;
 
-#if BUILDFLAG(IS_WIN)
-// This is from extensions/common/switches.cc
-// Marks a renderer as extension process.
-// TODO(joel@microsoft.com): Replace this with a layer-respecting alternative.
-const char kExtensionProcess[] = "extension-process";
-#endif
 
 // the global list of all renderer processes
 base::IDMap<RenderProcessHost*, ChildProcessId>& GetAllHosts() {
@@ -2021,14 +2005,9 @@ bool RenderProcessHostImpl::Init() {
         base::checked_cast<int32_t>(id_.GetUnsafeValue())));
 
     base::Thread::Options options;
-#if BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
-    // In-process plugins require this to be a UI message loop.
-    options.message_pump_type = base::MessagePumpType::UI;
-#else
     // We can't have multiple UI loops on Linux and Android, so we don't support
     // in-process plugins.
     options.message_pump_type = base::MessagePumpType::DEFAULT;
-#endif
     // As for execution sequence, this callback should have no any dependency
     // on starting in-process-render-thread.
     // So put it here to trigger Channel initialization earlier to enable
@@ -2063,14 +2042,8 @@ bool RenderProcessHostImpl::Init() {
               gpu_channel_request_start_time.since_origin().InMicroseconds()));
     }
 
-#if BUILDFLAG(IS_WIN)
-    std::unique_ptr<SandboxedProcessLauncherDelegate> sandbox_delegate =
-        std::make_unique<RendererSandboxedProcessLauncherDelegateWin>(
-            *cmd_line, IsPdf(), IsJitDisabled());
-#else
     std::unique_ptr<SandboxedProcessLauncherDelegate> sandbox_delegate =
         std::make_unique<RendererSandboxedProcessLauncherDelegate>();
-#endif
 
     tracing_config_memory_region_ =
         MakeRefCounted<base::RefCountedData<base::ReadOnlySharedMemoryRegion>>(
@@ -3739,15 +3712,6 @@ void RenderProcessHostImpl::AppendRendererCommandLine(
   if (IsPdf())
     command_line->AppendSwitch(switches::kPdfRenderer);
 
-#if BUILDFLAG(IS_WIN)
-  if (command_line->HasSwitch(kExtensionProcess)) {
-    command_line->AppendArgNative(app_launch_prefetch::GetPrefetchSwitch(
-        app_launch_prefetch::SubprocessType::kExtension));
-  } else {
-    command_line->AppendArgNative(app_launch_prefetch::GetPrefetchSwitch(
-        app_launch_prefetch::SubprocessType::kRenderer));
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   // Now send any options from our own command line we want to propagate.
   const base::CommandLine& browser_command_line =
@@ -3785,11 +3749,6 @@ void RenderProcessHostImpl::AppendRendererCommandLine(
         blink::switches::kTouchTextSelectionStrategy_Direction);
   }
 
-#if BUILDFLAG(IS_WIN)
-  command_line->AppendSwitchASCII(
-      switches::kDeviceScaleFactor,
-      base::NumberToString(display::win::GetDPIScale()));
-#endif
 
   AppendCompositorCommandLineFlags(command_line);
 
@@ -3984,13 +3943,6 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
       switches::kDisableMediaSessionAPI,
       switches::kRendererWaitForJavaDebugger,
 #endif
-#if BUILDFLAG(IS_WIN)
-      switches::kDisableHighResTimer,
-      switches::kTextContrast,
-      switches::kTextGamma,
-      switches::kTrySupportedChannelLayouts,
-      switches::kRaiseTimerFrequency,
-#endif
 #if BUILDFLAG(IS_OZONE)
       switches::kOzonePlatform,
 #endif
@@ -4042,24 +3994,10 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
     }
   }
 
-#if BUILDFLAG(IS_WIN) && !defined(OFFICIAL_BUILD)
-  // Needed because we can't show the dialog from the sandbox. Don't pass
-  // --no-sandbox in official builds because that would bypass the bad_flgs
-  // prompt.
-  if (renderer_cmd->HasSwitch(switches::kRendererStartupDialog) &&
-      !renderer_cmd->HasSwitch(sandbox::policy::switches::kNoSandbox)) {
-    renderer_cmd->AppendSwitch(sandbox::policy::switches::kNoSandbox);
-  }
-#endif
 
   CopyFeatureSwitch(browser_cmd, renderer_cmd, switches::kEnableBlinkFeatures);
   CopyFeatureSwitch(browser_cmd, renderer_cmd, switches::kDisableBlinkFeatures);
 
-#if BUILDFLAG(IS_WIN)
-  if (media::IsMediaFoundationD3D11VideoCaptureEnabled()) {
-    renderer_cmd->AppendSwitch(switches::kVideoCaptureUseGpuMemoryBuffer);
-  }
-#endif
 }
 
 const base::Process& RenderProcessHostImpl::GetProcess() {
@@ -5134,7 +5072,7 @@ bool RenderProcessHostImpl::HasWarmLockedProcess(
 
 // static
 bool RenderProcessHostImpl::ShouldDelayProcessShutdown() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   return true;
 #else
   return false;
@@ -5612,10 +5550,6 @@ ChildProcessTerminationInfo RenderProcessHostImpl::GetChildTerminationInfo(
     info.status = base::TERMINATION_STATUS_PROCESS_CRASHED;
 
     // TODO(siggi): Remove this once https://crbug.com/806661 is resolved.
-#if BUILDFLAG(IS_WIN)
-    if (info.exit_code == WAIT_TIMEOUT && g_analyze_hung_renderer)
-      g_analyze_hung_renderer(child_process_launcher_->GetProcess());
-#endif
   }
 
 #if BUILDFLAG(IS_ANDROID)
@@ -5855,8 +5789,6 @@ uint64_t RenderProcessHostImpl::GetPrivateMemoryFootprint() {
                dump->platform_private_footprint->vm_swap_bytes;
 #elif BUILDFLAG(IS_APPLE)
   total_size = dump->platform_private_footprint->phys_footprint_bytes;
-#elif BUILDFLAG(IS_WIN)
-  total_size = dump->platform_private_footprint->private_bytes;
 #endif
 
   constexpr base::TimeDelta kPrivateMemoryFootprintCacheValidTime =

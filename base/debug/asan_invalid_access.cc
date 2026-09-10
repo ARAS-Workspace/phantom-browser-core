@@ -13,40 +13,9 @@
 #include "base/logging.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace base::debug {
 
 namespace {
-
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-// Corrupt a memory block and make sure that the corruption gets detected either
-// when we free it or when another crash happens (if |induce_crash| is set to
-// true).
-NOINLINE void CorruptMemoryBlock(bool induce_crash) {
-  // NOTE(sebmarchand): We intentionally corrupt a memory block here in order to
-  //     trigger an Address Sanitizer (ASAN) error report.
-  static const size_t kArraySize = 5;
-  auto array = base::HeapArray<LONG>::Uninit(kArraySize);
-
-  // Explicitly call out to a kernel32 function to perform the memory access.
-  // This way the underflow won't be detected but the corruption will (as the
-  // allocator will still be hooked).
-  auto InterlockedIncrementFn =
-      reinterpret_cast<LONG (*)(LONG volatile* addend)>(
-          GetProcAddress(GetModuleHandle(L"kernel32"), "InterlockedIncrement"));
-  CHECK(InterlockedIncrementFn);
-
-  LONG volatile dummy = InterlockedIncrementFn(UNSAFE_TODO(array.data() - 1));
-  base::debug::Alias(const_cast<LONG*>(&dummy));
-
-  if (induce_crash) {
-    base::ImmediateCrash();
-  }
-}
-#endif  // BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
 
 void MaybeImmediateCrash() {
   // On non-ASan builds, the invalid memory access above is not guaranteed
@@ -150,15 +119,6 @@ void AsanHeapMemberDereferenceAfterFree() {
 #if defined(ADDRESS_SANITIZER) || BUILDFLAG(IS_HWASAN)
 // The "corrupt-block" and "corrupt-heap" classes of bugs is specific to
 // Windows.
-#if BUILDFLAG(IS_WIN)
-void AsanCorruptHeapBlock() {
-  CorruptMemoryBlock(false);
-}
-
-void AsanCorruptHeap() {
-  CorruptMemoryBlock(true);
-}
-#endif  // BUILDFLAG(IS_WIN)
 #endif  // ADDRESS_SANITIZER
 
 }  // namespace base::debug

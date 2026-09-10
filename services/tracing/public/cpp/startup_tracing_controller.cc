@@ -91,12 +91,8 @@ class StartupTracingController::BackgroundTracer {
 #endif
 
     if (write_mode_ == WriteMode::kStreaming) {
-#if !BUILDFLAG(IS_WIN)
       OpenFile(output_file_);
       tracing_session_->Setup(trace_config, file_.TakePlatformFile());
-#else
-      NOTREACHED() << "Streaming to file is not supported on Windows yet";
-#endif
     } else {
       tracing_session_->Setup(trace_config);
     }
@@ -492,11 +488,6 @@ void StartupTracingController::StartIfNeeded() {
       tracing::TraceStartupConfig::GetInstance().GetOutputFormat();
 
   BackgroundTracer::WriteMode write_mode;
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/1158482/): Perfetto does not (yet) support writing directly
-  // to a file on Windows.
-  write_mode = BackgroundTracer::WriteMode::kAfterStopping;
-#else
   // Only protos can be incrementally written to a file - legacy json needs to
   // go through an additional conversion step after, which requires the entire
   // trace to be available.
@@ -504,7 +495,6 @@ void StartupTracingController::StartIfNeeded() {
       output_format == tracing::TraceStartupConfig::OutputFormat::kProto
           ? BackgroundTracer::WriteMode::kStreaming
           : BackgroundTracer::WriteMode::kAfterStopping;
-#endif
 
   auto perfetto_config =
       tracing::TraceStartupConfig::GetInstance().GetPerfettoConfig();

@@ -113,17 +113,11 @@
 // enabled and disabled independently, to aid testing.  These #defines are
 // here so that the same setting can be used in both the implementation and
 // in the unit test.
-#if PA_BUILDFLAG(IS_WIN)
-#define PA_FILE_PATH_USES_DRIVE_LETTERS
-#define PA_FILE_PATH_USES_WIN_SEPARATORS
-#endif  // PA_BUILDFLAG(IS_WIN)
 
 // Macros for string literal initialization of FilePath::CharType[].
-#if PA_BUILDFLAG(IS_WIN)
-#define PA_FILE_PATH_LITERAL(x) L##x
-#elif PA_BUILDFLAG(IS_POSIX)
+#if PA_BUILDFLAG(IS_POSIX)
 #define PA_FILE_PATH_LITERAL(x) x
-#endif  // PA_BUILDFLAG(IS_WIN)
+#endif  // PA_BUILDFLAG(IS_POSIX)
 
 namespace partition_alloc::internal::base {
 
@@ -131,16 +125,12 @@ namespace partition_alloc::internal::base {
 // pathnames on different platforms.
 class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) FilePath {
  public:
-#if PA_BUILDFLAG(IS_WIN)
-  // On Windows, for Unicode-aware applications, native pathnames are wchar_t
-  // arrays encoded in UTF-16.
-  typedef std::wstring StringType;
-#elif PA_BUILDFLAG(IS_POSIX)
+#if PA_BUILDFLAG(IS_POSIX)
   // On most platforms, native pathnames are char arrays, and the encoding
   // may or may not be specified.  On Mac OS X, native pathnames are encoded
   // in UTF-8.
   typedef std::string StringType;
-#endif  // PA_BUILDFLAG(IS_WIN)
+#endif  // PA_BUILDFLAG(IS_POSIX)
 
   typedef StringType::value_type CharType;
 

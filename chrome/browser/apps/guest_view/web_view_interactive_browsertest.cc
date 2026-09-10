@@ -560,8 +560,7 @@ class WebViewPointerLockInteractiveTest : public WebViewInteractiveTest {};
 class DISABLED_WebViewPopupInteractiveTest : public WebViewInteractiveTest {};
 
 // Timeouts flakily: crbug.com/40098536
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN) && \
-    defined(NDEBUG)
+#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_MAC) && defined(NDEBUG)
 #define MAYBE_PointerLock PointerLock
 #else
 #define MAYBE_PointerLock DISABLED_PointerLock
@@ -1092,7 +1091,7 @@ IN_PROC_BROWSER_TEST_F(WebViewFocusInteractiveTest, Focus_FocusRestored) {
 
 // ui::TextInputClient is NULL for mac and android.
 #if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
-#if defined(ADDRESS_SANITIZER) || BUILDFLAG(IS_WIN)
+#if defined(ADDRESS_SANITIZER)
 #define MAYBE_Focus_InputMethod DISABLED_Focus_InputMethod
 #else
 #define MAYBE_Focus_InputMethod Focus_InputMethod
@@ -1190,9 +1189,6 @@ IN_PROC_BROWSER_TEST_F(WebViewInteractiveTest, MAYBE_LongPressSelection) {
 
   blink::WebInputEvent::Type context_menu_gesture_event_type =
       blink::WebInputEvent::Type::kGestureLongPress;
-#if BUILDFLAG(IS_WIN)
-  context_menu_gesture_event_type = blink::WebInputEvent::Type::kGestureLongTap;
-#endif
   auto filter = std::make_unique<content::InputMsgWatcher>(
       GetGuestRenderFrameHost()->GetRenderWidgetHost(),
       context_menu_gesture_event_type);
@@ -1224,9 +1220,7 @@ IN_PROC_BROWSER_TEST_F(WebViewInteractiveTest, MAYBE_LongPressSelection) {
   run_loop->Run();
 
 // TODO: Fix quick menu opening on Windows.
-#if !BUILDFLAG(IS_WIN)
   EXPECT_TRUE(ui::TouchSelectionMenuRunner::GetInstance()->IsRunning());
-#endif
 
   EXPECT_FALSE(GetGuestView()->web_contents()->IsShowingContextMenu());
 }
@@ -1310,8 +1304,7 @@ IN_PROC_BROWSER_TEST_F(WebViewInteractiveTest, WordLookupShadowDom) {
 
 // Flaky on Mac: http://crbug.com/41370441
 // Flaky on Linux/ChromeOS/Windows: http://crbug.com/41390528
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_FocusAndVisibility DISABLED_FocusAndVisibility
 #else
 #define MAYBE_FocusAndVisibility FocusAndVisibility
@@ -1418,8 +1411,7 @@ IN_PROC_BROWSER_TEST_F(WebViewInteractiveTest, DISABLED_KeyboardFocusSimple) {
 // Flaky on MacOSX, crbug.com/41373673.
 // Flaky on linux, crbug.com/40513300.
 // Flaky on Windows, crbug.com/40578243.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #define MAYBE_KeyboardFocusWindowCycle DISABLED_KeyboardFocusWindowCycle
 #else
 #define MAYBE_KeyboardFocusWindowCycle KeyboardFocusWindowCycle

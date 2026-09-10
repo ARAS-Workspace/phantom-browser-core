@@ -1670,9 +1670,6 @@ class VideoOverlayWindowWithShowAnimationTest
  public:
   void SetUp() override {
     VideoOverlayWindowViewsTest::SetUp();
-#if BUILDFLAG(IS_WIN)
-    GTEST_SKIP() << "Fade in animation is disabled on Windows.";
-#endif
   }
 };
 

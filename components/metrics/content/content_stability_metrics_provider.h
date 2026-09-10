@@ -72,10 +72,6 @@ class ContentStabilityMetricsProvider
                            CdmServiceProcessObserverUtility);
   FRIEND_TEST_ALL_PREFIXES(ContentStabilityMetricsProviderTest,
                            CdmServiceProcessObserverUtilityLaunchFailed);
-#if BUILDFLAG(IS_WIN)
-  FRIEND_TEST_ALL_PREFIXES(ContentStabilityMetricsProviderTest,
-                           MediaFoundationServiceProcessObserverUtility);
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_ANDROID)
   FRIEND_TEST_ALL_PREFIXES(ContentStabilityMetricsProviderTest,
                            MediaDrmSupportProcessObserverUtility);

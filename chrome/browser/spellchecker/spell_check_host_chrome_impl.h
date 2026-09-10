@@ -86,10 +86,6 @@ class SpellCheckHostChromeImpl : public SpellCheckHostImpl {
       const std::vector<spellcheck::SpellingMarker>& spelling_markers,
       RequestTextCheckCallback callback) override;
 
-#if BUILDFLAG(IS_WIN)
-  void InitializeDictionaries(InitializeDictionariesCallback callback) override;
-#endif  // BUILDFLAG(IS_WIN)
-
   // Clears a finished request from |requests_|. Exposed to SpellingRequest.
   void OnRequestFinished(SpellingRequest* request);
 
@@ -97,14 +93,6 @@ class SpellCheckHostChromeImpl : public SpellCheckHostImpl {
   static void CombineResultsForTesting(
       std::vector<SpellCheckResult>* remote_results,
       const std::vector<SpellCheckResult>& local_results);
-
-#if BUILDFLAG(IS_WIN)
-  void OnDictionariesInitialized();
-
-  // Callback passed as argument to InitializeDictionaries, and invoked when
-  // the dictionaries are loaded for the first time.
-  InitializeDictionariesCallback dictionaries_loaded_callback_;
-#endif  // BUILDFLAG(IS_WIN)
 
   // All pending requests.
   std::set<std::unique_ptr<SpellingRequest>, base::UniquePtrComparator>

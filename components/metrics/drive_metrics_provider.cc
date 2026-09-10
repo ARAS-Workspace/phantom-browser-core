@@ -23,7 +23,7 @@
 namespace metrics {
 
 namespace {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.
 // LINT.IfChange(OptionalBoolRecord)
@@ -108,7 +108,7 @@ void DriveMetricsProvider::QuerySeekPenalty(
   std::optional<base::DriveInfo> drive_info = base::GetFileDriveInfo(path);
   if (drive_info.has_value()) {
     response->has_seek_penalty = drive_info->has_seek_penalty;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     response->is_removable = drive_info->is_removable;
     response->is_usb = drive_info->is_usb;
 #endif
@@ -135,10 +135,10 @@ void DriveMetricsProvider::FillDriveMetrics(
     drive->set_has_seek_penalty(local_state_->GetBoolean(pref_name));
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   RecordTriStateMetric("UMA.DriveIsRemovableResult", response.is_removable);
 #endif
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   RecordTriStateMetric("UMA.DriveIsUSBResult", response.is_usb);
 #endif
 }

@@ -232,7 +232,6 @@ TEST_F(MenuRunnerTest, MAYBE_LatinMnemonic) {
   EXPECT_NE(nullptr, delegate->on_menu_closed_menu());
 }
 
-#if !BUILDFLAG(IS_WIN)
 // Tests that a key press on a non-US keyboard layout activates the correct menu
 // item. Disabled on Windows because a WM_CHAR event does not activate an item.
 TEST_F(MenuRunnerTest, NonLatinMnemonic) {
@@ -258,7 +257,6 @@ TEST_F(MenuRunnerTest, NonLatinMnemonic) {
   EXPECT_EQ(1, delegate->on_menu_closed_called());
   EXPECT_NE(nullptr, delegate->on_menu_closed_menu());
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 TEST_F(MenuRunnerTest, MenuItemViewShowsMnemonics) {
   if (!MenuSupportsMnemonics()) {

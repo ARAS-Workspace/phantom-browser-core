@@ -100,7 +100,7 @@ void TransferableResource::AsValueInto(
   }
   value->SetBoolean("is_backed_by_surface_view", is_backed_by_surface_view);
 #endif
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
   value->SetBoolean("wants_promotion_hint", wants_promotion_hint);
 #endif
   value->SetBoolean("needs_detiling", needs_detiling);

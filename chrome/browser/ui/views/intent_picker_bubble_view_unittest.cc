@@ -503,11 +503,7 @@ TEST_P(IntentPickerBubbleViewLayoutTest, CloseDialog) {
 }
 
 // TODO(crbug.com/40843230): Fix flakiness on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_KeyboardNavigation DISABLED_KeyboardNavigation
-#else
 #define MAYBE_KeyboardNavigation KeyboardNavigation
-#endif
 TEST_P(IntentPickerBubbleViewLayoutTest, MAYBE_KeyboardNavigation) {
   AddDefaultApps();
   auto bubble_widget =
@@ -621,11 +617,7 @@ TEST_P(IntentPickerBubbleViewGridLayoutTest, DefaultSelectionTwoApps) {
 }
 
 // TODO(crbug.com/40843230): Fix flakiness on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_OpenWithReturnKey DISABLED_OpenWithReturnKey
-#else
 #define MAYBE_OpenWithReturnKey OpenWithReturnKey
-#endif
 TEST_P(IntentPickerBubbleViewGridLayoutTest, MAYBE_OpenWithReturnKey) {
   AddDefaultApps();
   auto bubble_widget =

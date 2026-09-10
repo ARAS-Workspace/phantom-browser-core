@@ -61,11 +61,7 @@ const char kArcActivityName2[] = "activity_name2";
 #if !BUILDFLAG(IS_CHROMEOS)
 // We only upload serial number on Windows.
 void VerifySerialNumber(const std::string& serial_number) {
-#if BUILDFLAG(IS_WIN)
-  EXPECT_NE(std::string(), serial_number);
-#else
   EXPECT_EQ(std::string(), serial_number);
-#endif  // BUILDFLAG(IS_WIN)
 }
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 
@@ -359,9 +355,6 @@ TEST_F(ReportGeneratorTest, GenerateBasicReport) {
   EXPECT_NE(std::string(), os_report.arch());
   EXPECT_NE(std::string(), os_report.version());
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(os_report.has_version_type());
-#endif  // BUILDFLAG(IS_WIN)
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 
   EXPECT_TRUE(basic_request->GetDeviceReportRequest().has_browser_report());
@@ -402,9 +395,6 @@ TEST_F(ReportGeneratorTest, GenerateWithoutProfiles) {
   EXPECT_NE(std::string(), os_report.arch());
   EXPECT_NE(std::string(), os_report.version());
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(os_report.has_version_type());
-#endif  // BUILDFLAG(IS_WIN)
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 
   EXPECT_TRUE(basic_request->GetDeviceReportRequest().has_browser_report());

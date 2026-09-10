@@ -268,7 +268,7 @@ TEST_F(TCPBoundSocketTest, ConnectError) {
 //
 // Apple platforms don't allow binding multiple TCP sockets to the same port
 // even with SO_REUSEADDR enabled.
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_APPLE)
+#if !BUILDFLAG(IS_APPLE)
 TEST_F(TCPBoundSocketTest, ListenError) {
   // Bind a socket.
   mojo::Remote<mojom::TCPBoundSocket> bound_socket1;
@@ -295,7 +295,7 @@ TEST_F(TCPBoundSocketTest, ListenError) {
   EXPECT_TRUE(result == net::ERR_ADDRESS_IN_USE ||
               result == net::ERR_INVALID_ARGUMENT);
 }
-#endif  // !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_APPLE)
+#endif  // !BUILDFLAG(IS_APPLE)
 
 // Test the case bind succeeds, and transfer some data.
 TEST_F(TCPBoundSocketTest, ReadWrite) {
@@ -520,10 +520,6 @@ TEST_F(TCPBoundSocketTest, UpgradeToTLS) {
 // down.
 TEST_F(TCPBoundSocketTest, UpgradeToTLSDuringShutdownWithBoundSocket) {
   base::test::ScopedFeatureList scoped_feature_list;
-#if BUILDFLAG(IS_WIN)
-  scoped_feature_list.InitAndEnableFeature(
-      net::features::kTcpSocketIoCompletionPortWin);
-#endif  // BUILDFLAG(IS_WIN)
   net::test_server::EmbeddedTestServer test_server(
       net::test_server::EmbeddedTestServer::TYPE_HTTPS);
   test_server.RegisterRequestHandler(base::BindRepeating(

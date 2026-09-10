@@ -22,10 +22,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/test/file_path_reparse_point_win.h"
-#endif
-
 namespace extensions {
 
 using ::base::i18n::LanguageTag;
@@ -81,14 +77,6 @@ TEST(ExtensionResourceTest, ResourcesOutsideOfPath) {
       symlink_file);
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  base::FilePath reparse_dir = inner_dir.AppendASCII("reparse");
-  ASSERT_TRUE(base::CreateDirectory(reparse_dir));
-  auto reparse_point =
-      base::test::FilePathReparsePoint::Create(reparse_dir, temp.GetPath());
-  ASSERT_TRUE(reparse_point.has_value());
-#endif
-
   // A non-packing extension should be able to access the file within the
   // directory.
   ExtensionResource r1(extension_id, inner_dir,
@@ -137,42 +125,6 @@ TEST(ExtensionResourceTest, ResourcesOutsideOfPath) {
   EXPECT_FALSE(r6.GetFilePath().empty());
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  base::FilePath outer_via_reparse =
-      base::FilePath().AppendASCII("reparse").AppendASCII("outer");
-
-  // The non-packing extension should also not be able to access a resource that
-  // points out of the directory via a reparse point.
-  ExtensionResource r7(extension_id, inner_dir, outer_via_reparse);
-  EXPECT_TRUE(r7.GetFilePath().empty());
-
-  // ... but a packing extension can.
-  ExtensionResource r8(extension_id, inner_dir, outer_via_reparse);
-  r8.set_follow_symlinks_anywhere();
-  EXPECT_FALSE(r8.GetFilePath().empty());
-
-  // Make sure that a non-normalized extension root path is supported.
-  base::FilePath inner_dir_non_normalized =
-      temp.GetPath().AppendASCII("dIrEcToRy");
-  ExtensionResource r9(extension_id, inner_dir_non_normalized,
-                       base::FilePath().AppendASCII("inner"));
-  EXPECT_FALSE(r9.GetFilePath().empty());
-
-  // Make sure that a network root path is supported by converting a path such
-  // as C:\temp to \\localhost\c$\temp. Regression test for crbug.com/410059474.
-  base::FilePath::CharType drive_letter =
-      base::ToLowerASCII(inner_dir.value().at(0));
-  EXPECT_GE(drive_letter, 'a');
-  EXPECT_LE(drive_letter, 'z');
-  EXPECT_EQ(inner_dir.value().at(1), ':');
-  EXPECT_EQ(inner_dir.value().at(2), '\\');
-  base::FilePath inner_dir_network(
-      base::FilePath::StringType(FILE_PATH_LITERAL("\\\\localhost\\")) +
-      drive_letter + FILE_PATH_LITERAL("$\\") + inner_dir.value().substr(3));
-  ExtensionResource r10(extension_id, inner_dir_network,
-                        base::FilePath().AppendASCII("inner"));
-  EXPECT_FALSE(r10.GetFilePath().empty());
-#endif
 }
 
 TEST(ExtensionResourceTest, CreateWithAllResourcesOnDisk) {
@@ -218,10 +170,6 @@ TEST(ExtensionResourceTest, CreateWithAllResourcesOnDisk) {
   // Expect default path only, since fallback logic is disabled.
   // See http://crbug.com/27359.
   expected_path = base::MakeAbsoluteFilePath(root_resource);
-#if BUILDFLAG(IS_WIN)
-  // Convert path to long format to avoid mixing long and 8.3 formats in test.
-  expected_path = base::MakeLongFilePath(expected_path);
-#endif  // BUILDFLAG(IS_WIN)
   ASSERT_FALSE(expected_path.empty());
 
   EXPECT_EQ(ToLower(expected_path.value()), ToLower(resolved_path.value()));

@@ -47,10 +47,6 @@ class SkiaOutputDeviceDawn : public SkiaOutputDevice {
 
   ~SkiaOutputDeviceDawn() override;
 
-#if BUILDFLAG(IS_WIN)
-  virtual gpu::SurfaceHandle GetChildSurfaceHandle() const;
-#endif
-
   // SkiaOutputDevice implementation:
   bool Reshape(const ReshapeParams& params) override;
   void Present(const std::optional<gfx::Rect>& update_rect,

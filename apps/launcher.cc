@@ -389,12 +389,7 @@ void LaunchPlatformAppWithCommandLineAndLaunchId(
     }
   }
 
-#if BUILDFLAG(IS_WIN)
-  base::CommandLine::StringType about_blank_url(
-      base::ASCIIToWide(url::kAboutBlankURL));
-#else
   base::CommandLine::StringType about_blank_url(url::kAboutBlankURL);
-#endif
   base::CommandLine::StringVector args = command_line.GetArgs();
   // Browser tests will add about:blank to the command line. This should
   // never be interpreted as a file to open, as doing so with an app that

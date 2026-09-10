@@ -37,11 +37,6 @@
 #include <sys/mman.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>  // Must be in front of other Windows header files
-
-#include <Psapi.h>
-#endif
 
 
 using ProcessSnapshot =
@@ -111,10 +106,7 @@ std::optional<size_t> ProcessMemoryDump::CountResidentBytes(
   size_t max_page_count = GetSystemPageCount(
       std::min(mapped_size_aligned, kMaxChunkSize), page_size);
 
-#if BUILDFLAG(IS_WIN)
-  auto vec = base::HeapArray<PSAPI_WORKING_SET_EX_INFORMATION>::WithSize(
-      max_page_count);
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   auto vec = base::HeapArray<char>::WithSize(max_page_count);
 #elif BUILDFLAG(IS_POSIX)
   auto vec = base::HeapArray<unsigned char>::WithSize(max_page_count);
@@ -143,20 +135,7 @@ std::optional<size_t> ProcessMemoryDump::CountResidentBytes(
       }
     };
 
-#if BUILDFLAG(IS_WIN)
-    for (size_t i = 0; i < page_count; i++) {
-      vec[i].VirtualAddress =
-          reinterpret_cast<void*>(chunk_start + i * page_size);
-    }
-
-    auto span = vec.first(page_count);
-    failure = !::QueryWorkingSetEx(::GetCurrentProcess(), span.data(),
-                                   static_cast<DWORD>(span.size_bytes()));
-
-    for (size_t i = 0; i < page_count; i++) {
-      accumulate_page_if_resident(i, vec[i].VirtualAttributes.Valid);
-    }
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
     // mincore in MAC does not fail with EAGAIN.
     failure =
         !!mincore(reinterpret_cast<void*>(chunk_start), chunk_size, vec.data());

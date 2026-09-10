@@ -340,11 +340,7 @@ IN_PROC_BROWSER_TEST_P(PDFExtensionInteractiveUITest,
 }
 
 // TODO(crbug.com/40847318): Deflake this test.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TouchSelectionBounds DISABLED_TouchSelectionBounds
-#else
 #define MAYBE_TouchSelectionBounds TouchSelectionBounds
-#endif  // BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_P(PDFExtensionInteractiveUITest,
                        MAYBE_TouchSelectionBounds) {
   // Use test.pdf here because it has embedded font metrics. With a fixed zoom,

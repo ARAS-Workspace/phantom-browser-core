@@ -29,9 +29,7 @@
 #include "base/trace_event/base_tracing_forward.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include <pthread.h>
 #include <unistd.h>
 #endif
@@ -59,9 +57,7 @@ class TimeDelta;
 // because we are logging and the occasional false match is not catastrophic).
 class BASE_EXPORT PlatformThreadId {
  public:
-#if BUILDFLAG(IS_WIN)
-  using UnderlyingType = DWORD;
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   using UnderlyingType = uint64_t;
 #elif BUILDFLAG(IS_POSIX)
   using UnderlyingType = pid_t;
@@ -132,9 +128,7 @@ inline std::ostream& operator<<(std::ostream& stream,
 // Used to operate on threads.
 class PlatformThreadHandle {
  public:
-#if BUILDFLAG(IS_WIN)
-  typedef void* Handle;
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   typedef pthread_t Handle;
 #endif
 

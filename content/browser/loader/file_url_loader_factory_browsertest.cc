@@ -13,15 +13,6 @@
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <objbase.h>
-
-#include <windows.h>
-
-#include <shlobj.h>
-#include <wrl/client.h>
-#endif
-
 #include <string>
 
 #include "base/files/file_path.h"
@@ -224,106 +215,7 @@ IN_PROC_BROWSER_TEST_F(FileURLLoaderFactoryBrowserTest, SymlinksToFiles) {
             test_browser_client.access_allowed_args()[0].profile_path);
 }
 
-#elif BUILDFLAG(IS_WIN)
-
-// Test shortcuts on Windows. These are treated as redirects.
-IN_PROC_BROWSER_TEST_F(FileURLLoaderFactoryBrowserTest, ResolveShortcutTest) {
-  TestFileAccessContentBrowserClient test_browser_client;
-
-  // Create an empty temp directory, to be sure there's no file in it.
-  base::ScopedAllowBlockingForTesting allow_blocking;
-  base::ScopedTempDir temp_dir;
-  ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
-
-  base::FilePath lnk_path =
-      temp_dir.GetPath().Append(FILE_PATH_LITERAL("foo.lnk"));
-
-  base::FilePath test = TestFilePath();
-
-  // Create a shortcut for the test.
-  {
-    Microsoft::WRL::ComPtr<IShellLink> shell;
-    ASSERT_TRUE(SUCCEEDED(::CoCreateInstance(
-        CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shell))));
-    Microsoft::WRL::ComPtr<IPersistFile> persist;
-    ASSERT_TRUE(SUCCEEDED(shell.As<IPersistFile>(&persist)));
-    EXPECT_TRUE(SUCCEEDED(shell->SetPath(TestFilePath().value().c_str())));
-    EXPECT_TRUE(SUCCEEDED(shell->SetDescription(L"ResolveShortcutTest")));
-    std::wstring lnk_string = lnk_path.value();
-    EXPECT_TRUE(SUCCEEDED(persist->Save(lnk_string.c_str(), TRUE)));
-  }
-
-  EXPECT_TRUE(NavigateToURL(
-      shell(), net::FilePathToFileURL(lnk_path),
-      net::FilePathToFileURL(TestFilePath()) /* expect_commit_url */));
-  EXPECT_EQ(kSuccessTitle, shell()->web_contents()->GetTitle());
-
-  ASSERT_EQ(2u, test_browser_client.access_allowed_args().size());
-  EXPECT_EQ(lnk_path, test_browser_client.access_allowed_args()[0].path);
-  EXPECT_EQ(AbsoluteFilePath(lnk_path),
-            test_browser_client.access_allowed_args()[0].absolute_path);
-  EXPECT_EQ(ProfilePath(),
-            test_browser_client.access_allowed_args()[0].profile_path);
-
-  EXPECT_EQ(TestFilePath(), test_browser_client.access_allowed_args()[1].path);
-  EXPECT_EQ(AbsoluteFilePath(TestFilePath()),
-            test_browser_client.access_allowed_args()[1].absolute_path);
-  EXPECT_EQ(ProfilePath(),
-            test_browser_client.access_allowed_args()[1].profile_path);
-
-  // Test the case where access to the shortcut URL is blocked. Should display
-  // an error page at the shortcut's file URL.
-
-  test_browser_client.ClearAccessAllowedArgs();
-  test_browser_client.set_blocked_path(lnk_path);
-
-  TestNavigationObserver navigation_observer2(shell()->web_contents());
-  EXPECT_FALSE(NavigateToURL(shell(), net::FilePathToFileURL(lnk_path)));
-  EXPECT_FALSE(navigation_observer2.last_navigation_succeeded());
-  EXPECT_THAT(navigation_observer2.last_net_error_code(),
-              net::test::IsError(net::ERR_ACCESS_DENIED));
-  EXPECT_EQ(net::FilePathToFileURL(lnk_path),
-            shell()->web_contents()->GetURL());
-  EXPECT_EQ(kErrorTitle, shell()->web_contents()->GetTitle());
-
-  ASSERT_EQ(1u, test_browser_client.access_allowed_args().size());
-  EXPECT_EQ(lnk_path, test_browser_client.access_allowed_args()[0].path);
-  EXPECT_EQ(AbsoluteFilePath(lnk_path),
-            test_browser_client.access_allowed_args()[0].absolute_path);
-  EXPECT_EQ(ProfilePath(),
-            test_browser_client.access_allowed_args()[0].profile_path);
-
-  // Test the case where access to the destination URL is blocked. The redirect
-  // is followed, so this should end up at the shortcut destination, but
-  // displaying an error.
-
-  test_browser_client.ClearAccessAllowedArgs();
-  test_browser_client.set_blocked_path(TestFilePath());
-
-  TestNavigationObserver navigation_observer3(shell()->web_contents());
-  EXPECT_FALSE(NavigateToURL(shell(), net::FilePathToFileURL(lnk_path)));
-  EXPECT_FALSE(navigation_observer3.last_navigation_succeeded());
-  EXPECT_THAT(navigation_observer3.last_net_error_code(),
-              net::test::IsError(net::ERR_ACCESS_DENIED));
-  EXPECT_EQ(net::FilePathToFileURL(TestFilePath()),
-            shell()->web_contents()->GetURL());
-  EXPECT_EQ(kErrorTitle, shell()->web_contents()->GetTitle());
-
-  ASSERT_EQ(2u, test_browser_client.access_allowed_args().size());
-  EXPECT_EQ(lnk_path, test_browser_client.access_allowed_args()[0].path);
-  EXPECT_EQ(AbsoluteFilePath(lnk_path),
-            test_browser_client.access_allowed_args()[0].absolute_path);
-  EXPECT_EQ(ProfilePath(),
-            test_browser_client.access_allowed_args()[0].profile_path);
-
-  EXPECT_EQ(TestFilePath(), test_browser_client.access_allowed_args()[1].path);
-  EXPECT_EQ(AbsoluteFilePath(TestFilePath()),
-            test_browser_client.access_allowed_args()[1].absolute_path);
-  EXPECT_EQ(ProfilePath(),
-            test_browser_client.access_allowed_args()[1].profile_path);
-}
-
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 
 IN_PROC_BROWSER_TEST_F(FileURLLoaderFactoryBrowserTest,
                        RedirectToFileUrlMainFrame) {

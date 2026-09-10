@@ -1211,7 +1211,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionWebRequestApiTest, DISABLED_WebRequestTypes) {
 // Test that a request to an OpenSearch description document (OSDD) generates
 // an event with the expected details.
 // Flaky on Windows and Mac: https://crbug.com/40771884
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_WebRequestTestOSDD DISABLED_WebRequestTestOSDD
 #else
 #define MAYBE_WebRequestTestOSDD WebRequestTestOSDD
@@ -1740,8 +1740,7 @@ IN_PROC_BROWSER_TEST_P(ExtensionWebRequestApiTestWithContextType,
 // TODO(crbug.com/40259518): test is flaky on Mac10.14.
 // TODO(crbug.com/40282182): test is flaky on linux tests.
 // TODO(crbug.com/393555373): test is flaky on Windows.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_WebRequestRedirectsWorkers DISABLED_WebRequestRedirectsWorkers
 #else
 #define MAYBE_WebRequestRedirectsWorkers WebRequestRedirectsWorkers
@@ -9513,11 +9512,7 @@ INSTANTIATE_TEST_SUITE_P(/* no prefix */,
 
 // TODO(crbug.com/502806827): Multiple worker threads creation fails silently on
 // Windows ASAN builds, causing this test to hang.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_RequestInterceptionCoverage DISABLED_RequestInterceptionCoverage
-#else
 #define MAYBE_RequestInterceptionCoverage RequestInterceptionCoverage
-#endif
 IN_PROC_BROWSER_TEST_P(ExtensionWebRequestApiCoverageTest,
                        MAYBE_RequestInterceptionCoverage) {
   ASSERT_TRUE(StartWebSocketServer());

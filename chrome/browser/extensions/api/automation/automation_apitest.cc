@@ -414,7 +414,7 @@ IN_PROC_BROWSER_TEST_P(AutomationApiTestWithContextType, ImageLabels) {
 }
 
 // Flaky on Win and ChromeOS: crbug.com/375385426
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_Events DISABLED_Events
 #else
 #define MAYBE_Events Events
@@ -430,7 +430,7 @@ IN_PROC_BROWSER_TEST_P(AutomationApiTestWithContextType, Actions) {
 }
 
 // Flaky on Win and ChromeOS: crbug.com/375385426
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_Location DISABLED_Location
 #else
 #define MAYBE_Location Location
@@ -465,7 +465,7 @@ INSTANTIATE_TEST_SUITE_P(ServiceWorker,
                          ::testing::Values(ContextType::kServiceWorker));
 
 // Flaky on Mac: crbug.com/1338036
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_ImageData DISABLED_ImageData
 #else
 #define MAYBE_ImageData ImageData
@@ -482,7 +482,7 @@ IN_PROC_BROWSER_TEST_P(AutomationApiTestWithContextType, TableProperties) {
 }
 
 // Flaky on Mac and Windows: crbug.com/40781950
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_CloseTab DISABLED_CloseTab
 #else
 #define MAYBE_CloseTab CloseTab
@@ -498,7 +498,7 @@ IN_PROC_BROWSER_TEST_P(AutomationApiTestWithContextType, Find) {
 }
 
 // Flaky on Win and ChromeOS: crbug.com/375385426
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_Attributes DISABLED_Attributes
 #else
 #define MAYBE_Attributes Attributes
@@ -515,11 +515,7 @@ IN_PROC_BROWSER_TEST_P(AutomationApiTestWithContextType, ReverseRelations) {
 }
 
 // TODO(crbug.com/389060012): Flaky on Win.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TreeChange DISABLED_TreeChange
-#else
 #define MAYBE_TreeChange TreeChange
-#endif
 IN_PROC_BROWSER_TEST_P(AutomationApiTestWithContextType, MAYBE_TreeChange) {
   StartEmbeddedTestServer();
   ASSERT_TRUE(CreateExtensionAndRunTest("tabs/tree_change.js")) << message_;

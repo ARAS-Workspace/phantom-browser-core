@@ -57,10 +57,10 @@ class ChromeMetricsServicesManagerClient
   // there was user consent, then metrics and crashes would be reported.
   static bool IsClientInSampleForMetrics();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // Same as above, but specifically just for crash reporting.
   static bool IsClientInSampleForCrashes();
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   // Gets the sample rate for in-sample clients. If the sample rate is not
   // defined, returns false, and |rate| is unchanged, otherwise returns true,
@@ -82,10 +82,6 @@ class ChromeMetricsServicesManagerClient
   scoped_refptr<network::SharedURLLoaderFactory> GetURLLoaderFactory() override;
   const metrics::EnabledStateProvider& GetEnabledStateProvider() override;
   bool IsOffTheRecordSessionActive() override;
-#if BUILDFLAG(IS_WIN)
-  // On Windows, the client controls whether Crashpad can upload crash reports.
-  void UpdateRunningServices(bool may_record, bool may_upload) override;
-#endif  // BUILDFLAG(IS_WIN)
 
  private:
   // This is defined as a member class to get access to

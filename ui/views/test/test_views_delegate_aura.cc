@@ -16,12 +16,6 @@ TestViewsDelegate::TestViewsDelegate() = default;
 
 TestViewsDelegate::~TestViewsDelegate() = default;
 
-#if BUILDFLAG(IS_WIN)
-HICON TestViewsDelegate::GetSmallWindowIcon() const {
-  return nullptr;
-}
-#endif
-
 void TestViewsDelegate::OnBeforeWidgetInit(
     Widget::InitParams* params,
     internal::NativeWidgetDelegate* delegate) {

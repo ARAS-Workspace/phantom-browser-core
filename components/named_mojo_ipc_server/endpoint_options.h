@@ -14,10 +14,6 @@
 #include "mojo/public/c/system/invitation.h"
 #include "mojo/public/cpp/platform/named_platform_channel.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <string>
-#endif
-
 namespace named_mojo_ipc_server {
 
 // Options used by NamedMojoIpcServer to start the server endpoint.
@@ -34,12 +30,6 @@ struct EndpointOptions {
   EndpointOptions(mojo::NamedPlatformChannel::ServerName server_name,
                   const MessagePipeId& message_pipe_id,
                   MojoSendInvitationFlags extra_send_invitation_flags);
-#if BUILDFLAG(IS_WIN)
-  EndpointOptions(mojo::NamedPlatformChannel::ServerName server_name,
-                  const MessagePipeId& message_pipe_id,
-                  MojoSendInvitationFlags extra_send_invitation_flags,
-                  std::wstring security_descriptor);
-#endif
   EndpointOptions(EndpointOptions&&);
   EndpointOptions(const EndpointOptions&);
   ~EndpointOptions();
@@ -59,24 +49,12 @@ struct EndpointOptions {
   MojoSendInvitationFlags extra_send_invitation_flags =
       MOJO_SEND_INVITATION_FLAG_NONE;
 
-#if BUILDFLAG(IS_WIN)
-  // If non-empty, a security descriptor to use when creating the pipe. If
-  // empty, a default security descriptor will be used.
-  std::wstring security_descriptor;
-#endif
-
 #if BUILDFLAG(IS_LINUX)
   // Iff this is true, connecting clients running as a different user from the
   // server (i.e. the calling process) will be rejected.
   bool require_same_peer_user = true;
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  // If true, the server will open the caller process and store it in
-  // ConnectionInfo. This is useful for pinning the process identity to avoid
-  // PID-reuse attacks.
-  bool include_peer_process_info = false;
-#endif
 };
 
 }  // namespace named_mojo_ipc_server

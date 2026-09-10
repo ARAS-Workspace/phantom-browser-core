@@ -140,13 +140,9 @@ class PersistentCachePerftest
 
   // Returns true if this platform has expensive database commits.
   static bool HasExpensiveCommits() {
-#if BUILDFLAG(IS_WIN)
-    return true;
-#else
     // Android and other POSIX systems appear to benefit from batch atomic
     // writes.
     return false;
-#endif
   }
 
   void ReportMeasurement(std::string operation_name,

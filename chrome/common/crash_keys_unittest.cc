@@ -16,10 +16,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#endif
-
 using crash_reporter::GetCrashKeyValue;
 using ::testing::IsEmpty;
 
@@ -69,16 +65,7 @@ namespace {
 
 void InitFromArgv(base::CommandLine& command_line,
                   std::initializer_list<std::string> args) {
-#if BUILDFLAG(IS_WIN)
-  // Convert arguments to wstring on windows.
-  base::CommandLine::StringVector arg_vector;
-  for (std::string arg : args) {
-    arg_vector.push_back(base::ASCIIToWide(arg));
-  }
-  command_line.InitFromArgv(arg_vector);
-#else
   command_line.InitFromArgv(args);
-#endif
 }
 
 }  // namespace

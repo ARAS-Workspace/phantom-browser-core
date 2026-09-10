@@ -254,7 +254,7 @@ void CreateAndAddWebUIDataSource(Profile* profile) {
 bool IsValidChromeSigninReason(const GURL& url) {
 #if BUILDFLAG(IS_CHROMEOS)
   return true;
-#else   // BUILDFLAG(IS_WIN)
+#else
   signin_metrics::Reason reason =
       signin::GetSigninReasonForEmbeddedPromoURL(url);
 
@@ -271,7 +271,7 @@ bool IsValidChromeSigninReason(const GURL& url) {
       // page instead of crashing. Check crbug.com/479741617.
       return false;
   }
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 }  // namespace

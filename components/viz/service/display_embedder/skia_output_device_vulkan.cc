@@ -90,15 +90,6 @@ SkiaOutputDeviceVulkan::~SkiaOutputDeviceVulkan() {
       std::move(vulkan_surface_));
 }
 
-#if BUILDFLAG(IS_WIN)
-gpu::SurfaceHandle SkiaOutputDeviceVulkan::GetChildSurfaceHandle() {
-  if (vulkan_surface_->accelerated_widget() != surface_handle_) [[likely]] {
-    return vulkan_surface_->accelerated_widget();
-  }
-  return gpu::kNullSurfaceHandle;
-}
-#endif
-
 bool SkiaOutputDeviceVulkan::Reshape(const ReshapeParams& params) {
   DCHECK(!scoped_write_);
 

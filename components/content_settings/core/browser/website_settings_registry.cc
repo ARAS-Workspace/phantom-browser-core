@@ -63,10 +63,7 @@ const WebsiteSettingsInfo* WebsiteSettingsRegistry::Register(
     WebsiteSettingsInfo::ScopingType scoping_type,
     Platforms platform,
     WebsiteSettingsInfo::IncognitoBehavior incognito_behavior) {
-#if BUILDFLAG(IS_WIN)
-  if (!(platform & PLATFORM_WINDOWS))
-    return nullptr;
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   if (!(platform & PLATFORM_LINUX))
     return nullptr;
 #elif BUILDFLAG(IS_MAC)

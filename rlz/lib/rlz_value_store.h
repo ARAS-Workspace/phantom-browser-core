@@ -15,10 +15,6 @@
 #include "build/build_config.h"
 #include "rlz/lib/rlz_enums.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "rlz/win/lib/lib_mutex.h"
-#endif
-
 #if BUILDFLAG(IS_APPLE)
 #include "base/apple/scoped_nsautorelease_pool.h"
 #include "base/memory/stack_allocated.h"
@@ -102,9 +98,7 @@ class ScopedRlzValueStoreLock {
 
  private:
   std::unique_ptr<RlzValueStore> store_;
-#if BUILDFLAG(IS_WIN)
-  LibMutex lock_;
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   STACK_ALLOCATED_IGNORE("https://crbug.com/1424190")
   base::apple::ScopedNSAutoreleasePool autorelease_pool_;
 #endif

@@ -407,18 +407,6 @@ void AuthenticatorTestBase::SetUp() {
   chromeos::U2FClient::InitializeFake();
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  // Disable the Windows WebAuthn API integration by default. Individual tests
-  // can modify this.
-  fake_win_webauthn_api_.set_available(false);
-
-  // Prevent `FidoRequestHandlerBase` from doing a system API call, which can
-  // cause tests to finish early since `RunUntilIdle` won't see it in the task
-  // queue.
-  biometrics_override_ =
-      std::make_unique<device::fido::win::ScopedBiometricsOverride>(false);
-#endif
-
   ResetVirtualDevice();
 }
 

@@ -862,17 +862,11 @@ TEST_F(BubbleFrameViewTest, GetMinimumSize) {
 
 TEST_F(BubbleFrameViewTest, GetMaximumSize) {
   gfx::Rect maximum_rect(frame()->GetMaximumSize());
-#if BUILDFLAG(IS_WIN)
-  // On Windows, GetMaximumSize causes problems with DWM, so it should just be 0
-  // (unlimited). See http://crbug.com/506206.
-  EXPECT_EQ(gfx::Size(), maximum_rect.size());
-#else
   maximum_rect.Inset(frame()->GetBorderInsets());
 
   // Should ignore the contents view's maximum size and use the preferred size.
   gfx::Size expected_size = AddAdditionalSize(kPreferredClientSize);
   EXPECT_EQ(expected_size, maximum_rect.size());
-#endif
 }
 
 TEST_F(BubbleFrameViewTest, LayoutWithHeader) {

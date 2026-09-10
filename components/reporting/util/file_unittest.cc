@@ -59,16 +59,11 @@ TEST(FileTest, DeleteFileWarnIfFailed) {
   {
     // On Windows, we open the file to prevent it from being deleted. Otherwise,
     // we modify the directory permission to prevent it from being deleted.
-#if BUILDFLAG(IS_WIN)
-    base::File file(file_path, base::File::FLAG_OPEN | base::File::FLAG_READ);
-    ASSERT_TRUE(file.IsValid());
-#else   // BUILDFLAG(IS_WIN)
     base::FilePermissionRestorer restore_permissions_for(dir_path);
     // Get rid of the write permission from temp_dir
     ASSERT_TRUE(base::MakeFileUnwritable(dir_path));
     // Ensure no deletion permission
     ASSERT_FALSE(base::PathIsWritable(dir_path));
-#endif  // BUILDFLAG(IS_WIN)
     ASSERT_TRUE(base::PathExists(file_path));
     ASSERT_FALSE(DeleteFileWarnIfFailed(file_path))
         << "Deletion of an existing file without permission should fail";

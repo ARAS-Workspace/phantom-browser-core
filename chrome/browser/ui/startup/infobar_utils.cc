@@ -41,26 +41,16 @@
 #include "chrome/browser/ui/startup/chrome_for_testing_infobar_delegate.h"
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #include "base/feature_list.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/pdf/infobar/pdf_infobar_controller.h"
 #include "chrome/browser/ui/startup/default_browser_prompt/pin_infobar/pin_infobar_controller.h"
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/views/session_restore_infobar/session_restore_infobar_controller.h"
 #include "chrome/browser/ui/views/session_restore_infobar/session_restore_infobar_model.h"
-#endif
-
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#include "chrome/browser/global_features.h"
-#include "chrome/browser/win/installer_downloader/installer_downloader_controller.h"
-#endif
-
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/startup/startup_launch_manager.h"  // nogncheck
-#include "chrome/browser/ui/startup/startup_launch_infobar_manager_impl.h"  // nogncheck
 #endif
 
 namespace {
@@ -212,22 +202,6 @@ void AddInfoBarsIfNecessary(BrowserWindowInterface* browser,
 
   OSCryptAsyncAvailabilityInfoBarDelegate::MaybeCreate(browser);
 
-#if BUILDFLAG(IS_WIN)
-  if (auto* startup_launch_manager =
-          StartupLaunchManager::From(g_browser_process)) {
-    startup_launch_manager->SetInfoBarManager(
-        std::make_unique<StartupLaunchInfoBarManagerImpl>());
-    startup_launch_manager->MaybeShowInfoBars();
-  }
-#endif
-
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  if (auto* controller =
-          g_browser_process->GetFeatures()->installer_downloader_controller()) {
-    controller->MaybeShowInfoBar();
-  }
-#endif
-
 #if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
   if (is_web_app ||
       startup_command_line.HasSwitch(switches::kNoDefaultBrowserCheck) ||
@@ -235,18 +209,18 @@ void AddInfoBarsIfNecessary(BrowserWindowInterface* browser,
     return;
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(features::kSessionRestoreInfobar)) {
     auto* session_restore_infobar_controller =
         session_restore_infobar::SessionRestoreInfobarController::From(browser);
     session_restore_infobar_controller->MaybeShowInfoBar(*profile,
                                                          is_post_crash_launch);
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   // The default browser prompt should only be shown after the first run.
   if (is_first_run == chrome::startup::IsFirstRun::kNo) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
     if (base::FeatureList::IsEnabled(features::kSeparateDefaultAndPinPrompt)) {
       const int seed = features::kSeparateDefaultAndPinPromptRandSeed.Get();
       const int choice = (seed > 0) ? (seed % 2) : base::RandIntInclusive(0, 1);
@@ -284,7 +258,7 @@ void AddInfoBarsIfNecessary(BrowserWindowInterface* browser,
 #else
     // Purely default browser path since it's non mac/windows.
     ShowDefaultBrowserPrompt(profile, base::DoNothing());
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
   }
 #endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
 }

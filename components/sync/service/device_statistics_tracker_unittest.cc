@@ -120,9 +120,7 @@ class DeviceStatisticsTrackerTest : public testing::Test {
   }
 
   sync_pb::SyncEnums_OsType GetLocalOsType() const {
-#if BUILDFLAG(IS_WIN)
-    return sync_pb::SyncEnums_OsType_OS_TYPE_WINDOWS;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     return sync_pb::SyncEnums_OsType_OS_TYPE_MAC;
 #elif BUILDFLAG(IS_LINUX)
     return sync_pb::SyncEnums_OsType_OS_TYPE_LINUX;
@@ -731,7 +729,7 @@ TEST_F(DeviceStatisticsTrackerTest, RecordsOtherPlatformsMetrics) {
       /*expected_count=*/1);
 
   int primary_expected_platforms = 2;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   --primary_expected_platforms;
 #endif
   histogram_tester.ExpectBucketCount(
@@ -839,7 +837,7 @@ TEST_F(DeviceStatisticsTrackerTest, RecordsMultiPlatformHistoryOptInMetrics) {
   EXPECT_TRUE(future.Wait());
 
   int expected_other_platforms = 2;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   --expected_other_platforms;
 #endif
 

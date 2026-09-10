@@ -29,15 +29,6 @@
 #include "third_party/abseil-cpp/absl/strings/str_format.h"
 #include "third_party/re2/src/re2/re2.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/strings/string_number_conversions_win.h"
-#include "chrome/updater/util/win_util.h"
-#include "chrome/updater/win/test/test_executables.h"
-#include "chrome/updater/win/test/test_strings.h"
-#endif
-
 namespace updater::test {
 namespace {
 
@@ -71,42 +62,6 @@ TEST(UnitTestUtil, Processes) {
         }
         return is_match;
       };
-#if BUILDFLAG(IS_WIN)
-  // Ensure the test process is not running before the test.
-  EXPECT_TRUE(KillProcesses(kTestProcessExecutableName, 0));
-  EXPECT_TRUE(WaitForProcessesToExit(kTestProcessExecutableName,
-                                     TestTimeouts::action_timeout()));
-  EXPECT_FALSE(IsProcessRunning(kTestProcessExecutableName));
-
-  // Start two long-lived processes and expect to find them running.
-  std::vector<base::Process> long_running;
-  long_running.push_back(
-      LongRunningProcess(GetUpdaterScopeForTesting(), GetTestName(), nullptr));
-  long_running.push_back(
-      LongRunningProcess(GetUpdaterScopeForTesting(), GetTestName(), nullptr));
-  for (const base::Process& p : long_running) {
-    EXPECT_TRUE(p.IsValid());
-  }
-  EXPECT_TRUE(IsProcessRunning(kTestProcessExecutableName));
-
-  EXPECT_TRUE(print_processes_tester(kTestProcessExecutableName));
-
-  // Terminate the long-lived processes, expect to find them not running, then
-  // inspect their exit code.
-  static constexpr int kExitCode = 12345;
-  EXPECT_FALSE(WaitForProcessesToExit(kTestProcessExecutableName,
-                                      base::Milliseconds(1)));
-  EXPECT_TRUE(KillProcesses(kTestProcessExecutableName, kExitCode));
-  EXPECT_TRUE(WaitForProcessesToExit(kTestProcessExecutableName,
-                                     TestTimeouts::action_timeout()));
-  EXPECT_FALSE(IsProcessRunning(kTestProcessExecutableName));
-  for (const base::Process& p : long_running) {
-    int exit_code = 0;
-    EXPECT_TRUE(
-        p.WaitForExitWithTimeout(TestTimeouts::tiny_timeout(), &exit_code));
-    EXPECT_EQ(exit_code, kExitCode);
-  }
-#else
   // Test the state of the process for the unit test process itself.
   base::FilePath::StringType unit_test = [] {
     base::FilePath unit_test_executable;
@@ -116,7 +71,6 @@ TEST(UnitTestUtil, Processes) {
   EXPECT_TRUE(IsProcessRunning(unit_test));
   EXPECT_FALSE(WaitForProcessesToExit(unit_test, base::Milliseconds(1)));
   EXPECT_TRUE(print_processes_tester(unit_test));
-#endif  // IS_WIN
 }
 
 TEST(UnitTestUtil, GetTestName) {
@@ -160,30 +114,6 @@ TEST(UnitTestUtil, DeleteFileAndEmptyParentDirectories) {
   EXPECT_FALSE(base::DirectoryExists(temp_dir.GetPath()));
   EXPECT_TRUE(base::DirectoryExists(temp_path));
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST(UnitTestUtil, FindProcesses) {
-  base::CommandLine command_line = GetTestProcessCommandLine(
-      GetUpdaterScopeForTesting(), test::GetTestName());
-
-  // Create a unique name for a shared event to be waited for in the test
-  // process and signaled in this test.
-  EventHolder event_holder(CreateWaitableEventForTest());
-
-  command_line.AppendSwitchNative(kTestEventToWaitOn, event_holder.name);
-
-  const base::Process process = base::LaunchProcess(command_line, {});
-  ASSERT_TRUE(process.IsValid());
-
-  EXPECT_TRUE(test::WaitFor([&] { return process.IsRunning(); }));
-  EXPECT_EQ(test::FindProcesses(kTestProcessExecutableName).size(), 1U);
-
-  event_holder.event.Signal();
-
-  EXPECT_TRUE(test::WaitFor([&] { return !process.IsRunning(); }));
-  EXPECT_TRUE(test::FindProcesses(kTestProcessExecutableName).empty());
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST(UnitTestUtil, IsJSONSubset) {
   std::optional<base::Value> needle =

@@ -54,11 +54,6 @@
 #include "ui/events/keycodes/keyboard_codes.h"
 #include "ui/views/layout/animating_layout_manager_test_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/aura/window.h"
-#include "ui/aura/window_tree_host.h"
-#endif
-
 using base::ASCIIToUTF16;
 using base::WideToUTF16;
 using content::NavigationController;

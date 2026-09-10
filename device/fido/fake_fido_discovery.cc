@@ -114,17 +114,6 @@ FakeFidoDiscoveryFactory::Create(FidoTransportProtocol transport) {
   NOTREACHED();
 }
 
-#if BUILDFLAG(IS_WIN)
-std::unique_ptr<device::FidoDiscoveryBase>
-FakeFidoDiscoveryFactory::MaybeCreateWinWebAuthnApiDiscovery() {
-  if (!discover_win_webauthn_api_authenticator_) {
-    return nullptr;
-  }
-
-  return FidoDiscoveryFactory::MaybeCreateWinWebAuthnApiDiscovery();
-}
-#endif
-
 }  // namespace test
 
 }  // namespace device

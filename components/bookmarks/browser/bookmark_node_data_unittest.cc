@@ -371,11 +371,7 @@ TEST_F(BookmarkNodeDataTest, MAYBE_WriteToClipboardMultipleURLs) {
 
   // Now read the data back in.
   std::u16string combined_text;
-#if BUILDFLAG(IS_WIN)
-  std::u16string new_line = u"\r\n";
-#else
   std::u16string new_line = u"\n";
-#endif
   combined_text = base::UTF8ToUTF16(url.spec()) + new_line
     + base::UTF8ToUTF16(url2.spec());
   std::u16string clipboard_text = ui::clipboard_test_util::ReadText(
@@ -456,11 +452,7 @@ TEST_F(BookmarkNodeDataTest, MAYBE_WriteToClipboardFolderAndURL) {
 
   // Now read the data back in.
   std::u16string combined_text;
-#if BUILDFLAG(IS_WIN)
-  std::u16string new_line = u"\r\n";
-#else
   std::u16string new_line = u"\n";
-#endif
   std::u16string folder_title = u"g1";
   combined_text = base::ASCIIToUTF16(url.spec()) + new_line + folder_title;
   std::u16string clipboard_text = ui::clipboard_test_util::ReadText(

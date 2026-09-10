@@ -847,7 +847,7 @@ class CONTENT_EXPORT MediaStreamManager
       GetRawDeviceIdsOpenedForFrameCallback callback,
       base::flat_set<GlobalRenderFrameHostId> render_frame_host_ids) const;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   void OnVideoCaptureHostConnectionError();
 #endif
 

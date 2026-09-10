@@ -43,7 +43,7 @@ UpdateRecommendedMessageBox::UpdateRecommendedMessageBox() {
   SetOwnedByWidget(OwnedByWidgetPassKey());
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
+    (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
   SetTitle(IDS_UPDATE_RECOMMENDED_DIALOG_TITLE_ALT);
 #else
   SetTitle(IDS_UPDATE_RECOMMENDED_DIALOG_TITLE);
@@ -53,7 +53,7 @@ UpdateRecommendedMessageBox::UpdateRecommendedMessageBox() {
 #if BUILDFLAG(IS_CHROMEOS)
   update_message = l10n_util::GetStringUTF16(IDS_UPDATE_RECOMMENDED);
 #elif BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
+    (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
   update_message = l10n_util::GetPluralStringFUTF16(
       IDS_UPDATE_RECOMMENDED_ALT,
       GlobalBrowserCollection::GetInstance()->GetIncognitoBrowserCount());

@@ -148,13 +148,6 @@ class PrintBackendServiceImpl : public mojom::PrintBackendService {
   void FetchCapabilities(
       const std::string& printer_name,
       mojom::PrintBackendService::FetchCapabilitiesCallback callback) override;
-#if BUILDFLAG(IS_WIN)
-  void GetPaperPrintableArea(
-      const std::string& printer_name,
-      const PrintSettings::RequestedMedia& media,
-      mojom::PrintBackendService::GetPaperPrintableAreaCallback callback)
-      override;
-#endif
   void EstablishPrintingContext(uint32_t context_id
 #if BUILDFLAG(ENABLE_OOP_BASIC_PRINT_DIALOG)
                                 ,
@@ -185,17 +178,6 @@ class PrintBackendServiceImpl : public mojom::PrintBackendService {
       const std::optional<PrintSettings>& settings,
 #endif
       mojom::PrintBackendService::StartPrintingCallback callback) override;
-#if BUILDFLAG(IS_WIN)
-  void RenderPrintedPage(
-      int32_t document_cookie,
-      uint32_t page_index,
-      mojom::MetafileDataType page_data_type,
-      base::ReadOnlySharedMemoryRegion serialized_page,
-      const gfx::Size& page_size,
-      const gfx::Rect& page_content_rect,
-      float shrink_factor,
-      mojom::PrintBackendService::RenderPrintedPageCallback callback) override;
-#endif  // BUILDFLAG(IS_WIN)
   void RenderPrintedDocument(
       int32_t document_cookie,
       uint32_t page_count,

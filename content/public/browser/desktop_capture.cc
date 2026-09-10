@@ -30,10 +30,6 @@
 #include "base/nix/xdg_util.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/mac/mac_util.h"
 
@@ -53,18 +49,7 @@ webrtc::DesktopCaptureOptions CreateDesktopCaptureOptions() {
   auto options = webrtc::DesktopCaptureOptions::CreateDefault();
   // Leave desktop effects enabled during WebRTC captures.
   options.set_disable_effects(false);
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/webrtc/15045): Possibly remove this flag. Keeping for now
-  // to force fallback to GDI.
-  static BASE_FEATURE(kDirectXCapturer, base::FEATURE_ENABLED_BY_DEFAULT);
-  if (base::FeatureList::IsEnabled(kDirectXCapturer)) {
-    // Results in DirectX as main capture API and GDI as fallback solution.
-    options.set_allow_directx_capturer(true);
-  }
-  options.set_enumerate_current_process_windows(
-      ShouldEnumerateCurrentProcessWindows());
-
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // Enabling IO surface capturer means that we will be using the
   // CGDisplayStreamCreate() API. This is marked as deprecated from macOS 14
   // (Sonoma), only use it if it's available.
@@ -123,11 +108,7 @@ bool CanUsePipeWire() {
 }
 
 bool ShouldEnumerateCurrentProcessWindows() {
-#if BUILDFLAG(IS_WIN)
-  return false;
-#else
   return true;
-#endif
 }
 
 void OpenNativeScreenCapturePicker(

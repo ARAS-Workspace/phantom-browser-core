@@ -129,7 +129,7 @@
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/ui/extensions/settings_api_bubble_helpers.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/search_engines/default_search_extension_controlled_controller.h"
 #include "extensions/common/extension_features.h"
 #endif
@@ -152,7 +152,7 @@ LensSearchController* GetLensSearchController(
                       : nullptr;
 }
 
-#if BUILDFLAG(ENABLE_EXTENSIONS) && (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC))
+#if BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(IS_MAC)
 // Guards a withheld navigation against a continuation that is never invoked.
 //
 // OpenMatch() abandons a pending navigation while the extension-DSE
@@ -309,7 +309,7 @@ bool ChromeOmniboxClient::
     ShowConfirmationDialogIfDefaultSearchExtensionControlled(
         const GURL& url,
         base::OnceCallback<void(ExtensionControlledDialogResult)> callback) {
-#if BUILDFLAG(ENABLE_EXTENSIONS) && (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC))
+#if BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(IS_MAC)
   CHECK(base::FeatureList::IsEnabled(
       extensions_features::kSearchEngineExplicitChoiceDialog));
   if (!browser_) {
@@ -971,7 +971,7 @@ void ChromeOmniboxClient::OnAutocompleteAccept(
   }
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (!base::FeatureList::IsEnabled(
           extensions_features::kSearchEngineExplicitChoiceDialog)) {
     extensions::MaybeShowExtensionControlledSearchNotification(

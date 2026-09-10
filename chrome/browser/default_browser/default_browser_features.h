@@ -75,15 +75,6 @@ BASE_DECLARE_FEATURE(kVisualGuidedSetterDocking);
 BASE_DECLARE_FEATURE_PARAM(DefaultBrowserSetterType,
                            kDefaultBrowserSetterParam);
 
-#if BUILDFLAG(IS_WIN)
-// Parameter for the URL used by the visual guided setter.
-BASE_DECLARE_FEATURE_PARAM(std::string, kDefaultBrowserVisualGuideUrlParam);
-
-// Parameter for the maximum amount of time we should wait for the Settings
-// window.
-BASE_DECLARE_FEATURE_PARAM(base::TimeDelta, kFindSettingsTimeout);
-#endif
-
 }  // namespace default_browser
 
 #endif  // CHROME_BROWSER_DEFAULT_BROWSER_DEFAULT_BROWSER_FEATURES_H_

@@ -63,19 +63,6 @@
 #include "base/debug/leak_annotations.h"
 #endif  // defined(LEAK_SANITIZER)
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <io.h>
-
-#include "base/win/win_util.h"
-
-typedef HANDLE FileHandle;
-// Windows warns on using write().  It prefers _write().
-#define write(fd, buf, count) _write(fd, buf, static_cast<unsigned int>(count))
-// Windows doesn't define STDERR_FILENO.  Define it here.
-#define STDERR_FILENO 2
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_APPLE)
 #include <CoreFoundation/CoreFoundation.h>
@@ -242,9 +229,7 @@ base::stack<LogAssertHandlerFunction>& GetLogAssertHandlerStack() {
 LogMessageHandlerFunction g_log_message_handler = nullptr;
 
 uint64_t TickCount() {
-#if BUILDFLAG(IS_WIN)
-  return GetTickCount();
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   return mach_absolute_time();
 #elif BUILDFLAG(IS_POSIX)
   struct timespec ts;
@@ -258,9 +243,7 @@ uint64_t TickCount() {
 }
 
 void DeleteFilePath(const PathString& log_name) {
-#if BUILDFLAG(IS_WIN)
-  DeleteFile(log_name.c_str());
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   unlink(log_name.c_str());
 #else
 #error Unsupported platform
@@ -268,19 +251,7 @@ void DeleteFilePath(const PathString& log_name) {
 }
 
 PathString GetDefaultLogFile() {
-#if BUILDFLAG(IS_WIN)
-  // On Windows we use the same path as the exe.
-  wchar_t module_name[MAX_PATH];
-  GetModuleFileName(nullptr, module_name, MAX_PATH);
-
-  PathString log_name = module_name;
-  PathString::size_type last_backslash = log_name.rfind('\\', log_name.size());
-  if (last_backslash != PathString::npos) {
-    log_name.erase(last_backslash + 1);
-  }
-  log_name += FILE_PATH_LITERAL("debug.log");
-  return log_name;
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   // On other platforms we just use the current directory.
   return PathString("debug.log");
 #endif
@@ -326,44 +297,7 @@ bool InitializeLogFileHandle() {
     return true;
   }
 
-#if BUILDFLAG(IS_WIN)
-  // The FILE_APPEND_DATA access mask ensures that the file is atomically
-  // appended to across accesses from multiple threads.
-  // https://msdn.microsoft.com/en-us/library/windows/desktop/aa364399(v=vs.85).aspx
-  // https://msdn.microsoft.com/en-us/library/windows/desktop/aa363858(v=vs.85).aspx
-  g_log_file = CreateFile(g_log_file_name->c_str(), FILE_APPEND_DATA,
-                          FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                          OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-  if (g_log_file == INVALID_HANDLE_VALUE || g_log_file == nullptr) {
-    // We are intentionally not using FilePath or FileUtil here to reduce the
-    // dependencies of the logging implementation. For e.g. FilePath and
-    // FileUtil depend on shell32 and user32.dll. This is not acceptable for
-    // some consumers of base logging like chrome_elf, etc.
-    // Please don't change the code below to use FilePath.
-    // try the current directory
-    wchar_t system_buffer[MAX_PATH];
-    system_buffer[0] = 0;
-    DWORD len = ::GetCurrentDirectory(std::size(system_buffer), system_buffer);
-    if (len == 0 || len > std::size(system_buffer)) {
-      return false;
-    }
-
-    *g_log_file_name = system_buffer;
-    // Append a trailing backslash if needed.
-    if (g_log_file_name->back() != L'\\') {
-      *g_log_file_name += FILE_PATH_LITERAL("\\");
-    }
-    *g_log_file_name += FILE_PATH_LITERAL("debug.log");
-
-    g_log_file = CreateFile(g_log_file_name->c_str(), FILE_APPEND_DATA,
-                            FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                            OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-    if (g_log_file == INVALID_HANDLE_VALUE || g_log_file == nullptr) {
-      g_log_file = nullptr;
-      return false;
-    }
-  }
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   g_log_file = fopen(g_log_file_name->c_str(), "a");
   if (g_log_file == nullptr) {
     return false;
@@ -376,9 +310,7 @@ bool InitializeLogFileHandle() {
 }
 
 void CloseFile(FileHandle log) {
-#if BUILDFLAG(IS_WIN)
-  CloseHandle(log);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   fclose(log);
 #else
 #error Unsupported platform
@@ -439,11 +371,7 @@ std::string BuildCrashString(const char* file,
   // Only log last path component.
   if (file) {
     const char* slash = UNSAFE_TODO(strrchr(file,
-#if BUILDFLAG(IS_WIN)
-                                            '\\'
-#else
                                             '/'
-#endif  // BUILDFLAG(IS_WIN)
                                             ));
     if (slash) {
       file = UNSAFE_TODO(slash + 1);
@@ -505,13 +433,13 @@ bool BaseInitLoggingImpl(const LoggingSettings& settings) {
   // default log file will re-initialize to the new options.
   CloseLogFileUnlocked();
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
   if (settings.log_file) {
     CHECK(settings.log_file_path.empty());
     g_log_file = settings.log_file;
     return true;
   }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
   CHECK(!settings.log_file_path.empty())
       << "LOG_TO_FILE set but no log_file_path!";
@@ -650,16 +578,6 @@ void DisplayDebugMessageInDialog(std::string_view str) {
     return;
   }
 
-#if BUILDFLAG(IS_WIN)
-  // We intentionally don't implement a dialog on other platforms.
-  // You can just look at stderr.
-  if (base::win::IsUser32AndGdi32Available()) {
-    MessageBoxW(nullptr, base::as_wcstr(base::UTF8ToUTF16(str)), L"Fatal error",
-                MB_OK | MB_ICONHAND | MB_TOPMOST);
-  } else {
-    OutputDebugStringW(base::as_wcstr(base::UTF8ToUTF16(str)));
-  }
-#endif  // BUILDFLAG(IS_WIN)
 }
 #endif  // !defined(NDEBUG)
 
@@ -732,9 +650,7 @@ void LogMessage::Flush() {
   }
 
   if ((g_logging_destination & LOG_TO_SYSTEM_DEBUG_LOG) != 0) {
-#if BUILDFLAG(IS_WIN)
-    OutputDebugStringA(str_newline.c_str());
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
     // Log roughly the same way that CFLog() and NSLog() would. See 10.10.5
     // CF-1153.18/CFUtilities.c __CFLogCString().
     CFBundleRef main_bundle = CFBundleGetMainBundle();
@@ -813,7 +729,7 @@ void LogMessage::Flush() {
     // The Android system may truncate the string if it's too long.
     __android_log_write(priority, kAndroidLogTag, str_newline.c_str());
 #endif
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_APPLE)
   }
 
   if (ShouldLogToStderr(severity_)) {
@@ -841,12 +757,7 @@ void LogMessage::Flush() {
     base::AutoLock guard(GetLoggingLock());
 #endif
     if (InitializeLogFileHandle()) {
-#if BUILDFLAG(IS_WIN)
-      DWORD num_written;
-      WriteFile(g_log_file, static_cast<const void*>(str_newline.c_str()),
-                static_cast<DWORD>(str_newline.length()), &num_written,
-                nullptr);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
       std::ignore = UNSAFE_TODO(
           fwrite(str_newline.data(), str_newline.size(), 1, g_log_file));
       fflush(g_log_file);
@@ -902,15 +813,7 @@ void LogMessage::Init(const char* file, int line) {
       stream_ << base::PlatformThread::CurrentId() << ':';
     }
     if (g_log_timestamp) {
-#if BUILDFLAG(IS_WIN)
-      SYSTEMTIME local_time;
-      GetLocalTime(&local_time);
-      stream_ << std::setfill('0') << std::setw(2) << local_time.wMonth
-              << std::setw(2) << local_time.wDay << '/' << std::setw(2)
-              << local_time.wHour << std::setw(2) << local_time.wMinute
-              << std::setw(2) << local_time.wSecond << '.' << std::setw(3)
-              << local_time.wMilliseconds << ':';
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
       timeval tv;
       gettimeofday(&tv, nullptr);
       time_t t = tv.tv_sec;
@@ -985,73 +888,21 @@ LogMessageFatal::~LogMessageFatal() {
   base::ImmediateCrash();
 }
 
-#if BUILDFLAG(IS_WIN)
-// This has already been defined in the header, but defining it again as DWORD
-// ensures that the type used in the header is equivalent to DWORD. If not,
-// the redefinition is a compile error.
-typedef DWORD SystemErrorCode;
-#endif
 
 SystemErrorCode GetLastSystemErrorCode() {
-#if BUILDFLAG(IS_WIN)
-  return ::GetLastError();
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   return errno;
 #endif
 }
 
 BASE_EXPORT std::string SystemErrorCodeToString(SystemErrorCode error_code) {
-#if BUILDFLAG(IS_WIN)
-  LPWSTR msgbuf = nullptr;
-  DWORD len = ::FormatMessageW(
-      FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
-          FORMAT_MESSAGE_IGNORE_INSERTS,
-      nullptr, error_code, 0, reinterpret_cast<LPWSTR>(&msgbuf), 0, nullptr);
-  if (len) {
-    std::u16string message = base::WideToUTF16(msgbuf);
-    ::LocalFree(msgbuf);
-    msgbuf = nullptr;
-    // Messages returned by system end with line breaks.
-    return base::UTF16ToUTF8(base::CollapseWhitespace(message, true)) +
-           base::StringPrintf(" (0x%lX)", error_code);
-  }
-  return base::StringPrintf("Error (0x%lX) while retrieving error. (0x%lX)",
-                            GetLastError(), error_code);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   return base::safe_strerror(error_code) +
          base::StringPrintf(" (%d)", error_code);
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 }
 
-#if BUILDFLAG(IS_WIN)
-Win32ErrorLogMessage::Win32ErrorLogMessage(const char* file,
-                                           int line,
-                                           LogSeverity severity,
-                                           SystemErrorCode err)
-    : LogMessage(file, line, severity), err_(err) {}
-
-Win32ErrorLogMessage::~Win32ErrorLogMessage() {
-  AppendError();
-}
-
-void Win32ErrorLogMessage::AppendError() {
-  // Don't let actions from this method affect the system error after returning.
-  base::ScopedClearLastError scoped_clear_last_error;
-
-  stream() << ": " << SystemErrorCodeToString(err_);
-  // We're about to crash (CHECK). Put |err_| on the stack (by placing it in a
-  // field) and use Alias in hopes that it makes it into crash dumps.
-  DWORD last_error = err_;
-  base::debug::Alias(&last_error);
-}
-
-Win32ErrorLogMessageFatal::~Win32ErrorLogMessageFatal() {
-  AppendError();
-  Flush();
-  base::ImmediateCrash();
-}
-
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 ErrnoLogMessage::ErrnoLogMessage(const char* file,
                                  int line,
                                  LogSeverity severity,
@@ -1079,7 +930,7 @@ ErrnoLogMessageFatal::~ErrnoLogMessageFatal() {
   base::ImmediateCrash();
 }
 
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 
 void CloseLogFile() {
 #if BUILDFLAG(IS_POSIX)
@@ -1112,23 +963,6 @@ FILE* DuplicateLogFILE() {
 }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-HANDLE DuplicateLogFileHandle() {
-  // `g_log_file` should only be valid, or nullptr, but be very careful that we
-  // do not duplicate INVALID_HANDLE_VALUE as it aliases the process handle.
-  if (!(g_logging_destination & LOG_TO_FILE) || !g_log_file ||
-      g_log_file == INVALID_HANDLE_VALUE) {
-    return nullptr;
-  }
-  HANDLE duplicate = nullptr;
-  if (!::DuplicateHandle(::GetCurrentProcess(), g_log_file,
-                         ::GetCurrentProcess(), &duplicate, 0,
-                         /*bInheritHandle=*/TRUE, DUPLICATE_SAME_ACCESS)) {
-    return nullptr;
-  }
-  return duplicate;
-}
-#endif
 
 // Used for testing. Declared in test/scoped_logging_settings.h.
 ScopedLoggingSettings::ScopedLoggingSettings()
@@ -1205,18 +1039,6 @@ void RawLog(int level, const char* message) {
 // This was defined at the beginning of this file.
 #undef write
 
-#if BUILDFLAG(IS_WIN)
-bool IsLoggingToFileEnabled() {
-  return g_logging_destination & LOG_TO_FILE;
-}
-
-std::wstring GetLogFileFullPath() {
-  if (g_log_file_name) {
-    return *g_log_file_name;
-  }
-  return std::wstring();
-}
-#endif
 
 // Used for testing. Declared in test/scoped_logging_settings.h.
 ScopedVmoduleSwitches::ScopedVmoduleSwitches() = default;

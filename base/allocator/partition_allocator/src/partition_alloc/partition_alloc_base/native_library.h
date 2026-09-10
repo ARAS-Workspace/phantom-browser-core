@@ -14,17 +14,13 @@
 #include "partition_alloc/partition_alloc_base/component_export.h"
 #include "partition_alloc/partition_alloc_base/files/file_path.h"
 
-#if PA_BUILDFLAG(IS_WIN)
-#include <windows.h>
-#elif PA_BUILDFLAG(IS_APPLE)
+#if PA_BUILDFLAG(IS_APPLE)
 #include <CoreFoundation/CoreFoundation.h>
 #endif  // OS_*
 
 namespace partition_alloc::internal::base {
 
-#if PA_BUILDFLAG(IS_WIN)
-using NativeLibrary = HMODULE;
-#elif PA_BUILDFLAG(IS_APPLE)
+#if PA_BUILDFLAG(IS_APPLE)
 enum NativeLibraryType { BUNDLE, DYNAMIC_LIB };
 enum NativeLibraryObjCStatus {
   OBJC_UNKNOWN,
@@ -46,18 +42,13 @@ using NativeLibrary = void*;
 #endif  // OS_*
 
 struct PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) NativeLibraryLoadError {
-#if PA_BUILDFLAG(IS_WIN)
-  NativeLibraryLoadError() : code(0) {}
-#endif  // PA_BUILDFLAG(IS_WIN)
 
   // Returns a string representation of the load error.
   std::string ToString() const;
 
-#if PA_BUILDFLAG(IS_WIN)
-  DWORD code;
-#elif PA_BUILDFLAG(IS_POSIX)
+#if PA_BUILDFLAG(IS_POSIX)
   std::string message;
-#endif  // PA_BUILDFLAG(IS_WIN)
+#endif  // PA_BUILDFLAG(IS_POSIX)
 };
 
 struct PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) NativeLibraryOptions {

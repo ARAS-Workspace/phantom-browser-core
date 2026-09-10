@@ -571,13 +571,8 @@ class LayerTreeHostScrollTestScrollSnapping : public LayerTreeHostScrollTest {
 MULTI_THREAD_TEST_F(LayerTreeHostScrollTestScrollSnapping);
 
 // TODO(crbug.com/440535492): Flaky on Win dbg.
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-#define MAYBE_LayerTreeHostScrollTestCaseWithChild \
-  DISABLED_LayerTreeHostScrollTestCaseWithChild
-#else
 #define MAYBE_LayerTreeHostScrollTestCaseWithChild \
   LayerTreeHostScrollTestCaseWithChild
-#endif
 class MAYBE_LayerTreeHostScrollTestCaseWithChild
     : public LayerTreeHostScrollTest {
  public:
@@ -1154,7 +1149,7 @@ MULTI_THREAD_TEST_F(LayerTreeHostScrollTestImplOnlyScroll);
 // TODO(crbug.com/40451005): Mac currently doesn't support smooth scrolling
 // wheel events.
 // TODO(crbug.com/440535492): Flaky on Win dbg.
-#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_WIN) && !defined(NDEBUG))
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_SmoothScrollAnimationEndNotification \
   DISABLED_SmoothScrollAnimationEndNotification
 #else
@@ -1305,7 +1300,7 @@ void DoGestureScroll(LayerTreeHostImpl* host_impl,
 // TODO(crbug.com/40762489): Flaky on Fuchsia, ChromeOS, and Linux.
 // TODO(crbug.com/41495136): Flaky on Windows
 // TODO(crbug.com/342502558): Flaky on Mac
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_LayerTreeHostScrollTestImplOnlyScrollSnap \
   DISABLED_LayerTreeHostScrollTestImplOnlyScrollSnap
 #else

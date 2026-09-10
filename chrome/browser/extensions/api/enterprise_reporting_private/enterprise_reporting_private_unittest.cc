@@ -44,17 +44,7 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <netfw.h>
-#include <shlobj.h>
-#include <wrl/client.h>
-
-#include "base/test/test_reg_util_win.h"
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "base/test/metrics/histogram_tester.h"
 #include "chrome/browser/enterprise/signals/signals_aggregator_factory.h"
 #include "components/device_signals/core/browser/mock_signals_aggregator.h"  // nogncheck
@@ -63,7 +53,7 @@
 #include "components/device_signals/core/browser/user_context.h"   // nogncheck
 #include "components/device_signals/core/common/common_types.h"    // nogncheck
 #include "components/device_signals/core/common/signals_constants.h"  // nogncheck
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include "base/nix/xdg_util.h"
@@ -88,11 +78,11 @@ std::unique_ptr<KeyedService> CreateProfileIDService(
   return std::make_unique<enterprise::ProfileIdService>(kFakeProfileID);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 constexpr char kNoError[] = "";
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if !BUILDFLAG(IS_CHROMEOS)
 
@@ -291,89 +281,6 @@ TEST_F(EnterpriseReportingPrivateDeviceDataFunctionsTest, RetrieveDeviceData) {
 }
 
 // TODO(pastarmovj): Remove once implementation for the other platform exists.
-#if BUILDFLAG(IS_WIN)
-
-// Test for API enterprise.reportingPrivate.getDeviceId
-class EnterpriseReportingPrivateGetPersistentSecretFunctionTest
-    : public ExtensionApiUnittest {
- public:
-  EnterpriseReportingPrivateGetPersistentSecretFunctionTest() = default;
-
-  EnterpriseReportingPrivateGetPersistentSecretFunctionTest(
-      const EnterpriseReportingPrivateGetPersistentSecretFunctionTest&) =
-      delete;
-  EnterpriseReportingPrivateGetPersistentSecretFunctionTest& operator=(
-      const EnterpriseReportingPrivateGetPersistentSecretFunctionTest&) =
-      delete;
-
-  void SetUp() override {
-    ExtensionApiUnittest::SetUp();
-#if BUILDFLAG(IS_WIN)
-    ASSERT_NO_FATAL_FAILURE(
-        registry_override_manager_.OverrideRegistry(HKEY_CURRENT_USER));
-#endif
-  }
-
- private:
-#if BUILDFLAG(IS_WIN)
-  registry_util::RegistryOverrideManager registry_override_manager_;
-#endif
-};
-
-TEST_F(EnterpriseReportingPrivateGetPersistentSecretFunctionTest, GetSecret) {
-  auto function = base::MakeRefCounted<
-      EnterpriseReportingPrivateGetPersistentSecretFunction>();
-  std::optional<base::Value> result1 =
-      RunFunctionAndReturnValue(function.get(), "[]");
-  ASSERT_TRUE(result1);
-  ASSERT_TRUE(result1->is_blob());
-  auto generated_blob = result1->GetBlob();
-
-  // Re-running should not change the secret.
-  auto function2 = base::MakeRefCounted<
-      EnterpriseReportingPrivateGetPersistentSecretFunction>();
-  std::optional<base::Value> result2 =
-      RunFunctionAndReturnValue(function2.get(), "[]");
-  ASSERT_TRUE(result2);
-  ASSERT_TRUE(result2->is_blob());
-  ASSERT_EQ(generated_blob, result2->GetBlob());
-
-  // Re-running should not change the secret even when force recreate is set.
-  auto function3 = base::MakeRefCounted<
-      EnterpriseReportingPrivateGetPersistentSecretFunction>();
-  std::optional<base::Value> result3 =
-      RunFunctionAndReturnValue(function3.get(), "[true]");
-  ASSERT_TRUE(result3);
-  ASSERT_TRUE(result3->is_blob());
-  ASSERT_EQ(generated_blob, result3->GetBlob());
-
-  const wchar_t kDefaultRegistryPath[] =
-      L"SOFTWARE\\Google\\Endpoint Verification";
-  const wchar_t kValueName[] = L"Safe Storage";
-
-  base::win::RegKey key;
-  ASSERT_EQ(ERROR_SUCCESS,
-            key.Create(HKEY_CURRENT_USER, kDefaultRegistryPath, KEY_WRITE));
-  // Mess up with the value.
-  ASSERT_EQ(ERROR_SUCCESS, key.WriteValue(kValueName, 1337));
-
-  // Re-running with no recreate enforcement should return an error.
-  auto function4 = base::MakeRefCounted<
-      EnterpriseReportingPrivateGetPersistentSecretFunction>();
-  std::string error = RunFunctionAndReturnError(function4.get(), "[]");
-  ASSERT_FALSE(error.empty());
-
-  // Re=running should not change the secret even when force recreate is set.
-  auto function5 = base::MakeRefCounted<
-      EnterpriseReportingPrivateGetPersistentSecretFunction>();
-  std::optional<base::Value> result5 =
-      RunFunctionAndReturnValue(function5.get(), "[true]");
-  ASSERT_TRUE(result5);
-  ASSERT_TRUE(result5->is_blob());
-  ASSERT_NE(generated_blob, result5->GetBlob());
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 using EnterpriseReportingPrivateGetDeviceInfoTest = ExtensionApiUnittest;
 
@@ -389,9 +296,6 @@ TEST_F(EnterpriseReportingPrivateGetDeviceInfoTest, GetDeviceInfo) {
   ASSERT_TRUE(info);
 #if BUILDFLAG(IS_MAC)
   EXPECT_EQ("macOS", info->os_name);
-#elif BUILDFLAG(IS_WIN)
-  EXPECT_EQ("windows", info->os_name);
-  EXPECT_FALSE(info->device_model.empty());
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   std::unique_ptr<base::Environment> env(base::Environment::Create());
   env->SetVar(base::nix::kXdgCurrentDesktopEnvVar, "XFCE");
@@ -475,7 +379,7 @@ class EnterpriseReportingPrivateGetContextInfoTest
 
   bool BuiltInDnsClientPlatformDefault() {
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+    BUILDFLAG(IS_LINUX)
     return true;
 #else
     return false;
@@ -842,109 +746,6 @@ INSTANTIATE_TEST_SUITE_P(
                     "google.com",
                     "https://*"));
 
-#if BUILDFLAG(IS_WIN)
-class EnterpriseReportingPrivateGetContextInfoOSFirewallTest
-    : public EnterpriseReportingPrivateGetContextInfoTest,
-      public testing::WithParamInterface<SettingValue> {
- public:
-  EnterpriseReportingPrivateGetContextInfoOSFirewallTest()
-      : enabled_(VARIANT_TRUE) {}
-
- protected:
-  void SetUp() override {
-    if (!::IsUserAnAdmin()) {
-      // INetFwPolicy2::put_FirewallEnabled fails for non-admin users.
-      GTEST_SKIP() << "This test must be run by an admin user";
-    }
-    EnterpriseReportingPrivateGetContextInfoTest::SetUp();
-    HRESULT hr = CoCreateInstance(CLSID_NetFwPolicy2, nullptr, CLSCTX_ALL,
-                                  IID_PPV_ARGS(&firewall_policy_));
-    EXPECT_GE(hr, 0);
-
-    long profile_types = 0;
-    hr = firewall_policy_->get_CurrentProfileTypes(&profile_types);
-    EXPECT_GE(hr, 0);
-
-    // Setting the firewall for each active profile
-    const NET_FW_PROFILE_TYPE2 kProfileTypes[] = {NET_FW_PROFILE2_PUBLIC,
-                                                  NET_FW_PROFILE2_PRIVATE,
-                                                  NET_FW_PROFILE2_DOMAIN};
-    for (auto profile_type : kProfileTypes) {
-      if (profile_types & profile_type) {
-        hr = firewall_policy_->get_FirewallEnabled(profile_type, &enabled_);
-        EXPECT_GE(hr, 0);
-        active_profile_ = profile_type;
-        hr = firewall_policy_->put_FirewallEnabled(
-            profile_type, firewall_value_ == SettingValue::ENABLED
-                              ? VARIANT_TRUE
-                              : VARIANT_FALSE);
-        EXPECT_GE(hr, 0);
-        break;
-      }
-    }
-  }
-
-  void TearDown() override {
-    if (!::IsUserAnAdmin()) {
-      // Test already skipped in `SetUp`.
-      return;
-    }
-    // Resetting the firewall to its initial state
-    HRESULT hr =
-        firewall_policy_->put_FirewallEnabled(active_profile_, enabled_);
-    EXPECT_GE(hr, 0);
-    EnterpriseReportingPrivateGetContextInfoTest::TearDown();
-  }
-
-  extensions::api::enterprise_reporting_private::SettingValue
-  ToInfoSettingValue(device_signals::SettingValue value) {
-    switch (value) {
-      case SettingValue::DISABLED:
-        return extensions::api::enterprise_reporting_private::SettingValue::
-            kDisabled;
-      case SettingValue::ENABLED:
-        return extensions::api::enterprise_reporting_private::SettingValue::
-            kEnabled;
-      default:
-        NOTREACHED();
-    }
-  }
-  Microsoft::WRL::ComPtr<INetFwPolicy2> firewall_policy_;
-  SettingValue firewall_value_ = GetParam();
-  VARIANT_BOOL enabled_;
-  NET_FW_PROFILE_TYPE2 active_profile_;
-};
-
-TEST_P(EnterpriseReportingPrivateGetContextInfoOSFirewallTest, Test) {
-  enterprise_reporting_private::ContextInfo info = GetContextInfo();
-
-  EXPECT_TRUE(info.browser_affiliation_ids.empty());
-  EXPECT_TRUE(info.profile_affiliation_ids.empty());
-  EXPECT_TRUE(info.on_file_attached_providers.empty());
-  EXPECT_TRUE(info.on_file_downloaded_providers.empty());
-  EXPECT_TRUE(info.on_bulk_data_entry_providers.empty());
-  EXPECT_EQ(enterprise_reporting_private::RealtimeUrlCheckMode::kDisabled,
-            info.realtime_url_check_mode);
-  EXPECT_TRUE(info.on_security_event_providers.empty());
-  EXPECT_EQ(version_info::GetVersionNumber(), info.browser_version);
-  EXPECT_EQ(enterprise_reporting_private::SafeBrowsingLevel::kStandard,
-            info.safe_browsing_protection_level);
-  EXPECT_EQ(BuiltInDnsClientPlatformDefault(),
-            info.built_in_dns_client_enabled);
-  EXPECT_EQ(
-      enterprise_reporting_private::PasswordProtectionTrigger::kPolicyUnset,
-      info.password_protection_warning_trigger);
-  EXPECT_FALSE(info.chrome_remote_desktop_app_blocked);
-  EXPECT_EQ(ToInfoSettingValue(firewall_value_), info.os_firewall);
-  EXPECT_TRUE(info.enterprise_profile_id);
-}
-
-INSTANTIATE_TEST_SUITE_P(,
-                         EnterpriseReportingPrivateGetContextInfoOSFirewallTest,
-                         testing::Values(SettingValue::DISABLED,
-                                         SettingValue::ENABLED));
-
-#endif  // BUILDFLAG(IS_WIN)
 
 class EnterpriseReportingPrivateGetContextInfoRealTimeURLCheckTest
     : public EnterpriseReportingPrivateGetContextInfoTest,
@@ -1000,7 +801,7 @@ TEST_P(EnterpriseReportingPrivateGetContextInfoRealTimeURLCheckTest, Test) {
   EXPECT_TRUE(info.enterprise_profile_id);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 namespace {
 
@@ -1233,9 +1034,9 @@ TEST_F(EnterpriseReportingPrivateGetFileSystemInfoTest, CollectionError) {
       "Enterprise.DeviceSignals.Collection.FileSystemInfo.Delta", 0);
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
 // Tests for API enterprise.reportingPrivate.getSettings
 class EnterpriseReportingPrivateGetSettingsTest : public UserContextGatedTest {
@@ -1411,268 +1212,6 @@ TEST_F(EnterpriseReportingPrivateGetSettingsTest, CollectionError) {
       "Enterprise.DeviceSignals.Collection.SystemSettings.Delta", 0);
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_WIN)
-
-std::string GetFakeUserContextJsonParams() {
-  auto user_context = GetFakeUserContext();
-  base::ListValue params;
-  params.Append(user_context.ToValue());
-  return base::WriteJson(params).value_or("");
-}
-
-// Tests for API enterprise.reportingPrivate.getAvInfo
-class EnterpriseReportingPrivateGetAvInfoTest : public UserContextGatedTest {
- protected:
-  void SetUp() override {
-    UserContextGatedTest::SetUp();
-
-    function_ =
-        base::MakeRefCounted<EnterpriseReportingPrivateGetAvInfoFunction>();
-  }
-
-  device_signals::SignalName signal_name() {
-    return device_signals::SignalName::kAntiVirus;
-  }
-
-  scoped_refptr<extensions::EnterpriseReportingPrivateGetAvInfoFunction>
-      function_;
-};
-
-TEST_F(EnterpriseReportingPrivateGetAvInfoTest, Success) {
-  device_signals::AvProduct fake_av_product;
-  fake_av_product.display_name = "Fake display name";
-  fake_av_product.state = device_signals::AvProductState::kOff;
-
-  device_signals::AntiVirusSignalResponse av_response;
-  av_response.av_products.push_back(fake_av_product);
-
-  device_signals::SignalsAggregationResponse expected_response;
-  expected_response.av_signal_response = av_response;
-
-  SetFakeResponse(expected_response);
-
-  auto response = api_test_utils::RunFunctionAndReturnSingleResult(
-      function_.get(), GetFakeUserContextJsonParams(), profile());
-
-  EXPECT_EQ(function_->GetError(), kNoError);
-
-  ASSERT_TRUE(response);
-  ASSERT_TRUE(response->is_list());
-  const base::ListValue& list_value = response->GetList();
-  ASSERT_EQ(list_value.size(), av_response.av_products.size());
-
-  const base::Value& av_value = list_value.front();
-  ASSERT_TRUE(av_value.is_dict());
-  auto parsed_av_signal =
-      enterprise_reporting_private::AntiVirusSignal::FromValue(
-          av_value.GetDict());
-  ASSERT_TRUE(parsed_av_signal);
-  EXPECT_EQ(parsed_av_signal->display_name, fake_av_product.display_name);
-  EXPECT_EQ(parsed_av_signal->state,
-            enterprise_reporting_private::AntiVirusProductState::kOff);
-
-  histogram_tester_.ExpectUniqueSample(
-      "Enterprise.DeviceSignals.Collection.Success", signal_name(), 1);
-  histogram_tester_.ExpectUniqueSample(
-      "Enterprise.DeviceSignals.Collection.Success.AntiVirus.Items",
-      /*number_of_items=*/1,
-      /*number_of_occurrences=*/1);
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Success.AntiVirus.Latency", 1);
-
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Failure", 0);
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Failure.AntiVirus.Latency", 0);
-}
-
-TEST_F(EnterpriseReportingPrivateGetAvInfoTest, TopLevelError) {
-  device_signals::SignalCollectionError expected_error =
-      device_signals::SignalCollectionError::kConsentRequired;
-
-  device_signals::SignalsAggregationResponse expected_response;
-  expected_response.top_level_error = expected_error;
-  SetFakeResponse(expected_response);
-
-  auto error = api_test_utils::RunFunctionAndReturnError(
-      function_.get(), GetFakeUserContextJsonParams(), profile());
-
-  EXPECT_EQ(error, function_->GetError());
-  EXPECT_EQ(error, device_signals::ErrorToString(expected_error));
-
-  histogram_tester_.ExpectUniqueSample(
-      "Enterprise.DeviceSignals.Collection.Failure", signal_name(), 1);
-  histogram_tester_.ExpectUniqueSample(
-      "Enterprise.DeviceSignals.Collection.Failure.AntiVirus.TopLevelError",
-      /*error=*/expected_error,
-      /*number_of_occurrences=*/1);
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Failure.AntiVirus.Latency", 1);
-
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Success", 0);
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Success.AntiVirus.Latency", 0);
-}
-
-TEST_F(EnterpriseReportingPrivateGetAvInfoTest, CollectionError) {
-  device_signals::SignalCollectionError expected_error =
-      device_signals::SignalCollectionError::kMissingSystemService;
-
-  device_signals::AntiVirusSignalResponse av_response;
-  av_response.collection_error = expected_error;
-
-  device_signals::SignalsAggregationResponse expected_response;
-  expected_response.av_signal_response = av_response;
-  SetFakeResponse(expected_response);
-
-  auto error = api_test_utils::RunFunctionAndReturnError(
-      function_.get(), GetFakeUserContextJsonParams(), profile());
-
-  EXPECT_EQ(error, function_->GetError());
-  EXPECT_EQ(error, device_signals::ErrorToString(expected_error));
-
-  histogram_tester_.ExpectUniqueSample(
-      "Enterprise.DeviceSignals.Collection.Failure", signal_name(), 1);
-  histogram_tester_.ExpectUniqueSample(
-      "Enterprise.DeviceSignals.Collection.Failure.AntiVirus."
-      "CollectionLevelError",
-      /*error=*/expected_error,
-      /*number_of_occurrences=*/1);
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Failure.AntiVirus.Latency", 1);
-
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Success", 0);
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Success.AntiVirus.Latency", 0);
-}
-
-
-// Tests for API enterprise.reportingPrivate.getHotfixes
-class EnterpriseReportingPrivateGetHotfixesTest : public UserContextGatedTest {
- protected:
-  void SetUp() override {
-    UserContextGatedTest::SetUp();
-
-    function_ =
-        base::MakeRefCounted<EnterpriseReportingPrivateGetHotfixesFunction>();
-  }
-
-  device_signals::SignalName signal_name() {
-    return device_signals::SignalName::kHotfixes;
-  }
-
-  scoped_refptr<extensions::EnterpriseReportingPrivateGetHotfixesFunction>
-      function_;
-};
-
-TEST_F(EnterpriseReportingPrivateGetHotfixesTest, Success) {
-  static constexpr char kFakeHotfixId[] = "hotfix id";
-  device_signals::HotfixSignalResponse hotfix_response;
-  hotfix_response.hotfixes.push_back({kFakeHotfixId});
-
-  device_signals::SignalsAggregationResponse expected_response;
-  expected_response.hotfix_signal_response = hotfix_response;
-
-  SetFakeResponse(expected_response);
-
-  auto response = api_test_utils::RunFunctionAndReturnSingleResult(
-      function_.get(), GetFakeUserContextJsonParams(), profile());
-
-  EXPECT_EQ(function_->GetError(), kNoError);
-
-  ASSERT_TRUE(response);
-  ASSERT_TRUE(response->is_list());
-  const base::ListValue& list_value = response->GetList();
-  ASSERT_EQ(list_value.size(), hotfix_response.hotfixes.size());
-
-  const base::Value& hotfix_value = list_value.front();
-  ASSERT_TRUE(hotfix_value.is_dict());
-  auto parsed_hotfix = enterprise_reporting_private::HotfixSignal::FromValue(
-      hotfix_value.GetDict());
-  ASSERT_TRUE(parsed_hotfix);
-  EXPECT_EQ(parsed_hotfix->hotfix_id, kFakeHotfixId);
-
-  histogram_tester_.ExpectUniqueSample(
-      "Enterprise.DeviceSignals.Collection.Success", signal_name(), 1);
-  histogram_tester_.ExpectUniqueSample(
-      "Enterprise.DeviceSignals.Collection.Success.Hotfixes.Items",
-      /*number_of_items=*/1,
-      /*number_of_occurrences=*/1);
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Success.Hotfixes.Latency", 1);
-
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Failure", 0);
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Failure.Hotfixes.Latency", 0);
-}
-
-TEST_F(EnterpriseReportingPrivateGetHotfixesTest, TopLevelError) {
-  device_signals::SignalCollectionError expected_error =
-      device_signals::SignalCollectionError::kConsentRequired;
-
-  device_signals::SignalsAggregationResponse expected_response;
-  expected_response.top_level_error = expected_error;
-  SetFakeResponse(expected_response);
-
-  auto error = api_test_utils::RunFunctionAndReturnError(
-      function_.get(), GetFakeUserContextJsonParams(), profile());
-
-  EXPECT_EQ(error, function_->GetError());
-  EXPECT_EQ(error, device_signals::ErrorToString(expected_error));
-
-  histogram_tester_.ExpectUniqueSample(
-      "Enterprise.DeviceSignals.Collection.Failure", signal_name(), 1);
-  histogram_tester_.ExpectUniqueSample(
-      "Enterprise.DeviceSignals.Collection.Failure.Hotfixes.TopLevelError",
-      /*error=*/expected_error,
-      /*number_of_occurrences=*/1);
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Failure.Hotfixes.Latency", 1);
-
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Success", 0);
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Success.Hotfixes.Latency", 0);
-}
-
-TEST_F(EnterpriseReportingPrivateGetHotfixesTest, CollectionError) {
-  device_signals::SignalCollectionError expected_error =
-      device_signals::SignalCollectionError::kMissingSystemService;
-
-  device_signals::HotfixSignalResponse hotfix_response;
-  hotfix_response.collection_error = expected_error;
-
-  device_signals::SignalsAggregationResponse expected_response;
-  expected_response.hotfix_signal_response = hotfix_response;
-  SetFakeResponse(expected_response);
-
-  auto error = api_test_utils::RunFunctionAndReturnError(
-      function_.get(), GetFakeUserContextJsonParams(), profile());
-
-  EXPECT_EQ(error, function_->GetError());
-  EXPECT_EQ(error, device_signals::ErrorToString(expected_error));
-
-  histogram_tester_.ExpectUniqueSample(
-      "Enterprise.DeviceSignals.Collection.Failure", signal_name(), 1);
-  histogram_tester_.ExpectUniqueSample(
-      "Enterprise.DeviceSignals.Collection.Failure.Hotfixes."
-      "CollectionLevelError",
-      /*error=*/expected_error,
-      /*number_of_occurrences=*/1);
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Failure.Hotfixes.Latency", 1);
-
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Success", 0);
-  histogram_tester_.ExpectTotalCount(
-      "Enterprise.DeviceSignals.Collection.Success.Hotfixes.Latency", 0);
-}
-
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace extensions

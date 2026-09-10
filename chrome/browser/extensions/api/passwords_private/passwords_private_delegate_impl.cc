@@ -135,20 +135,6 @@ std::u16string GetReauthPurpose(
     case extensions::api::passwords_private::PlaintextReason::kNone:
       NOTREACHED();
   }
-#elif BUILDFLAG(IS_WIN)
-  switch (reason) {
-    case extensions::api::passwords_private::PlaintextReason::kView:
-      return l10n_util::GetStringUTF16(
-          IDS_PASSWORDS_PAGE_AUTHENTICATION_PROMPT);
-    case extensions::api::passwords_private::PlaintextReason::kCopy:
-      return l10n_util::GetStringUTF16(
-          IDS_PASSWORDS_PAGE_COPY_AUTHENTICATION_PROMPT);
-    case extensions::api::passwords_private::PlaintextReason::kEdit:
-      return l10n_util::GetStringUTF16(
-          IDS_PASSWORDS_PAGE_EDIT_AUTHENTICATION_PROMPT);
-    case extensions::api::passwords_private::PlaintextReason::kNone:
-      NOTREACHED();
-  }
 #elif BUILDFLAG(IS_CHROMEOS)
   switch (reason) {
     case extensions::api::passwords_private::PlaintextReason::kView:
@@ -230,7 +216,7 @@ extensions::api::passwords_private::ImportResults ConvertImportResults(
   return private_results;
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 
 using password_manager::prefs::kBiometricAuthenticationBeforeFilling;
 
@@ -256,12 +242,6 @@ std::u16string GetMessageForBiometricAuthenticationBeforeFillingSetting(
   message = l10n_util::GetStringUTF16(
       pref_enabled ? IDS_PASSWORD_MANAGER_TURN_OFF_FILLING_REAUTH_MAC
                    : IDS_PASSWORD_MANAGER_TURN_ON_FILLING_REAUTH_MAC);
-#elif BUILDFLAG(IS_WIN)
-  const bool pref_enabled =
-      prefs->GetBoolean(kBiometricAuthenticationBeforeFilling);
-  message = l10n_util::GetStringUTF16(
-      pref_enabled ? IDS_PASSWORD_MANAGER_TURN_OFF_FILLING_REAUTH_WIN
-                   : IDS_PASSWORD_MANAGER_TURN_ON_FILLING_REAUTH_WIN);
 #elif BUILDFLAG(IS_CHROMEOS)
   const bool pref_enabled =
       prefs->GetBoolean(kBiometricAuthenticationBeforeFilling);
@@ -374,15 +354,13 @@ PasswordsPrivateDelegateImpl::PasswordsPrivateDelegateImpl(
 PasswordsPrivateDelegateImpl::~PasswordsPrivateDelegateImpl() {
   saved_passwords_presenter_.RemoveObserver(this);
   install_manager_observation_.Reset();
-#if !BUILDFLAG(IS_WIN)
   if (device_authenticator_) {
     device_authenticator_->Cancel();
   }
-#endif
   device_authenticator_.reset();
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 std::unique_ptr<device_reauth::DeviceAuthenticator>
 PasswordsPrivateDelegateImpl::GetDeviceAuthenticator(
     base::TimeDelta auth_validity_period) {
@@ -788,9 +766,6 @@ void PasswordsPrivateDelegateImpl::ContinueImport(
 #if BUILDFLAG(IS_MAC)
   message = l10n_util::GetStringUTF16(
       IDS_PASSWORDS_PAGE_IMPORT_AUTHENTICATION_PROMPT_BIOMETRIC_SUFFIX);
-#elif BUILDFLAG(IS_WIN)
-  message = l10n_util::GetStringUTF16(
-      IDS_PASSWORDS_PAGE_IMPORT_AUTHENTICATION_PROMPT);
 #endif
 
   AuthenticateUser(
@@ -811,9 +786,6 @@ void PasswordsPrivateDelegateImpl::ExportPasswords(
 #if BUILDFLAG(IS_MAC)
   message = l10n_util::GetStringUTF16(
       IDS_PASSWORDS_PAGE_EXPORT_AUTHENTICATION_PROMPT_BIOMETRIC_SUFFIX);
-#elif BUILDFLAG(IS_WIN)
-  message = l10n_util::GetStringUTF16(
-      IDS_PASSWORDS_PAGE_EXPORT_AUTHENTICATION_PROMPT);
 #endif
 
   AuthenticateUser(
@@ -880,7 +852,7 @@ PasswordsPrivateDelegateImpl::GetPasswordCheckStatus() {
 
 void PasswordsPrivateDelegateImpl::SwitchBiometricAuthBeforeFillingState(
     AuthenticationCallback authentication_callback) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
   AuthResultCallback callback =
       base::BindOnce(&ChangeBiometricAuthenticationBeforeFillingSetting, prefs_,
                      std::move(authentication_callback));
@@ -962,9 +934,6 @@ void PasswordsPrivateDelegateImpl::DeleteAllPasswordManagerData(
   message = l10n_util::GetStringFUTF16(
       IDS_PASSWORDS_PAGE_DELETE_ALL_DATA_AUTHENTICATION_PROMPT_BIOMETRIC_SUFFIX,
       l10n_util::GetStringUTF16(IDS_PASSWORD_MANAGER_BRAND_NAME));
-#elif BUILDFLAG(IS_WIN)
-  message = l10n_util::GetStringUTF16(
-      IDS_PASSWORDS_PAGE_DELETE_ALL_DATA_AUTHENTICATION_PROMPT);
 #endif
 
   AuthenticateUser(
@@ -1286,7 +1255,7 @@ void PasswordsPrivateDelegateImpl::AuthenticateUser(
   auto callback = password_manager::metrics_util::TimeCallbackMediumTimes(
       std::move(auth_callback), "PasswordManager.Settings.AuthenticationTime2");
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_CHROMEOS)
   std::move(callback).Run(true);
 #else
 
@@ -1294,16 +1263,7 @@ void PasswordsPrivateDelegateImpl::AuthenticateUser(
   // TODO(crbug.com/40241199): Remove Cancel and instead simply destroy
   // |device_authenticator_|.
   if (device_authenticator_) {
-#if BUILDFLAG(IS_WIN)
-    // `device_authenticator_` lives as long as the authentication is in
-    // progress. Since there is currently no way of canceling authentication
-    // if the new one wants to start, new authentications will be resolved as if
-    // they failed until the pending authentication gets resolved by the user.
-    std::move(callback).Run(false);
-    return;
-#else
     device_authenticator_->Cancel();
-#endif
   }
   device_authenticator_ = GetDeviceAuthenticator(auth_validity_period);
 

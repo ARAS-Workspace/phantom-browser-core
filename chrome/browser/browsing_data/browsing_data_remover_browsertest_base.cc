@@ -331,9 +331,6 @@ void BrowsingDataRemoverBrowserTestBase::CheckUserDirectoryForString(
       // Unfortunately this hack doesn't work on Windows where an open file
       // can't be moved.
       bool break_leveldb_locks = strict_checking;
-#if BUILDFLAG(IS_WIN)
-      break_leveldb_locks = false;
-#endif
       if (!status.ok() && break_leveldb_locks) {
         base::FilePath lock_file = path.DirName().AppendASCII("LOCK");
         storage::FilesystemImpl::UnlockFileLocal(lock_file);

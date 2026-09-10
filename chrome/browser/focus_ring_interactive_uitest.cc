@@ -88,8 +88,6 @@ class FocusRingBrowserTest : public InProcessBrowserTest {
     std::string platform_suffix;
 #if BUILDFLAG(IS_MAC)
     platform_suffix = "_mac";
-#elif BUILDFLAG(IS_WIN)
-    platform_suffix = "_win";
 #elif BUILDFLAG(IS_LINUX)
     platform_suffix = "_linux";
 #elif BUILDFLAG(IS_CHROMEOS)
@@ -139,7 +137,7 @@ IN_PROC_BROWSER_TEST_F(FocusRingBrowserTest, MAYBE_Checkbox) {
 
 // TODO(crbug.com/40774264): Flaky on Mac.
 // TODO(b/334008286): Failing on Windows.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_Radio DISABLED_Radio
 #else
 #define MAYBE_Radio Radio
@@ -180,7 +178,7 @@ IN_PROC_BROWSER_TEST_F(FocusRingBrowserTest, MAYBE_Button) {
 
 // TODO(crbug.com/40774264): Flaky on Mac.
 // TODO(b/334008286): Failing on Windows.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_Anchor DISABLED_Anchor
 #else
 #define MAYBE_Anchor Anchor

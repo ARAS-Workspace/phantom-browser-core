@@ -15,9 +15,6 @@ extern const char kSessionOptionCaptureVideoOnDedicatedThread[];
 #if BUILDFLAG(IS_MAC)
 extern const char kSessionOptionEnableSckCapturer[];
 #endif  // BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_WIN)
-extern const char kSessionOptionAllowDxgiCapturer[];
-#endif  // BUILDFLAG(IS_WIN)
 extern const char kSessionOptionDisableUdp[];
 extern const char kSessionOptionVp9EncoderSpeed[];
 extern const char kSessionOptionAv1ActiveMap[];

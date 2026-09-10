@@ -580,9 +580,7 @@ IN_PROC_BROWSER_TEST_P(FileSystemURLLoaderFactoryTest, DirectoryListing) {
       listing_entries.push_back(line);
   }
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ("<script>start(\"foo\\\\bar\");</script>", listing_header);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   EXPECT_EQ("<script>start(\"/foo/bar\");</script>", listing_header);
 #endif
 

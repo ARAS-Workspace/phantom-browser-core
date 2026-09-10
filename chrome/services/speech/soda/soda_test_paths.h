@@ -18,22 +18,6 @@ inline constexpr base::FilePath::CharType kSodaResourcePath[] =
 inline constexpr base::FilePath::CharType kSodaTestBinaryRelativePath[] =
     FILE_PATH_LITERAL("libsoda_for_testing.so");
 
-#elif BUILDFLAG(IS_WIN) && defined(ARCH_CPU_64_BITS)
-
-inline constexpr base::FilePath::CharType kSodaResourcePath[] =
-    FILE_PATH_LITERAL("third_party/soda-win64/resources");
-
-inline constexpr base::FilePath::CharType kSodaTestBinaryRelativePath[] =
-    FILE_PATH_LITERAL("SODA_for_testing.dll");
-
-#elif BUILDFLAG(IS_WIN) && defined(ARCH_CPU_32_BITS)
-
-inline constexpr base::FilePath::CharType kSodaResourcePath[] =
-    FILE_PATH_LITERAL("third_party/soda-win32/resources");
-
-inline constexpr base::FilePath::CharType kSodaTestBinaryRelativePath[] =
-    FILE_PATH_LITERAL("SODA_for_testing.dll");
-
 #elif BUILDFLAG(IS_LINUX)
 
 inline constexpr base::FilePath::CharType kSodaResourcePath[] =

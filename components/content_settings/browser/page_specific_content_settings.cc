@@ -896,9 +896,6 @@ bool PageSpecificContentSettings::IsContentBlocked(
       content_type == ContentSettingsType::SENSORS ||
       content_type == ContentSettingsType::GEOLOCATION ||
       content_type == ContentSettingsType::GEOLOCATION_WITH_OPTIONS ||
-#if BUILDFLAG(IS_WIN)
-      content_type == ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER ||
-#endif
       content_type == ContentSettingsType::NOTIFICATIONS) {
     const auto& it = content_settings_status_.find(content_type);
     if (it != content_settings_status_.end()) {
@@ -926,9 +923,6 @@ bool PageSpecificContentSettings::IsContentAllowed(
       content_type != ContentSettingsType::SENSORS &&
       content_type != ContentSettingsType::GEOLOCATION &&
       content_type != ContentSettingsType::GEOLOCATION_WITH_OPTIONS &&
-#if BUILDFLAG(IS_WIN)
-      content_type != ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER &&
-#endif
       content_type != ContentSettingsType::NOTIFICATIONS) {
     return false;
   }
@@ -1221,7 +1215,7 @@ void PageSpecificContentSettings::OnBrowsingDataAccessed(
   MaybeNotifySiteDataObservers(access_details);
 }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
 void PageSpecificContentSettings::OnProtectedMediaIdentifierPermissionSet(
     const GURL& requesting_origin,
     bool allowed) {
@@ -1436,9 +1430,6 @@ void PageSpecificContentSettings::OnContentSettingChanged(
     case ContentSettingsType::ADS:
     case ContentSettingsType::SOUND:
     case ContentSettingsType::CLIPBOARD_READ_WRITE:
-#if BUILDFLAG(IS_WIN)
-    case ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER:
-#endif
     case ContentSettingsType::SENSORS: {
       // Geolocation and Notification falls through to this logic.
       PermissionSetting setting =

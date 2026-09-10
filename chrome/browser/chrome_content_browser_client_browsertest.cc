@@ -133,9 +133,9 @@
 #include "chrome/test/base/launchservices_utils_mac.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #include "third_party/blink/public/common/features.h"
-#endif  //  BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
 #include "base/files/scoped_temp_dir.h"
@@ -645,10 +645,10 @@ class PreferredRootScrollbarColorSchemeChromeClientTest
  public:
   PreferredRootScrollbarColorSchemeChromeClientTest()
       : theme_color_(DarkMode() ? SK_ColorDKGRAY : SK_ColorLTGRAY) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
     feature_list_.InitAndEnableFeature(
         blink::features::kRootScrollbarFollowsBrowserTheme);
-#endif  //  BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX)
   }
 
   void SetUpOnMainThread() override {
@@ -728,14 +728,14 @@ IN_PROC_BROWSER_TEST_P(PreferredRootScrollbarColorSchemeChromeClientTest,
             ExpectedColorScheme());
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 // This test verifies that the root scrollbar color theme is set correctly only
 // when using a custom theme.
 IN_PROC_BROWSER_TEST_P(PreferredRootScrollbarColorSchemeChromeClientTest,
                        VerifyRootScrollbarColorTheme) {
   EXPECT_TRUE(ThemeColorMatches());
 }
-#endif  //  BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX)
 
 INSTANTIATE_TEST_SUITE_P(
     All,

@@ -20,13 +20,6 @@ void FakeDisplayClient::OnDisplayReceivedCALayerParams(
     gfx::CALayerParams ca_layer_params) {}
 #endif
 
-#if BUILDFLAG(IS_WIN)
-void FakeDisplayClient::CreateLayeredWindowUpdater(
-    mojo::PendingReceiver<mojom::LayeredWindowUpdater> receiver) {}
-void FakeDisplayClient::AddChildWindowToBrowser(
-    gpu::SurfaceHandle child_window) {}
-#endif
-
 #if BUILDFLAG(IS_LINUX) && BUILDFLAG(SUPPORTS_OZONE_X11)
 void FakeDisplayClient::DidCompleteSwapWithNewSize(const gfx::Size& size) {}
 #endif  // BUILDFLAG(IS_LINUX) && BUILDFLAG(SUPPORTS_OZONE_X11)

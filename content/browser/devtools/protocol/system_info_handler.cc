@@ -53,7 +53,7 @@ std::unique_ptr<SystemInfo::Size> GfxSizeToSystemInfoSize(
 // Windows builds need more time -- see Issue 873112 and 1004472.
 // Mac builds need more time - see Issue angleproject:6182.
 #if ((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && !defined(NDEBUG)) || \
-    BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_OZONE)
+    BUILDFLAG(IS_MAC) || BUILDFLAG(IS_OZONE)
 static constexpr int kGPUInfoWatchdogTimeoutMultiplierOS = 3;
 #else
 static constexpr int kGPUInfoWatchdogTimeoutMultiplierOS = 1;
@@ -138,10 +138,6 @@ std::unique_ptr<GPUDevice> GPUDeviceToProtocol(
   return GPUDevice::Create()
       .SetVendorId(device.vendor_id)
       .SetDeviceId(device.device_id)
-#if BUILDFLAG(IS_WIN)
-      .SetSubSysId(device.sub_sys_id)
-      .SetRevision(device.revision)
-#endif
       .SetVendorString(device.vendor_string)
       .SetDeviceString(device.device_string)
       .SetDriverVendor(device.driver_vendor)
@@ -226,12 +222,7 @@ void SendGetInfoResponse(std::unique_ptr<GetInfoCallback> callback) {
           .Build();
 
   base::CommandLine* command = base::CommandLine::ForCurrentProcess();
-#if BUILDFLAG(IS_WIN)
-  std::string command_string =
-      base::WideToUTF8(command->GetCommandLineString());
-#else
   std::string command_string = command->GetCommandLineString();
-#endif
 
   callback->sendSuccess(std::move(gpu), gpu_info.machine_model_name,
                         gpu_info.machine_model_version, command_string);

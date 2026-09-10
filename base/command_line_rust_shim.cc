@@ -18,13 +18,8 @@
 namespace base::rust {
 
 std::unique_ptr<base::CommandLine> NewForProgram(::rust::Str program) {
-#if BUILDFLAG(IS_WIN)
-  std::wstring wprogram = base::UTF8ToWide(std::string_view{program});
-  return std::make_unique<base::CommandLine>(base::FilePath(wprogram));
-#else
   std::string sprogram(program);
   return std::make_unique<base::CommandLine>(base::FilePath(sprogram));
-#endif
 }
 
 bool HasSwitch(const base::CommandLine& cmd, ::rust::Str switch_string) {
@@ -59,21 +54,13 @@ void AppendArg(base::CommandLine& cmd, ::rust::Str value) {
 ::rust::Vec<::rust::String> GetArgs(const base::CommandLine& cmd) {
   ::rust::Vec<::rust::String> result;
   for (const auto& arg : cmd.GetArgs()) {
-#if BUILDFLAG(IS_WIN)
-    result.push_back(::rust::String(base::WideToUTF8(arg)));
-#else
     result.push_back(::rust::String(arg));
-#endif
   }
   return result;
 }
 
 ::rust::String GetProgram(const base::CommandLine& cmd) {
-#if BUILDFLAG(IS_WIN)
-  return ::rust::String(base::WideToUTF8(cmd.GetProgram().value()));
-#else
   return ::rust::String(cmd.GetProgram().value());
-#endif
 }
 
 bool GetAppOutput(const base::CommandLine& cmd, ::rust::String& output) {

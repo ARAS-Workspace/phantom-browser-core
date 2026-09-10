@@ -11,8 +11,6 @@
 #include "third_party/blink/renderer/platform/fonts/android/font_unique_name_lookup_android.h"
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include "third_party/blink/renderer/platform/fonts/linux/font_unique_name_lookup_linux.h"
-#elif BUILDFLAG(IS_WIN)
-#include "third_party/blink/renderer/platform/fonts/win/font_unique_name_lookup_win.h"
 #endif
 
 namespace blink {
@@ -26,8 +24,6 @@ FontUniqueNameLookup::GetPlatformUniqueNameLookup() {
   return std::make_unique<FontUniqueNameLookupAndroid>();
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   return std::make_unique<FontUniqueNameLookupLinux>();
-#elif BUILDFLAG(IS_WIN)
-  return std::make_unique<FontUniqueNameLookupWin>();
 #else
   return nullptr;
 #endif

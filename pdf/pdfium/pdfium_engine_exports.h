@@ -21,10 +21,6 @@
 #include "ui/gfx/geometry/size.h"
 #include "ui/gfx/geometry/size_f.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "pdf/flatten_pdf_result.h"
 #endif
@@ -81,16 +77,6 @@ class PDFiumEngineExports {
   std::optional<FlattenPdfResult> CreateFlattenedPdf(
       base::span<const uint8_t> input_buffer);
 #endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_WIN)
-  // See the definition of RenderPDFPageToDC in pdf.cc for details.
-  bool RenderPDFPageToDC(base::span<const uint8_t> pdf_buffer,
-                         int page_index,
-                         const RenderingSettings& settings,
-                         HDC dc);
-
-  void SetPDFUsePrintMode(int mode);
-#endif  // BUILDFLAG(IS_WIN)
 
   // See the definition of RenderPDFPageToBitmap in pdf.cc for details.
   bool RenderPDFPageToBitmap(base::span<const uint8_t> pdf_buffer,

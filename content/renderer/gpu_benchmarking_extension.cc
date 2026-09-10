@@ -88,13 +88,6 @@
 #include "printing/print_settings.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-#include <objbase.h>
-
-#include <XpsObjectModel.h>
-#include <wrl/client.h>
-#endif
-
 namespace blink {
 
 // This class allows us to access the LayerTreeHost on WebFrameWidget. It is
@@ -578,28 +571,6 @@ void OnSwapCompletedHelper(CallbackAndContext* callback_and_context,
 // feature; no need for it in release builds.
 // Also note:  You must execute Chrome with `--no-sandbox` and
 // `--enable-gpu-benchmarking` for this to work.
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-static sk_sp<SkDocument> MakeXPSDocument(SkWStream* s) {
-  // I am not sure why this hasn't been initialized yet.
-  std::ignore = CoInitializeEx(
-      nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-  // In non-sandboxed mode, we will need to create and hold on to the
-  // factory before entering the sandbox.
-  Microsoft::WRL::ComPtr<IXpsOMObjectFactory> factory;
-  HRESULT hr = ::CoCreateInstance(CLSID_XpsOMObjectFactory, nullptr,
-                                  CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&factory));
-  if (FAILED(hr) || !factory) {
-    LOG(ERROR) << "CoCreateInstance(CLSID_XpsOMObjectFactory, ...) failed:"
-               << logging::SystemErrorCodeToString(hr);
-  }
-
-  SkXPS::Options opts;
-  opts.pngEncoder = [](SkWStream* dst, const SkPixmap& src) {
-    return SkPngRustEncoder::Encode(dst, src, {});
-  };
-  return SkXPS::MakeDocument(s, factory.Get(), opts);
-}
-#endif
 }  // namespace
 
 // static
@@ -746,15 +717,11 @@ void GpuBenchmarking::PrintPagesToSkPictures(v8::Isolate* isolate,
 
 void GpuBenchmarking::PrintPagesToXPS(v8::Isolate* isolate,
                                       const std::string& filename) {
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-  PrintDocumentTofile(isolate, filename, &MakeXPSDocument, render_frame_.get());
-#else
   std::string msg("PrintPagesToXPS is unsupported.");
   isolate->ThrowException(v8::Exception::Error(
       v8::String::NewFromUtf8(isolate, msg.c_str(), v8::NewStringType::kNormal,
                               msg.length())
           .ToLocalChecked()));
-#endif
 }
 
 void GpuBenchmarking::PrintToSkPicture(v8::Isolate* isolate,

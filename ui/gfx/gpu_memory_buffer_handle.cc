@@ -9,80 +9,7 @@
 #include "build/build_config.h"
 #include "ui/gfx/generic_shared_memory_id.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/scoped_handle.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace gfx {
-
-#if BUILDFLAG(IS_WIN)
-namespace {
-base::win::ScopedHandle CloneDXGIHandle(HANDLE handle) {
-  HANDLE target_handle = nullptr;
-  if (!::DuplicateHandle(GetCurrentProcess(), handle, GetCurrentProcess(),
-                         &target_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-    DVPLOG(1) << "Error duplicating GMB DXGI handle";
-  }
-  return base::win::ScopedHandle(target_handle);
-}
-}  // namespace
-
-DXGIHandle DXGIHandle::CreateFakeForTest() {
-  // DXGIHandle requires a valid HANDLE, so just create a placeholder event.
-  base::win::ScopedHandle fake_handle(
-      ::CreateEvent(nullptr, FALSE, FALSE, nullptr));
-  return DXGIHandle(std::move(fake_handle));
-}
-
-DXGIHandle::DXGIHandle() = default;
-DXGIHandle::~DXGIHandle() = default;
-
-DXGIHandle::DXGIHandle(base::win::ScopedHandle buffer_handle)
-    : buffer_handle_(std::move(buffer_handle)) {
-  DCHECK(buffer_handle_.is_valid());
-}
-
-DXGIHandle::DXGIHandle(base::win::ScopedHandle buffer_handle,
-                       const DXGIHandleToken& token,
-                       base::UnsafeSharedMemoryRegion region)
-    : buffer_handle_(std::move(buffer_handle)),
-      token_(token),
-      region_(std::move(region)) {
-  DCHECK(buffer_handle_.is_valid());
-}
-
-DXGIHandle::DXGIHandle(DXGIHandle&&) = default;
-DXGIHandle& DXGIHandle::operator=(DXGIHandle&&) = default;
-
-bool DXGIHandle::IsValid() const {
-  return buffer_handle_.is_valid();
-}
-
-DXGIHandle DXGIHandle::Clone() const {
-  DXGIHandle handle;
-  if (buffer_handle_.is_valid()) {
-    handle.buffer_handle_ = CloneDXGIHandle(buffer_handle_.Get());
-  }
-  handle.token_ = token_;
-  handle.region_ = region_.Duplicate();
-  return handle;
-}
-
-DXGIHandle DXGIHandle::CloneWithRegion(
-    base::UnsafeSharedMemoryRegion region) const {
-  DXGIHandle handle = Clone();
-  DCHECK(!handle.region_.IsValid());
-  handle.region_ = std::move(region);
-  return handle;
-}
-
-base::win::ScopedHandle DXGIHandle::TakeBufferHandle() {
-  DCHECK(buffer_handle_.is_valid());
-  return std::move(buffer_handle_);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 GpuMemoryBufferHandle::GpuMemoryBufferHandle() = default;
 
@@ -92,14 +19,6 @@ GpuMemoryBufferHandle::GpuMemoryBufferHandle(
       region_(std::move(region)) {
   CHECK(region_.IsValid(), base::NotFatalUntil::M155);
 }
-
-#if BUILDFLAG(IS_WIN)
-GpuMemoryBufferHandle::GpuMemoryBufferHandle(DXGIHandle handle)
-    : type(GpuMemoryBufferType::DXGI_SHARED_HANDLE),
-      dxgi_handle_(std::move(handle)) {
-  CHECK(dxgi_handle_.IsValid());
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_OZONE)
 GpuMemoryBufferHandle::GpuMemoryBufferHandle(
@@ -155,8 +74,6 @@ GpuMemoryBufferHandle GpuMemoryBufferHandle::Clone() const {
   handle.io_surface_plane_strides_ = io_surface_plane_strides_;
   handle.io_surface_plane_offsets_ = io_surface_plane_offsets_;
 #endif
-#elif BUILDFLAG(IS_WIN)
-  handle.dxgi_handle_ = dxgi_handle_.Clone();
 #elif BUILDFLAG(IS_ANDROID)
   if (android_hardware_buffer.is_valid()) {
     handle.android_hardware_buffer = android_hardware_buffer.Clone();

@@ -43,13 +43,6 @@ const char kFakeSignalMacAddr1[] = "00-11-22-33-44-55-66";
 const char kFakeSignalMacAddr2[] = "AA-BB-CC-DD-EE-FF";
 const char kFakeSignalMacAddr3[] = "A0-B1-C2-D3-E4-F5";
 
-#if BUILDFLAG(IS_WIN)
-const char kFakeSignalAvName[] = "AV_name_from_signals";
-
-const char kFakeFirstHotfix[] = "hotfix_1";
-const char kFakeSecondHotfix[] = "hotfix_2";
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_ANDROID)
 const bool kFakeHasHarmfulApps = false;
 const bool kFakeVerifiedAppsEnabled = true;
@@ -101,20 +94,6 @@ device_signals::SignalsAggregationResponse CreateFilledResponse(
   device_signals::AgentSignalsResponse agent_signals;
   agent_signals.detected_agents = {device_signals::Agents::kCrowdStrikeFalcon};
   response.agent_signals_response = agent_signals;
-
-#if BUILDFLAG(IS_WIN)
-  device_signals::AvProduct av_product;
-  av_product.display_name = kFakeSignalAvName;
-  av_product.state = device_signals::AvProductState::kExpired;
-  device_signals::AntiVirusSignalResponse av_response;
-  av_response.av_products.push_back(av_product);
-  response.av_signal_response = av_response;
-
-  device_signals::HotfixSignalResponse hotfix_response;
-  hotfix_response.hotfixes.push_back({kFakeFirstHotfix});
-  hotfix_response.hotfixes.push_back({kFakeSecondHotfix});
-  response.hotfix_signal_response = hotfix_response;
-#endif  // BUILDFLAG(IS_WIN)
 
   if (include_cert_signals) {
     device_signals::CertificateSignalsResponse cert_response;
@@ -192,12 +171,7 @@ class ChromeProfileRequestGeneratorTest
           device_signals::AgentSignalCollectionType::kDetectedAgents);
     }
 
-#if BUILDFLAG(IS_WIN)
-    request.signal_names.emplace(device_signals::SignalName::kAntiVirus);
-    request.signal_names.emplace(device_signals::SignalName::kHotfixes);
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     if (enterprise_signals::features::IsCertificateCollectionEnabled() &&
         challenge.has_value() && !challenge.value().empty()) {
       request.signal_names.emplace(device_signals::SignalName::kCertificates);
@@ -224,7 +198,7 @@ class ChromeProfileRequestGeneratorTest
         }
       }
     }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
     request.trigger = device_signals::Trigger::kSignalsReport;
     return request;
@@ -296,16 +270,6 @@ class ChromeProfileRequestGeneratorTest
         EXPECT_EQ(os_report.detected_agents(0), em::Agent::CROWDSTRIKE_FALCON);
       }
 
-#if BUILDFLAG(IS_WIN)
-      auto av_info = os_report.antivirus_info(0);
-      EXPECT_EQ(av_info.display_name(), kFakeSignalAvName);
-      EXPECT_EQ(av_info.state(), em::AntiVirusProduct::EXPIRED);
-
-      auto first_hotfix = os_report.hotfixes(0);
-      EXPECT_EQ(first_hotfix, kFakeFirstHotfix);
-      auto second_hotfix = os_report.hotfixes(1);
-      EXPECT_EQ(second_hotfix, kFakeSecondHotfix);
-#endif  // BUILDFLAG(IS_WIN)
     } else {
       EXPECT_EQ(os_report.name(), policy::GetOSPlatform());
       EXPECT_EQ(os_report.arch(), policy::GetOSArchitecture());
@@ -316,10 +280,6 @@ class ChromeProfileRequestGeneratorTest
       ASSERT_FALSE(os_report.has_screen_lock_secured());
 
       EXPECT_EQ(0, os_report.mac_addresses_size());
-#if BUILDFLAG(IS_WIN)
-      EXPECT_EQ(0, os_report.antivirus_info_size());
-      EXPECT_EQ(0, os_report.hotfixes_size());
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_IOS)
       EXPECT_FALSE(os_report.has_ios_specific_attributes());
 #endif  // BUILDFLAG(IS_IOS)
@@ -453,7 +413,7 @@ TEST_P(ChromeProfileRequestGeneratorTest,
       /*is_profile_id_null=*/false, agent_collection_enabled);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_P(ChromeProfileRequestGeneratorTest,
        GenerateFullReportWithCertificateSignals) {
   constexpr char kFakeChallenge[] = "fake_challenge";
@@ -527,7 +487,7 @@ TEST_P(ChromeProfileRequestGeneratorTest,
       /*is_profile_id_null=*/false, agent_collection_enabled,
       /*expect_cert_signals=*/true);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 TEST_P(ChromeProfileRequestGeneratorTest, GenerateSecuritySignalsOnlyReport) {
   bool agent_collection_enabled = is_agent_collection_enabled();

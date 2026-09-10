@@ -417,7 +417,7 @@ IN_PROC_BROWSER_TEST_F(LoaderBrowserTest, CrossSiteNoUnloadOn204) {
 // complete and isn't conducive to quick turnarounds. As we don't currently
 // strip the app on the build bots, this is bad times.
 // TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
-#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_WIN) && !defined(NDEBUG))
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_CrossSiteAfterCrash DISABLED_CrossSiteAfterCrash
 #else
 #define MAYBE_CrossSiteAfterCrash CrossSiteAfterCrash
@@ -1396,11 +1396,7 @@ IN_PROC_BROWSER_TEST_F(LoaderNoScriptStreamingBrowserTest, LoadScript) {
 // Tests that script can be loaded when the server responded 304 response.
 // TODO(crbug.com/369439037):  Re-enable once flakiness is resolved for Windows
 // ASAN.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_Subresource304Response DISABLED_Subresource304Response
-#else
 #define MAYBE_Subresource304Response Subresource304Response
-#endif
 IN_PROC_BROWSER_TEST_F(LoaderBrowserTest, MAYBE_Subresource304Response) {
   embedded_test_server()->RegisterRequestHandler(base::BindRepeating(
       [](const net::test_server::HttpRequest& request)

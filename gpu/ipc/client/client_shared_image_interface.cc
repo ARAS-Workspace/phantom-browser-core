@@ -14,9 +14,6 @@
 #include "ui/gfx/gpu_fence.h"
 #include "ui/gfx/gpu_memory_buffer_handle.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/gfx/win/d3d_shared_fence.h"
-#endif
 
 namespace gpu {
 
@@ -26,7 +23,7 @@ ClientSharedImageInterface::ClientSharedImageInterface(
     : gpu_channel_(std::move(channel)),
       proxy_(proxy),
       shared_memory_pool_(
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
           base::MakeRefCounted<base::UnsafeSharedMemoryPool>()
 #else
           nullptr
@@ -153,7 +150,7 @@ scoped_refptr<ClientSharedImage> ClientSharedImageInterface::CreateSharedImage(
     gfx::GpuMemoryBufferHandle buffer_handle) {
   DCHECK(gpu::IsValidClientUsage(si_info.usage))
       << static_cast<uint32_t>(si_info.usage);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   CHECK(!si_info.format.PrefersExternalSampler()) << si_info.format.ToString();
 #endif
   // Copy which can be modified.
@@ -174,7 +171,7 @@ scoped_refptr<ClientSharedImage> ClientSharedImageInterface::CreateSharedImage(
     gfx::GpuMemoryBufferHandle buffer_handle) {
   DCHECK(gpu::IsValidClientUsage(si_info.usage))
       << static_cast<uint32_t>(si_info.usage);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   CHECK(!si_info.format.PrefersExternalSampler()) << si_info.format.ToString();
 #endif
   auto buffer_handle_type = buffer_handle.type;
@@ -226,30 +223,12 @@ void ClientSharedImageInterface::CopyToGpuMemoryBuffer(
   proxy_->CopyToGpuMemoryBuffer(sync_token, mailbox);
 }
 
-#if BUILDFLAG(IS_WIN)
-void ClientSharedImageInterface::CopyToGpuMemoryBufferAsync(
-    const SyncToken& sync_token,
-    const Mailbox& mailbox,
-    base::OnceCallback<void(bool)> callback) {
-  proxy_->CopyToGpuMemoryBufferAsync(sync_token, mailbox, std::move(callback));
-}
-
-void ClientSharedImageInterface::UpdateSharedImage(
-    const SyncToken& sync_token,
-    scoped_refptr<gfx::D3DSharedFence> d3d_shared_fence,
-    const Mailbox& mailbox) {
-  proxy_->UpdateSharedImage(sync_token, std::move(d3d_shared_fence), mailbox);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 void ClientSharedImageInterface::CopyNativeGmbToSharedMemoryAsync(
     gfx::GpuMemoryBufferHandle buffer_handle,
     base::UnsafeSharedMemoryRegion memory_region,
     base::OnceCallback<void(bool)> callback) {
-#if BUILDFLAG(IS_WIN)
-  CHECK_EQ(buffer_handle.type, gfx::GpuMemoryBufferType::DXGI_SHARED_HANDLE);
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   CHECK_EQ(buffer_handle.type,
            gfx::GpuMemoryBufferType::ANDROID_HARDWARE_BUFFER);
 #endif
@@ -257,7 +236,7 @@ void ClientSharedImageInterface::CopyNativeGmbToSharedMemoryAsync(
   proxy_->CopyNativeGmbToSharedMemoryAsync(
       std::move(buffer_handle), std::move(memory_region), std::move(callback));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 void ClientSharedImageInterface::DestroySharedImage(const SyncToken& sync_token,
                                                     const Mailbox& mailbox) {

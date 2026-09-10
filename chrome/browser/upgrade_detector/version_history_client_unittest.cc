@@ -44,17 +44,7 @@ class VersionHistoryClientTest : public ::testing::Test {
   network::TestURLLoaderFactory url_loader_factory_;
 };
 
-#if BUILDFLAG(IS_WIN)
-
-#if defined(ARCH_CPU_ARM64)
-#define CURRENT_PLATFORM "win_arm64"
-#elif defined(ARCH_CPU_X86_64)
-#define CURRENT_PLATFORM "win64"
-#else
-#define CURRENT_PLATFORM "win"
-#endif
-
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 
 #define CURRENT_PLATFORM "linux"
 
@@ -74,7 +64,7 @@ class VersionHistoryClientTest : public ::testing::Test {
 
 #error Unsupported platform
 
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // Tests that GetLastServedDate() returns the correct date when the server is
 // responsive.

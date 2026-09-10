@@ -120,7 +120,7 @@ class InstallAppLocallyCommandTest : public WebAppTest {
   }
 
   bool HasShortcutsOsIntegration() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     return true;
 #else
     return false;
@@ -144,16 +144,7 @@ class InstallAppLocallyCommandTest : public WebAppTest {
     scoped_refptr<OsIntegrationTestOverrideImpl> test_override =
         OsIntegrationTestOverrideImpl::Get();
 
-#if BUILDFLAG(IS_WIN)
-    std::optional<SkColor> desktop_color =
-        test_override->GetShortcutIconTopLeftColor(
-            profile(), test_override->desktop(), app_id, app_name);
-    std::optional<SkColor> application_menu_icon_color =
-        test_override->GetShortcutIconTopLeftColor(
-            profile(), test_override->application_menu(), app_id, app_name);
-    EXPECT_EQ(desktop_color.value(), application_menu_icon_color.value());
-    return desktop_color.value();
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     std::optional<SkColor> icon_color =
         test_override->GetShortcutIconTopLeftColor(
             profile(), test_override->chrome_apps_folder(), app_id, app_name);

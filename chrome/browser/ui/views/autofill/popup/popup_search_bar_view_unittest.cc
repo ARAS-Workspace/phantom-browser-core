@@ -148,7 +148,6 @@ TEST_F(PopupSearchBarViewTest, OnInputChangedCallbackIsThrottled) {
 
 // TODO(crbug.com/338934966): Enable when key events suppressing in tests is
 // fixed.
-#if !BUILDFLAG(IS_WIN)
 TEST_F(PopupSearchBarViewTest, KeyPressedFromTextfieldPassedToDelegateFirst) {
   PopupSearchBarView* view =
       widget().SetContentsView(std::make_unique<PopupSearchBarView>(
@@ -171,7 +170,6 @@ TEST_F(PopupSearchBarViewTest, KeyPressedFromTextfieldPassedToDelegateFirst) {
   task_environment()->FastForwardBy(
       PopupSearchBarView::kInputChangeCallbackDelay);
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 TEST_F(PopupSearchBarViewTest, ClearButton) {
   PopupSearchBarView* view =

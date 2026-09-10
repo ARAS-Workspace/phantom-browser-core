@@ -35,10 +35,6 @@
 #include "ui/accessibility/platform/ax_platform_node.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 namespace views::test {
 
 namespace {
@@ -219,54 +215,5 @@ IN_PROC_BROWSER_TEST_F(MenuControllerUITest, DISABLED_TestMouseOverShownMenu) {
 // TODO(davidbienvenu): If possible, get test working for linux and
 // mac. Only status_icon_win runs a menu with a null parent widget
 // currently.
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(MenuControllerUITest, FocusOnOrphanMenu) {
-  // This test is extremely flaky on WIN10_20H2, so disable.
-  // TODO(crbug.com/40188371) Investigate why it's so flaky on that version of
-  // Windows.
-  if (base::win::OSInfo::GetInstance()->version() >=
-      base::win::Version::WIN10_20H2) {
-    GTEST_SKIP() << "Skipping test for WIN10_20H2 and greater";
-  }
-  // Going into full screen mode prevents pre-test focus and mouse position
-  // state from affecting test, and helps ui_controls function correctly.
-  chrome::ToggleFullscreenMode(browser());
-  content::ScopedAccessibilityModeOverride ax_mode_override(
-      ui::kAXModeComplete);
-  MenuDelegate menu_delegate;
-  auto menu_item_owning = std::make_unique<MenuItemView>(&menu_delegate);
-  MenuItemView* menu_item = menu_item_owning.get();
-  AXEventCounter ax_counter(views::AXUpdateNotifier::Get());
-  EXPECT_EQ(ax_counter.GetCount(ax::mojom::Event::kMenuStart), 0);
-  EXPECT_EQ(ax_counter.GetCount(ax::mojom::Event::kMenuPopupStart), 0);
-  EXPECT_EQ(ax_counter.GetCount(ax::mojom::Event::kMenuPopupEnd), 0);
-  EXPECT_EQ(ax_counter.GetCount(ax::mojom::Event::kMenuEnd), 0);
-  std::unique_ptr<MenuRunner> menu_runner(std::make_unique<MenuRunner>(
-      std::move(menu_item_owning), views::MenuRunner::CONTEXT_MENU));
-  MenuItemView* first_item = menu_item->AppendMenuItem(1, u"One");
-  menu_item->AppendMenuItem(2, u"Two");
-  menu_runner->RunMenuAt(nullptr, nullptr, gfx::Rect(),
-                         views::MenuAnchorPosition::kTopLeft,
-                         ui::mojom::MenuSourceType::kNone);
-  EXPECT_EQ(ax_counter.GetCount(ax::mojom::Event::kMenuStart), 1);
-  EXPECT_EQ(ax_counter.GetCount(ax::mojom::Event::kMenuPopupStart), 1);
-  EXPECT_EQ(ax_counter.GetCount(ax::mojom::Event::kMenuPopupEnd), 0);
-  EXPECT_EQ(ax_counter.GetCount(ax::mojom::Event::kMenuEnd), 0);
-  base::RunLoop loop;
-  // SendKeyPress fails if the window doesn't have focus.
-  ASSERT_TRUE(ui_controls::SendKeyPressNotifyWhenDone(
-      menu_item->GetSubmenu()->GetWidget()->GetNativeWindow(), ui::VKEY_DOWN,
-      false, false, false, false, loop.QuitClosure()));
-  loop.Run();
-  EXPECT_TRUE(first_item->IsSelected());
-  EXPECT_TRUE(first_item->GetViewAccessibility().IsFocusedForTesting());
-  menu_runner->Cancel();
-  EXPECT_FALSE(first_item->GetViewAccessibility().IsFocusedForTesting());
-  EXPECT_EQ(ax_counter.GetCount(ax::mojom::Event::kMenuStart), 1);
-  EXPECT_EQ(ax_counter.GetCount(ax::mojom::Event::kMenuPopupStart), 1);
-  EXPECT_EQ(ax_counter.GetCount(ax::mojom::Event::kMenuPopupEnd), 1);
-  EXPECT_EQ(ax_counter.GetCount(ax::mojom::Event::kMenuEnd), 1);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace views::test

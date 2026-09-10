@@ -45,14 +45,6 @@ BrowserPrintingContextFactoryForTest::CreatePrintingContext(
   if (access_denied_errors_for_new_document_) {
     context->SetNewDocumentBlockedByPermissions();
   }
-#if BUILDFLAG(IS_WIN)
-  if (access_denied_errors_for_render_page_) {
-    context->SetOnRenderPageBlockedByPermissions();
-  }
-  if (failed_error_for_render_page_number_) {
-    context->SetOnRenderPageFailsForPage(failed_error_for_render_page_number_);
-  }
-#endif
   if (access_denied_errors_for_render_document_) {
     context->SetOnRenderDocumentBlockedByPermissions();
   }
@@ -86,14 +78,6 @@ void BrowserPrintingContextFactoryForTest::SetPrinterNameForSubsequentContexts(
   printer_name_ = printer_name;
 }
 
-#if BUILDFLAG(IS_WIN)
-void BrowserPrintingContextFactoryForTest::
-    SetPrinterLanguageTypeForSubsequentContexts(
-        mojom::PrinterLanguageType printer_language_type) {
-  printer_language_type_ = printer_language_type;
-}
-#endif
-
 void BrowserPrintingContextFactoryForTest::
     SetUserSettingsPageRangesForSubsequentContext(
         const PageRanges& page_ranges) {
@@ -123,18 +107,6 @@ void BrowserPrintingContextFactoryForTest::SetAccessDeniedErrorOnNewDocument(
     bool cause_errors) {
   access_denied_errors_for_new_document_ = cause_errors;
 }
-
-#if BUILDFLAG(IS_WIN)
-void BrowserPrintingContextFactoryForTest::SetAccessDeniedErrorOnRenderPage(
-    bool cause_errors) {
-  access_denied_errors_for_render_page_ = cause_errors;
-}
-
-void BrowserPrintingContextFactoryForTest::SetFailedErrorForRenderPage(
-    uint32_t page_number) {
-  failed_error_for_render_page_number_ = page_number;
-}
-#endif
 
 void BrowserPrintingContextFactoryForTest::SetAccessDeniedErrorOnRenderDocument(
     bool cause_errors) {
@@ -176,12 +148,6 @@ BrowserPrintingContextFactoryForTest::MakeDefaultTestPrintingContext(
 
   std::unique_ptr<PrintSettings> settings =
       test::MakeDefaultPrintSettings(printer_name);
-
-#if BUILDFLAG(IS_WIN)
-  if (printer_language_type_.has_value()) {
-    settings->set_printer_language_type(printer_language_type_.value());
-  }
-#endif
 
   context->SetDeviceSettings(printer_name, std::move(settings));
   return context;

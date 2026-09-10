@@ -52,28 +52,6 @@ TEST_F(VfsUtilsTest, MakePendingFileSetDirectoryNotFound) {
               ErrorIs(FileSetError::kPermanent));
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST_F(VfsUtilsTest, MakePendingFileSetInUseWin) {
-  base::FilePath db_path =
-      temp_dir_path().Append(kBaseName).AddExtension(kDbFileExtension);
-
-  // Open the file exclusively to simulate in-use.
-  base::File exclusive_file(db_path, base::File::FLAG_CREATE_ALWAYS |
-                                         base::File::FLAG_WRITE |
-                                         base::File::FLAG_WIN_EXCLUSIVE_READ |
-                                         base::File::FLAG_WIN_EXCLUSIVE_WRITE);
-  ASSERT_TRUE(exclusive_file.IsValid());
-
-  // Try to create a pending file set with single_connection=true (which
-  // requests exclusive access).
-  EXPECT_THAT(MakePendingFileSet(Client::kTest, temp_dir_path(),
-                                 base::FilePath(kBaseName),
-                                 /*single_connection=*/true,
-                                 /*journal_mode_wal=*/false),
-              ErrorIs(FileSetError::kTransient));
-}
-#endif
-
 TEST_F(VfsUtilsTest, MakePendingFileSetNotAFile) {
   base::FilePath db_path =
       temp_dir_path().Append(kBaseName).AddExtension(kDbFileExtension);

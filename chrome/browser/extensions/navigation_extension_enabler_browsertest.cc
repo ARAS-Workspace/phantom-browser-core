@@ -29,9 +29,9 @@
 #include "extensions/common/constants.h"
 #include "extensions/common/extension.h"
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_MAC)
 #include "content/public/common/url_constants.h"
-#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#endif  // !BUILDFLAG(IS_MAC)
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
@@ -243,7 +243,7 @@ IN_PROC_BROWSER_TEST_F(DisableExtensionBrowserTest,
   // once renderer-process shutdown delay causing `extension_site_instance` to
   // be reused is addressed (see
   // RendererProcessHostImpl::ShouldDelayProcessShutdown() for details).
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_MAC)
   EXPECT_NE(subframe->GetSiteInstance(), extension_site_instance);
   auto& principal = subframe->GetSiteInstance()->GetSecurityPrincipal();
   if (content::SiteIsolationPolicy::IsErrorPageIsolationEnabled(false)) {
@@ -256,7 +256,7 @@ IN_PROC_BROWSER_TEST_F(DisableExtensionBrowserTest,
     // The disabled extension process should be locked.
     EXPECT_TRUE(subframe->GetProcess()->IsProcessLockedToSiteForTesting());
   }
-#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#endif  // !BUILDFLAG(IS_MAC)
 
   // Re-enable the extension.
   extension_registrar()->EnableExtension(extension->id());

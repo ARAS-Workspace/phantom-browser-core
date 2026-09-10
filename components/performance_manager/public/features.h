@@ -247,10 +247,6 @@ BASE_DECLARE_FEATURE_PARAM(size_t, kTransientKeepAlivePolicyMaxCount);
 // USER_BLOCKING.
 BASE_DECLARE_FEATURE(kExtensionServiceWorkerVoter);
 
-#if BUILDFLAG(IS_WIN)
-BASE_DECLARE_FEATURE(kBrowserProcessAboveNormalPriority);
-#endif
-
 BASE_DECLARE_FEATURE(kDisableTabDiscarding);
 
 // When enabled, PageLiveStateDecorator uses the page loading state to avoid

@@ -9,9 +9,9 @@
 
 #include "build/build_config.h"
 
-#if !(BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN))
+#if !(BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC))
 #error EnterpriseSigninService should only be built on desktop platforms.
-#endif  // !(BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN))
+#endif  // !(BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC))
 
 #include "base/memory/raw_ptr.h"
 #include "base/scoped_observation.h"

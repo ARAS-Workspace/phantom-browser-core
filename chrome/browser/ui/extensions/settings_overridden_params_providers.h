@@ -33,7 +33,7 @@ enum class MissingParams {
 std::optional<ExtensionSettingsOverriddenDialog::Params> GetNtpOverriddenParams(
     Profile* profile);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // Returns true if the extension controlling the default search engine set the
 // *same* engine the user was already using, in which case nothing was actually
 // overridden and there is nothing to confirm. This happens when a user selects
@@ -61,7 +61,7 @@ void GetSearchOverriddenParamsThenRun(
     base::OnceCallback<
         void(std::unique_ptr<ExtensionSettingsOverriddenDialog::Params>)>
         done_callback);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace settings_overridden_params
 

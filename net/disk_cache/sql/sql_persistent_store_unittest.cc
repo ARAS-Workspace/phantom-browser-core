@@ -209,9 +209,6 @@ class SqlPersistentStoreTestBase : public testing::Test {
 
     auto db = std::make_unique<sql::Database>(
         sql::DatabaseOptions()
-#if BUILDFLAG(IS_WIN)
-            .set_exclusive_database_file_lock(true)
-#endif  // IS_WIN
             .set_wal_mode(IsWalModeEnabled()),
         sql::Database::Tag("HttpCacheDiskCache"));
     CHECK(db->Open(GetDatabaseFilePath()));
@@ -959,9 +956,6 @@ TEST_P(SqlPersistentStoreTest, SharedCacheEnabledAbsentInOldDatabase) {
   {
     auto db = std::make_unique<sql::Database>(
         sql::DatabaseOptions()
-#if BUILDFLAG(IS_WIN)
-            .set_exclusive_database_file_lock(true)
-#endif
             .set_wal_mode(IsWalModeEnabled()),
         sql::Database::Tag("HttpCacheDiskCache"));
     ASSERT_TRUE(db->Open(GetDatabaseFilePath()));

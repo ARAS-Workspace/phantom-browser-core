@@ -40,10 +40,7 @@ class COMPONENT_EXPORT(NETWORK_CPP_BASE) TransferableSocket {
   // the `socket` handle.
   // On Windows, a `destination_process` must be supplied which must match the
   // process that the TransferableSocket will be transmitted to using IPC.
-#if BUILDFLAG(IS_WIN)
-  TransferableSocket(net::SocketDescriptor socket,
-                     base::ProcessId destination_process_id);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   explicit TransferableSocket(net::SocketDescriptor socket);
 #else
 #error "Unsupported Platform"
@@ -62,14 +59,12 @@ class COMPONENT_EXPORT(NETWORK_CPP_BASE) TransferableSocket {
  private:
   friend struct mojo::StructTraits<network::mojom::TransferableSocketDataView,
                                    network::TransferableSocket>;
-#if BUILDFLAG(IS_WIN)
-  std::vector<uint8_t> wsa_info_buffer_;
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   explicit TransferableSocket(mojo::PlatformHandle socket);
   mojo::PlatformHandle socket_;
 #else
 #error "Unsupported platform"
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 
 #if DCHECK_IS_ON()
   bool has_been_transferred_ = false;

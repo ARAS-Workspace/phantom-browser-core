@@ -182,9 +182,6 @@ void WeightsFileSessionImpl::Finalize(FinalizeCallback callback) {
     uint32_t ro_flags = base::File::FLAG_OPEN | base::File::FLAG_READ |
                         base::File::FLAG_NO_FOLLOW |
                         base::File::FLAG_WIN_NO_EXECUTE;
-#if BUILDFLAG(IS_WIN)
-    ro_flags |= base::File::FLAG_WIN_SHARE_DELETE;
-#endif
     ro_file = base::File(tempfile_path_, ro_flags);
     base::DeleteFile(tempfile_path_);
     tempfile_path_.clear();

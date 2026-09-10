@@ -194,10 +194,6 @@ void StartServerOnIOThread(
       LOG(WARNING) << "Unexpected " << bindv6only_filename << " contents.";
       need_ipv4 = NeedIPv4::UNKNOWN;
     }
-#elif BUILDFLAG(IS_WIN)
-    // On Windows, the net component always enables dual-protocol bind. See
-    // https://chromium.googlesource.com/chromium/src/+/69.0.3464.0/net/socket/socket_descriptor.cc#28.
-    need_ipv4 = NeedIPv4::NOT_NEEDED;
 #else
     LOG(WARNING) << "Running on a platform not officially supported by "
                  << kChromeDriverProductFullName << ".";

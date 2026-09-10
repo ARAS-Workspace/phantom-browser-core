@@ -95,11 +95,7 @@ class ScopedAccessibilityModeTest : public ContentBrowserTest {
   BrowserContext& browser_context2() { return *browser_context2_; }
   WebContents& web_contents3() { return *web_contents3_; }
 
-#if BUILDFLAG(IS_WIN)
-  static constexpr ui::AXMode kIgnoredModeFlags{ui::AXMode::kNativeAPIs};
-#else
   static constexpr ui::AXMode kIgnoredModeFlags{};
-#endif
 
  private:
   raw_ptr<BrowserAccessibilityState> accessibility_state_ = nullptr;

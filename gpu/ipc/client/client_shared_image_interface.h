@@ -74,22 +74,13 @@ class GPU_IPC_CLIENT_EXPORT ClientSharedImageInterface
       const SharedImageInfo& si_info) override;
   void CopyToGpuMemoryBuffer(const SyncToken& sync_token,
                              const Mailbox& mailbox) override;
-#if BUILDFLAG(IS_WIN)
-  void CopyToGpuMemoryBufferAsync(
-      const SyncToken& sync_token,
-      const Mailbox& mailbox,
-      base::OnceCallback<void(bool)> callback) override;
-  void UpdateSharedImage(const SyncToken& sync_token,
-                         scoped_refptr<gfx::D3DSharedFence> d3d_shared_fence,
-                         const Mailbox& mailbox) override;
-#endif  // BUILDFLAG(IS_WIN)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   void CopyNativeGmbToSharedMemoryAsync(
       gfx::GpuMemoryBufferHandle buffer_handle,
       base::UnsafeSharedMemoryRegion memory_region,
       base::OnceCallback<void(bool)> callback) override;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   void DestroySharedImage(const SyncToken& sync_token,
                           const Mailbox& mailbox) override;

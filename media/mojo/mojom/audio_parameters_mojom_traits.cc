@@ -126,12 +126,6 @@ bool StructTraits<media::mojom::AudioParametersHardwareCapabilitiesDataView,
   output->bitstream_formats = input.bitstream_formats();
   output->require_encapsulation = input.require_encapsulation();
   output->require_audio_offload = input.require_audio_offload();
-#if BUILDFLAG(IS_WIN)
-  if (output->require_audio_offload &&
-      !base::FeatureList::IsEnabled(media::kAudioOffload)) {
-    return false;
-  }
-#endif
   return true;
 }
 

@@ -837,13 +837,8 @@ TEST_F(TranslateBubbleViewTest,
 }
 
 // TODO(crbug.com/527306844): Re-enable this test.
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-#define MAYBE_ListShowsUpAgainWhenTypingAfterLanguageSelection \
-  DISABLED_ListShowsUpAgainWhenTypingAfterLanguageSelection
-#else
 #define MAYBE_ListShowsUpAgainWhenTypingAfterLanguageSelection \
   ListShowsUpAgainWhenTypingAfterLanguageSelection
-#endif
 TEST_F(TranslateBubbleViewTest,
        MAYBE_ListShowsUpAgainWhenTypingAfterLanguageSelection) {
   base::test::ScopedFeatureList features(translate::kTranslateLanguageSearchUI);

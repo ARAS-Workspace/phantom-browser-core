@@ -757,11 +757,7 @@ IN_PROC_BROWSER_TEST_F(CrExtensionsPackDialogTest, Interaction) {
 
 // Disabling on Windows due to flaky timeout on some build bots.
 // http://crbug.com/41383244
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PackSuccess DISABLED_PackSuccess
-#else
 #define MAYBE_PackSuccess PackSuccess
-#endif
 IN_PROC_BROWSER_TEST_F(CrExtensionsPackDialogTest, MAYBE_PackSuccess) {
   RunTestCase("PackSuccess");
 }

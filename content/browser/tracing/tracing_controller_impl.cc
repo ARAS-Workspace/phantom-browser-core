@@ -76,15 +76,6 @@
 #include "content/browser/tracing/cast_tracing_agent.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/power_monitor/cpu_frequency_utils.h"
-#include "base/win/registry.h"
-#include "base/win/win_util.h"
-#include "base/win/windows_version.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include <sys/time.h>
 #include "content/browser/android/tracing_controller_android.h"

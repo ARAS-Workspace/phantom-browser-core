@@ -116,9 +116,7 @@ Study::Platform ClientFilterableState::GetCurrentPlatform() {
     DVLOG(1) << "Invalid platform provided: " << forced_platform;
   }
 
-#if BUILDFLAG(IS_WIN)
-  return Study::PLATFORM_WINDOWS;
-#elif BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
   return Study::PLATFORM_IOS;
 #elif BUILDFLAG(IS_MAC)
   return Study::PLATFORM_MAC;
@@ -139,17 +137,11 @@ Study::Platform ClientFilterableState::GetCurrentPlatform() {
 base::Version ClientFilterableState::GetOSVersion() {
   base::Version ret;
 
-#if BUILDFLAG(IS_WIN)
-  std::string win_version = base::SysInfo::OperatingSystemVersion();
-  ret = base::Version(win_version);
-  DCHECK(ret.IsValid()) << win_version;
-#else
   // Every other OS is supported by OperatingSystemVersionNumbers
   int major, minor, build;
   base::SysInfo::OperatingSystemVersionNumbers(&major, &minor, &build);
   ret = base::Version(base::StringPrintf("%d.%d.%d", major, minor, build));
   DCHECK(ret.IsValid());
-#endif
 
   return ret;
 }

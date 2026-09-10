@@ -97,12 +97,6 @@
 #include "ui/views/widget/root_view.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/display/win/screen_win.h"
-#include "ui/gfx/win/hwnd_util.h"
-#include "ui/views/win/hwnd_util.h"
-#endif
-
 #if defined(USE_AURA)
 #include "ui/aura/window.h"
 #endif
@@ -2251,11 +2245,7 @@ bool TabStrip::ShouldHighlightCloseButtonAfterRemove() {
 }
 
 bool TabStrip::TitlebarBackgroundIsTransparent() const {
-#if BUILDFLAG(IS_WIN)
-  return false;
-#else
   return GetWidget()->ShouldWindowContentsBeTransparent();
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 const Tab* TabStrip::GetLastVisibleTab() const {

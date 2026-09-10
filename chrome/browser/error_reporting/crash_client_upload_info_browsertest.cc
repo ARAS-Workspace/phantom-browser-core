@@ -43,12 +43,6 @@ IN_PROC_BROWSER_TEST_F(CrashClientUploadInfoTest, GetClientProductInfo) {
 #endif  // defined(ADDRESS_SANITIZER)
 #elif BUILDFLAG(IS_MAC)
   constexpr char kProductName[] = "Chrome_Mac";
-#elif BUILDFLAG(IS_WIN)
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  constexpr char kProductName[] = "Chrome";
-#else
-  constexpr char kProductName[] = "Chromium";
-#endif
 #endif
 
   crash_reporter::ProductInfo product_info;

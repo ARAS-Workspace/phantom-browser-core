@@ -28,11 +28,6 @@ bool StructTraits<blink::mojom::RendererPreferencesDataView,
     return false;
   out->use_subpixel_positioning = data.use_subpixel_positioning();
 
-#if BUILDFLAG(IS_WIN)
-  out->text_contrast = data.text_contrast();
-  out->text_gamma = data.text_gamma();
-#endif  // BUILDFLAG(IS_WIN)
-
   out->focus_ring_color = data.focus_ring_color();
   out->active_selection_bg_color = data.active_selection_bg_color();
   out->active_selection_fg_color = data.active_selection_fg_color();
@@ -47,7 +42,7 @@ bool StructTraits<blink::mojom::RendererPreferencesDataView,
 
   out->use_custom_colors = data.use_custom_colors();
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
   out->use_overlay_scrollbar = data.use_overlay_scrollbar();
 #endif
 
@@ -81,28 +76,6 @@ bool StructTraits<blink::mojom::RendererPreferencesDataView,
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   if (!data.ReadSystemFontFamilyName(&out->system_font_family_name))
     return false;
-#endif
-#if BUILDFLAG(IS_WIN)
-  if (!data.ReadCaptionFontFamilyName(&out->caption_font_family_name))
-    return false;
-  out->caption_font_height = data.caption_font_height();
-
-  if (!data.ReadSmallCaptionFontFamilyName(
-          &out->small_caption_font_family_name))
-    return false;
-  out->small_caption_font_height = data.small_caption_font_height();
-
-  if (!data.ReadMenuFontFamilyName(&out->menu_font_family_name))
-    return false;
-  out->menu_font_height = data.menu_font_height();
-
-  if (!data.ReadStatusFontFamilyName(&out->status_font_family_name))
-    return false;
-  out->status_font_height = data.status_font_height();
-
-  if (!data.ReadMessageFontFamilyName(&out->message_font_family_name))
-    return false;
-  out->message_font_height = data.message_font_height();
 #endif
 #if BUILDFLAG(IS_OZONE)
   out->selection_clipboard_buffer_available =

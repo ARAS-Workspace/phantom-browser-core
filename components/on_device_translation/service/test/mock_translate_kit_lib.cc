@@ -37,11 +37,7 @@
 #include "components/on_device_translation/service/proto/translate_kit_api.pb.h"
 #include "components/on_device_translation/service/translate_kit_structs.h"
 
-#if BUILDFLAG(IS_WIN)
-#define TRANSLATE_KIT_EXPORT __declspec(dllexport)
-#else
 #define TRANSLATE_KIT_EXPORT __attribute__((visibility("default")))
-#endif
 
 using chrome::on_device_translation::TranslateKitLanguagePackageConfig;
 

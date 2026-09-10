@@ -178,12 +178,7 @@ IN_PROC_BROWSER_TEST_P(WatermarkBrowserTest, WatermarkShownAfterNavigation) {
 }
 
 // TODO(crbug.com/40261456): Flakily fails on Windows
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_WatermarkClearedAfterNavigation \
-  DISABLED_WatermarkClearedAfterNavigation
-#else
 #define MAYBE_WatermarkClearedAfterNavigation WatermarkClearedAfterNavigation
-#endif
 IN_PROC_BROWSER_TEST_P(WatermarkBrowserTest,
                        MAYBE_WatermarkClearedAfterNavigation) {
   ASSERT_TRUE(SetWatermark(GetParam().watermark_text));

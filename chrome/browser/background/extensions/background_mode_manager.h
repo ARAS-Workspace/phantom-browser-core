@@ -29,10 +29,6 @@
 #include "components/prefs/pref_change_registrar.h"
 #include "extensions/common/extension_id.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/startup/startup_launch_manager.h"
-#endif
-
 class Browser;
 class BrowserWindowInterface;
 class PrefRegistrySimple;
@@ -402,12 +398,6 @@ class BackgroundModeManager : public BrowserCollectionObserver,
   // background app status of profiles when they open/close background apps.
   raw_ptr<ProfileAttributesStorage, AcrossTasksDanglingUntriaged>
       profile_storage_;
-
-#if BUILDFLAG(IS_WIN)
-  // Handles interaction with StartupLaunchManager.
-  StartupLaunchManager::Client startup_launch_client_{
-      StartupLaunchReason::kExtensions};
-#endif
 
   // Registrars for managing our change observers.
   base::CallbackListSubscription on_app_terminating_subscription_;

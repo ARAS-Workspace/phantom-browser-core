@@ -152,15 +152,6 @@
 #include "chrome/browser/ui/browser_commands_mac.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/windows_version.h"
-#include "content/public/browser/gpu_data_manager.h"
-#include "ui/aura/window.h"
-#include "ui/aura/window_tree_host.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ash/boca/on_task/on_task_locked_controller.h"
 #include "chrome/browser/platform_util.h"
@@ -180,9 +171,9 @@
 #include "ui/ozone/public/ozone_platform.h"
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/shortcuts/desktop_shortcuts_utils.h"
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS));
 
@@ -863,7 +854,7 @@ void BrowserCommandController::HandleCommandWithDisposition(
       break;
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
     case IDC_MINIMIZE_WINDOW:
       browser_->GetWindow()->Minimize();
       break;
@@ -874,7 +865,7 @@ void BrowserCommandController::HandleCommandWithDisposition(
       browser_->GetWindow()->Restore();
       break;
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_LINUX)
     case IDC_USE_SYSTEM_TITLE_BAR: {
@@ -884,15 +875,6 @@ void BrowserCommandController::HandleCommandWithDisposition(
       break;
     }
 #endif  // BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_WIN)
-    case IDC_MOVE_WINDOW:
-      chrome::OpenMoveWindow(browser_);
-      break;
-    case IDC_SIZE_WINDOW:
-      chrome::OpenSizeWindow(browser_);
-      break;
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
     case IDC_TOGGLE_FULLSCREEN_TOOLBAR:
@@ -1118,12 +1100,12 @@ void BrowserCommandController::HandleCommandWithDisposition(
       break;
     case IDC_CREATE_SHORTCUT:
       base::RecordAction(base::UserMetricsAction("CreateShortcut"));
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       chrome::CreateDesktopShortcutForActiveWebContents(browser_);
 #else
       web_app::CreateWebAppFromCurrentWebContents(
           browser_, web_app::WebAppInstallFlow::kCreateShortcut);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       break;
     case IDC_INSTALL_PWA:
       base::RecordAction(base::UserMetricsAction("InstallWebAppFromMenu"));
@@ -1319,13 +1301,13 @@ void BrowserCommandController::HandleCommandWithDisposition(
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
     case IDC_CHROME_WHATS_NEW:
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
+    (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
       ShowChromeWhatsNew(browser_);
       break;
 #else
       NOTREACHED();
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-        // (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
+#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && (BUILDFLAG(IS_MAC) ||
+        // BUILDFLAG(IS_LINUX))
     case IDC_CHROME_ENTERPRISE_RELEASE_NOTES:
       if (base::FeatureList::IsEnabled(features::kEnterpriseReleaseNotes)) {
         chrome::ShowChromeEnterpriseReleaseNotes(browser_);
@@ -1737,11 +1719,11 @@ void BrowserCommandController::InitCommandState() {
   command_updater_->UpdateCommandEnabled(IDC_VISIT_DESKTOP_OF_LRU_USER_4, true);
   command_updater_->UpdateCommandEnabled(IDC_VISIT_DESKTOP_OF_LRU_USER_5, true);
 #endif
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
   command_updater_->UpdateCommandEnabled(IDC_MINIMIZE_WINDOW, true);
   command_updater_->UpdateCommandEnabled(IDC_MAXIMIZE_WINDOW, true);
   command_updater_->UpdateCommandEnabled(IDC_RESTORE_WINDOW, true);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_LINUX)
   bool use_system_title_bar = true;
@@ -1753,11 +1735,6 @@ void BrowserCommandController::InitCommandState() {
   command_updater_->UpdateCommandEnabled(IDC_USE_SYSTEM_TITLE_BAR,
                                          use_system_title_bar);
 #endif  // BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_WIN)
-  command_updater_->UpdateCommandEnabled(IDC_MOVE_WINDOW, true);
-  command_updater_->UpdateCommandEnabled(IDC_SIZE_WINDOW, true);
-#endif  // BUILDFLAG(IS_WIN)
 
   command_updater_->UpdateCommandEnabled(IDC_OPEN_IN_PWA_WINDOW,
                                          web_app::CanPopOutWebApp(profile()));
@@ -2143,14 +2120,14 @@ void BrowserCommandController::UpdateCommandsForTabState() {
   bool can_create_web_app = web_app::CanCreateWebApp(browser_);
   command_updater_->UpdateCommandEnabled(IDC_INSTALL_PWA, can_create_web_app);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   command_updater_->UpdateCommandEnabled(
       IDC_CREATE_SHORTCUT,
       shortcuts::CanCreateDesktopShortcut(current_web_contents));
 #else
   command_updater_->UpdateCommandEnabled(IDC_CREATE_SHORTCUT,
                                          can_create_web_app);
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   UpdateCommandAndActionEnabled(IDC_SEND_TAB_TO_SELF, kActionSendTabToSelf,
                                 CanSendTabToSelf(browser_));

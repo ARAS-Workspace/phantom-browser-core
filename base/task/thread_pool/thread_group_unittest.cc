@@ -34,11 +34,6 @@
 #include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/com_init_check_hook.h"
-#include "base/win/com_init_util.h"
-#endif
-
 namespace base::internal {
 
 namespace {
@@ -520,40 +515,6 @@ TEST_P(ThreadGroupTestAllExecutionModes, ScopedBlockingCallTwice) {
                             Unretained(&task_ran)));
   task_ran.Wait();
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_P(ThreadGroupTestAllExecutionModes, COMMTAWorkerEnvironment) {
-  StartThreadGroup(ThreadGroup::WorkerEnvironment::COM_MTA);
-  auto task_runner = test::CreatePooledTaskRunnerWithExecutionMode(
-      execution_mode(), &mock_pooled_task_runner_delegate_);
-
-  TestWaitableEvent task_ran;
-  task_runner->PostTask(
-      FROM_HERE, BindOnce(
-                     [](TestWaitableEvent* task_ran) {
-                       win::AssertComApartmentType(win::ComApartmentType::MTA);
-                       task_ran->Signal();
-                     },
-                     Unretained(&task_ran)));
-  task_ran.Wait();
-}
-
-TEST_P(ThreadGroupTestAllExecutionModes, NoWorkerEnvironment) {
-  StartThreadGroup(ThreadGroup::WorkerEnvironment::NONE);
-  auto task_runner = test::CreatePooledTaskRunnerWithExecutionMode(
-      execution_mode(), &mock_pooled_task_runner_delegate_);
-
-  TestWaitableEvent task_ran;
-  task_runner->PostTask(
-      FROM_HERE, BindOnce(
-                     [](TestWaitableEvent* task_ran) {
-                       win::AssertComApartmentType(win::ComApartmentType::NONE);
-                       task_ran->Signal();
-                     },
-                     Unretained(&task_ran)));
-  task_ran.Wait();
-}
-#endif
 
 // Verifies that ShouldYield() returns false when there is no pending task.
 TEST_F(ThreadGroupTest, ShouldYieldSingleTask) {

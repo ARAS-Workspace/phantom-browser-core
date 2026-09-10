@@ -37,7 +37,7 @@ const uint8_t GLTestHelper::kCheckClearValue;
 #endif
 
 gl::GLDisplay* GLTestHelper::InitializeGL(gl::GLImplementation gl_impl) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   gpu::TrySetNonSoftwareDevicePreferenceForTesting(gl::GpuPreference::kDefault);
 #endif
 

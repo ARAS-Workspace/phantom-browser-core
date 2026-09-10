@@ -119,7 +119,7 @@
 #include "extensions/common/permissions/permissions_data.h"
 #include "extensions/common/switches.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/extensions/policy_dse_ntp_override_metrics_reporter.h"
 #endif
 
@@ -973,7 +973,7 @@ void ExtensionService::OnInstalledExtensionsLoaded() {
       },
       AsExtensionServiceWeakPtr()));
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   PolicyDseNtpOverrideMetricsReporter::ReportMetrics(profile_);
 #endif
 }

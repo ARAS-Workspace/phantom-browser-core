@@ -195,7 +195,7 @@ class PermissionElementBrowserTest : public PermissionElementBrowserTestBase {
 };
 
 // TODO(crbug.com/532784506): Re-enable this test on Mac.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #define MAYBE_RequestPermissionDispatchResolveEvent \
   DISABLED_RequestPermissionDispatchResolveEvent
 #else

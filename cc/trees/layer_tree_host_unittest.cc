@@ -896,7 +896,7 @@ class LayerTreeHostTestSetNeedsCommit2 : public LayerTreeHostTest {
 };
 
 // TODO(crbug.com/527726460): Flaky on Linux and Windows debug builds.
-#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)) && !defined(NDEBUG)
+#if BUILDFLAG(IS_LINUX) && !defined(NDEBUG)
 #define MAYBE_RunMultiThread_DelegatingRenderer \
   DISABLED_RunMultiThread_DelegatingRenderer
 #else
@@ -9731,10 +9731,8 @@ class LayerTreeHostTestDelegatedInkMetadataCompositorOnlyFrame
 };
 
 // TODO(crbug.com/40265182): flaky on win-asan.
-#if !(BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER))
 SINGLE_AND_MULTI_THREAD_TEST_F(
     LayerTreeHostTestDelegatedInkMetadataCompositorOnlyFrame);
-#endif
 
 // Base class for EventMetrics-related tests.
 class LayerTreeHostTestEventsMetrics : public LayerTreeHostTest {

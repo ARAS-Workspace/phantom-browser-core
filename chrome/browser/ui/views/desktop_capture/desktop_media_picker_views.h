@@ -242,15 +242,6 @@ class DesktopMediaPickerDialogView : public views::DialogDelegateView,
 
   std::optional<content::DesktopMediaID> accepted_source_;
 
-#if BUILDFLAG(IS_WIN)
-  // Track the session ID for excluding Picture-in-Picture windows from screen
-  // capture while this picker is open (Windows only).
-  std::optional<base::UnguessableToken> pip_exclusion_session_id_;
-
-  // Set to true when the user accepts/confirms the dialog, indicating that
-  // the actual screen capture session is about to start.
-  bool accepted_ = false;
-#endif
 
 #if BUILDFLAG(IS_MAC)
   std::unique_ptr<ScreenCapturePermissionChecker>

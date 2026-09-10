@@ -1821,9 +1821,6 @@ TEST_F(ContentAnalysisDelegateWithLocalClient, FailClosed) {
 
                    bool expected_result = true;
     // Should only fail closed on Windows.
-#if BUILDFLAG(IS_WIN)
-                   expected_result = false;
-#endif
                    EXPECT_EQ(expected_result, result.text_results[0]);
                    *called = true;
                  },

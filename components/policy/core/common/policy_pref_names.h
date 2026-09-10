@@ -39,21 +39,7 @@ enum class DownloadRestriction {
 
 namespace policy_prefs {
 
-#if BUILDFLAG(IS_WIN)
-// Integer pref that stores Azure Active Directory management authority.
-inline constexpr char kAzureActiveDirectoryManagement[] =
-    "management.platform.azure_active_directory";
-
-// TODO(crbug.com/531448879): Revert this change when AzureAD logic migration is
-// complete.
-// Integer pref that stores Azure Active Directory device management authority.
-inline constexpr char kAzureActiveDirectoryDeviceManagement[] =
-    "management.platform.azure_active_directory_device";
-
-// Integer pref that stores the Windows enterprise MDM management authority.
-inline constexpr char kEnterpriseMDMManagementWindows[] =
-    "management.platform.enterprise_mdm_win";
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // Integer pref that stores the Mac enterprise MDM management authority.
 inline constexpr char kEnterpriseMDMManagementMac[] =
     "management.platform.enterprise_mdm_mac";
@@ -63,7 +49,7 @@ inline constexpr char kEnterpriseMDMManagementAndroid[] =
     "management.platform.enterprise_mdm_android";
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 // Boolean pref indicating whether protected content identifiers are allowed.
 inline constexpr char kProtectedContentIdentifiersAllowed[] =
     "policy.protected_content_identifiers.allowed";

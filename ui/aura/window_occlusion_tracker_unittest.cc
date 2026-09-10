@@ -124,17 +124,6 @@ class WindowOcclusionTrackerTest : public test::AuraTestBase {
   WindowOcclusionTrackerTest& operator=(const WindowOcclusionTrackerTest&) =
       delete;
 
-#if BUILDFLAG(IS_WIN)
-  void SetUp() override {
-    // Native Window Occlusion calculation runs in the background and can
-    // interfere with the expectations of these tests, so, disable it.
-    scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/{},
-        /*disabled_features=*/{features::kCalculateNativeWinOcclusion});
-    AuraTestBase::SetUp();
-  }
-#endif
-
   Window* CreateTrackedWindow(
       MockWindowDelegate* delegate,
       const gfx::Rect& bounds,

@@ -20,10 +20,6 @@
 #include "chrome/common/chrome_paths.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/registry.h"
-#endif
-
 namespace extensions {
 
 namespace {
@@ -50,16 +46,6 @@ void WriteTestNativeHostManifest(const base::FilePath& target_dir,
   JSONFileValueSerializer serializer(manifest_path);
   ASSERT_TRUE(serializer.Serialize(manifest));
 
-#if BUILDFLAG(IS_WIN)
-  HKEY root_key = user_level ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE;
-  std::wstring key = L"SOFTWARE\\Google\\Chrome\\NativeMessagingHosts\\" +
-                     base::UTF8ToWide(host_name);
-  base::win::RegKey manifest_key(
-      root_key, key.c_str(),
-      KEY_SET_VALUE | KEY_CREATE_SUB_KEY | KEY_CREATE_LINK);
-  ASSERT_EQ(ERROR_SUCCESS,
-            manifest_key.WriteValue(NULL, manifest_path.value().c_str()));
-#endif
 }
 
 }  // namespace
@@ -73,10 +59,6 @@ const char ScopedTestNativeMessagingHost::
         "com.google.chrome.test.inbound_native_echo";
 const char ScopedTestNativeMessagingHost::kExtensionId[] =
     "knldjmfmopnpolahpmmgbagdohdnhkik";
-#if BUILDFLAG(IS_WIN)
-const char ScopedTestNativeMessagingHost::kHostExeName[] =
-    "com.google.chrome.test.exe.echo";
-#endif
 
 ScopedTestNativeMessagingHost::ScopedTestNativeMessagingHost() = default;
 
@@ -90,22 +72,13 @@ void ScopedTestNativeMessagingHost::RegisterTestHost(bool user_level) {
   test_user_data_dir = test_user_data_dir.AppendASCII("native_messaging")
                            .AppendASCII("native_hosts");
 
-#if BUILDFLAG(IS_WIN)
-  HKEY root_key = user_level ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE;
-  ASSERT_NO_FATAL_FAILURE(registry_override_.OverrideRegistry(root_key));
-#else
   path_override_ = std::make_unique<base::ScopedPathOverride>(
       user_level ? chrome::DIR_USER_NATIVE_MESSAGING
                  : chrome::DIR_NATIVE_MESSAGING,
       temp_dir_.GetPath());
-#endif
 
   base::CopyFile(test_user_data_dir.AppendASCII("echo.py"),
                  temp_dir_.GetPath().AppendASCII("echo.py"));
-#if BUILDFLAG(IS_WIN)
-  base::FilePath host_path = temp_dir_.GetPath().AppendASCII("echo.bat");
-  base::CopyFile(test_user_data_dir.AppendASCII("echo.bat"), host_path);
-#endif
 
 #if BUILDFLAG(IS_POSIX)
   base::FilePath host_path = temp_dir_.GetPath().AppendASCII("echo.py");
@@ -126,29 +99,6 @@ void ScopedTestNativeMessagingHost::RegisterTestHost(bool user_level) {
       temp_dir_.GetPath(), kSupportsNativeInitiatedConnectionsHostName,
       host_path, user_level, true));
 }
-
-#if BUILDFLAG(IS_WIN)
-// On Windows, a new codepath is used to directly launch .EXE-based Native
-// Hosts.
-void ScopedTestNativeMessagingHost::RegisterTestExeHost(
-    std::string_view filename,
-    bool user_level) {
-  base::ScopedAllowBlockingForTesting allow_blocking;
-  ASSERT_TRUE(temp_dir_.CreateUniqueTempDir());
-
-  base::FilePath binary_dir;
-  ASSERT_TRUE(base::PathService::Get(base::DIR_EXE, &binary_dir));
-  HKEY root_key = user_level ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE;
-  ASSERT_NO_FATAL_FAILURE(registry_override_.OverrideRegistry(root_key));
-
-  // Unlike in the |RegisterTestHost| case above, we must leave the Host
-  // .exe where it was built, because the Host will fail to run from the
-  // temp_dir_ if is_component_build is set for the build.
-  base::FilePath host_path = binary_dir.AppendASCII(filename);
-  ASSERT_NO_FATAL_FAILURE(WriteTestNativeHostManifest(
-      temp_dir_.GetPath(), kHostExeName, host_path, user_level, false));
-}
-#endif
 
 ScopedTestNativeMessagingHost::~ScopedTestNativeMessagingHost() {
   base::ScopedAllowBlockingForTesting allow_blocking;

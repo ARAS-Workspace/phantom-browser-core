@@ -86,11 +86,7 @@ class UninstallationViaOsSettingsSubManagerTest : public WebAppTest {
 };
 
 bool IsOsUninstallationSupported() {
-#if BUILDFLAG(IS_WIN)
-  return true;
-#else
   return false;
-#endif
 }
 
 TEST_F(UninstallationViaOsSettingsSubManagerTest, TestUserUninstallable) {
@@ -100,11 +96,7 @@ TEST_F(UninstallationViaOsSettingsSubManagerTest, TestUserUninstallable) {
 
   std::vector<base::Bucket> samples = histogram_tester.GetAllSamples(
       "WebApp.OsSettingsUninstallRegistration.Result");
-#if BUILDFLAG(IS_WIN)
-  EXPECT_THAT(samples, base::BucketsAre(base::Bucket(/*min=*/1, 1)));
-#else
   EXPECT_THAT(samples, testing::IsEmpty());
-#endif  // BUILDFLAG(IS_WIN)
 
   auto state =
       fake_provider().registrar_unsafe().GetAppCurrentOsIntegrationState(
@@ -117,11 +109,7 @@ TEST_F(UninstallationViaOsSettingsSubManagerTest, TestUserUninstallable) {
   base::expected<bool, std::string> result =
       fake_os_integration().IsUninstallRegisteredWithOs(app_id, "Test App",
                                                         profile());
-#if BUILDFLAG(IS_WIN)
-    EXPECT_THAT(result, base::test::ValueIs(true));
-#else
     EXPECT_FALSE(result.has_value());
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 TEST_F(UninstallationViaOsSettingsSubManagerTest, TestNotUserUninstallable) {
@@ -143,11 +131,7 @@ TEST_F(UninstallationViaOsSettingsSubManagerTest, TestNotUserUninstallable) {
   base::expected<bool, std::string> result =
       fake_os_integration().IsUninstallRegisteredWithOs(app_id, "Test App",
                                                         profile());
-#if BUILDFLAG(IS_WIN)
-  EXPECT_THAT(result, base::test::ValueIs(false));
-#else
   EXPECT_FALSE(result.has_value());
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 TEST_F(UninstallationViaOsSettingsSubManagerTest, UninstallApp) {
@@ -165,13 +149,8 @@ TEST_F(UninstallationViaOsSettingsSubManagerTest, UninstallApp) {
                                                         profile());
   std::vector<base::Bucket> samples = histogram_tester.GetAllSamples(
       "WebApp.OsSettingsUninstallUnregistration.Result");
-#if BUILDFLAG(IS_WIN)
-  EXPECT_THAT(samples, base::BucketsAre(base::Bucket(/*min=*/1, 1)));
-  EXPECT_THAT(install_result, base::test::ValueIs(false));
-#else
   EXPECT_THAT(samples, testing::IsEmpty());
   EXPECT_FALSE(install_result.has_value());
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 // Testing crbug.com/40904294, that OS states can be cleaned up even after
@@ -184,11 +163,7 @@ TEST_F(UninstallationViaOsSettingsSubManagerTest,
 
   std::vector<base::Bucket> samples = histogram_tester.GetAllSamples(
       "WebApp.OsSettingsUninstallRegistration.Result");
-#if BUILDFLAG(IS_WIN)
-  EXPECT_THAT(samples, base::BucketsAre(base::Bucket(/*min=*/1, 1)));
-#else
   EXPECT_THAT(samples, testing::IsEmpty());
-#endif  // BUILDFLAG(IS_WIN)
 
   auto state =
       fake_provider().registrar_unsafe().GetAppCurrentOsIntegrationState(
@@ -204,13 +179,8 @@ TEST_F(UninstallationViaOsSettingsSubManagerTest,
   std::vector<base::Bucket> unregistration_samples =
       histogram_tester.GetAllSamples(
           "WebApp.OsSettingsUninstallUnregistration.Result");
-#if BUILDFLAG(IS_WIN)
-  EXPECT_THAT(unregistration_samples, testing::IsEmpty());
-  EXPECT_THAT(install_result, base::test::ValueIs(true));
-#else
   EXPECT_THAT(unregistration_samples, testing::IsEmpty());
   EXPECT_FALSE(install_result.has_value());
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 }  // namespace

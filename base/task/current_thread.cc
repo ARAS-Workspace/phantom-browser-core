@@ -154,7 +154,7 @@ MessagePumpForUI* CurrentUIThread::GetMessagePumpForUI() const {
   return static_cast<MessagePumpForUI*>(current_->GetMessagePump());
 }
 
-#if BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_OZONE)
 bool CurrentUIThread::WatchFileDescriptor(
     int fd,
     bool persistent,
@@ -179,23 +179,6 @@ void CurrentUIThread::Abort() {
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-void CurrentUIThread::RegisterNativeEventObserver(
-    MessagePumpForUI::NativeEventObserver* observer) {
-  GetMessagePumpForUI()->RegisterNativeEventObserver(observer);
-}
-
-void CurrentUIThread::UnregisterNativeEventObserver(
-    MessagePumpForUI::NativeEventObserver* observer) {
-  GetMessagePumpForUI()->UnregisterNativeEventObserver(observer);
-}
-
-MessagePumpForUI::NativeEventObserver*
-CurrentUIThread::ResetNativeEventObserverForTesting(
-    MessagePumpForUI::NativeEventObserver* observer) {
-  return GetMessagePumpForUI()->ResetNativeEventObserverForTesting(observer);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 //------------------------------------------------------------------------------
 // CurrentIOThread
@@ -218,20 +201,7 @@ MessagePumpForIO* CurrentIOThread::GetMessagePumpForIO() const {
   return static_cast<MessagePumpForIO*>(current_->GetMessagePump());
 }
 
-#if BUILDFLAG(IS_WIN)
-bool CurrentIOThread::RegisterIOHandler(HANDLE file,
-                                        MessagePumpForIO::IOHandler* handler) {
-  DCHECK(current_->IsBoundToCurrentThread());
-  return GetMessagePumpForIO()->RegisterIOHandler(file, handler);
-}
-
-bool CurrentIOThread::RegisterJobObject(HANDLE job,
-                                        MessagePumpForIO::IOHandler* handler) {
-  DCHECK(current_->IsBoundToCurrentThread());
-  return GetMessagePumpForIO()->RegisterJobObject(job, handler);
-}
-
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 bool CurrentIOThread::WatchFileDescriptor(
     int fd,
     bool persistent,
@@ -242,7 +212,7 @@ bool CurrentIOThread::WatchFileDescriptor(
   return GetMessagePumpForIO()->WatchFileDescriptor(fd, persistent, mode,
                                                     controller, delegate);
 }
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_MAC) || \
     (BUILDFLAG(IS_IOS) && !BUILDFLAG(CRONET_BUILD) && !BUILDFLAG(IS_IOS_TVOS))

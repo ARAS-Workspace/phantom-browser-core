@@ -95,7 +95,7 @@ void ManagedProfileRequiredPage::CommandReceived(const std::string& command) {
 
   switch (cmd) {
     case security_interstitials::CMD_DONT_PROCEED:
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       if (ManagedProfileRequiredNavigationThrottle::IsBlockingNavigations(
               web_contents()->GetBrowserContext())) {
         ManagedProfileRequiredNavigationThrottle::ShowBlockedWindow(
@@ -109,7 +109,7 @@ void ManagedProfileRequiredPage::CommandReceived(const std::string& command) {
       controller()->metrics_helper()->RecordUserDecision(
           MetricsHelper::DONT_PROCEED);
       controller()->Reload();
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       break;
     case security_interstitials::CMD_PROCEED:
     case security_interstitials::CMD_OPEN_HELP_CENTER:

@@ -35,10 +35,6 @@
 #include "base/message_loop/message_pump_default.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 using ::testing::_;
 using ::testing::AnyNumber;
 using ::testing::AtMost;
@@ -158,20 +154,6 @@ class MessagePumpTest : public ::testing::TestWithParam<MessagePumpType> {
 #endif
   void AddPreDoWorkExpectations(
       testing::StrictMock<MockMessagePumpDelegate>& delegate) {
-#if BUILDFLAG(IS_WIN)
-    if (GetParam() == MessagePumpType::UI) {
-      // The Windows MessagePumpForUI may do native work from ::PeekMessage()
-      // and labels itself as such.
-      EXPECT_CALL(delegate, MockOnBeginWorkItem);
-      EXPECT_CALL(delegate, MockOnEndWorkItem);
-
-      // If the above event was MessagePumpForUI's own kMsgHaveWork internal
-      // event, it will process another event to replace it (ref.
-      // ProcessPumpReplacementMessage).
-      EXPECT_CALL(delegate, MockOnBeginWorkItem).Times(AtMost(1));
-      EXPECT_CALL(delegate, MockOnEndWorkItem).Times(AtMost(1));
-    }
-#endif  // BUILDFLAG(IS_WIN)
 #if defined(USE_GLIB)
     do_work_counts.try_emplace(&delegate, 0);
     if (GetParam() == MessagePumpType::UI) {

@@ -64,11 +64,6 @@
 #include "components/user_manager/user_names.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/base_paths_win.h"
-#include "base/test/scoped_path_override.h"
-#endif
-
 namespace web_app {
 
 class WebAppPolicyManagerBrowserTest : public base::test::WithFeatureOverride,

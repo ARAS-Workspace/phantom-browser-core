@@ -16,10 +16,6 @@
 #include "ui/gfx/font_names_testing.h"
 #include "ui/gfx/font_render_params.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/gfx/system_fonts_win.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "ui/linux/fake_linux_ui.h"
 #endif
@@ -137,23 +133,5 @@ TEST(PlatformFontSkiaRenderParamsTest, DefaultFontRenderParams) {
   EXPECT_EQ(default_font->GetFontRenderParams(),
             named_font->GetFontRenderParams());
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST(PlatformFontSkiaOnWindowsTest, SystemFont) {
-  // Ensures that the font styles are kept while creating the default font.
-  gfx::Font system_font = win::GetDefaultSystemFont();
-  gfx::Font default_font;
-
-  EXPECT_EQ(system_font.GetFontName(), default_font.GetFontName());
-  EXPECT_EQ(system_font.GetFontSize(), default_font.GetFontSize());
-  EXPECT_EQ(system_font.GetStyle(), default_font.GetStyle());
-  EXPECT_EQ(system_font.GetWeight(), default_font.GetWeight());
-  EXPECT_EQ(system_font.GetHeight(), default_font.GetHeight());
-  EXPECT_EQ(system_font.GetBaseline(), default_font.GetBaseline());
-  EXPECT_EQ(system_font.GetBaseline(), default_font.GetBaseline());
-  EXPECT_EQ(system_font.GetFontRenderParams(),
-            default_font.GetFontRenderParams());
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace gfx

@@ -28,13 +28,6 @@
 #include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/com_init_util.h"
-#include "base/win/current_module.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace base::internal {
 
 namespace {
@@ -563,122 +556,6 @@ TEST_F(PooledSingleThreadTaskRunnerManagerJoinTest,
   task_blocking.Signal();
   join_from_different_thread.Join();
 }
-
-#if BUILDFLAG(IS_WIN)
-
-TEST_P(PooledSingleThreadTaskRunnerManagerCommonTest, COMSTAInitialized) {
-  scoped_refptr<SingleThreadTaskRunner> com_task_runner =
-      single_thread_task_runner_manager_->CreateCOMSTATaskRunner(
-          {TaskShutdownBehavior::BLOCK_SHUTDOWN},
-          GetSingleThreadTaskRunnerThreadMode());
-
-  com_task_runner->PostTask(FROM_HERE, BindOnce(&win::AssertComApartmentType,
-                                                win::ComApartmentType::STA));
-
-  test::ShutdownTaskTracker(&task_tracker_);
-}
-
-TEST_F(PooledSingleThreadTaskRunnerManagerTest, COMSTASameThreadUsed) {
-  scoped_refptr<SingleThreadTaskRunner> task_runner_1 =
-      single_thread_task_runner_manager_->CreateCOMSTATaskRunner(
-          {TaskShutdownBehavior::BLOCK_SHUTDOWN},
-          SingleThreadTaskRunnerThreadMode::SHARED);
-  scoped_refptr<SingleThreadTaskRunner> task_runner_2 =
-      single_thread_task_runner_manager_->CreateCOMSTATaskRunner(
-          {TaskShutdownBehavior::BLOCK_SHUTDOWN},
-          SingleThreadTaskRunnerThreadMode::SHARED);
-
-  PlatformThreadRef thread_ref_1;
-  task_runner_1->PostTask(FROM_HERE,
-                          BindOnce(&CaptureThreadRef, &thread_ref_1));
-  PlatformThreadRef thread_ref_2;
-  task_runner_2->PostTask(FROM_HERE,
-                          BindOnce(&CaptureThreadRef, &thread_ref_2));
-
-  test::ShutdownTaskTracker(&task_tracker_);
-
-  ASSERT_FALSE(thread_ref_1.is_null());
-  ASSERT_FALSE(thread_ref_2.is_null());
-  EXPECT_EQ(thread_ref_1, thread_ref_2);
-}
-
-namespace {
-
-const wchar_t* const kTestWindowClassName =
-    L"PooledSingleThreadTaskRunnerManagerTestWinMessageWindow";
-
-class PooledSingleThreadTaskRunnerManagerTestWin
-    : public PooledSingleThreadTaskRunnerManagerTest {
- public:
-  PooledSingleThreadTaskRunnerManagerTestWin() = default;
-  PooledSingleThreadTaskRunnerManagerTestWin(
-      const PooledSingleThreadTaskRunnerManagerTestWin&) = delete;
-  PooledSingleThreadTaskRunnerManagerTestWin& operator=(
-      const PooledSingleThreadTaskRunnerManagerTestWin&) = delete;
-
-  void SetUp() override {
-    PooledSingleThreadTaskRunnerManagerTest::SetUp();
-    register_class_succeeded_ = RegisterTestWindowClass();
-    ASSERT_TRUE(register_class_succeeded_);
-  }
-
-  void TearDown() override {
-    if (register_class_succeeded_) {
-      ::UnregisterClass(kTestWindowClassName, CURRENT_MODULE());
-    }
-
-    PooledSingleThreadTaskRunnerManagerTest::TearDown();
-  }
-
-  HWND CreateTestWindow() {
-    return CreateWindow(kTestWindowClassName, kTestWindowClassName, 0, 0, 0, 0,
-                        0, HWND_MESSAGE, nullptr, CURRENT_MODULE(), nullptr);
-  }
-
- private:
-  bool RegisterTestWindowClass() {
-    WNDCLASSEX window_class = {};
-    window_class.cbSize = sizeof(window_class);
-    window_class.lpfnWndProc = &::DefWindowProc;
-    window_class.hInstance = CURRENT_MODULE();
-    window_class.lpszClassName = kTestWindowClassName;
-    return !!::RegisterClassEx(&window_class);
-  }
-
-  bool register_class_succeeded_ = false;
-};
-
-}  // namespace
-
-TEST_F(PooledSingleThreadTaskRunnerManagerTestWin, PumpsMessages) {
-  scoped_refptr<SingleThreadTaskRunner> com_task_runner =
-      single_thread_task_runner_manager_->CreateCOMSTATaskRunner(
-          {TaskShutdownBehavior::BLOCK_SHUTDOWN},
-          SingleThreadTaskRunnerThreadMode::DEDICATED);
-  HWND hwnd = nullptr;
-  // HWNDs process messages on the thread that created them, so we have to
-  // create them within the context of the task runner to properly simulate a
-  // COM callback.
-  com_task_runner->PostTask(
-      FROM_HERE,
-      BindOnce([](PooledSingleThreadTaskRunnerManagerTestWin* test_harness,
-                  HWND* hwnd) { *hwnd = test_harness->CreateTestWindow(); },
-               Unretained(this), &hwnd));
-
-  task_tracker_.FlushForTesting();
-
-  ASSERT_NE(hwnd, nullptr);
-  // If the message pump isn't running, we will hang here. This simulates how
-  // COM would receive a callback with its own message HWND.
-  SendMessage(hwnd, WM_USER, 0, 0);
-
-  com_task_runner->PostTask(
-      FROM_HERE, BindOnce([](HWND hwnd) { ::DestroyWindow(hwnd); }, hwnd));
-
-  test::ShutdownTaskTracker(&task_tracker_);
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 namespace {
 

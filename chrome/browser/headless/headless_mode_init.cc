@@ -11,7 +11,7 @@
 // New headless mode is available on Linux, Windows and Mac platforms.
 // More platforms will be added later, so avoid function level clutter
 // by providing stub implementations at the end of the file.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 #include "base/base_switches.h"
 #include "base/command_line.h"
@@ -27,10 +27,6 @@
 #if BUILDFLAG(IS_LINUX)
 #include "ui/gl/gl_switches.h"               // nogncheck
 #include "ui/ozone/public/ozone_switches.h"  // nogncheck
-#endif
-
-#if BUILDFLAG(IS_WIN)
-#include "chrome/chrome_elf/chrome_elf_main.h"
 #endif
 
 namespace headless {
@@ -119,27 +115,6 @@ class HeadlessModeHandleImpl : public HeadlessModeHandle {
   base::expected<void, std::string> CreateUniqueUserDataDir() {
     CHECK(!user_data_dir_.IsValid());
 
-#if BUILDFLAG(IS_WIN)
-    // On Windows user data dir is handled before chrome.dll is loaded in
-    // chrome_elf, see chrome/install_static/user_data_dir.h/cc, so check to
-    // see if the temporary data dir for headless mode was created there and
-    // if so, associate it with our code for cleanup on exit.
-    if (IsTemporaryUserDataDirectoryCreatedForHeadless()) {
-      wchar_t user_data_dir_buf[MAX_PATH], invalid_user_data_dir_buf[MAX_PATH];
-      if (GetUserDataDirectoryThunk(user_data_dir_buf,
-                                    std::size(user_data_dir_buf),
-                                    invalid_user_data_dir_buf,
-                                    std::size(invalid_user_data_dir_buf))) {
-        base::FilePath user_data_dir(user_data_dir_buf);
-        if (!user_data_dir.empty()) {
-          if (!user_data_dir_.Set(user_data_dir)) {
-            return base::unexpected(
-                "Invalid unique headless user data directory.");
-          }
-        }
-      }
-    }
-#else   // BUILDFLAG(IS_WIN)
     base::FilePath default_user_data_dir;
     if (!chrome::GetDefaultUserDataDirectory(&default_user_data_dir)) {
       return base::unexpected("Failed to get default user data directory.");
@@ -155,7 +130,6 @@ class HeadlessModeHandleImpl : public HeadlessModeHandle {
       return base::unexpected(
           "Failed to create a unique user data directory for headless.");
     }
-#endif  // BUILDFLAG(IS_WIN)
 
     return base::ok();
   }
@@ -173,7 +147,7 @@ InitHeadlessMode() {
 
 }  // namespace headless
 
-#else  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#else
 
 namespace headless {
 
@@ -184,4 +158,4 @@ InitHeadlessMode() {
 
 }  // namespace headless
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

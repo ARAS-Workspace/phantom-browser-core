@@ -159,12 +159,10 @@ TEST_P(SqliteVfsReadWriteMojomTraitsTest, Do) {
                    base::File::FLAG_CREATE | base::File::FLAG_READ |
                        base::File::FLAG_WRITE);
     ASSERT_TRUE(source.wal_index_file.IsValid());
-#if !BUILDFLAG(IS_WIN)
     source.wal_index_file_read_only =
         base::File(temp_dir.GetPath().Append(FILE_PATH_LITERAL("four")),
                    base::File::FLAG_OPEN | base::File::FLAG_READ);
     ASSERT_TRUE(source.wal_index_file_read_only.IsValid());
-#endif
   }
 
   if (GetParam() == TestVariant::kRollbackMultipleConnections ||
@@ -179,10 +177,8 @@ TEST_P(SqliteVfsReadWriteMojomTraitsTest, Do) {
   base::PlatformFile journal_file = source.journal_file.GetPlatformFile();
   base::PlatformFile wal_file = source.wal_file.GetPlatformFile();
   base::PlatformFile wal_index_file = source.wal_index_file.GetPlatformFile();
-#if !BUILDFLAG(IS_WIN)
   base::PlatformFile wal_index_file_read_only =
       source.wal_index_file_read_only.GetPlatformFile();
-#endif
   std::optional<base::subtle::PlatformSharedMemoryHandle> shared_lock;
   if (source.shared_lock.IsValid()) {
     shared_lock = source.shared_lock.GetPlatformHandle();
@@ -199,9 +195,7 @@ TEST_P(SqliteVfsReadWriteMojomTraitsTest, Do) {
   EXPECT_FALSE(source.journal_file.IsValid());
   EXPECT_FALSE(source.wal_file.IsValid());
   EXPECT_FALSE(source.wal_index_file.IsValid());
-#if !BUILDFLAG(IS_WIN)
   EXPECT_FALSE(source.wal_index_file_read_only.IsValid());
-#endif
   EXPECT_FALSE(source.shared_lock.IsValid());
 
   // The result should be populated.
@@ -212,10 +206,8 @@ TEST_P(SqliteVfsReadWriteMojomTraitsTest, Do) {
                 GetParam() == TestVariant::kWalSingleConnection);
   EXPECT_EQ(result.wal_index_file.IsValid(),
             GetParam() == TestVariant::kWalMultipleConnections);
-#if !BUILDFLAG(IS_WIN)
   EXPECT_EQ(result.wal_index_file_read_only.IsValid(),
             GetParam() == TestVariant::kWalMultipleConnections);
-#endif
   EXPECT_TRUE(result.read_write);
   EXPECT_EQ(result.shared_lock.IsValid(),
             GetParam() == TestVariant::kRollbackMultipleConnections ||
@@ -230,12 +222,10 @@ TEST_P(SqliteVfsReadWriteMojomTraitsTest, Do) {
   if (wal_index_file != base::kInvalidPlatformFile) {
     EXPECT_EQ(result.wal_index_file.GetPlatformFile(), wal_index_file);
   }
-#if !BUILDFLAG(IS_WIN)
   if (wal_index_file_read_only != base::kInvalidPlatformFile) {
     EXPECT_EQ(result.wal_index_file_read_only.GetPlatformFile(),
               wal_index_file_read_only);
   }
-#endif
   if (shared_lock) {
     EXPECT_EQ(result.shared_lock.GetPlatformHandle(), shared_lock);
   }

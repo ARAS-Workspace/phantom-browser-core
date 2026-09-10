@@ -376,14 +376,6 @@ base::File::Error ObfuscatedFileUtilMemoryDelegate::CopyOrMoveFile(
     if (dest_dp->entry->type != src_dp->entry->type)
       return base::File::FILE_ERROR_INVALID_OPERATION;
 
-#if BUILDFLAG(IS_WIN)
-    // Overwriting an empty directory with another directory isn't
-    // supported natively on Windows.
-    // To keep the behavior indistinguishable from on-disk operation,
-    // in-memory implementation also fails.
-    if (src_is_directory)
-      return base::File::FILE_ERROR_NOT_A_FILE;
-#endif
   }
 
   switch (mode) {

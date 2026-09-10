@@ -170,39 +170,6 @@ GetSignalsContract() {
   contract[names::kScreenLockSecured] =
       base::BindRepeating(VerifyIsSettingInteger, names::kScreenLockSecured);
 
-#if BUILDFLAG(IS_WIN)
-    contract[names::kAntivirusState] =
-        base::BindRepeating(VerifyIsSettingInteger, names::kAntivirusState);
-  contract[names::kWindowsMachineDomain] =
-      base::BindRepeating(VerifyOptionalString, names::kWindowsMachineDomain);
-  contract[names::kWindowsUserDomain] =
-      base::BindRepeating(VerifyOptionalString, names::kWindowsUserDomain);
-  contract[names::kSecureBootEnabled] =
-      base::BindRepeating(VerifyIsSettingInteger, names::kSecureBootEnabled);
-
-  contract[names::kCrowdStrike] =
-      base::BindLambdaForTesting([](const base::DictValue& signals) {
-        // CrowdStrike signals are optional. But if the object is set, then at
-        // least one of the values must be present.
-        auto* cs_value = signals.Find(device_signals::names::kCrowdStrike);
-        if (!cs_value) {
-          return true;
-        }
-
-        if (!cs_value->is_dict()) {
-          return false;
-        }
-
-        const auto& cs_dict = cs_value->GetDict();
-        auto* customer_id =
-            cs_dict.FindString(device_signals::names::kCustomerId);
-        auto* agent_id = cs_dict.FindString(device_signals::names::kAgentId);
-
-        return (customer_id && !customer_id->empty()) ||
-               (agent_id && !agent_id->empty());
-      });
-
-#else
   // Windows-only signals that shouldn't be set on other platforms.
   contract[names::kAntivirusState] =
       base::BindRepeating(VerifyUnset, names::kAntivirusState);
@@ -214,9 +181,8 @@ GetSignalsContract() {
       base::BindRepeating(VerifyUnset, names::kSecureBootEnabled);
   contract[names::kCrowdStrike] =
       base::BindRepeating(VerifyUnset, names::kCrowdStrike);
-#endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   contract[names::kAllowScreenLock] =
       base::BindRepeating(VerifyUnset, names::kAllowScreenLock);
   contract[names::kImei] = base::BindRepeating(VerifyUnset, names::kImei);
@@ -236,7 +202,7 @@ GetSignalsContract() {
       VerifyIsStringArray, names::kMeid, /*enforce_value=*/false);
   contract[names::kTrigger] =
       base::BindRepeating(VerifyIsIntegerWithRange, names::kTrigger, 0, 2);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   return contract;
 }

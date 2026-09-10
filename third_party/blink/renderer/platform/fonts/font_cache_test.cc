@@ -140,8 +140,7 @@ TEST_F(FontCacheTest, firstAvailableOrFirst) {
             FontCache::FirstAvailableOrFirst(", not exist, not exist"));
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 // local() font matching requires a Mojo connection which is not available in
 // unit tests.
 #define MAYBE_FontUniqueNameMatchAvailable DISABLED_FontUniqueNameMatchAvailable
@@ -166,7 +165,7 @@ TEST_F(FontCacheTest, MAYBE_FontUniqueNameMatchAvailable) {
 // Unfortunately, we can't ensure a font here since on Android and Mac the
 // unittests can't access the font configuration. However, this test passes
 // when it's not crashing in FontCache.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
 #define MAYBE_GetLargerThanMaxUnsignedFont DISABLED_GetLargerThanMaxUnsignedFont
 #else
 #define MAYBE_GetLargerThanMaxUnsignedFont GetLargerThanMaxUnsignedFont

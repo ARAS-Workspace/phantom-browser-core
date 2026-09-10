@@ -12,10 +12,6 @@
 #include "device/vr/openxr/test/openxr_mock_helper.h"
 #include "device/vr/openxr/test/openxr_test_helper.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <wrl.h>
-#endif
-
 namespace openxr_mock {
 
 namespace {
@@ -187,10 +183,7 @@ XrResult XRAPI_PTR xrCreateInstance(const XrInstanceCreateInfo* create_info,
   RETURN_IF(create_info->type != XR_TYPE_INSTANCE_CREATE_INFO,
             XR_ERROR_VALIDATION_FAILURE, "XrInstanceCreateInfo type invalid");
 
-#if BUILDFLAG(IS_WIN)
-  RETURN_IF(create_info->next != nullptr, XR_ERROR_VALIDATION_FAILURE,
-            "XrInstanceCreateInfo next is not nullptr");
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   RETURN_IF(create_info->next == nullptr, XR_ERROR_VALIDATION_FAILURE,
             "XrInstanceCreateInfo next is nullptr");
   const XrInstanceCreateInfoAndroidKHR* android_create_info =
@@ -282,19 +275,7 @@ XrResult XRAPI_PTR xrCreateSession(XrInstance instance,
   RETURN_IF(create_info->createFlags != 0, XR_ERROR_VALIDATION_FAILURE,
             "XrSessionCreateInfo createFlags is not 0");
   RETURN_IF_XR_FAILED(GetTestHelper().ValidateSystemId(create_info->systemId));
-#if BUILDFLAG(IS_WIN)
-  const XrGraphicsBindingD3D11KHR* binding =
-      static_cast<const XrGraphicsBindingD3D11KHR*>(create_info->next);
-  RETURN_IF(binding->type != XR_TYPE_GRAPHICS_BINDING_D3D11_KHR,
-            XR_ERROR_VALIDATION_FAILURE,
-            "XrGraphicsBindingD3D11KHR type invalid");
-  RETURN_IF(binding->next != nullptr, XR_ERROR_VALIDATION_FAILURE,
-            "XrGraphicsBindingD3D11KHR next is not nullptr");
-  RETURN_IF(binding->device == nullptr, XR_ERROR_VALIDATION_FAILURE,
-            "D3D11Device is nullptr");
-
-  GetTestHelper().SetD3DDevice(binding->device);
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   const XrGraphicsBindingOpenGLESAndroidKHR* binding =
       static_cast<const XrGraphicsBindingOpenGLESAndroidKHR*>(
           create_info->next);
@@ -331,11 +312,7 @@ XrResult XRAPI_PTR xrCreateSwapchain(XrSession session,
             XR_ERROR_VALIDATION_FAILURE,
             "XrSwapchainCreateInfo usageFlags is not "
             "XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT");
-#if BUILDFLAG(IS_WIN)
-  RETURN_IF(create_info->format != DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
-            XR_ERROR_SWAPCHAIN_FORMAT_UNSUPPORTED,
-            "XrSwapchainCreateInfo format unsupported");
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   RETURN_IF(create_info->format != OpenXrTestHelper::kSwapchainFormat,
             XR_ERROR_SWAPCHAIN_FORMAT_UNSUPPORTED,
             "XrSwapchainCreateInfo format unsupported");
@@ -699,10 +676,7 @@ XrResult XRAPI_PTR xrEnumerateSwapchainFormats(XrSession session,
             "format_capacity_input is less than required size");
   RETURN_IF(formats == nullptr, XR_ERROR_VALIDATION_FAILURE,
             "Formats Array is nullptr");
-#if BUILDFLAG(IS_WIN)
-  // This is what is hardcoded in `OpenXrGraphicsBindingD3D11`.
-  formats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // This is what is hardcoded in `OpenXrGraphicsBindingOpenGLES`.
   formats[0] = OpenXrTestHelper::kSwapchainFormat;
 #endif
@@ -735,29 +709,7 @@ xrEnumerateSwapchainImages(XrSwapchain swapchain,
             "image_capacity_input is neither 0 or kMinSwapchainBuffering");
   RETURN_IF(images == nullptr, XR_ERROR_VALIDATION_FAILURE,
             "XrSwapchainImageBaseHeader is nullptr");
-#if BUILDFLAG(IS_WIN)
-  const std::vector<Microsoft::WRL::ComPtr<ID3D11Texture2D>>& textures =
-      GetTestHelper().GetSwapchainTextures();
-  DCHECK_EQ(textures.size(), image_capacity_input);
-
-  // SAFETY: Test-only implementation of a C-Style API that thus has to provide
-  // arrays as a pointer and a size. The sole callers are our own product/test
-  // code.
-  auto images_span = UNSAFE_BUFFERS(
-      base::span(reinterpret_cast<XrSwapchainImageD3D11KHR*>(images),
-                 image_capacity_input));
-  for (uint32_t i = 0; i < image_capacity_input; i++) {
-    XrSwapchainImageD3D11KHR& image = images_span[i];
-
-    RETURN_IF(image.type != XR_TYPE_SWAPCHAIN_IMAGE_D3D11_KHR,
-              XR_ERROR_VALIDATION_FAILURE,
-              "XrSwapchainImageD3D11KHR type invalid");
-    RETURN_IF(image.next != nullptr, XR_ERROR_VALIDATION_FAILURE,
-              "XrSwapchainImageD3D11KHR next is not nullptr");
-
-    image.texture = textures[i].Get();
-  }
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   const std::vector<uint32_t>& texture_ids =
       GetTestHelper().GetSwapchainTextureIDs(swapchain);
   DCHECK_EQ(texture_ids.size(), image_capacity_input);
@@ -783,43 +735,6 @@ xrEnumerateSwapchainImages(XrSwapchain swapchain,
 
   return XR_SUCCESS;
 }
-
-#if BUILDFLAG(IS_WIN)
-XrResult XRAPI_PTR xrGetD3D11GraphicsRequirementsKHR(
-    XrInstance instance,
-    XrSystemId system_id,
-    XrGraphicsRequirementsD3D11KHR* graphics_requirements) {
-  DVLOG(2) << __FUNCTION__;
-  RETURN_IF_XR_FAILED(GetTestHelper().ValidateInstance(instance));
-  RETURN_IF_XR_FAILED(GetTestHelper().ValidateSystemId(system_id));
-  RETURN_IF(graphics_requirements == nullptr, XR_ERROR_VALIDATION_FAILURE,
-            "XrGraphicsRequirementsD3D11KHR is nullptr");
-  RETURN_IF(
-      graphics_requirements->type != XR_TYPE_GRAPHICS_REQUIREMENTS_D3D11_KHR,
-      XR_ERROR_VALIDATION_FAILURE,
-      "XrGraphicsRequirementsD3D11KHR type invalid");
-  RETURN_IF(graphics_requirements->next != nullptr, XR_ERROR_VALIDATION_FAILURE,
-            "XrGraphicsRequirementsD3D11KHR next is not nullptr");
-
-  Microsoft::WRL::ComPtr<IDXGIFactory1> dxgi_factory;
-  Microsoft::WRL::ComPtr<IDXGIAdapter> adapter;
-  HRESULT hr = CreateDXGIFactory1(IID_PPV_ARGS(&dxgi_factory));
-  DCHECK(SUCCEEDED(hr));
-  if (SUCCEEDED(dxgi_factory->EnumAdapters(0, &adapter))) {
-    DXGI_ADAPTER_DESC desc;
-    adapter->GetDesc(&desc);
-    graphics_requirements->adapterLuid = desc.AdapterLuid;
-
-    // Require D3D11.1 to support shared NT handles.
-    graphics_requirements->minFeatureLevel = D3D_FEATURE_LEVEL_11_1;
-
-    return XR_SUCCESS;
-  }
-
-  RETURN_IF_FALSE(false, XR_ERROR_VALIDATION_FAILURE,
-                  "Unable to create query DXGI Adapter");
-}
-#endif
 
 XrResult XRAPI_PTR xrGetActionStateFloat(XrSession session,
                                          const XrActionStateGetInfo* get_info,
@@ -1372,9 +1287,6 @@ XrResult XRAPI_PTR xrGetInstanceProcAddr(XrInstance instance,
   TRY_LOAD_METHOD(xrEnumerateSwapchainImages);
   TRY_LOAD_METHOD(xrEnumerateViewConfigurations);
   TRY_LOAD_METHOD(xrEnumerateViewConfigurationViews);
-#if BUILDFLAG(IS_WIN)
-  TRY_LOAD_METHOD(xrGetD3D11GraphicsRequirementsKHR);
-#endif
   TRY_LOAD_METHOD(xrGetActionStateFloat);
   TRY_LOAD_METHOD(xrGetActionStateBoolean);
   TRY_LOAD_METHOD(xrGetActionStateVector2f);

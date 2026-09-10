@@ -56,7 +56,7 @@ class TabGroupHeaderInteractiveUiTest
 
 // Disable these tests on windows.
 // TODO(crbug.com/547718513): Re-enable
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_Collapse DISABLED_Collapse
 #else
 #define MAYBE_Collapse Collapse

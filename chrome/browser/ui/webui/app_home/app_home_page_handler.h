@@ -23,7 +23,7 @@
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "mojo/public/cpp/bindings/remote.h"
 
-static_assert(BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX));
+static_assert(BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX));
 
 class BrowserWindowInterface;
 class ExtensionEnableFlow;

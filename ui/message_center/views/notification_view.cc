@@ -95,21 +95,6 @@ gfx::FontList GetHeaderTextFontList() {
 }
 
 gfx::Insets CalculateTopPadding(int font_list_height) {
-#if BUILDFLAG(IS_WIN)
-  // On Windows, the fonts can have slightly different metrics reported,
-  // depending on where the code runs. In Chrome, DirectWrite is on, which means
-  // font metrics are reported from Skia, which rounds from float using ceil.
-  // In unit tests, however, GDI is used to report metrics, and the height
-  // reported there is consistent with other platforms. This means there is a
-  // difference of 1px in height between Chrome on Windows and everything else
-  // (where everything else includes unit tests on Windows). This 1px causes the
-  // text and everything else to stop aligning correctly, so we account for it
-  // by shrinking the top padding by 1.
-  if (font_list_height != 15) {
-    DCHECK_EQ(16, font_list_height);
-    return kTextViewPaddingDefault - gfx::Insets::TLBR(1, 0, 0, 0);
-  }
-#endif
 
   return kTextViewPaddingDefault;
 }

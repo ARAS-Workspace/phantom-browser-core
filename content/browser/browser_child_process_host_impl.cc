@@ -67,11 +67,6 @@
 #include "services/tracing/public/cpp/system_tracing_service.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "content/browser/renderer_host/dwrite_font_proxy_impl_win.h"
-#include "content/public/common/font_cache_dispatcher_win.h"
-#include "content/public/common/font_cache_win.mojom.h"
-#endif
 
 #if BUILDFLAG(CLANG_PROFILING_INSIDE_SANDBOX)
 #include "content/public/common/profiling_utils.h"
@@ -306,10 +301,6 @@ void BrowserChildProcessHostImpl::LaunchWithoutExtraCommandLineSwitches(
   // connection status notifications until we observe OnChannelConnected().
 #if BUILDFLAG(CLANG_PROFILING_INSIDE_SANDBOX)
   bool is_elevated = false;
-#if BUILDFLAG(IS_WIN)
-  is_elevated = (delegate->GetSandboxType() ==
-                 sandbox::mojom::Sandbox::kNoSandboxAndElevatedPrivileges);
-#endif
   if (!is_elevated)
     child_process_host_->SetProfilingFile(OpenProfilingFile());
 #endif
@@ -390,11 +381,6 @@ void BrowserChildProcessHostImpl::OnChannelConnected(int32_t peer_pid) {
 
 void BrowserChildProcessHostImpl::OnProcessConnected() {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
-#if BUILDFLAG(IS_WIN)
-  // From this point onward, the exit of the child process is detected by an
-  // error on the IPC channel or ChildProcessHost pipe.
-  early_exit_watcher_.StopWatching();
-#endif
 
   if (IsProcessLaunched()) {
     launched_and_connected_ = true;
@@ -441,11 +427,6 @@ void BrowserChildProcessHostImpl::OnChildDisconnected() {
 
   tracing_registration_.reset();
 
-#if BUILDFLAG(IS_WIN)
-  // OnChildDisconnected may be called without OnChannelConnected, so stop the
-  // early exit watcher so GetTerminationStatus can close the process handle.
-  early_exit_watcher_.StopWatching();
-#endif
 
   if (child_process_launcher_.get() || IsProcessLaunched()) {
     ChildProcessTerminationInfo info =
@@ -507,12 +488,6 @@ void BrowserChildProcessHostImpl::OnChildDisconnected() {
         // TODO(wfh): Decide to what to do with OOMs here.
         break;
       }
-#if BUILDFLAG(IS_WIN)
-      case base::TERMINATION_STATUS_INTEGRITY_FAILURE: {
-        // TODO(wfh): Decide to what to do with CIG failures here.
-        break;
-      }
-#endif  // BUILDFLAG(IS_WIN)
       case base::TERMINATION_STATUS_EVICTED_FOR_MEMORY: {
         // TODO(crbug.com/394092280): Decide to what to do with preemptive
         // process kill failures here.
@@ -658,14 +633,6 @@ void BrowserChildProcessHostImpl::OnProcessLaunched() {
   child_thread_type_switcher_.SetPid(process.Pid());
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-  // Start a WaitableEventWatcher that will invoke OnProcessExitedEarly if the
-  // child process exits. This watcher is stopped once the IPC channel is
-  // connected and the exit of the child process is detected by an error on the
-  // IPC channel thereafter.
-  DCHECK(!early_exit_watcher_.GetWatchedObject());
-  early_exit_watcher_.StartWatchingOnce(process.Handle(), this);
-#endif
 
   DCHECK(!process.is_current());
   data_.SetProcess(process.Duplicate());
@@ -789,12 +756,5 @@ void BrowserChildProcessHostImpl::TerminateProcessForBadMessage(
   process->child_process_launcher_->Terminate(RESULT_CODE_KILLED_BAD_MESSAGE);
 }
 
-#if BUILDFLAG(IS_WIN)
-
-void BrowserChildProcessHostImpl::OnObjectSignaled(HANDLE object) {
-  OnChildDisconnected();
-}
-
-#endif
 
 }  // namespace content

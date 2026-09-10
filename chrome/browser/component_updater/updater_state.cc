@@ -47,7 +47,7 @@ std::unique_ptr<UpdaterState::StateReader> UpdaterState::StateReader::Create(
     bool is_machine) {
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   if (std::unique_ptr<StateReader> state_reader_chromium_updater =
           [is_machine]() -> std::unique_ptr<StateReader> {
         // Create a `StateReaderChromiumUpdater` instance only if a prefs.json
@@ -74,12 +74,10 @@ std::unique_ptr<UpdaterState::StateReader> UpdaterState::StateReader::Create(
       }()) {
     return state_reader_chromium_updater;
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_MAC)
   return std::make_unique<UpdaterState::StateReaderKeystone>();
-#elif BUILDFLAG(IS_WIN)
-  return std::make_unique<UpdaterState::StateReaderOmaha>();
 #else
   return nullptr;
 #endif  // IS_MAC
@@ -165,11 +163,11 @@ UpdaterState::UpdaterState(bool is_machine)
 UpdaterState::~UpdaterState() = default;
 
 UpdaterState::Attributes UpdaterState::GetState(bool is_machine) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return UpdaterState(is_machine).Serialize();
 #else
   return {};
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 }
 
 std::optional<UpdaterState::State> UpdaterState::ReadState(bool is_machine) {

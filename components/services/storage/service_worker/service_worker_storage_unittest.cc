@@ -972,18 +972,10 @@ TEST_F(ServiceWorkerStorageDiskTest, DeleteAndStartOver_OpenedFileExists) {
       base::BindOnce(&DatabaseStatusCallback, run_loop.QuitClosure(), &status));
   run_loop.Run();
 
-#if BUILDFLAG(IS_WIN)
-  // On Windows, deleting the directory containing an opened file should fail.
-  EXPECT_EQ(ServiceWorkerDatabase::Status::kErrorIOError, *status);
-  EXPECT_TRUE(storage()->IsDisabled());
-  EXPECT_TRUE(base::DirectoryExists(storage()->GetDiskCachePath()));
-  EXPECT_TRUE(base::DirectoryExists(storage()->GetDatabasePath()));
-#else
   EXPECT_EQ(ServiceWorkerDatabase::Status::kOk, *status);
   EXPECT_TRUE(storage()->IsDisabled());
   EXPECT_FALSE(base::DirectoryExists(storage()->GetDiskCachePath()));
   EXPECT_FALSE(base::DirectoryExists(storage()->GetDatabasePath()));
-#endif
 }
 
 // Tests reading storage usage from database.

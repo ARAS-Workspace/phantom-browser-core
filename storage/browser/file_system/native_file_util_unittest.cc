@@ -20,10 +20,6 @@
 #include "base/test/android/content_uri_test_utils.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "windows.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace storage {
 namespace {
 
@@ -68,19 +64,6 @@ class NativeFileUtilTest : public testing::Test {
     EXPECT_EQ(mode, expected_mode);
   }
 #endif  // BUILDFLAG(IS_POSIX)
-
-#if BUILDFLAG(IS_WIN)
-  void ExpectFileHasPermissionsWin(base::FilePath file,
-                                   DWORD expected_attributes) {
-    base::File::Info file_info;
-    DWORD attributes;
-    ASSERT_TRUE(FileExists(file));
-
-    attributes = ::GetFileAttributes(file.value().c_str());
-    EXPECT_NE(attributes, INVALID_FILE_ATTRIBUTES);
-    EXPECT_EQ(attributes, expected_attributes);
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
  private:
   base::ScopedTempDir data_dir_;
@@ -457,13 +440,6 @@ TEST_F(NativeFileUtilTest, MoveFile) {
       NativeFileUtil::CopyOrMoveFile(
           dir, to_file, FileSystemOperation::CopyOrMoveOptionSet(), move));
 
-#if BUILDFLAG(IS_WIN)
-  // Source is a directory, destination is a directory.
-  EXPECT_EQ(base::File::FILE_ERROR_NOT_A_FILE,
-            NativeFileUtil::CopyOrMoveFile(
-                dir, dir2, FileSystemOperation::CopyOrMoveOptionSet(), move));
-#endif
-
   ASSERT_EQ(base::File::FILE_OK,
             NativeFileUtil::EnsureFileExists(from_file, &created));
   ASSERT_TRUE(FileExists(from_file));
@@ -517,7 +493,6 @@ TEST_F(NativeFileUtilTest, MoveFile_Directory) {
   EXPECT_EQ(1020, GetSize(to_file));
 }
 
-#if !BUILDFLAG(IS_WIN)
 TEST_F(NativeFileUtilTest, MoveFile_OverwriteEmptyDirectory) {
   base::FilePath from_directory = Path("fromdirectory");
   base::FilePath to_directory = Path("todirectory");
@@ -547,7 +522,6 @@ TEST_F(NativeFileUtilTest, MoveFile_OverwriteEmptyDirectory) {
   EXPECT_TRUE(FileExists(to_file));
   EXPECT_EQ(1020, GetSize(to_file));
 }
-#endif
 
 TEST_F(NativeFileUtilTest, PreserveLastModified) {
   base::FilePath from_file = Path("fromfile");
@@ -600,7 +574,7 @@ TEST_F(NativeFileUtilTest, PreserveLastModified) {
 }
 
 // This test is disabled on Fuchsia because file permissions are not supported.
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_POSIX)
 TEST_F(NativeFileUtilTest, PreserveDestinationPermissions) {
   // Ensure both the src and dest files exist.
   base::FilePath to_file = Path("to-file");
@@ -619,9 +593,6 @@ TEST_F(NativeFileUtilTest, PreserveDestinationPermissions) {
 #if BUILDFLAG(IS_POSIX)
   int dest_initial_mode;
   ASSERT_TRUE(base::GetPosixFilePermissions(to_file, &dest_initial_mode));
-#elif BUILDFLAG(IS_WIN)
-  DWORD dest_initial_attributes = ::GetFileAttributes(to_file.value().c_str());
-  ASSERT_NE(dest_initial_attributes, INVALID_FILE_ATTRIBUTES);
 #endif  // BUILDFLAG(IS_POSIX)
 
   // Give dest file some distinct permissions it didn't have before.
@@ -629,11 +600,6 @@ TEST_F(NativeFileUtilTest, PreserveDestinationPermissions) {
   int old_dest_mode = dest_initial_mode | S_IRGRP | S_IXOTH;
   EXPECT_NE(old_dest_mode, dest_initial_mode);
   EXPECT_TRUE(base::SetPosixFilePermissions(to_file, old_dest_mode));
-#elif BUILDFLAG(IS_WIN)
-  DWORD old_dest_attributes = FILE_ATTRIBUTE_NORMAL;
-  EXPECT_NE(old_dest_attributes, dest_initial_attributes);
-  EXPECT_TRUE(
-      ::SetFileAttributes(to_file.value().c_str(), old_dest_attributes));
 #endif  // BUILDFLAG(IS_POSIX)
 
   // Test for copy (nosync).
@@ -644,8 +610,6 @@ TEST_F(NativeFileUtilTest, PreserveDestinationPermissions) {
                 NativeFileUtil::COPY_NOSYNC));
 #if BUILDFLAG(IS_POSIX)
   ExpectFileHasPermissionsPosix(to_file, old_dest_mode);
-#elif BUILDFLAG(IS_WIN)
-  ExpectFileHasPermissionsWin(to_file, old_dest_attributes);
 #endif  // BUILDFLAG(IS_POSIX)
 
   // Test for copy (sync).
@@ -656,8 +620,6 @@ TEST_F(NativeFileUtilTest, PreserveDestinationPermissions) {
                 NativeFileUtil::COPY_SYNC));
 #if BUILDFLAG(IS_POSIX)
   ExpectFileHasPermissionsPosix(to_file, old_dest_mode);
-#elif BUILDFLAG(IS_WIN)
-  ExpectFileHasPermissionsWin(to_file, old_dest_attributes);
 #endif  // BUILDFLAG(IS_POSIX)
 
   // Test for move.
@@ -668,14 +630,12 @@ TEST_F(NativeFileUtilTest, PreserveDestinationPermissions) {
                 NativeFileUtil::MOVE));
 #if BUILDFLAG(IS_POSIX)
   ExpectFileHasPermissionsPosix(to_file, old_dest_mode);
-#elif BUILDFLAG(IS_WIN)
-  ExpectFileHasPermissionsWin(to_file, old_dest_attributes);
 #endif  // BUILDFLAG(IS_POSIX)
 }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 
 // This test is disabled on Fuchsia because file permissions are not supported.
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_POSIX)
 TEST_F(NativeFileUtilTest, PreserveLastModifiedAndDestinationPermissions) {
   base::FilePath from_file = Path("fromfile");
   base::FilePath to_file1 = Path("tofile1");
@@ -712,9 +672,6 @@ TEST_F(NativeFileUtilTest, PreserveLastModifiedAndDestinationPermissions) {
 #if BUILDFLAG(IS_POSIX)
   int dest_initial_mode;
   ASSERT_TRUE(base::GetPosixFilePermissions(to_file1, &dest_initial_mode));
-#elif BUILDFLAG(IS_WIN)
-  DWORD dest_initial_attributes = ::GetFileAttributes(to_file1.value().c_str());
-  ASSERT_NE(dest_initial_attributes, INVALID_FILE_ATTRIBUTES);
 #endif  // BUILDFLAG(IS_POSIX)
 
   // Give dest files some distinct permissions they didn't have before.
@@ -724,15 +681,6 @@ TEST_F(NativeFileUtilTest, PreserveLastModifiedAndDestinationPermissions) {
   EXPECT_TRUE(base::SetPosixFilePermissions(to_file1, old_dest_mode));
   EXPECT_TRUE(base::SetPosixFilePermissions(to_file2, old_dest_mode));
   EXPECT_TRUE(base::SetPosixFilePermissions(to_file3, old_dest_mode));
-#elif BUILDFLAG(IS_WIN)
-  DWORD old_dest_attributes = FILE_ATTRIBUTE_NORMAL;
-  EXPECT_NE(old_dest_attributes, dest_initial_attributes);
-  EXPECT_TRUE(
-      ::SetFileAttributes(to_file1.value().c_str(), old_dest_attributes));
-  EXPECT_TRUE(
-      ::SetFileAttributes(to_file2.value().c_str(), old_dest_attributes));
-  EXPECT_TRUE(
-      ::SetFileAttributes(to_file3.value().c_str(), old_dest_attributes));
 #endif  // BUILDFLAG(IS_POSIX)
 
   // Test for copy (nosync).
@@ -750,8 +698,6 @@ TEST_F(NativeFileUtilTest, PreserveLastModifiedAndDestinationPermissions) {
 
 #if BUILDFLAG(IS_POSIX)
   ExpectFileHasPermissionsPosix(to_file1, old_dest_mode);
-#elif BUILDFLAG(IS_WIN)
-  ExpectFileHasPermissionsWin(to_file1, old_dest_attributes);
 #endif  // BUILDFLAG(IS_POSIX)
 
   // Test for copy (sync).
@@ -767,8 +713,6 @@ TEST_F(NativeFileUtilTest, PreserveLastModifiedAndDestinationPermissions) {
 
 #if BUILDFLAG(IS_POSIX)
   ExpectFileHasPermissionsPosix(to_file2, old_dest_mode);
-#elif BUILDFLAG(IS_WIN)
-  ExpectFileHasPermissionsWin(to_file2, old_dest_attributes);
 #endif  // BUILDFLAG(IS_POSIX)
 
   // Test for move.
@@ -784,10 +728,8 @@ TEST_F(NativeFileUtilTest, PreserveLastModifiedAndDestinationPermissions) {
 
 #if BUILDFLAG(IS_POSIX)
   ExpectFileHasPermissionsPosix(to_file3, old_dest_mode);
-#elif BUILDFLAG(IS_WIN)
-  ExpectFileHasPermissionsWin(to_file3, old_dest_attributes);
 #endif  // BUILDFLAG(IS_POSIX)
 }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 
 }  // namespace storage

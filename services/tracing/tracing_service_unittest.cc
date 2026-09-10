@@ -394,7 +394,6 @@ TEST_F(TracingServiceTest, PerfettoClientProducer) {
   EXPECT_EQ(kNumPackets, ReadAndCountTestPackets(*session));
 }
 
-#if !BUILDFLAG(IS_WIN)
 // TODO(crbug.com/40736989): Support tracing to file on Windows.
 TEST_F(TracingServiceTest, TraceToFile) {
   // Set up API bindings.
@@ -457,6 +456,5 @@ TEST_F(TracingServiceTest, TraceToFile) {
   ASSERT_TRUE(base::ReadFileToString(output_file_path, &trace));
   EXPECT_EQ(kNumPackets, CountTestPackets(trace.data(), trace.length()));
 }
-#endif
 
 }  // namespace tracing

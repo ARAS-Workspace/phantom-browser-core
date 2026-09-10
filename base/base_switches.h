@@ -135,19 +135,6 @@ inline constexpr char kWaitForDebugger[] = "wait-for-debugger";
 // See flag_descriptions.cc for more details.
 inline constexpr char kEnableBenchmarking[] = "enable-benchmarking";
 
-#if BUILDFLAG(IS_WIN)
-// Disable high-resolution timer on Windows.
-inline constexpr char kDisableHighResTimer[] = "disable-highres-timer";
-
-// Disables the USB keyboard detection for blocking the OSK on Windows.
-inline constexpr char kDisableUsbKeyboardDetect[] =
-    "disable-usb-keyboard-detect";
-
-// Forces the use of QPC for TimeTicks even if cpuid doesn't report the presence
-// of an invariant TSC.
-inline constexpr char kForceHighResTimeTicks[] = "force-high-res-timeticks";
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 // The /dev/shm partition is too small in certain VM environments, causing
 // Chrome to fail or crash (see http://crbug.com/715363). Use this flag to

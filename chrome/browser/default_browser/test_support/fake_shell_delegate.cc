@@ -20,16 +20,4 @@ void FakeShellDelegate::StartCheckIsDefault(
   std::move(callback).Run(default_state_);
 }
 
-#if BUILDFLAG(IS_WIN)
-void FakeShellDelegate::StartCheckDefaultClientProgId(
-    const GURL& scheme,
-    base::OnceCallback<void(const std::u16string&)> callback) {
-  std::u16string prog_id = u"";
-  if (scheme.scheme() == "http") {
-    prog_id = http_assoc_prog_id_;
-  }
-  std::move(callback).Run(prog_id);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 }  // namespace default_browser

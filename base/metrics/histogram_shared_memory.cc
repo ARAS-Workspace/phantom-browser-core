@@ -23,11 +23,6 @@
 #include "base/strings/string_split.h"
 #include "base/unguessable_token.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/win_util.h"
-#endif
 
 
 // This file supports passing a read/write histogram shared memory region

@@ -19,10 +19,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "testing/multiprocess_func_list.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <shlobj.h>
-#endif
-
 namespace base {
 namespace {
 
@@ -123,10 +119,6 @@ using HistogramSharedMemoryTest = ::testing::TestWithParam<bool>;
 INSTANTIATE_TEST_SUITE_P(All,
                          HistogramSharedMemoryTest,
                          ::testing::Values(/*launch_options.elevated=*/false
-#if BUILDFLAG(IS_WIN)
-                                           ,
-                                           /*launch_options.elevated=*/true
-#endif
                                            ));
 
 TEST_P(HistogramSharedMemoryTest, PassSharedMemoryRegion_Enabled) {
@@ -144,13 +136,6 @@ TEST_P(HistogramSharedMemoryTest, PassSharedMemoryRegion_Enabled) {
   LaunchOptions launch_options;
 
   // On windows, check both the elevated and non-elevated launches.
-#if BUILDFLAG(IS_WIN)
-  launch_options.start_hidden = true;
-  launch_options.elevated = GetParam();
-  if (launch_options.elevated && !::IsUserAnAdmin()) {
-    GTEST_SKIP() << "This test must be run by an admin user";
-  }
-#endif
 
   // Update the launch parameters.
   shared_memory::SharedMemorySwitch shared_memory_switch(

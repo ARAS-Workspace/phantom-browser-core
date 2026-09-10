@@ -15,10 +15,6 @@
 #include "build/build_config.h"
 #include "remoting/host/webauthn/remote_webauthn_state_change_notifier.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_handle.h"
-#endif
-
 namespace remoting {
 
 // Class to notify the remote WebAuthn proxy extension of possible changes in
@@ -49,9 +45,6 @@ class RemoteWebAuthnExtensionNotifier final
     ~RemoteStateChangeContext();
 
     std::vector<base::FilePath> dirs;
-#if BUILDFLAG(IS_WIN)
-    base::win::ScopedHandle user_token;
-#endif
   };
 
   static RemoteStateChangeContext GetRemoteStateChangeContext();

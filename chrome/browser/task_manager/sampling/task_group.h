@@ -131,14 +131,6 @@ class TaskGroup {
     is_backgrounded_ = is_backgrounded;
   }
 
-#if BUILDFLAG(IS_WIN)
-  int64_t gdi_current_handles() const { return gdi_current_handles_; }
-  int64_t gdi_peak_handles() const { return gdi_peak_handles_; }
-  int64_t user_current_handles() const { return user_current_handles_; }
-  int64_t user_peak_handles() const { return user_peak_handles_; }
-  int64_t hard_faults_per_second() const { return hard_faults_per_second_; }
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
   int open_fd_count() const { return open_fd_count_; }
   void set_open_fd_count(int open_fd_count) { open_fd_count_ = open_fd_count; }
@@ -212,14 +204,6 @@ class TaskGroup {
   // the individual tasks sharing the same process.
   std::optional<base::ByteSize> per_process_network_usage_rate_;
 
-#if BUILDFLAG(IS_WIN)
-  // Windows GDI and USER Handles.
-  int64_t gdi_current_handles_ = -1;
-  int64_t gdi_peak_handles_ = -1;
-  int64_t user_current_handles_ = -1;
-  int64_t user_peak_handles_ = -1;
-  int64_t hard_faults_per_second_ = -1;
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
   // The number of file descriptors currently open by the process.
   int open_fd_count_ = -1;

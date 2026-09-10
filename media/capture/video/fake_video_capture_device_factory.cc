@@ -57,16 +57,7 @@ media::VideoPixelFormat GetPixelFormatFromDeviceIndex(int device_index) {
     return media::PIXEL_FORMAT_Y16;
   if (device_index == 2)
     return media::PIXEL_FORMAT_MJPEG;
-#if BUILDFLAG(IS_WIN)
-  if (media::IsMediaFoundationD3D11VideoCaptureEnabled() &&
-      switches::IsVideoCaptureUseGpuMemoryBufferEnabled()) {
-    return media::PIXEL_FORMAT_NV12;
-  } else {
-    return media::PIXEL_FORMAT_I420;
-  }
-#else
   return media::PIXEL_FORMAT_I420;
-#endif
 }
 
 void AppendAllCombinationsToFormatsContainer(
@@ -120,12 +111,6 @@ FakeVideoCaptureDeviceFactory::FakeVideoCaptureDeviceFactory() {
   // The default |devices_config_| is the one obtained from an empty options
   // string.
   ParseFakeDevicesConfigFromOptionsString("", &devices_config_);
-#if BUILDFLAG(IS_WIN)
-  if (media::IsMediaFoundationD3D11VideoCaptureEnabled() &&
-      switches::IsVideoCaptureUseGpuMemoryBufferEnabled()) {
-    dxgi_device_manager_ = DXGIDeviceManager::Create(luid_);
-  }
-#endif
 }
 
 FakeVideoCaptureDeviceFactory::~FakeVideoCaptureDeviceFactory() = default;
@@ -235,8 +220,6 @@ void FakeVideoCaptureDeviceFactory::GetDevicesInfo(
         VideoCaptureApi::UNKNOWN;
 #elif BUILDFLAG(IS_MAC)
         VideoCaptureApi::MACOSX_AVFOUNDATION;
-#elif BUILDFLAG(IS_WIN)
-        VideoCaptureApi::WIN_DIRECT_SHOW;
 #elif BUILDFLAG(IS_ANDROID)
         VideoCaptureApi::ANDROID_API2_LEGACY;
 #else
@@ -395,19 +378,5 @@ void FakeVideoCaptureDeviceFactory::ParseFakeDevicesConfigFromOptionsString(
     config->push_back(settings);
   }
 }
-
-#if BUILDFLAG(IS_WIN)
-void FakeVideoCaptureDeviceFactory::OnGpuInfoUpdate(const CHROME_LUID& luid) {
-  luid_ = luid;
-  if (dxgi_device_manager_) {
-    dxgi_device_manager_->OnGpuInfoUpdate(luid_);
-  }
-}
-
-scoped_refptr<DXGIDeviceManager>
-FakeVideoCaptureDeviceFactory::GetDxgiDeviceManager() {
-  return dxgi_device_manager_;
-}
-#endif
 
 }  // namespace media

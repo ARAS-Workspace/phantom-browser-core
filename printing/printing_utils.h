@@ -16,11 +16,6 @@
 #include "build/build_config.h"
 #include "printing/buildflags/buildflags.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_handle_types.h"
-#include "ui/gfx/geometry/rect.h"
-#endif
-
 namespace gfx {
 class Size;
 }
@@ -58,19 +53,6 @@ bool SizesEqualWithinEpsilon(const gfx::Size& lhs,
                              const gfx::Size& rhs,
                              int epsilon);
 #endif
-
-#if BUILDFLAG(IS_WIN)
-// Get page content rect adjusted based on
-// http://dev.w3.org/csswg/css3-page/#positioning-page-box
-COMPONENT_EXPORT(PRINTING_BASE)
-gfx::Rect GetCenteredPageContentRect(const gfx::Size& paper_size,
-                                     const gfx::Size& page_size,
-                                     const gfx::Rect& page_content_rect);
-
-// Returns the printable area in device units for `hdc`.
-COMPONENT_EXPORT(PRINTING_BASE)
-gfx::Rect GetPrintableAreaDeviceUnits(HDC hdc);
-#endif  // BUILDFLAG(IS_WIN)
 
 // Helper for tests and DCHECKs to validate that `maybe_pdf_data` suggests a PDF
 // document. This includes checking a minimal size and magic bytes.

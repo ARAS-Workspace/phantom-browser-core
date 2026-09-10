@@ -602,11 +602,7 @@ IN_PROC_BROWSER_TEST_F(WebAppEngagementBrowserTest, RecordedForNonApps) {
 // line flags.
 #if !BUILDFLAG(IS_CHROMEOS)
 // TODO(crbug.com/409686053): Flaky on windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CommandLineWindowByUrl DISABLED_CommandLineWindowByUrl
-#else
 #define MAYBE_CommandLineWindowByUrl CommandLineWindowByUrl
-#endif
 IN_PROC_BROWSER_TEST_F(WebAppEngagementBrowserTest,
                        MAYBE_CommandLineWindowByUrl) {
   base::HistogramTester tester;
@@ -643,16 +639,6 @@ IN_PROC_BROWSER_TEST_F(WebAppEngagementBrowserTest,
       GetLastActiveBrowserWindowInterfaceWithAnyProfile();
   EXPECT_EQ(app_browser->GetType(), BrowserWindowInterface::Type::TYPE_APP);
 
-#if BUILDFLAG(IS_WIN)
-  {
-    // From c/b/ui/startup/launch_mode_recorder.h:
-    constexpr char kLaunchModesHistogram[] = "Launch.Mode2";
-    const base::HistogramBase::Sample32 kWebAppOther = 22;
-
-    tester.ExpectUniqueSample(kLaunchModesHistogram, kWebAppOther, 1);
-  }
-#endif  // BUILDFLAG(IS_WIN
-
   // Check that the number of browsers and tabs is correct.
   expected_browsers++;
 
@@ -665,7 +651,7 @@ IN_PROC_BROWSER_TEST_F(WebAppEngagementBrowserTest,
 
 // TODO(crbug.com/40877225): Flaky on Mac.
 // TODO(crbug.com/399243964): Flaky on Windows.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_CommandLineWindowByAppId DISABLED_CommandLineWindowByAppId
 #else
 #define MAYBE_CommandLineWindowByAppId CommandLineWindowByAppId
@@ -708,16 +694,6 @@ IN_PROC_BROWSER_TEST_F(WebAppEngagementBrowserTest,
   EXPECT_TRUE(web_app::AppBrowserController::IsWebApp(app_browser));
   EXPECT_TRUE(AppBrowserController::IsWebApp(app_browser));
 
-#if BUILDFLAG(IS_WIN)
-  {
-    // From c/b/ui/startup/launch_mode_recorder.h:
-    constexpr char kLaunchModesHistogram[] = "Launch.Mode2";
-    const base::HistogramBase::Sample32 kWebAppOther = 22;
-
-    tester.ExpectUniqueSample(kLaunchModesHistogram, kWebAppOther, 1);
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   // Check that the number of browsers and tabs is correct.
   expected_browsers++;
 
@@ -728,11 +704,7 @@ IN_PROC_BROWSER_TEST_F(WebAppEngagementBrowserTest,
   EXPECT_EQ(expected_tabs, app_browser->GetTabStripModel()->count());
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CommandLineTab DISABLED_CommandLineTab
-#else
 #define MAYBE_CommandLineTab CommandLineTab
-#endif
 // TODO(crbug.com/409956115): Reenable the test when failure is fixed.
 IN_PROC_BROWSER_TEST_F(WebAppEngagementBrowserTest, MAYBE_CommandLineTab) {
   base::HistogramTester tester;
@@ -766,16 +738,6 @@ IN_PROC_BROWSER_TEST_F(WebAppEngagementBrowserTest, MAYBE_CommandLineTab) {
       command_line, base::FilePath(), chrome::startup::IsProcessStartup::kNo,
       {browser()->GetProfile(), StartupProfileMode::kBrowserWindow}, {}));
   app_loaded_observer.Wait();
-
-#if BUILDFLAG(IS_WIN)
-  {
-    // From startup_browser_creator_impl.cc:
-    constexpr char kLaunchModesHistogram[] = "Launch.Mode2";
-    const base::HistogramBase::Sample32 kWebAppOther = 22;
-
-    tester.ExpectUniqueSample(kLaunchModesHistogram, kWebAppOther, 1);
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   // Check that the number of browsers and tabs is correct.
   expected_tabs++;

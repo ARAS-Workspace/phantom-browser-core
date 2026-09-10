@@ -130,25 +130,6 @@ void NormalizeToLf(base::span<const CharType> src, base::span<CharType> dst) {
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-void InternalNormalizeLineEndingsToCrLf(const std::string& from,
-                                        Vector<uint8_t>& buffer) {
-  size_t new_len = RequiredSizeForCrLf(base::as_byte_span(from));
-  if (new_len < from.length())
-    return;
-
-  if (new_len == from.length()) {
-    buffer.append_range(from);
-    return;
-  }
-
-  wtf_size_t old_buffer_size = buffer.size();
-  buffer.Grow(base::checked_cast<wtf_size_t>(old_buffer_size + new_len));
-  NormalizeToCrLf(base::as_byte_span(from),
-                  base::span(buffer).subspan(old_buffer_size));
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 }  // namespace
 
 void NormalizeLineEndingsToLf(const std::string& from,
@@ -209,11 +190,7 @@ String NormalizeLineEndingsToCrLf(const String& src) {
 
 void NormalizeLineEndingsToNative(const std::string& from,
                                   Vector<uint8_t>& result) {
-#if BUILDFLAG(IS_WIN)
-  InternalNormalizeLineEndingsToCrLf(from, result);
-#else
   NormalizeLineEndingsToLf(from, result);
-#endif
 }
 
 }  // namespace blink

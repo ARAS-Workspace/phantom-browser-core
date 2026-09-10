@@ -1659,8 +1659,7 @@ IN_PROC_BROWSER_TEST_P(WebViewTest, Shim_TestDisplayNoneWebviewLoad) {
   TestHelper("testDisplayNoneWebviewLoad", "web_view/shim", NO_TEST_SERVER);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #define MAYBE_Shim_TestDisplayNoneWebviewRemoveChild \
   DISABLED_Shim_TestDisplayNoneWebviewRemoveChild
 #else
@@ -2515,11 +2514,7 @@ INSTANTIATE_TEST_SUITE_P(/* no prefix */,
 // Test makes sure that an interstitial is shown in `<webview>` with an SSL
 // error.
 // Flaky on Win dbg: crbug.com/40547388
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-#define MAYBE_ShowInterstitialForSSLError DISABLED_ShowInterstitialForSSLError
-#else
 #define MAYBE_ShowInterstitialForSSLError ShowInterstitialForSSLError
-#endif
 IN_PROC_BROWSER_TEST_P(WebViewSSLErrorTest, MAYBE_ShowInterstitialForSSLError) {
   SSLTestHelper();
 }
@@ -2616,11 +2611,7 @@ IN_PROC_BROWSER_TEST_P(WebViewSSLErrorTest, NavigateThroughSSLError) {
 // Test makes sure that the interstitial is registered in the
 // `RenderWidgetHostInputEventRouter` when inside a `<webview>`.
 // Flaky on Win dbg: crbug.com/40547388
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-#define MAYBE_InterstitialPageRouteEvents DISABLED_InterstitialPageRouteEvents
-#else
 #define MAYBE_InterstitialPageRouteEvents InterstitialPageRouteEvents
-#endif
 IN_PROC_BROWSER_TEST_P(WebViewSSLErrorTest, MAYBE_InterstitialPageRouteEvents) {
   SSLTestHelper();
 
@@ -2640,11 +2631,7 @@ IN_PROC_BROWSER_TEST_P(WebViewSSLErrorTest, MAYBE_InterstitialPageRouteEvents) {
 // Test makes sure that the browser does not crash when a `<webview>` navigates
 // out of an interstitial caused by a SSL error.
 // Flaky on Win dbg: crbug.com/40547388
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-#define MAYBE_InterstitialPageDetach DISABLED_InterstitialPageDetach
-#else
 #define MAYBE_InterstitialPageDetach InterstitialPageDetach
-#endif
 IN_PROC_BROWSER_TEST_P(WebViewSSLErrorTest, MAYBE_InterstitialPageDetach) {
   SSLTestHelper();
 
@@ -2656,11 +2643,7 @@ IN_PROC_BROWSER_TEST_P(WebViewSSLErrorTest, MAYBE_InterstitialPageDetach) {
 // This test makes sure the browser process does not crash if app is closed
 // while an interstitial is being shown in guest.
 // Flaky on Win dbg: crbug.com/40547388
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-#define MAYBE_InterstitialTearDown DISABLED_InterstitialTearDown
-#else
 #define MAYBE_InterstitialTearDown InterstitialTearDown
-#endif
 IN_PROC_BROWSER_TEST_P(WebViewSSLErrorTest, MAYBE_InterstitialTearDown) {
   SSLTestHelper();
 
@@ -4052,13 +4035,7 @@ IN_PROC_BROWSER_TEST_P(WebViewTest, ClearDataTwice) {
       << message_;
 }
 
-#if BUILDFLAG(IS_WIN)
-// Test is disabled on Windows because it fails often (~9% time)
-// http://crbug.com/40418521
-#define MAYBE_ClearDataCache DISABLED_ClearDataCache
-#else
 #define MAYBE_ClearDataCache ClearDataCache
-#endif
 IN_PROC_BROWSER_TEST_P(WebViewTest, MAYBE_ClearDataCache) {
   TestHelper("testClearCache", "web_view/clear_data_cache", NEEDS_TEST_SERVER);
 }
@@ -6209,187 +6186,6 @@ IN_PROC_BROWSER_TEST_P(WebViewGuestScrollTouchTest,
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-
-// This runs the chrome://chrome-signin page which includes an OOPIF-<webview>
-// of accounts.google.com.
-class ChromeSignInWebViewTest : public WebViewTest {
- public:
-  ChromeSignInWebViewTest() = default;
-  ~ChromeSignInWebViewTest() override = default;
-
- protected:
-  void WaitForWebViewInDom() {
-    auto* web_contents = browser()->tab_strip_model()->GetActiveWebContents();
-    auto* script =
-        "var count = 10;"
-        "var interval;"
-        "interval = setInterval(function(){"
-        "  if (document.querySelector('inline-login-app').shadowRoot"
-        "       .querySelector('webview')) {"
-        "    document.title = 'success';"
-        "    console.log('FOUND webview');"
-        "    clearInterval(interval);"
-        "  } else if (count == 0) {"
-        "    document.title = 'error';"
-        "    clearInterval(interval);"
-        "  } else {"
-        "    count -= 1;"
-        "  }"
-        "}, 1000);";
-    ExecuteScriptWaitForTitle(web_contents, script, "success");
-  }
-};
-
-INSTANTIATE_TEST_SUITE_P(/* no prefix */,
-                         ChromeSignInWebViewTest,
-                         testing::Bool(),
-                         ChromeSignInWebViewTest::DescribeParams);
-
-// Check that rules from the DeclarativeNetRequest API are not matched for
-// requests originating from WebViews.
-IN_PROC_BROWSER_TEST_P(ChromeSignInWebViewTest,
-                       DeclarativeNetRequestRulesNotMatched) {
-  SKIP_FOR_MPARCH();  // TODO(crbug.com/40202416): Enable test for MPArch.
-
-  // Load an extension that blocks all main frame requests into
-  // accounts.google.com which is loaded inside the WebView in
-  // chrome://chrome-signin.
-  const auto* extension = LoadExtension(test_data_dir_.AppendASCII(
-      "api_test/declarative_net_request/block_chrome_signin"));
-
-  // Navigate to a WebUI page that contains a WebView which loads
-  // accounts.google.com.
-  const GURL signin_url{"chrome://chrome-signin/?reason=6"};
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), signin_url));
-  WaitForWebViewInDom();
-
-  // Check that no rules were matched from the extension. Note that the test
-  // would not complete if the accounts.google.com request from the WebView is
-  // blocked.
-  extensions::declarative_net_request::RulesMonitorService*
-      rules_monitor_service =
-          extensions::declarative_net_request::RulesMonitorService::Get(
-              browser()->GetProfile());
-  ASSERT_TRUE(rules_monitor_service);
-  extensions::declarative_net_request::ActionTracker& action_tracker =
-      rules_monitor_service->action_tracker();
-
-  EXPECT_TRUE(action_tracker
-                  .GetMatchedRules(*extension, std::nullopt, base::Time::Min())
-                  .empty());
-}
-
-// This verifies the fix for http://crbug.com/41287549.
-IN_PROC_BROWSER_TEST_P(ChromeSignInWebViewTest,
-                       ClosingChromeSignInShouldNotCrash) {
-  SKIP_FOR_MPARCH();  // TODO(crbug.com/40202416): Enable test for MPArch.
-
-  GURL signin_url{"chrome://chrome-signin/?reason=6"};
-
-  ASSERT_TRUE(AddTabAtIndex(0, signin_url, ui::PAGE_TRANSITION_TYPED));
-  ASSERT_TRUE(AddTabAtIndex(1, signin_url, ui::PAGE_TRANSITION_TYPED));
-  WaitForWebViewInDom();
-
-  chrome::CloseTab(browser());
-}
-
-// This test verifies that unattached guests are not included as the inner
-// WebContents. The test verifies this by triggering a find-in-page request on a
-// page with both an attached and an unattached <webview> and verifies that,
-// unlike the attached guest, no find requests are sent for the unattached
-// guest. For more context see https://crbug.com/41421893.
-IN_PROC_BROWSER_TEST_P(ChromeSignInWebViewTest,
-                       NoFindInPageForUnattachedGuest) {
-  SKIP_FOR_MPARCH();  // TODO(crbug.com/40202416): Enable test for MPArch.
-
-  GURL signin_url{"chrome://chrome-signin/?reason=6"};
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), signin_url));
-
-  // Navigate a tab to a page with a <webview>.
-  auto* embedder_web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  auto* attached_guest_view =
-      GetGuestViewManager()->WaitForSingleGuestViewCreated();
-  ASSERT_TRUE(attached_guest_view);
-
-  auto* find_helper =
-      find_in_page::FindTabHelper::FromWebContents(embedder_web_contents);
-
-  // Wait until a first GuestView is attached.
-  GetGuestViewManager()->WaitUntilAttached(attached_guest_view);
-
-  base::RunLoop run_loop;
-  // This callback is called before attaching a second GuestView.
-  GetGuestViewManager()->SetWillAttachCallback(
-      base::BindLambdaForTesting([&](guest_view::GuestViewBase* guest_view) {
-        ASSERT_TRUE(guest_view);
-        ASSERT_FALSE(guest_view->attached());
-
-        auto* attached_guest_rfh = attached_guest_view->GetGuestMainFrame();
-        auto* unattached_guest_rfh = guest_view->GetGuestMainFrame();
-        EXPECT_NE(unattached_guest_rfh, attached_guest_rfh);
-        find_helper->StartFinding(u"doesn't matter", true, true, false);
-        auto pending = content::GetRenderFrameHostsWithPendingFindResults(
-            embedder_web_contents);
-        // Request for main frame of the tab.
-        EXPECT_EQ(1U,
-                  pending.count(embedder_web_contents->GetPrimaryMainFrame()));
-        // Request for main frame of the attached guest.
-        EXPECT_EQ(1U, pending.count(attached_guest_rfh));
-        // No request for the unattached guest.
-        EXPECT_EQ(0U, pending.count(unattached_guest_rfh));
-        run_loop.Quit();
-      }));
-  // Now add a new <webview> and wait until its guest WebContents is created.
-  ExecuteScriptAsync(embedder_web_contents,
-                     "var webview = document.createElement('webview');"
-                     "webview.src = 'data:text/html,foo';"
-                     "document.body.appendChild(webview);");
-  run_loop.Run();
-}
-
-// Ensure that WebRequest events are not dispatched to pages that are not the
-// embedder of the source webview.
-// See also testWebRequestAPIOnlyForInstance.
-IN_PROC_BROWSER_TEST_P(ChromeSignInWebViewTest,
-                       TestWebRequestOnlyDispatchToEmbedder) {
-  SKIP_FOR_MPARCH();  // TODO(crbug.com/40202416): Enable test for MPArch.
-
-  ASSERT_TRUE(StartEmbeddedTestServer());
-
-  // Load a WebUI with a webview. For testing convenience, we use the existing
-  // chrome signin page.
-  const GURL signin_url{"chrome://chrome-signin/?reason=6"};
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), signin_url));
-  WaitForWebViewInDom();
-  content::WebContents* tab_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  // Set an onBeforeRequest handler on the WebUI's webview.
-  EXPECT_TRUE(content::ExecJs(
-      tab_contents,
-      "let wv = document.querySelector( "
-      "    'inline-login-app').shadowRoot.querySelector('webview'); "
-      "window.sawRequest = false; "
-      "wv.request.onBeforeRequest.addListener((details) => { "
-      "  console.log('Unexpected request event', details.url); "
-      "  window.sawRequest = true; "
-      "  return {cancel: true}; "
-      "}, {types: ['main_frame'], urls: ['<all_urls>']}, "
-      "['blocking']);"));
-
-  // Launch an app that creates and loads its own webview. The app will get
-  // WebRequest events for its webview.
-  TestHelper("testWebRequestAPI", "web_view/shim", NO_TEST_SERVER);
-
-  // The WebUI should not see the events for the app's webview.
-  EXPECT_EQ(false, content::EvalJs(tab_contents, "window.sawRequest;"));
-}
-
-#endif  // BUILDFLAG(IS_WIN)
-
 // This test class makes "isolated.com" an isolated origin, to be used in
 // testing isolated origins inside of a WebView.
 class IsolatedOriginWebViewTest : public WebViewTest {
@@ -7589,7 +7385,7 @@ IN_PROC_BROWSER_TEST_P(SitePerProcessWebViewTest, ContentScript) {
 // Checks that content scripts work in an out-of-process iframe in a <webview>
 // tag.
 // TODO(crbug.com/40864752): Fix flakiness on win-rel and mac.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_ContentScriptInOOPIF DISABLED_ContentScriptInOOPIF
 #else
 #define MAYBE_ContentScriptInOOPIF ContentScriptInOOPIF

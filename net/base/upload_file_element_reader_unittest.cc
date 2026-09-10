@@ -80,10 +80,6 @@ class UploadFileElementReaderTest : public testing::TestWithParam<bool>,
     // the test fixture waiting on it to be closed.
     int open_flags = base::File::FLAG_OPEN | base::File::FLAG_READ |
                      base::File::FLAG_WIN_SHARE_DELETE;
-#if BUILDFLAG(IS_WIN)
-    // On Windows, file must be opened for asynchronous operation.
-    open_flags |= base::File::FLAG_ASYNC;
-#endif  // BUILDFLAG(IS_WIN)
 
     base::File file(temp_file_path_, open_flags);
     EXPECT_TRUE(file.IsValid());

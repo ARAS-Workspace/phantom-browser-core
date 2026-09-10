@@ -6261,20 +6261,6 @@ void RenderFrameHostImpl::DidFocusFrame() {
   CHECK(owner_);  // See `owner_` invariants about `IsActive()`.
   owner_->SetFocusedFrame(GetSiteInstance()->group());
 
-#if BUILDFLAG(IS_WIN)
-  // If the frame has a url, notify the view to allow it to supply the Url to
-  // any interested IME (e.g. Windows 11's TSF uses this information).
-  if (!last_committed_url_.is_empty()) {
-    RenderWidgetHostView* view = render_view_host_->GetWidget()->GetView();
-    if (view) {
-      ui::TextInputClient* input_client = view->GetTextInputClient();
-      if (input_client) {
-        input_client->NotifyOnFrameFocusChanged();
-      }
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   // The lost focus tracker is cleared out after a focus call.
   GetOutermostMainFrameOrEmbedder()->GetRenderWidgetHost()->ResetLostFocus();
 }

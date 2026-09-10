@@ -354,9 +354,6 @@ class RenderViewHostTestHarness : public ::testing::Test {
   std::unique_ptr<RenderViewHostTestEnabler> rvh_test_enabler_;
 
   std::unique_ptr<WebContents> contents_;
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<ui::ScopedOleInitializer> ole_initializer_;
-#endif
 #if BUILDFLAG(IS_APPLE)
   std::unique_ptr<display::ScopedNativeScreen> screen_;
 #endif

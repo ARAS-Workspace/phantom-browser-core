@@ -365,26 +365,4 @@ IN_PROC_BROWSER_TEST_F(SystemDisplayApiTest, ResetDisplayIds) {
 
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-using SystemDisplayGetInfoTest = ExtensionApiTest;
-
-IN_PROC_BROWSER_TEST_F(SystemDisplayGetInfoTest, GetInfo) {
-  DisplayInfoProvider::ResetForTesting();
-  scoped_refptr<const Extension> test_extension =
-      ExtensionBuilder("Test", ExtensionBuilder::Type::PLATFORM_APP).Build();
-
-  scoped_refptr<SystemDisplayGetInfoFunction> get_info_function(
-      new SystemDisplayGetInfoFunction());
-
-  get_info_function->set_has_callback(true);
-  get_info_function->set_extension(test_extension.get());
-
-  // Verify that the GetInfo function runs successfully. This uses the real
-  // DisplayInfoProvider to verify that DisplayInfoProvider::GetAllDisplaysInfo
-  // calls its callback.
-  ASSERT_TRUE(
-      api_test_utils::RunFunction(get_info_function.get(), "[]", profile()));
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 }  // namespace extensions

@@ -296,12 +296,6 @@ VideoCaptureServiceImpl::VideoCaptureServiceImpl(
     media::CameraAppDeviceBridgeImpl::GetInstance()->SetUITaskRunner(
         ui_task_runner_);
 #endif
-#if BUILDFLAG(IS_WIN)
-    if (base::FeatureList::IsEnabled(
-            features::kWinCameraMonitoringInVideoCaptureService)) {
-      InitializeDeviceMonitor();
-    }
-#endif
 }
 
 VideoCaptureServiceImpl::~VideoCaptureServiceImpl() {
@@ -435,23 +429,7 @@ void VideoCaptureServiceImpl::InitializeDeviceMonitor() {
   video_capture_device_monitor_mac_->StartMonitoring();
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  CHECK(base::FeatureList::IsEnabled(
-      features::kWinCameraMonitoringInVideoCaptureService));
-  if (video_capture_system_message_window_win_) {
-    return;
-  }
-  video_capture_system_message_window_win_ =
-      std::make_unique<media::SystemMessageWindowWin>();
-#endif
 }
-
-#if BUILDFLAG(IS_WIN)
-void VideoCaptureServiceImpl::OnGpuInfoUpdate(const CHROME_LUID& luid) {
-  LazyInitializeDeviceFactory();
-  device_factory_->OnGpuInfoUpdate(luid);
-}
-#endif
 
 #if BUILDFLAG(ENABLE_GPU_CHANNEL_MEDIA_CAPTURE)
 void VideoCaptureServiceImpl::SetVizGpu(std::unique_ptr<viz::Gpu> viz_gpu) {

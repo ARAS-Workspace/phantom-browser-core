@@ -19,10 +19,6 @@
 #include "base/thread_annotations.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#endif
-
 namespace base {
 
 // Converts module id to match the id that the Google-internal symbol server

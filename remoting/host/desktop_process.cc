@@ -26,12 +26,6 @@
 #include "remoting/host/desktop_environment.h"
 #include "remoting/host/desktop_session_agent.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/windows_version.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace remoting {
 
 DesktopProcess::DesktopProcess(
@@ -86,18 +80,7 @@ void DesktopProcess::InjectSas() {
 
 void DesktopProcess::LockWorkstation() {
   DCHECK(caller_task_runner_->BelongsToCurrentThread());
-#if BUILDFLAG(IS_WIN)
-  if (base::win::OSInfo::GetInstance()->version_type() ==
-      base::win::VersionType::SUITE_HOME) {
-    return;
-  }
-
-  if (!::LockWorkStation()) {
-    PLOG(ERROR) << "LockWorkStation() failed";
-  }
-#else
   NOTREACHED();
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 void DesktopProcess::OnChannelConnected(int32_t peer_pid) {
@@ -163,16 +146,8 @@ bool DesktopProcess::Start(
   desktop_environment_factory_ = std::move(desktop_environment_factory);
 
   // Launch the audio capturing thread.
-#if BUILDFLAG(IS_WIN)
-  // On Windows the AudioCapturer requires COM, so we run a single-threaded
-  // apartment, which requires a UI thread.
-  audio_task_runner_ = AutoThread::CreateWithLoopAndComInitTypes(
-      "ChromotingAudioThread", caller_task_runner_, base::MessagePumpType::UI,
-      AutoThread::COM_INIT_STA);
-#else   // !BUILDFLAG(IS_WIN)
   audio_task_runner_ = AutoThread::CreateWithType(
       "ChromotingAudioThread", caller_task_runner_, base::MessagePumpType::IO);
-#endif  // !BUILDFLAG(IS_WIN)
 
   // Create a desktop agent.
   mojo::ScopedMessagePipeHandle desktop_pipe = CreateDesktopAgent();

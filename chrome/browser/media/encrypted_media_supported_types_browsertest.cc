@@ -54,7 +54,7 @@
 #include "media/base/win/mf_feature_checks.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/profiles/profile.h"
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/prefs/pref_service.h"
@@ -151,7 +151,7 @@ const char16_t kUnexpectedResult16[] = u"unexpected result";
 // session is supported on Windows and Mac. On ChromeOS, it is supported when
 // the protected media identifier permission is allowed. See
 // kUnsafelyAllowProtectedMediaIdentifierForDomain used below.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #define EXPECT_WV_SW_SECURE_PERSISTENT_SESSION EXPECT_WV
 #else
 #define EXPECT_WV_SW_SECURE_PERSISTENT_SESSION EXPECT_UNSUPPORTED
@@ -513,7 +513,7 @@ class EncryptedMediaSupportedTypesTest : public InProcessBrowserTest {
     auto hevc_supported = IsSupportedByKeySystem(key_system, kVideoMP4MimeType,
                                                  video_mp4_hevc_codecs());
 #if BUILDFLAG(ENABLE_HEVC_PARSER_AND_HW_DECODER)
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     // On Windows & Linux platforms, HEVC support is detected through the GPU
     // capabilities which won't indicate support when running the tests.
     // TODO(crbug.com/40226210): Fix this so that we can inject HEVC support on
@@ -523,7 +523,7 @@ class EncryptedMediaSupportedTypesTest : public InProcessBrowserTest {
     // On other platforms, HEVC support should be available if
     // kPlatformHEVCDecoderSupport is enabled.
     EXPECT_ECK_PROPRIETARY(hevc_supported);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 #else
     EXPECT_UNSUPPORTED(hevc_supported);
 #endif  // BUILDFLAG(ENABLE_HEVC_PARSER_AND_HW_DECODER)
@@ -2003,7 +2003,7 @@ IN_PROC_BROWSER_TEST_F(
 
 // Testing the Enterprise policy kProtectedContentIdentifiersAllowed
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(EncryptedMediaSupportedTypesWidevineTest,
                        WidevineHWSecureBlockedWhenPolicyBlocked) {
   browser()->GetProfile()->GetPrefs()->SetBoolean(
@@ -2054,7 +2054,7 @@ IN_PROC_BROWSER_TEST_F(EncryptedMediaSupportedTypesWidevineTest,
   EXPECT_UNSUPPORTED(IsAudioRobustnessSupported(kWidevine, "HW_SECURE_ALL"));
 #endif
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_PLAYREADY)
 IN_PROC_BROWSER_TEST_F(EncryptedMediaSupportedTypesPlayReadyTest,

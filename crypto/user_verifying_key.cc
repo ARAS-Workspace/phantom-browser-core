@@ -46,11 +46,6 @@ RefCountedUserVerifyingSigningKey::RefCountedUserVerifyingSigningKey(
 RefCountedUserVerifyingSigningKey::~RefCountedUserVerifyingSigningKey() =
     default;
 
-#if BUILDFLAG(IS_WIN)
-std::unique_ptr<UserVerifyingKeyProvider> GetUserVerifyingKeyProviderWin();
-void IsKeyCredentialManagerAvailable(base::OnceCallback<void(bool)> callback);
-#endif
-
 #if BUILDFLAG(IS_MAC)
 std::unique_ptr<UserVerifyingKeyProvider> GetUserVerifyingKeyProviderMac(
     UserVerifyingKeyProvider::Config config);
@@ -63,9 +58,7 @@ std::unique_ptr<UserVerifyingKeyProvider> GetUserVerifyingKeyProvider(
   if (g_mock_provider) {
     return g_mock_provider();
   }
-#if BUILDFLAG(IS_WIN)
-  return GetUserVerifyingKeyProviderWin();
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return GetUserVerifyingKeyProviderMac(std::move(config));
 #else
   return nullptr;
@@ -83,9 +76,7 @@ void AreUserVerifyingKeysSupported(
     std::move(callback).Run(g_mock_provider() != nullptr);
     return;
   }
-#if BUILDFLAG(IS_WIN)
-  IsKeyCredentialManagerAvailable(std::move(callback));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   AreMacUnexportableKeysAvailable(std::move(config), std::move(callback));
 #else
   std::move(callback).Run(false);

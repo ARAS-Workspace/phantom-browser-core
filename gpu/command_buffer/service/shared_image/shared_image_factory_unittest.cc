@@ -131,8 +131,7 @@ TEST_F(SharedImageFactoryTest, InvalidWebGPUUsage) {
 
   bool supports_shared_buffer =
       factory_->CreateSharedImage(mailbox, si_info, kNullSurfaceHandle);
-  // This is expected to work only on Windows.
-  ASSERT_EQ(supports_shared_buffer, BUILDFLAG(IS_WIN));
+  ASSERT_FALSE(supports_shared_buffer);
 
   if (!supports_shared_buffer) {
     GTEST_SKIP() << "WEBGPU_SHARED_BUFFER is not supported on this platform.";

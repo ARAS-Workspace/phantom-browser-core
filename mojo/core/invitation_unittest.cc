@@ -50,10 +50,6 @@
 #include "base/apple/mach_port_rendezvous.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace mojo {
 namespace core {
 namespace {
@@ -330,9 +326,6 @@ base::Process MAYBE_InvitationTest::LaunchChildTestClient(
   base::LaunchOptions default_launch_options;
   base::LaunchOptions& launch_options =
       custom_launch_options ? *custom_launch_options : default_launch_options;
-#if BUILDFLAG(IS_WIN)
-  launch_options.start_hidden = true;
-#endif
 
   PlatformChannel channel;
   PlatformHandle local_endpoint_handle;
@@ -385,12 +378,7 @@ void MAYBE_InvitationTest::SendInvitationToClient(
 
   MojoPlatformProcessHandle process_handle;
   process_handle.struct_size = sizeof(process_handle);
-#if BUILDFLAG(IS_WIN)
-  process_handle.value =
-      static_cast<uint64_t>(reinterpret_cast<uintptr_t>(process));
-#else
   process_handle.value = static_cast<uint64_t>(process);
-#endif
 
   MojoInvitationTransportEndpoint transport_endpoint;
   transport_endpoint.struct_size = sizeof(transport_endpoint);
@@ -1034,7 +1022,7 @@ DEFINE_TEST_CLIENT(MultiBrokerNetworkClient) {
   MojoClose(secondary_broker);
 }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_POSIX)
 TEST_F(MAYBE_InvitationTest, NoLeakOnFailedSend) {
   if (!mojo::core::IsMojoIpczEnabled()) {
     GTEST_SKIP() << "This test is specific to the MojoIpcz driver.";
@@ -1042,14 +1030,8 @@ TEST_F(MAYBE_InvitationTest, NoLeakOnFailedSend) {
 
   // Helper lambda to retrieve the number of open handles.
   auto get_open_handle_count = []() {
-#if BUILDFLAG(IS_WIN)
-    DWORD handle_count = 0;
-    ::GetProcessHandleCount(::GetCurrentProcess(), &handle_count);
-    return static_cast<int>(handle_count);
-#else  // BUILDFLAG(IS_POSIX)
     return base::ProcessMetrics::CreateCurrentProcessMetrics()
         ->GetOpenFdCount();
-#endif
   };
 
   const int initial_count = get_open_handle_count();
@@ -1083,7 +1065,7 @@ TEST_F(MAYBE_InvitationTest, NoLeakOnFailedSend) {
   const int final_count = get_open_handle_count();
   EXPECT_LT(final_count, initial_count + iterations / 2);
 }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 
 }  // namespace
 }  // namespace core

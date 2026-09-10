@@ -57,38 +57,13 @@ bool FindLayersInOrder(
   return false;
 }
 
-#if BUILDFLAG(IS_WIN)
-
-struct FindAllWindowsData {
-  // This field is not a raw_ptr<> because it was filtered by the rewriter for:
-  // #reinterpret-cast-trivial-type
-  RAW_PTR_EXCLUSION aura::Window::Windows* windows;
-};
-
-BOOL CALLBACK FindAllWindowsCallback(HWND hwnd, LPARAM param) {
-  FindAllWindowsData* data = reinterpret_cast<FindAllWindowsData*>(param);
-  if (aura::WindowTreeHost* host =
-          aura::WindowTreeHost::GetForAcceleratedWidget(hwnd)) {
-    data->windows->push_back(host->window());
-  }
-  return TRUE;
-}
-
-#endif  // BUILDFLAG(IS_WIN)
-
 aura::Window::Windows GetAllTopLevelWindows() {
   aura::Window::Windows roots;
   if (*g_root_window_provider) {
     return g_root_window_provider->Run();
   }
 
-#if BUILDFLAG(IS_WIN)
-  {
-    FindAllWindowsData data = {&roots};
-    EnumThreadWindows(GetCurrentThreadId(), FindAllWindowsCallback,
-                      reinterpret_cast<LPARAM>(&data));
-  }
-#elif BUILDFLAG(ENABLE_DESKTOP_AURA)
+#if BUILDFLAG(ENABLE_DESKTOP_AURA)
   roots = DesktopWindowTreeHostPlatform::GetAllOpenWindows();
 #endif
   aura::test::AuraTestHelper* aura_test_helper =
@@ -135,7 +110,7 @@ gfx::Size WidgetTest::GetNativeWidgetMinimumContentSize(Widget* widget) {
   // the window manager is interested in knowing the size constraints. On
   // ChromeOS, it's handled internally. Elsewhere, the size constraints need to
   // be pushed to the window server when they change.
-#if !BUILDFLAG(ENABLE_DESKTOP_AURA) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if !BUILDFLAG(ENABLE_DESKTOP_AURA) || BUILDFLAG(IS_LINUX)
   return widget->GetNativeWindow()->delegate()->GetMinimumSize();
 #else
   NOTREACHED();

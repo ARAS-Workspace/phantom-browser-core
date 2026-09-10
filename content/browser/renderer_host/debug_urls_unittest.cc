@@ -25,10 +25,6 @@ TEST_F(DebugUrlsUnitTest, IsDebugURL_NonDebugUrlsReturnFalse) {
 }
 
 TEST_F(DebugUrlsUnitTest, IsDebugURL_AsanUrlsReturnTrue) {
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(IsDebugURL(GURL("chrome://crash/browser-corrupt-heap-block")));
-  EXPECT_TRUE(IsDebugURL(GURL("chrome://crash/browser-corrupt-heap")));
-#endif
 }
 
 TEST_F(DebugUrlsUnitTest, IsDebugURL_DebugUrlsReturnTrue) {
@@ -39,9 +35,6 @@ TEST_F(DebugUrlsUnitTest, IsDebugURL_DebugUrlsReturnTrue) {
   EXPECT_TRUE(IsDebugURL(GURL("chrome://crash/browser/heap-underflow")));
   EXPECT_TRUE(
       IsDebugURL(GURL("chrome://crash/browser/member-dereference-after-free")));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(IsDebugURL(GURL(blink::kChromeUIBrowserHeapCorruptionURL)));
-#endif
   EXPECT_TRUE(IsDebugURL(GURL(blink::kChromeUIBrowserUIHang)));
   EXPECT_TRUE(IsDebugURL(GURL(blink::kChromeUIDelayedBrowserUIHang)));
   EXPECT_TRUE(IsDebugURL(GURL(blink::kChromeUIGpuCleanURL)));

@@ -15,9 +15,7 @@
 #include "ui/base/pointer/pointer_device.h"
 #include "ui/gl/gpu_switching_manager.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/events/devices/input_device_observer_win.h"
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include "ui/events/devices/device_data_manager.h"
 #elif BUILDFLAG(IS_ANDROID)
 #include "ui/base/device_form_factor.h"
@@ -55,9 +53,7 @@ SlowWebPreferenceCacheObserver::~SlowWebPreferenceCacheObserver() = default;
 SlowWebPreferenceCache::SlowWebPreferenceCache() {
   gpu_switch_observation_.Observe(ui::GpuSwitchingManager::GetInstance());
 
-#if BUILDFLAG(IS_WIN)
-  ui::InputDeviceObserverWin::GetInstance()->AddObserver(this);
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   ui::DeviceDataManager::GetInstance()->AddObserver(this);
 #elif BUILDFLAG(IS_ANDROID)
   ui::InputDeviceObserverAndroid::GetInstance()->AddObserver(this);
@@ -67,9 +63,7 @@ SlowWebPreferenceCache::SlowWebPreferenceCache() {
 }
 
 SlowWebPreferenceCache::~SlowWebPreferenceCache() {
-#if BUILDFLAG(IS_WIN)
-  ui::InputDeviceObserverWin::GetInstance()->RemoveObserver(this);
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   ui::DeviceDataManager::GetInstance()->RemoveObserver(this);
 #elif BUILDFLAG(IS_ANDROID)
   ui::InputDeviceObserverAndroid::GetInstance()->RemoveObserver(this);
@@ -236,9 +230,6 @@ std::pair<int, int> SlowWebPreferenceCache::GetAvailablePointerAndHoverTypes() {
   // ui::GetAvailablePointerAndHoverTypes needs to call some in order to
   // figure out tablet device details in base::win::IsDeviceUsedAsATablet,
   // see https://crbug.com/1262162.
-#if BUILDFLAG(IS_WIN)
-  base::ScopedAllowBlocking scoped_allow_blocking;
-#endif
   return ui::GetAvailablePointerAndHoverTypes();
 }
 

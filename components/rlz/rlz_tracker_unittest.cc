@@ -396,24 +396,7 @@ void RlzLibTest::ExpectReactivationRlzPingSent(bool expected) {
 //
 // Also want to test that pre-warming the RLZ string cache works correctly.
 
-#if BUILDFLAG(IS_WIN)
-const char kOmniboxInstall[] = "C1I";
-const char kOmniboxSetToGoogle[] = "C1S";
-const char kOmniboxFirstSearch[] = "C1F";
-
-const char kHomepageInstall[] = "C2I";
-const char kHomepageSetToGoogle[] = "C2S";
-const char kHomepageFirstSearch[] = "C2F";
-
-const char kAppListInstall[] = "C7I";
-const char kAppListSetToGoogle[] = "C7S";
-const char kAppListFirstSearch[] = "C7F";
-
-const char kEnterpriseEnrollment[] = "C1X";
-const char kEnterpriseUnenrollment[] = "C1Y";
-const char kEnterpriseEnrolledActivate[] = "C1Z";
-const char kEnterpriseEnrolledFirstSearch[] = "C1W";
-#elif BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
 const char kOmniboxInstallPhone[] = "CDI";
 const char kOmniboxSetToGooglePhone[] = "CDS";
 const char kOmniboxFirstSearchPhone[] = "CDF";

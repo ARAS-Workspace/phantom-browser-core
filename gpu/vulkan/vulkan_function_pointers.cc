@@ -373,29 +373,6 @@ bool VulkanFunctionPointers::BindInstanceFunctionPointers(
   }
 #endif  // defined(USE_VULKAN_XCB)
 
-#if BUILDFLAG(IS_WIN)
-  if (gfx::HasExtension(enabled_extensions,
-                        VK_KHR_WIN32_SURFACE_EXTENSION_NAME)) {
-    constexpr char kvkCreateWin32SurfaceKHR[] = "vkCreateWin32SurfaceKHR";
-    vkCreateWin32SurfaceKHR = reinterpret_cast<PFN_vkCreateWin32SurfaceKHR>(
-        vkGetInstanceProcAddr(vk_instance, kvkCreateWin32SurfaceKHR));
-    if (!vkCreateWin32SurfaceKHR) {
-      LogGetProcError(kvkCreateWin32SurfaceKHR);
-      return false;
-    }
-
-    constexpr char kvkGetPhysicalDeviceWin32PresentationSupportKHR[] =
-        "vkGetPhysicalDeviceWin32PresentationSupportKHR";
-    vkGetPhysicalDeviceWin32PresentationSupportKHR =
-        reinterpret_cast<PFN_vkGetPhysicalDeviceWin32PresentationSupportKHR>(
-            vkGetInstanceProcAddr(
-                vk_instance, kvkGetPhysicalDeviceWin32PresentationSupportKHR));
-    if (!vkGetPhysicalDeviceWin32PresentationSupportKHR) {
-      LogGetProcError(kvkGetPhysicalDeviceWin32PresentationSupportKHR);
-      return false;
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
   if (gfx::HasExtension(enabled_extensions,
@@ -1081,30 +1058,6 @@ bool VulkanFunctionPointers::BindDeviceFunctionPointers(
   }
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-  if (gfx::HasExtension(enabled_extensions,
-                        VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME)) {
-    constexpr char kvkGetSemaphoreWin32HandleKHR[] =
-        "vkGetSemaphoreWin32HandleKHR";
-    vkGetSemaphoreWin32HandleKHR =
-        reinterpret_cast<PFN_vkGetSemaphoreWin32HandleKHR>(
-            vkGetDeviceProcAddr(vk_device, kvkGetSemaphoreWin32HandleKHR));
-    if (!vkGetSemaphoreWin32HandleKHR) {
-      LogGetProcError(kvkGetSemaphoreWin32HandleKHR);
-      return false;
-    }
-
-    constexpr char kvkImportSemaphoreWin32HandleKHR[] =
-        "vkImportSemaphoreWin32HandleKHR";
-    vkImportSemaphoreWin32HandleKHR =
-        reinterpret_cast<PFN_vkImportSemaphoreWin32HandleKHR>(
-            vkGetDeviceProcAddr(vk_device, kvkImportSemaphoreWin32HandleKHR));
-    if (!vkImportSemaphoreWin32HandleKHR) {
-      LogGetProcError(kvkImportSemaphoreWin32HandleKHR);
-      return false;
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_POSIX)
   if (gfx::HasExtension(enabled_extensions,
@@ -1128,29 +1081,6 @@ bool VulkanFunctionPointers::BindDeviceFunctionPointers(
   }
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-  if (gfx::HasExtension(enabled_extensions,
-                        VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME)) {
-    constexpr char kvkGetMemoryWin32HandleKHR[] = "vkGetMemoryWin32HandleKHR";
-    vkGetMemoryWin32HandleKHR = reinterpret_cast<PFN_vkGetMemoryWin32HandleKHR>(
-        vkGetDeviceProcAddr(vk_device, kvkGetMemoryWin32HandleKHR));
-    if (!vkGetMemoryWin32HandleKHR) {
-      LogGetProcError(kvkGetMemoryWin32HandleKHR);
-      return false;
-    }
-
-    constexpr char kvkGetMemoryWin32HandlePropertiesKHR[] =
-        "vkGetMemoryWin32HandlePropertiesKHR";
-    vkGetMemoryWin32HandlePropertiesKHR =
-        reinterpret_cast<PFN_vkGetMemoryWin32HandlePropertiesKHR>(
-            vkGetDeviceProcAddr(vk_device,
-                                kvkGetMemoryWin32HandlePropertiesKHR));
-    if (!vkGetMemoryWin32HandlePropertiesKHR) {
-      LogGetProcError(kvkGetMemoryWin32HandlePropertiesKHR);
-      return false;
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
 
 
@@ -1262,10 +1192,6 @@ void VulkanFunctionPointers::ResetForTesting() {
   vkGetPhysicalDeviceXcbPresentationSupportKHR = nullptr;
 #endif  // defined(USE_VULKAN_XCB)
 
-#if BUILDFLAG(IS_WIN)
-  vkCreateWin32SurfaceKHR = nullptr;
-  vkGetPhysicalDeviceWin32PresentationSupportKHR = nullptr;
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
   vkCreateAndroidSurfaceKHR = nullptr;
@@ -1358,20 +1284,12 @@ void VulkanFunctionPointers::ResetForTesting() {
   vkImportSemaphoreFdKHR = nullptr;
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-  vkGetSemaphoreWin32HandleKHR = nullptr;
-  vkImportSemaphoreWin32HandleKHR = nullptr;
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_POSIX)
   vkGetMemoryFdKHR = nullptr;
   vkGetMemoryFdPropertiesKHR = nullptr;
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-  vkGetMemoryWin32HandleKHR = nullptr;
-  vkGetMemoryWin32HandlePropertiesKHR = nullptr;
-#endif  // BUILDFLAG(IS_WIN)
 
 
 

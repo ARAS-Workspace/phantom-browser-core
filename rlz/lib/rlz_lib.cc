@@ -29,10 +29,6 @@
 #include "rlz/lib/string_utils.h"
 #include "services/network/public/mojom/url_loader_factory.mojom.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "rlz/lib/machine_deal_win.h"
-#endif
-
 namespace {
 
 // Event information returned from ping response.
@@ -542,11 +538,6 @@ bool ParsePingResponse(Product product, const char* response) {
     }
   } while (line_end_index >= 0);
 
-#if BUILDFLAG(IS_WIN)
-  // Update the DCC in registry if needed.
-  SetMachineDealCodeFromPingResponse(response);
-#endif
-
   return true;
 }
 
@@ -592,13 +583,6 @@ bool GetPingParams(Product product, const AccessPoint* access_points,
       }
     }
 
-#if BUILDFLAG(IS_WIN)
-    // Report the DCC too if not empty. DCCs are windows-only.
-    char dcc[kMaxDccLength + 1];
-    dcc[0] = 0;
-    if (GetMachineDealCode(dcc, std::size(dcc)) && dcc[0])
-      base::StringAppendF(&cgi_string, "&%s=%s", kDccCgiVariable, dcc);
-#endif
   }
 
   if (cgi_string.size() >= cgi_size)

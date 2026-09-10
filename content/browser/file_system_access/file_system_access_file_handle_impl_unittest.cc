@@ -216,10 +216,6 @@ class FileSystemAccessFileHandleImplTestBase : public testing::Test {
                    bool is_incognito,
                    bool use_content_uri = false) {
     ASSERT_TRUE(dir_.CreateUniqueTempDir());
-#if BUILDFLAG(IS_WIN)
-    // Convert path to long format to avoid mixing long and 8.3 formats in test.
-    ASSERT_TRUE(dir_.Set(base::MakeLongFilePath(dir_.Take())));
-#endif  // BUILDFLAG(IS_WIN)
 
     web_contents_ = web_contents_factory_.CreateWebContents(&browser_context_);
     static_cast<TestWebContents*>(web_contents_)

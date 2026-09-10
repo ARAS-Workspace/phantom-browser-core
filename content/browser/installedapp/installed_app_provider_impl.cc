@@ -26,32 +26,17 @@
 #include "mojo/public/cpp/bindings/clone_traits.h"
 #include "third_party/blink/public/mojom/installedapp/related_application.mojom.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "content/browser/installedapp/fetch_related_win_apps_task.h"
-#include "content/browser/installedapp/native_win_app_fetcher.h"
-#include "content/browser/installedapp/native_win_app_fetcher_impl.h"
-#endif
-
 namespace content {
 
 namespace {
 constexpr int kMaxNumberOfQueriedApps = 10;
 
-#if BUILDFLAG(IS_WIN)
-std::unique_ptr<NativeWinAppFetcher> CreateNativeWinAppFetcher() {
-  return std::make_unique<NativeWinAppFetcherImpl>();
-}
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 InstalledAppProviderImpl::InstalledAppProviderImpl(
     RenderFrameHost& render_frame_host,
     mojo::PendingReceiver<blink::mojom::InstalledAppProvider> pending_receiver)
     : DocumentService(render_frame_host, std::move(pending_receiver)) {
-#if BUILDFLAG(IS_WIN)
-  native_win_app_fetcher_factory_ =
-      base::BindRepeating(&CreateNativeWinAppFetcher);
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 InstalledAppProviderImpl::~InstalledAppProviderImpl() = default;
@@ -90,14 +75,6 @@ void InstalledAppProviderImpl::FilterInstalledApps(
   }
 
   base::ConcurrentCallbacks<FetchRelatedAppsTaskResult> concurrent;
-
-#if BUILDFLAG(IS_WIN)
-  if (base::FeatureList::IsEnabled(features::kFilterInstalledAppsWinMatching)) {
-    StartTask(std::make_unique<FetchRelatedWinAppsTask>(
-                  native_win_app_fetcher_factory_.Run()),
-              related_apps, concurrent.CreateCallback());
-  }
-#endif
 
 #if !BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(
@@ -157,15 +134,6 @@ void InstalledAppProviderImpl::AggregateTaskResults(
 
   return std::move(callback).Run(mojo::Clone(matched_apps));
 }
-
-#if BUILDFLAG(IS_WIN)
-void InstalledAppProviderImpl::SetNativeWinAppFetcherFactoryForTesting(
-    base::RepeatingCallback<std::unique_ptr<NativeWinAppFetcher>()> factory) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  CHECK_IS_TEST();
-  native_win_app_fetcher_factory_ = std::move(factory);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // static
 void InstalledAppProviderImpl::Create(

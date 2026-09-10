@@ -27,20 +27,14 @@
 #include "build/build_config.h"
 #include "components/privacy_sandbox/privacy_sandbox_attestations/privacy_sandbox_attestations_histograms.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#include <winternl.h>
-
-#include "base/byte_size.h"
-#include "base/win/windows_handle_util.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include <mach/mach.h>
 #include <mach/task.h>
 #elif BUILDFLAG(IS_LINUX)
 #include <sys/resource.h>
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 namespace {
 
 // These values are taken from the
@@ -67,38 +61,6 @@ constexpr uint32_t kColdStartHardFaultCountThreshold = 3500;
 constexpr int kHardFaultBytesMin = 1024;
 constexpr int kHardFaultBytesMax = 1073741824;  // 1 GiB
 constexpr int kHardFaultBytesBucketCount = 50;
-
-}  // namespace
-#endif
-
-#if BUILDFLAG(IS_WIN)
-namespace {
-
-// The struct used to return system process information via the NT internal
-// QuerySystemInformation call. This is partially documented at
-// http://goo.gl/Ja9MrH and fully documented at http://goo.gl/QJ70rn
-// This structure is laid out in the same format on both 32-bit and 64-bit
-// systems, but has a different size due to the various pointer-sized fields.
-struct SYSTEM_PROCESS_INFORMATION_EX {
-  ULONG NextEntryOffset;
-  ULONG NumberOfThreads;
-  LARGE_INTEGER WorkingSetPrivateSize;
-  ULONG HardFaultCount;
-  BYTE Reserved1[36];
-  PVOID Reserved2[3];
-  // This is labeled a handle so that it expands to the correct size for
-  // 32-bit and 64-bit operating systems. However, under the hood it's a
-  // 32-bit DWORD containing the process ID.
-  HANDLE UniqueProcessId;
-  PVOID Reserved3;
-  ULONG HandleCount;
-  BYTE Reserved4[4];
-  PVOID Reserved5[11];
-  SIZE_T PeakPagefileUsage;
-  SIZE_T PrivatePageCount;
-  LARGE_INTEGER Reserved6[6];
-  // Array of SYSTEM_THREAD_INFORMATION structs follows.
-};
 
 }  // namespace
 #endif
@@ -206,87 +168,7 @@ BrowserStartupMetricRecorder& GetBrowser() {
   return instance;
 }
 
-#if BUILDFLAG(IS_WIN)
-// Returns the hard fault count of the current process, or nullopt if it can't
-// be determined.
-std::optional<uint32_t>
-BrowserStartupMetricRecorder::GetHardFaultCountForCurrentProcess() {
-  // The output of this system call depends on the number of threads and
-  // processes on the entire system, and this can change between calls. Retry
-  // a small handful of times growing the buffer along the way.
-  // NOTE: The actual required size depends entirely on the number of
-  // processes and threads running on the system. The initial guess suffices for
-  // ~100s of processes and ~1000s of threads.
-  std::vector<uint8_t> buffer(base::KiBU(32).InBytes());
-  constexpr int kMaxNumBufferResize = 2;
-  int num_buffer_resize = 0;
-  for (;;) {
-    ULONG return_length = 0;
-    const NTSTATUS status = ::NtQuerySystemInformation(
-        SystemProcessInformation, buffer.data(),
-        static_cast<ULONG>(buffer.size()), &return_length);
-
-    // NtQuerySystemInformation succeeded.
-    if (NT_SUCCESS(status)) {
-      DCHECK_LE(return_length, buffer.size());
-      break;
-    }
-
-    // NtQuerySystemInformation failed due to insufficient buffer length.
-    if (return_length > buffer.size()) {
-      // Abort if a large size is required for the buffer. It is undesirable
-      // to fill a large buffer just to record histograms.
-#if defined(_WIN64)
-      constexpr ULONG kMaxLength =
-          base::MiBU(2).InBytes();  // 2 MB for 64-bit systems
-#else
-      constexpr ULONG kMaxLength =
-          base::KiBU(512).InBytes();  // 512 KB for 32-bit systems
-#endif
-      if (return_length >= kMaxLength) {
-        return std::nullopt;
-      }
-
-      // Resize the buffer and retry, if the buffer hasn't already been
-      // resized too many times. Use double the return length to have padding
-      // for new threads spawned in the meantime.
-      if (num_buffer_resize < kMaxNumBufferResize) {
-        ++num_buffer_resize;
-        buffer.resize(std::min(return_length * 2, kMaxLength));
-        continue;
-      }
-    }
-
-    // Abort if NtQuerySystemInformation failed for another reason than
-    // insufficient buffer length, or if the buffer was resized too many
-    // times.
-    DCHECK(return_length <= buffer.size() ||
-           num_buffer_resize >= kMaxNumBufferResize);
-    return std::nullopt;
-  }
-
-  // Look for the struct housing information for the current process.
-  const DWORD proc_id = ::GetCurrentProcessId();
-  size_t index = 0;
-  while (index < buffer.size()) {
-    DCHECK_LE(index + sizeof(SYSTEM_PROCESS_INFORMATION_EX), buffer.size());
-    SYSTEM_PROCESS_INFORMATION_EX* proc_info =
-        UNSAFE_TODO(reinterpret_cast<SYSTEM_PROCESS_INFORMATION_EX*>(
-            buffer.data() + index));
-    if (base::win::HandleToUint32(proc_info->UniqueProcessId) == proc_id) {
-      return proc_info->HardFaultCount;
-    }
-    // The list ends when NextEntryOffset is zero. This also prevents busy
-    // looping if the data is in fact invalid.
-    if (proc_info->NextEntryOffset <= 0) {
-      return std::nullopt;
-    }
-    index += proc_info->NextEntryOffset;
-  }
-
-  return std::nullopt;
-}
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 std::optional<uint32_t>
 BrowserStartupMetricRecorder::GetHardFaultCountForCurrentProcess() {
   task_events_info_data_t events_info;
@@ -311,7 +193,7 @@ BrowserStartupMetricRecorder::GetHardFaultCountForCurrentProcess() {
   }
   return base::saturated_cast<uint32_t>(usage.ru_majflt);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC)
 
 void BrowserStartupMetricRecorder::ResetSessionForTesting() {
   GetCommon().ResetSessionForTesting();
@@ -579,7 +461,7 @@ void BrowserStartupMetricRecorder::RecordBrowserWindowFirstPaint(
   }
   is_first_call = false;
   RecordBrowserWindowFirstPaintTicks(ticks);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Mirror Startup.BrowserMessageLoopStartHardFault{Count,Bytes} at the first
   // paint checkpoint (using a higher 1M cap for Count to avoid saturation).
   // We record this unconditionally (even if ShouldLogStartupHistogram() is
@@ -617,7 +499,7 @@ void BrowserStartupMetricRecorder::RecordFirstRunSentinelCreation(
 }
 
 void BrowserStartupMetricRecorder::RecordHardFaultHistogram() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   DCHECK_EQ(UNDETERMINED_STARTUP_TEMPERATURE, g_startup_temperature);
 
   const std::optional<uint32_t> hard_fault_count =
@@ -657,7 +539,7 @@ void BrowserStartupMetricRecorder::RecordHardFaultHistogram() {
   // Record the startup 'temperature'.
   base::UmaHistogramEnumeration("Startup.Temperature", g_startup_temperature,
                                 STARTUP_TEMPERATURE_COUNT);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 }
 
 bool BrowserStartupMetricRecorder::ShouldLogStartupHistogram() const {

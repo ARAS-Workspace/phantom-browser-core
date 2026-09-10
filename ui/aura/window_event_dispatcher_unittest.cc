@@ -747,11 +747,7 @@ std::string EventTypesToString(const EventFilterRecorder::Events& events) {
 
 }  // namespace
 
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_X86)
-#define MAYBE(x) DISABLED_##x
-#else
 #define MAYBE(x) x
-#endif
 
 // Verifies a repost mouse event targets the window with capture (if there is
 // one).
@@ -1329,11 +1325,7 @@ TEST_F(WindowEventDispatcherTest, DoNotDispatchInShutdown) {
   window->RemovePreTargetHandler(&recorder);
 }
 
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_X86)
-#define MAYBE(x) DISABLED_##x
-#else
 #define MAYBE(x) x
-#endif
 
 // Tests synthetic mouse events generated when window bounds changes such that
 // the cursor previously outside the window becomes inside, or vice versa.

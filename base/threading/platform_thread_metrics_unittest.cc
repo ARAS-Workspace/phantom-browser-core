@@ -34,10 +34,6 @@
 #include <sys/resource.h>
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace base {
 
 namespace {
@@ -94,17 +90,7 @@ class MetricsTestThread final : public SimpleThread {
 
   // SimpleThread:
   void Run() final {
-#if BUILDFLAG(IS_WIN)
-    // CurrentHandle() returns a pseudo-handle that's the same in every thread.
-    // Duplicate it to get a real handle.
-    HANDLE win_handle;
-    ASSERT_TRUE(::DuplicateHandle(::GetCurrentProcess(), ::GetCurrentThread(),
-                                  ::GetCurrentProcess(), &win_handle,
-                                  THREAD_QUERY_LIMITED_INFORMATION, FALSE, 0));
-    PlatformThreadHandle handle(win_handle);
-#else
     PlatformThreadHandle handle = PlatformThread::CurrentHandle();
-#endif
     handle_.store(handle, std::memory_order_relaxed);
     handle_ready_event_.Signal();
 
@@ -139,24 +125,12 @@ class MetricsTestThread final : public SimpleThread {
 class PlatformThreadMetricsTest : public ::testing::Test {
  public:
   void SetUp() override {
-#if BUILDFLAG(IS_WIN) && !defined(ARCH_CPU_ARM64)
-    // TSC is only initialized once TSCTicksPerSecond() is called twice at least
-    // 50 ms apart on the same thread to get a baseline. If the system has a
-    // TSC, make sure it's initialized so all GetCumulativeCPUUsage calls use
-    // it.
-    if (time_internal::HasConstantRateTSC()) {
-      if (time_internal::TSCTicksPerSecond() == 0) {
-        PlatformThread::Sleep(Milliseconds(51));
-      }
-      ASSERT_GT(time_internal::TSCTicksPerSecond(), 0);
-    }
-#endif
   }
 };
 
 }  // namespace
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE)
 TEST_F(PlatformThreadMetricsTest, CreateFromHandle) {
   EXPECT_FALSE(PlatformThreadMetrics::CreateFromHandle(PlatformThreadHandle()));
   EXPECT_TRUE(
@@ -171,7 +145,7 @@ TEST_F(PlatformThreadMetricsTest, CreateFromHandle) {
 }
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 TEST_F(PlatformThreadMetricsTest, CreateFromId) {
   EXPECT_FALSE(PlatformThreadMetrics::CreateFromId(PlatformThreadId()));
   EXPECT_FALSE(PlatformThreadMetrics::CreateFromId(kInvalidThreadId));
@@ -242,17 +216,12 @@ TEST_F(PlatformThreadMetricsTest, GetCumulativeCPUUsage_OtherThread) {
   // values, although it may fail on some platforms. (If the measurement works,
   // it will include any CPU used between the last measurement and the join.)
 
-#if BUILDFLAG(IS_WIN)
-  // Windows can always read the final CPU usage of a stopped thread.
-  ASSERT_NE(cpu_usage3, std::nullopt);
-#else
   // POSIX platforms are racy, so the measurement may fail. Apple and Fuchsia
   // seem to always fail, but if a change causes measurements to start working,
   // that's good too.
   if (cpu_usage3.has_value()) {
     EXPECT_GE(cpu_usage3.value(), cpu_usage2.value());
   }
-#endif
 }
 
 #if BUILDFLAG(IS_ANDROID)

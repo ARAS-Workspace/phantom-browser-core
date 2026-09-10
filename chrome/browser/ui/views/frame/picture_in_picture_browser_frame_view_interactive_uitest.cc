@@ -469,16 +469,7 @@ class PictureInPictureBrowserFrameViewTest : public WebRtcTestBase,
   std::unique_ptr<ModalWidgetDelegate> delegate_;
 };
 
-#if BUILDFLAG(IS_WIN) && defined(NDEBUG)
-// TODO(jazzhsu): Fix test on MAC and Wayland. Test currently not working on
-// those platforms because if we send mouse move event outside of the pip window
-// in ui_test_utils::SendMouseMoveSync, the pip window will not receive the
-// event.
-// TODO(crbug.com/403599401): Fails on Win11 debug.
-#define MAYBE_TitleActivation TitleActivation
-#else
 #define MAYBE_TitleActivation DISABLED_TitleActivation
-#endif
 IN_PROC_BROWSER_TEST_F(PictureInPictureBrowserFrameViewTest,
                        MAYBE_TitleActivation) {
   ASSERT_NO_FATAL_FAILURE(SetUpDocumentPIP());
@@ -1383,7 +1374,6 @@ IN_PROC_BROWSER_TEST_F(PictureInPictureBrowserFrameViewTest,
   EXPECT_NE(nullptr, pip_frame_view()->GetBackToTabButtonForTesting());
 }
 
-#if !BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_F(PictureInPictureBrowserFrameViewTest,
                        FadeInAnimationIsUsedOnWindowShow) {
   // Set up document PiP.
@@ -1395,7 +1385,6 @@ IN_PROC_BROWSER_TEST_F(PictureInPictureBrowserFrameViewTest,
   EXPECT_NE(nullptr, pip_fade_animator);
   EXPECT_EQ(1, pip_fade_animator->GetFadeInCallsCountForTesting());
 }
-#endif
 
 IN_PROC_BROWSER_TEST_P(PictureInPictureBrowserFrameViewTest,
                        TestAnimationTiming) {

@@ -69,11 +69,7 @@ class ConsentDialogUiTest : public InProcessBrowserTest {
 };
 
 // TODO(crbug.com/416157468): Enable the test.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_GetConsentDialogBodyTest DISABLED_GetConsentDialogBodyTest
-#else
 #define MAYBE_GetConsentDialogBodyTest GetConsentDialogBodyTest
-#endif
 IN_PROC_BROWSER_TEST_F(ConsentDialogUiTest, MAYBE_GetConsentDialogBodyTest) {
   // Simulate a managed profile.
   AddEnterpriseManagedPolicies();

@@ -16,13 +16,7 @@
 #include "mojo/buildflags.h"
 #include "mojo/core/embedder/features.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/debug/dump_without_crashing.h"
-#include "base/win/scoped_handle.h"
-#include "mojo/public/cpp/platform/named_platform_channel.h"
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include <fcntl.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -46,67 +40,7 @@ namespace mojo {
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-void CreateChannel(PlatformHandle* local_endpoint,
-                   PlatformHandle* remote_endpoint) {
-  std::wstring pipe_name = NamedPlatformChannel::GetPipeNameFromServerName(
-      NamedPlatformChannel::GenerateRandomServerName(), /*is_local_pipe=*/true);
-  DWORD kOpenMode =
-      PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED | FILE_FLAG_FIRST_PIPE_INSTANCE;
-  const DWORD kPipeMode = PIPE_TYPE_BYTE | PIPE_READMODE_BYTE;
-  *local_endpoint = PlatformHandle(base::win::ScopedHandle(
-      ::CreateNamedPipeW(pipe_name.c_str(), kOpenMode, kPipeMode,
-                         1,           // Max instances.
-                         4096,        // Output buffer size.
-                         4096,        // Input buffer size.
-                         5000,        // Timeout in ms.
-                         nullptr)));  // Default security descriptor.
-  PCHECK(local_endpoint->is_valid());
-
-  const DWORD kDesiredAccess = GENERIC_READ | GENERIC_WRITE;
-  // The SECURITY_ANONYMOUS flag means that the server side cannot impersonate
-  // the client.
-  DWORD kFlags =
-      SECURITY_SQOS_PRESENT | SECURITY_ANONYMOUS | FILE_FLAG_OVERLAPPED;
-  // Allow the handle to be inherited by child processes.
-  SECURITY_ATTRIBUTES security_attributes = {sizeof(SECURITY_ATTRIBUTES),
-                                             nullptr, TRUE};
-  *remote_endpoint = PlatformHandle(base::win::ScopedHandle(
-      ::CreateFileW(pipe_name.c_str(), kDesiredAccess, 0, &security_attributes,
-                    OPEN_EXISTING, kFlags, nullptr)));
-  if (!remote_endpoint->is_valid() && ::GetLastError() == ERROR_PIPE_BUSY) {
-    // TODO(crbug.com/443055954): Sporadically, opening this named pipe fails
-    // with ERROR_PIPE_BUSY. This is unexpected as the pipe name is random. But
-    // there is a very small probability of a name collision, so try again with
-    // a new name. After this hypothesis is tested, refactor this function based
-    // on what has been learned.
-    pipe_name = NamedPlatformChannel::GetPipeNameFromServerName(
-        NamedPlatformChannel::GenerateRandomServerName(),
-        /*is_local_pipe=*/true);
-    *local_endpoint = PlatformHandle(base::win::ScopedHandle(
-        ::CreateNamedPipeW(pipe_name.c_str(), kOpenMode, kPipeMode,
-                           1,           // Max instances.
-                           4096,        // Output buffer size.
-                           4096,        // Input buffer size.
-                           5000,        // Timeout in ms.
-                           nullptr)));  // Default security descriptor.
-    PCHECK(local_endpoint->is_valid());
-    *remote_endpoint = PlatformHandle(base::win::ScopedHandle(
-        ::CreateFileW(pipe_name.c_str(), kDesiredAccess, 0,
-                      &security_attributes, OPEN_EXISTING, kFlags, nullptr)));
-    if (remote_endpoint->is_valid()) {
-      base::debug::DumpWithoutCrashing();
-    }
-  }
-
-  PCHECK(remote_endpoint->is_valid());
-
-  // Since a client has connected, ConnectNamedPipe() should return zero and
-  // GetLastError() should return ERROR_PIPE_CONNECTED.
-  CHECK(!::ConnectNamedPipe(local_endpoint->GetHandle().Get(), nullptr));
-  PCHECK(::GetLastError() == ERROR_PIPE_CONNECTED);
-}
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#if BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
 void CreateChannel(PlatformHandle* local_endpoint,
                    PlatformHandle* remote_endpoint) {
   // Mach messaging is simplex; and in order to enable full-duplex

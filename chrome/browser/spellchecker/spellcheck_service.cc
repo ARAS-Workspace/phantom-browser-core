@@ -55,12 +55,6 @@
 #include "ash/constants/ash_features.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-#include "base/task/task_traits.h"
-#include "base/task/thread_pool.h"
-#include "components/spellcheck/browser/windows_spell_checker.h"
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-
 using content::BrowserThread;
 
 namespace {
@@ -142,22 +136,6 @@ SpellcheckService::SpellcheckService(content::BrowserContext* context)
   single_dictionary_pref.SetValue("");
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-  if (!spellcheck::UseBrowserSpellChecker()) {
-    // A user may have disabled the Windows spellcheck feature after adding
-    // non-Hunspell supported languages on the language settings page. Remove
-    // preferences for non-Hunspell languages so that there is no attempt to
-    // load a non-existent Hunspell dictionary, and so that Hunspell
-    // spellchecking isn't broken because of the failed load.
-    ScopedListPrefUpdate update(prefs,
-                                spellcheck::prefs::kSpellCheckDictionaries);
-    update->EraseIf([](const base::Value& entry) {
-      return spellcheck::GetCorrespondingSpellCheckLanguage(entry.GetString())
-          .empty();
-    });
-  }
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-
   pref_change_registrar_.Add(
       spellcheck::prefs::kSpellCheckDictionaries,
       base::BindRepeating(&SpellcheckService::OnSpellCheckDictionariesChanged,
@@ -210,15 +188,6 @@ SpellcheckService::SpellcheckService(content::BrowserContext* context)
       custom_dictionary_->Load();
     }
   }
-
-#if BUILDFLAG(IS_WIN)
-  if (spellcheck::UseBrowserSpellChecker()) {
-    // If initialization of the spellcheck service is on-demand, it is up to the
-    // instantiator of the spellcheck service to call InitializeDictionaries
-    // with a callback.
-    return;
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   // 2. Initialize Hunspell dictionaries.
   if (run_hunspell_init) {
@@ -312,22 +281,8 @@ void SpellcheckService::GetDictionaries(
                         ",", base::TRIM_WHITESPACE, base::SPLIT_WANT_ALL);
   for (const auto& accept_language : accept_languages) {
     Dictionary dictionary;
-#if BUILDFLAG(IS_WIN)
-    if (spellcheck::UseBrowserSpellChecker()) {
-      SpellcheckService* spellcheck =
-          SpellcheckServiceFactory::GetForContext(browser_context);
-      if (spellcheck && spellcheck->UsesWindowsDictionary(accept_language))
-        dictionary.language = accept_language;
-    }
-
-    if (dictionary.language.empty()) {
-      dictionary.language =
-          spellcheck::GetCorrespondingSpellCheckLanguage(accept_language);
-    }
-#else
     dictionary.language =
         spellcheck::GetCorrespondingSpellCheckLanguage(accept_language);
-#endif  // BUILDFLAG(IS_WIN)
 
     if (dictionary.language.empty())
       continue;
@@ -366,117 +321,8 @@ std::string SpellcheckService::GetSupportedAcceptLanguageCode(
         /* include_script_tag= */ false);
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (!spellcheck::UseBrowserSpellChecker())
-    return supported_accept_language;
-
-  // Exclude dictionaries that are for private use, such as "ja-Latn-JP-x-ext".
-  if (SpellcheckService::HasPrivateUseSubTag(supported_language_full_tag))
-    return "";
-
-  // Collect the hardcoded list of accept-languages supported by the browser,
-  // that is, languages that can be added as preferred languages in the
-  // languages settings page.
-  std::vector<std::string> accept_languages;
-  l10n_util::GetAcceptLanguages(&accept_languages);
-
-  if (generic_only) {
-    return GetSupportedAcceptLanguageCodeGenericOnly(
-        supported_language_full_tag, accept_languages);
-  }
-
-  // First try exact match. Per BCP47, tags are in ASCII and should be treated
-  // as case-insensitive (although there are conventions for the capitalization
-  // of subtags).
-  auto iter = std::ranges::find_if(
-      accept_languages,
-      [supported_language_full_tag](const auto& accept_language) {
-        return base::EqualsCaseInsensitiveASCII(supported_language_full_tag,
-                                                accept_language);
-      });
-  if (iter != accept_languages.end())
-    return *iter;
-
-  // Then try matching just the language and (optional) script subtags, but
-  // not the region subtag. For example, Edge supports sr-Cyrl-RS as an accept
-  // language, but not sr-Cyrl-CS. Matching language + script subtags assures
-  // we get the correct script for spellchecking, and not use sr-Latn-RS if
-  // language packs for both scripts are installed on the system.
-  if (!supported_language_full_tag.contains("-")) {
-    return "";
-  }
-
-  iter = std::ranges::find_if(
-      accept_languages,
-      [supported_language_full_tag](const auto& accept_language) {
-        return base::EqualsCaseInsensitiveASCII(
-            SpellcheckService::GetLanguageAndScriptTag(
-                supported_language_full_tag,
-                /* include_script_tag= */ true),
-            SpellcheckService::GetLanguageAndScriptTag(
-                accept_language,
-                /* include_script_tag= */ true));
-      });
-
-  if (iter != accept_languages.end())
-    return *iter;
-
-  // Then try just matching the leading language subtag. E.g. Edge supports
-  // kok as an accept language, but if the Konkani language pack is
-  // installed the Windows spellcheck API reports kok-Deva-IN for the
-  // dictionary name.
-  return GetSupportedAcceptLanguageCodeGenericOnly(supported_language_full_tag,
-                                                   accept_languages);
-
-#else
   return supported_accept_language;
-#endif  // BUILDFLAG(IS_WIN)
 }
-
-#if BUILDFLAG(IS_WIN)
-// static
-void SpellcheckService::EnableFirstUserLanguageForSpellcheck(
-    PrefService* prefs) {
-  // Ensure that spellcheck is enabled for the first language in the
-  // accept languages list.
-  base::ListValue user_dictionaries =
-      prefs->GetList(spellcheck::prefs::kSpellCheckDictionaries).Clone();
-  std::vector<std::string> user_languages =
-      base::SplitString(prefs->GetString(language::prefs::kAcceptLanguages),
-                        ",", base::TRIM_WHITESPACE, base::SPLIT_WANT_ALL);
-
-  // Some first run scenarios will add an accept language to preferences that
-  // is not found in the hard-coded list in kAcceptLanguageList. Only
-  // languages in kAcceptLanguageList can be spellchecked. An example is an
-  // installation on a device where Finnish is the Windows display
-  // language--the initial accept language preferences are observed to be
-  // "fi-FI,fi,en-US,en". Only "fi" is contained in kAcceptLanguageList.
-  std::string first_user_language;
-  std::vector<std::string> accept_languages;
-  l10n_util::GetAcceptLanguages(&accept_languages);
-  for (const auto& user_language : user_languages) {
-    if (std::ranges::contains(accept_languages, user_language)) {
-      first_user_language = user_language;
-      break;
-    }
-  }
-
-  bool first_user_language_spellchecked = false;
-  for (const auto& dictionary_value : user_dictionaries) {
-    first_user_language_spellchecked =
-        dictionary_value.GetString().contains(first_user_language);
-    if (first_user_language_spellchecked)
-      break;
-  }
-
-  if (!first_user_language_spellchecked) {
-    user_dictionaries.Insert(user_dictionaries.begin(),
-                             base::Value(first_user_language));
-    prefs->SetList(spellcheck::prefs::kSpellCheckDictionaries,
-                   std::move(user_dictionaries));
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 void SpellcheckService::StartRecordingMetrics(bool spellcheck_enabled) {
   metrics_ = std::make_unique<SpellCheckHostMetrics>();
@@ -488,12 +334,6 @@ void SpellcheckService::StartRecordingMetrics(bool spellcheck_enabled) {
 
   OnUseSpellingServiceChanged();
 
-#if BUILDFLAG(IS_WIN)
-  if (record_configuration_metrics) {
-    RecordChromeLocalesStats();
-    RecordSpellcheckLocalesStats();
-  }
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 void SpellcheckService::InitForRenderer(content::RenderProcessHost* host) {
@@ -583,17 +423,6 @@ void SpellcheckService::LoadDictionaries() {
     // The spellcheck language passed to platform APIs may differ from the
     // accept language.
     std::string platform_spellcheck_language;
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-    if (spellcheck::UseBrowserSpellChecker()) {
-      std::string windows_dictionary_name =
-          GetSupportedWindowsDictionaryLanguage(dictionary);
-      if (!windows_dictionary_name.empty()) {
-        platform_spellcheck_language =
-            SpellcheckService::GetTagToPassToWindowsSpellchecker(
-                dictionary, windows_dictionary_name);
-      }
-    }
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 
     hunspell_dictionaries_.push_back(
         std::make_unique<SpellcheckHunspellDictionary>(
@@ -602,27 +431,6 @@ void SpellcheckService::LoadDictionaries() {
     hunspell_dictionaries_.back()->Load();
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (RecordSpellingConfigurationMetrics(context_)) {
-    RecordSpellcheckLocalesStats();
-  }
-
-#if BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-  if (spellcheck::UseBrowserSpellChecker()) {
-    // Only want to fire the callback on first call to LoadDictionaries
-    // originating from InitializeDictionaries, since supported platform
-    // dictionaries are cached throughout the browser session and not
-    // dynamically updated. LoadDictionaries can be called multiple times in a
-    // browser session, even before InitializeDictionaries is called, e.g. when
-    // language settings are changed.
-    if (!dictionaries_loaded() && dictionaries_loaded_callback_) {
-      dictionaries_loaded_ = true;
-      std::move(dictionaries_loaded_callback_).Run();
-    }
-    return;
-  }
-#endif  // BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-#endif  // BUILDFLAG(IS_WIN)
   dictionaries_loaded_ = true;
 }
 
@@ -635,15 +443,6 @@ bool SpellcheckService::IsSpellcheckEnabled() const {
   const PrefService* prefs = user_prefs::UserPrefs::Get(context_);
 
   bool enable_if_uninitialized = false;
-#if BUILDFLAG(IS_WIN)
-  if (spellcheck::UseBrowserSpellChecker()) {
-    // If initialization of the spellcheck service is on-demand, the
-    // renderer-side SpellCheck object needs to start out as enabled in order
-    // for a click on editable content to initialize the spellcheck service.
-    if (!dictionaries_loaded())
-      enable_if_uninitialized = true;
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   return prefs->GetBoolean(spellcheck::prefs::kSpellCheckEnable) &&
          (!hunspell_dictionaries_.empty() || enable_if_uninitialized);
@@ -702,13 +501,6 @@ void SpellcheckService::InitializeDictionaries(base::OnceClosure done) {
     return;
   }
 
-#if BUILDFLAG(IS_WIN)
-  dictionaries_loaded_callback_ = std::move(done);
-  // Need to initialize the platform spellchecker in order to record platform
-  // locale stats even if the platform spellcheck feature is disabled.
-  InitializePlatformSpellchecker();
-#endif  // BUILDFLAG(IS_WIN)
-
   PrefService* prefs = user_prefs::UserPrefs::Get(context_);
   DCHECK(prefs);
 
@@ -716,90 +508,9 @@ void SpellcheckService::InitializeDictionaries(base::OnceClosure done) {
   StartRecordingMetrics(
       prefs->GetBoolean(spellcheck::prefs::kSpellCheckEnable));
 
-#if BUILDFLAG(IS_WIN)
-  if (spellcheck::UseBrowserSpellChecker() && platform_spell_checker()) {
-    spellcheck_platform::RetrieveSpellcheckLanguages(
-        platform_spell_checker(),
-        base::BindOnce(&SpellcheckService::InitWindowsDictionaryLanguages,
-                       GetWeakPtr()));
-    return;
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   // Using Hunspell.
   LoadDictionaries();
 }
-
-#if BUILDFLAG(IS_WIN)
-void SpellcheckService::InitWindowsDictionaryLanguages(
-    const std::vector<std::string>& windows_spellcheck_languages) {
-  windows_spellcheck_dictionary_map_.clear();
-  for (const auto& windows_spellcheck_language : windows_spellcheck_languages) {
-    std::string accept_language =
-        SpellcheckService::GetSupportedAcceptLanguageCode(
-            windows_spellcheck_language, /* generic_only */ false);
-    AddWindowsSpellcheckDictionary(accept_language,
-                                   windows_spellcheck_language);
-
-    // There is one unfortunate special case (so far the only one known). The
-    // accept language "sr" is supported, and if you use it as a display
-    // language you see Cyrillic script. If a Windows language pack is
-    // installed that supports "sr-Cyrl-*", mark the "sr" accept language
-    // as having Windows spellcheck support instead of using Hunspell.
-    if (base::EqualsCaseInsensitiveASCII(
-            "sr-Cyrl", SpellcheckService::GetLanguageAndScriptTag(
-                           windows_spellcheck_language,
-                           /* include_script_tag= */ true))) {
-      AddWindowsSpellcheckDictionary("sr", windows_spellcheck_language);
-    }
-
-    // Add the generic language with the region subtag removed too if it exists
-    // in the list of accept languages, and use it when calling the Windows
-    // spellcheck APIs. For example, if the preferred language settings include
-    // just generic Portuguese (pt), but the Portuguese (Brazil) platform
-    // language pack (pt-BR) is installed, we want an entry for it so that the
-    // generic Portuguese language can be enabled for spellchecking. The Windows
-    // platform spellcheck API has logic to load the pt-BR dictionary if only pt
-    // is specified as the BCP47 language tag. The use of a map in
-    // AddWindowsSpellcheckDictionary ensures there won't be duplicate entries
-    // if a generic language was already added above (ar-SA would already be
-    // mapped to ar since the accept language ar-SA is not recognized by the
-    // browser e.g.).
-    accept_language = SpellcheckService::GetSupportedAcceptLanguageCode(
-        windows_spellcheck_language, /* generic_only */ true);
-    AddWindowsSpellcheckDictionary(accept_language, accept_language);
-  }
-
-  // A user may have removed a language pack for a non-Hunspell language after
-  // enabling it for spellcheck on the language settings page. Remove
-  // preferences for this language so that there is no attempt to load a
-  // non-existent Hunspell dictionary, and so that Hunspell spellchecking isn't
-  // broken because of the failed load. This also handles the case where the
-  // primary preferred language is enabled for spellchecking during first run,
-  // but it's now determined that there is neither Windows platform nor Hunspell
-  // dictionary support for that language.
-  PrefService* prefs = user_prefs::UserPrefs::Get(context_);
-  DCHECK(prefs);
-  // When following object goes out of scope, preference change observers will
-  // be notified (even if there is no preference change).
-  ScopedListPrefUpdate update(prefs,
-                              spellcheck::prefs::kSpellCheckDictionaries);
-  update->EraseIf([this](const base::Value& entry) {
-    const std::string dictionary_name = entry.GetString();
-    return (!UsesWindowsDictionary(dictionary_name) &&
-            spellcheck::GetCorrespondingSpellCheckLanguage(dictionary_name)
-                .empty());
-  });
-
-  // No need to call LoadDictionaries() as when the ScopedListPrefUpdate object
-  // goes out of scope, the preference change handler will do this.
-}
-
-bool SpellcheckService::UsesWindowsDictionary(
-    std::string accept_language) const {
-  return !GetSupportedWindowsDictionaryLanguage(accept_language).empty();
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // static
 void SpellcheckService::OverrideBinderForTesting(SpellCheckerBinder binder) {
@@ -835,82 +546,6 @@ std::string SpellcheckService::GetLanguageAndScriptTag(
 
   return language_and_script_tag;
 }
-
-#if BUILDFLAG(IS_WIN)
-// static
-std::string SpellcheckService::GetSupportedAcceptLanguageCodeGenericOnly(
-    const std::string& supported_language_full_tag,
-    const std::vector<std::string>& accept_languages) {
-  auto iter = std::ranges::find_if(
-      accept_languages,
-      [supported_language_full_tag](const auto& accept_language) {
-        return base::EqualsCaseInsensitiveASCII(
-            SpellcheckService::GetLanguageAndScriptTag(
-                supported_language_full_tag,
-                /* include_script_tag= */ false),
-            SpellcheckService::GetLanguageAndScriptTag(
-                accept_language,
-                /* include_script_tag= */ false));
-      });
-
-  if (iter != accept_languages.end()) {
-    // Special case for Serbian--"sr" implies Cyrillic script. Don't mark it as
-    // supported for sr-Latn*.
-    if (base::EqualsCaseInsensitiveASCII(
-            SpellcheckService::GetLanguageAndScriptTag(
-                supported_language_full_tag,
-                /* include_script_tag= */ true),
-            "sr-Latn")) {
-      return "";
-    }
-    return *iter;
-  }
-
-  return "";
-}
-
-// static
-bool SpellcheckService::HasPrivateUseSubTag(const std::string& full_tag) {
-  std::vector<std::string> subtags = base::SplitString(
-      full_tag, "-", base::TRIM_WHITESPACE, base::SPLIT_WANT_ALL);
-
-  // Private use subtags are separated from the other subtags by the reserved
-  // single-character subtag 'x'.
-  return std::ranges::contains(subtags, "x");
-}
-
-// static
-std::string SpellcheckService::GetTagToPassToWindowsSpellchecker(
-    const std::string& accept_language,
-    const std::string& supported_language_full_tag) {
-  // First try exact match. Per BCP47, tags are in ASCII and should be treated
-  // as case-insensitive (although there are conventions for the capitalization
-  // of subtags, they are sometimes broken).
-  if (base::EqualsCaseInsensitiveASCII(supported_language_full_tag,
-                                       accept_language)) {
-    // Unambiguous spellcheck dictionary to be used.
-    return supported_language_full_tag;
-  }
-
-  // Accept language does not match script or region subtags.
-  // If there is a script subtag, include it, to avoid for example passing
-  // "sr" which is ambiguous as Serbian can use Cyrillic or Latin script.
-  // There is one unfortunate special case (so far the only one known). The
-  // accept language "sr" is supported, and if you use it as a display
-  // language you see Cyrillic script. However, the Windows spellcheck API
-  // returns "sr-Latn-*" dictionaries if the unqualified language tag is
-  // passed. The following forces Windows spellchecking to use Cyrillic script
-  // in this case, and if the language pack is not installed there will be a
-  // fallback to Hunspell support when spellchecking is performed.
-  if (base::EqualsCaseInsensitiveASCII("sr", accept_language))
-    return "sr-Cyrl";
-
-  return SpellcheckService::GetLanguageAndScriptTag(
-      supported_language_full_tag,
-      /* include_script_tag= */ true);
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 // static
 void SpellcheckService::AttachStatusEvent(base::WaitableEvent* status_event) {
@@ -998,11 +633,6 @@ void SpellcheckService::OnAcceptLanguagesChanged() {
 
   dictionaries_pref.SetValue(filtered_dictionaries);
 
-#if BUILDFLAG(IS_WIN)
-  if (RecordSpellingConfigurationMetrics(context_)) {
-    RecordChromeLocalesStats();
-  }
-#endif  // BUILDFLAG(IS_WIN)
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
@@ -1017,80 +647,9 @@ std::vector<std::string> SpellcheckService::GetNormalizedAcceptLanguages(
     std::ranges::transform(
         accept_languages, accept_languages.begin(),
         [&](const std::string& language) {
-#if BUILDFLAG(IS_WIN)
-          if (spellcheck::UseBrowserSpellChecker() &&
-              UsesWindowsDictionary(language))
-            return language;
-#endif  // BUILDFLAG(IS_WIN)
           return spellcheck::GetCorrespondingSpellCheckLanguage(language);
         });
   }
 
   return accept_languages;
 }
-
-#if BUILDFLAG(IS_WIN)
-void SpellcheckService::InitializePlatformSpellchecker() {
-  // The Windows spell checker must be created before the dictionaries are
-  // initialized. Note it is instantiated even if only Hunspell is being used
-  // since metrics on the availability of Windows platform language packs are
-  // being recorded. Thus method should only be called once, except in test
-  // code.
-  if (!platform_spell_checker()) {
-    platform_spell_checker_ = std::make_unique<WindowsSpellChecker>(
-        base::ThreadPool::CreateCOMSTATaskRunner({base::MayBlock()}));
-  }
-}
-
-void SpellcheckService::RecordSpellcheckLocalesStats() {
-  if (metrics_ && platform_spell_checker() && !hunspell_dictionaries_.empty()) {
-    std::vector<std::string> hunspell_locales;
-    for (auto& dict : hunspell_dictionaries_) {
-      hunspell_locales.push_back(dict->GetLanguage());
-    }
-    spellcheck_platform::RecordSpellcheckLocalesStats(
-        platform_spell_checker(), std::move(hunspell_locales));
-  }
-}
-
-void SpellcheckService::RecordChromeLocalesStats() {
-  if (metrics_ && platform_spell_checker()) {
-    std::vector<std::string> accept_languages =
-        GetNormalizedAcceptLanguages(/* normalize_for_spellcheck */ false);
-    if (!accept_languages.empty()) {
-      spellcheck_platform::RecordChromeLocalesStats(
-          platform_spell_checker(), std::move(accept_languages));
-    }
-  }
-}
-
-void SpellcheckService::AddWindowsSpellcheckDictionary(
-    const std::string& accept_language,
-    const std::string& supported_language_full_tag) {
-  if (!accept_language.empty()) {
-    windows_spellcheck_dictionary_map_.insert(
-        {accept_language, supported_language_full_tag});
-  }
-}
-
-std::string SpellcheckService::GetSupportedWindowsDictionaryLanguage(
-    const std::string& accept_language) const {
-  // BCP47 language tag used by the Windows spellchecker API.
-  std::string spellcheck_language;
-
-  auto it = windows_spellcheck_dictionary_map_.find(accept_language);
-  if (it != windows_spellcheck_dictionary_map_.end())
-    spellcheck_language = it->second;
-
-  return spellcheck_language;
-}
-
-void SpellcheckService::AddSpellcheckLanguagesForTesting(
-    const std::vector<std::string>& languages) {
-  InitializePlatformSpellchecker();
-  if (platform_spell_checker()) {
-    spellcheck_platform::AddSpellcheckLanguagesForTesting(
-        platform_spell_checker(), languages);
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)

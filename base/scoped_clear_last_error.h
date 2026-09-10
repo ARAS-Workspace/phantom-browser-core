@@ -30,25 +30,11 @@ class BASE_EXPORT ScopedClearLastErrorBase {
   const int last_errno_;
 };
 
-#if BUILDFLAG(IS_WIN)
-
-// Windows specific implementation of ScopedClearLastError.
-class BASE_EXPORT ScopedClearLastError : public ScopedClearLastErrorBase {
- public:
-  ScopedClearLastError();
-  ScopedClearLastError(const ScopedClearLastError&) = delete;
-  ScopedClearLastError& operator=(const ScopedClearLastError&) = delete;
-  ~ScopedClearLastError();
-
- private:
-  const unsigned long last_system_error_;
-};
-
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 
 using ScopedClearLastError = ScopedClearLastErrorBase;
 
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 
 }  // namespace base
 

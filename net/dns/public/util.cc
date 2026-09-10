@@ -51,7 +51,7 @@ IPEndPoint GetMdnsReceiveEndPoint(AddressFamily address_family) {
 // CrOS as described in crbug.com/931916, and the following is a temporary
 // mitigation to reconcile the two issues. Remove this after closing
 // crbug.com/899310.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   // With Windows, binding to a mulitcast group address is not allowed.
   // Multicast messages will be received appropriate to the multicast groups the
   // socket has joined. Sockets intending to receive multicast messages should

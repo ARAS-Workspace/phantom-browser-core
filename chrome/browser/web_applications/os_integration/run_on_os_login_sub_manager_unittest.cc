@@ -244,7 +244,7 @@ class RunOnOsLoginSubManagerExecuteTest
   ~RunOnOsLoginSubManagerExecuteTest() override = default;
 
   bool IsRunOnOsLoginExecuteEnabled() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     return true;
 #else
     return false;

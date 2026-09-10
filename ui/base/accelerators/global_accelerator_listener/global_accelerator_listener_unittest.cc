@@ -187,7 +187,6 @@ TEST_F(GlobalAcceleratorListenerTest, OnCommandsChanged) {
                               gfx::kNullAcceleratedWidget, base::DoNothing());
 }
 
-#if !BUILDFLAG(IS_WIN)
 TEST_F(GlobalAcceleratorListenerTest, OnCommandsChangedWithWidget) {
   GlobalAcceleratorListener* listener = GetUIListener();
   BaseGlobalAcceleratorListenerForTesting* ui_listener = GetUIListener();
@@ -202,7 +201,6 @@ TEST_F(GlobalAcceleratorListenerTest, OnCommandsChangedWithWidget) {
   listener->OnCommandsChanged(kAcceleratorGroupId, kProfileId, kCommands,
                               kWidget, base::DoNothing());
 }
-#endif
 
 // Tests that execute_command passed to OnCommandsChanged becomes a no-op after
 // WeakPtr invalidation.

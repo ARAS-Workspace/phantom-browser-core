@@ -521,11 +521,7 @@ std::optional<base::DictValue> ReadRecipeFile(
 }
 
 std::string FilePathToUTF8(const base::FilePath::StringType& str) {
-#if BUILDFLAG(IS_WIN)
-  return base::WideToUTF8(str);
-#else
   return str;
-#endif
 }
 
 std::optional<base::FilePath> GetCommandFilePath() {
@@ -827,11 +823,7 @@ bool WebPageReplayServerWrapper::RunWebPageReplayCmd(
   base::FilePath wpr_executable_binary =
       base::FilePath(FILE_PATH_LITERAL("run_wpr.py"));
   base::CommandLine full_command(base::FilePath(FILE_PATH_LITERAL(
-#if BUILDFLAG(IS_WIN)
-      "vpython3.bat"
-#else
       "vpython3"
-#endif
       )));
   full_command.AppendArgPath(
       web_page_replay_binary_dir.Append(wpr_executable_binary));

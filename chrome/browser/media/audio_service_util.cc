@@ -20,7 +20,7 @@
 
 namespace {
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 const base::Value* GetPolicy(const char* policy_name) {
   const policy::PolicyMap& policies =
       g_browser_process->browser_policy_connector()
@@ -39,21 +39,10 @@ bool GetPolicyOrFeature(const char* policy_name, const base::Feature& feature) {
 }  // namespace
 
 bool IsAudioServiceSandboxEnabled() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   return GetPolicyOrFeature(policy::key::kAudioSandboxEnabled,
                             features::kAudioServiceSandbox);
 #else
   return base::FeatureList::IsEnabled(features::kAudioServiceSandbox);
 #endif
 }
-
-#if BUILDFLAG(IS_WIN)
-// TODO(crbug.com/40242320): Remove the kAudioProcessHighPriorityEnabled policy
-// and the code enabled by this function.
-bool IsAudioProcessHighPriorityEnabled() {
-  const base::Value* value =
-      GetPolicy(policy::key::kAudioProcessHighPriorityEnabled);
-
-  return value && value->GetBool();
-}
-#endif

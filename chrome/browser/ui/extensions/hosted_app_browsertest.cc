@@ -784,13 +784,8 @@ IN_PROC_BROWSER_TEST_P(HostedOrWebAppTest,
 }
 
 // Flaky, mostly on Windows: http://crbug.com/40662800
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ShouldShowCustomTabBarForHTTPAppHTTPSUrl \
-  DISABLED_ShouldShowCustomTabBarForHTTPAppHTTPSUrl
-#else
 #define MAYBE_ShouldShowCustomTabBarForHTTPAppHTTPSUrl \
   ShouldShowCustomTabBarForHTTPAppHTTPSUrl
-#endif
 IN_PROC_BROWSER_TEST_P(HostedOrWebAppTest,
                        MAYBE_ShouldShowCustomTabBarForHTTPAppHTTPSUrl) {
   ASSERT_TRUE(https_server()->Start());
@@ -1502,13 +1497,8 @@ IN_PROC_BROWSER_TEST_P(HostedAppProcessModelTest,
 // site URL. See https://crbug.com/40104314.
 // The navigation currently fails/results in a 404 on Windows, so it's currently
 // disabled.  TODO(crbug.com/40152624): Fix this.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_NavigateToAppURLWithDoubleSlashPath \
-  DISABLED_NavigateToAppURLWithDoubleSlashPath
-#else
 #define MAYBE_NavigateToAppURLWithDoubleSlashPath \
   NavigateToAppURLWithDoubleSlashPath
-#endif
 IN_PROC_BROWSER_TEST_P(HostedAppProcessModelTest,
                        MAYBE_NavigateToAppURLWithDoubleSlashPath) {
   // Set up and launch the hosted app.

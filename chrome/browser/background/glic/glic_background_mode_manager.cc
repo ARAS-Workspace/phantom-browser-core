@@ -32,10 +32,6 @@
 #include "ui/base/accelerators/accelerator.h"
 #include "ui/base/accelerators/global_accelerator_listener/global_accelerator_listener.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/startup/startup_launch_manager.h"
-#endif
-
 namespace glic {
 
 class GlicBackgroundModeManager::AcceleratorRegistrar
@@ -307,9 +303,6 @@ void GlicBackgroundModeManager::UpdateState() {
     ExitBackgroundMode();
   }
 
-#if BUILDFLAG(IS_WIN)
-  startup_launch_client_.SetLaunchOnStartup(should_be_active);
-#endif
 }
 
 bool GlicBackgroundModeManager::IsEnabledInAnyLoadedProfile() {

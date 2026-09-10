@@ -107,7 +107,7 @@ TEST(AudioProcessingPropertiesToAudioProcessingSettingsTest,
   EXPECT_FALSE(settings_with_system_ns.noise_suppression);
 }
 
-#if (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN))
+#if BUILDFLAG(IS_MAC)
 TEST(AudioProcessingPropertiesToAudioProcessingSettingsTest,
      SystemNsDoesNotDeactivateBrowserNsWhenTandemNsIsAllowed) {
   base::test::ScopedFeatureList feature_list;
@@ -144,11 +144,7 @@ TEST(AudioProcessingPropertiesToAudioProcessingSettingsTest,
     // (since it's allowed in tandem).
     EXPECT_TRUE(processing_layout.NoiseSuppressionInTandem());
   } else {
-#if BUILDFLAG(IS_WIN)
-    bool independent_ns_allowed = false;
-#else
     bool independent_ns_allowed = true;
-#endif
     // We are using loopback AEC. In this case, platform NS is still running if
     // it's allowed to be used independently of platform AEC.
     EXPECT_EQ(independent_ns_allowed,
@@ -178,7 +174,7 @@ TEST(AudioProcessingPropertiesToAudioProcessingSettingsTest,
   EXPECT_FALSE(settings_with_system_agc.automatic_gain_control);
 }
 
-#if (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN))
+#if BUILDFLAG(IS_MAC)
 TEST(AudioProcessingPropertiesToAudioProcessingSettingsTest,
      SystemAgcDoesNotDeactivateBrowserAgcWhenTandemAgcIsAllowed) {
   base::test::ScopedFeatureList feature_list;
@@ -281,7 +277,6 @@ TEST_P(MediaStreamAudioProcessingLayoutTest,
       EchoCanceller::From(properties, available_platform_effects);
 
   if (echo_canceller.IsPlatformProvided()) {
-#if (!BUILDFLAG(IS_WIN))
     // Disable AGC and NS if not requested.
     if (!properties.auto_gain_control) {
       expected_effects &= ~media::AudioParameters::AUTOMATIC_GAIN_CONTROL;
@@ -294,7 +289,6 @@ TEST_P(MediaStreamAudioProcessingLayoutTest,
       // the code works now.
       expected_effects &= ~media::AudioParameters::NOISE_SUPPRESSION;
     }
-#endif
   } else {
     // No platform processing if platform AEC is not requested.
     expected_effects &= ~media::AudioParameters::ECHO_CANCELLER;

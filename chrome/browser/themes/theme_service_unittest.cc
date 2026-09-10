@@ -309,10 +309,6 @@ class ColorProviderTest : public ThemeServiceTest,
 
     os_settings_provider_.SetPreferredColorScheme(GetPreferredColorScheme());
     os_settings_provider_.SetPreferredContrast(GetPreferredContrast());
-#if BUILDFLAG(IS_WIN)
-    os_settings_provider_.SetForcedColorsActive(
-        GetPreferredContrast() == ui::NativeTheme::PreferredContrast::kMore);
-#endif  // BUILDFLAG(IS_WIN)
 
     // Update ThemeService to use the system theme if necessary.
     if (GetSystemTheme() == SystemTheme::kCustom) {
@@ -626,11 +622,6 @@ TEST_F(ThemeServiceTest, UseDefaultTheme_DisableNtpThemeTest) {
 TEST_P(ColorProviderTest, OmniboxContrast) {
   // TODO(crbug.com/40847629): Windows platform high contrast colors are
   // not sufficiently high-contrast to pass this test.
-#if BUILDFLAG(IS_WIN)
-  if (GetPreferredContrast() == ui::NativeTheme::PreferredContrast::kMore) {
-    return;
-  }
-#endif
 #if BUILDFLAG(IS_LINUX)
   // TODO(crbug.com/41494383): Linux platform native dark mode colors aren't
   //                      sufficiently high contrast to pass.
@@ -982,7 +973,7 @@ TEST_F(ThemeServiceTest, UseDeviceTheme_ExplicitlyTrue) {
 }
 #endif  // IS_CHROMEOS
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
 // Verify that UseDefaultTheme() clears the system theme follow preference.
 TEST_F(ThemeServiceTest, UseDefaultTheme_ClearsSystemThemeFollow) {
   // Set the preference to true first

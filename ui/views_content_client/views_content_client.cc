@@ -12,16 +12,9 @@
 
 namespace ui {
 
-#if BUILDFLAG(IS_WIN)
-ViewsContentClient::ViewsContentClient(
-    HINSTANCE instance, sandbox::SandboxInterfaceInfo* sandbox_info)
-    : instance_(instance), sandbox_info_(sandbox_info) {
-}
-#else
 ViewsContentClient::ViewsContentClient(int argc, const char** argv)
     : argc_(argc), argv_(argv) {
 }
-#endif
 
 ViewsContentClient::~ViewsContentClient() {
 }
@@ -30,13 +23,8 @@ int ViewsContentClient::RunMain() {
   ViewsContentMainDelegate delegate(this);
   content::ContentMainParams params(&delegate);
 
-#if BUILDFLAG(IS_WIN)
-  params.instance = instance_;
-  params.sandbox_info = sandbox_info_;
-#else
   params.argc = argc_;
   params.argv = argv_;
-#endif
 
   return content::ContentMain(std::move(params));
 }

@@ -604,11 +604,7 @@ IN_PROC_BROWSER_TEST_F(FullscreenControllerInteractiveTest,
 }
 
 // TODO: crbug.com/371511161 - Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SecondPointerLockShowsBubble DISABLED_SecondPointerLockShowsBubble
-#else
 #define MAYBE_SecondPointerLockShowsBubble SecondPointerLockShowsBubble
-#endif
 IN_PROC_BROWSER_TEST_F(FullscreenControllerInteractiveTest,
                        MAYBE_SecondPointerLockShowsBubble) {
   SetWebContentsGrantedSilentPointerLockPermission();
@@ -693,8 +689,7 @@ IN_PROC_BROWSER_TEST_F(FullscreenControllerInteractiveTest,
   ASSERT_FALSE(IsPointerLocked());
 }
 
-#if BUILDFLAG(IS_LINUX) && defined(USE_AURA) || \
-    BUILDFLAG(IS_WIN) && defined(NDEBUG)
+#if BUILDFLAG(IS_LINUX) && defined(USE_AURA)
 // TODO(erg): linux_aura bringup: http://crbug.com/40295645
 // Test is flaky on Windows: https://crbug.com/40717280
 #define MAYBE_TestTabDoesntExitPointerLockOnSubFrameNavigation \
@@ -1394,13 +1389,13 @@ INSTANTIATE_TEST_SUITE_P(, AutomaticFullscreenTest, ::testing::Bool());
 // Tests must run in series to manage virtual displays on supported platforms.
 // Use 2+ physical displays to run locally with --gtest_also_run_disabled_tests.
 // See: //docs/ui/display/multiscreen_testing.md
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #define MAYBE_MultiScreenFullscreenControllerInteractiveTest \
   MultiScreenFullscreenControllerInteractiveTest
 #else
 #define MAYBE_MultiScreenFullscreenControllerInteractiveTest \
   DISABLED_MultiScreenFullscreenControllerInteractiveTest
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 class MAYBE_MultiScreenFullscreenControllerInteractiveTest
     : public FullscreenControllerInteractiveTest {
  public:
@@ -1880,11 +1875,7 @@ IN_PROC_BROWSER_TEST_F(MAYBE_MultiScreenFullscreenControllerInteractiveTest,
 
 // TODO(crbug.com/40723237): Disabled on Windows, where RenderWidgetHostViewAura
 // blindly casts display::Screen::Get() to display::win::ScreenWin*.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_FullscreenOnPermissionGrant DISABLED_FullscreenOnPermissionGrant
-#else
 #define MAYBE_FullscreenOnPermissionGrant FullscreenOnPermissionGrant
-#endif
 // Test requesting fullscreen using the permission grant's transient activation.
 IN_PROC_BROWSER_TEST_F(MAYBE_MultiScreenFullscreenControllerInteractiveTest,
                        MAYBE_FullscreenOnPermissionGrant) {
@@ -2106,22 +2097,3 @@ class StartFullscreenInteractiveTest : public InProcessBrowserTest {
 
 // TODO(crbug.com/532711215): The Wayland, X11, and Mac test environments have
 // issues with bounds propagating when entering fullscreen.
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(StartFullscreenInteractiveTest,
-                       ViewportSizeMatchesDisplay) {
-  // Create a new browser directly in fullscreen but don't show it yet. This
-  // explicitly mimics session restore recovering a fullscreen window better
-  // than toggling an unshown browser.
-  BrowserWindowCreateParams params(browser()->GetProfile(),
-                                   /*from_user_gesture=*/true);
-  params.initial_show_state = ui::mojom::WindowShowState::kFullscreen;
-  BrowserWindowInterface* new_browser = CreateBrowserWindow(std::move(params));
-
-  // Show the browser and wait for it to become fully initialized.
-  AddBlankTabAndShow(new_browser->GetBrowserForMigrationOnly());
-
-  // Verify the WebContents bounds eventually match the display bounds, proving
-  // no space was reserved for the top UI.
-  WaitForViewportSizeToMatchDisplay(new_browser);
-}
-#endif  // BUILDFLAG(IS_WIN)

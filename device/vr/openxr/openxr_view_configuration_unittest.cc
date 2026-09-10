@@ -23,14 +23,12 @@ constexpr uint32_t kRecommendedImageHeight = 1584;
 constexpr uint32_t kMaxImageWidth = 8192;
 constexpr uint32_t kMaxImageHeight = 8192;
 
-#if !BUILDFLAG(IS_WIN)
 // Per-view max texture width limit is 16384 / 2 = 8192.
 // Raw max is 8192x8192.
 // max_scale_w = 8192 / 1440 = 5.6888...
 // max_scale_h = 8192 / 1584 = 5.1717...
 // max_scale_limit = min(5.6888, 5.1717) = 5.1717...
 constexpr double kDefaultDoubleWideScaleFactor = 5.1717;
-#endif
 
 constexpr XrViewConfigurationView kDefaultXrViewProperties{
     XR_TYPE_VIEW_CONFIGURATION_VIEW,
@@ -58,30 +56,6 @@ void ValidateScale(const OpenXrViewProperties& properties, double scale) {
 }  // namespace
 
 // Viewport scaling isn't supported on windows, validate default behavior.
-#if BUILDFLAG(IS_WIN)
-
-TEST(OpenXrViewPropertiesTest, ValidateNoFramebufferScale) {
-  OpenXrViewProperties properties(kDefaultXrViewProperties, /*view_count=*/2,
-                                  kMaxTextureSize);
-
-  // Since framebuffer scaling isn't supported, a scale of 1.0 should be
-  // reported by default.
-  ValidateScale(properties, 1.0);
-}
-
-TEST(OpenXrViewPropertiesTest, CommandLineSwitchIgnored) {
-  base::test::ScopedCommandLine scoped_command_line;
-  scoped_command_line.GetProcessCommandLine()->AppendSwitchASCII(
-      switches::kWebXrMaxFramebufferScale, "2.0");
-
-  OpenXrViewProperties properties(kDefaultXrViewProperties, /*view_count=*/2,
-                                  kMaxTextureSize);
-  // Command-line override should not be applied if viewport scaling isn't
-  // supported.
-  ValidateScale(properties, 1.0);
-}
-
-#else
 
 TEST(OpenXrViewPropertiesTest, LowMemoryDeviceClamping) {
   // Override memory to 8GB (low-memory threshold is <=8GB).
@@ -162,7 +136,5 @@ TEST(OpenXrViewPropertiesTest, CommandLineSwitchOverride_InvalidLarge) {
   // hardware.
   ValidateScale(properties, kDefaultDoubleWideScaleFactor);
 }
-
-#endif  // !BUILDFLAG(IS_WIN)
 
 }  // namespace device

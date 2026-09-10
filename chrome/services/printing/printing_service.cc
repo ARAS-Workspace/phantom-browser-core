@@ -21,13 +21,6 @@
 #include "chrome/services/printing/pdf_flattener.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <memory>
-
-#include "chrome/services/printing/pdf_to_emf_converter.h"
-#include "chrome/services/printing/pdf_to_emf_converter_factory.h"
-#endif
-
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
 #include "chrome/services/printing/pdf_nup_converter.h"
 #include "chrome/services/printing/pdf_to_pwg_raster_converter.h"
@@ -81,15 +74,6 @@ void PrintingService::BindPdfFlattener(
     mojo::PendingReceiver<mojom::PdfFlattener> receiver) {
   mojo::MakeSelfOwnedReceiver(std::make_unique<printing::PdfFlattener>(),
                               std::move(receiver));
-}
-#endif
-
-#if BUILDFLAG(IS_WIN)
-void PrintingService::BindPdfToEmfConverterFactory(
-    mojo::PendingReceiver<mojom::PdfToEmfConverterFactory> receiver) {
-  mojo::MakeSelfOwnedReceiver(
-      std::make_unique<printing::PdfToEmfConverterFactory>(),
-      std::move(receiver));
 }
 #endif
 

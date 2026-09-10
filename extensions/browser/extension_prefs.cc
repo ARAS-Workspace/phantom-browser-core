@@ -450,11 +450,7 @@ static std::string MakePathRelative(const base::FilePath& parent,
   if (base::FilePath::IsSeparator(retval[0])) {
     retval = retval.substr(1);
   }
-#if BUILDFLAG(IS_WIN)
-  return base::WideToUTF8(retval);
-#else
   return retval;
-#endif
 }
 
 void ExtensionPrefs::MakePathsRelative() {

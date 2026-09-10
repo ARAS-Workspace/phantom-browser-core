@@ -13,9 +13,6 @@
 #include "base/types/pass_key.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_handle.h"
-#endif
 
 
 namespace gpu {
@@ -46,10 +43,6 @@ class COMPONENT_EXPORT(VULKAN) VulkanMemory {
   base::ScopedFD GetMemoryFd(VkExternalMemoryHandleTypeFlagBits handle_type);
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedHandle GetMemoryHandle(
-      VkExternalMemoryHandleTypeFlagBits handle_type);
-#endif  // BUILDFLAG(IS_WIN)
 
 
   VulkanDeviceQueue* device_queue() const { return device_queue_; }

@@ -26,13 +26,6 @@
 #include "headless/lib/browser/headless_web_contents_impl.h"
 #include "third_party/blink/public/common/user_agent/user_agent_metadata.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/command_line.h"
-#include "components/os_crypt/async/browser/dpapi_key_provider.h"
-#include "components/os_crypt/async/browser/os_crypt_win.h"
-#include "headless/public/switches.h"
-#endif
-
 #if BUILDFLAG(IS_APPLE)
 #include "components/os_crypt/async/browser/keychain_key_provider.h"
 #endif
@@ -317,23 +310,12 @@ void HeadlessBrowserImpl::CreatePrefService() {
   }
 
   auto pref_registry = base::MakeRefCounted<user_prefs::PrefRegistrySyncable>();
-#if BUILDFLAG(IS_WIN)
-  os_crypt_async::RegisterLocalPrefs(pref_registry.get());
-#endif
 
   PrefServiceFactory factory;
 
   factory.set_user_prefs(pref_store);
   local_state_ = factory.Create(std::move(pref_registry));
 
-#if BUILDFLAG(IS_WIN)
-  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
-  if (!command_line->HasSwitch(switches::kDisableCookieEncryption) &&
-      os_crypt_async::InitWithExistingKey(local_state_.get()) !=
-          os_crypt_async::InitResult::kSuccess) {
-    command_line->AppendSwitch(switches::kDisableCookieEncryption);
-  }
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 PrefService* HeadlessBrowserImpl::GetPrefs() {
@@ -344,13 +326,7 @@ PrefService* HeadlessBrowserImpl::GetPrefs() {
 void HeadlessBrowserImpl::CreateOSCryptAsync() {
   std::vector<std::pair<size_t, std::unique_ptr<os_crypt_async::KeyProvider>>>
       providers;
-#if BUILDFLAG(IS_WIN) && defined(HEADLESS_USE_PREFS)
-  if (local_state_) {
-    providers.emplace_back(std::make_pair(
-        /*precedence=*/10u, std::make_unique<os_crypt_async::DPAPIKeyProvider>(
-                                local_state_.get())));
-  }
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   providers.emplace_back(std::make_pair(
       /*precedence=*/10u,
       std::make_unique<os_crypt_async::KeychainKeyProvider>()));

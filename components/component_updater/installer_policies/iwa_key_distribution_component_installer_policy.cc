@@ -33,11 +33,7 @@ constexpr std::string_view kPreloadedKey = "is_preloaded";
 constexpr std::string_view kIwaKdcExpCohortAttribute = "_iwa_kdc_exp_cohort";
 
 component_updater::OnDemandUpdater::Priority GetOnDemandUpdatePriority() {
-#if BUILDFLAG(IS_WIN)
-  return component_updater::OnDemandUpdater::Priority::FOREGROUND;
-#else
   return component_updater::OnDemandUpdater::Priority::BACKGROUND;
-#endif
 }
 
 }  // namespace

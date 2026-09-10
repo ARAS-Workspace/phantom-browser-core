@@ -180,7 +180,7 @@ SyncConfirmationUI::SyncConfirmationUI(content::WebUI* web_ui)
                     IDS_SYNC_LOADING_CONFIRMATION_TITLE);
 
   bool is_first_run_desktop_refresh_enabled = false;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   const bool is_in_search_engine_choice_region =
       CHECK_DEREF(regional_capabilities::RegionalCapabilitiesServiceFactory::
                       GetForProfile(profile_))
@@ -188,7 +188,7 @@ SyncConfirmationUI::SyncConfirmationUI(content::WebUI* web_ui)
   is_first_run_desktop_refresh_enabled =
       switches::IsFirstRunDesktopRefreshEnabled(
           is_in_search_engine_choice_region);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   source->AddBoolean("isFirstRunDesktopRefreshEnabled",
                      is_first_run_desktop_refresh_enabled);
 

@@ -55,8 +55,7 @@ static_assert(sizeof(void*) != 8, "");
    PA_BUILDFLAG(IS_ANDROID))
 
 // Need TLS support.
-#define PA_CONFIG_THREAD_CACHE_SUPPORTED() \
-  (PA_BUILDFLAG(IS_POSIX) || PA_BUILDFLAG(IS_WIN))
+#define PA_CONFIG_THREAD_CACHE_SUPPORTED() (PA_BUILDFLAG(IS_POSIX))
 
 // Too expensive for official builds, as it adds cache misses to all
 // allocations. On the other hand, we want wide metrics coverage to get
@@ -120,8 +119,7 @@ static_assert(sizeof(void*) == 8);
 //
 // Regardless, the "normal" TLS access is fast on x86_64 (see partition_tls.h),
 // so don't bother with thread_local anywhere.
-#if !(PA_BUILDFLAG(IS_WIN) && PA_BUILDFLAG(IS_COMPONENT_BUILD)) && \
-    !PA_BUILDFLAG(IS_APPLE) && !PA_BUILDFLAG(IS_LINUX) &&          \
+#if !PA_BUILDFLAG(IS_APPLE) && !PA_BUILDFLAG(IS_LINUX) && \
     !PA_BUILDFLAG(IS_CHROMEOS)
 #define PA_CONFIG_THREAD_LOCAL_TLS() 1
 #else
@@ -154,11 +152,7 @@ static_assert(sizeof(void*) == 8);
 // Lazy commit should only be enabled on Windows, because commit charge is
 // only meaningful and limited on Windows. It affects performance on other
 // platforms and is simply not needed there due to OS supporting overcommit.
-#if PA_BUILDFLAG(IS_WIN)
-constexpr bool kUseLazyCommit = true;
-#else
 constexpr bool kUseLazyCommit = false;
-#endif
 
 // See the comment in PartitionBucket::SlotSpanCommittedSize(). This should not
 // be enabled on Windows (because it increases committed memory, which is a

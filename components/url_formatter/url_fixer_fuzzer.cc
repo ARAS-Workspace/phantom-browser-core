@@ -25,11 +25,7 @@ namespace url_formatter {
 namespace {
 
 base::FilePath GenerateFuzzedFilePath(std::string_view valid_utf8_string) {
-#if BUILDFLAG(IS_WIN)
-  return base::FilePath(base::UTF8ToWide(valid_utf8_string));
-#else
   return base::FilePath(valid_utf8_string);
-#endif
 }
 
 // Theoretically, FuzzTest should be able to apply `.WithMaxSize()`

@@ -8,13 +8,7 @@
 #include "base/notreached.h"
 #include "third_party/blink/renderer/platform/wtf/threading.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <intrin.h>
-#include <stddef.h>
-#include <winnt.h>
-#elif defined(__GLIBC__)
+#if defined(__GLIBC__)
 extern "C" void* __libc_stack_end;  // NOLINT
 #endif
 
@@ -92,8 +86,6 @@ size_t GetUnderestimatedStackSize() {
 #endif
   }
   return pthread_get_stacksize_np(pthread_self());
-#elif BUILDFLAG(IS_WIN) && defined(COMPILER_MSVC)
-  return Threading::ThreadStackSize();
 #else
 #error "Stack frame size estimation not supported on this platform."
   return 0;
@@ -140,23 +132,6 @@ void* GetStackStartImpl() {
 #endif
 #elif BUILDFLAG(IS_APPLE)
   return pthread_get_stackaddr_np(pthread_self());
-#elif BUILDFLAG(IS_WIN) && defined(COMPILER_MSVC)
-// On Windows stack limits for the current thread are available in
-// the thread information block (TIB).
-// On Windows ARM64, stack limits could be retrieved by calling
-// GetCurrentThreadStackLimits. This API doesn't work on x86 and x86_64 here
-// because it requires Windows 8+.
-#if defined(ARCH_CPU_X86_64)
-  return reinterpret_cast<void*>(
-      reinterpret_cast<NT_TIB64*>(NtCurrentTeb())->StackBase);
-#elif defined(ARCH_CPU_X86)
-  return reinterpret_cast<void*>(
-      reinterpret_cast<NT_TIB*>(NtCurrentTeb())->StackBase);
-#elif defined(ARCH_CPU_ARM64)
-  ULONG_PTR lowLimit, highLimit;
-  ::GetCurrentThreadStackLimits(&lowLimit, &highLimit);
-  return reinterpret_cast<void*>(highLimit);
-#endif
 #else
 #error Unsupported getStackStart on this platform.
 #endif
@@ -217,38 +192,6 @@ void InitializeMainThreadStackEstimate() {
   }
   g_main_thread_underestimated_stack_size = underestimated_stack_size;
 }
-
-#if BUILDFLAG(IS_WIN) && defined(COMPILER_MSVC)
-size_t ThreadStackSize() {
-  // Notice that we cannot use the TIB's StackLimit for the stack end, as i
-  // tracks the end of the committed range. We're after the end of the reserved
-  // stack area (most of which will be uncommitted, most times.)
-  MEMORY_BASIC_INFORMATION stack_info = {};
-  size_t result_size =
-      VirtualQuery(&stack_info, &stack_info, sizeof(MEMORY_BASIC_INFORMATION));
-  DCHECK_GE(result_size, sizeof(MEMORY_BASIC_INFORMATION));
-  uint8_t* stack_end = reinterpret_cast<uint8_t*>(stack_info.AllocationBase);
-
-  uint8_t* stack_start = reinterpret_cast<uint8_t*>(GetStackStart());
-  CHECK(stack_start);
-  CHECK_GT(stack_start, stack_end);
-  size_t thread_stack_size = static_cast<size_t>(stack_start - stack_end);
-  // When the third last page of the reserved stack is accessed as a
-  // guard page, the second last page will be committed (along with removing
-  // the guard bit on the third last) _and_ a stack overflow exception
-  // is raised.
-  //
-  // We have zero interest in running into stack overflow exceptions while
-  // marking objects, so simply consider the last three pages + one above
-  // as off-limits and adjust the reported stack size accordingly.
-  //
-  // http://blogs.msdn.com/b/satyem/archive/2012/08/13/thread-s-stack-memory-management.aspx
-  // explains the details.
-  CHECK_GT(thread_stack_size, 4u * 0x1000);
-  thread_stack_size -= 4 * 0x1000;
-  return thread_stack_size;
-}
-#endif
 
 }  // namespace internal
 

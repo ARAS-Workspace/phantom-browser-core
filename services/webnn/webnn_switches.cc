@@ -16,7 +16,7 @@ namespace switches {
 // has trouble deducing the type and size of the array, even if you specify the
 // type. If you add new build flags to items of the array, be sure and also add
 // them to the #if right below guarding the definition.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(WEBNN_USE_TFLITE) || BUILDFLAG(IS_WIN) || \
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(WEBNN_USE_TFLITE) || \
     BUILDFLAG(WEBNN_USE_LITERT)
 
 // Returns the list of WebNN switches passed from the GpuProcessHost to the
@@ -29,20 +29,6 @@ base::span<const char* const> GetWebNNSwitchesCopiedFromGpuProcessHost() {
 #endif
 #if BUILDFLAG(WEBNN_USE_TFLITE) || BUILDFLAG(WEBNN_USE_LITERT)
       kWebNNTfliteDumpModel,
-#endif
-#if BUILDFLAG(IS_WIN)
-      kWebNNOrtLoggingLevel,
-      kWebNNOrtDumpModel,
-      kWebNNOrtLibraryPathForTesting,
-      kWebNNOrtEpLibraryPathForTesting,
-      kWebNNOrtEpDevice,
-      kWebNNOrtIgnoreEpBlocklist,
-      kWebNNOrtIgnoreIhvEps,
-      kWebNNOrtDisableVirtualDevices,
-      kWebNNOrtAllowAllCompilerDevices,
-      kWebNNOrtGraphOptimizationLevel,
-      kWebNNOrtEnableProfiling,
-      kWebNNOrtDisableCpuFallback,
 #endif
   });
   return flags;

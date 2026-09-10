@@ -44,9 +44,7 @@
 #include "components/update_client/protocol_definition.h"
 #include "components/update_client/update_client.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/updater/win/setup/uninstall.h"
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include "chrome/updater/posix/setup.h"
 #endif
 

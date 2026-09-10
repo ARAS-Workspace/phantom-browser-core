@@ -192,7 +192,7 @@ class ConditionalFocusInteractiveUiTest : public WebRtcTestBase {
 };
 
 // Flaky on Win bots and on linux release bots http://crbug.com/40203510
-#if BUILDFLAG(IS_WIN) || (BUILDFLAG(IS_LINUX) && defined(NDEBUG))
+#if BUILDFLAG(IS_LINUX) && defined(NDEBUG)
 #define MAYBE_CapturedTabFocusedIfNoExplicitCallToFocus \
   DISABLED_CapturedTabFocusedIfNoExplicitCallToFocus
 #else
@@ -207,7 +207,7 @@ IN_PROC_BROWSER_TEST_F(ConditionalFocusInteractiveUiTest,
 }
 
 // Flaky on Win bots and on linux release bots http://crbug.com/40203510
-#if BUILDFLAG(IS_WIN) || (BUILDFLAG(IS_LINUX) && defined(NDEBUG))
+#if BUILDFLAG(IS_LINUX) && defined(NDEBUG)
 #define MAYBE_CapturedTabFocusedIfExplicitlyCallingFocus \
   DISABLED_CapturedTabFocusedIfExplicitlyCallingFocus
 #else

@@ -15,11 +15,7 @@
 #include "build/build_config.h"
 #include "content/public/browser/browser_thread.h"
 
-#if BUILDFLAG(IS_WIN)
-#define NumberToStringType base::NumberToString16
-#else
 #define NumberToStringType base::NumberToString
-#endif
 
 namespace webrtc_event_logging {
 

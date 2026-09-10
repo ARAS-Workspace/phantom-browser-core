@@ -16,25 +16,12 @@
 #include "partition_alloc/random.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if PA_BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace partition_alloc {
 
 namespace {
 
 uintptr_t GetMask() {
   uintptr_t mask = internal::ASLRMask();
-#if PA_BUILDFLAG(PA_ARCH_CPU_32_BITS) && PA_BUILDFLAG(IS_WIN)
-  BOOL is_wow64 = FALSE;
-  if (!IsWow64Process(GetCurrentProcess(), &is_wow64)) {
-    is_wow64 = FALSE;
-  }
-  if (!is_wow64) {
-    mask = 0;
-  }
-#endif  // PA_BUILDFLAG(PA_ARCH_CPU_32_BITS) && PA_BUILDFLAG(IS_WIN)
   return mask;
 }
 
@@ -54,13 +41,8 @@ uintptr_t GetRandomBits() {
 TEST(PartitionAllocAddressSpaceRandomizationTest, DisabledASLR) {
   uintptr_t mask = GetMask();
   if (!mask) {
-#if PA_BUILDFLAG(IS_WIN) && PA_BUILDFLAG(PA_ARCH_CPU_32_BITS)
-    // ASLR should be turned off on 32-bit Windows.
-    EXPECT_EQ(0u, GetRandomPageBase());
-#else
     // Otherwise, 0 is very unexpected.
     EXPECT_NE(0u, GetRandomPageBase());
-#endif
   }
 }
 

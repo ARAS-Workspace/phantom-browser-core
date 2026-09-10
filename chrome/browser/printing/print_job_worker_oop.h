@@ -71,19 +71,12 @@ class PrintJobWorkerOop : public PrintJobWorker {
   // Local callback wrappers for Print Backend Service mojom call.  Virtual to
   // support testing.
   virtual void OnDidStartPrinting(mojom::ResultCode result, int job_id);
-#if BUILDFLAG(IS_WIN)
-  virtual void OnDidRenderPrintedPage(uint32_t page_index,
-                                      mojom::ResultCode result);
-#endif
   virtual void OnDidRenderPrintedDocument(mojom::ResultCode result);
   virtual void OnDidDocumentDone(int job_id, mojom::ResultCode result);
   virtual void OnDidCancel(scoped_refptr<PrintJob> job,
                            mojom::ResultCode cancel_reason);
 
   // `PrintJobWorker` overrides.
-#if BUILDFLAG(IS_WIN)
-  bool SpoolPage(PrintedPage* page) override;
-#endif
   bool SpoolDocument() override;
   void OnDocumentDone() override;
   void FinishDocumentDone(int job_id) override;
@@ -105,12 +98,6 @@ class PrintJobWorkerOop : public PrintJobWorker {
   void SendEstablishPrintingContext();
   void SendStartPrinting(const std::string& device_name,
                          const std::u16string& document_name);
-#if BUILDFLAG(IS_WIN)
-  void SendRenderPrintedPage(
-      const PrintedPage* page,
-      mojom::MetafileDataType page_data_type,
-      base::ReadOnlySharedMemoryRegion serialized_page_data);
-#endif  // BUILDFLAG(IS_WIN)
   void SendRenderPrintedDocument(
       mojom::MetafileDataType data_type,
       base::ReadOnlySharedMemoryRegion serialized_data);
@@ -152,11 +139,6 @@ class PrintJobWorkerOop : public PrintJobWorker {
 
   // Indicates if the print job was initiated from the print system dialog.
   const bool print_from_system_dialog_;
-
-#if BUILDFLAG(IS_WIN)
-  // Number of pages that have completed printing.
-  uint32_t pages_printed_count_ = 0;
-#endif
 
   // Tracks if a restart for printing has already been attempted.
   bool print_retried_ = false;

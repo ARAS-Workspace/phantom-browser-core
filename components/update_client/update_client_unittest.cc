@@ -67,12 +67,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/windows_types.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace update_client {
 namespace {
 
@@ -6344,11 +6338,7 @@ class UpdateClientCleanupTest : public UpdateClientTest {
   base::FilePath temp_dir_;
 
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    ASSERT_TRUE(base::GetSecureTempDirectory(&temp_dir_));
-#else   // BUILDFLAG(IS_WIN)
     ASSERT_TRUE(base::GetTempDir(&temp_dir_));
-#endif  // BUILDFLAG(IS_WIN)
 
     config()->SetProdId(
         base::Uuid::GenerateRandomV4().AsLowercaseString().substr(0, 8));
@@ -6367,19 +6357,6 @@ class UpdateClientCleanupTest : public UpdateClientTest {
     if (age.is_zero()) {
       return path;
     }
-
-#if BUILDFLAG(IS_WIN)
-    // Manually set the directory's creation/access time to simulate age.
-    FILETIME creation_filetime =
-        (base::Time::NowFromSystemTime() + age).ToFileTime();
-    base::File download_dir(path, base::File::FLAG_OPEN |
-                                      base::File::FLAG_WIN_BACKUP_SEMANTICS |
-                                      base::File::FLAG_WRITE_ATTRIBUTES);
-    EXPECT_TRUE(download_dir.IsValid());
-    EXPECT_TRUE(::SetFileTime(download_dir.GetPlatformFile(),
-                              &creation_filetime, NULL, NULL));
-    download_dir.Close();
-#endif  // BUILDFLAG(IS_WIN)
 
     return path;
   }
@@ -6413,20 +6390,11 @@ TEST_F(UpdateClientCleanupTest, CleansStaleDirectoriesOnConstruction) {
   EXPECT_FALSE(base::PathExists(stale_dir))
       << stale_dir << " should be deleted.";
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(base::PathExists(fresh_dir))
-      << fresh_dir << " should be preserved.";
-#else   // BUILDFLAG(IS_WIN)
   EXPECT_FALSE(base::PathExists(fresh_dir))
       << fresh_dir << " should be deleted.";
-#endif  // BUILDFLAG(IS_WIN)
 
   EXPECT_TRUE(base::PathExists(other_prod_dir))
       << other_prod_dir << " should be preserved.";
-
-#if BUILDFLAG(IS_WIN)
-  ASSERT_TRUE(RetryFileOperation(&base::DeletePathRecursively, fresh_dir));
-#endif  // BUILDFLAG(IS_WIN)
 
   ASSERT_TRUE(RetryFileOperation(&base::DeletePathRecursively, other_prod_dir));
 }
@@ -6677,11 +6645,7 @@ TEST_F(UpdateClientTest,
 // Tests cancellation of an active download when `UpdateClient::Stop` is called.
 TEST_F(UpdateClientTest, Install_StopCancelsActiveDownload) {
   base::FilePath temp_dir;
-#if BUILDFLAG(IS_WIN)
-  ASSERT_TRUE(base::GetSecureTempDirectory(&temp_dir));
-#else   // BUILDFLAG(IS_WIN)
   ASSERT_TRUE(base::GetTempDir(&temp_dir));
-#endif  // BUILDFLAG(IS_WIN)
 
   base::FileEnumerator(
       temp_dir, /*recursive=*/false, base::FileEnumerator::DIRECTORIES,

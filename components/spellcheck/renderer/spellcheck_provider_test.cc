@@ -20,25 +20,6 @@
 #include "third_party/blink/public/platform/web_runtime_features.h"
 #include "third_party/blink/public/web/web_text_check_client.h"
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-#include "base/files/file_path.h"
-#include "base/path_service.h"
-
-namespace {
-base::FilePath GetHunspellDirectory() {
-  base::FilePath hunspell_directory;
-  if (!base::PathService::Get(base::DIR_SRC_TEST_DATA_ROOT,
-                              &hunspell_directory)) {
-    return base::FilePath();
-  }
-
-  hunspell_directory = hunspell_directory.AppendASCII("third_party");
-  hunspell_directory = hunspell_directory.AppendASCII("hunspell_dictionaries");
-  return hunspell_directory;
-}
-}  // namespace
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-
 FakeTextCheckingResult::FakeTextCheckingResult() = default;
 FakeTextCheckingResult::~FakeTextCheckingResult() = default;
 
@@ -69,32 +50,6 @@ void FakeSpellCheck::SetFakeLanguageCounts(size_t language_count,
   language_count_ = language_count;
   enabled_language_count_ = enabled_count;
 }
-
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-void FakeSpellCheck::InitializeSpellCheckForLocale(const std::string& language,
-                                                   bool use_hunspell) {
-  // Non-Hunspell case is passed invalid file to SpellcheckLanguage::Init.
-  base::File file;
-
-  if (use_hunspell) {
-    base::FilePath hunspell_directory = GetHunspellDirectory();
-    EXPECT_FALSE(hunspell_directory.empty());
-    base::FilePath hunspell_file_path =
-        spellcheck::GetVersionedFileName(language, hunspell_directory);
-    file.Initialize(hunspell_file_path,
-                    base::File::FLAG_OPEN | base::File::FLAG_READ);
-    EXPECT_TRUE(file.IsValid()) << hunspell_file_path << " is not valid"
-                                << file.ErrorToString(file.GetLastFileError());
-  }
-
-  // Add the SpellcheckLanguage manually to the SpellCheck object.
-  SpellCheck::languages_.push_back(
-      std::make_unique<SpellcheckLanguage>(embedder_provider_));
-  SpellCheck::languages_.back()->platform_spelling_engine_ =
-      std::make_unique<HunspellEngine>(embedder_provider_);
-  SpellCheck::languages_.back()->Init(std::move(file), language);
-}
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 
 void FakeSpellCheck::InitializeSpellCheckWithLanguage() {
   // Add the SpellcheckLanguage manually to the SpellCheck object.
@@ -213,13 +168,6 @@ void TestingSpellCheckProvider::FillSuggestionList(const std::u16string&,
 }
 #endif  // BUILDFLAG(ENABLE_SPELLING_SERVICE)
 
-#if BUILDFLAG(IS_WIN)
-void TestingSpellCheckProvider::InitializeDictionaries(
-    InitializeDictionariesCallback callback) {
-  std::move(callback).Run(/*dictionaries=*/{}, /*custom_words=*/{},
-                          /*enable=*/false);
-}
-#endif  // BUILDFLAG(IS_WIN)
 #endif  // BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 
 #if BUILDFLAG(IS_ANDROID)
@@ -240,25 +188,6 @@ bool TestingSpellCheckProvider::SatisfyRequestFromCache(
     blink::WebTextCheckingCompletion* completion) {
   return SpellCheckProvider::SatisfyRequestFromCache(text, completion);
 }
-
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-int TestingSpellCheckProvider::AddCompletionForTest(
-    std::unique_ptr<FakeTextCheckingCompletion> completion,
-    SpellCheckProvider::HybridSpellCheckRequestInfo request_info) {
-  int id =
-      SpellCheckProvider::text_check_completions_.Add(std::move(completion));
-  SpellCheckProvider::hybrid_requests_info_[id] = request_info;
-  return id;
-}
-
-void TestingSpellCheckProvider::OnRespondTextCheck(
-    int identifier,
-    const std::u16string& line,
-    const std::vector<SpellCheckResult>& results) {
-  SpellCheckProvider::OnRespondTextCheck(identifier, line, results);
-  base::RunLoop().RunUntilIdle();
-}
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 
 base::WeakPtr<SpellCheckProvider> TestingSpellCheckProvider::GetWeakPtr() {
   return weak_factory_.GetWeakPtr();

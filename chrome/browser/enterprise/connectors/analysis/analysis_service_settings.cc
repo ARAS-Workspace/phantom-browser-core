@@ -50,9 +50,7 @@ AnalysisServiceSettings::AnalysisServiceSettings(
 #if BUILDFLAG(ENTERPRISE_LOCAL_CONTENT_ANALYSIS)
 void AnalysisServiceSettings::ParseVerificationSignatures(
     const base::DictValue& settings_dict) {
-#if BUILDFLAG(IS_WIN)
-  const char* verification_key = kKeyWindowsVerification;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   const char* verification_key = kKeyMacVerification;
 #elif BUILDFLAG(IS_LINUX)
   const char* verification_key = kKeyLinuxVerification;

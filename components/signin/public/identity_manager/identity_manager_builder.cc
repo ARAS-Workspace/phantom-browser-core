@@ -113,9 +113,6 @@ IdentityManager::InitParameters BuildIdentityManagerInitParameters(
 #if BUILDFLAG(IS_IOS)
         std::move(params->device_accounts_provider),
 #endif
-#if BUILDFLAG(IS_WIN)
-        params->reauth_callback,
-#endif
         params->signin_client);
   }
 

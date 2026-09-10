@@ -52,11 +52,7 @@ class MockRemoteUrlOpener : public mojom::RemoteUrlOpener {
 };
 
 base::CommandLine::StringType ToCommandLineString(const char* str) {
-#if BUILDFLAG(IS_WIN)
-  return base::UTF8ToWide(str);
-#else
   return str;
-#endif
 }
 
 }  // namespace
@@ -234,13 +230,8 @@ TEST_F(RemoteOpenUrlClientTest, OpenUrlTimeout_LocalFallback) {
 }
 
 TEST_F(RemoteOpenUrlClientTest, OpenFilePath_LocalFallback) {
-#if BUILDFLAG(IS_WIN)
-  const wchar_t* file_path = L"C:\\test\\file\\path";
-  GURL file_url("file:///C:/test/file/path");
-#else
   const char* file_path = "/test/file/path";
   GURL file_url("file:///test/file/path");
-#endif
 
   BindMockRemoteUrlOpener();
 

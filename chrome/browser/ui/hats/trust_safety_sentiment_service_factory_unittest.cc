@@ -40,8 +40,7 @@ class TrustSafetySentimentServiceFactoryTest : public testing::Test {
   raw_ptr<MockHatsService> mock_hats_service_;
 };
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || \
-    (BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS))
+#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS))
 
 TEST_F(TrustSafetySentimentServiceFactoryTest, ServiceAvailable) {
   EXPECT_CALL(*mock_hats_service(), CanShowAnySurvey(/*user_prompted=*/false))
@@ -98,5 +97,4 @@ TEST_F(TrustSafetySentimentServiceFactoryTest, NoServiceWrongPlatform) {
       .Times(0);
   EXPECT_FALSE(TrustSafetySentimentServiceFactory::GetForProfile(profile()));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) ||
-        // (BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS))
+#endif  // BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS))

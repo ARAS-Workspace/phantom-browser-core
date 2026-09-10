@@ -42,10 +42,6 @@
 #include "net/url_request/url_request_error_job.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/shortcut.h"
-#endif
-
 namespace net {
 
 URLRequestTestJobBackedByFile::FileMetaInfo::FileMetaInfo() = default;

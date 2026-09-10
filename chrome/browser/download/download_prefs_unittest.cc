@@ -377,12 +377,11 @@ TEST(DownloadPrefsTest, Pdf) {
 #if BUILDFLAG(IS_CHROMEOS)
   // ChromeOS always has a "SystemReader" that opens in a tab.
   EXPECT_TRUE(prefs.ShouldOpenPdfInSystemReader());
-#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   EXPECT_FALSE(prefs.ShouldOpenPdfInSystemReader());
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
   prefs.SetShouldOpenPdfInSystemReader(true);
 #endif
 
@@ -391,7 +390,7 @@ TEST(DownloadPrefsTest, Pdf) {
   EXPECT_FALSE(prefs.IsAutoOpenByUserUsed());
   EXPECT_FALSE(prefs.IsAutoOpenEnabled(kURL, kPdfFile));
   EXPECT_TRUE(prefs.ShouldOpenPdfInSystemReader());
-#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   EXPECT_TRUE(prefs.IsAutoOpenByUserUsed());
   EXPECT_TRUE(prefs.IsAutoOpenEnabled(kURL, kPdfFile));
   EXPECT_TRUE(prefs.ShouldOpenPdfInSystemReader());

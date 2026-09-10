@@ -141,14 +141,6 @@ inline constexpr char kProfileCreationTime[] = "profile.creation_time";
 // Preference which stores randomly generated profile ID for LOM.
 inline constexpr char kLomProfileId[] = "private_metrics.lom.profile_id";
 
-#if BUILDFLAG(IS_WIN)
-// This is a timestamp of the last time this profile was reset by a third party
-// tool. On Windows, a third party tool may set a registry value that will be
-// compared to this value and if different will result in a profile reset
-// prompt. See triggered_profile_resetter.h for more information.
-inline constexpr char kLastProfileResetTimestamp[] =
-    "profile.last_reset_timestamp";
-#endif
 
 // The URL to open the new tab page to. Only set by Group Policy.
 inline constexpr char kNewTabPageLocationOverride[] =
@@ -236,32 +228,10 @@ inline constexpr char kWebKitFantasyFontFamilyMap[] =
 inline constexpr char kWebKitMathFontFamilyMap[] = WEBKIT_WEBPREFS_FONTS_MATH;
 inline constexpr char kWebKitStandardFontFamilyArabic[] =
     "webkit.webprefs.fonts.standard.Arab";
-#if BUILDFLAG(IS_WIN)
-inline constexpr char kWebKitFixedFontFamilyArabic[] =
-    "webkit.webprefs.fonts.fixed.Arab";
-#endif
 inline constexpr char kWebKitSerifFontFamilyArabic[] =
     "webkit.webprefs.fonts.serif.Arab";
 inline constexpr char kWebKitSansSerifFontFamilyArabic[] =
     "webkit.webprefs.fonts.sansserif.Arab";
-#if BUILDFLAG(IS_WIN)
-inline constexpr char kWebKitStandardFontFamilyCyrillic[] =
-    "webkit.webprefs.fonts.standard.Cyrl";
-inline constexpr char kWebKitFixedFontFamilyCyrillic[] =
-    "webkit.webprefs.fonts.fixed.Cyrl";
-inline constexpr char kWebKitSerifFontFamilyCyrillic[] =
-    "webkit.webprefs.fonts.serif.Cyrl";
-inline constexpr char kWebKitSansSerifFontFamilyCyrillic[] =
-    "webkit.webprefs.fonts.sansserif.Cyrl";
-inline constexpr char kWebKitStandardFontFamilyGreek[] =
-    "webkit.webprefs.fonts.standard.Grek";
-inline constexpr char kWebKitFixedFontFamilyGreek[] =
-    "webkit.webprefs.fonts.fixed.Grek";
-inline constexpr char kWebKitSerifFontFamilyGreek[] =
-    "webkit.webprefs.fonts.serif.Grek";
-inline constexpr char kWebKitSansSerifFontFamilyGreek[] =
-    "webkit.webprefs.fonts.sansserif.Grek";
-#endif
 inline constexpr char kWebKitStandardFontFamilyJapanese[] =
     "webkit.webprefs.fonts.standard.Jpan";
 inline constexpr char kWebKitFixedFontFamilyJapanese[] =
@@ -278,10 +248,6 @@ inline constexpr char kWebKitSerifFontFamilyKorean[] =
     "webkit.webprefs.fonts.serif.Hang";
 inline constexpr char kWebKitSansSerifFontFamilyKorean[] =
     "webkit.webprefs.fonts.sansserif.Hang";
-#if BUILDFLAG(IS_WIN)
-inline constexpr char kWebKitCursiveFontFamilyKorean[] =
-    "webkit.webprefs.fonts.cursive.Hang";
-#endif
 inline constexpr char kWebKitStandardFontFamilySimplifiedHan[] =
     "webkit.webprefs.fonts.standard.Hans";
 inline constexpr char kWebKitFixedFontFamilySimplifiedHan[] =
@@ -298,7 +264,7 @@ inline constexpr char kWebKitSerifFontFamilyTraditionalHan[] =
     "webkit.webprefs.fonts.serif.Hant";
 inline constexpr char kWebKitSansSerifFontFamilyTraditionalHan[] =
     "webkit.webprefs.fonts.sansserif.Hant";
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 inline constexpr char kWebKitCursiveFontFamilySimplifiedHan[] =
     "webkit.webprefs.fonts.cursive.Hans";
 inline constexpr char kWebKitCursiveFontFamilyTraditionalHan[] =
@@ -1004,7 +970,7 @@ inline constexpr char kPrintPreviewDisabled[] =
 inline constexpr char kPrintPreviewDefaultDestinationSelectionRules[] =
     "printing.default_destination_selection_rules";
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // Boolean controlling whether the "Print as image" option should be available
 // in Print Preview when printing a PDF.
 inline constexpr char kPrintPdfAsImageAvailability[] =
@@ -1022,13 +988,6 @@ inline constexpr char kPrintPdfAsImageDefault[] =
     "printing.print_pdf_as_image_default";
 #endif
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_PRINTING)
-// An integer pref that holds the PostScript mode to use when printing.
-inline constexpr char kPrintPostScriptMode[] = "printing.postscript_mode";
-
-// An integer pref that holds the rasterization mode to use when printing.
-inline constexpr char kPrintRasterizationMode[] = "printing.rasterization_mode";
-#endif
 
 #if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_ANDROID)
 // A pref that sets the default destination in Print Preview to always be the
@@ -1160,12 +1119,6 @@ inline constexpr char kEnterpriseProfileCreationKeepBrowsingData[] =
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 #endif
 
-#if BUILDFLAG(IS_WIN)
-// Put the user into an onboarding group that's decided when they go through
-// the first run onboarding experience. Only users in a group will have their
-// finch group pinged to keep track of them for the experiment.
-inline constexpr char kNaviOnboardGroup[] = "browser.navi_onboard_group";
-#endif  // BUILDFLAG(IS_WIN)
 
 // Boolean indicating whether, as part of the adaptive activation quiet UI dry
 // run experiment, the user has accumulated three notification permission
@@ -1402,7 +1355,7 @@ inline constexpr char kStabilitySystemUncleanShutdownCount[] =
 inline constexpr char kBrowserSuppressDefaultBrowserPrompt[] =
     "browser.suppress_default_browser_prompt_for_version";
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // The time at which the default-PDF-viewer infobar was last shown.
 inline constexpr char kPdfInfoBarLastShown[] = "browser.pdf_infobar_last_shown";
 
@@ -1416,15 +1369,15 @@ inline constexpr char kPinInfoBarLastShown[] = "browser.pin_infobar_last_shown";
 // How many times the pin-to-taskbar infobar has been shown.
 inline constexpr char kPinInfoBarTimesShown[] =
     "browser.pin_infobar_times_shown";
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // How many times the session restore infobar has been shown.
 inline constexpr char kSessionRestoreInfoBarTimesShown[] =
     "browser.session_restore_infobar_times_shown";
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // A collection of position, size, and other data relating to the browser
 // window to restore on startup.
@@ -1468,8 +1421,7 @@ static_assert(std::string_view(kDownloadDefaultDirectory) ==
 // upgrade a unsafe location to a safe location.
 inline constexpr char kDownloadDirUpgraded[] = "download.directory_upgrade";
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 inline constexpr char kOpenPdfDownloadInSystemReader[] =
     "download.open_pdf_in_system_reader";
 #endif
@@ -1960,18 +1912,12 @@ inline constexpr char kDefaultVideoCaptureDeviceDeprecated[] =
 // the content.
 inline constexpr char kMediaStorageIdSalt[] = "media.storage_id_salt";
 
-#if BUILDFLAG(IS_WIN)
-// Mapping of origin to their origin id (UnguessableToken). Origin IDs are only
-// stored for origins using MediaFoundation-based CDMs.
-inline constexpr char kMediaCdmOriginData[] = "media.cdm.origin_data";
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // A boolean pref to determine whether or not the network service is running
 // sandboxed.
 inline constexpr char kNetworkServiceSandboxEnabled[] =
     "net.network_service_sandbox";
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // If non-zero, then the last major version of Chrome where a failed launch of
 // the network service occurred. A failed launch is defined as either the
@@ -2110,10 +2056,6 @@ inline constexpr char
         "authorization";
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-// The integer value of the CloudAPAuthEnabled policy.
-inline constexpr char kCloudApAuthEnabled[] = "auth.cloud_ap_auth.enabled";
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
 // The integer value of the AndroidEntraSSOEnabled policy.
@@ -2352,53 +2294,16 @@ inline constexpr char kMacRestoreLocationPermissionsExperimentCount[] =
     "mac_restore_location_permissions_experiment_count";
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-// A list of base::Time value indicating the timestamps when hardware secure
-// decryption was disabled due to errors or crashes. The implementation
-// maintains a max size of the list (e.g. 2).
-inline constexpr char kGlobalHardwareSecureDecryptionDisabledTimes[] =
-    "media.hardware_secure_decryption.disabled_times";
-inline constexpr char kHardwareSecureDecryptionDisabledTimes[] =
-    "hardware_secure_decryption.disabled_times";
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 // Defines administrator-set availability of Chrome for Testing.
 inline constexpr char kChromeForTestingAllowed[] = "chrome_for_testing.allowed";
 #endif
 
-#if BUILDFLAG(IS_WIN)
-inline constexpr char kForegroundLaunchOnLogin[] =
-    "launch_on_login.foreground.enabled";
-
-// Boolean representing whether the infobar has been accepted by the user.
-inline constexpr char kStartupLaunchInfobarAccepted[] =
-    "launch_on_login.infobar_accepted";
-
-// base::Time containing time at which the startup launch infobar was last
-// dismissed by the user.
-inline constexpr char kStartupLaunchInfobarLastDeclinedTime[] =
-    "launch_on_login.infobar_last_declined_time";
-
-// Int representing the number of times the user has dismissed the startup
-// launch infobar.
-inline constexpr char kStartupLaunchInfobarDeclinedCount[] =
-    "launch_on_login.infobar_declined_count";
-#endif
 
 // A boolean pref which determines whether the QR Code generator feature is
 // enabled. Controlled by QRCodeGeneratorEnabled policy.
 inline constexpr char kQRCodeGeneratorEnabled[] = "qr_code_generator_enabled";
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-inline constexpr char kOsUpdateHandlerEnabled[] = "os_update_handler_enabled";
-
-// A boolean pref that determines whether Chrome shows system notifications
-// about its features.
-inline constexpr char kFeatureNotificationsEnabled[] =
-    "feature_notifications_enabled";
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 // An enum that controls what level of toasts we show to the user.
 inline constexpr char kToastAlertLevel[] = "settings.toast.alert_level";
@@ -2428,15 +2333,6 @@ inline constexpr char kBackgroundModeEnabled[] = "background_mode.enabled";
 inline constexpr char kHardwareAccelerationModeEnabled[] =
     "hardware_acceleration_mode.enabled";
 
-#if BUILDFLAG(IS_WIN)
-// Set to true if process isolation mode is enabled.
-inline constexpr char kProcessIsolationEnabled[] = "isolation_state.enabled";
-
-// A string representing the state or field trial group name of the isolation
-// state.
-inline constexpr char kPreviousIsolationState[] = "isolation_state.previous";
-
-#endif  // BUILDFLAG(IS_WIN)
 
 // Hardware acceleration mode from previous browser launch.
 inline constexpr char kHardwareAccelerationModePrevious[] =
@@ -2460,21 +2356,6 @@ inline constexpr char kMediaGalleriesRememberedGalleries[] =
     "media_galleries.remembered_galleries";
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-// Counts how many more times the 'profile on a network share' warning should be
-// shown to the user before the next silence period.
-inline constexpr char kNetworkProfileWarningsLeft[] =
-    "network_profile.warnings_left";
-// Tracks the time of the last shown warning. Used to reset
-// |network_profile.warnings_left| after a silence period.
-inline constexpr char kNetworkProfileLastWarningTime[] =
-    "network_profile.last_warning_time";
-
-// The last Chrome version at which
-// shell_integration::win::MigrateTaskbarPins() completed.
-inline constexpr char kShortcutMigrationVersion[] =
-    "browser.shortcut_migration_version";
-#endif  // BUILDFLAG(IS_WIN)
 
 // An integer that is incremented whenever changes are made to app shortcuts.
 // Increasing this causes all app shortcuts to be recreated.
@@ -2611,39 +2492,6 @@ inline constexpr char kCommerceMerchantViewerMessagesShownTime[] =
 inline constexpr char kWebShareVisitedTargets[] =
     "profile.web_share.visited_targets";
 
-#if BUILDFLAG(IS_WIN)
-
-inline constexpr char kRestrictCoreSharingOnRenderer[] =
-    "restrict_core_sharing_on_renderer";
-
-// A boolean value, controlling whether Chrome renderer processes should have
-// Renderer App Container enabled or not. If this pref is set to false then
-// Renderer App Container is disabled, otherwise Renderer App Container is
-// controlled by the `RendererAppContainer` feature owned by sandbox/policy.
-inline constexpr char kRendererAppContainerEnabled[] =
-    "renderer_app_container_enabled";
-
-// A boolean that controls whether the Browser process has
-// ProcessExtensionPointDisablePolicy enabled.
-inline constexpr char kBlockBrowserLegacyExtensionPoints[] =
-    "block_browser_legacy_extension_points";
-
-// An integer enum that controls the policy-managed dynamic code settings. This
-// is linked via a PolicyToPreferenceMapEntry to the underlying policy.
-inline constexpr char kDynamicCodeSettings[] = "dynamic_code_settings";
-
-// A boolean that controls whether the Browser process has Application Bound
-// (App-Bound) Encryption enabled.
-inline constexpr char kApplicationBoundEncryptionEnabled[] =
-    "application_bound_encryption_enabled";
-
-// A boolean that controls whether or not the Printing LPAC Sandbox is enabled
-// or not. This is linked via a PolicyToPreferenceMapEntry to the underlying
-// policy PrintingLPACSandboxEnabled.
-inline constexpr char kPrintingLPACSandboxEnabled[] =
-    "printing_lpac_sandbox_enabled";
-
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
 // Timestamp of the clipboard's last modified time, stored in base::Time's
@@ -2942,7 +2790,7 @@ inline constexpr char kLensRegionSearchEnabled[] =
 inline constexpr char kLensDesktopNTPSearchEnabled[] =
     "policy.lens_desktop_ntp_search_enabled";
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 // A dict mapping the edition name with the major version it was shown.
 inline constexpr char kWhatsNewEditionUsed[] = "browser.whats_new.edition_used";
 // A list containing the features of each module in order of when they
@@ -3074,12 +2922,6 @@ inline constexpr char kHappyEyeballsV3Enabled[] =
 inline constexpr char kIPv6ReachabilityOverrideEnabled[] =
     "net.ipv6_reachability_override_enabled";
 
-#if BUILDFLAG(IS_WIN)
-// Whether native hosts executables launch directly is enabled or
-// disabled.
-inline constexpr char kNativeHostsExecutablesLaunchDirectly[] =
-    "native_hosts_executables_launch_directly";
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
 // Dictionary mapping language to Read Aloud voice. Keys are language names like

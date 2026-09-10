@@ -569,8 +569,7 @@ IN_PROC_BROWSER_TEST_F(TrustedVaultEncryptionKeysTabHelperBrowserTest,
 // These tests are disabled under MSAN. The enclave subprocess is written in
 // Rust and FFI from Rust to C++ doesn't work in Chromium at this time
 // (crbug.com/40240570).
-#if !defined(MEMORY_SANITIZER) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC))
+#if !defined(MEMORY_SANITIZER) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC))
 // For testing opportunistic retrieval of passkey secrets we need a special
 // infrastructure setup like the sync server, fake enclave, service fakes, and
 // platform fakes. This setup is being performed by the
@@ -692,7 +691,7 @@ IN_PROC_BROWSER_TEST_F(
               IsEmpty());
 }
 #endif  // !defined(MEMORY_SANITIZER) && (BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC))
+        // BUILDFLAG(IS_MAC))
 
 IN_PROC_BROWSER_TEST_F(
     TrustedVaultEncryptionKeysTabHelperBrowserTest,

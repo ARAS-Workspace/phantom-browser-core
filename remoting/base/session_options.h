@@ -56,14 +56,6 @@ struct SessionOptions {
   std::optional<bool> enable_sck_capturer;
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-  // Whether to allow DXGI capturer on Windows.
-  // A nullopt value means the option is unset and uses the default value
-  // (false).
-  // Corresponding option key: Allow-Dxgi-Capturer
-  std::optional<bool> allow_dxgi_capturer;
-#endif  // BUILDFLAG(IS_WIN)
-
   // Whether to disable UDP connections.
   // A nullopt value means the option is unset and uses the default value
   // (false).

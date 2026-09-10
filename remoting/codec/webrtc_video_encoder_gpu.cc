@@ -39,10 +39,6 @@
 #include "third_party/webrtc/modules/desktop_capture/desktop_frame.h"
 #include "third_party/webrtc/modules/desktop_capture/desktop_geometry.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#endif
-
 namespace {
 
 using media::VideoCodecProfile;
@@ -134,13 +130,6 @@ class WebrtcVideoEncoderGpu::Core
   void UseOutputBitstreamBufferId(int32_t bitstream_buffer_id);
 
   void RunAnyPendingEncode();
-
-#if BUILDFLAG(IS_WIN)
-  // This object is required by Chromium to ensure proper init/uninit of COM on
-  // this thread.  The guidance is to match the lifetime of this object to the
-  // lifetime of the thread if possible.
-  std::unique_ptr<base::win::ScopedCOMInitializer> scoped_com_initializer_;
-#endif
 
   State state_ = UNINITIALIZED;
 
@@ -351,13 +340,6 @@ void WebrtcVideoEncoderGpu::Core::NotifyErrorStatus(
 void WebrtcVideoEncoderGpu::Core::BeginInitialization() {
   DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
 
-#if BUILDFLAG(IS_WIN)
-  if (!scoped_com_initializer_) {
-    scoped_com_initializer_ =
-        std::make_unique<base::win::ScopedCOMInitializer>();
-  }
-#endif
-
   VideoPixelFormat input_format = VideoPixelFormat::PIXEL_FORMAT_NV12;
   // TODO(zijiehe): Implement some logical way to set an initial bitrate.
   // Currently we set the bitrate to 8M bits / 1M bytes per frame, and 30 frames
@@ -416,14 +398,6 @@ std::unique_ptr<WebrtcVideoEncoder> WebrtcVideoEncoderGpu::CreateForH264() {
 
 // static
 bool WebrtcVideoEncoderGpu::IsSupportedByH264(const Profile& profile) {
-#if BUILDFLAG(IS_WIN)
-  // This object is required by Chromium to ensure proper init/uninit of COM on
-  // this thread.  The guidance is to match the lifetime of this object to the
-  // lifetime of the thread if possible.  Since we are still experimenting with
-  // H.264 and run the encoder on a different thread, we use a locally scoped
-  // object for now.
-  base::win::ScopedCOMInitializer scoped_com_initializer;
-#endif
 
   media::VideoEncodeAccelerator::SupportedProfiles profiles =
       media::GpuVideoEncodeAcceleratorFactory::GetSupportedProfiles(

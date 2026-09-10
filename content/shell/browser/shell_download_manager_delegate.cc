@@ -13,11 +13,6 @@
 #include "build/build_config.h"
 #include "components/download/public/common/download_target_info.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <commdlg.h>
-#endif
 
 #include "base/check_op.h"
 #include "base/command_line.h"
@@ -37,10 +32,6 @@
 #include "content/shell/common/shell_switches.h"
 #include "net/base/filename_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/aura/window.h"
-#include "ui/aura/window_tree_host.h"
-#endif
 
 namespace content {
 
@@ -170,34 +161,7 @@ void ShellDownloadManagerDelegate::ChooseDownloadPath(
     return;
 
   base::FilePath result;
-#if BUILDFLAG(IS_WIN)
-  std::wstring file_name = suggested_path.BaseName().value();
-  file_name.resize(MAX_PATH);
-
-  OPENFILENAME save_as{};
-  save_as.lStructSize = sizeof(OPENFILENAME);
-  WebContents* web_contents = DownloadItemUtils::GetWebContents(item);
-  // |web_contents| could be null if the tab was quickly closed.
-  if (!web_contents)
-    return;
-  save_as.hwndOwner =
-      web_contents->GetNativeView()->GetHost()->GetAcceleratedWidget();
-  save_as.lpstrFile = &file_name[0];
-  save_as.nMaxFile = file_name.size();
-
-  std::wstring directory;
-  if (!suggested_path.empty())
-    directory = suggested_path.DirName().value();
-
-  save_as.lpstrInitialDir = directory.c_str();
-  save_as.Flags = OFN_OVERWRITEPROMPT | OFN_EXPLORER | OFN_ENABLESIZING |
-                  OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST;
-
-  if (GetSaveFileName(&save_as))
-    result = base::FilePath(std::wstring(save_as.lpstrFile));
-#else
   NOTIMPLEMENTED();
-#endif
 
   download::DownloadTargetInfo target_info;
   target_info.target_path = result;

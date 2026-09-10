@@ -1380,11 +1380,7 @@ class LCPPTimingPredictorBrowserTest : public LCPPTimingPredictorTestBase {
 // Confirm image element of the first LCP is predicted rather than div, or the
 // actual LCP(current implementation)
 // TODO(crbug.com/413192370): Flaky on win-rel.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_Base DISABLED_Base
-#else
 #define MAYBE_Base Base
-#endif
 IN_PROC_BROWSER_TEST_F(LCPPTimingPredictorBrowserTest, MAYBE_Base) {
   TestPrediction();
 }
@@ -1409,11 +1405,7 @@ class LCPPTimingPredictorBrowserFlagTest
 
 // kLCPCriticalPathPredictorRecordedLcpElementTypes should not affect.
 // TODO(crbug.com/413192370): Flaky on win-rel.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_WithKCriticalPathFlag DISABLED_WithKCriticalPathFlag
-#else
 #define MAYBE_WithKCriticalPathFlag WithKCriticalPathFlag
-#endif
 IN_PROC_BROWSER_TEST_P(LCPPTimingPredictorBrowserFlagTest,
                        MAYBE_WithKCriticalPathFlag) {
   TestPrediction();

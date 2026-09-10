@@ -108,11 +108,7 @@ IN_PROC_BROWSER_TEST_F(IPCInterfacesDumper, DumperTest) {
   std::string file_path = env->GetVar("IPC_DUMP_PATH").value_or("");
 
   base::ScopedAllowBlockingForTesting allow_blocking;
-#if BUILDFLAG(IS_WIN)
-  base::FilePath filepath = base::FilePath(base::UTF8ToWide(file_path));
-#else
   base::FilePath filepath = base::FilePath(file_path);
-#endif
   base::File file(std::move(filepath),
                   base::File::FLAG_CREATE_ALWAYS | base::File::FLAG_WRITE);
   std::optional<std::string> json_string = base::WriteJson(json);

@@ -97,10 +97,6 @@ TEST(SecurityTest, MAYBE_NewOverflow) {
     char* volatile p = reinterpret_cast<char*>(array_pointer.get());
     OverflowTestsSoftExpectTrue(!p);
   }
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_64_BITS)
-  // On Windows, the compiler prevents static array sizes of more than
-  // 0x7fffffff (error C2148).
-#else
   {
     std::unique_ptr<char[][kArraySize2]> array_pointer(
         new (nothrow) char[kDynamicArraySize][kArraySize2]);
@@ -108,7 +104,6 @@ TEST(SecurityTest, MAYBE_NewOverflow) {
     char* volatile p = reinterpret_cast<char*>(array_pointer.get());
     OverflowTestsSoftExpectTrue(!p);
   }
-#endif  // BUILDFLAG(IS_WIN) && defined(ARCH_CPU_64_BITS)
 }
 
 }  // namespace

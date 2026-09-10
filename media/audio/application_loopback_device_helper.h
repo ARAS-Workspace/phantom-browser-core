@@ -63,22 +63,6 @@ CreateRestrictOwnAudioBrowserLoopbackDeviceId(std::string_view bundle_id,
 std::pair<std::string, std::optional<pid_t>> MEDIA_EXPORT
 ParseApplicationLoopbackDeviceId(std::string_view device_id);
 
-#elif BUILDFLAG(IS_WIN)
-
-std::string MEDIA_EXPORT
-CreateApplicationLoopbackDeviceId(const uint32_t application_id);
-
-// A Restrict Own Audio Device ID is used in the cases where the browser
-// is capturing its own audio, but is not allowed to capture audio from the tab
-// that performs the capture. The Device ID still contain the Application ID of
-// this browser.
-std::string MEDIA_EXPORT CreateRestrictOwnAudioBrowserLoopbackDeviceId();
-
-// Extracts the Application ID from a Application Loopback Device ID.
-// A CHECK() will be triggered if the device_id is not a Application loopback
-// device ID, or it does not contain a valid application ID.
-uint32_t MEDIA_EXPORT
-GetApplicationIdFromApplicationLoopbackDeviceId(std::string_view device_id);
 #endif  // BUILDFLAG(IS_MAC)
 
 bool MEDIA_EXPORT

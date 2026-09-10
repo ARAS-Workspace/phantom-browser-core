@@ -103,14 +103,6 @@ class SpellcheckLanguagePolicyHandlersTest
 };
 
 TEST_P(SpellcheckLanguagePolicyHandlersTest, ApplyPolicySettings) {
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-  std::optional<spellcheck::ScopedDisableBrowserSpellCheckerForTesting>
-      disable_browser_spell_checker;
-  if (!GetParam().windows_spellchecker_enabled) {
-    // Hunspell-only spellcheck languages will be used.
-    disable_browser_spell_checker.emplace();
-  }
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 
   PrefValueMap prefs;
   policy::PolicyMap policy;
@@ -162,26 +154,6 @@ INSTANTIATE_TEST_SUITE_P(
     TestCases,
     SpellcheckLanguagePolicyHandlersTest,
     testing::Values(
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-        // Test cases for Windows spellchecker (policy languages not restricted
-        // to Hunspell).
-        TestCase({"ar-SA", "es-MX", "fi", "fr",
-                  "not-a-language"} /* blocked languages */,
-                 {"fi", "fr", "not-another-language"} /* forced languages */,
-                 {"ar", "es-MX"} /* expected blocked languages */,
-                 {"fi", "fr"} /* expected forced languages */,
-                 true /* spellcheck enabled */,
-                 true /* windows spellchecker enabled */),
-        TestCase({"ar-SA", "es-MX", "fi", "fr "} /* blocked languages */,
-                 {"fi", "fr"} /* forced languages */,
-                 {""} /* expected blocked languages */,
-                 {""} /* expected forced languages */,
-                 false /* spellcheck enabled */,
-                 true /* windows spellchecker enabled */),
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-        // Test cases for Hunspell only spellchecker. ar-SA and fi are
-        // non-Hunspell languages so are ignored for policy enforcement. If they
-        // ever obtain Hunspell support, the first test case below will fail.
         TestCase({"ar-SA", "es-MX", "fi", "fr",
                   "not-a-language"} /* blocked languages */,
                  {"fi", "fr", "not-another-language"} /* forced languages */,

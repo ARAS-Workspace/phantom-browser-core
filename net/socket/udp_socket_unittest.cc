@@ -51,16 +51,10 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "testing/platform_test.h"
 
-#if !BUILDFLAG(IS_WIN)
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
-#else
-#include <winsock2.h>
-
-#include <iphlpapi.h>
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 #include "net/android/network_change_notifier_factory_android.h"
@@ -122,13 +116,7 @@ class UDPSocketTest : public PlatformTest, public WithTaskEnvironment {
     rv = callback.GetResult(rv);
     if (rv < 0)
       return std::string();
-#if BUILDFLAG(IS_WIN)
-    // The DSCP value is not populated on Windows, in order to avoid incurring
-    // an extra system call.
-    EXPECT_EQ(socket->GetLastTos().dscp, DSCP_DEFAULT);
-#else
     EXPECT_EQ(socket->GetLastTos().dscp, dscp);
-#endif
     EXPECT_EQ(socket->GetLastTos().ecn, ecn);
     return std::string(buffer_->data(), rv);
   }
@@ -165,13 +153,7 @@ class UDPSocketTest : public PlatformTest, public WithTaskEnvironment {
     rv = callback.GetResult(rv);
     if (rv < 0)
       return std::string();
-#if BUILDFLAG(IS_WIN)
-    // The DSCP value is not populated on Windows, in order to avoid incurring
-    // an extra system call.
-    EXPECT_EQ(socket->GetLastTos().dscp, DSCP_DEFAULT);
-#else
     EXPECT_EQ(socket->GetLastTos().dscp, dscp);
-#endif
     EXPECT_EQ(socket->GetLastTos().ecn, ecn);
     return std::string(buffer_->data(), rv);
   }
@@ -473,13 +455,6 @@ TEST_F(UDPSocketTest, ConnectUsingDefaultNetworkRestrictedPort) {
               IsError(ERR_UNSAFE_PORT));
   histogram_tester.ExpectTotalCount("Net.RestrictedLocalhostPorts", 1);
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(UDPSocketTest, ConnectNonBlocking) {
-  ConnectTest(true, false);
-  ConnectTest(true, true);
-}
-#endif
 
 TEST_F(UDPSocketTest, PartialRecv) {
   UDPServerSocket server_socket(nullptr, NetLogSource());
@@ -897,11 +872,7 @@ TEST_F(UDPSocketTest, JoinMulticastGroup) {
   EXPECT_TRUE(group_ip.AssignFromIPLiteral(kGroup));
 // TODO(https://github.com/google/gvisor/issues/3839): don't guard on
 // OS_FUCHSIA.
-#if BUILDFLAG(IS_WIN)
-  IPEndPoint bind_address(IPAddress::AllZeros(group_ip.size()), 0 /* port */);
-#else
   IPEndPoint bind_address(group_ip, 0 /* port */);
-#endif  // BUILDFLAG(IS_WIN)
 
   UDPSocket socket(DatagramSocket::DEFAULT_BIND, nullptr, NetLogSource());
   EXPECT_THAT(socket.Open(bind_address.GetFamily()), IsOk());
@@ -931,12 +902,7 @@ TEST_F(UDPSocketTest, MAYBE_SharedMulticastAddress) {
   ASSERT_TRUE(group_ip.AssignFromIPLiteral(kGroup));
 // TODO(https://github.com/google/gvisor/issues/3839): don't guard on
 // OS_FUCHSIA.
-#if BUILDFLAG(IS_WIN)
-  IPEndPoint receive_address(IPAddress::AllZeros(group_ip.size()),
-                             0 /* port */);
-#else
   IPEndPoint receive_address(group_ip, 0 /* port */);
-#endif  // BUILDFLAG(IS_WIN)
 
   NetworkInterfaceList interfaces;
   ASSERT_TRUE(GetNetworkList(&interfaces, 0));
@@ -1050,12 +1016,7 @@ TEST_F(UDPSocketTest, VerifyDscpAndEcnExchangeV4) {
   EXPECT_EQ(client.SetRecvTos(), 0);
   EXPECT_EQ(server.SetRecvTos(), 0);
 
-#if BUILDFLAG(IS_WIN)
-  // Do not exercise the DSCP code because it requires a mock Qwave API.
-  EXPECT_EQ(client.SetTos(DSCP_NO_CHANGE, ECN_ECT1), 0);
-#else
   EXPECT_EQ(client.SetTos(DSCP_AF41, ECN_ECT1), 0);
-#endif
   std::string client_message = "hello";
   EXPECT_EQ(WriteSocket(&client, client_message),
             static_cast<int>(client_message.length()));
@@ -1075,12 +1036,7 @@ TEST_F(UDPSocketTest, VerifyDscpAndEcnExchangeV4) {
             static_cast<int>(second_message.length()));
   EXPECT_EQ(ReadSocket(&client, DSCP_CS2, ECN_ECT0), second_message.data());
 
-#if BUILDFLAG(IS_WIN)
-  // The Windows sendmsg API does not allow setting ECN_CE as the outgoing mark.
-  EcnCodePoint final_ecn = ECN_ECT1;
-#else
   EcnCodePoint final_ecn = ECN_CE;
-#endif
 
   EXPECT_EQ(server.SetTos(DSCP_NO_CHANGE, final_ecn), 0);
   EXPECT_EQ(SendToSocket(&server, second_message),
@@ -1116,12 +1072,7 @@ TEST_F(UDPSocketTest, VerifyDscpAndEcnExchangeV6) {
   EXPECT_EQ(client.SetRecvTos(), 0);
   EXPECT_EQ(server.SetRecvTos(), 0);
 
-#if BUILDFLAG(IS_WIN)
-  // Do not exercise the DSCP code because it requires a mock Qwave API.
-  EXPECT_EQ(client.SetTos(DSCP_NO_CHANGE, ECN_ECT1), 0);
-#else
   EXPECT_EQ(client.SetTos(DSCP_AF41, ECN_ECT1), 0);
-#endif
   std::string client_message = "hello";
   EXPECT_EQ(WriteSocket(&client, client_message),
             static_cast<int>(client_message.length()));
@@ -1141,12 +1092,7 @@ TEST_F(UDPSocketTest, VerifyDscpAndEcnExchangeV6) {
             static_cast<int>(second_message.length()));
   EXPECT_EQ(ReadSocket(&client, DSCP_CS2, ECN_ECT0), second_message.data());
 
-#if BUILDFLAG(IS_WIN)
-  // The Windows sendmsg API does not allow setting ECN_CE as the outgoing mark.
-  EcnCodePoint final_ecn = ECN_ECT1;
-#else
   EcnCodePoint final_ecn = ECN_CE;
-#endif
 
   EXPECT_EQ(server.SetTos(DSCP_NO_CHANGE, final_ecn), 0);
   EXPECT_EQ(SendToSocket(&server, second_message),
@@ -1185,45 +1131,26 @@ TEST_F(UDPSocketTest, VerifyDscpAndEcnExchangeDualStack) {
   EXPECT_THAT(client.Connect(server_v4_address), IsOk());
   EXPECT_EQ(server.SetRecvTos(), 0);
 
-#if BUILDFLAG(IS_WIN)
-  // Windows requires a Mock QWave API to allow the client to set the DSCP. For
-  // efficiency reasons, Chromium windows UDP sockets do not provide access to
-  // incoming DSCP anyway. To avoid all the mocking, don't set the DSCP at all
-  // for Windows. RecvFromSocket() doesn't check the DSCP for Windows.
-  EXPECT_EQ(client.SetTos(DSCP_NO_CHANGE, ECN_ECT1), 0);
-#else
   EXPECT_EQ(client.SetTos(DSCP_AF41, ECN_ECT1), 0);
-#endif  //! BUILDFLAG(IS_WIN)
   std::string first_message = "foobar";
   EXPECT_EQ(WriteSocket(&client, first_message),
             static_cast<int>(first_message.length()));
   EXPECT_EQ(RecvFromSocket(&server, DSCP_AF41, ECN_ECT1), first_message.data());
 
   std::string second_message = "foo";
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(client.SetTos(DSCP_NO_CHANGE, ECN_ECT0), 0);
-#else
   EXPECT_EQ(client.SetTos(DSCP_CS2, ECN_ECT0), 0);
-#endif
   EXPECT_EQ(WriteSocket(&client, second_message),
             static_cast<int>(second_message.length()));
   EXPECT_EQ(RecvFromSocket(&server, DSCP_CS2, ECN_ECT0), second_message.data());
 
-#if BUILDFLAG(IS_WIN)
-  // The Windows sendmsg API does not allow setting ECN_CE as the outgoing mark.
-  EcnCodePoint final_ecn = ECN_ECT1;
-#else
   EcnCodePoint final_ecn = ECN_CE;
-#endif
   EXPECT_EQ(client.SetTos(DSCP_NO_CHANGE, final_ecn), 0);
   EXPECT_EQ(WriteSocket(&client, second_message),
             static_cast<int>(second_message.length()));
   EXPECT_EQ(RecvFromSocket(&server, DSCP_CS2, final_ecn),
             second_message.data());
 
-#if !BUILDFLAG(IS_WIN)
   EXPECT_EQ(client.SetTos(DSCP_AF41, ECN_NO_CHANGE), 0);
-#endif
   EXPECT_EQ(WriteSocket(&client, second_message),
             static_cast<int>(second_message.length()));
   EXPECT_EQ(RecvFromSocket(&server, DSCP_AF41, final_ecn),
@@ -1257,45 +1184,26 @@ TEST_F(UDPSocketTest, VerifyDscpAndEcnExchangeDualStackV4Mapped) {
   EXPECT_THAT(client.Connect(server_v4_address), IsOk());
   EXPECT_EQ(server.SetRecvTos(), 0);
 
-#if BUILDFLAG(IS_WIN)
-  // Windows requires a Mock QWave API to allow the client to set the DSCP. For
-  // efficiency reasons, Chromium windows UDP sockets do not provide access to
-  // incoming DSCP anyway. To avoid all the mocking, don't set the DSCP at all
-  // for Windows. RecvFromSocket() doesn't check the DSCP for Windows.
-  EXPECT_EQ(client.SetTos(DSCP_NO_CHANGE, ECN_ECT1), 0);
-#else
   EXPECT_EQ(client.SetTos(DSCP_AF41, ECN_ECT1), 0);
-#endif
   std::string first_message = "foobar";
   EXPECT_EQ(WriteSocket(&client, first_message),
             static_cast<int>(first_message.length()));
   EXPECT_EQ(RecvFromSocket(&server, DSCP_AF41, ECN_ECT1), first_message.data());
 
   std::string second_message = "foo";
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(client.SetTos(DSCP_NO_CHANGE, ECN_ECT0), 0);
-#else
   EXPECT_EQ(client.SetTos(DSCP_CS2, ECN_ECT0), 0);
-#endif
   EXPECT_EQ(WriteSocket(&client, second_message),
             static_cast<int>(second_message.length()));
   EXPECT_EQ(RecvFromSocket(&server, DSCP_CS2, ECN_ECT0), second_message.data());
 
-#if BUILDFLAG(IS_WIN)
-  // The Windows sendmsg API does not allow setting ECN_CE as the outgoing mark.
-  EcnCodePoint final_ecn = ECN_ECT1;
-#else
   EcnCodePoint final_ecn = ECN_CE;
-#endif
   EXPECT_EQ(client.SetTos(DSCP_NO_CHANGE, final_ecn), 0);
   EXPECT_EQ(WriteSocket(&client, second_message),
             static_cast<int>(second_message.length()));
   EXPECT_EQ(RecvFromSocket(&server, DSCP_CS2, final_ecn),
             second_message.data());
 
-#if !BUILDFLAG(IS_WIN)
   EXPECT_EQ(client.SetTos(DSCP_AF41, ECN_NO_CHANGE), 0);
-#endif
   EXPECT_EQ(WriteSocket(&client, second_message),
             static_cast<int>(second_message.length()));
   EXPECT_EQ(RecvFromSocket(&server, DSCP_AF41, final_ecn),
@@ -1328,12 +1236,7 @@ TEST_F(UDPSocketTest, VerifyDscpAndEcnExchangeNonBlocking) {
   EXPECT_EQ(client.SetRecvTos(), 0);
   EXPECT_EQ(server.SetRecvTos(), 0);
 
-#if BUILDFLAG(IS_WIN)
-  // Do not exercise the DSCP code because it requires a mock Qwave API.
-  EXPECT_EQ(client.SetTos(DSCP_NO_CHANGE, ECN_ECT1), 0);
-#else
   EXPECT_EQ(client.SetTos(DSCP_AF41, ECN_ECT1), 0);
-#endif
   std::string client_message = "hello";
   EXPECT_EQ(WriteSocket(&client, client_message),
             static_cast<int>(client_message.length()));
@@ -1480,375 +1383,6 @@ TEST_F(UDPSocketTest, ConnectUsingNetworkAsync) {
 }
 
 }  // namespace
-
-#if BUILDFLAG(IS_WIN)
-
-namespace {
-
-const HANDLE kFakeHandle1 = (HANDLE)12;
-const HANDLE kFakeHandle2 = (HANDLE)13;
-
-const QOS_FLOWID kFakeFlowId1 = (QOS_FLOWID)27;
-const QOS_FLOWID kFakeFlowId2 = (QOS_FLOWID)38;
-
-class TestUDPSocketWin : public UDPSocketWin {
- public:
-  TestUDPSocketWin(QwaveApi* qos,
-                   DatagramSocket::BindType bind_type,
-                   net::NetLog* net_log,
-                   const net::NetLogSource& source)
-      : UDPSocketWin(bind_type, net_log, source), qos_(qos) {}
-
-  TestUDPSocketWin(const TestUDPSocketWin&) = delete;
-  TestUDPSocketWin& operator=(const TestUDPSocketWin&) = delete;
-
-  // Overriding GetQwaveApi causes the test class to use the injected mock
-  // QwaveApi instance instead of the singleton.
-  QwaveApi* GetQwaveApi() const override { return qos_; }
-
- private:
-  raw_ptr<QwaveApi> qos_;
-};
-
-class MockQwaveApi : public QwaveApi {
- public:
-  MOCK_CONST_METHOD0(qwave_supported, bool());
-  MOCK_METHOD0(OnFatalError, void());
-  MOCK_METHOD2(CreateHandle, BOOL(PQOS_VERSION version, PHANDLE handle));
-  MOCK_METHOD1(CloseHandle, BOOL(HANDLE handle));
-  MOCK_METHOD6(AddSocketToFlow,
-               BOOL(HANDLE handle,
-                    SOCKET socket,
-                    PSOCKADDR addr,
-                    QOS_TRAFFIC_TYPE traffic_type,
-                    DWORD flags,
-                    PQOS_FLOWID flow_id));
-
-  MOCK_METHOD4(
-      RemoveSocketFromFlow,
-      BOOL(HANDLE handle, SOCKET socket, QOS_FLOWID flow_id, DWORD reserved));
-  MOCK_METHOD7(SetFlow,
-               BOOL(HANDLE handle,
-                    QOS_FLOWID flow_id,
-                    QOS_SET_FLOW op,
-                    ULONG size,
-                    PVOID data,
-                    DWORD reserved,
-                    LPOVERLAPPED overlapped));
-};
-
-std::unique_ptr<UDPSocket> OpenedDscpTestClient(QwaveApi* api,
-                                                IPEndPoint bind_address) {
-  auto client = std::make_unique<TestUDPSocketWin>(
-      api, DatagramSocket::DEFAULT_BIND, nullptr, NetLogSource());
-  int rv = client->Open(bind_address.GetFamily());
-  EXPECT_THAT(rv, IsOk());
-
-  return client;
-}
-
-std::unique_ptr<UDPSocket> ConnectedDscpTestClient(QwaveApi* api) {
-  IPEndPoint bind_address;
-  // We need a real IP, but we won't actually send anything to it.
-  EXPECT_TRUE(CreateUDPAddress("8.8.8.8", 9999, &bind_address));
-  auto client = OpenedDscpTestClient(api, bind_address);
-  EXPECT_THAT(client->Connect(bind_address), IsOk());
-  return client;
-}
-
-std::unique_ptr<UDPSocket> UnconnectedDscpTestClient(QwaveApi* api) {
-  IPEndPoint bind_address;
-  EXPECT_TRUE(CreateUDPAddress("0.0.0.0", 9999, &bind_address));
-  auto client = OpenedDscpTestClient(api, bind_address);
-  EXPECT_THAT(client->Bind(bind_address), IsOk());
-  return client;
-}
-
-}  // namespace
-
-using ::testing::Return;
-using ::testing::SetArgPointee;
-using ::testing::_;
-
-TEST_F(UDPSocketTest, SetDSCPNoopIfPassedNoChange) {
-  MockQwaveApi api;
-  EXPECT_CALL(api, qwave_supported()).WillRepeatedly(Return(true));
-
-  EXPECT_CALL(api, AddSocketToFlow(_, _, _, _, _, _)).Times(0);
-  std::unique_ptr<UDPSocket> client = ConnectedDscpTestClient(&api);
-  EXPECT_THAT(client->SetDiffServCodePoint(DSCP_NO_CHANGE), IsOk());
-}
-
-TEST_F(UDPSocketTest, SetDSCPFailsIfQOSDoesntLink) {
-  MockQwaveApi api;
-  EXPECT_CALL(api, qwave_supported()).WillRepeatedly(Return(false));
-  EXPECT_CALL(api, CreateHandle(_, _)).Times(0);
-
-  std::unique_ptr<UDPSocket> client = ConnectedDscpTestClient(&api);
-  EXPECT_EQ(ERR_NOT_IMPLEMENTED, client->SetDiffServCodePoint(DSCP_AF41));
-}
-
-TEST_F(UDPSocketTest, SetDSCPFailsIfHandleCantBeCreated) {
-  MockQwaveApi api;
-  EXPECT_CALL(api, qwave_supported()).WillRepeatedly(Return(true));
-  EXPECT_CALL(api, CreateHandle(_, _)).WillOnce(Return(false));
-  EXPECT_CALL(api, OnFatalError()).Times(1);
-
-  std::unique_ptr<UDPSocket> client = ConnectedDscpTestClient(&api);
-  EXPECT_EQ(ERR_INVALID_HANDLE, client->SetDiffServCodePoint(DSCP_AF41));
-
-  RunUntilIdle();
-
-  EXPECT_CALL(api, qwave_supported()).WillRepeatedly(Return(false));
-  EXPECT_EQ(ERR_NOT_IMPLEMENTED, client->SetDiffServCodePoint(DSCP_AF41));
-}
-
-MATCHER_P(DscpPointee, dscp, "") {
-  return *(DWORD*)arg == (DWORD)dscp;
-}
-
-TEST_F(UDPSocketTest, ConnectedSocketDelayedInitAndUpdate) {
-  MockQwaveApi api;
-  std::unique_ptr<UDPSocket> client = ConnectedDscpTestClient(&api);
-  EXPECT_CALL(api, qwave_supported()).WillRepeatedly(Return(true));
-  EXPECT_CALL(api, CreateHandle(_, _))
-      .WillOnce(DoAll(SetArgPointee<1>(kFakeHandle1), Return(true)));
-
-  EXPECT_CALL(api, AddSocketToFlow(_, _, _, _, _, _))
-      .WillOnce(DoAll(SetArgPointee<5>(kFakeFlowId1), Return(true)));
-  EXPECT_CALL(api, SetFlow(_, _, _, _, _, _, _));
-
-  // First set on connected sockets will fail since init is async and
-  // we haven't given the runloop a chance to execute the callback.
-  EXPECT_EQ(ERR_INVALID_HANDLE, client->SetDiffServCodePoint(DSCP_AF41));
-  RunUntilIdle();
-  EXPECT_THAT(client->SetDiffServCodePoint(DSCP_AF41), IsOk());
-
-  // New dscp value should reset the flow.
-  EXPECT_CALL(api, RemoveSocketFromFlow(_, _, kFakeFlowId1, _));
-  EXPECT_CALL(api, AddSocketToFlow(_, _, _, QOSTrafficTypeBestEffort, _, _))
-      .WillOnce(DoAll(SetArgPointee<5>(kFakeFlowId2), Return(true)));
-  EXPECT_CALL(api, SetFlow(_, _, QOSSetOutgoingDSCPValue, _,
-                           DscpPointee(DSCP_DEFAULT), _, _));
-  EXPECT_THAT(client->SetDiffServCodePoint(DSCP_DEFAULT), IsOk());
-
-  // Called from DscpManager destructor.
-  EXPECT_CALL(api, RemoveSocketFromFlow(_, _, kFakeFlowId2, _));
-  EXPECT_CALL(api, CloseHandle(kFakeHandle1));
-}
-
-TEST_F(UDPSocketTest, UnonnectedSocketDelayedInitAndUpdate) {
-  MockQwaveApi api;
-  EXPECT_CALL(api, qwave_supported()).WillRepeatedly(Return(true));
-  EXPECT_CALL(api, CreateHandle(_, _))
-      .WillOnce(DoAll(SetArgPointee<1>(kFakeHandle1), Return(true)));
-
-  // CreateHandle won't have completed yet.  Set passes.
-  std::unique_ptr<UDPSocket> client = UnconnectedDscpTestClient(&api);
-  EXPECT_THAT(client->SetDiffServCodePoint(DSCP_AF41), IsOk());
-
-  RunUntilIdle();
-  EXPECT_THAT(client->SetDiffServCodePoint(DSCP_AF42), IsOk());
-
-  // Called from DscpManager destructor.
-  EXPECT_CALL(api, CloseHandle(kFakeHandle1));
-}
-
-// TODO(zstein): Mocking out DscpManager might be simpler here
-// (just verify that DscpManager::Set and DscpManager::PrepareForSend are
-// called).
-TEST_F(UDPSocketTest, SendToCallsQwaveApis) {
-  MockQwaveApi api;
-  std::unique_ptr<UDPSocket> client = UnconnectedDscpTestClient(&api);
-  EXPECT_CALL(api, qwave_supported()).WillRepeatedly(Return(true));
-  EXPECT_CALL(api, CreateHandle(_, _))
-      .WillOnce(DoAll(SetArgPointee<1>(kFakeHandle1), Return(true)));
-  EXPECT_THAT(client->SetDiffServCodePoint(DSCP_AF41), IsOk());
-  RunUntilIdle();
-
-  EXPECT_CALL(api, AddSocketToFlow(_, _, _, _, _, _))
-      .WillOnce(DoAll(SetArgPointee<5>(kFakeFlowId1), Return(true)));
-  EXPECT_CALL(api, SetFlow(_, _, _, _, _, _, _));
-  std::string simple_message("hello world");
-  IPEndPoint server_address(IPAddress::IPv4Localhost(), 9438);
-  int rv = SendToSocket(client.get(), simple_message, server_address);
-  EXPECT_EQ(simple_message.length(), static_cast<size_t>(rv));
-
-  // TODO(zstein): Move to second test case (Qwave APIs called once per address)
-  rv = SendToSocket(client.get(), simple_message, server_address);
-  EXPECT_EQ(simple_message.length(), static_cast<size_t>(rv));
-
-  // TODO(zstein): Move to third test case (Qwave APIs called for each
-  // destination address).
-  EXPECT_CALL(api, AddSocketToFlow(_, _, _, _, _, _)).WillOnce(Return(true));
-  IPEndPoint server_address2(IPAddress::IPv4Localhost(), 9439);
-
-  rv = SendToSocket(client.get(), simple_message, server_address2);
-  EXPECT_EQ(simple_message.length(), static_cast<size_t>(rv));
-
-  // Called from DscpManager destructor.
-  EXPECT_CALL(api, RemoveSocketFromFlow(_, _, _, _));
-  EXPECT_CALL(api, CloseHandle(kFakeHandle1));
-}
-
-TEST_F(UDPSocketTest, SendToCallsApisAfterDeferredInit) {
-  MockQwaveApi api;
-  std::unique_ptr<UDPSocket> client = UnconnectedDscpTestClient(&api);
-  EXPECT_CALL(api, qwave_supported()).WillRepeatedly(Return(true));
-  EXPECT_CALL(api, CreateHandle(_, _))
-      .WillOnce(DoAll(SetArgPointee<1>(kFakeHandle1), Return(true)));
-
-  // SetDiffServCodepoint works even if qos api hasn't finished initing.
-  EXPECT_THAT(client->SetDiffServCodePoint(DSCP_CS7), IsOk());
-
-  std::string simple_message("hello world");
-  IPEndPoint server_address(IPAddress::IPv4Localhost(), 9438);
-
-  // SendTo works, but doesn't yet apply TOS
-  EXPECT_CALL(api, AddSocketToFlow(_, _, _, _, _, _)).Times(0);
-  int rv = SendToSocket(client.get(), simple_message, server_address);
-  EXPECT_EQ(simple_message.length(), static_cast<size_t>(rv));
-
-  RunUntilIdle();
-  // Now we're initialized, SendTo triggers qos calls with correct codepoint.
-  EXPECT_CALL(api, AddSocketToFlow(_, _, _, QOSTrafficTypeControl, _, _))
-      .WillOnce(DoAll(SetArgPointee<5>(kFakeFlowId1), Return(true)));
-  EXPECT_CALL(api, SetFlow(_, _, _, _, _, _, _)).WillOnce(Return(true));
-  rv = SendToSocket(client.get(), simple_message, server_address);
-  EXPECT_EQ(simple_message.length(), static_cast<size_t>(rv));
-
-  // Called from DscpManager destructor.
-  EXPECT_CALL(api, RemoveSocketFromFlow(_, _, kFakeFlowId1, _));
-  EXPECT_CALL(api, CloseHandle(kFakeHandle1));
-}
-
-class DscpManagerTest : public TestWithTaskEnvironment {
- protected:
-  DscpManagerTest() {
-    EXPECT_CALL(api_, qwave_supported()).WillRepeatedly(Return(true));
-    EXPECT_CALL(api_, CreateHandle(_, _))
-        .WillOnce(DoAll(SetArgPointee<1>(kFakeHandle1), Return(true)));
-    dscp_manager_ = std::make_unique<DscpManager>(&api_, INVALID_SOCKET);
-
-    CreateUDPAddress("1.2.3.4", 9001, &address1_);
-    CreateUDPAddress("1234:5678:90ab:cdef:1234:5678:90ab:cdef", 9002,
-                     &address2_);
-  }
-
-  MockQwaveApi api_;
-  std::unique_ptr<DscpManager> dscp_manager_;
-
-  IPEndPoint address1_;
-  IPEndPoint address2_;
-};
-
-TEST_F(DscpManagerTest, PrepareForSendIsNoopIfNoSet) {
-  RunUntilIdle();
-  dscp_manager_->PrepareForSend(address1_);
-}
-
-TEST_F(DscpManagerTest, PrepareForSendCallsQwaveApisAfterSet) {
-  RunUntilIdle();
-  dscp_manager_->Set(DSCP_CS2);
-
-  // AddSocketToFlow should be called for each address.
-  // SetFlow should only be called when the flow is first created.
-  EXPECT_CALL(api_, AddSocketToFlow(_, _, _, _, _, _))
-      .WillOnce(DoAll(SetArgPointee<5>(kFakeFlowId1), Return(true)));
-  EXPECT_CALL(api_, SetFlow(_, kFakeFlowId1, _, _, _, _, _));
-  dscp_manager_->PrepareForSend(address1_);
-
-  EXPECT_CALL(api_, AddSocketToFlow(_, _, _, _, _, _))
-      .WillOnce(DoAll(SetArgPointee<5>(kFakeFlowId1), Return(true)));
-  EXPECT_CALL(api_, SetFlow(_, _, _, _, _, _, _)).Times(0);
-  dscp_manager_->PrepareForSend(address2_);
-
-  // Called from DscpManager destructor.
-  EXPECT_CALL(api_, RemoveSocketFromFlow(_, _, kFakeFlowId1, _));
-  EXPECT_CALL(api_, CloseHandle(kFakeHandle1));
-}
-
-TEST_F(DscpManagerTest, PrepareForSendCallsQwaveApisOncePerAddress) {
-  RunUntilIdle();
-  dscp_manager_->Set(DSCP_CS2);
-
-  EXPECT_CALL(api_, AddSocketToFlow(_, _, _, _, _, _))
-      .WillOnce(DoAll(SetArgPointee<5>(kFakeFlowId1), Return(true)));
-  EXPECT_CALL(api_, SetFlow(_, kFakeFlowId1, _, _, _, _, _));
-  dscp_manager_->PrepareForSend(address1_);
-  EXPECT_CALL(api_, AddSocketToFlow(_, _, _, _, _, _)).Times(0);
-  EXPECT_CALL(api_, SetFlow(_, _, _, _, _, _, _)).Times(0);
-  dscp_manager_->PrepareForSend(address1_);
-
-  // Called from DscpManager destructor.
-  EXPECT_CALL(api_, RemoveSocketFromFlow(_, _, kFakeFlowId1, _));
-  EXPECT_CALL(api_, CloseHandle(kFakeHandle1));
-}
-
-TEST_F(DscpManagerTest, SetDestroysExistingFlow) {
-  RunUntilIdle();
-  dscp_manager_->Set(DSCP_CS2);
-
-  EXPECT_CALL(api_, AddSocketToFlow(_, _, _, _, _, _))
-      .WillOnce(DoAll(SetArgPointee<5>(kFakeFlowId1), Return(true)));
-  EXPECT_CALL(api_, SetFlow(_, kFakeFlowId1, _, _, _, _, _));
-  dscp_manager_->PrepareForSend(address1_);
-
-  // Calling Set should destroy the existing flow.
-  // TODO(zstein): Verify that RemoveSocketFromFlow with no address
-  // destroys the flow for all destinations.
-  EXPECT_CALL(api_, RemoveSocketFromFlow(_, NULL, kFakeFlowId1, _));
-  dscp_manager_->Set(DSCP_CS5);
-
-  EXPECT_CALL(api_, AddSocketToFlow(_, _, _, _, _, _))
-      .WillOnce(DoAll(SetArgPointee<5>(kFakeFlowId2), Return(true)));
-  EXPECT_CALL(api_, SetFlow(_, kFakeFlowId2, _, _, _, _, _));
-  dscp_manager_->PrepareForSend(address1_);
-
-  // Called from DscpManager destructor.
-  EXPECT_CALL(api_, RemoveSocketFromFlow(_, _, kFakeFlowId2, _));
-  EXPECT_CALL(api_, CloseHandle(kFakeHandle1));
-}
-
-TEST_F(DscpManagerTest, SocketReAddedOnRecreateHandle) {
-  RunUntilIdle();
-  dscp_manager_->Set(DSCP_CS2);
-
-  // First Set and Send work fine.
-  EXPECT_CALL(api_, AddSocketToFlow(_, _, _, _, _, _))
-      .WillOnce(DoAll(SetArgPointee<5>(kFakeFlowId1), Return(true)));
-  EXPECT_CALL(api_, SetFlow(_, kFakeFlowId1, _, _, _, _, _))
-      .WillOnce(Return(true));
-  EXPECT_THAT(dscp_manager_->PrepareForSend(address1_), IsOk());
-
-  // Make Second flow operation fail (requires resetting the codepoint).
-  EXPECT_CALL(api_, RemoveSocketFromFlow(_, _, kFakeFlowId1, _))
-      .WillOnce(Return(true));
-  dscp_manager_->Set(DSCP_CS7);
-
-  auto error = std::make_unique<base::ScopedClearLastError>();
-  ::SetLastError(ERROR_DEVICE_REINITIALIZATION_NEEDED);
-  EXPECT_CALL(api_, AddSocketToFlow(_, _, _, _, _, _)).WillOnce(Return(false));
-  EXPECT_CALL(api_, SetFlow(_, _, _, _, _, _, _)).Times(0);
-  EXPECT_CALL(api_, CloseHandle(kFakeHandle1));
-  EXPECT_CALL(api_, CreateHandle(_, _))
-      .WillOnce(DoAll(SetArgPointee<1>(kFakeHandle2), Return(true)));
-  EXPECT_EQ(ERR_INVALID_HANDLE, dscp_manager_->PrepareForSend(address1_));
-  error = nullptr;
-  RunUntilIdle();
-
-  // Next Send should work fine, without requiring another Set
-  EXPECT_CALL(api_, AddSocketToFlow(_, _, _, QOSTrafficTypeControl, _, _))
-      .WillOnce(DoAll(SetArgPointee<5>(kFakeFlowId2), Return(true)));
-  EXPECT_CALL(api_, SetFlow(_, kFakeFlowId2, _, _, _, _, _))
-      .WillOnce(Return(true));
-  EXPECT_THAT(dscp_manager_->PrepareForSend(address1_), IsOk());
-
-  // Called from DscpManager destructor.
-  EXPECT_CALL(api_, RemoveSocketFromFlow(_, _, kFakeFlowId2, _));
-  EXPECT_CALL(api_, CloseHandle(kFakeHandle2));
-}
-#endif
 
 TEST_F(UDPSocketTest, ReadWithSocketOptimization) {
   std::string simple_message("hello world!");

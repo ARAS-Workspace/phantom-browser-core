@@ -41,8 +41,6 @@ namespace OnMessage = api::test::OnMessage;
 
 namespace {
 
-#if !BUILDFLAG(IS_WIN)  // flaky http://crbug.com/40435404
-
 // Tests running extension APIs on WebUI.
 class ExtensionWebUITest : public ExtensionApiTest {
  protected:
@@ -465,8 +463,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionWebUIListenersTest, MultipleURLListeners) {
   )"));
   EXPECT_FALSE(event_router->HasEventListener("test.onMessage"));
 }
-
-#endif
 
 }  // namespace
 

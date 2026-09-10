@@ -94,7 +94,7 @@ struct StructTraits<viz::mojom::TransferableResourceDataView,
   }
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
   static bool wants_promotion_hint(const viz::TransferableResource& resource) {
     return resource.wants_promotion_hint;
   }

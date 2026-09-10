@@ -1046,7 +1046,7 @@ bool ShouldDeleteUndecryptablePasswords(
   }
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (is_user_data_dir_policy_set) {
     return false;
   }

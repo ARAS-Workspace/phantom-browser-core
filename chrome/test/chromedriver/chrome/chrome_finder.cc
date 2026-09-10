@@ -24,41 +24,9 @@
 #include "chrome/common/chrome_constants.h"
 #include "chrome/test/chromedriver/constants/version.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/base_paths_win.h"
-#include "base/win/windows_version.h"
-#endif
-
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-void GetApplicationDirs(std::vector<base::FilePath>* locations) {
-  std::vector<base::FilePath> installation_locations;
-  base::FilePath local_app_data, program_files, program_files_x86,
-      program_files_64_32;
-  if (base::PathService::Get(base::DIR_LOCAL_APP_DATA, &local_app_data))
-    installation_locations.push_back(local_app_data);
-  if (base::PathService::Get(base::DIR_PROGRAM_FILES, &program_files))
-    installation_locations.push_back(program_files);
-  if (base::PathService::Get(base::DIR_PROGRAM_FILESX86, &program_files_x86))
-    installation_locations.push_back(program_files_x86);
-  if (base::PathService::Get(base::DIR_PROGRAM_FILES6432, &program_files_64_32))
-    installation_locations.push_back(program_files_64_32);
-
-  for (size_t i = 0; i < installation_locations.size(); ++i) {
-    locations->push_back(
-        installation_locations[i].Append(L"Google\\Chrome\\Application"));
-  }
-  for (size_t i = 0; i < installation_locations.size(); ++i) {
-    locations->push_back(installation_locations[i].Append(
-        L"Google\\Chrome for Testing\\Application"));
-  }
-  for (size_t i = 0; i < installation_locations.size(); ++i) {
-    locations->push_back(
-        installation_locations[i].Append(L"Chromium\\Application"));
-  }
-}
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 void GetApplicationDirs(std::vector<base::FilePath>* locations) {
   // TODO: Respect users' PATH variables.
   // Until then, we use an approximation of the most common defaults.
@@ -88,25 +56,13 @@ void GetPathsFromEnvironment(std::vector<base::FilePath>* paths) {
     return;
   }
 
-#if BUILDFLAG(IS_WIN)
-  common_path = base::UTF8ToWide(path.value());
-  delimiter = L";";
-#else
   common_path = path.value();
   delimiter = ":";
-#endif
 
   std::vector<base::FilePath::StringType> path_entries = base::SplitString(
       common_path, delimiter, base::KEEP_WHITESPACE, base::SPLIT_WANT_ALL);
 
   for (auto& path_entry : path_entries) {
-#if BUILDFLAG(IS_WIN)
-    size_t size = path_entry.size();
-    if (size >= 2 && path_entry[0] == '"' && path_entry[size - 1] == '"') {
-      path_entry.erase(0, 1);
-      path_entry.erase(size - 2, 1);
-    }
-#endif
     if (path_entry.size() > 0)
       paths->emplace_back(path_entry);
   }
@@ -114,17 +70,12 @@ void GetPathsFromEnvironment(std::vector<base::FilePath>* paths) {
 
 std::vector<base::FilePath> GetChromeProgramNames() {
   return {
-#if BUILDFLAG(IS_WIN)
-    base::FilePath(chrome::kBrowserProcessExecutablePath),
-        base::FilePath(FILE_PATH_LITERAL(
-            "chrome.exe")),  // Chrome for Testing or Google Chrome
-        base::FilePath(FILE_PATH_LITERAL("chromium.exe")),
-#elif BUILDFLAG(IS_MAC)
-    base::FilePath(chrome::kBrowserProcessExecutablePath),
-        base::FilePath(
-            chrome::kGoogleChromeForTestingBrowserProcessExecutablePath),
-        base::FilePath(chrome::kGoogleChromeBrowserProcessExecutablePath),
-        base::FilePath(chrome::kChromiumBrowserProcessExecutablePath),
+#if BUILDFLAG(IS_MAC)
+      base::FilePath(chrome::kBrowserProcessExecutablePath),
+      base::FilePath(
+          chrome::kGoogleChromeForTestingBrowserProcessExecutablePath),
+      base::FilePath(chrome::kGoogleChromeBrowserProcessExecutablePath),
+      base::FilePath(chrome::kChromiumBrowserProcessExecutablePath),
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
     base::FilePath(chrome::kBrowserProcessExecutablePath),
         base::FilePath("chrome"),  // Chrome for Testing or Google Chrome
@@ -139,10 +90,8 @@ std::vector<base::FilePath> GetChromeProgramNames() {
 
 std::vector<base::FilePath> GetHeadlessShellProgramNames() {
   return {
-#if BUILDFLAG(IS_WIN)
-    base::FilePath(FILE_PATH_LITERAL("chrome-headless-shell.exe")),
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
-    base::FilePath("chrome-headless-shell"),
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+      base::FilePath("chrome-headless-shell"),
 #else
     // it will compile but won't work on other OSes
     base::FilePath()

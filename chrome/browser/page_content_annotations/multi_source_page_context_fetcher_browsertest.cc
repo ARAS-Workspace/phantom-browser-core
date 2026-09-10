@@ -243,12 +243,7 @@ class ScreenshotTimeoutMultiSourcePageContextFetcherBrowserTest
   base::test::ScopedFeatureList features_;
 };
 
-#if BUILDFLAG(IS_WIN)
-// TODO(crbug.com/526023956): Re-enable this test on Windows.
-#define MAYBE_TakesScreenshot DISABLED_TakesScreenshot
-#else
 #define MAYBE_TakesScreenshot TakesScreenshot
-#endif
 IN_PROC_BROWSER_TEST_F(
     ScreenshotTimeoutMultiSourcePageContextFetcherBrowserTest,
     MAYBE_TakesScreenshot) {

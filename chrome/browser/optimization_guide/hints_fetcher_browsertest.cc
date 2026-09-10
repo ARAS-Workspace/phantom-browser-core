@@ -1684,7 +1684,7 @@ class HintsFetcherSearchPageLimitedURLsBrowserTest
 };
 
 // TODO(crbug.com/40067071): Disable limited SRP test on Windows/CrOS for now.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_HintsFetcherLimitedResults DISABLED_HintsFetcherLimitedResults
 #else
 #define MAYBE_HintsFetcherLimitedResults HintsFetcherLimitedResults
@@ -1935,8 +1935,7 @@ IN_PROC_BROWSER_TEST_F(ProactivePersonalizationHintsFetcherBrowserTest,
 // TODO(crbug.com/40919396): De-leakify and re-enable.
 // TODO(crbug.com/520436633): Fix timeout issues before re-enabling likely due
 // to the wait call.
-#if (BUILDFLAG(IS_LINUX) && defined(LEAK_SANITIZER)) || \
-    (BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER))
+#if BUILDFLAG(IS_LINUX) && defined(LEAK_SANITIZER)
 #define MAYBE_FetchingUrlFetchesWithAccessToken \
   DISABLED_FetchingUrlFetchesWithAccessToken
 #else

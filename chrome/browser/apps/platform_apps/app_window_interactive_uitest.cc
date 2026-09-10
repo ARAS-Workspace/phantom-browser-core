@@ -19,16 +19,6 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "ui/aura/window.h"
-#include "ui/aura/window_tree_host.h"
-#include "ui/views/widget/desktop_aura/desktop_window_tree_host_win.h"
-#include "ui/views/win/hwnd_message_handler_delegate.h"
-#include "ui/views/win/hwnd_util.h"
-#endif
-
 using extensions::AppWindow;
 using extensions::NativeAppWindow;
 
@@ -281,23 +271,6 @@ void AppWindowInteractiveTest::TestOuterBoundsHelper(
   gfx::Rect window_bounds;
   gfx::Size min_size, max_size;
 
-#if BUILDFLAG(IS_WIN)
-  // Get the bounds from the HWND.
-  HWND hwnd = views::HWNDForNativeWindow(window->GetNativeWindow());
-  RECT rect;
-  ::GetWindowRect(hwnd, &rect);
-  window_bounds = gfx::Rect(rect.left, rect.top, rect.right - rect.left,
-                            rect.bottom - rect.top);
-
-  // HWNDMessageHandler calls this when responding to WM_GETMINMAXSIZE, so it's
-  // the closest to what the window will see.
-  views::HWNDMessageHandlerDelegate* host =
-      static_cast<views::HWNDMessageHandlerDelegate*>(
-          static_cast<views::DesktopWindowTreeHostWin*>(
-              aura::WindowTreeHost::GetForAcceleratedWidget(hwnd)));
-  host->GetMinMaxSize(&min_size, &max_size);
-#endif  // BUILDFLAG(IS_WIN)
-
   // These match the values in the outer_bounds/test.js
   EXPECT_EQ(gfx::Rect(10, 11, 300, 301), window_bounds);
   EXPECT_EQ(window->GetBaseWindow()->GetBounds(), window_bounds);
@@ -308,15 +281,9 @@ void AppWindowInteractiveTest::TestOuterBoundsHelper(
 }
 
 // TODO(jackhou): Make this test work for other OSes.
-#if !BUILDFLAG(IS_WIN)
 #define MAYBE_TestOuterBoundsFrameChrome DISABLED_TestOuterBoundsFrameChrome
 #define MAYBE_TestOuterBoundsFrameNone DISABLED_TestOuterBoundsFrameNone
 #define MAYBE_TestOuterBoundsFrameColor DISABLED_TestOuterBoundsFrameColor
-#else
-#define MAYBE_TestOuterBoundsFrameChrome TestOuterBoundsFrameChrome
-#define MAYBE_TestOuterBoundsFrameNone TestOuterBoundsFrameNone
-#define MAYBE_TestOuterBoundsFrameColor TestOuterBoundsFrameColor
-#endif
 
 // Test that the outer bounds match that of the native window.
 IN_PROC_BROWSER_TEST_F(AppWindowInteractiveTest,
@@ -340,7 +307,7 @@ IN_PROC_BROWSER_TEST_F(AppWindowInteractiveTest,
 // other platforms, see http://crbug.com/41080386.
 // Flaky failures on Windows; see https://crbug.com/40551480.
 #if ((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_AURA)) || \
-    BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+    BUILDFLAG(IS_MAC)
 #define MAYBE_TestCreate DISABLED_TestCreate
 #else
 #define MAYBE_TestCreate TestCreate
@@ -359,7 +326,7 @@ IN_PROC_BROWSER_TEST_F(AppWindowInteractiveTest, MAYBE_TestCreate) {
 // Those tests should be disabled on Linux GTK when they are enabled on the
 // other platforms, see http://crbug.com/41080386
 #if ((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_AURA)) || \
-    BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+    BUILDFLAG(IS_MAC)
 #define MAYBE_TestShow DISABLED_TestShow
 #else
 #define MAYBE_TestShow TestShow
@@ -420,7 +387,7 @@ IN_PROC_BROWSER_TEST_F(AppWindowInteractiveTest, MAYBE_TestFullscreen) {
 }
 
 // Only Linux and Windows use keep-alive to determine when to shut down.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 // In general, hidden windows should not keep Chrome alive. The exception is
 // when windows are created hidden, we allow the app some time to show the

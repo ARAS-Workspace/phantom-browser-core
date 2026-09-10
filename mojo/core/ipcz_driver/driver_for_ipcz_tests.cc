@@ -212,18 +212,6 @@ class MojoIpczTestDriver : public ipcz::test::TestDriver {
             command_line.GetSwitchValueASCII(PlatformChannel::kHandleSwitch));
 
     base::Process parent_process;
-#if BUILDFLAG(IS_WIN)
-    // If we're launched as a broker, the test will pass us a handle back to its
-    // process. The Transport uses this to duplicate handles to and from the
-    // parent process. See SpawnTestNodeProcess().
-    const std::string parent_handle_switch =
-        command_line.GetSwitchValueASCII(kParentHandle);
-    int parent_handle_value;
-    if (!parent_handle_switch.empty() &&
-        base::StringToInt(parent_handle_switch, &parent_handle_value)) {
-      parent_process = base::Process(LongToHandle(parent_handle_value));
-    }
-#endif  // BUILDFLAG(IS_WIN)
     const bool is_broker = parent_process.IsValid();
     return Transport::ReleaseAsHandle(Transport::Create(
         {.source = is_broker ? Transport::kBroker : Transport::kNonBroker,
@@ -284,27 +272,6 @@ class MojoIpczTestDriver : public ipcz::test::TestDriver {
         Transport::TakeFromHandle(their_transport);
     PlatformChannelEndpoint endpoint = transport->TakeEndpoint();
     endpoint.PrepareToPass(options, command_line);
-#if BUILDFLAG(IS_WIN)
-    options.start_hidden = true;
-
-    base::Process this_process;
-    if (details.is_broker) {
-      // If we're launching another broker, it needs a handle back to our own
-      // process so that it can duplicate handles between us and itself. See
-      // GetClientTestNodeTransport().
-      HANDLE dupe;
-      BOOL ok = ::DuplicateHandle(::GetCurrentProcess(), ::GetCurrentProcess(),
-                                  ::GetCurrentProcess(), &dupe, 0, TRUE,
-                                  DUPLICATE_SAME_ACCESS);
-      CHECK(ok);
-      this_process = base::Process(dupe);
-
-      options.handles_to_inherit.push_back(this_process.Handle());
-      command_line.AppendSwitchASCII(
-          kParentHandle,
-          base::NumberToString(HandleToLong(this_process.Handle())));
-    }
-#endif
 
     base::Process child = base::SpawnMultiProcessTestChild(
         test_child_main, command_line, options);

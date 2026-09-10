@@ -80,7 +80,7 @@ bool IsWebGLEnabled(content::WebContents* contents) {
 }  // namespace
 
 // TODO(crbug.com/40684098): Deflake this test.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_Disable3DAPIs DISABLED_Disable3DAPIs
 #else
 #define MAYBE_Disable3DAPIs Disable3DAPIs

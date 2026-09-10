@@ -15,13 +15,6 @@
 #include "components/policy/proto/device_management_backend.pb.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/test/test_reg_util_win.h"
-#include "base/win/registry.h"
-#include "chrome/updater/util/win_util.h"
-#include "chrome/updater/win/win_constants.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace device_management_storage {
 
 namespace {
@@ -71,81 +64,6 @@ TEST(DMStorage, LoadDeviceID) {
 }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-TEST(DMStorage, LoadEnrollmentToken) {
-  registry_util::RegistryOverrideManager registry_overrides;
-  ASSERT_NO_FATAL_FAILURE(
-      registry_overrides.OverrideRegistry(HKEY_LOCAL_MACHINE));
-
-  base::ScopedTempDir cache_root;
-  ASSERT_TRUE(cache_root.CreateUniqueTempDir());
-  auto storage = CreateDMStorage(cache_root.GetPath());
-  EXPECT_TRUE(storage->GetEnrollmentToken().empty());
-
-  base::win::RegKey legacy_key;
-  EXPECT_EQ(legacy_key.Create(HKEY_LOCAL_MACHINE,
-                              updater::kRegKeyCompanyLegacyCloudManagement,
-                              updater::Wow6432(KEY_WRITE)),
-            ERROR_SUCCESS);
-  EXPECT_EQ(
-      legacy_key.WriteValue(updater::kRegValueCloudManagementEnrollmentToken,
-                            L"legacy_test_enrollment_token"),
-      ERROR_SUCCESS);
-  EXPECT_EQ(storage->GetEnrollmentToken(), "legacy_test_enrollment_token");
-
-  base::win::RegKey key;
-  EXPECT_EQ(
-      key.Create(HKEY_LOCAL_MACHINE, updater::kRegKeyCompanyCloudManagement,
-                 updater::Wow6432(KEY_WRITE)),
-      ERROR_SUCCESS);
-  EXPECT_EQ(key.WriteValue(updater::kRegValueEnrollmentToken,
-                           L"test_enrollment_token"),
-            ERROR_SUCCESS);
-  EXPECT_EQ(storage->GetEnrollmentToken(), "test_enrollment_token");
-}
-
-TEST(DMStorage, StoreEnrollmentToken) {
-  registry_util::RegistryOverrideManager registry_overrides;
-  ASSERT_NO_FATAL_FAILURE(
-      registry_overrides.OverrideRegistry(HKEY_LOCAL_MACHINE));
-
-  base::ScopedTempDir cache_root;
-  ASSERT_TRUE(cache_root.CreateUniqueTempDir());
-  auto storage = CreateDMStorage(cache_root.GetPath());
-  EXPECT_TRUE(storage->GetEnrollmentToken().empty());
-
-  EXPECT_TRUE(storage->StoreEnrollmentToken("enrollment_token"));
-  EXPECT_EQ(storage->GetEnrollmentToken(), "enrollment_token");
-
-  EXPECT_TRUE(storage->StoreEnrollmentToken("new_enrollment_token"));
-  EXPECT_EQ(storage->GetEnrollmentToken(), "new_enrollment_token");
-}
-
-TEST(DMStorage, DeleteEnrollmentToken) {
-  registry_util::RegistryOverrideManager registry_overrides;
-  ASSERT_NO_FATAL_FAILURE(
-      registry_overrides.OverrideRegistry(HKEY_LOCAL_MACHINE));
-
-  base::ScopedTempDir cache_root;
-  ASSERT_TRUE(cache_root.CreateUniqueTempDir());
-  auto storage = CreateDMStorage(cache_root.GetPath());
-  EXPECT_TRUE(storage->GetEnrollmentToken().empty());
-
-  EXPECT_TRUE(storage->StoreEnrollmentToken("test_token"));
-  base::win::RegKey legacy_key;
-  EXPECT_EQ(legacy_key.Create(HKEY_LOCAL_MACHINE,
-                              updater::kRegKeyCompanyLegacyCloudManagement,
-                              updater::Wow6432(KEY_WRITE)),
-            ERROR_SUCCESS);
-  EXPECT_EQ(
-      legacy_key.WriteValue(updater::kRegValueCloudManagementEnrollmentToken,
-                            L"legacy_test_token"),
-      ERROR_SUCCESS);
-
-  EXPECT_TRUE(storage->DeleteEnrollmentToken());
-  EXPECT_EQ(storage->GetEnrollmentToken(), "");
-}
-#else
 TEST(DMStorage, StoreEnrollmentToken) {
   base::ScopedTempDir cache_root;
   ASSERT_TRUE(cache_root.CreateUniqueTempDir());
@@ -176,7 +94,6 @@ TEST(DMStorage, DeleteEnrollmentToken) {
   EXPECT_TRUE(storage->DeleteEnrollmentToken());
   EXPECT_EQ(storage->GetEnrollmentToken(), "");
 }
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST(DMStorage, DMToken) {
   base::ScopedTempDir cache_root;

@@ -38,10 +38,6 @@
 #include <unistd.h>
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if defined(REMOTING_USE_X11)
 #include "remoting/host/linux/desktop_resizer_x11.h"
 #include "remoting/host/linux/x11_util.h"
@@ -103,17 +99,6 @@ std::string Me2MeDesktopEnvironment::GetCapabilities() const {
     capabilities += " ";
   }
   capabilities += protocol::kRateLimitResizeRequests;
-
-#if BUILDFLAG(IS_WIN)
-  capabilities += " ";
-  capabilities += protocol::kSendAttentionSequenceAction;
-
-  if (base::win::OSInfo::GetInstance()->version_type() !=
-      base::win::VersionType::SUITE_HOME) {
-    capabilities += " ";
-    capabilities += protocol::kLockWorkstationAction;
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   if (desktop_environment_options().enable_remote_webauthn()) {
     capabilities += " ";
@@ -226,12 +211,7 @@ bool Me2MeDesktopEnvironment::InitializeSecurity(
         client_session_control);
 
     // Create the disconnect window.
-#if BUILDFLAG(IS_WIN)
-    disconnect_window_ = HostWindow::CreateAutoHidingDisconnectWindow(
-        interaction_strategy().CreateLocalInputMonitor());
-#else
     disconnect_window_ = HostWindow::CreateDisconnectWindow();
-#endif
     disconnect_window_ = std::make_unique<HostWindowProxy>(
         caller_task_runner(), ui_task_runner(), std::move(disconnect_window_));
     disconnect_window_->Start(client_session_control);

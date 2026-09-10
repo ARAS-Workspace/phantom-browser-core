@@ -124,20 +124,14 @@
 #include "url/origin.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include "components/webapps/isolated_web_apps/scheme.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/smart_card/smart_card_permission_context.h"
 #include "chrome/browser/smart_card/smart_card_permission_context_factory.h"
 #include "components/user_manager/user_manager.h"
-#endif
-
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/media/cdm_document_service_impl.h"
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
@@ -2094,8 +2088,7 @@ void SiteSettingsHandler::SendZoomLevels() {
 
   base::ListValue zoom_levels_exceptions;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   // Show any non-default Isolated Web App zoom levels at the top of the page.
   auto* web_app_provider = web_app::WebAppProvider::GetForWebApps(profile_);
   if (web_app_provider) {
@@ -2128,8 +2121,7 @@ void SiteSettingsHandler::SendZoomLevels() {
                     *b.GetDict().FindString(site_settings::kDisplayName);
                 return name_a < name_b;
               });
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   }
 
   content::HostZoomMap* host_zoom_map =
@@ -2196,8 +2188,7 @@ void SiteSettingsHandler::HandleRemoveZoomLevel(const base::ListValue& args) {
 
   GURL url(host_or_spec);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   if (url.is_valid() && url.GetScheme() == webapps::kIsolatedAppScheme) {
     base::expected<web_app::IsolatedWebAppUrlInfo, std::string> iwa_url_info =
         web_app::IsolatedWebAppUrlInfo::Create(url);
@@ -2213,8 +2204,7 @@ void SiteSettingsHandler::HandleRemoveZoomLevel(const base::ListValue& args) {
     host_zoom_map->SetZoomLevelForHost(url.GetHost(), default_level);
     return;
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
   content::HostZoomMap* host_zoom_map =
       content::HostZoomMap::GetDefaultForBrowserContext(profile_);
@@ -2663,29 +2653,6 @@ void SiteSettingsHandler::RemoveNonModelData(
                                         base::Value());
   }
 
-#if BUILDFLAG(IS_WIN)
-  // Removes any Media License Data associated with the origin that is not
-  // stored in quota nodes. This should only be on Windows as ChromeOS does
-  // not support removing Media License Data per origin, and
-  // site_settings_handler.cc does not handle Android site specific code.
-  // The code for Android site specific code is located in
-  // components/browser_ui/site_settings/android/website_preference_bridge.cc
-  // TODO(b/248311157) - When CrOS supports the ability to delete platform
-  // keys by domain, implement the CrOS specific logic regarding clearing site
-  // specific media license data.
-  // TODO(b/248311157) - When the migration to BrowsingDataModel is finished,
-  // remove this and integrate the media license data removal steps there.
-  auto filter_builder = content::BrowsingDataFilterBuilder::Create(
-      content::BrowsingDataFilterBuilder::Mode::kDelete);
-
-  for (const auto& origin : origins) {
-    filter_builder->AddOrigin(origin);
-  }
-
-  CdmDocumentServiceImpl::ClearCdmData(
-      profile_, base::Time::Min(), base::Time::Max(),
-      filter_builder->BuildUrlFilter(), base::DoNothing());
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 void SiteSettingsHandler::SetModelForTesting(

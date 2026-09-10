@@ -73,11 +73,6 @@ const base::FeatureParam<int>
 BASE_DECLARE_FEATURE(kNotificationOneTapUnsubscribeOnDesktop);
 #endif
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-BASE_DECLARE_FEATURE(kRegisterOsUpdateHandlerWin);
-BASE_DECLARE_FEATURE(kInstallPlatformExperienceHelperWin);
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-
 BASE_DECLARE_FEATURE(kRestartNetworkServiceUnsandboxedForFailedLaunch);
 BASE_DECLARE_FEATURE(kSandboxExternalProtocolBlocked);
 BASE_DECLARE_FEATURE(kSandboxExternalProtocolBlockedWarning);
@@ -89,18 +84,6 @@ BASE_DECLARE_FEATURE(kSecretPortalKeyProviderUseForEncryption);
 BASE_DECLARE_FEATURE(kTriggerNetworkDataMigration);
 
 BASE_DECLARE_FEATURE(kWebUsbDeviceDetection);
-
-#if BUILDFLAG(IS_WIN)
-BASE_DECLARE_FEATURE(kBrowserDynamicCodeDisabled);
-BASE_DECLARE_FEATURE(kIsolatedProcess);
-
-BASE_DECLARE_FEATURE(kNoPreReadMainDll);
-BASE_DECLARE_FEATURE(kNoPreReadMainDllIfSsd);
-BASE_DECLARE_FEATURE(kNoPreReadMainDllStartup);
-extern const base::FeatureParam<base::TimeDelta>
-    kNoPreReadMainDllStartup_StartupDuration;
-BASE_DECLARE_FEATURE(kAutoDeElevate);
-#endif
 
 BASE_DECLARE_FEATURE(kRemovalOfIWAsFromTabCapture);
 

@@ -106,12 +106,7 @@ TEST(ProtocolHandlerUtilTest, InvalidCustomHandlerSyntax) {
   };
 }
 
-#if (BUILDFLAG(IS_WIN) && !defined(NDEBUG))
-// Flaky on Windows
-#define MAYBE_InvalidURL DISABLED_InvalidURL
-#else
 #define MAYBE_InvalidURL InvalidURL
-#endif
 TEST(ProtocolHandlerUtilTest, MAYBE_InvalidURL) {
   struct {
     const char* title;

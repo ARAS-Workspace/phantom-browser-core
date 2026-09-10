@@ -34,9 +34,7 @@ struct COMPONENT_EXPORT(PENDING_FILE_SET) PendingFileSet {
   base::File journal_file;
   base::File wal_file;
   base::File wal_index_file;
-#if !BUILDFLAG(IS_WIN)
   base::File wal_index_file_read_only;
-#endif
 
   // An optional read-write region of memory shared by all processes accessing
   // `db_file_` that holds the locking state for the database. Locks are not

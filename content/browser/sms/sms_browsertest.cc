@@ -211,11 +211,7 @@ class SmsBrowserTest : public ContentBrowserTest {
 }  // namespace
 
 // TODO(crbug.com/41486967): Flaky on Win Debug
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-#define MAYBE_Receive DISABLED_Receive
-#else
 #define MAYBE_Receive Receive
-#endif
 IN_PROC_BROWSER_TEST_F(SmsBrowserTest, MAYBE_Receive) {
   base::HistogramTester histogram_tester;
   GURL url = GetTestUrl(nullptr, "simple_page.html");
@@ -634,11 +630,7 @@ IN_PROC_BROWSER_TEST_F(SmsBrowserTest, DISABLED_TwoTabsDifferentOrigin) {
 }
 
 // TODO(crbug.com/41486967): Flaky on Win Debug
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-#define MAYBE_SmsReceivedAfterTabIsClosed DISABLED_SmsReceivedAfterTabIsClosed
-#else
 #define MAYBE_SmsReceivedAfterTabIsClosed SmsReceivedAfterTabIsClosed
-#endif
 IN_PROC_BROWSER_TEST_F(SmsBrowserTest, MAYBE_SmsReceivedAfterTabIsClosed) {
   GURL url = GetTestUrl(nullptr, "simple_page.html");
   EXPECT_TRUE(NavigateToURL(shell(), url));

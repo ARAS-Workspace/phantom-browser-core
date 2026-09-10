@@ -715,12 +715,6 @@ LayerTreeTest::LayerTreeTest(viz::RendererType renderer_type,
     // SwiftShader is a multi-threaded renderer and TSAN takes a lot longer to
     // run tests when using SwiftShader
     timeout_seconds_ = 35;
-#elif BUILDFLAG(IS_WIN) && defined(_DEBUG)
-    // Debug builds on Windows are much slower than on other platforms, possibly
-    // because Windows uses separate debug versions of the C Run-Time Library
-    // for debug builds, whereas other platforms use the same system libraries
-    // for debug and release builds.
-    timeout_seconds_ = 25;
 #elif defined(MEMORY_SANITIZER)
     // MSAN is slower than uninstrumented code
     timeout_seconds_ = 20;

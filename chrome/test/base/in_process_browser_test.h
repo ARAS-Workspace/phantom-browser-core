@@ -40,12 +40,6 @@ namespace base {
 
 class CommandLine;
 
-#if BUILDFLAG(IS_WIN)
-namespace win {
-class ScopedCOMInitializer;
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 }  // namespace base
 
 namespace content {
@@ -437,10 +431,6 @@ class InProcessBrowserTest : public content::BrowserTestBase {
   // default.
   ui::test::ScopedFakeFullKeyboardAccess faked_full_keyboard_access_;
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<base::win::ScopedCOMInitializer> com_initializer_;
-#endif
 
 #if defined(TOOLKIT_VIEWS)
   std::unique_ptr<views::ViewsDelegate> views_delegate_;

@@ -73,11 +73,9 @@ CheckError::~CheckError() {
   if (!has_errno) {
     log_message_.~LogMessage();
   } else {
-#if PA_BUILDFLAG(IS_WIN)
-    errno_log_message_.~Win32ErrorLogMessage();
-#elif PA_BUILDFLAG(IS_POSIX)
+#if PA_BUILDFLAG(IS_POSIX)
     errno_log_message_.~ErrnoLogMessage();
-#endif  // PA_BUILDFLAG(IS_WIN)
+#endif  // PA_BUILDFLAG(IS_POSIX)
   }
 }
 

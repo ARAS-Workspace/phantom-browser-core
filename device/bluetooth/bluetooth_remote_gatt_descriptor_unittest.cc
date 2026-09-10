@@ -17,8 +17,6 @@
 #include "device/bluetooth/test/bluetooth_test_android.h"
 #elif BUILDFLAG(IS_APPLE)
 #include "device/bluetooth/test/bluetooth_test_mac.h"
-#elif BUILDFLAG(IS_WIN)
-#include "device/bluetooth/test/bluetooth_test_win.h"
 #elif defined(USE_CAST_BLUETOOTH_ADAPTER)
 #include "device/bluetooth/test/bluetooth_test_cast.h"
 #elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
@@ -28,18 +26,10 @@
 namespace device {
 
 class BluetoothRemoteGattDescriptorTest :
-#if BUILDFLAG(IS_WIN)
-    public BluetoothTestWinrt {
-#else
     public BluetoothTest {
-#endif
  public:
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    BluetoothTestWinrt::SetUp();
-#else
     BluetoothTest::SetUp();
-#endif
   }
 
   void TearDown() override {
@@ -51,11 +41,7 @@ class BluetoothRemoteGattDescriptorTest :
     descriptor1_ = nullptr;
     descriptor2_ = nullptr;
 
-#if BUILDFLAG(IS_WIN)
-    BluetoothTestWinrt::TearDown();
-#else
     BluetoothTest::TearDown();
-#endif
   }
 
   // Creates adapter_, device_, service_, characteristic_,
@@ -95,21 +81,12 @@ class BluetoothRemoteGattDescriptorTest :
   raw_ptr<BluetoothRemoteGattDescriptor> descriptor2_ = nullptr;
 };
 
-#if BUILDFLAG(IS_WIN)
-using BluetoothRemoteGattDescriptorTestWinrt =
-    BluetoothRemoteGattDescriptorTest;
-#endif
-
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
 #define MAYBE_GetIdentifier GetIdentifier
 #else
 #define MAYBE_GetIdentifier DISABLED_GetIdentifier
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt, GetIdentifier) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_GetIdentifier) {
-#endif
   InitWithFakeAdapter();
   StartLowEnergyDiscoverySession();
   // 2 devices to verify that descriptors on them have distinct IDs.
@@ -194,11 +171,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_GetIdentifier) {
 #else
 #define MAYBE_GetUUID DISABLED_GetUUID
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt, GetUUID) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_GetUUID) {
-#endif
   InitWithFakeAdapter();
   StartLowEnergyDiscoverySession();
   BluetoothDevice* device = SimulateLowEnergyDevice(3);
@@ -246,11 +219,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_GetUUID) {
 #define MAYBE_ReadRemoteDescriptor_Empty DISABLED_ReadRemoteDescriptor_Empty
 #endif
 // Tests ReadRemoteDescriptor and GetValue with empty value buffer.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt, ReadRemoteDescriptor_Empty) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_ReadRemoteDescriptor_Empty) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeDescriptorBoilerplate());
 
   descriptor1_->ReadRemoteDescriptor(
@@ -274,11 +243,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_ReadRemoteDescriptor_Empty) {
 #define MAYBE_WriteRemoteDescriptor_Empty DISABLED_WriteRemoteDescriptor_Empty
 #endif
 // Tests WriteRemoteDescriptor with empty value buffer.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt, WriteRemoteDescriptor_Empty) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_WriteRemoteDescriptor_Empty) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeDescriptorBoilerplate());
 
   std::vector<uint8_t> empty_vector;
@@ -357,11 +322,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest,
 #define MAYBE_ReadRemoteDescriptor DISABLED_ReadRemoteDescriptor
 #endif
 // Tests ReadRemoteDescriptor and GetValue with non-empty value buffer.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt, ReadRemoteDescriptor) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_ReadRemoteDescriptor) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeDescriptorBoilerplate());
 
   descriptor1_->ReadRemoteDescriptor(
@@ -390,11 +351,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_ReadRemoteDescriptor) {
 #define MAYBE_WriteRemoteDescriptor DISABLED_WriteRemoteDescriptor
 #endif
 // Tests WriteRemoteDescriptor with non-empty value buffer.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt, WriteRemoteDescriptor) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_WriteRemoteDescriptor) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeDescriptorBoilerplate());
 
   auto values = std::to_array<uint8_t>({0, 1, 2, 3, 4, 0xf, 0xf0, 0xff});
@@ -417,11 +374,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_WriteRemoteDescriptor) {
 #define MAYBE_ReadRemoteDescriptor_Twice DISABLED_ReadRemoteDescriptor_Twice
 #endif
 // Tests ReadRemoteDescriptor and GetValue multiple times.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt, ReadRemoteDescriptor_Twice) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_ReadRemoteDescriptor_Twice) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeDescriptorBoilerplate());
 
   descriptor1_->ReadRemoteDescriptor(
@@ -459,11 +412,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_ReadRemoteDescriptor_Twice) {
 #define MAYBE_WriteRemoteDescriptor_Twice DISABLED_WriteRemoteDescriptor_Twice
 #endif
 // Tests WriteRemoteDescriptor multiple times.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt, WriteRemoteDescriptor_Twice) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_WriteRemoteDescriptor_Twice) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeDescriptorBoilerplate());
 
   auto values = std::to_array<uint8_t>({0, 1, 2, 3, 4, 0xf, 0xf0, 0xff});
@@ -501,13 +450,8 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_WriteRemoteDescriptor_Twice) {
   DISABLED_ReadRemoteDescriptor_MultipleDescriptors
 #endif
 // Tests ReadRemoteDescriptor on two descriptors.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt,
-       ReadRemoteDescriptor_MultipleDescriptors) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest,
        MAYBE_ReadRemoteDescriptor_MultipleDescriptors) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeDescriptorBoilerplate());
 
   descriptor1_->ReadRemoteDescriptor(
@@ -544,13 +488,8 @@ TEST_F(BluetoothRemoteGattDescriptorTest,
   DISABLED_WriteRemoteDescriptor_MultipleDescriptors
 #endif
 // Tests WriteRemoteDescriptor on two descriptors.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt,
-       WriteRemoteDescriptor_MultipleDescriptors) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest,
        MAYBE_WriteRemoteDescriptor_MultipleDescriptors) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeDescriptorBoilerplate());
 
   std::vector<uint8_t> test_vector1;
@@ -583,11 +522,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest,
 #define MAYBE_ReadError DISABLED_ReadError
 #endif
 // Tests ReadRemoteDescriptor asynchronous error.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt, ReadError) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_ReadError) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeDescriptorBoilerplate());
 
   descriptor1_->ReadRemoteDescriptor(
@@ -607,11 +542,7 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_ReadError) {
 #define MAYBE_WriteError DISABLED_WriteError
 #endif
 // Tests WriteRemoteDescriptor asynchronous error.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt, WriteError) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_WriteError) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeDescriptorBoilerplate());
 
   std::vector<uint8_t> empty_vector;
@@ -702,13 +633,8 @@ TEST_F(BluetoothRemoteGattDescriptorTest, MAYBE_WriteSynchronousError) {
   DISABLED_ReadRemoteDescriptor_ReadPending
 #endif
 // Tests ReadRemoteDescriptor error with a pending read operation.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt,
-       ReadRemoteDescriptor_ReadPending) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest,
        MAYBE_ReadRemoteDescriptor_ReadPending) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeDescriptorBoilerplate());
 
   descriptor1_->ReadRemoteDescriptor(
@@ -740,13 +666,8 @@ TEST_F(BluetoothRemoteGattDescriptorTest,
   DISABLED_WriteRemoteDescriptor_WritePending
 #endif
 // Tests WriteRemoteDescriptor error with a pending write operation.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt,
-       WriteRemoteDescriptor_WritePending) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest,
        MAYBE_WriteRemoteDescriptor_WritePending) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeDescriptorBoilerplate());
 
   std::vector<uint8_t> empty_vector;
@@ -779,13 +700,8 @@ TEST_F(BluetoothRemoteGattDescriptorTest,
   DISABLED_ReadRemoteDescriptor_WritePending
 #endif
 // Tests ReadRemoteDescriptor error with a pending write operation.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt,
-       ReadRemoteDescriptor_WritePending) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest,
        MAYBE_ReadRemoteDescriptor_WritePending) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeDescriptorBoilerplate());
 
   std::vector<uint8_t> empty_vector;
@@ -817,13 +733,8 @@ TEST_F(BluetoothRemoteGattDescriptorTest,
   DISABLED_WriteRemoteDescriptor_ReadPending
 #endif
 // Tests WriteRemoteDescriptor error with a pending Read operation.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattDescriptorTestWinrt,
-       WriteRemoteDescriptor_ReadPending) {
-#else
 TEST_F(BluetoothRemoteGattDescriptorTest,
        MAYBE_WriteRemoteDescriptor_ReadPending) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeDescriptorBoilerplate());
 
   std::vector<uint8_t> empty_vector;
@@ -931,11 +842,5 @@ TEST_F(BluetoothRemoteGattDescriptorTest, ReadRemoteDescriptor_NSNumber) {
   EXPECT_EQ(test_vector, descriptor1_->GetValue());
 }
 #endif  // BUILDFLAG(IS_APPLE)
-
-#if BUILDFLAG(IS_WIN)
-INSTANTIATE_TEST_SUITE_P(All,
-                         BluetoothRemoteGattDescriptorTestWinrt,
-                         ::testing::ValuesIn(kBluetoothTestWinrtParam));
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace device

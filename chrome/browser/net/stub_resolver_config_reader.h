@@ -131,17 +131,6 @@ class StubResolverConfigReader {
   void SetOverrideDnsOverHttpsConfigSource(
       std::unique_ptr<DnsOverHttpsConfigSource> doh_source);
 
-#if BUILDFLAG(IS_WIN)
-  // Set flag for testing Zero Trust DNS scenario
-  static void SetZTDNSEnabledForTesting(bool is_ztdns_enabled_for_testing) {
-    is_ztdns_enabled_for_testing_ = is_ztdns_enabled_for_testing;
-  }
-
-  static bool IsZTDNSEnabledForTesting() {
-    return is_ztdns_enabled_for_testing_;
-  }
-#endif
-
   static std::vector<net::IPEndPoint> GetFallbackDohNameservers();
 
  private:
@@ -189,11 +178,6 @@ class StubResolverConfigReader {
   // Whether or not an Android device or profile is owned.
   // A nullopt indicates this value has not been determined yet.
   std::optional<bool> android_has_owner_;
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  // Flag used for testing Zero Trust DNS scenario.
-  static bool is_ztdns_enabled_for_testing_;
 #endif
 
   base::WeakPtrFactory<StubResolverConfigReader> weak_factory_{this};

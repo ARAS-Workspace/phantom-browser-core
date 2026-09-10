@@ -34,13 +34,6 @@
 #include "base/time/time.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/debug/crash_logging.h"
-#include "base/win/scoped_com_initializer.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace base::internal {
 
 namespace {
@@ -305,169 +298,6 @@ class WorkerThreadDelegate : public WorkerThread::Delegate {
   AtomicThreadRefChecker thread_ref_checker_;
 };
 
-#if BUILDFLAG(IS_WIN)
-
-class WorkerThreadCOMDelegate : public WorkerThreadDelegate {
- public:
-  WorkerThreadCOMDelegate(const std::string& thread_name,
-                          WorkerThread::ThreadLabel thread_label,
-                          TrackedRef<TaskTracker> task_tracker)
-      : WorkerThreadDelegate(thread_name,
-                             thread_label,
-                             std::move(task_tracker)) {}
-
-  WorkerThreadCOMDelegate(const WorkerThreadCOMDelegate&) = delete;
-  WorkerThreadCOMDelegate& operator=(const WorkerThreadCOMDelegate&) = delete;
-  ~WorkerThreadCOMDelegate() override { DCHECK(!scoped_com_initializer_); }
-
-  // WorkerThread::Delegate:
-  void OnMainEntry(WorkerThread* worker) override {
-    WorkerThreadDelegate::OnMainEntry(worker);
-
-    scoped_com_initializer_ = std::make_unique<win::ScopedCOMInitializer>();
-
-    // Make sure this COM thread is initialized correctly in an STA. The thread
-    // would be in the default MTA state upon failure, which would mean any
-    // other MTA thread could service calls invoked by COM on objects living in
-    // this apartment.
-    if (!scoped_com_initializer_->Succeeded()) {
-      // Collect the reason when CoInitializeEx fails. Classic OOM (or ATOM
-      // exhaustion) should lead to process death in ScopedCOMInitializer, but
-      // other failures will leak out. Collect the failure codes in an effort to
-      // understand whether or not these failures are actionable; see
-      // https://crbug.com/40074523.
-      SCOPED_CRASH_KEY_NUMBER("WorkerThreadCOMDelegate", "hr",
-                              scoped_com_initializer_->hr());
-      NOTREACHED();
-    }
-  }
-
-  RegisteredTaskSource GetWork(WorkerThread* worker) override {
-    // This scheme below allows us to cover the following scenarios:
-    // * Only WorkerThreadDelegate::GetWork() has work:
-    //   Always return the task source from GetWork().
-    // * Only the Windows Message Queue has work:
-    //   Always return the task source from GetWorkFromWindowsMessageQueue();
-    // * Both WorkerThreadDelegate::GetWork() and the Windows Message Queue
-    //   have work:
-    //   Process task sources from each source round-robin style.
-    CheckedAutoLock auto_lock(lock_);
-
-    // |worker_awake_| is always set before a call to WakeUp(), but it is
-    // not set when messages are added to the Windows Message Queue. Ensure that
-    // it is set before getting work, to avoid unnecessary wake ups.
-    //
-    // Note: It wouldn't be sufficient to set |worker_awake_| in WaitForWork()
-    // when MsgWaitForMultipleObjectsEx() indicates that it was woken up by a
-    // Windows Message, because of the following scenario:
-    //  T1: PostTask
-    //      Queue task
-    //      Set |worker_awake_| to true
-    //  T2: Woken up by a Windows Message
-    //      Set |worker_awake_| to true
-    //      Run the task posted by T1
-    //      Wait for work
-    //  T1: WakeUp()
-    //  T2: Woken up by Waitable Event
-    //      Does not set |worker_awake_| (wake up not from Windows Message)
-    //      GetWork
-    //      !! Getting work while |worker_awake_| is false !!
-    worker_awake_ = true;
-    RegisteredTaskSource task_source;
-    if (get_work_first_) {
-      task_source = WorkerThreadDelegate::GetWorkLockRequired(worker);
-      if (task_source) {
-        get_work_first_ = false;
-      }
-    }
-
-    if (!task_source) {
-      CheckedAutoUnlock auto_unlock(lock_);
-      task_source = GetWorkFromWindowsMessageQueue();
-      if (task_source) {
-        get_work_first_ = true;
-      }
-    }
-
-    if (!task_source && !get_work_first_) {
-      // This case is important if we checked the Windows Message Queue first
-      // and found there was no work. We don't want to return null immediately
-      // as that could cause the thread to go to sleep while work is waiting via
-      // WorkerThreadDelegate::GetWork().
-      task_source = WorkerThreadDelegate::GetWorkLockRequired(worker);
-    }
-    if (!task_source) {
-      // The worker will sleep after this returns nullptr.
-      worker_awake_ = false;
-      return nullptr;
-    }
-    auto run_status = task_source.WillRunTask();
-    DCHECK_NE(run_status, TaskSource::RunStatus::kDisallowed);
-    return task_source;
-  }
-
-  void OnMainExit(WorkerThread* /* worker */) override {
-    scoped_com_initializer_.reset();
-  }
-
-  void WaitForWork() override {
-    const TimeDelta sleep_time = GetSleepTimeout();
-    const DWORD milliseconds_wait = checked_cast<DWORD>(
-        sleep_time.is_max() ? INFINITE : sleep_time.InMilliseconds());
-    const HANDLE wake_up_event_handle = wake_up_event_.handle();
-    MsgWaitForMultipleObjectsEx(1, &wake_up_event_handle, milliseconds_wait,
-                                QS_ALLINPUT, 0);
-  }
-
- private:
-  RegisteredTaskSource GetWorkFromWindowsMessageQueue() {
-    MSG msg;
-    if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE) != FALSE) {
-      Task pump_message_task(FROM_HERE,
-                             BindOnce(
-                                 [](MSG msg) {
-                                   TranslateMessage(&msg);
-                                   DispatchMessage(&msg);
-                                 },
-                                 std::move(msg)),
-                             TimeTicks::Now(), TimeDelta());
-      if (task_tracker()->WillPostTask(
-              &pump_message_task, TaskShutdownBehavior::SKIP_ON_SHUTDOWN)) {
-        auto transaction = message_pump_sequence_->BeginTransaction();
-        const bool sequence_should_be_queued =
-            transaction.WillPushImmediateTask();
-        DCHECK(sequence_should_be_queued)
-            << "GetWorkFromWindowsMessageQueue() does not expect "
-               "queueing of pump tasks.";
-        auto registered_task_source = task_tracker_->RegisterTaskSource(
-            std::move(message_pump_sequence_));
-        if (!registered_task_source) {
-          return nullptr;
-        }
-        transaction.PushImmediateTask(std::move(pump_message_task));
-        return registered_task_source;
-      } else {
-        // `pump_message_task`'s destructor may run sequence-affine code, so it
-        // must be leaked when `WillPostTask` returns false.
-        auto leak = std::make_unique<Task>(std::move(pump_message_task));
-        ANNOTATE_LEAKING_OBJECT_PTR(leak.get());
-        leak.release();
-      }
-    }
-    return nullptr;
-  }
-
-  bool get_work_first_ = true;
-  const scoped_refptr<Sequence> message_pump_sequence_ =
-      MakeRefCounted<Sequence>(TaskTraits{MayBlock()},
-                               nullptr,
-                               TaskSourceExecutionMode::kParallel,
-                               GetCurrentTaskImportance());
-  std::unique_ptr<win::ScopedCOMInitializer> scoped_com_initializer_;
-};
-
-#endif  // BUILDFLAG(IS_WIN)
-
 }  // namespace
 
 class PooledSingleThreadTaskRunnerManager::PooledSingleThreadTaskRunner
@@ -612,19 +442,6 @@ PooledSingleThreadTaskRunnerManager::PooledSingleThreadTaskRunnerManager(
       delayed_task_manager_(delayed_task_manager) {
   DCHECK(task_tracker_);
   DCHECK(delayed_task_manager_);
-#if BUILDFLAG(IS_WIN)
-  static_assert(std::extent<decltype(shared_com_worker_threads_)>() ==
-                    std::extent<decltype(shared_worker_threads_)>(),
-                "The size of |shared_com_worker_threads_| must match "
-                "|shared_worker_threads_|");
-  static_assert(
-      std::extent<
-          std::remove_reference<decltype(shared_com_worker_threads_[0])>>() ==
-          std::extent<
-              std::remove_reference<decltype(shared_worker_threads_[0])>>(),
-      "The size of |shared_com_worker_threads_| must match "
-      "|shared_worker_threads_|");
-#endif  // BUILDFLAG(IS_WIN)
   DCHECK(!g_manager_is_alive);
   g_manager_is_alive = true;
 }
@@ -692,15 +509,6 @@ PooledSingleThreadTaskRunnerManager::CreateSingleThreadTaskRunner(
     SingleThreadTaskRunnerThreadMode thread_mode) {
   return CreateTaskRunnerImpl<WorkerThreadDelegate>(traits, thread_mode);
 }
-
-#if BUILDFLAG(IS_WIN)
-scoped_refptr<SingleThreadTaskRunner>
-PooledSingleThreadTaskRunnerManager::CreateCOMSTATaskRunner(
-    const TaskTraits& traits,
-    SingleThreadTaskRunnerThreadMode thread_mode) {
-  return CreateTaskRunnerImpl<WorkerThreadCOMDelegate>(traits, thread_mode);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // static
 PooledSingleThreadTaskRunnerManager::ContinueOnShutdown
@@ -810,22 +618,6 @@ PooledSingleThreadTaskRunnerManager::CreateWorkerThreadDelegate<
       task_tracker_);
 }
 
-#if BUILDFLAG(IS_WIN)
-template <>
-std::unique_ptr<WorkerThreadDelegate>
-PooledSingleThreadTaskRunnerManager::CreateWorkerThreadDelegate<
-    WorkerThreadCOMDelegate>(const std::string& name,
-                             int id,
-                             SingleThreadTaskRunnerThreadMode thread_mode) {
-  return std::make_unique<WorkerThreadCOMDelegate>(
-      StringPrintf("ThreadPoolSingleThreadCOMSTA%s", name.c_str()),
-      thread_mode == SingleThreadTaskRunnerThreadMode::DEDICATED
-          ? WorkerThread::ThreadLabel::DEDICATED_COM
-          : WorkerThread::ThreadLabel::SHARED_COM,
-      task_tracker_);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 template <typename DelegateType>
 WorkerThread*
 PooledSingleThreadTaskRunnerManager::CreateAndRegisterWorkerThread(
@@ -853,18 +645,6 @@ PooledSingleThreadTaskRunnerManager::GetSharedWorkerThreadForTraits<
                                [TraitsToContinueOnShutdown(traits)];
 }
 
-#if BUILDFLAG(IS_WIN)
-template <>
-WorkerThread*&
-PooledSingleThreadTaskRunnerManager::GetSharedWorkerThreadForTraits<
-    WorkerThreadCOMDelegate>(const TaskTraits& traits,
-                             ThreadType originating_thread_type) {
-  return shared_com_worker_threads_[GetEnvironmentIndexForTraits(
-      traits, originating_thread_type, inherit_task_importance_by_default_)]
-                                   [TraitsToContinueOnShutdown(traits)];
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 void PooledSingleThreadTaskRunnerManager::UnregisterWorkerThread(
     WorkerThread* worker) {
   // Cleanup uses a CheckedLock, so call Cleanup() after releasing |lock_|.
@@ -887,17 +667,9 @@ void PooledSingleThreadTaskRunnerManager::UnregisterWorkerThread(
 
 void PooledSingleThreadTaskRunnerManager::ReleaseSharedWorkerThreads() {
   decltype(shared_worker_threads_) local_shared_worker_threads;
-#if BUILDFLAG(IS_WIN)
-  decltype(shared_com_worker_threads_) local_shared_com_worker_threads;
-#endif
   {
     CheckedAutoLock auto_lock(lock_);
     local_shared_worker_threads = std::exchange(shared_worker_threads_, {});
-#if BUILDFLAG(IS_WIN)
-    local_shared_com_worker_threads =
-        std::exchange(shared_com_worker_threads_, {});
-
-#endif
   }
 
   for (auto& threads : local_shared_worker_threads) {
@@ -908,15 +680,6 @@ void PooledSingleThreadTaskRunnerManager::ReleaseSharedWorkerThreads() {
     }
   }
 
-#if BUILDFLAG(IS_WIN)
-  for (auto& com_threads : local_shared_com_worker_threads) {
-    for (auto* com_thread : com_threads) {
-      if (com_thread) {
-        UnregisterWorkerThread(com_thread);
-      }
-    }
-  }
-#endif
 }
 
 }  // namespace base::internal

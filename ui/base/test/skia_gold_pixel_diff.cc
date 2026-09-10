@@ -9,10 +9,6 @@
 #include <utility>
 #include <vector>
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 #include "base/auto_reset.h"
 #include "base/base_paths.h"
 #include "base/command_line.h"
@@ -51,9 +47,7 @@ namespace ui::test {
 constexpr char kSkiaGoldInstance[] = "chrome";
 constexpr char kSkiaGoldPublicInstance[] = "chrome-public";
 
-#if BUILDFLAG(IS_WIN)
-constexpr wchar_t kSkiaGoldCtl[] = L"tools/skia_goldctl/win/goldctl.exe";
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #if defined(ARCH_CPU_ARM64)
 constexpr char kSkiaGoldCtl[] = "tools/skia_goldctl/mac_arm64/goldctl";
 #else
@@ -112,9 +106,7 @@ void AppendArgsJustAfterProgram(base::CommandLine& cmd,
 }
 
 const char* GetPlatformName() {
-#if BUILDFLAG(IS_WIN)
-  return "windows";
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   return "macOS";
 #elif BUILDFLAG(IS_LINUX)
   return "linux";

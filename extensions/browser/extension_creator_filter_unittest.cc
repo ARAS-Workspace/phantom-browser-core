@@ -15,10 +15,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "testing/platform_test.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace {
 
 class ExtensionCreatorFilterTest : public PlatformTest {
@@ -155,37 +151,5 @@ TEST_F(ExtensionCreatorFilterTest, IgnoreFilesInSpecialDir) {
         << "i: " << i << ", input: " << test_file.value();
   }
 }
-
-#if BUILDFLAG(IS_WIN)
-struct StringBooleanWithBooleanTestData {
-  const base::FilePath::CharType* input_char;
-  bool input_bool;
-  bool expected;
-};
-
-TEST_F(ExtensionCreatorFilterTest, WindowsHiddenFiles) {
-  const auto cases = std::to_array<StringBooleanWithBooleanTestData>({
-      {FILE_PATH_LITERAL("a-normal-file"), false, true},
-      {FILE_PATH_LITERAL(".a-dot-file"), false, false},
-      {FILE_PATH_LITERAL(".a-dot-file-that-we-have-set-to-hidden"), true,
-       false},
-      {FILE_PATH_LITERAL("a-file-that-we-have-set-to-hidden"), true, false},
-      {FILE_PATH_LITERAL("a-file-that-we-have-not-set-to-hidden"), false, true},
-  });
-
-  for (size_t i = 0; i < std::size(cases); ++i) {
-    base::FilePath input(cases[i].input_char);
-    bool should_hide = cases[i].input_bool;
-    base::FilePath test_file(CreateTestFile(input));
-
-    if (should_hide) {
-      SetFileAttributes(test_file.value().c_str(), FILE_ATTRIBUTE_HIDDEN);
-    }
-    bool observed = filter_->ShouldPackageFile(test_file);
-    EXPECT_EQ(cases[i].expected, observed)
-        << "i: " << i << ", input: " << test_file.value();
-  }
-}
-#endif
 
 }  // namespace

@@ -349,13 +349,9 @@ int SandboxedVfsFileImpl::SectorSize() {
 
 int SandboxedVfsFileImpl::DeviceCharacteristics() {
   // TODO(pwnall): Figure out if we can get away with returning 0 on Windows.
-#if BUILDFLAG(IS_WIN)
-  return SQLITE_IOCAP_UNDELETABLE_WHEN_OPEN;
-#else
   // NOTE: SQLite's unix VFS attempts to detect the underlying filesystem and
   // sets some flags based on the result.
   return 0;
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 int SandboxedVfsFileImpl::ShmMap(int page_index,

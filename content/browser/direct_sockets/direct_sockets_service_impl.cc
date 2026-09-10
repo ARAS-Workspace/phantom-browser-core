@@ -51,10 +51,6 @@
 #include "third_party/blink/public/common/features_generated.h"
 #include "third_party/blink/public/mojom/direct_sockets/direct_sockets.mojom.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <winsock2.h>
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_POSIX)
 #include <sys/socket.h>
 #endif  // BUILDFLAG(IS_POSIX)

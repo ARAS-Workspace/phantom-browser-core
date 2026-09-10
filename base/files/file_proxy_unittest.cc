@@ -180,11 +180,6 @@ TEST_F(FileProxyTest, Close) {
   FileProxy proxy(file_task_runner());
   CreateProxy(File::FLAG_CREATE | File::FLAG_WRITE, &proxy);
 
-#if BUILDFLAG(IS_WIN)
-  // This fails on Windows if the file is not closed.
-  EXPECT_FALSE(base::Move(TestPath(), TestDirPath().AppendASCII("new")));
-#endif
-
   RunLoop run_loop;
   proxy.Close(BindOnce(&FileProxyTest::DidFinish, weak_factory_.GetWeakPtr(),
                        run_loop.QuitWhenIdleClosure()));

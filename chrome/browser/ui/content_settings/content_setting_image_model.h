@@ -54,9 +54,6 @@ class ContentSettingImageModel {
 #if BUILDFLAG(IS_CHROMEOS)
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kSmartCardIconElementId);
 #endif
-#if BUILDFLAG(IS_WIN)
-  DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kProtectedMediaElementId);
-#endif
 
   ContentSettingImageModel(const ContentSettingImageModel&) = delete;
   ContentSettingImageModel& operator=(const ContentSettingImageModel&) = delete;

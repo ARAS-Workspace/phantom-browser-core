@@ -33,11 +33,6 @@
 #include "content/browser/android/tracing_controller_android.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#include "base/win/windows_version.h"
-#include "ui/base/win/scoped_ole_initializer.h"
-#endif
 
 namespace content {
 namespace {
@@ -88,13 +83,6 @@ int BrowserMainRunnerImpl::Initialize(MainFunctionParams parameters) {
       WaitForDebugger("Browser");
     }
 
-#if BUILDFLAG(IS_WIN)
-    base::win::EnableHighDPISupport();
-    // Ole must be initialized before starting message pump, so that TSF
-    // (Text Services Framework) module can interact with the message pump
-    // on Windows 8 Metro mode.
-    ole_initializer_ = std::make_unique<ui::ScopedOleInitializer>();
-#endif  // BUILDFLAG(IS_WIN)
 
     gfx::InitializeFonts();
 
@@ -170,9 +158,6 @@ void BrowserMainRunnerImpl::Shutdown() {
     main_loop_->ShutdownThreadsAndCleanUp();
 
     ui::ShutdownInputMethod();
-#if BUILDFLAG(IS_WIN)
-    ole_initializer_.reset(NULL);
-#endif
     main_loop_.reset(nullptr);
 
     is_shutdown_ = true;

@@ -3442,13 +3442,13 @@ class
     : public SingleClientBookmarksWithAccountStorageSyncTest {
  public:
   SingleClientBookmarksWithAccountStorageSyncTestSyncToSignInDisabledOnDesktop() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     features_override_.InitWithFeatures(
         /*enabled_features=*/{},
         /*disabled_features=*/{
             syncer::kReplaceSyncPromosWithSignInPromos,
             syncer::kReplaceSyncPromosWithSigninPromosNewSignin});
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   }
 
   // The value doesn't matter, since the tests use SetupSyncWithMode(..) to
@@ -3574,7 +3574,7 @@ class SingleClientBookmarksSyncTestWithEnabledMigrateSyncingUserToSignedIn
   base::test::ScopedFeatureList features_override_;
 };
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // TODO(crbug.com/505733920): Enable the test.
 #if BUILDFLAG(IS_MAC) && defined(ADDRESS_SANITIZER)
@@ -3801,7 +3801,7 @@ IN_PROC_BROWSER_TEST_F(
                            ElementsAre(IsUrlBookmark(kBankTitle, kBankUrl))),
                   IsUrlBookmark(kMapsTitle, kMapsUrl)));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 IN_PROC_BROWSER_TEST_F(
     SingleClientBookmarksSyncTestWithEnabledMigrateSyncingUserToSignedIn,

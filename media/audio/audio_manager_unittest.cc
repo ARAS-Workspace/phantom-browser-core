@@ -47,11 +47,6 @@
 #include "media/audio/mac/audio_manager_mac.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#include "media/audio/win/audio_manager_win.h"
-#endif
-
 #if defined(USE_PULSEAUDIO)
 #include "media/audio/pulse/audio_manager_pulse.h"
 #include "media/audio/pulse/pulse_util.h"
@@ -289,26 +284,6 @@ TEST_F(AudioManagerTest, EnumerateOutputDevices) {
 // Run additional tests for Windows since enumeration can be done using
 // two different APIs. MMDevice is default for Vista and higher and Wave
 // is default for XP and lower.
-#if BUILDFLAG(IS_WIN)
-
-// Override default enumeration API and force usage of Windows MMDevice.
-// This test will only run on Windows Vista and higher.
-TEST_F(AudioManagerTest, EnumerateInputDevicesWinMMDevice) {
-  ABORT_AUDIO_TEST_IF_NOT(InputDevicesAvailable());
-
-  AudioDeviceDescriptions device_descriptions;
-  device_info_accessor_->GetAudioInputDeviceDescriptions(&device_descriptions);
-  CheckDeviceDescriptions(device_descriptions);
-}
-
-TEST_F(AudioManagerTest, EnumerateOutputDevicesWinMMDevice) {
-  ABORT_AUDIO_TEST_IF_NOT(OutputDevicesAvailable());
-
-  AudioDeviceDescriptions device_descriptions;
-  device_info_accessor_->GetAudioOutputDeviceDescriptions(&device_descriptions);
-  CheckDeviceDescriptions(device_descriptions);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if defined(USE_PULSEAUDIO)
 // On Linux, there are two implementations available and both can
@@ -401,17 +376,17 @@ TEST_F(AudioManagerTest, EnumerateOutputDevicesAlsaWithOutputDeviceSwitch) {
 #endif  // defined(USE_ALSA)
 
 TEST_F(AudioManagerTest, GetOutputStreamParameters) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   ABORT_AUDIO_TEST_IF_NOT(InputDevicesAvailable());
 
   std::string default_device_id = AudioDeviceDescription::kDefaultDeviceId;
   AudioParameters params = GetOutputStreamParameters(default_device_id);
   EXPECT_TRUE(params.IsValid());
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 }
 
 TEST_F(AudioManagerTest, GetAssociatedOutputDeviceID) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   ABORT_AUDIO_TEST_IF_NOT(InputDevicesAvailable() && OutputDevicesAvailable());
 
   AudioDeviceDescriptions device_descriptions;
@@ -430,7 +405,7 @@ TEST_F(AudioManagerTest, GetAssociatedOutputDeviceID) {
   }
 
   EXPECT_TRUE(found_an_associated_device);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 }
 
 class TestAudioManager : public FakeAudioManager {

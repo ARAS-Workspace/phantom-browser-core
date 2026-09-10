@@ -7,9 +7,6 @@
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "google_apis/gaia/google_service_auth_error.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
 #include "chrome/browser/media/router/discovery/access_code/access_code_cast_constants.h"
 #include "components/sessions/content/session_tab_helper.h"
 #include "services/network/test/test_network_connection_tracker.h"

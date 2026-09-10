@@ -245,7 +245,7 @@ TEST_F(ListFamilyMembersServiceTest,
 }
 
 // Data cleanup is only available for Windows, Mac and Linux
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_F(ListFamilyMembersServiceTest, ListFamilyFetcherClearsResponseOnSignout) {
   // Test the `fetcher_`.
   AccountInfo primary_account = identity_test_env_.MakePrimaryAccountAvailable(
@@ -297,7 +297,7 @@ TEST_F(ListFamilyMembersServiceTest, ListFamilyFetcherResetsPrefOnSignout) {
   EXPECT_EQ(pref_service_.GetString(prefs::kFamilyLinkUserMemberRole),
             kDefaultEmptyFamilyMemberRole);
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 }  // namespace
 }  // namespace supervised_user

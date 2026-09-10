@@ -165,17 +165,6 @@
 #include "url/url_constants.h"
 #include "url/url_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <objbase.h>
-
-#include <windows.h>
-
-#include <shlobj.h>
-#include <wrl/client.h>
-
-#include "base/win/scoped_com_initializer.h"
-#endif
-
 #if BUILDFLAG(IS_APPLE)
 #include "base/mac/mac_util.h"
 #endif

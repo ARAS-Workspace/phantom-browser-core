@@ -100,10 +100,6 @@ class TabStatsTracker :
                            TabDeletionGetsHandledProperly);
   FRIEND_TEST_ALL_PREFIXES(TabStatsTrackerBrowserTest,
                            TabsAndWindowsAreCountedAccurately);
-#if BUILDFLAG(IS_WIN)
-  FRIEND_TEST_ALL_PREFIXES(TabStatsTrackerBrowserTest,
-                           TestCalculateAndRecordNativeWindowVisibilities);
-#endif
 
   // The UmaStatsReportingDelegate is responsible for delivering statistics
   // reported by the TabStatsTracker via UMA.

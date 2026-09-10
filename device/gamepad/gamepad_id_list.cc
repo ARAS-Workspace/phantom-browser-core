@@ -650,14 +650,6 @@ GamepadIdList& GamepadIdList::Get() {
   return g_singleton.Get();
 }
 
-#if BUILDFLAG(IS_WIN)
-// static
-std::string GamepadIdList::GetProductIdentifier(uint16_t vendor_id,
-                                                uint16_t product_id) {
-  return base::StringPrintf("%04x:%04x", vendor_id, product_id);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 XInputType GamepadIdList::GetXInputType(uint16_t vendor_id,
                                         uint16_t product_id) const {
   const auto find_it = kGamepadInfo.find({vendor_id, product_id});

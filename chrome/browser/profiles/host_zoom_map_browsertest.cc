@@ -255,31 +255,6 @@ IN_PROC_BROWSER_TEST_F(HostZoomMapBrowserTest, ZoomEventsWorkForOffTheRecord) {
                                 test_scheme, test_host));
 }
 
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(
-    HostZoomMapBrowserTest,
-    WebviewBasedSigninUsesDefaultStoragePartitionForEmbedder) {
-  GURL signin_url =
-      signin::GetEmbeddedPromoURL(signin_metrics::AccessPoint::kStartPage,
-                                  signin_metrics::Reason::kFetchLstOnly, false);
-  GURL test_url = SubstituteTestServerPort(signin_url);
-  std::string test_host(test_url.GetHost());
-  std::string test_scheme(test_url.GetScheme());
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), test_url));
-
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  HostZoomMap* host_zoom_map = HostZoomMap::GetForWebContents(web_contents);
-
-  // For the webview based sign-in code, the sign in page uses the default host
-  // zoom map.
-  HostZoomMap* default_profile_host_zoom_map =
-      HostZoomMap::GetDefaultForBrowserContext(browser()->GetProfile());
-  EXPECT_EQ(host_zoom_map, default_profile_host_zoom_map);
-}
-#endif
-
 // Regression test for crbug.com/40361379.
 IN_PROC_BROWSER_TEST_F(HostZoomMapBrowserTest, ToggleDefaultZoomLevel) {
   const double default_zoom_level = blink::ZoomFactorToZoomLevel(1.5);

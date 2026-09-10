@@ -516,11 +516,7 @@ IN_PROC_BROWSER_TEST_P(GeolocationBrowserTest, NoPromptForAllowedOrigin) {
 }
 
 // Crashes on Win only.  http://crbug.com/40653217
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PromptForOffTheRecord DISABLED_PromptForOffTheRecord
-#else
 #define MAYBE_PromptForOffTheRecord PromptForOffTheRecord
-#endif
 
 IN_PROC_BROWSER_TEST_P(GeolocationBrowserTest, MAYBE_PromptForOffTheRecord) {
   // For a regular profile the user is prompted, and when granted the position

@@ -124,11 +124,6 @@
 #include "net/dns/mdns_client_impl.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <Winsock2.h>
-#include "net/base/winsock_init.h"
-#endif
-
 #if BUILDFLAG(IS_POSIX)
 #include <net/if.h>
 #include "net/base/sys_addrinfo.h"
@@ -459,9 +454,6 @@ HostResolverManager::HostResolverManager(
 
   DCHECK_GE(dispatcher_->num_priorities(), static_cast<size_t>(NUM_PRIORITIES));
 
-#if BUILDFLAG(IS_WIN)
-  EnsureWinsockInit();
-#endif
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
   RunLoopbackProbeJob();
 #endif

@@ -20,35 +20,8 @@ int MockKeyboard::GetCharacters(Layout layout,
                                 int key_code,
                                 Modifiers modifiers,
                                 std::u16string* output) {
-#if BUILDFLAG(IS_WIN)
-  CHECK(output);
-  // Change the keyboard layout only when we have to because it takes a lot of
-  // time to load a keyboard-layout driver.
-  // When we change the layout, we reset the modifier status to force updating
-  // the keyboard status.
-  if (layout != keyboard_layout_) {
-    if (!driver_.SetLayout(layout))
-      return -1;
-    keyboard_layout_ = layout;
-    keyboard_modifiers_ = INVALID;
-  }
-
-  // Update the keyboard states.
-  if (modifiers != keyboard_modifiers_) {
-    if (!driver_.SetModifiers(modifiers))
-      return -1;
-    keyboard_modifiers_ = modifiers;
-  }
-
-  // Retrieve Unicode characters associate with the key code.
-  std::wstring wide_output;
-  int result = driver_.GetCharacters(key_code, &wide_output);
-  *output = base::WideToUTF16(wide_output);
-  return result;
-#else
   NOTIMPLEMENTED();
   return -1;
-#endif
 }
 
 }  // namespace content

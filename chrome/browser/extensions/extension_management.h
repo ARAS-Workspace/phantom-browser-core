@@ -41,7 +41,7 @@ namespace extensions {
 
 enum class ManagedToolbarPinMode;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 BASE_DECLARE_FEATURE(
     kDisableForceInstalledExtensionsInLowTrustEnviromentWhenGreylisted);
 #endif

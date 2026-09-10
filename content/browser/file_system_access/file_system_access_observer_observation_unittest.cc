@@ -599,13 +599,8 @@ TEST_F(FileSystemAccessObserverObservationTest,
 }
 
 // TODO(crbug.com/393229134): Reenable this test.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DirectoryObservationDestructedAfterScopeRootDeleted \
-  DISABLED_DirectoryObservationDestructedAfterScopeRootDeleted
-#else
 #define MAYBE_DirectoryObservationDestructedAfterScopeRootDeleted \
   DirectoryObservationDestructedAfterScopeRootDeleted
-#endif
 TEST_F(FileSystemAccessObserverObservationTest,
        MAYBE_DirectoryObservationDestructedAfterScopeRootDeleted) {
   base::FilePath dir_path = CreateDirectory();
@@ -644,13 +639,8 @@ TEST_F(FileSystemAccessObserverObservationTest,
 }
 
 // TODO(crbug.com/393229134): Reenable this test.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DirectoryObservationNotDestructedAfterFileDeleted \
-  DISABLED_DirectoryObservationNotDestructedAfterFileDeleted
-#else
 #define MAYBE_DirectoryObservationNotDestructedAfterFileDeleted \
   DirectoryObservationNotDestructedAfterFileDeleted
-#endif
 TEST_F(FileSystemAccessObserverObservationTest,
        MAYBE_DirectoryObservationNotDestructedAfterFileDeleted) {
   base::FilePath dir_path = CreateDirectory();
@@ -686,13 +676,8 @@ TEST_F(FileSystemAccessObserverObservationTest,
 }
 
 // TODO(crbug.com/393229134): Reenable this test.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ObservationDestroyedOnQuotaExceeded \
-  DISABLED_ObservationDestroyedOnQuotaExceeded
-#else
 #define MAYBE_ObservationDestroyedOnQuotaExceeded \
   ObservationDestroyedOnQuotaExceeded
-#endif
 TEST_F(FileSystemAccessObserverObservationTest,
        MAYBE_ObservationDestroyedOnQuotaExceeded) {
   base::FilePath favorites_path = CreateDirectory();

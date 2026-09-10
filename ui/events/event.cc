@@ -42,10 +42,6 @@
 #include "ui/events/ozone/layout/keyboard_layout_engine_manager.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/events/keycodes/platform_key_map_win.h"
-#endif
-
 namespace ui {
 namespace {
 
@@ -394,10 +390,6 @@ std::string LocatedEvent::ToString() const {
        " target=", base::StringPrintf("%p", target()),
 #if BUILDFLAG(IS_OZONE)
        " native=", (native_event() ? native_event()->ToString() : "(nil)")
-#elif BUILDFLAG(IS_WIN)
-       " native={hwnd=", base::StringPrintf("%p", native_event().hwnd), " pt=",
-       base::StringPrintf("%d,%d", native_event().pt.x, native_event().pt.y),
-       "}"
 #endif
       });
 }
@@ -664,7 +656,7 @@ std::unique_ptr<Event> MouseWheelEvent::Clone() const {
   return std::make_unique<MouseWheelEvent>(*this);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // This value matches Windows, Fuchsia WHEEL_DELTA, and (roughly) Firefox on
 // Linux.
 // static
@@ -929,16 +921,6 @@ void KeyEvent::InitializeNative() {
 
 #if BUILDFLAG(IS_LINUX)
   NormalizeFlags();
-#elif BUILDFLAG(IS_WIN)
-  // Only Windows has native character events.
-  if (is_char_) {
-    key_ = DomKey::FromCharacter(static_cast<int32_t>(native_event().wParam));
-    SetFlags(PlatformKeyMap::ReplaceControlAndAltWithAltGraph(flags()));
-  } else {
-    int adjusted_flags = flags();
-    key_ = PlatformKeyMap::DomKeyFromKeyboardCode(key_code(), &adjusted_flags);
-    SetFlags(adjusted_flags);
-  }
 #endif
 }
 
@@ -967,7 +949,6 @@ void KeyEvent::ApplyLayout() const {
   }
 #endif
 
-#if !BUILDFLAG(IS_WIN)
   // Native Windows character events always have is_char_ == true,
   // so this is a synthetic or native keystroke event.
   // Therefore, perform only the fallback action.
@@ -975,7 +956,6 @@ void KeyEvent::ApplyLayout() const {
     DCHECK(EventTypeFromNative(native_event()) == EventType::kKeyPressed ||
            EventTypeFromNative(native_event()) == EventType::kKeyReleased);
   }
-#endif
 
   if (!DomCodeToUsLayoutDomKey(code, flags(), &key_, &dummy_key_code))
     key_ = DomKey::UNIDENTIFIED;
@@ -1010,13 +990,6 @@ bool KeyEvent::IsRepeated(KeyEvent** last_key_event) {
   DCHECK(last);
   bool is_repeat = false;
 
-#if BUILDFLAG(IS_WIN)
-  if (HasNativeEvent()) {
-    // Bit 30 of lParam represents the "previous key state". If set, the key
-    // was already down, therefore this is an auto-repeat.
-    is_repeat = (native_event().lParam & 0x40000000) != 0;
-  }
-#endif
   if (!is_repeat) {
     if (key_code() == last->key_code() &&
         (flags() & ~EF_MOUSE_BUTTON) ==
@@ -1109,23 +1082,7 @@ char16_t KeyEvent::GetUnmodifiedText() const {
 }
 
 bool KeyEvent::IsUnicodeKeyCode() const {
-#if BUILDFLAG(IS_WIN)
-  if (!IsAltDown())
-    return false;
-  const int key = key_code();
-  if (key >= VKEY_NUMPAD0 && key <= VKEY_NUMPAD9)
-    return true;
-  // Check whether the user is using the numeric keypad with num-lock off.
-  // In that case, EF_EXTENDED will not be set; if it is set, the key event
-  // originated from the relevant non-numpad dedicated key, e.g. [Insert].
-  return (!(flags() & EF_IS_EXTENDED_KEY) &&
-          (key == VKEY_INSERT || key == VKEY_END || key == VKEY_DOWN ||
-           key == VKEY_NEXT || key == VKEY_LEFT || key == VKEY_CLEAR ||
-           key == VKEY_RIGHT || key == VKEY_HOME || key == VKEY_UP ||
-           key == VKEY_PRIOR));
-#else
   return false;
-#endif
 }
 
 void KeyEvent::NormalizeFlags() {

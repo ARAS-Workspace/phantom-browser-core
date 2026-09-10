@@ -20,11 +20,6 @@
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
 
-#if BUILDFLAG(IS_WIN)
-namespace gfx {
-class D3DSharedFence;
-}
-#endif
 
 namespace viz {
 class SharedImageFormat;
@@ -77,21 +72,12 @@ class SharedImageInterfaceProxy {
   void CopyToGpuMemoryBuffer(const SyncToken& sync_token,
                              const Mailbox& mailbox);
 
-#if BUILDFLAG(IS_WIN)
-  void CopyToGpuMemoryBufferAsync(const SyncToken& sync_token,
-                                  const Mailbox& mailbox,
-                                  base::OnceCallback<void(bool)> callback);
-  void UpdateSharedImage(const SyncToken& sync_token,
-                         scoped_refptr<gfx::D3DSharedFence> d3d_shared_fence,
-                         const Mailbox& mailbox);
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   void CopyNativeGmbToSharedMemoryAsync(
       gfx::GpuMemoryBufferHandle buffer_handle,
       base::UnsafeSharedMemoryRegion memory_region,
       base::OnceCallback<void(bool)> callback);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   void UpdateSharedImage(const SyncToken& sync_token, const Mailbox& mailbox);
   void UpdateSharedImage(const SyncToken& sync_token,
@@ -149,10 +135,6 @@ class SharedImageInterfaceProxy {
 
   const gpu::SharedImageCapabilities capabilities_;
 
-#if BUILDFLAG(IS_WIN)
-  absl::flat_hash_set<gfx::DXGIHandleToken> registered_fence_tokens_
-      GUARDED_BY(lock_);
-#endif
 };
 
 }  // namespace gpu

@@ -307,9 +307,6 @@ void OmniboxEverywhereUIManager::CreateAndInitWidget(
   params.shadow_type = views::Widget::InitParams::ShadowType::kNone;
   params.activatable = views::Widget::InitParams::Activatable::kYes;
   bool is_ephemeral = IsEphemeral();
-#if BUILDFLAG(IS_WIN)
-  params.dont_show_in_taskbar = is_ephemeral;
-#endif  // BUILDFLAG(IS_WIN)
   widget_delegate_ = std::make_unique<OmniboxEverywhereWidgetDelegate>();
   if (draggable_region_) {
     widget_delegate_->SetDraggableRegion(draggable_region_);

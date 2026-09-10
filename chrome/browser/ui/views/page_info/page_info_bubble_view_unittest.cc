@@ -1020,11 +1020,7 @@ TEST_F(PageInfoBubbleViewTest, SetPermissionInfoWithPolicySerialPorts) {
 // Test that updating the number of cookies used by the current page doesn't add
 // any extra views to Page Info.
 TEST_F(PageInfoBubbleViewTest, UpdatingSiteDataRetainsLayout) {
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_VR)
-  size_t kExpectedChildren = 6;
-#else
   size_t kExpectedChildren = 5;
-#endif
   if (page_info::IsAboutThisSiteFeatureEnabled(
           g_browser_process->GetApplicationLocale())) {
     ++kExpectedChildren;

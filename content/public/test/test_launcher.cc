@@ -62,16 +62,7 @@
 #include "base/files/file_descriptor_watcher_posix.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/base_switches.h"
-#include "content/public/app/sandbox_helper_win.h"
-#include "sandbox/policy/win/sandbox_win.h"
-#include "sandbox/win/src/sandbox_factory.h"
-#include "sandbox/win/src/sandbox_types.h"
-
-// To avoid conflicts with the macro from the Windows SDK...
-#undef GetCommandLine
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "base/apple/scoped_nsautorelease_pool.h"
 #include "base/mac/mac_util.h"
 #include "sandbox/mac/seatbelt_exec.h"
@@ -353,13 +344,7 @@ int LaunchTestsInternal(TestLauncherDelegate* launcher_delegate,
   ContentMainParams params(content_main_delegate.get());
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  sandbox::SandboxInterfaceInfo sandbox_info = {nullptr};
-  InitializeSandboxInfo(&sandbox_info);
-
-  params.instance = GetModuleHandle(NULL);
-  params.sandbox_info = &sandbox_info;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   sandbox::SeatbeltExecServer::CreateFromArgumentsResult seatbelt =
       sandbox::SeatbeltExecServer::CreateFromArguments(
           command_line->GetProgram().value().c_str(), argc,
@@ -370,7 +355,7 @@ int LaunchTestsInternal(TestLauncherDelegate* launcher_delegate,
 #elif !BUILDFLAG(IS_ANDROID)
   params.argc = argc;
   params.argv = const_cast<const char**>(argv);
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 #if !BUILDFLAG(IS_ANDROID)
   // This needs to be before trying to run tests as otherwise utility processes
@@ -479,10 +464,6 @@ int LaunchTests(TestLauncherDelegate* launcher_delegate,
   base::ScopedBlockTestsWritingToSpecialDirs scoped_blocker(
       {
           base::DIR_SRC_TEST_DATA_ROOT,
-#if BUILDFLAG(IS_WIN)
-          base::DIR_USER_STARTUP,
-          base::DIR_START_MENU,
-#endif  // BUILDFLAG(IS_WIN)
       },
       ([](const base::FilePath& path) {
         ADD_FAILURE()

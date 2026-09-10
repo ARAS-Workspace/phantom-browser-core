@@ -79,11 +79,7 @@ mojom::PaintPreviewCaptureParamsPtr ToMojoParams(
 
 base::FilePath ParseStringFilePath(std::string_view raw_path) {
   return base::FilePath(
-#if BUILDFLAG(IS_WIN)
-      base::UTF8ToWide(raw_path)
-#else
       raw_path
-#endif
   );
 }
 

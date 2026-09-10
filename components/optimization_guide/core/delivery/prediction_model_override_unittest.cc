@@ -17,15 +17,9 @@ namespace optimization_guide {
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-const char kTestAbsoluteFilePath[] = "C:\\absolute\\file\\path";
-const char kOtherAbsoluteFilePath[] = "C:\\other\\absolute\\file\\path";
-const char kTestRelativeFilePath[] = "relative\\file\\path";
-#else
 const char kTestAbsoluteFilePath[] = "/absolutefilepath";
 const char kOtherAbsoluteFilePath[] = "/other/abs/file/path";
 const char kTestRelativeFilePath[] = "relativefilepath";
-#endif
 
 }  // namespace
 
@@ -91,17 +85,10 @@ TEST(PredictionModelOverridesTest, OneFilePath) {
   std::string encoded_metadata;
   metadata.SerializeToString(&encoded_metadata);
   encoded_metadata = base::Base64Encode(encoded_metadata);
-#if BUILDFLAG(IS_WIN)
-  base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
-      switches::kModelOverride,
-      base::StringPrintf("OPTIMIZATION_TARGET_PAINFUL_PAGE_LOAD|%s|%s",
-                         kTestAbsoluteFilePath, encoded_metadata));
-#else
   base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
       switches::kModelOverride,
       base::StringPrintf("OPTIMIZATION_TARGET_PAINFUL_PAGE_LOAD:%s:%s",
                          kTestAbsoluteFilePath, encoded_metadata));
-#endif
 
   auto overrides = PredictionModelOverrides::ParseFromCommandLine(
       base::CommandLine::ForCurrentProcess());
@@ -119,21 +106,12 @@ TEST(PredictionModelOverridesTest, MultipleFilePath) {
   std::string encoded_metadata;
   metadata.SerializeToString(&encoded_metadata);
   encoded_metadata = base::Base64Encode(encoded_metadata);
-#if BUILDFLAG(IS_WIN)
-  base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
-      switches::kModelOverride,
-      base::StringPrintf("OPTIMIZATION_TARGET_PAINFUL_PAGE_LOAD|%s,"
-                         "OPTIMIZATION_TARGET_PAGE_TOPICS|%s|%s",
-                         kTestAbsoluteFilePath, kOtherAbsoluteFilePath,
-                         encoded_metadata));
-#else
   base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
       switches::kModelOverride,
       base::StringPrintf("OPTIMIZATION_TARGET_PAINFUL_PAGE_LOAD:%s,"
                          "OPTIMIZATION_TARGET_PAGE_TOPICS:%s:%s",
                          kTestAbsoluteFilePath, kOtherAbsoluteFilePath,
                          encoded_metadata));
-#endif
 
   auto overrides = PredictionModelOverrides::ParseFromCommandLine(
       base::CommandLine::ForCurrentProcess());

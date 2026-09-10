@@ -454,21 +454,7 @@
 #include "url/third_party/mozilla/url_parse.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/files/file_util.h"
-#include "base/strings/string_tokenizer.h"
-#include "base/win/win_util.h"
-#include "base/win/windows_version.h"
-#include "chrome/browser/lifetime/application_lifetime_desktop.h"
-#include "chrome/browser/performance_manager/public/dll_pre_read_policy_win.h"
-#include "chrome/browser/tracing/tracing_features.h"
-#include "chrome/browser/tracing/windows_system_tracing_client_win.h"
-#include "chrome/install_static/install_util.h"
-#include "chrome/installer/util/isolation_support.h"
-#include "chrome/services/util_win/public/mojom/util_win.mojom.h"
-#include "content/public/browser/tracing_service.h"
-#include "sandbox/win/src/sandbox_policy.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/browser_process_platform_part_mac.h"
 #include "chrome/browser/enterprise/platform_auth/platform_auth_proxying_url_loader_factory.h"
 #include "chrome/common/chrome_version.h"
@@ -639,13 +625,11 @@
 #include "components/permissions/android/permissions_reprompt_controller_android.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/enterprise/network_header_injection/http_header_injection_proxying_url_loader_factory.h"
 #include "chrome/browser/enterprise/network_header_injection/http_header_injection_utils.h"
 #include "components/webapps/isolated_web_apps/scheme.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
 #include "components/captive_portal/content/captive_portal_tab_helper.h"
@@ -873,16 +857,14 @@ GURL ReplaceURLHostAndPath(const GURL& url,
 }
 
 bool IsIsolatedWebAppOrigin(const url::Origin& origin) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   return origin.scheme() == webapps::kIsolatedAppScheme;
 #else
   return false;
 #endif
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 bool IsIsolatedWebAppUrl(const GURL& url) {
   return url.SchemeIs(webapps::kIsolatedAppScheme);
 }
@@ -977,8 +959,7 @@ blink::mojom::AutoplayPolicy DetermineWebContentsAutoplayPolicy(
     return blink::mojom::AutoplayPolicy::kNoUserGestureRequired;
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   // If a user requests Read Aloud audio playbaback through the "Listen to this
   // page" entry point in the context menu, page distillation and TTS engine
   // readiness may take longer than the user gesture timeout. Thus, we allow
@@ -990,8 +971,7 @@ blink::mojom::AutoplayPolicy DetermineWebContentsAutoplayPolicy(
           chrome::kChromeUIUntrustedReadAnythingSidePanelHost) {
     return blink::mojom::AutoplayPolicy::kNoUserGestureRequired;
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
   // If we can show a setting to disable autoplay policy and are currently set
   // to `kDocumentUserActivationRequired`, return the user preference.
@@ -1154,9 +1134,7 @@ GetRendererConfiguration(content::RenderProcessHost* render_process_host) {
 bool ShouldHonorPolicies() {
   bool management_check_required = false;
 
-#if BUILDFLAG(IS_WIN)
-  management_check_required = true;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (base::FeatureList::GetInstance() &&
       base::FeatureList::IsEnabled(
           policy::features::kUseManagementServiceForSensitivePolicies)) {
@@ -1341,33 +1319,6 @@ void MaybeAppendSecureOriginsAllowlistSwitch(base::CommandLine* cmdline) {
         base::JoinString(allowlist, ","));
   }
 }
-
-#if BUILDFLAG(IS_WIN) && !defined(COMPONENT_BUILD) && \
-    !defined(ADDRESS_SANITIZER)
-// Returns the full path to |module_name|. Both dev builds (where |module_name|
-// is in the current executable's directory) and proper installs (where
-// |module_name| is in a versioned sub-directory of the current executable's
-// directory) are supported. The identified file is not guaranteed to exist.
-base::FilePath GetModulePath(std::wstring_view module_name) {
-  base::FilePath exe_dir;
-  const bool has_path = base::PathService::Get(base::DIR_EXE, &exe_dir);
-  DCHECK(has_path);
-
-  // Look for the module in a versioned sub-directory of the current
-  // executable's directory and return the path if it can be read. This is the
-  // expected location of modules for proper installs.
-  const base::FilePath module_path =
-      exe_dir.AppendASCII(chrome::kChromeVersion).Append(module_name);
-  if (base::PathExists(module_path)) {
-    return module_path;
-  }
-
-  // Otherwise, return the path to the module in the current executable's
-  // directory. This is the expected location of modules for dev builds.
-  return exe_dir.Append(module_name);
-}
-#endif  // BUILDFLAG(IS_WIN) && !defined(COMPONENT_BUILD) &&
-        // !defined(ADDRESS_SANITIZER)
 
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 void MaybeAddCondition(
@@ -1694,7 +1645,7 @@ void ChromeContentBrowserClient::RegisterProfilePrefs(
       prefs::kSubAppsAPIsAllowedWithoutGestureAndAuthorizationForOrigins);
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   registry->RegisterBooleanPref(
       policy::policy_prefs::kProtectedContentIdentifiersAllowed, true);
 #endif
@@ -1815,8 +1766,7 @@ ChromeContentBrowserClient::GetStoragePartitionConfigForSite(
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   if (content::SiteIsolationPolicy::ShouldUrlUseApplicationIsolationLevel(
           browser_context, site)) {
     CHECK(IsIsolatedWebAppUrl(site));
@@ -1829,8 +1779,7 @@ ChromeContentBrowserClient::GetStoragePartitionConfigForSite(
 
     return iwa_url_info.storage_partition_config(browser_context);
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #endif
 
   return default_storage_partition_config;
@@ -2764,8 +2713,7 @@ bool ChromeContentBrowserClient::ShouldUrlUseApplicationIsolationLevel(
     content::BrowserContext* browser_context,
     const GURL& url) {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
   if (!content::AreIsolatedWebAppsEnabled(browser_context)) {
     return false;
@@ -2776,8 +2724,7 @@ bool ChromeContentBrowserClient::ShouldUrlUseApplicationIsolationLevel(
   if (IsIsolatedWebAppOrigin(origin)) {
     return true;
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #endif
   return false;
 }
@@ -3226,14 +3173,6 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
     };
     command_line->CopySwitchesFrom(browser_command_line, kSwitchNames);
   }
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  if (!performance_manager::ShouldPreReadDllInChild()) {
-    command_line->AppendSwitch(switches::kNoPreReadMainDll);
-  }
-
-  base::TimeTicks::MaybeAddHighResolutionTimeTicksSwitch(command_line);
 #endif
 
   ThreadProfilerConfiguration::Get()->AppendCommandLineSwitchForChildProcess(
@@ -4107,7 +4046,7 @@ GetPreferredColorScheme(const WebPreferences& web_prefs,
 
 std::optional<SkColor> GetRootScrollbarThemeColor(WebContents* web_contents) {
   bool root_scrollbar_follows_browser_theme = false;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
   root_scrollbar_follows_browser_theme = base::FeatureList::IsEnabled(
       blink::features::kRootScrollbarFollowsBrowserTheme);
 #endif
@@ -4910,7 +4849,7 @@ void ChromeContentBrowserClient::OverrideWebPreferences(
   web_prefs->touch_drag_drop_enabled =
       base::FeatureList::IsEnabled(features::kTouchDragAndDrop);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   web_prefs->touch_dragend_context_menu =
       base::FeatureList::IsEnabled(features::kTouchDragAndDrop);
 #endif
@@ -5149,11 +5088,9 @@ void ChromeContentBrowserClient::GetAdditionalAllowedSchemesForFileSystem(
   additional_allowed_schemes->push_back(content::kChromeDevToolsScheme);
   additional_allowed_schemes->push_back(content::kChromeUIScheme);
   additional_allowed_schemes->push_back(content::kChromeUIUntrustedScheme);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   additional_allowed_schemes->push_back(webapps::kIsolatedAppScheme);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   for (auto& extra_part : extra_parts_) {
     extra_part->GetAdditionalAllowedSchemesForFileSystem(
         additional_allowed_schemes);
@@ -5245,254 +5182,6 @@ void ChromeContentBrowserClient::GetAdditionalMappedFilesForChildProcess(
         // BUILDFLAG(IS_CHROMEOS)
 }
 #endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_WIN)
-std::wstring ChromeContentBrowserClient::GetAppContainerSidForSandboxType(
-    sandbox::mojom::Sandbox sandbox_type,
-    AppContainerFlags flags) {
-  // TODO(wfh): Add support for more process types here. crbug.com/41182255
-  switch (sandbox_type) {
-    case sandbox::mojom::Sandbox::kRenderer:
-      if (flags & AppContainerFlags::kAppContainerFlagDisableAppContainer) {
-        return std::wstring();
-      }
-      return std::wstring(install_static::GetSandboxSidPrefix()) + L"129201922";
-    case sandbox::mojom::Sandbox::kUtility:
-      return std::wstring();
-    case sandbox::mojom::Sandbox::kGpu:
-      return std::wstring();
-    case sandbox::mojom::Sandbox::kOnDeviceModelExecution:
-      return std::wstring();
-    case sandbox::mojom::Sandbox::kWebNNModelCompilation:
-      return std::wstring();
-    case sandbox::mojom::Sandbox::kNoSandbox:
-    case sandbox::mojom::Sandbox::kNoSandboxAndElevatedPrivileges:
-    case sandbox::mojom::Sandbox::kXrCompositing:
-    case sandbox::mojom::Sandbox::kNetwork:
-    case sandbox::mojom::Sandbox::kCdm:
-#if BUILDFLAG(ENABLE_OOP_PRINTING)
-    case sandbox::mojom::Sandbox::kPrintBackend:
-#endif
-    case sandbox::mojom::Sandbox::kPrintCompositor:
-    case sandbox::mojom::Sandbox::kAudio:
-    case sandbox::mojom::Sandbox::kScreenAI:
-    case sandbox::mojom::Sandbox::kSpeechRecognition:
-    case sandbox::mojom::Sandbox::kPdfConversion:
-    case sandbox::mojom::Sandbox::kService:
-    case sandbox::mojom::Sandbox::kServiceWithJit:
-    case sandbox::mojom::Sandbox::kIconReader:
-    case sandbox::mojom::Sandbox::kMediaFoundationCdm:
-    case sandbox::mojom::Sandbox::kProxyResolver:
-      // Should never reach here.
-      NOTREACHED();
-  }
-}
-
-bool ChromeContentBrowserClient::IsAppContainerDisabled(
-    sandbox::mojom::Sandbox sandbox_type) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-
-  constexpr auto kSandboxPolicyPrefMapping =
-      base::MakeFixedFlatMap<sandbox::mojom::Sandbox, std::string_view>({
-          {sandbox::mojom::Sandbox::kRenderer,
-           prefs::kRendererAppContainerEnabled},
-          {sandbox::mojom::Sandbox::kPrintCompositor,
-           prefs::kPrintingLPACSandboxEnabled},
-      });
-  auto iter = kSandboxPolicyPrefMapping.find(sandbox_type);
-
-  if (iter == kSandboxPolicyPrefMapping.end()) {
-    return false;
-  }
-
-  PrefService* local_state = g_browser_process->local_state();
-  const PrefService::Preference* pref =
-      local_state->FindPreference(iter->second);
-  // App Container is disabled if managed pref is set to false.
-  if (pref && pref->IsManaged() && !pref->GetValue()->GetBool()) {
-    return true;
-  }
-
-  return false;
-}
-
-std::wstring
-ChromeContentBrowserClient::GetLPACCapabilityNameForNetworkService() {
-  // Use a different LPAC capability name for each Chrome channel so network
-  // service data between hannels is isolated.
-  version_info::Channel channel = chrome::GetChannel();
-  switch (channel) {
-    case version_info::Channel::CANARY:
-      return std::wstring(L"lpacChromeCanaryNetworkSandbox");
-    case version_info::Channel::BETA:
-      return std::wstring(L"lpacChromeBetaNetworkSandbox");
-    case version_info::Channel::DEV:
-      return std::wstring(L"lpacChromeDevNetworkSandbox");
-    case version_info::Channel::STABLE:
-      return std::wstring(L"lpacChromeStableNetworkSandbox");
-    case version_info::Channel::UNKNOWN:
-      return std::wstring(L"lpacChromeNetworkSandbox");
-  }
-}
-
-// Note: Only use sparingly to add Chrome specific sandbox functionality here.
-// Other code should reside in the content layer. Changes to this function
-// should be reviewed by the security team.
-bool ChromeContentBrowserClient::PreSpawnChild(
-    sandbox::TargetConfig* config,
-    sandbox::mojom::Sandbox sandbox_type,
-    ChildSpawnFlags flags) {
-  DCHECK(!config->IsConfigured());
-// Does not work under component build because all the component DLLs would need
-// to be manually added and maintained. Does not work under ASAN build because
-// ASAN has not yet fully initialized its instrumentation by the time the CIG
-// intercepts run.
-#if !defined(COMPONENT_BUILD) && !defined(ADDRESS_SANITIZER)
-  bool enforce_code_integrity = false;
-
-  switch (sandbox_type) {
-    case sandbox::mojom::Sandbox::kRenderer:
-      enforce_code_integrity = true;
-      break;
-    case sandbox::mojom::Sandbox::kNetwork:
-      enforce_code_integrity = base::FeatureList::IsEnabled(
-          sandbox::policy::features::kNetworkServiceCodeIntegrity);
-      break;
-    case sandbox::mojom::Sandbox::kWebNNModelCompilation:
-      // Enable startup CIG so non-MS-signed DLLs cannot be injected into
-      // the WebNN compiler process. The ONNX Runtime and execution-provider
-      // DLLs that ship with Chrome are Microsoft-signed and load fine
-      // under CIG. chrome.dll / chrome_elf.dll are allowed below via
-      // AllowExtraDll(). For IHV testing with non-MS-signed EPs (e.g.
-      // --webnn-ort-library-path-for-testing), pass
-      // --allow-third-party-modules to disable startup CIG.
-      enforce_code_integrity =
-          !base::CommandLine::ForCurrentProcess()->HasSwitch(
-              sandbox::policy::switches::kAllowThirdPartyModules);
-      break;
-    case sandbox::mojom::Sandbox::kServiceWithJit:
-      enforce_code_integrity = true;
-      break;
-    case sandbox::mojom::Sandbox::kUtility:
-    case sandbox::mojom::Sandbox::kGpu:
-    case sandbox::mojom::Sandbox::kNoSandbox:
-    case sandbox::mojom::Sandbox::kNoSandboxAndElevatedPrivileges:
-    case sandbox::mojom::Sandbox::kXrCompositing:
-    case sandbox::mojom::Sandbox::kCdm:
-#if BUILDFLAG(ENABLE_PRINTING)
-    case sandbox::mojom::Sandbox::kPrintBackend:
-#endif
-    case sandbox::mojom::Sandbox::kPrintCompositor:
-    case sandbox::mojom::Sandbox::kScreenAI:
-    case sandbox::mojom::Sandbox::kAudio:
-    case sandbox::mojom::Sandbox::kOnDeviceModelExecution:
-    case sandbox::mojom::Sandbox::kSpeechRecognition:
-    case sandbox::mojom::Sandbox::kPdfConversion:
-    case sandbox::mojom::Sandbox::kService:
-    case sandbox::mojom::Sandbox::kIconReader:
-    case sandbox::mojom::Sandbox::kMediaFoundationCdm:
-    case sandbox::mojom::Sandbox::kProxyResolver:
-      break;
-  }
-
-  if (!enforce_code_integrity) {
-    return true;
-  }
-
-  // Only enable signing mitigation if launching from chrome.exe.
-  base::FilePath exe_path;
-  if (!base::PathService::Get(base::FILE_EXE, &exe_path)) {
-    return true;
-  }
-  if (chrome::kBrowserProcessExecutableName != exe_path.BaseName().value()) {
-    return true;
-  }
-
-  sandbox::MitigationFlags mitigations = config->GetProcessMitigations();
-  mitigations |= sandbox::MITIGATION_FORCE_MS_SIGNED_BINS;
-  if (base::FeatureList::IsEnabled(
-          sandbox::policy::features::kWinSboxModuleTamperingProtection)) {
-    mitigations |= sandbox::MITIGATION_MODULE_TAMPERING_PROTECTION;
-  }
-  sandbox::ResultCode result = config->SetProcessMitigations(mitigations);
-  if (result != sandbox::SBOX_ALL_OK) {
-    return false;
-  }
-
-  // Allow loading chrome.dll and chrome_elf.dll for most process types.
-  static constexpr auto kChildDlls = {chrome::kBrowserResourcesDll,
-                                      chrome::kElfDll};
-#if BUILDFLAG(ENABLE_SEPARATE_RENDERER_BINARY)
-  // Allow loading chrome_renderer.dll and chrome_elf.dll for renderers.
-  static constexpr auto kRendererDlls = {chrome::kRendererDll, chrome::kElfDll};
-  const auto& extra_dlls = sandbox_type == sandbox::mojom::Sandbox::kRenderer
-                               ? kRendererDlls
-                               : kChildDlls;
-#else
-  const auto& extra_dlls = kChildDlls;
-#endif
-  for (const auto* dll : extra_dlls) {
-    result = config->AllowExtraDll(GetModulePath(dll).value());
-    if (result != sandbox::SBOX_ALL_OK) {
-      return false;
-    }
-  }
-#endif  // !defined(COMPONENT_BUILD) && !defined(ADDRESS_SANITIZER)
-  return true;
-}
-
-// Note: Only use sparingly to add Chrome specific sandbox functionality here.
-// Other code should reside in the content layer. Changes to this function
-// should be reviewed by the security team.
-bool ChromeContentBrowserClient::IsUtilityCetCompatible(
-    const std::string& utility_sub_type) {
-  if (utility_sub_type == chrome::mojom::UtilWin::Name_) {
-    return false;
-  }
-  return true;
-}
-
-void ChromeContentBrowserClient::SessionEnding(
-    std::optional<DWORD> control_type) {
-  chrome::SessionEnding();
-}
-
-bool ChromeContentBrowserClient::ShouldEnableAudioProcessHighPriority() {
-  return IsAudioProcessHighPriorityEnabled();
-}
-
-bool ChromeContentBrowserClient::ShouldRestrictCoreSharingOnRenderer() {
-  if (base::win::GetVersion() < base::win::Version::WIN11_24H2) {
-    return false;
-  }
-
-  if (base::FeatureList::IsEnabled(
-          sandbox::policy::features::kWinSboxRestrictCoreSharingOnRenderer)) {
-    return true;
-  }
-
-  PrefService* local_state = nullptr;
-  if (g_browser_process) {
-    local_state = g_browser_process->local_state();
-  } else {
-    local_state = startup_data_.chrome_feature_list_creator()->local_state();
-  }
-
-  const PrefService::Preference* pref =
-      local_state->FindPreference(prefs::kRestrictCoreSharingOnRenderer);
-  // CPU core sharing is disabled if managed pref is set to false.
-  if (pref && pref->IsManaged() && pref->GetValue()->is_bool()) {
-    return pref->GetValue()->GetBool();
-  }
-
-  return false;
-}
-
-std::optional<std::wstring>
-ChromeContentBrowserClient::GetWindowsSecurityAttributeName() const {
-  return installer::GetIsolationAttributeName();
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 void ChromeContentBrowserClient::
     RegisterMojoBinderPoliciesForSameOriginPrerendering(
@@ -6137,8 +5826,7 @@ ChromeContentBrowserClient::CreateNonNetworkNavigationURLLoaderFactory(
         profile, content::ChildProcessHost::kInvalidUniqueID);
   }
 #endif  // BUILDFLAG(IS_CHROMEOS)
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   if (scheme == webapps::kIsolatedAppScheme) {
     if (content::AreIsolatedWebAppsEnabled(browser_context) &&
         !browser_context->ShutdownStarted()) {
@@ -6149,8 +5837,7 @@ ChromeContentBrowserClient::CreateNonNetworkNavigationURLLoaderFactory(
 
     return {};
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE) || BUILDFLAG(IS_CHROMEOS) ||
         // !BUILDFLAG(IS_ANDROID)
 
@@ -6209,8 +5896,7 @@ void ChromeContentBrowserClient::
   DCHECK(browser_context);
   DCHECK(factories);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   if (content::AreIsolatedWebAppsEnabled(browser_context) &&
       !browser_context->ShutdownStarted()) {
     std::optional<url::Origin> app_origin;
@@ -6234,8 +5920,7 @@ void ChromeContentBrowserClient::
                        web_app::IsolatedWebAppURLLoaderFactory::Create(
                            browser_context, app_origin, enforce_same_origin));
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   DCHECK(!ChromeContentBrowserClientExtensionsPart::
@@ -6255,8 +5940,7 @@ void ChromeContentBrowserClient::
   DCHECK(browser_context);
   DCHECK(factories);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   if (content::AreIsolatedWebAppsEnabled(browser_context) &&
       !browser_context->ShutdownStarted()) {
     factories->emplace(webapps::kIsolatedAppScheme,
@@ -6264,8 +5948,7 @@ void ChromeContentBrowserClient::
                            browser_context, /*app_origin=*/std::nullopt,
                            /*enforce_same_origin=*/true));
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   if (ChromeContentBrowserClientExtensionsPart::AreExtensionsDisabledForProfile(
@@ -6528,8 +6211,7 @@ void ChromeContentBrowserClient::
   }
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   {
     auto* rph = content::RenderProcessHost::FromID(render_process_id);
     content::BrowserContext* browser_context = rph->GetBrowserContext();
@@ -6553,8 +6235,7 @@ void ChromeContentBrowserClient::
       }
     }
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   content::BrowserContext* browser_context =
@@ -6640,13 +6321,11 @@ void ChromeContentBrowserClient::WillCreateURLLoaderFactory(
   }
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   // Install the HTTP Header Injection proxying factory.
   enterprise_custom_headers::HttpHeaderInjectionProxyingURLLoaderFactory::
       MaybeProxyRequest(browser_context, factory_builder);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
   signin::ProxyingURLLoaderFactory::MaybeProxyRequest(
       frame, type == URLLoaderFactoryType::kNavigation, request_initiator,
@@ -6686,8 +6365,7 @@ void ChromeContentBrowserClient::WillCreateURLLoaderFactory(
   MaybeSetTargetNetwork(GetBoundNetworkFromRenderFrameHost(frame),
                         factory_builder, is_for_network_service);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   // WARNING: This must be the last wrapper in the chain for
   // TrustedURLLoaderHeaderClient. This ensures that our client is the outermost
   // wrapper of `header_client`, allowing us to apply enterprise headers AFTER
@@ -6695,8 +6373,7 @@ void ChromeContentBrowserClient::WillCreateURLLoaderFactory(
   // guaranteeing enterprise header injection precedence over extensions.
   enterprise_custom_headers::MaybeWrapTrustedURLLoaderHeaderClient(
       browser_context, header_client);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 }
 
 std::vector<std::unique_ptr<content::URLLoaderRequestInterceptor>>
@@ -6793,8 +6470,7 @@ ChromeContentBrowserClient::GetWebSocketOptions(
   content::ContentBrowserClient::WebSocketOptions options;
   options.options = network::mojom::kWebSocketOptionNone;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   if (frame) {
     enterprise_custom_headers::MaybeCreateWebSocketHeaderClient(
         frame->GetBrowserContext(), &options.header_client);
@@ -7213,8 +6889,7 @@ bool ChromeContentBrowserClient::HandleExternalProtocol(
     mojo::PendingRemote<network::mojom::URLLoaderFactory>* out_factory) {
   CHECK(content::BrowserThread::CurrentlyOn(content::BrowserThread::UI));
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // Handle the google-chrome:// scheme (and chromium://).
   // If the scheme is present, we strip it and navigate to the inner URL.
   // This avoids launching a new browser instance via the OS handler.
@@ -7365,8 +7040,7 @@ bool ChromeContentBrowserClient::HandleWebUI(
                                  chrome::kChromeUIHelpHost);
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
   // Rewrite chrome://settings/addresses to chrome://settings/contactInfo.
   if (url->SchemeIs(content::kChromeUIScheme) &&
@@ -7386,8 +7060,7 @@ bool ChromeContentBrowserClient::HandleWebUI(
     replacements.SetPathStr(chrome::kChromeUISearchSettingsPath);
     *url = url->ReplaceComponents(replacements);
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(CHROME_ROOT_STORE_CERT_MANAGEMENT_UI)
   if (url->SchemeIs(content::kChromeUIScheme) &&
@@ -8072,8 +7745,7 @@ bool ChromeContentBrowserClient::
 void ChromeContentBrowserClient::
     GrantAdditionalRequestPrivilegesToWorkerProcess(int child_id,
                                                     const GURL& script_url) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   // IWA Service Workers need to be explicitly granted access to their origin
   // because isolated-app: isn't a web-safe scheme that can be accessed by
   // default.
@@ -8081,8 +7753,7 @@ void ChromeContentBrowserClient::
     ChildProcessSecurityPolicy::GetInstance()->GrantRequestOrigin(
         child_id, url::Origin::Create(script_url));
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   if (base::FeatureList::IsEnabled(
@@ -8599,8 +8270,7 @@ ChromeContentBrowserClient::GetAlternativeErrorPageOverrideInfo(
     }
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   if (content::AreIsolatedWebAppsEnabled(browser_context) &&
       IsIsolatedWebAppUrl(url)) {
     content::mojom::AlternativeErrorPageOverrideInfoPtr
@@ -8613,8 +8283,7 @@ ChromeContentBrowserClient::GetAlternativeErrorPageOverrideInfo(
       return alternative_error_page_override_info;
     }
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
   if (error_code == net::ERR_INTERNET_DISCONNECTED) {
     content::mojom::AlternativeErrorPageOverrideInfoPtr
@@ -9208,7 +8877,7 @@ bool ChromeContentBrowserClient::ShouldSuppressAXLoadComplete(
 void ChromeContentBrowserClient::ShowCaptionSettings(
     content::RenderFrameHost* rfh) {
   CHECK(rfh);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // Windows and Mac caption styles come from the OS settings. Open the native
   // dialog to allow users to change them.
   captions::CaptionSettingsDialog::ShowCaptionSettingsDialog();
@@ -9392,27 +9061,6 @@ bool ChromeContentBrowserClient::ShouldDispatchPagehideDuringCommit(
          !template_url_service->IsSearchResultsPageFromDefaultSearchProvider(
              destination_url);
 }
-
-#if BUILDFLAG(IS_WIN)
-void ChromeContentBrowserClient::OnTracingServiceStarted() {
-  CHECK(!windows_system_tracing_client_);
-  if (base::FeatureList::IsEnabled(kWindowsSystemTracing)) {
-    windows_system_tracing_client_ = WindowsSystemTracingClient::Create(
-        install_static::GetTracingServiceClsid(),
-        install_static::GetTracingServiceIid());
-    windows_system_tracing_client_->Start(base::BindOnce(
-        [](base::ProcessId pid,
-           mojo::PendingRemote<tracing::mojom::TracedProcess> remote_process) {
-          content::GetTracingService().AddClient(
-              tracing::mojom::ClientInfo::New(pid, std::move(remote_process)));
-        }));
-  }
-}
-
-void ChromeContentBrowserClient::OnTracingServiceStopped() {
-  windows_system_tracing_client_.reset();
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 bool ChromeContentBrowserClient::ShouldEnableSubframeZoom() {
 #if BUILDFLAG(ENABLE_PDF)

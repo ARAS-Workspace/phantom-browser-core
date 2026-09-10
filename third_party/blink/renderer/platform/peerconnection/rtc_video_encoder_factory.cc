@@ -441,9 +441,9 @@ RTCVideoEncoderFactory::RTCVideoEncoderFactory(
   // We may not need to add check for media::kPlatformHEVCEncoderSupport here
   // but it's added for consistency with other codecs like H264 and AV1.
   if (
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
       !base::FeatureList::IsEnabled(media::kPlatformHEVCEncoderSupport) ||
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
       !base::FeatureList::IsEnabled(::features::kWebRtcAllowH265Send)) {
     disabled_profiles_.emplace_back(media::HEVCPROFILE_MAIN);
     disabled_profiles_.emplace_back(media::HEVCPROFILE_MAIN10);

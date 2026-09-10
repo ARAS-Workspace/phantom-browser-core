@@ -258,16 +258,6 @@ class VideoResourceUpdaterTest : public testing::Test {
     return video_frame;
   }
 
-#if BUILDFLAG(IS_WIN)
-  scoped_refptr<VideoFrame> CreateTestDCompSurfaceVideoFrame() {
-    scoped_refptr<VideoFrame> video_frame = CreateTestHardwareVideoFrame(
-        viz::SinglePlaneFormat::kRGBA_8888, PIXEL_FORMAT_ABGR, kSRGBColorSpace,
-        GL_TEXTURE_EXTERNAL_OES, /*needs_raster_access=*/false);
-    video_frame->metadata().dcomp_surface = true;
-    return video_frame;
-  }
-#endif
-
   size_t GetSharedImageCount() {
     return context_provider_->SharedImageInterface()->shared_image_count();
   }
@@ -782,51 +772,6 @@ TEST_F(VideoResourceUpdaterTest, CreateForHardwarePlanes_TextureQuad) {
             resource.resource.texture_target());
   EXPECT_EQ(0u, GetSharedImageCount());
 }
-
-#if BUILDFLAG(IS_WIN)
-// Check that a video frame marked as containing a DComp surface turns into a
-// texture draw quad that is required for overlay.
-TEST_F(VideoResourceUpdaterTest, CreateForHardwarePlanes_DCompSurface) {
-  std::unique_ptr<VideoResourceUpdater> updater = CreateUpdaterForHardware();
-  EXPECT_EQ(0u, GetSharedImageCount());
-  scoped_refptr<VideoFrame> video_frame = CreateTestDCompSurfaceVideoFrame();
-
-  VideoFrameExternalResource resource =
-      updater->CreateExternalResourceFromVideoFrame(video_frame);
-  EXPECT_TRUE(resource.release_callback);
-  EXPECT_EQ((GLenum)GL_TEXTURE_EXTERNAL_OES,
-            resource.resource.texture_target());
-  EXPECT_EQ(0u, GetSharedImageCount());
-
-  updater->ObtainFrameResource(video_frame);
-
-  std::unique_ptr<viz::CompositorRenderPass> pass =
-      viz::CompositorRenderPass::Create();
-  pass->SetNew(/*pass_id=*/viz::CompositorRenderPassId{1},
-               /*output_rect=*/gfx::Rect(video_frame->coded_size()),
-               /*damage_rect=*/gfx::Rect(),
-               /*transform_to_root_target=*/gfx::Transform());
-  updater->AppendQuad(
-      /*render_pass=*/pass.get(), video_frame,
-      /*transform=*/gfx::Transform(),
-      /*quad_rect=*/gfx::Rect(video_frame->coded_size()),
-      /*visible_quad_rect=*/gfx::Rect(video_frame->coded_size()),
-      gfx::MaskFilterInfo(), /*clip_rect=*/std::nullopt,
-      /*context_opaque=*/true, /*draw_opacity=*/1.0,
-      /*sorting_context_id=*/0);
-
-  EXPECT_EQ(1u, pass->quad_list.size());
-
-  const viz::TextureDrawQuad* quad =
-      pass->quad_list.ElementAt(0)->DynamicCast<viz::TextureDrawQuad>();
-  EXPECT_NE(nullptr, quad);
-  EXPECT_EQ(gfx::ProtectedVideoType::kHardwareProtected,
-            quad->protected_video_type);
-  EXPECT_EQ(viz::OverlayPriority::kRequired, quad->overlay_priority_hint);
-
-  updater->ReleaseFrameResource();
-}
-#endif
 
 // Passthrough the sync token returned by the compositor if we don't have an
 // existing release sync token.

@@ -4181,13 +4181,7 @@ IN_PROC_BROWSER_TEST_F(DownloadContentTest,
   DownloadManagerForShell(shell())->GetAllDownloads(&downloads);
   ASSERT_EQ(1u, downloads.size());
   base::FilePath file_name = downloads[0]->GetTargetFilePath().BaseName();
-#if BUILDFLAG(IS_WIN)
-  // Windows file extension depends on system registry.
-  EXPECT_TRUE(file_name.value() == FILE_PATH_LITERAL("download.htm") ||
-              file_name.value() == FILE_PATH_LITERAL("download.html"));
-#else
   EXPECT_EQ(FILE_PATH_LITERAL("download.html"), file_name.value());
-#endif
 
   ASSERT_TRUE(origin_one.ShutdownAndWaitUntilComplete());
   ASSERT_TRUE(origin_two.ShutdownAndWaitUntilComplete());

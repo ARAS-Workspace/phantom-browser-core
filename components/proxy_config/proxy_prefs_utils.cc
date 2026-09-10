@@ -64,7 +64,7 @@ net::ProxyChain ProxyOverrideRuleProxyFromString(std::string_view raw_value) {
 bool ProxyOverrideRulesAllowed(const PrefService* pref_service,
                                policy::PolicyService* policy_service) {
   CHECK(pref_service);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   if (pref_service->GetInteger(prefs::kEnableProxyOverrideRulesForAllUsers) ==
       1) {
     return true;
@@ -87,9 +87,9 @@ bool ProxyOverrideRulesAllowed(const PrefService* pref_service,
            (pref->IsManaged() &&
             pref_service->GetInteger(prefs::kProxyOverrideRulesScope) ==
                 policy::POLICY_SCOPE_USER));
-#else   // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#else
   return true;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 }
 
 }  // namespace proxy_config

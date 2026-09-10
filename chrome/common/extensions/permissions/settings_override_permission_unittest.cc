@@ -89,7 +89,7 @@ TEST_F(SettingsOverridePermissionTest, HomePage) {
   const PermissionSet& permission_set =
       extension->permissions_data()->active_permissions();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_TRUE(permission_set.HasAPIPermission(APIPermissionID::kHomepage));
   EXPECT_TRUE(VerifyOnePermissionMessage(
       extension->permissions_data(), "Change your home page to: google.com"));
@@ -107,7 +107,7 @@ TEST_F(SettingsOverridePermissionTest, StartupPages) {
   const PermissionSet& permission_set =
       extension->permissions_data()->active_permissions();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_TRUE(permission_set.HasAPIPermission(APIPermissionID::kStartupPages));
   EXPECT_TRUE(VerifyOnePermissionMessage(
       extension->permissions_data(), "Change your start page to: startup.com"));
@@ -125,7 +125,7 @@ TEST_F(SettingsOverridePermissionTest, SearchSettings) {
   const PermissionSet& permission_set =
       extension->permissions_data()->active_permissions();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_TRUE(
       permission_set.HasAPIPermission(APIPermissionID::kSearchProvider));
   EXPECT_TRUE(
@@ -146,7 +146,7 @@ TEST_F(SettingsOverridePermissionTest, All) {
   const PermissionSet& permission_set =
       extension->permissions_data()->active_permissions();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_TRUE(permission_set.HasAPIPermission(APIPermissionID::kHomepage));
   EXPECT_TRUE(permission_set.HasAPIPermission(APIPermissionID::kStartupPages));
   EXPECT_TRUE(
@@ -165,7 +165,7 @@ TEST_F(SettingsOverridePermissionTest, Some) {
   const PermissionSet& permission_set =
       extension->permissions_data()->active_permissions();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_TRUE(permission_set.HasAPIPermission(APIPermissionID::kHomepage));
   EXPECT_TRUE(
       permission_set.HasAPIPermission(APIPermissionID::kSearchProvider));

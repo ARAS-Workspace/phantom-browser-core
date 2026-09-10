@@ -15,10 +15,6 @@
 #include "components/crash/core/common/crash_key.h"
 #include "load_cdm_uma_helper.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 #if BUILDFLAG(ENABLE_CDM_HOST_VERIFICATION)
 #include "base/feature_list.h"
 #include "media/base/media_switches.h"
@@ -165,12 +161,6 @@ bool CdmModule::Initialize(const base::FilePath& cdm_path) {
 
   static crash_reporter::CrashKeyString<32> cdm_version_key("cdm-version");
   cdm_version_key.Set(cdm_version);
-
-#if BUILDFLAG(IS_WIN)
-  // Load DXVA before sandbox lockdown to give CDM access to Output Protection
-  // Manager (OPM).
-  ::LoadLibraryA("dxva2.dll");
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(ENABLE_CDM_HOST_VERIFICATION)
   if (base::FeatureList::IsEnabled(media::kCdmHostVerification))

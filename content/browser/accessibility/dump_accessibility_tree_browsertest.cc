@@ -31,9 +31,6 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
 
 // Tests that use @DEFAULT_ACTION-ON to open a popup for an <input> (such as
 // color or date/time pickers) never complete on Android, where native pickers
@@ -138,18 +135,10 @@ void DumpAccessibilityTreeTest::ChooseFeatures(
   enabled_features->emplace_back(blink::features::kUserMediaElement);
   enabled_features->emplace_back(blink::features::kUserMediaElementLegacy);
   enabled_features->emplace_back(blink::features::kInstallElement);
-#if BUILDFLAG(IS_WIN)
-  // Enable UIA MathML support for dump tests
-  enabled_features->emplace_back(features::kUiaMathMlSupport);
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_ANDROID)
   disabled_features->emplace_back(
       features::kAccessibilityPopulateSupplementalDescriptionApi);
 #endif  // BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_WIN)
-  // Enable UIA MathML support on Windows.
-  enabled_features->emplace_back(features::kUiaMathMlSupport);
-#endif  // BUILDFLAG(IS_WIN)
   DumpAccessibilityTestBase::ChooseFeatures(enabled_features,
                                             disabled_features);
 }
@@ -755,12 +744,6 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
 }
 
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest, AccessibilityAriaActions) {
-#if BUILDFLAG(IS_WIN)
-  if (GetParam() == ui::AXApiType::kWinUIA &&
-      base::win::GetVersion() < base::win::Version::WIN11) {
-    GTEST_SKIP() << "UIA AccessibleActions custom property requires Win11+.";
-  }
-#endif
   RunAriaTest(FILE_PATH_LITERAL("aria-actions.html"));
 }
 
@@ -3063,13 +3046,8 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
 // The /blink test pass is different when run on Windows vs other OSs.
 // So separate into two different tests: <input type="datetime-local"> has a
 // ", " inserted between fields on Windows.
-#if BUILDFLAG(IS_WIN)
-#define AccessibilityInputDateWithPopupOpenMultiple_TestFile \
-  FILE_PATH_LITERAL("input-date-with-popup-open-multiple-for-win.html")
-#else
 #define AccessibilityInputDateWithPopupOpenMultiple_TestFile \
   FILE_PATH_LITERAL("input-date-with-popup-open-multiple.html")
-#endif
 
 IN_PROC_BROWSER_TEST_P(
     DumpAccessibilityTreeTest,
@@ -3280,12 +3258,7 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest, AccessibilityInputTime) {
 
 // The /blink test pass is different when run on Windows vs other OSs.
 // So separate into two different tests.
-#if BUILDFLAG(IS_WIN)
-#define AccessibilityInputTypes_TestFile \
-  FILE_PATH_LITERAL("input-types-for-win.html")
-#else
 #define AccessibilityInputTypes_TestFile FILE_PATH_LITERAL("input-types.html")
-#endif
 
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest, AccessibilityInputTypes) {
   RunHtmlTest(AccessibilityInputTypes_TestFile);
@@ -4404,11 +4377,7 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest, NameImgLabelledbyInputsTree) {
 }
 
 // TODO(crbug.com/386918219): Flaky on UIA
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ReloadSelectionCrash DISABLED_ReloadSelectionCrash
-#else
 #define MAYBE_ReloadSelectionCrash ReloadSelectionCrash
-#endif
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeTest,
                        MAYBE_ReloadSelectionCrash) {
   RunCrashTest(FILE_PATH_LITERAL("reload-selection-crash.html"));

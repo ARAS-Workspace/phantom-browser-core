@@ -21,10 +21,6 @@
 #include "mojo/public/cpp/bindings/remote.h"
 #include "third_party/blink/public/web/web_text_check_client.h"
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-#include <unordered_map>
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-
 class SpellCheck;
 struct SpellCheckResult;
 
@@ -48,15 +44,6 @@ class SpellCheckProvider : public content::RenderFrameObserver,
  public:
   using WebTextCheckCompletions =
       base::IDMap<std::unique_ptr<blink::WebTextCheckingCompletion>>;
-
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-  // A struct to hold information related to hybrid spell check requests.
-  struct HybridSpellCheckRequestInfo {
-    bool used_hunspell;
-    bool used_native;
-    base::TimeTicks request_start_ticks;
-  };
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 
   SpellCheckProvider(content::RenderFrame* render_frame,
                      SpellCheck* spellcheck);
@@ -166,19 +153,6 @@ class SpellCheckProvider : public content::RenderFrameObserver,
       const std::u16string& text,
       const std::vector<spellcheck::SpellingMarker>& spelling_markers);
 
-#if BUILDFLAG(IS_WIN)
-  // Callback for when spellcheck service has been initialized on demand.
-  void OnRespondInitializeDictionaries(
-      const std::u16string& text,
-      std::vector<spellcheck::mojom::SpellCheckBDictLanguagePtr> dictionaries,
-      const std::vector<std::string>& custom_words,
-      bool enable);
-
-  // Flag indicating that the spellcheck service has been initialized and
-  // the dictionaries have been loaded initially. Used to avoid an unnecessary
-  // mojo call to determine this in every text check request.
-  bool dictionaries_loaded_ = false;
-#endif  // BUILDFLAG(IS_WIN)
 #endif  // BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 
   // Holds ongoing spellchecking operations.
@@ -211,10 +185,6 @@ class SpellCheckProvider : public content::RenderFrameObserver,
   // Tracks whether a console warning has already been emitted for this
   // document.
   bool document_custom_dictionary_overflow_warned_ = false;
-
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-  std::unordered_map<int, HybridSpellCheckRequestInfo> hybrid_requests_info_;
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 
   base::WeakPtrFactory<SpellCheckProvider> weak_factory_{this};
 };

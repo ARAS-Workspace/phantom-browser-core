@@ -95,7 +95,7 @@ namespace extensions {
 namespace {
 
 bool ExpectChromeAppsDefaultEnabled() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   return false;
 #else
   return true;
@@ -158,7 +158,7 @@ class TabsAddedObserver : public TabStripModelObserver {
   std::vector<raw_ptr<content::WebContents, VectorExperimental>> observed_tabs_;
 };
 
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_CHROMEOS)
 bool CopyTestDataAndGetTestFilePath(const base::FilePath& test_data_file,
                                     const base::FilePath& temp_dir,
                                     const char* filename,
@@ -171,7 +171,7 @@ bool CopyTestDataAndGetTestFilePath(const base::FilePath& test_data_file,
   *file_path = path;
   return true;
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_WIN)
+#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 class PlatformAppWithFileBrowserTest : public PlatformAppBrowserTest {
  public:
@@ -495,8 +495,7 @@ IN_PROC_BROWSER_TEST_F(PlatformAppBrowserTest,
 
 // Failing on some Win and Linux buildbots.  See crbug.com/41095977.
 // TODO(crbug.com/40846460): Fix flakiness on macOS and re-enable this test.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #define MAYBE_Iframes DISABLED_Iframes
 #else
 #define MAYBE_Iframes Iframes
@@ -565,11 +564,7 @@ IN_PROC_BROWSER_TEST_F(PlatformAppBrowserTest, DISABLED_Isolation) {
 }
 
 // See crbug.com/40321301
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ExtensionWindowingApis DISABLED_ExtensionWindowingApis
-#else
 #define MAYBE_ExtensionWindowingApis ExtensionWindowingApis
-#endif
 
 IN_PROC_BROWSER_TEST_F(PlatformAppBrowserTest, MAYBE_ExtensionWindowingApis) {
   // Initially there should be just the one browser window visible to the
@@ -667,7 +662,6 @@ IN_PROC_BROWSER_TEST_F(PlatformAppWithFileBrowserTest,
       << message_;
 }
 
-#if !BUILDFLAG(IS_WIN)
 // Tests that launch data is sent through for a file with an empty extension if
 // a handler accepts "".
 IN_PROC_BROWSER_TEST_F(PlatformAppWithFileBrowserTest,
@@ -699,7 +693,6 @@ IN_PROC_BROWSER_TEST_F(PlatformAppWithFileBrowserTest,
       "platform_apps/launch_file_with_any_extension", test_file))
       << message_;
 }
-#endif  //  !BUILDFLAG(IS_WIN)
 
 // Tests that launch data is sent through for a file with no extension if a
 // handler accepts *.
@@ -828,7 +821,7 @@ IN_PROC_BROWSER_TEST_F(PlatformAppBrowserTest, OpenLink) {
 
 // This appears to be unreliable.
 // TODO(stevenjb): Investigate and enable
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_AppWindowRestoreState DISABLED_AppWindowRestoreState
 #else
 #define MAYBE_AppWindowRestoreState AppWindowRestoreState

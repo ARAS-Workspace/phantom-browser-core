@@ -82,13 +82,6 @@ class StructTraits<remoting::mojom::DesktopCaptureOptionsDataView,
     return options.detect_updated_region();
   }
 
-#if BUILDFLAG(IS_WIN)
-  static bool allow_directx_capturer(
-      const ::webrtc::DesktopCaptureOptions& options) {
-    return options.allow_directx_capturer();
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   static bool Read(remoting::mojom::DesktopCaptureOptionsDataView data_view,
                    ::webrtc::DesktopCaptureOptions* out_options);
 };
@@ -621,46 +614,6 @@ struct EnumTraits<remoting::mojom::FileTransferError_Type,
     NOTREACHED();
   }
 };
-
-#if BUILDFLAG(IS_WIN)
-template <>
-class UnionTraits<
-    remoting::mojom::FileChooserResultDataView,
-    ::remoting::Result<base::FilePath,
-                       ::remoting::protocol::FileTransfer_Error>> {
- public:
-  static remoting::mojom::FileChooserResultDataView::Tag GetTag(
-      const ::remoting::Result<base::FilePath,
-                               ::remoting::protocol::FileTransfer_Error>&
-          result) {
-    if (result.is_success())
-      return remoting::mojom::FileChooserResultDataView::Tag::kFilepath;
-    else if (result.is_error())
-      return remoting::mojom::FileChooserResultDataView::Tag::kError;
-
-    NOTREACHED();
-  }
-
-  static const base::FilePath& filepath(
-      const ::remoting::Result<base::FilePath,
-                               ::remoting::protocol::FileTransfer_Error>&
-          result) {
-    return result.success();
-  }
-
-  static const ::remoting::protocol::FileTransfer_Error& error(
-      const ::remoting::Result<base::FilePath,
-                               ::remoting::protocol::FileTransfer_Error>&
-          result) {
-    return result.error();
-  }
-
-  static bool Read(
-      remoting::mojom::FileChooserResultDataView data_view,
-      ::remoting::Result<base::FilePath,
-                         ::remoting::protocol::FileTransfer_Error>* out_result);
-};
-#endif  // BUILDFLAG(IS_WIN)
 
 template <>
 class StructTraits<remoting::mojom::KeyboardLayoutDataView,
@@ -1692,13 +1645,6 @@ class StructTraits<remoting::mojom::SessionOptionsDataView,
     return options.enable_sck_capturer;
   }
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_WIN)
-  static std::optional<bool> allow_dxgi_capturer(
-      const ::remoting::SessionOptions& options) {
-    return options.allow_dxgi_capturer;
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   static std::optional<bool> disable_udp(
       const ::remoting::SessionOptions& options) {

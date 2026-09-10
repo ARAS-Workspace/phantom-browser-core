@@ -104,7 +104,7 @@ const ModuleCache::Module* AddNonNativeModule(
   return module_ptr;
 }
 
-#if (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_IOS) && !defined(ARCH_CPU_ARM64)) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_IOS) && !defined(ARCH_CPU_ARM64)
 #define MAYBE_TEST(TestSuite, TestName) TEST(TestSuite, TestName)
 #else
 #define MAYBE_TEST(TestSuite, TestName) TEST(TestSuite, DISABLED_##TestName)
@@ -120,8 +120,6 @@ MAYBE_TEST(ModuleCacheTest, GetDebugBasename) {
             module->GetDebugBasename().RemoveFinalExtension().value());
 #elif BUILDFLAG(IS_POSIX)
   EXPECT_EQ("base_unittests", module->GetDebugBasename().value());
-#elif BUILDFLAG(IS_WIN)
-  EXPECT_EQ(L"base_unittests.exe.pdb", module->GetDebugBasename().value());
 #endif
 }
 

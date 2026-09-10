@@ -35,10 +35,6 @@
 #include "third_party/search_engines_data/resources/definitions/prepopulated_engines.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace {
 
 void SetOverrides(sync_preferences::TestingPrefServiceSyncable* prefs,
@@ -524,7 +520,7 @@ TEST_F(DefaultSearchManagerTest,
   ExpectSimilar(builtin_engine, ignored_extension_engine.get());
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 TEST_F(DefaultSearchManagerTest, DefaultSearchReset) {
   base::test::ScopedFeatureList feature_list{
       switches::kResetTamperedDefaultSearchEngine};
@@ -691,55 +687,6 @@ TEST_F(DefaultSearchManagerTest, UserDseChangeDisablesResetNotification) {
   EXPECT_FALSE(pref_service()->GetBoolean(
       prefs::kUnacknowledgedDefaultSearchEngineResetOccurred));
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(DefaultSearchManagerTest,
-       DefaultSearchResetOnEnterpriseDeviceWithoutPolicy) {
-  base::test::ScopedFeatureList feature_list{
-      switches::kResetTamperedDefaultSearchEngine};
-  // Simulate an enterprise device.
-  base::win::ScopedDomainStateForTesting scoped_domain_state_(true);
-  base::HistogramTester histograms;
-
-  auto user_data = set_default_search_provider_data_pref("search_engine_A");
-  set_mirrored_default_search_provider_data_pref("search_engine_B");
-
-  auto manager = create_manager();
-
-  // The DSE prefs SHOULD be cleared since there is no policy enforcing it,
-  // even though it is an enterprise device.
-  EXPECT_TRUE(
-      pref_service()
-          ->GetDict(DefaultSearchManager::kDefaultSearchProviderDataPrefName)
-          .empty());
-  EXPECT_TRUE(
-      pref_service()
-          ->GetDict(
-              DefaultSearchManager::kMirroredDefaultSearchProviderDataPrefName)
-          .empty());
-
-  // DSE reset was executed.
-  histograms.ExpectUniqueSample(
-      DefaultSearchManager::kDefaultSearchEngineMirrorCheckOutcomeMetric,
-      static_cast<int>(
-          DefaultSearchManager::DefaultSearchEngineMirrorCheckOutcomeType::
-              kMirrorCheckReset),
-      1);
-
-  // Reset DID occur.
-  EXPECT_TRUE(pref_service()->GetBoolean(
-      prefs::kUnacknowledgedDefaultSearchEngineResetOccurred));
-  // A mirror check reset time IS recorded.
-  EXPECT_FALSE(pref_service()->GetTime(
-                   prefs::kDefaultSearchEngineMirrorCheckResetTimeStamp) ==
-               base::Time());
-
-  // The DSE should now be the fallback.
-  DefaultSearchManager::Source source;
-  manager->GetDefaultSearchEngine(&source);
-  EXPECT_EQ(DefaultSearchManager::FROM_FALLBACK, source);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_F(DefaultSearchManagerTest, DontResetDefaultSearchIfFeatureDisabled) {
   base::test::ScopedFeatureList feature_list;
@@ -950,4 +897,4 @@ TEST_F(DefaultSearchManagerTest, EncryptionResetSetsUnacknowledgedResetPref) {
                   prefs::kDefaultSearchEngineMirrorCheckResetTimeStamp) ==
               base::Time());
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)

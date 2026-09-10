@@ -87,34 +87,6 @@ void InitSkiaGraphiteFeatureParams(const base::Feature* feature) {
           feature, "enable_msaa_on_newer_intel",
           g_skia_graphite_feature_params.enable_msaa_on_newer_intel)
           .Get();
-#if BUILDFLAG(IS_WIN)
-  g_skia_graphite_feature_params.dawn_dumpwc_d3d_errors =
-      base::FeatureParam<bool>(
-          feature, "dawn_dumpwc_d3d_errors",
-          g_skia_graphite_feature_params.dawn_dumpwc_d3d_errors)
-          .Get();
-  g_skia_graphite_feature_params.dawn_disable_d3d_shader_optimizations =
-      base::FeatureParam<bool>(
-          feature, "dawn_disable_d3d_shader_optimizations",
-          g_skia_graphite_feature_params.dawn_disable_d3d_shader_optimizations)
-          .Get();
-  g_skia_graphite_feature_params.dawn_d3d11_delay_flush =
-      base::FeatureParam<bool>(
-          feature, "dawn_d3d11_delay_flush",
-          g_skia_graphite_feature_params.dawn_d3d11_delay_flush)
-          .Get();
-  g_skia_graphite_feature_params.flush_d3d11_tile_raster_commands_to_driver =
-      base::FeatureParam<bool>(
-          feature, "flush_d3d11_tile_raster_commands_to_driver",
-          g_skia_graphite_feature_params
-              .flush_d3d11_tile_raster_commands_to_driver)
-          .Get();
-  g_skia_graphite_feature_params.triple_buffered_dcomp_root_surface =
-      base::FeatureParam<bool>(
-          feature, "triple_buffered_dcomp_root_surface",
-          g_skia_graphite_feature_params.triple_buffered_dcomp_root_surface)
-          .Get();
-#endif
 
   GetGraphiteParamsInitFlag().Set();
 }
@@ -205,8 +177,8 @@ BASE_FEATURE(kSharedImageStubHighPriority, base::FEATURE_DISABLED_BY_DEFAULT);
 // DefaultEnableGpuRasterization has launched on Mac, Windows, ChromeOS,
 // Android and Linux.
 BASE_FEATURE(kDefaultEnableGpuRasterization,
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_ANDROID) || BUILDFLAG(USE_WEBGPU_ON_VULKAN_VIA_GL_INTEROP)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(USE_WEBGPU_ON_VULKAN_VIA_GL_INTEROP)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -222,10 +194,6 @@ BASE_FEATURE(kEnableMSAAOnNewIntelGPUs,
              base::FEATURE_DISABLED_BY_DEFAULT
 #endif
 );
-
-#if BUILDFLAG(IS_WIN)
-BASE_FEATURE(kNoUndamagedOverlayPromotion, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_IOS)
 // If enabled, the TASK_CATEGORY_POLICY value of the GPU process will be
@@ -284,8 +252,8 @@ BASE_FEATURE(kEnableDrDc,
 
 // Enable WebGPU on gpu service side only. This is used with origin trial and
 // enabled by default on supported platforms.
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_ANDROID) || BUILDFLAG(USE_WEBGPU_ON_VULKAN_VIA_GL_INTEROP)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(USE_WEBGPU_ON_VULKAN_VIA_GL_INTEROP)
 #define WEBGPU_ENABLED base::FEATURE_ENABLED_BY_DEFAULT
 #else
 #define WEBGPU_ENABLED base::FEATURE_DISABLED_BY_DEFAULT
@@ -418,11 +386,7 @@ BASE_FEATURE(kSkiaGraphiteSmallPathAtlas, base::FEATURE_DISABLED_BY_DEFAULT);
 // When enabled, the Graphite feature check (including blocklist) is deferred to
 // the GPU process rather than evaluated in the browser process.
 BASE_FEATURE(kLateGraphiteFeatureCheck,
-#if BUILDFLAG(IS_WIN)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 // Enable Skia Graphite's Pipeline precompilation feature.
@@ -434,7 +398,7 @@ BASE_FEATURE(kSkiaGraphitePrecompilation, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Whether to use PersistentCache for Skia Graphite's pipeline cache.
 BASE_FEATURE(kSkiaGraphiteUsePersistentCache,
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -471,11 +435,7 @@ const base::FeatureParam<int> kSkiaGraphiteMinPathSizeForMsaa{
 // Usage for Graphite is controlled independently with
 // kSkiaGraphiteDawnUsePersistentCache.
 BASE_FEATURE(kGpuPersistentCache,
-#if BUILDFLAG(IS_WIN)
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#else
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 BASE_FEATURE(kGpuPersistentCacheMetadata, base::FEATURE_DISABLED_BY_DEFAULT);
 
@@ -596,11 +556,6 @@ bool IsSkiaGraphiteSupportedByDevice(const base::CommandLine* command_line) {
   // Graphite on ChromeOS uses the Dawn Vulkan backend. Only enable Graphite if
   // device would already be using Ganesh/Vulkan.
   return IsUsingVulkan();
-#elif BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-  // Graphite on Windows ARM requires further research.
-  return false;
-#elif BUILDFLAG(IS_WIN)
-  return true;
 #else
   // Disallow Graphite from being enabled via the base::Feature on
   // not-yet-supported platforms to avoid users experiencing undefined behavior,
@@ -883,10 +838,6 @@ bool IsGraphiteContextThreadSafe() {
 BASE_FEATURE(kWebGPUCompatibilityMode, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kWebGPUAndroidOpenGLES, base::FEATURE_ENABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_WIN)
-BASE_FEATURE(kWebGPUQualcommWindows, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 // Enables runtime configuration of the GPU watchdog timeout via
 // experimentation.

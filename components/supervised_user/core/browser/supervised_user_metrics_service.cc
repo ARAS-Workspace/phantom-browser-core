@@ -100,10 +100,10 @@ SupervisedUserMetricsService::SupervisedUserMetricsService(
   DCHECK(pref_service_);
   url_filtering_service_observation_.Observe(&url_filtering_service);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   CHECK(extensions_metrics_delegate_)
       << "Extensions metrics delegate must exist on Win/Linux/Mac";
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   CheckForNewDay();
   // Check for a new day every |kTimerInterval| as well.

@@ -55,7 +55,7 @@ FontPlatformData::FontPlatformData() = default;
 
 FontPlatformData::FontPlatformData(const FontPlatformData& source)
     : typeface_(source.typeface_),
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
       family_(source.family_),
 #endif
       text_size_(source.text_size_),
@@ -74,7 +74,7 @@ FontPlatformData::FontPlatformData(const FontPlatformData& source)
 
 FontPlatformData::FontPlatformData(const FontPlatformData& src, float text_size)
     : FontPlatformData(src.typeface_,
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
                        src.family_.data(),
 #else
                        std::string(),
@@ -96,9 +96,9 @@ FontPlatformData::FontPlatformData(sk_sp<SkTypeface> typeface,
                                    ResolvedFontFeatures resolved_font_features,
                                    FontOrientation orientation)
     : typeface_(typeface),
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
       family_(family),
-#endif  // !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#endif  // !BUILDFLAG(IS_MAC)
       text_size_(text_size),
       synthetic_bold_(synthetic_bold),
       synthetic_italic_(synthetic_italic),
@@ -107,7 +107,6 @@ FontPlatformData::FontPlatformData(sk_sp<SkTypeface> typeface,
       resolved_font_features_(std::move(resolved_font_features)) {
 #if !BUILDFLAG(IS_MAC)
   style_ = WebFontRenderStyle::GetDefault();
-#if !BUILDFLAG(IS_WIN)
   WebFontRenderStyle system_style;
   system_style = QuerySystemRenderStyle(family, text_size,
                                         typeface_->fontStyle(), text_rendering);
@@ -120,9 +119,6 @@ FontPlatformData::FontPlatformData(sk_sp<SkTypeface> typeface,
             ? WebFontRenderStyle::kNoPreference
             : 0;
   }
-#else
-  auto system_style = QuerySystemForRenderStyle();
-#endif  // !BUILDFLAG(IS_WIN)
   style_.OverrideWith(system_style);
 #endif  // !BUILDFLAG(IS_MAC)
 }
@@ -221,7 +217,7 @@ bool FontPlatformData::FontContainsCharacter(UChar32 character) const {
 }
 #endif
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_MAC)
 // static
 WebFontRenderStyle FontPlatformData::QuerySystemRenderStyle(
     const std::string& family,
@@ -258,9 +254,9 @@ WebFontRenderStyle FontPlatformData::QuerySystemRenderStyle(
 
   return result;
 }
-#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#endif  // !BUILDFLAG(IS_MAC)
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_IOS)
 SkFont FontPlatformData::CreateSkFont(const FontDescription*) const {
   SkFont font(typeface_);
   style_.ApplyToSkFont(&font);
@@ -279,7 +275,7 @@ SkFont FontPlatformData::CreateSkFont(const FontDescription*) const {
 
   return font;
 }
-#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_IOS)
 
 String FontPlatformData::GetPostScriptName() const {
   if (!typeface_)

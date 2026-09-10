@@ -72,7 +72,7 @@ TEST_F(MetricsServiceClientTest, TestGetStorageLimits) {
   const MetricsLogStore::StorageLimits storage_limits =
       client.GetStorageLimits();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   EXPECT_EQ(20u, storage_limits.initial_log_queue_limits.min_log_count);
   EXPECT_EQ(8u, storage_limits.ongoing_log_queue_limits.min_log_count);
   EXPECT_EQ(3u * 1024 * 1024,

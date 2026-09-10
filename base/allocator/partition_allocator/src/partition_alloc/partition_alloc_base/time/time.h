@@ -93,17 +93,6 @@
 #include <unistd.h>
 #endif
 
-#if PA_BUILDFLAG(IS_WIN)
-#include "partition_alloc/partition_alloc_base/win/windows_types.h"
-
-namespace ABI {
-namespace Windows {
-namespace Foundation {
-struct DateTime;
-}  // namespace Foundation
-}  // namespace Windows
-}  // namespace ABI
-#endif
 
 namespace partition_alloc::internal::base {
 
@@ -112,9 +101,6 @@ class TimeDelta;
 template <typename T>
 constexpr TimeDelta Microseconds(T n);
 
-#if PA_BUILDFLAG(IS_WIN)
-class PlatformThreadHandle;
-#endif
 
 // TimeDelta ------------------------------------------------------------------
 
@@ -122,13 +108,7 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) TimeDelta {
  public:
   constexpr TimeDelta() = default;
 
-#if PA_BUILDFLAG(IS_WIN)
-  static TimeDelta FromQPCValue(LONGLONG qpc_value);
-  // TODO(crbug.com/40638442): Avoid base::TimeDelta factory functions
-  // based on absolute time
-  static TimeDelta FromFileTime(FILETIME ft);
-  static TimeDelta FromWinrtDateTime(ABI::Windows::Foundation::DateTime dt);
-#elif PA_BUILDFLAG(IS_POSIX)
+#if PA_BUILDFLAG(IS_POSIX)
   static TimeDelta FromTimeSpec(const timespec& ts);
 #endif
 #if PA_BUILDFLAG(IS_APPLE)
@@ -190,9 +170,6 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) TimeDelta {
 
 #if PA_BUILDFLAG(IS_POSIX)
   struct timespec ToTimeSpec() const;
-#endif
-#if PA_BUILDFLAG(IS_WIN)
-  ABI::Windows::Foundation::DateTime ToWinrtDateTime() const;
 #endif
 
   // Returns the frequency in Hertz (cycles per second) that has a period of
@@ -480,22 +457,6 @@ class TimeBase {
   int64_t us_;
 };
 
-#if PA_BUILDFLAG(IS_WIN)
-#if PA_BUILDFLAG(PA_ARCH_CPU_ARM64)
-// TSCTicksPerSecond is not supported on Windows on Arm systems because the
-// cycle-counting methods use the actual CPU cycle count, and not a consistent
-// incrementing counter.
-#else
-// Returns true if the CPU support constant rate TSC.
-[[nodiscard]] PA_COMPONENT_EXPORT(
-    PARTITION_ALLOC_BASE) bool HasConstantRateTSC();
-
-// Returns the frequency of the TSC in ticks per second, or 0 if it hasn't
-// been measured yet. Needs to be guarded with a call to HasConstantRateTSC().
-[[nodiscard]] PA_COMPONENT_EXPORT(
-    PARTITION_ALLOC_BASE) double TSCTicksPerSecond();
-#endif
-#endif  // PA_BUILDFLAG(IS_WIN)
 
 }  // namespace time_internal
 
@@ -520,12 +481,6 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) Time
   static constexpr int64_t kMicrosecondsFromWindowsToUnixEpoch =
       INT64_C(11644473600000000);
 
-#if PA_BUILDFLAG(IS_WIN)
-  // To avoid overflow in QPC to Microseconds calculations, since we multiply
-  // by kMicrosecondsPerSecond, then the QPC value should not exceed
-  // (2^63 - 1) / 1E6. If it exceeds that threshold, we divide then multiply.
-  static constexpr int64_t kQPCOverflowThreshold = INT64_C(0x8637BD05AF7);
-#endif
 
   // Contains the NULL time. Use Time::Now() to get the current time.
   constexpr Time() : TimeBase(0) {}
@@ -624,10 +579,6 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) Time
 #endif
 #endif
 
-#if PA_BUILDFLAG(IS_WIN)
-  static Time FromFileTime(FILETIME ft);
-  FILETIME ToFileTime() const;
-#endif  // PA_BUILDFLAG(IS_WIN)
 
   // For legacy deserialization only. Converts an integer value representing
   // Time to a class. This may be used when deserializing a |Time| structure,
@@ -833,12 +784,6 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) TimeTicks
   [[nodiscard]] static bool IsConsistentAcrossProcesses();
 
 
-#if PA_BUILDFLAG(IS_WIN)
-  // Translates an absolute QPC timestamp into a TimeTicks value. The returned
-  // value has the same origin as Now(). Do NOT attempt to use this if
-  // IsHighResolution() returns false.
-  static TimeTicks FromQPCValue(LONGLONG qpc_value);
-#endif
 
 #if PA_BUILDFLAG(IS_APPLE)
   static TimeTicks FromMachAbsoluteTime(uint64_t mach_absolute_time);
@@ -892,10 +837,6 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) TimeTicks
   }
 
  protected:
-#if PA_BUILDFLAG(IS_WIN)
-  typedef DWORD (*TickFunctionType)(void);
-  static TickFunctionType SetMockTickFunction(TickFunctionType ticker);
-#endif
 
  private:
   friend class time_internal::TimeBase<TimeTicks>;
@@ -918,8 +859,6 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) ThreadTicks
   [[nodiscard]] static bool IsSupported() {
 #if (defined(_POSIX_THREAD_CPUTIME) && _POSIX_THREAD_CPUTIME >= 0) || PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID)
     return true;
-#elif PA_BUILDFLAG(IS_WIN)
-    return IsSupportedWin();
 #else
     return false;
 #endif
@@ -928,9 +867,6 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) ThreadTicks
   // Waits until the initialization is completed. Needs to be guarded with a
   // call to IsSupported().
   static void WaitUntilInitialized() {
-#if PA_BUILDFLAG(IS_WIN)
-    WaitUntilInitializedWin();
-#endif
   }
 
   // Returns thread-specific CPU-time on systems that support this feature.
@@ -942,12 +878,6 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) ThreadTicks
   // absolutely needed, call WaitUntilInitialized() before this method.
   static ThreadTicks Now();
 
-#if PA_BUILDFLAG(IS_WIN)
-  // Similar to Now() above except this returns thread-specific CPU time for an
-  // arbitrary thread. All comments for Now() method above apply apply to this
-  // method as well.
-  static ThreadTicks GetForThread(const PlatformThreadHandle& thread_handle);
-#endif
 
   // Converts an integer value representing ThreadTicks to a class. This may be
   // used when deserializing a |ThreadTicks| structure, using a value known to
@@ -969,10 +899,6 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC_BASE) ThreadTicks
   // internal use and testing.
   constexpr explicit ThreadTicks(int64_t us) : TimeBase(us) {}
 
-#if PA_BUILDFLAG(IS_WIN)
-  [[nodiscard]] static bool IsSupportedWin();
-  static void WaitUntilInitializedWin();
-#endif
 };
 
 }  // namespace partition_alloc::internal::base

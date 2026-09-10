@@ -32,10 +32,7 @@ MockXRDeviceHookBase::MockXRDeviceHookBase() {
   // TODO(https://crbug.com/381913614): Instead of this pattern, consider
   // spinning up/holding onto and setting the test hook on the XrRuntimeManager,
   // which could pass on to providers.
-#if BUILDFLAG(IS_WIN)
-  content::GetXRDeviceServiceForTesting()->BindHookForTesting(
-      receiver_.BindNewPipeAndPassRemote(thread_->task_runner()).PassPipe());
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   webxr::OpenXrPlatformHelperAndroid::SetXrHostActivityDisabledForTesting(true);
   OpenXrTestHelper::Get().SetTestHook(
       receiver_.BindNewPipeAndPassRemote(thread_->task_runner()));

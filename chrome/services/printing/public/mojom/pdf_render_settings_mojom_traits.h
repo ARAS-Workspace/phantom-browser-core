@@ -22,18 +22,6 @@ struct EnumTraits<printing::mojom::PdfRenderSettings_Mode,
     switch (mode) {
       case PrintMode::NORMAL:
         return MojomMode::NORMAL;
-#if BUILDFLAG(IS_WIN)
-      case PrintMode::TEXTONLY:
-        return MojomMode::TEXTONLY;
-      case PrintMode::POSTSCRIPT_LEVEL2:
-        return MojomMode::POSTSCRIPT_LEVEL2;
-      case PrintMode::POSTSCRIPT_LEVEL3:
-        return MojomMode::POSTSCRIPT_LEVEL3;
-      case PrintMode::EMF_WITH_REDUCED_RASTERIZATION:
-        return MojomMode::EMF_WITH_REDUCED_RASTERIZATION;
-      case PrintMode::POSTSCRIPT_LEVEL3_WITH_TYPE42_FONTS:
-        return MojomMode::POSTSCRIPT_LEVEL3_WITH_TYPE42_FONTS;
-#endif
     }
     NOTREACHED() << "Unknown mode " << static_cast<int>(mode);
   }
@@ -45,18 +33,6 @@ struct EnumTraits<printing::mojom::PdfRenderSettings_Mode,
     switch (input) {
       case MojomMode::NORMAL:
         return PrintMode::NORMAL;
-#if BUILDFLAG(IS_WIN)
-      case MojomMode::TEXTONLY:
-        return PrintMode::TEXTONLY;
-      case MojomMode::POSTSCRIPT_LEVEL2:
-        return PrintMode::POSTSCRIPT_LEVEL2;
-      case MojomMode::POSTSCRIPT_LEVEL3:
-        return PrintMode::POSTSCRIPT_LEVEL3;
-      case MojomMode::EMF_WITH_REDUCED_RASTERIZATION:
-        return PrintMode::EMF_WITH_REDUCED_RASTERIZATION;
-      case MojomMode::POSTSCRIPT_LEVEL3_WITH_TYPE42_FONTS:
-        return PrintMode::POSTSCRIPT_LEVEL3_WITH_TYPE42_FONTS;
-#endif
     }
     NOTREACHED() << "Unknown mode " << static_cast<int>(input);
   }

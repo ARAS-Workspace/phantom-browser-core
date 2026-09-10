@@ -345,7 +345,7 @@ void ShowCertificateViewer(WebContents* web_contents,
                                            web_contents, parent);
 }
 
-#if !(BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC))
+#if !BUILDFLAG(IS_MAC)
 void ShowCertificateViewerForClientAuth(content::WebContents* web_contents,
                                         gfx::NativeWindow parent,
                                         net::X509Certificate* cert) {

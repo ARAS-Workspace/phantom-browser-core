@@ -89,11 +89,9 @@ bool UiTest::VerifyVisibility(const std::set<UiElementName>& names,
     bool will_be_visible = WillElementBeVisible(element);
     // TODO(https://crbug.com/327467653): Timeout Spinner only visible on
     // Windows.
-#if !BUILDFLAG(IS_WIN)
     if (name == kWebVrTimeoutSpinner) {
       will_be_visible = expected_visibility;
     }
-#endif
     EXPECT_EQ(will_be_visible, expected_visibility);
     if (will_be_visible != expected_visibility)
       return false;

@@ -17,8 +17,6 @@ namespace {
 
 #if BUILDFLAG(IS_MAC)
 const uint64_t kTestDeviceId = 42;
-#elif BUILDFLAG(IS_WIN)
-const wchar_t* kTestDeviceId = L"device1";
 #else
 const char* kTestDeviceId = "device1";
 #endif

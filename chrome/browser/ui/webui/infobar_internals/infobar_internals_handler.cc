@@ -70,29 +70,19 @@
 #include "extensions/common/extension.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#include "chrome/browser/win/installer_downloader/installer_downloader_controller.h"
-#include "chrome/browser/win/installer_downloader/installer_downloader_pref_names.h"
-#endif
-
 #if BUILDFLAG(IS_MAC) && BUILDFLAG(ENABLE_UPDATER)
 #include "chrome/browser/ui/cocoa/keystone_infobar_delegate.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/startup/default_browser_prompt/default_browser_prompt_manager.h"  // nogncheck
 #include "chrome/browser/ui/startup/default_browser_prompt/default_browser_prompt_prefs.h"  // nogncheck
 #include "chrome/browser/ui/views/session_restore_infobar/session_restore_infobar_delegate.h"
 #include "chrome/browser/ui/views/session_restore_infobar/session_restore_infobar_manager.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/pdf/infobar/pdf_infobar_controller.h"
-#endif
-
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/startup/startup_launch_manager.h"  // nogncheck
-#include "chrome/browser/ui/startup/startup_launch_infobar_manager_impl.h"
 #endif
 
 using InfoBarType = infobar_internals::mojom::InfoBarType;
@@ -133,7 +123,7 @@ void InfoBarInternalsHandler::GetInfoBars(GetInfoBarsCallback callback) {
       "The Collected Cookies infobar is shown after the user has changed "
       "the allowed/blocked state of a cookie, reminding them to reload "
       "the page in order for the new cookies to take effect."));
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   infobar_list.emplace_back(InfoBarEntry::New(
       /*type=*/InfoBarType::kDefaultBrowser, /*name=*/"Default Browser",
       /*description=*/
@@ -170,15 +160,6 @@ void InfoBarInternalsHandler::GetInfoBars(GetInfoBarsCallback callback) {
       "want to allow an extension to communicate with a website in "
       "incognito mode. This trigger shows the infobar."));
 #endif
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  infobar_list.emplace_back(InfoBarEntry::New(
-      /*type=*/InfoBarType::kInstallerDownloader,
-      /*name=*/"Installer Downloader",
-      /*description=*/
-      "The Installer Downloader can only be triggered on Windows. The "
-      "manual trigger consist to reset any browser state that can "
-      "prevent it to shown and then trigger a show request."));
-#endif
 
 #if BUILDFLAG(IS_MAC) && BUILDFLAG(ENABLE_UPDATER)
   infobar_list.emplace_back(InfoBarEntry::New(
@@ -203,7 +184,7 @@ void InfoBarInternalsHandler::GetInfoBars(GetInfoBarsCallback callback) {
       "The Page Info infobar is shown when a user changes permissions, "
       "asking them to reload the page to apply settings."));
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   infobar_list.emplace_back(InfoBarEntry::New(
       /*type=*/InfoBarType::kPdf, /*name=*/"PDF",
       /*description=*/
@@ -220,16 +201,6 @@ void InfoBarInternalsHandler::GetInfoBars(GetInfoBarsCallback callback) {
       "The Reload Plugin infobar is used to ask the user to reload a "
       "page when a plugin has crashed or disconnected. This trigger "
       "shows the infobar."));
-#endif
-
-#if BUILDFLAG(IS_WIN)
-
-  infobar_list.emplace_back(InfoBarEntry::New(
-      /*type=*/InfoBarType::kStartupLaunch, /*name=*/"Startup Launch",
-      /*description=*/
-      "Triggers the startup launch infobar. This infobar can only be "
-      "triggered on Windows, and only when LaunchOnStartup feature flag is "
-      "enabled."));
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
@@ -304,7 +275,7 @@ bool InfoBarInternalsHandler::TriggerInfoBarInternal(InfoBarType type) {
       }
       return true;
     }
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     case InfoBarType::kDefaultBrowser: {
       if (!profile) {
         return false;
@@ -413,36 +384,6 @@ bool InfoBarInternalsHandler::TriggerInfoBarInternal(InfoBarType type) {
       return false;
 #endif
     }
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-    case InfoBarType::kInstallerDownloader: {
-      if (auto* controller = g_browser_process->GetFeatures()
-                                 ->installer_downloader_controller()) {
-        PrefService* prefs = g_browser_process->local_state();
-
-        // This manual triggering from the debug page will reset the state of
-        // the installer downloader.
-        prefs->SetInteger(
-            installer_downloader::prefs::kInstallerDownloaderInfobarShowCount,
-            0);
-
-        // Reset the prevent future display flag.
-        prefs->SetBoolean(installer_downloader::prefs::
-                              kInstallerDownloaderPreventFutureDisplay,
-                          false);
-
-        // Set bypass flag to instruct to the controller to skip/ignore
-        // eligibility check result since it may failed.
-        prefs->SetBoolean(installer_downloader::prefs::
-                              kInstallerDownloaderBypassEligibilityCheck,
-                          true);
-
-        controller->MaybeShowInfoBar();
-
-        return true;
-      }
-      return false;
-    }
-#endif
     case InfoBarType::kLocalTestPoliciesApplied: {
       if (infobars::IsInfoBarMigrated(
               infobars::InfoBarDelegate::LOCAL_TEST_POLICIES_APPLIED_INFOBAR)) {
@@ -522,7 +463,7 @@ bool InfoBarInternalsHandler::TriggerInfoBarInternal(InfoBarType type) {
 #endif
     }
 #endif
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     case InfoBarType::kPdf: {
       if (!bwi || !bwi->GetActiveTabInterface()) {
         return false;
@@ -542,24 +483,6 @@ bool InfoBarInternalsHandler::TriggerInfoBarInternal(InfoBarType type) {
       controller->MaybeShowInfoBarCallback(
           shell_integration::DefaultWebClientState::NOT_DEFAULT);
       return true;
-    }
-#endif
-#if BUILDFLAG(IS_WIN)
-    case InfoBarType::kStartupLaunch: {
-      PrefService* local_state = g_browser_process->local_state();
-      local_state->ClearPref(prefs::kForegroundLaunchOnLogin);
-      local_state->ClearPref(prefs::kStartupLaunchInfobarAccepted);
-      local_state->ClearPref(prefs::kStartupLaunchInfobarDeclinedCount);
-      local_state->ClearPref(prefs::kStartupLaunchInfobarLastDeclinedTime);
-
-      if (auto* startup_launch_manager =
-              StartupLaunchManager::From(g_browser_process)) {
-        startup_launch_manager->SetInfoBarManager(
-            std::make_unique<StartupLaunchInfoBarManagerImpl>());
-        startup_launch_manager->MaybeShowInfoBars();
-        return true;
-      }
-      return false;
     }
 #endif
 #if BUILDFLAG(ENABLE_EXTENSIONS)

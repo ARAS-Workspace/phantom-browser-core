@@ -364,7 +364,7 @@ TaskManagerTableModel::~TaskManagerTableModel() {
   // Note: system_total_time_ is used for both since there is no functional
   // difference between browser & system (they are essentially the same tab).
   // Instead, the data is routed to the platform appropriate bucket.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   task_manager::RecordTabSwitchEvent(CategoryRecord::kBrowser,
                                      system_total_time_);
 #elif BUILDFLAG(IS_CHROMEOS)

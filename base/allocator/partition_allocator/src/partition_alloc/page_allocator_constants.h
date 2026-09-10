@@ -120,7 +120,7 @@ PageAllocationGranularityShift() {
     page_characteristics.shift.store(shift, std::memory_order_relaxed);
   }
   return shift;
-#elif PA_BUILDFLAG(IS_WIN) || PA_BUILDFLAG(PA_ARCH_CPU_PPC64)
+#elif PA_BUILDFLAG(PA_ARCH_CPU_PPC64)
   // Modern ppc64 systems support 4kB (shift = 12) and 64kB (shift = 16) page
   // sizes.  Since 64kB is the de facto standard on the platform and binaries
   // compiled for 64kB are likely to work on 4kB systems, 64kB is a good choice
@@ -130,7 +130,7 @@ PageAllocationGranularityShift() {
   return 14;  // 16kB
 #elif PA_BUILDFLAG(IS_APPLE) && PA_BUILDFLAG(PA_ARCH_CPU_64_BITS)
   return static_cast<size_t>(vm_page_shift);
-#elif PA_BUILDFLAG(IS_WIN) || PA_BUILDFLAG(PA_ARCH_CPU_PPC64)
+#elif PA_BUILDFLAG(PA_ARCH_CPU_PPC64)
   // Modern ppc64 systems support 4kB (shift = 12) and 64kB (shift = 16) page
   // sizes.  Since 64kB is the de facto standard on the platform and binaries
   // compiled for 64kB are likely to work on 4kB systems, 64kB is a good choice
@@ -180,11 +180,7 @@ SystemPageShift() {
   // On Windows allocation granularity is higher than the page size. This comes
   // into play when reserving address space range (allocation granularity),
   // compared to committing pages into memory (system page granularity).
-#if PA_BUILDFLAG(IS_WIN)
-  return 12;  // 4096=1<<12
-#else
   return PageAllocationGranularityShift();
-#endif
 }
 
 PA_ALWAYS_INLINE PAGE_ALLOCATOR_CONSTANTS_DECLARE_CONSTEXPR size_t

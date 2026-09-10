@@ -30,11 +30,7 @@
 #endif  // BUILDFLAG(IS_ANDROID)
 
 // Required for inet_pton()
-#if BUILDFLAG(IS_WIN)
-#include <winsock2.h>
-#else
 #include <arpa/inet.h>
-#endif
 
 namespace net {
 

@@ -26,10 +26,6 @@
 #include "printing/metafile.h"
 #include "printing/printed_document.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "printing/printed_page_win.h"
-#endif
-
 using content::BrowserThread;
 
 namespace printing {
@@ -147,44 +143,6 @@ void PrintJobWorkerOop::OnDidStartPrinting(mojom::ResultCode result,
                                          worker_weak_factory_.GetWeakPtr()));
 }
 
-#if BUILDFLAG(IS_WIN)
-void PrintJobWorkerOop::OnDidRenderPrintedPage(uint32_t page_index,
-                                               mojom::ResultCode result) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  if (result != mojom::ResultCode::kSuccess) {
-    // Once an error happens during rendering, there could be multiple calls
-    // to here as the queue of sent pages all return back with error.
-    PRINTER_LOG(ERROR)
-        << "Error rendering printed page via service for document "
-        << document_oop_->cookie() << ": " << result;
-    NotifyFailure(result);
-    return;
-  }
-  scoped_refptr<PrintedPage> page = document_oop_->GetPage(page_index);
-  if (!page) {
-    PRINTER_LOG(ERROR) << "Unable to get page " << page_index
-                       << " via service for document "
-                       << document_oop_->cookie();
-    NotifyFailure(mojom::ResultCode::kFailed);
-    return;
-  }
-  VLOG(1) << "Rendered printed page via service for document "
-          << document_oop_->cookie() << " page " << page_index;
-
-  // Signal everyone that the page is printed.
-  print_job()->PostTask(FROM_HERE,
-                        base::BindOnce(&PrintJob::OnPageDone, print_job(),
-                                       base::RetainedRef(page)));
-
-  ++pages_printed_count_;
-  if (pages_printed_count_ == document_oop_->expected_page_count()) {
-    // The last page has printed, can proceed to document done processing.
-    VLOG(1) << "All pages printed for document";
-    SendDocumentDone();
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 void PrintJobWorkerOop::OnDidRenderPrintedDocument(mojom::ResultCode result) {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   if (result != mojom::ResultCode::kSuccess) {
@@ -202,9 +160,6 @@ void PrintJobWorkerOop::OnDidRenderPrintedDocument(mojom::ResultCode result) {
 void PrintJobWorkerOop::OnDidDocumentDone(int job_id,
                                           mojom::ResultCode result) {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-#if BUILDFLAG(IS_WIN)
-  DCHECK_EQ(pages_printed_count_, document_oop_->expected_page_count());
-#endif
   if (result != mojom::ResultCode::kSuccess) {
     PRINTER_LOG(ERROR) << "Error completing printing via service for document "
                        << document_oop_->cookie() << ": " << result;
@@ -247,40 +202,6 @@ void PrintJobWorkerOop::OnDidCancel(scoped_refptr<PrintJob> job,
   // Done with private document reference.
   document_oop_ = nullptr;
 }
-
-#if BUILDFLAG(IS_WIN)
-bool PrintJobWorkerOop::SpoolPage(PrintedPage* page) {
-  DCHECK(task_runner()->RunsTasksInCurrentSequence());
-  DCHECK_NE(page_number(), PageNumber::npos());
-
-#if !defined(NDEBUG)
-  DCHECK(document()->IsPageInList(*page));
-#endif
-
-  const MetafilePlayer* metafile = page->metafile();
-  DCHECK(metafile);
-  base::MappedReadOnlyRegion region_mapping =
-      metafile->GetDataAsSharedMemoryRegion();
-  if (simulate_spooling_memory_errors_ || !region_mapping.IsValid()) {
-    PRINTER_LOG(ERROR)
-        << "Spooling page via service failed due to shared memory error.";
-    content::GetUIThreadTaskRunner({})->PostTask(
-        FROM_HERE, base::BindOnce(&PrintJobWorkerOop::NotifyFailure,
-                                  ui_weak_factory_.GetWeakPtr(),
-                                  mojom::ResultCode::kFailed));
-    return false;
-  }
-
-  VLOG(1) << "Spooling page " << page_number() << " to print via service";
-  content::GetUIThreadTaskRunner({})->PostTask(
-      FROM_HERE,
-      base::BindOnce(&PrintJobWorkerOop::SendRenderPrintedPage,
-                     ui_weak_factory_.GetWeakPtr(), base::RetainedRef(page),
-                     metafile->GetDataType(),
-                     std::move(region_mapping.region)));
-  return true;
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 bool PrintJobWorkerOop::SpoolDocument() {
   DCHECK(task_runner()->RunsTasksInCurrentSequence());
@@ -483,35 +404,6 @@ void PrintJobWorkerOop::SendStartPrinting(const std::string& device_name,
       base::BindOnce(&PrintJobWorkerOop::OnDidStartPrinting,
                      ui_weak_factory_.GetWeakPtr()));
 }
-
-#if BUILDFLAG(IS_WIN)
-void PrintJobWorkerOop::SendRenderPrintedPage(
-    const PrintedPage* page,
-    mojom::MetafileDataType page_data_type,
-    base::ReadOnlySharedMemoryRegion serialized_page_data) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-
-  // Page numbers are 0-based for the printing context.
-  const uint32_t page_index = page->page_number() - 1;
-  const int32_t document_cookie = document_oop_->cookie();
-  if (print_cancel_requested_) {
-    VLOG(1) << "Dropping page " << page_index << " of document "
-            << document_cookie << " to `" << device_name_
-            << "` because job was canceled";
-    return;
-  }
-
-  VLOG(1) << "Sending page " << page_index << " of document " << document_cookie
-          << " to `" << device_name_ << "` for printing";
-  PrintBackendServiceManager& service_mgr =
-      PrintBackendServiceManager::GetInstance();
-  service_mgr.RenderPrintedPage(
-      *service_manager_client_id_, device_name_, document_cookie, *page,
-      page_data_type, std::move(serialized_page_data),
-      base::BindOnce(&PrintJobWorkerOop::OnDidRenderPrintedPage,
-                     ui_weak_factory_.GetWeakPtr(), page_index));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 void PrintJobWorkerOop::SendRenderPrintedDocument(
     mojom::MetafileDataType data_type,

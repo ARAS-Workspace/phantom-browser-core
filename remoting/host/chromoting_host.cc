@@ -40,13 +40,6 @@
 #include "remoting/protocol/webrtc_connection_to_client.h"
 #include "remoting/signaling/signaling_id_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/strings/stringprintf.h"
-#include "base/win/win_util.h"
-#endif
-
 using remoting::protocol::ConnectionToClient;
 using remoting::protocol::InputStub;
 

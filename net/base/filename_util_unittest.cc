@@ -37,22 +37,18 @@ struct GenerateFilenameCase {
 // TODO(crbug.com/40605133): Make these char16_t once std::u16string is
 // std::u16string.
 std::wstring FilePathAsWString(const base::FilePath& path) {
-#if BUILDFLAG(IS_WIN)
-  return path.value();
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   return base::UTF8ToWide(path.value());
 #endif
 }
 base::FilePath WStringAsFilePath(const std::wstring& str) {
-#if BUILDFLAG(IS_WIN)
-  return base::FilePath(str);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   return base::FilePath(base::WideToUTF8(str));
 #endif
 }
 
 std::string GetLocaleWarningString() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   return "";
 #elif BUILDFLAG(IS_POSIX)
   // The generate filename tests can fail on certain OS_POSIX platforms when
@@ -118,9 +114,6 @@ constexpr const base::FilePath::CharType* kUnsafePortableBasenames[] = {
 
 constexpr const base::FilePath::CharType* kSafePortableRelativePaths[] = {
     FILE_PATH_LITERAL("a/a"),
-#if BUILDFLAG(IS_WIN)
-    FILE_PATH_LITERAL("a\\a"),
-#endif
 };
 
 }  // namespace
@@ -168,51 +161,30 @@ TEST(FilenameUtilTest, IsSafePortableRelativePath) {
 TEST(FilenameUtilTest, FileURLConversion) {
   // a list of test file names and the corresponding URLs
   const FileCase round_trip_cases[] = {
-#if BUILDFLAG(IS_WIN)
-    {L"C:\\foo\\bar.txt", "file:///C:/foo/bar.txt"},
-    {L"\\\\some computer\\foo\\bar.txt",
-     "file://some%20computer/foo/bar.txt"},  // UNC
-    {L"D:\\Name;with%some symbols*#",
-     "file:///D:/Name%3Bwith%25some%20symbols*%23"},
-    // issue 14153: To be tested with the OS default codepage other than 1252.
-    {L"D:\\latin1\\caf\x00E9\x00DD.txt",
-     "file:///D:/latin1/caf%C3%A9%C3%9D.txt"},
-    {L"D:\\otherlatin\\caf\x0119.txt", "file:///D:/otherlatin/caf%C4%99.txt"},
-    {L"D:\\greek\\\x03B1\x03B2\x03B3.txt",
-     "file:///D:/greek/%CE%B1%CE%B2%CE%B3.txt"},
-    {L"D:\\Chinese\\\x6240\x6709\x4e2d\x6587\x7f51\x9875.doc",
-     "file:///D:/Chinese/%E6%89%80%E6%9C%89%E4%B8%AD%E6%96%87%E7%BD%91"
-     "%E9%A1%B5.doc"},
-    {L"D:\\plane1\\\xD835\xDC00\xD835\xDC01.txt",  // Math alphabet "AB"
-     "file:///D:/plane1/%F0%9D%90%80%F0%9D%90%81.txt"},
-    // Other percent-encoded characters that are left alone when displaying a
-    // URL are decoded in a file path (https://crbug.com/585422).
-    {L"C:\\foo\\\U0001F512.txt",
-     "file:///C:/foo/%F0%9F%94%92.txt"},                         // Blocked.
-    {L"C:\\foo\\\u2001.txt", "file:///C:/foo/%E2%80%81.txt"},    // Blocked.
-    {L"C:\\foo\\\a\tbar\n ", "file:///C:/foo/%07%09bar%0A%20"},  // Blocked.
-#elif BUILDFLAG(IS_POSIX)
-    {L"/foo/bar.txt", "file:///foo/bar.txt"},
-    {L"/foo/BAR.txt", "file:///foo/BAR.txt"},
-    {L"/C:/foo/bar.txt", "file:///C:/foo/bar.txt"},
-    {L"/foo/bar?.txt", "file:///foo/bar%3F.txt"},
-    {L"/foo/\a\tbar\n ", "file:///foo/%07%09bar%0A%20"},
-    // %5C ('\\') is not special on POSIX, and is therefore decoded as normal.
-    {L"/foo/..\\bar", "file:///foo/..%5Cbar"},
-    {L"/some computer/foo/bar.txt", "file:///some%20computer/foo/bar.txt"},
-    {L"/Name;with%some symbols*#", "file:///Name%3Bwith%25some%20symbols*%23"},
-    {L"/latin1/caf\x00E9\x00DD.txt", "file:///latin1/caf%C3%A9%C3%9D.txt"},
-    {L"/otherlatin/caf\x0119.txt", "file:///otherlatin/caf%C4%99.txt"},
-    {L"/greek/\x03B1\x03B2\x03B3.txt", "file:///greek/%CE%B1%CE%B2%CE%B3.txt"},
-    {L"/Chinese/\x6240\x6709\x4e2d\x6587\x7f51\x9875.doc",
-     "file:///Chinese/%E6%89%80%E6%9C%89%E4%B8%AD%E6%96%87%E7%BD"
-     "%91%E9%A1%B5.doc"},
-    {L"/plane1/\x1D400\x1D401.txt",  // Math alphabet "AB"
-     "file:///plane1/%F0%9D%90%80%F0%9D%90%81.txt"},
-    // Other percent-encoded characters that are left alone when displaying a
-    // URL are decoded in a file path (https://crbug.com/585422).
-    {L"/foo/\U0001F512.txt", "file:///foo/%F0%9F%94%92.txt"},  // Blocked.
-    {L"/foo/\u2001.txt", "file:///foo/%E2%80%81.txt"},         // Blocked.
+#if BUILDFLAG(IS_POSIX)
+      {L"/foo/bar.txt", "file:///foo/bar.txt"},
+      {L"/foo/BAR.txt", "file:///foo/BAR.txt"},
+      {L"/C:/foo/bar.txt", "file:///C:/foo/bar.txt"},
+      {L"/foo/bar?.txt", "file:///foo/bar%3F.txt"},
+      {L"/foo/\a\tbar\n ", "file:///foo/%07%09bar%0A%20"},
+      // %5C ('\\') is not special on POSIX, and is therefore decoded as normal.
+      {L"/foo/..\\bar", "file:///foo/..%5Cbar"},
+      {L"/some computer/foo/bar.txt", "file:///some%20computer/foo/bar.txt"},
+      {L"/Name;with%some symbols*#",
+       "file:///Name%3Bwith%25some%20symbols*%23"},
+      {L"/latin1/caf\x00E9\x00DD.txt", "file:///latin1/caf%C3%A9%C3%9D.txt"},
+      {L"/otherlatin/caf\x0119.txt", "file:///otherlatin/caf%C4%99.txt"},
+      {L"/greek/\x03B1\x03B2\x03B3.txt",
+       "file:///greek/%CE%B1%CE%B2%CE%B3.txt"},
+      {L"/Chinese/\x6240\x6709\x4e2d\x6587\x7f51\x9875.doc",
+       "file:///Chinese/%E6%89%80%E6%9C%89%E4%B8%AD%E6%96%87%E7%BD"
+       "%91%E9%A1%B5.doc"},
+      {L"/plane1/\x1D400\x1D401.txt",  // Math alphabet "AB"
+       "file:///plane1/%F0%9D%90%80%F0%9D%90%81.txt"},
+      // Other percent-encoded characters that are left alone when displaying a
+      // URL are decoded in a file path (https://crbug.com/585422).
+      {L"/foo/\U0001F512.txt", "file:///foo/%F0%9F%94%92.txt"},  // Blocked.
+      {L"/foo/\u2001.txt", "file:///foo/%E2%80%81.txt"},         // Blocked.
 #endif
   };
 
@@ -230,73 +202,47 @@ TEST(FilenameUtilTest, FileURLConversion) {
 
   // Test that various file: URLs get decoded into the correct file type
   FileCase url_cases[] = {
-    {nullptr, "http://foo/bar.txt"},
-    {nullptr, "http://localhost/foo/bar.txt"},
-    {nullptr, "https://localhost/foo/bar.txt"},
-#if BUILDFLAG(IS_WIN)
-    {L"C:\\foo\\bar.txt", "file:c|/foo\\bar.txt"},
-    {L"C:\\foo\\bar.txt", "file:/c:/foo/bar.txt"},
-    {L"\\\\foo\\bar.txt", "file://foo\\bar.txt"},
-    {L"C:\\foo\\bar.txt", "file:///c:/foo/bar.txt"},
-    {L"\\\\foo\\bar.txt", "file:////foo\\bar.txt"},
-    {L"\\\\foo\\bar.txt", "file:/foo/bar.txt"},
-    {L"\\\\foo\\bar.txt", "file://foo\\bar.txt"},
-    {L"C:\\foo\\bar.txt", "file:\\\\\\c:/foo/bar.txt"},
-    // %2F ('/') should fail, because it might otherwise be interpreted as a
-    // path separator on Windows.
-    {nullptr, "file:///C:\\foo%2f..\\bar"},
-    // %5C ('\\') should fail, because it can't be represented in a Windows
-    // filename (and should not be considered a path separator).
-    {nullptr, "file:///foo\\..%5cbar"},
-    // %00 should fail, because it represents a null byte in a filename.
-    {nullptr, "file:///foo/%00bar.txt"},
-    // Other percent-encoded characters that are left alone when displaying a
-    // URL are decoded in a file path (https://crbug.com/585422).
-    {L"C:\\foo\\\n.txt", "file:///c:/foo/%0A.txt"},         // Control char.
-    {L"C:\\foo\\a=$b.txt", "file:///c:/foo/a%3D%24b.txt"},  // Reserved.
-    // Make sure that '+' isn't converted into ' '.
-    {L"C:\\foo\\romeo+juliet.txt", "file:/c:/foo/romeo+juliet.txt"},
-    // SAMBA share case.
-    {L"\\\\computername\\ShareName\\Path\\Foo.txt",
-     "file://computername/ShareName/Path/Foo.txt"},
-#elif BUILDFLAG(IS_POSIX)
-    {L"/c:/foo/bar.txt", "file:/c:/foo/bar.txt"},
-    {L"/c:/foo/bar.txt", "file:///c:/foo/bar.txt"},
-    {L"/foo/bar.txt", "file:/foo/bar.txt"},
-    {L"/c:/foo/bar.txt", "file:\\\\\\c:/foo/bar.txt"},
-    {L"/foo/bar.txt", "file:foo/bar.txt"},
-    {L"/foo/bar.txt", "file:///foo/bar.txt"},
-    {L"/foo/bar.txt", "file:////foo/bar.txt"},
-    {L"/foo/bar.txt", "file:////foo//bar.txt"},
-    {L"/foo/bar.txt", "file:////foo///bar.txt"},
-    {L"/foo/bar.txt", "file:////foo////bar.txt"},
-    {L"/c:/foo/bar.txt", "file:\\\\\\c:/foo/bar.txt"},
-    {L"/c:/foo/bar.txt", "file:c:/foo/bar.txt"},
-    // %2F ('/') should fail, because it can't be represented in a POSIX
-    // filename (and should not be considered a path separator).
-    {nullptr, "file:///foo%2f../bar"},
-    // %00 should fail, because it represents a null byte in a filename.
-    {nullptr, "file:///foo/%00bar.txt"},
-    // Other percent-encoded characters that are left alone when displaying a
-    // URL are decoded in a file path (https://crbug.com/585422).
-    {L"/foo/\n.txt", "file:///foo/%0A.txt"},         // Control char.
-    {L"/foo/a=$b.txt", "file:///foo/a%3D%24b.txt"},  // Reserved.
-    // Make sure that '+' isn't converted into ' '.
-    {L"/foo/romeo+juliet.txt", "file:///foo/romeo+juliet.txt"},
-    // Backslashes in a file URL are normalized as forward slashes.
-    {L"/bar.txt", "file://\\bar.txt"},
-    {L"/c|/foo/bar.txt", "file:c|/foo\\bar.txt"},
-    {L"/foo/bar.txt", "file:////foo\\bar.txt"},
-    // Accept obviously-local file URLs.
-    {L"/foo/bar.txt", "file:///foo/bar.txt"},
-    {L"/foo/bar.txt", "file://localhost/foo/bar.txt"},
-    {L"/foo/bar.txt", "file://127.0.0.1/foo/bar.txt"},
-    {L"/foo/bar.txt", "file://[::1]/foo/bar.txt"},
-    // Reject non-local file URLs.
-    {nullptr, "file://foo/bar.txt"},
-    {nullptr, "file://example.com/bar.txt"},
-    {nullptr, "file://192.168.1.1/foo/bar.txt"},
-    {nullptr, "file://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]/foo/bar.txt"},
+      {nullptr, "http://foo/bar.txt"},
+      {nullptr, "http://localhost/foo/bar.txt"},
+      {nullptr, "https://localhost/foo/bar.txt"},
+#if BUILDFLAG(IS_POSIX)
+      {L"/c:/foo/bar.txt", "file:/c:/foo/bar.txt"},
+      {L"/c:/foo/bar.txt", "file:///c:/foo/bar.txt"},
+      {L"/foo/bar.txt", "file:/foo/bar.txt"},
+      {L"/c:/foo/bar.txt", "file:\\\\\\c:/foo/bar.txt"},
+      {L"/foo/bar.txt", "file:foo/bar.txt"},
+      {L"/foo/bar.txt", "file:///foo/bar.txt"},
+      {L"/foo/bar.txt", "file:////foo/bar.txt"},
+      {L"/foo/bar.txt", "file:////foo//bar.txt"},
+      {L"/foo/bar.txt", "file:////foo///bar.txt"},
+      {L"/foo/bar.txt", "file:////foo////bar.txt"},
+      {L"/c:/foo/bar.txt", "file:\\\\\\c:/foo/bar.txt"},
+      {L"/c:/foo/bar.txt", "file:c:/foo/bar.txt"},
+      // %2F ('/') should fail, because it can't be represented in a POSIX
+      // filename (and should not be considered a path separator).
+      {nullptr, "file:///foo%2f../bar"},
+      // %00 should fail, because it represents a null byte in a filename.
+      {nullptr, "file:///foo/%00bar.txt"},
+      // Other percent-encoded characters that are left alone when displaying a
+      // URL are decoded in a file path (https://crbug.com/585422).
+      {L"/foo/\n.txt", "file:///foo/%0A.txt"},         // Control char.
+      {L"/foo/a=$b.txt", "file:///foo/a%3D%24b.txt"},  // Reserved.
+      // Make sure that '+' isn't converted into ' '.
+      {L"/foo/romeo+juliet.txt", "file:///foo/romeo+juliet.txt"},
+      // Backslashes in a file URL are normalized as forward slashes.
+      {L"/bar.txt", "file://\\bar.txt"},
+      {L"/c|/foo/bar.txt", "file:c|/foo\\bar.txt"},
+      {L"/foo/bar.txt", "file:////foo\\bar.txt"},
+      // Accept obviously-local file URLs.
+      {L"/foo/bar.txt", "file:///foo/bar.txt"},
+      {L"/foo/bar.txt", "file://localhost/foo/bar.txt"},
+      {L"/foo/bar.txt", "file://127.0.0.1/foo/bar.txt"},
+      {L"/foo/bar.txt", "file://[::1]/foo/bar.txt"},
+      // Reject non-local file URLs.
+      {nullptr, "file://foo/bar.txt"},
+      {nullptr, "file://example.com/bar.txt"},
+      {nullptr, "file://192.168.1.1/foo/bar.txt"},
+      {nullptr, "file://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]/foo/bar.txt"},
 #endif
   };
   for (const auto& test_case : url_cases) {
@@ -316,13 +262,7 @@ TEST(FilenameUtilTest, FileURLConversion) {
   {
     const char invalid_utf8[] = "file:///d:/Blah/\x85\x99.doc";
     EXPECT_TRUE(FileURLToFilePath(GURL(invalid_utf8), &output));
-#if BUILDFLAG(IS_WIN)
-    // On Windows, invalid UTF-8 bytes are interpreted using the default ANSI
-    // code page. This defaults to Windows-1252 (which we assume here).
-    const base::FilePath::CharType expected_output[] =
-        FILE_PATH_LITERAL("D:\\Blah\\\u2026\u2122.doc");
-    EXPECT_EQ(expected_output, output.value());
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
     // No conversion should happen, and the invalid UTF-8 should be preserved.
     const char expected_output[] = "/d:/Blah/\x85\x99.doc";
     EXPECT_EQ(expected_output, output.value());
@@ -333,13 +273,7 @@ TEST(FilenameUtilTest, FileURLConversion) {
   {
     const char invalid_utf8[] = "file:///d:/Blah/%85%99.doc";
     EXPECT_TRUE(FileURLToFilePath(GURL(invalid_utf8), &output));
-#if BUILDFLAG(IS_WIN)
-    // On Windows, invalid UTF-8 bytes are interpreted using the default ANSI
-    // code page. This defaults to Windows-1252 (which we assume here).
-    const base::FilePath::CharType expected_output[] =
-        FILE_PATH_LITERAL("D:\\Blah\\\u2026\u2122.doc");
-    EXPECT_EQ(expected_output, output.value());
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
     // No conversion should happen, and the invalid UTF-8 should be preserved.
     const char expected_output[] = "/d:/Blah/\x85\x99.doc";
     EXPECT_EQ(expected_output, output.value());
@@ -368,23 +302,7 @@ TEST(FilenameUtilTest, GenerateSafeFileName) {
       {__LINE__, "image/jpeg", "bar.jpg", "bar.jpg"},
       {__LINE__, "image/jpeg", "bar.jpeg", "bar.jpeg"},
 
-#if BUILDFLAG(IS_WIN)
-      // Device names
-      {__LINE__, "text/html", "con.htm", "_con.htm"},
-      {__LINE__, "text/html", "lpt1.htm", "_lpt1.htm"},
-      {__LINE__, "application/x-chrome-extension", "con", "_con.crx"},
-
-      // Looks like foo.{GUID} which get treated as namespace mounts on Windows.
-      {__LINE__, "text/html", "harmless.{not-really-this-may-be-a-guid}",
-       "harmless.download"},
-      {__LINE__, "text/html", "harmless.{mismatched-", "harmless.{mismatched-"},
-
-      // Dangerous extensions
-      {__LINE__, "text/html", "harmless.local", "harmless.download"},
-      {__LINE__, "text/html", "harmless.lnk", "harmless.download"},
-      {__LINE__, "text/html", "harmless.scf", "harmless.download"},
-      {__LINE__, "text/html", "harmless.url", "harmless.download"},
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
       // On Posix, none of the above set is particularly dangerous.
       {__LINE__, "text/html", "con.htm", "con.htm"},
       {__LINE__, "text/html", "lpt1.htm", "lpt1.htm"},
@@ -396,12 +314,10 @@ TEST(FilenameUtilTest, GenerateSafeFileName) {
       {__LINE__, "text/html", "harmless.lnk", "harmless.lnk"},
       {__LINE__, "text/html", "harmless.scf", "harmless.scf"},
       {__LINE__, "text/html", "harmless.url", "harmless.url"},
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
   };
 
-#if BUILDFLAG(IS_WIN)
-  base::FilePath base_path(FILE_PATH_LITERAL("C:\\foo"));
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   base::FilePath base_path("/foo");
 #endif
 
@@ -571,214 +487,155 @@ TEST(FilenameUtilTest, GenerateFileName) {
   // selected, they should be passed through the validation steps and
   // a correct extension should be added if necessary.
   const GenerateFilenameCase generation_tests[] = {
-    // Dotfiles. Ensures preceeding period(s) stripped.
-    {__LINE__, "http://www.google.com/.test.html", "", "", "", "", L"",
-     L"test.html"},
-    {__LINE__, "http://www.google.com/.test", "", "", "", "", L"", L"test"},
-    {__LINE__, "http://www.google.com/..test", "", "", "", "", L"", L"test"},
-    {// Disposition has relative paths, remove directory separators
-     __LINE__, "", "filename=../../../../././../a_file_name.txt", "", "",
-     "text/plain", L"download", L"_.._.._.._._._.._a_file_name.txt"},
-    {// Disposition has parent directories, remove directory separators
-     __LINE__, "", "filename=dir1/dir2/a_file_name.txt", "", "", "text/plain",
-     L"download", L"dir1_dir2_a_file_name.txt"},
-    {// Disposition has relative paths, remove directory separators
-     __LINE__, "", "filename=..\\..\\..\\..\\.\\.\\..\\a_file_name.txt", "", "",
-     "text/plain", L"download", L"_.._.._.._._._.._a_file_name.txt"},
-    {// Disposition has parent directories, remove directory separators
-     __LINE__, "", "filename=dir1\\dir2\\a_file_name.txt", "", "", "text/plain",
-     L"download", L"dir1_dir2_a_file_name.txt"},
-    {// Filename looks like HTML?
-     __LINE__, "", "filename=\"<blink>Hello kitty</blink>\"", "", "",
-     "text/plain", L"default", L"_blink_Hello kitty__blink_"},
-    {// A normal avi should get .avi and not .avi.avi
-     __LINE__, "https://example.com/misc/2.avi", "", "", "", "video/x-msvideo",
-     L"download", L"2.avi"},
-    {// Slashes are illegal, and should be replaced with underscores.
-     __LINE__, "http://example.com/foo%2f..%2fbar.jpg", "", "", "",
-     "text/plain", L"download", L"foo_.._bar.jpg"},
-    {// "%00" decodes to the NUL byte, which is illegal and should be replaced
-     // with an underscore. (Note: This can't be tested with a URL, since "%00"
-     // is illegal in a URL. Only applies to Content-Disposition.)
-     __LINE__, "http://example.com/download.py", "filename=foo%00bar.jpg", "",
-     "", "text/plain", L"download", L"foo_bar.jpg"},
-    {// Extension generation for C-D derived filenames.
-     __LINE__, "", "filename=my-cat", "", "", "image/jpeg", L"download",
-     L"my-cat"},
-    {// Unknown MIME type
-     __LINE__, "", "filename=my-cat", "", "", "dance/party", L"download",
-     L"my-cat"},
-    {// Known MIME type.
-     __LINE__, "", "filename=my-cat.jpg", "", "", "text/plain", L"download",
-     L"my-cat.jpg"},
-#if BUILDFLAG(IS_WIN)
-    // Test truncation of trailing dots and spaces (Windows)
-    {__LINE__, "", "filename=evil.exe ", "", "", "binary/octet-stream",
-     L"download", L"evil.exe"},
-    {__LINE__, "", "filename=evil.exe.", "", "", "binary/octet-stream",
-     L"download", L"evil.exe_"},
-    {__LINE__, "", "filename=evil.exe.  .  .", "", "", "binary/octet-stream",
-     L"download", L"evil.exe_______"},
-    {__LINE__, "", "filename=evil.", "", "", "binary/octet-stream", L"download",
-     L"evil_"},
-    {__LINE__, "", "filename=. . . . .", "", "", "binary/octet-stream",
-     L"download", L"download"},
-#elif BUILDFLAG(IS_POSIX)
-    // Test truncation of trailing dots and spaces (non-Windows)
-    {__LINE__, "", "filename=evil.exe ", "", "", "binary/octet-stream",
-     L"download", L"evil.exe"},
-    {__LINE__, "", "filename=evil.exe.", "", "", "binary/octet-stream",
-     L"download", L"evil.exe"},
-    {__LINE__, "", "filename=evil.exe.  .  .", "", "", "binary/octet-stream",
-     L"download", L"evil.exe.  . _"},
-    {__LINE__, "", "filename=evil.", "", "", "binary/octet-stream", L"download",
-     L"evil"},
-    {__LINE__, "", "filename=. . . . .", "", "", "binary/octet-stream",
-     L"download", L"_. . ._"},
+      // Dotfiles. Ensures preceeding period(s) stripped.
+      {__LINE__, "http://www.google.com/.test.html", "", "", "", "", L"",
+       L"test.html"},
+      {__LINE__, "http://www.google.com/.test", "", "", "", "", L"", L"test"},
+      {__LINE__, "http://www.google.com/..test", "", "", "", "", L"", L"test"},
+      {// Disposition has relative paths, remove directory separators
+       __LINE__, "", "filename=../../../../././../a_file_name.txt", "", "",
+       "text/plain", L"download", L"_.._.._.._._._.._a_file_name.txt"},
+      {// Disposition has parent directories, remove directory separators
+       __LINE__, "", "filename=dir1/dir2/a_file_name.txt", "", "", "text/plain",
+       L"download", L"dir1_dir2_a_file_name.txt"},
+      {// Disposition has relative paths, remove directory separators
+       __LINE__, "", "filename=..\\..\\..\\..\\.\\.\\..\\a_file_name.txt", "",
+       "", "text/plain", L"download", L"_.._.._.._._._.._a_file_name.txt"},
+      {// Disposition has parent directories, remove directory separators
+       __LINE__, "", "filename=dir1\\dir2\\a_file_name.txt", "", "",
+       "text/plain", L"download", L"dir1_dir2_a_file_name.txt"},
+      {// Filename looks like HTML?
+       __LINE__, "", "filename=\"<blink>Hello kitty</blink>\"", "", "",
+       "text/plain", L"default", L"_blink_Hello kitty__blink_"},
+      {// A normal avi should get .avi and not .avi.avi
+       __LINE__, "https://example.com/misc/2.avi", "", "", "",
+       "video/x-msvideo", L"download", L"2.avi"},
+      {// Slashes are illegal, and should be replaced with underscores.
+       __LINE__, "http://example.com/foo%2f..%2fbar.jpg", "", "", "",
+       "text/plain", L"download", L"foo_.._bar.jpg"},
+      {// "%00" decodes to the NUL byte, which is illegal and should be replaced
+       // with an underscore. (Note: This can't be tested with a URL, since
+       // "%00"
+       // is illegal in a URL. Only applies to Content-Disposition.)
+       __LINE__, "http://example.com/download.py", "filename=foo%00bar.jpg", "",
+       "", "text/plain", L"download", L"foo_bar.jpg"},
+      {// Extension generation for C-D derived filenames.
+       __LINE__, "", "filename=my-cat", "", "", "image/jpeg", L"download",
+       L"my-cat"},
+      {// Unknown MIME type
+       __LINE__, "", "filename=my-cat", "", "", "dance/party", L"download",
+       L"my-cat"},
+      {// Known MIME type.
+       __LINE__, "", "filename=my-cat.jpg", "", "", "text/plain", L"download",
+       L"my-cat.jpg"},
+#if BUILDFLAG(IS_POSIX)
+      // Test truncation of trailing dots and spaces (non-Windows)
+      {__LINE__, "", "filename=evil.exe ", "", "", "binary/octet-stream",
+       L"download", L"evil.exe"},
+      {__LINE__, "", "filename=evil.exe.", "", "", "binary/octet-stream",
+       L"download", L"evil.exe"},
+      {__LINE__, "", "filename=evil.exe.  .  .", "", "", "binary/octet-stream",
+       L"download", L"evil.exe.  . _"},
+      {__LINE__, "", "filename=evil.", "", "", "binary/octet-stream",
+       L"download", L"evil"},
+      {__LINE__, "", "filename=. . . . .", "", "", "binary/octet-stream",
+       L"download", L"_. . ._"},
 #endif
-    {__LINE__, "", "attachment; filename=\"meh.exe\xC2\xA0\"", "", "",
-     "binary/octet-stream", L"", L"meh.exe_"},
-    // Disappearing directory references:
-    {__LINE__, "", "filename=.", "", "", "dance/party", L"download",
-     L"download"},
-    {__LINE__, "", "filename=..", "", "", "dance/party", L"download",
-     L"download"},
-    {__LINE__, "", "filename=...", "", "", "dance/party", L"download",
-     L"download"},
-    // Reserved words on Windows
-    {__LINE__, "", "filename=COM1", "", "", "application/foo-bar", L"download",
-#if BUILDFLAG(IS_WIN)
-     L"_COM1"
-#else
-     L"COM1"
-#endif
-    },
-    {__LINE__, "", "filename=COM4.txt", "", "", "text/plain", L"download",
-#if BUILDFLAG(IS_WIN)
-     L"_COM4.txt"
-#else
-     L"COM4.txt"
-#endif
-    },
-    {__LINE__, "", "filename=lpt1.TXT", "", "", "text/plain", L"download",
-#if BUILDFLAG(IS_WIN)
-     L"_lpt1.TXT"
-#else
-     L"lpt1.TXT"
-#endif
-    },
-    {__LINE__, "", "filename=clock$.txt", "", "", "text/plain", L"download",
-#if BUILDFLAG(IS_WIN)
-     L"_clock$.txt"
-#else
-     L"clock$.txt"
-#endif
-    },
-    {// Validation should also apply to sugested name
-     __LINE__, "", "", "", "clock$.txt", "text/plain", L"download",
-#if BUILDFLAG(IS_WIN)
-     L"_clock$.txt"
-#else
-     L"clock$.txt"
-#endif
-    },
-    {// Device names only work when present at the start of the string.
-     __LINE__, "", "filename=mycom1.foo", "", "", "", L"download",
-     L"mycom1.foo"},
-    {__LINE__, "", "filename=Setup.exe.local", "", "", "", L"download",
-#if BUILDFLAG(IS_WIN)
-     L"Setup.exe.download"
-#else
-     L"Setup.exe.local"
-#endif
-    },
-    {__LINE__, "", "filename=Setup.exe.local.local", "", "", "", L"download",
-#if BUILDFLAG(IS_WIN)
-     L"Setup.exe.local.download"
-#else
-     L"Setup.exe.local.local"
-#endif
-    },
-    {__LINE__, "", "filename=Setup.exe.lnk", "", "", "", L"download",
-#if BUILDFLAG(IS_WIN)
-     L"Setup.exe.download"
-#else
-     L"Setup.exe.lnk"
-#endif
-    },
-    {__LINE__, "", "filename=Desktop.ini", "", "", "", L"download",
-#if BUILDFLAG(IS_WIN)
-     L"_Desktop.ini"
-#else
-     L"Desktop.ini"
-#endif
-    },
-    {__LINE__, "", "filename=Thumbs.db", "", "", "", L"download",
-#if BUILDFLAG(IS_WIN)
-     L"_Thumbs.db"
-#else
-     L"Thumbs.db"
-#endif
-    },
+      {__LINE__, "", "attachment; filename=\"meh.exe\xC2\xA0\"", "", "",
+       "binary/octet-stream", L"", L"meh.exe_"},
+      // Disappearing directory references:
+      {__LINE__, "", "filename=.", "", "", "dance/party", L"download",
+       L"download"},
+      {__LINE__, "", "filename=..", "", "", "dance/party", L"download",
+       L"download"},
+      {__LINE__, "", "filename=...", "", "", "dance/party", L"download",
+       L"download"},
+      // Reserved words on Windows
+      {__LINE__, "", "filename=COM1", "", "", "application/foo-bar",
+       L"download", L"COM1"},
+      {__LINE__, "", "filename=COM4.txt", "", "", "text/plain", L"download",
+       L"COM4.txt"},
+      {__LINE__, "", "filename=lpt1.TXT", "", "", "text/plain", L"download",
+       L"lpt1.TXT"},
+      {__LINE__, "", "filename=clock$.txt", "", "", "text/plain", L"download",
+       L"clock$.txt"},
+      {// Validation should also apply to sugested name
+       __LINE__, "", "", "", "clock$.txt", "text/plain", L"download",
+       L"clock$.txt"},
+      {// Device names only work when present at the start of the string.
+       __LINE__, "", "filename=mycom1.foo", "", "", "", L"download",
+       L"mycom1.foo"},
+      {__LINE__, "", "filename=Setup.exe.local", "", "", "", L"download",
+       L"Setup.exe.local"},
+      {__LINE__, "", "filename=Setup.exe.local.local", "", "", "", L"download",
+       L"Setup.exe.local.local"},
+      {__LINE__, "", "filename=Setup.exe.lnk", "", "", "", L"download",
+       L"Setup.exe.lnk"},
+      {__LINE__, "", "filename=Desktop.ini", "", "", "", L"download",
+       L"Desktop.ini"},
+      {__LINE__, "", "filename=Thumbs.db", "", "", "", L"download",
+       L"Thumbs.db"},
 
-    // Regression tests for older issues:
-    {// http://crbug.com/5772.
-     __LINE__, "http://www.example.com/foo.tar.gz", "", "", "",
-     "application/x-tar", L"download", L"foo.tar.gz"},
-    {// http://crbug.com/52250.
-     __LINE__, "http://www.example.com/foo.tgz", "", "", "",
-     "application/x-tar", L"download", L"foo.tgz"},
-    {// http://crbug.com/7337.
-     __LINE__, "http://maged.lordaeron.org/blank.reg", "", "", "",
-     "text/x-registry", L"download", L"blank.reg"},
-    {__LINE__, "http://www.example.com/bar.tar", "", "", "",
-     "application/x-tar", L"download", L"bar.tar"},
-    {__LINE__, "http://www.example.com/bar.bogus", "", "", "",
-     "application/x-tar", L"download", L"bar.bogus"},
-    {// http://crbug.com/20337
-     __LINE__, "http://www.example.com/.download.txt", "filename=.download.txt",
-     "", "", "text/plain", L"-download", L"download.txt"},
-    {// http://crbug.com/56855.
-     __LINE__, "http://www.example.com/bar.sh", "", "", "", "application/x-sh",
-     L"download", L"bar.sh"},
-    {// http://crbug.com/61571
-     __LINE__, "http://www.example.com/npdf.php?fn=foobar.pdf", "", "", "",
-     "application/x-chrome-extension", L"download", L"npdf.crx"},
-    {// Shouldn't overwrite C-D specified extension.
-     __LINE__, "http://www.example.com/npdf.php?fn=foobar.pdf",
-     "filename=foobar.jpg", "", "", "text/plain", L"download", L"foobar.jpg"},
-    {// http://crbug.com/87719
-     __LINE__, "http://www.example.com/image.aspx?id=blargh", "", "", "",
-     "application/x-chrome-extension", L"download", L"image.crx"},
-    {__LINE__, "http://www.example.com/image.aspx?id=blargh", "", "", " .foo",
-     "", L"download", L"_.foo"},
+      // Regression tests for older issues:
+      {// http://crbug.com/5772.
+       __LINE__, "http://www.example.com/foo.tar.gz", "", "", "",
+       "application/x-tar", L"download", L"foo.tar.gz"},
+      {// http://crbug.com/52250.
+       __LINE__, "http://www.example.com/foo.tgz", "", "", "",
+       "application/x-tar", L"download", L"foo.tgz"},
+      {// http://crbug.com/7337.
+       __LINE__, "http://maged.lordaeron.org/blank.reg", "", "", "",
+       "text/x-registry", L"download", L"blank.reg"},
+      {__LINE__, "http://www.example.com/bar.tar", "", "", "",
+       "application/x-tar", L"download", L"bar.tar"},
+      {__LINE__, "http://www.example.com/bar.bogus", "", "", "",
+       "application/x-tar", L"download", L"bar.bogus"},
+      {// http://crbug.com/20337
+       __LINE__, "http://www.example.com/.download.txt",
+       "filename=.download.txt", "", "", "text/plain", L"-download",
+       L"download.txt"},
+      {// http://crbug.com/56855.
+       __LINE__, "http://www.example.com/bar.sh", "", "", "",
+       "application/x-sh", L"download", L"bar.sh"},
+      {// http://crbug.com/61571
+       __LINE__, "http://www.example.com/npdf.php?fn=foobar.pdf", "", "", "",
+       "application/x-chrome-extension", L"download", L"npdf.crx"},
+      {// Shouldn't overwrite C-D specified extension.
+       __LINE__, "http://www.example.com/npdf.php?fn=foobar.pdf",
+       "filename=foobar.jpg", "", "", "text/plain", L"download", L"foobar.jpg"},
+      {// http://crbug.com/87719
+       __LINE__, "http://www.example.com/image.aspx?id=blargh", "", "", "",
+       "application/x-chrome-extension", L"download", L"image.crx"},
+      {__LINE__, "http://www.example.com/image.aspx?id=blargh", "", "", " .foo",
+       "", L"download", L"_.foo"},
 
-    // Note that the next 4 tests will not fail on all platforms on regression.
-    // They only fail if application/[x-]gzip has a default extension, which
-    // can vary across platforms (And even by OS install).
-    {__LINE__, "http://www.example.com/goat.tar.gz?wearing_hat=true", "", "",
-     "", "application/gzip", L"", L"goat.tar.gz"},
-    {__LINE__, "http://www.example.com/goat.tar.gz?wearing_hat=true", "", "",
-     "", "application/x-gzip", L"", L"goat.tar.gz"},
-    {__LINE__, "http://www.example.com/goat.tgz?wearing_hat=true", "", "", "",
-     "application/gzip", L"", L"goat.tgz"},
-    {__LINE__, "http://www.example.com/goat.tgz?wearing_hat=true", "", "", "",
-     "application/x-gzip", L"", L"goat.tgz"},
+      // Note that the next 4 tests will not fail on all platforms on
+      // regression.
+      // They only fail if application/[x-]gzip has a default extension, which
+      // can vary across platforms (And even by OS install).
+      {__LINE__, "http://www.example.com/goat.tar.gz?wearing_hat=true", "", "",
+       "", "application/gzip", L"", L"goat.tar.gz"},
+      {__LINE__, "http://www.example.com/goat.tar.gz?wearing_hat=true", "", "",
+       "", "application/x-gzip", L"", L"goat.tar.gz"},
+      {__LINE__, "http://www.example.com/goat.tgz?wearing_hat=true", "", "", "",
+       "application/gzip", L"", L"goat.tgz"},
+      {__LINE__, "http://www.example.com/goat.tgz?wearing_hat=true", "", "", "",
+       "application/x-gzip", L"", L"goat.tgz"},
 
 #if BUILDFLAG(IS_CHROMEOS)
-    {// http://crosbug.com/26028
-     __LINE__, "http://www.example.com/fooa%cc%88.txt", "", "", "",
-     "image/jpeg", L"foo\xe4", L"foo\xe4.txt"},
+      {// http://crosbug.com/26028
+       __LINE__, "http://www.example.com/fooa%cc%88.txt", "", "", "",
+       "image/jpeg", L"foo\xe4", L"foo\xe4.txt"},
 #endif
 
-    // U+3000 IDEOGRAPHIC SPACE (http://crbug.com/849794): In URL file name.
-    {__LINE__, "http://www.example.com/%E5%B2%A1%E3%80%80%E5%B2%A1.txt", "", "",
-     "", "text/plain", L"", L"\u5ca1\u3000\u5ca1.txt"},
-    // U+3000 IDEOGRAPHIC SPACE (http://crbug.com/849794): In
-    // Content-Disposition filename.
-    {__LINE__, "http://www.example.com/download.py",
-     "filename=%E5%B2%A1%E3%80%80%E5%B2%A1.txt", "utf-8", "", "text/plain", L"",
-     L"\u5ca1\u3000\u5ca1.txt"},
+      // U+3000 IDEOGRAPHIC SPACE (http://crbug.com/849794): In URL file name.
+      {__LINE__, "http://www.example.com/%E5%B2%A1%E3%80%80%E5%B2%A1.txt", "",
+       "", "", "text/plain", L"", L"\u5ca1\u3000\u5ca1.txt"},
+      // U+3000 IDEOGRAPHIC SPACE (http://crbug.com/849794): In
+      // Content-Disposition filename.
+      {__LINE__, "http://www.example.com/download.py",
+       "filename=%E5%B2%A1%E3%80%80%E5%B2%A1.txt", "utf-8", "", "text/plain",
+       L"", L"\u5ca1\u3000\u5ca1.txt"},
   };
 
   for (const auto& selection_test : selection_tests)

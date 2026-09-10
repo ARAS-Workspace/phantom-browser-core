@@ -512,7 +512,7 @@ void MediaInternals::SendGeneralAudioInformation() {
   audio_info_data.Set(media::kChromeWideEchoCancellation.name,
                       base::Value(chrome_wide_echo_cancellation_value_string));
 #endif
-#if (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN))
+#if BUILDFLAG(IS_MAC)
   std::string system_echo_cancellation_value_string =
       media::IsSystemEchoCancellationEnforced() ? "Enabled" : "Disabled";
   audio_info_data.Set(media::kEnforceSystemEchoCancellation.name,

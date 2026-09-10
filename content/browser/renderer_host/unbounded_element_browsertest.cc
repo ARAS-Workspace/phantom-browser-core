@@ -120,13 +120,6 @@ class UnboundedElementBrowserTestBase : public ContentBrowserTest {
       return tracker;
     }
     tracker->Add(native_window);
-#if BUILDFLAG(IS_WIN)
-    // Explicitly wait for the top-level window to be destroyed on windows, to
-    // avoid the test runner's leak detection check from failing.
-    if (native_window->parent()) {
-      tracker->Add(native_window->parent());
-    }
-#endif
     return tracker;
   }
 

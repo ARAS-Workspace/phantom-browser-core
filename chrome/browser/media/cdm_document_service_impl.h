@@ -45,26 +45,6 @@ class CdmDocumentServiceImpl final
 #if BUILDFLAG(IS_CHROMEOS)
   void IsVerifiedAccessEnabled(IsVerifiedAccessEnabledCallback callback) final;
 #endif  // BUILDFLAG(IS_CHROMEOS)
-#if BUILDFLAG(IS_WIN)
-  void GetMediaFoundationCdmData(
-      GetMediaFoundationCdmDataCallback callback) final;
-  void SetCdmClientToken(const std::vector<uint8_t>& client_token) final;
-  void OnCdmEvent(media::CdmEvent event, uint32_t hresult) final;
-
-  static void ClearCdmData(
-      Profile* profile,
-      base::Time start,
-      base::Time end,
-      const base::RepeatingCallback<bool(const GURL&)>& filter,
-      base::OnceClosure complete_cb);
-
-  // Gets the processed paths cache for use in the implementation.
-  static base::flat_set<base::FilePath>& GetCdmStoreProcessedPaths();
-
-  // Clears the processed paths cache for testing so that ACL migration logic
-  // can be re-triggered.
-  static void ClearCdmStoreProcessedPathsForTesting();
-#endif  // BUILDFLAG(IS_WIN)
 
  private:
   CdmDocumentServiceImpl(
@@ -91,11 +71,6 @@ class CdmDocumentServiceImpl final
 #if BUILDFLAG(IS_CHROMEOS)
   scoped_refptr<ash::attestation::PlatformVerificationFlow>
       platform_verification_flow_;
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  // See comments in OnCdmEvent() implementation.
-  std::set<media::CdmEvent> reported_cdm_event_;
 #endif
 
   base::WeakPtrFactory<CdmDocumentServiceImpl> weak_factory_{this};

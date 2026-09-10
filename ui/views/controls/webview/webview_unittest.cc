@@ -137,7 +137,7 @@ class WebViewTestWebContentsDelegate : public content::WebContentsDelegate {
   bool is_fullscreened_ = false;
 };
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 class TestRenderWidgetHostViewWithAccessible
     : public content::TestRenderWidgetHostView {
  public:
@@ -694,7 +694,7 @@ TEST_F(WebViewUnitTest, AccessibleProperties) {
   EXPECT_EQ(data.role, ax::mojom::Role::kWebView);
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 TEST_F(WebViewUnitTest,
        NativeViewAccessibleFallsBackWhenWebContentsAccessibleIsNull) {
   const std::unique_ptr<content::WebContents> web_contents =

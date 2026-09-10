@@ -2401,9 +2401,6 @@ bool PrintRenderFrameHelper::PrintPagesNative(
   }
 
   page_params->document_cookie = print_params.document_cookie;
-#if BUILDFLAG(IS_WIN)
-  page_params->physical_offsets = printer_printable_area_.origin();
-#endif
 
   if (print_with_params_callback_) {
     auto result = mojom::PrintWithParamsResultData::New();

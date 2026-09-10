@@ -41,26 +41,18 @@
 #include "build/chromeos_buildflags.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <intrin.h>
-#include <malloc.h>
-#else
 #include <alloca.h>
-#endif
 
 // STACK_SAMPLING_PROFILER_SUPPORTED is used to conditionally enable the tests
 // below for supported platforms (currently Win x64, Mac, iOS 64, some
 // Android, and ChromeOS x64).
 // ChromeOS: These don't run under MSan because parts of the stack aren't
 // initialized.
-#if (BUILDFLAG(IS_WIN) && defined(ARCH_CPU_X86_64)) || (BUILDFLAG(IS_MAC)) || \
-    (BUILDFLAG(IS_IOS) && defined(ARCH_CPU_64_BITS)) ||                       \
-    (BUILDFLAG(IS_ANDROID) &&                                                 \
-     (BUILDFLAG(ENABLE_ARM_CFI_TABLE) || defined(ARCH_CPU_ARM64))) ||         \
-    (BUILDFLAG(IS_CHROMEOS) &&                                                \
-     (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64)) &&                 \
+#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_IOS) && defined(ARCH_CPU_64_BITS)) || \
+    (BUILDFLAG(IS_ANDROID) &&                                                \
+     (BUILDFLAG(ENABLE_ARM_CFI_TABLE) || defined(ARCH_CPU_ARM64))) ||        \
+    (BUILDFLAG(IS_CHROMEOS) &&                                               \
+     (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64)) &&                \
      !defined(MEMORY_SANITIZER))
 #define STACK_SAMPLING_PROFILER_SUPPORTED 1
 #endif
@@ -200,20 +192,7 @@ void TestProfileBuilder::OnProfileCompleted(TimeDelta profile_duration,
 // is insufficient to ensure it's been unloaded.
 void SynchronousUnloadNativeLibrary(NativeLibrary library) {
   UnloadNativeLibrary(library);
-#if BUILDFLAG(IS_WIN)
-  // NativeLibrary is a typedef for HMODULE, which is actually the base address
-  // of the module.
-  uintptr_t module_base_address = reinterpret_cast<uintptr_t>(library);
-  HMODULE module_handle;
-  // Keep trying to get the module handle until the call fails.
-  while (::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-                                 GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                             reinterpret_cast<LPCTSTR>(module_base_address),
-                             &module_handle) ||
-         ::GetLastError() != ERROR_MOD_NOT_FOUND) {
-    PlatformThread::Sleep(Milliseconds(1));
-  }
-#elif BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
 // Unloading a library on Mac and Android is synchronous.
 #else
   NOTIMPLEMENTED();

@@ -39,11 +39,11 @@ constexpr char kSwitchDisableDeltaUpdates[] = "disable-delta-updates";
 // value is in seconds.
 constexpr char kInitialDelay[] = "initial-delay";
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 // Disables background downloads.
 constexpr char kSwitchDisableBackgroundDownloads[] =
     "disable-background-downloads";
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 // If there is an element of |vec| of the form |test|=.*, returns the right-
 // hand side of that assignment. Otherwise, returns an empty string.
@@ -75,7 +75,7 @@ ComponentUpdaterCommandLineConfigPolicy::
       cmdline->GetSwitchValueASCII(switches::kComponentUpdater), ",",
       base::KEEP_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   background_downloads_enabled_ =
       !std::ranges::contains(switch_values, kSwitchDisableBackgroundDownloads);
 #else

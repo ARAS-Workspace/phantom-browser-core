@@ -584,11 +584,7 @@ IN_PROC_BROWSER_TEST_F(NetworkServiceRestartBrowserTest,
 // |StoragePartition::GetURLLoaderFactoryForBrowserProcessIOThread()| can be
 // used after crashes.
 // Flaky on Windows. https://crbug.com/840127
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_BrowserIOPendingFactory DISABLED_BrowserIOPendingFactory
-#else
 #define MAYBE_BrowserIOPendingFactory BrowserIOPendingFactory
-#endif
 IN_PROC_BROWSER_TEST_F(NetworkServiceRestartBrowserTest,
                        MAYBE_BrowserIOPendingFactory) {
   if (IsInProcessNetworkService())
@@ -943,12 +939,7 @@ IN_PROC_BROWSER_TEST_F(NetworkServiceRestartBrowserTest, SSLKeyLogFileMetrics) {
   base::FilePath log_file_path;
   base::CreateTemporaryFile(&log_file_path);
 
-#if BUILDFLAG(IS_WIN)
-  // On Windows, FilePath::value() returns std::wstring, so convert.
-  std::string log_file_path_str = base::WideToUTF8(log_file_path.value());
-#else
   std::string log_file_path_str = log_file_path.value();
-#endif
 
   // Test that env var causes the histogram to be recorded.
   {

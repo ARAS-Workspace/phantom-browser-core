@@ -35,10 +35,7 @@ class ECSigningKey : public crypto::UnexportableSigningKey {
 
 #if BUILDFLAG(IS_MAC)
   SecKeyRef GetSecKeyRef() const override;
-#elif BUILDFLAG(IS_WIN)
-  bool SupportsTls13() override { return true; }
-  NCRYPT_KEY_HANDLE GetNCryptKeyHandle() const override { NOTREACHED(); }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
  private:
   crypto::keypair::PrivateKey key_;

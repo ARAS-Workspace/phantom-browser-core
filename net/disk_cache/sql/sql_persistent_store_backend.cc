@@ -322,9 +322,6 @@ SqlPersistentStore::Backend::Backend(
       read_cache_memory_monitor_(std::move(read_cache_memory_monitor)),
       reduce_uma_(net::features::kSqlDiskCacheReduceUma.Get()),
       db_(sql::DatabaseOptions()
-#if BUILDFLAG(IS_WIN)
-              .set_exclusive_database_file_lock(true)
-#endif  // IS_WIN
               .set_wal_mode(net::features::kSqlDiskCacheWalMode.Get())
               .set_no_sync(net::features::kSqlDiskCacheSynchronousOff.Get())
               .set_wal_commit_callback(base::BindRepeating(

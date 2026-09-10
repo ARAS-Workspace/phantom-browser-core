@@ -21,11 +21,9 @@
 
 namespace viz {
 
-#if !BUILDFLAG(IS_WIN)
 void DrawPolygon::RecomputeNormalForTesting() {
   ConstructNormal();
 }
-#endif
 
 static int sign(float v) {
   static const float epsilon = 0.00001f;

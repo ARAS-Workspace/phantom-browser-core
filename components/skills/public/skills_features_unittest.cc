@@ -27,7 +27,7 @@ class SkillsFeaturesTest : public testing::Test {
 TEST_F(SkillsFeaturesTest, IsSkillsEnabled_Default_PrefOn) {
   prefs_->SetBoolean(prefs::kChromeSkillsEnabled, true);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
   EXPECT_TRUE(IsSkillsEnabled(prefs_.get()));
 #else
   EXPECT_FALSE(IsSkillsEnabled(prefs_.get()));

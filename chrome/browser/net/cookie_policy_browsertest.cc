@@ -860,11 +860,7 @@ IN_PROC_BROWSER_TEST_P(
 }
 
 // TODO(crbug.com/394386466): Test failing on Windows-asan
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_UserSetting DISABLED_UserSetting
-#else
 #define MAYBE_UserSetting UserSetting
-#endif
 IN_PROC_BROWSER_TEST_P(
     ThirdPartyPartitionedStorageAccessibilitySharedWorkerTest,
     MAYBE_UserSetting) {

@@ -20,7 +20,7 @@
 #include "ui/color/color_id.h"
 #include "ui/gfx/paint_vector_icon.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/views/extensions/settings_overridden_dialog_view_utils.h"  // nogncheck
 #endif
 
@@ -140,7 +140,7 @@ void BuildSettingsOverriddenDialog(
   }
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 void BuildExplicitChoiceDialog(
     ui::DialogModel::Builder& dialog_builder,
     const SettingsOverriddenDialogController::ShowParams& show_params,
@@ -189,7 +189,7 @@ void BuildExplicitChoiceDialog(
       kSettingsOverriddenDialogNewSettingButtonId,
       create_selection_callback(DialogResult::kKeepNewSettings));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace
 
@@ -214,7 +214,7 @@ void ShowSettingsOverriddenDialog(
       ui::DialogModel::Builder(std::move(dialog_delegate_unique));
   dialog_builder.SetInternalName(kExtensionSettingsOverriddenDialogName);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // The "explicit choice" dialog is only supported on Windows and Mac.
   if (base::FeatureList::IsEnabled(
           extensions_features::kSearchEngineExplicitChoiceDialog) &&
@@ -224,9 +224,9 @@ void ShowSettingsOverriddenDialog(
   } else {
     BuildSettingsOverriddenDialog(dialog_builder, show_params, dialog_delegate);
   }
-#else   // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#else
   BuildSettingsOverriddenDialog(dialog_builder, show_params, dialog_delegate);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
   ShowModalDialog(parent, dialog_builder.Build());
 }

@@ -22,8 +22,6 @@
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/permissions/system/system_media_permission_cache_mac_test_helper.h"
-#elif BUILDFLAG(IS_WIN)
-#include "chrome/browser/permissions/system/system_media_source_win.h"
 #endif
 
 namespace system_permission_settings {
@@ -35,13 +33,6 @@ class SystemPermissionSettingsBrowserTest : public InProcessBrowserTest {
   SystemPermissionSettingsBrowserTest() {
 #if BUILDFLAG(IS_MAC)
     SetUseFakeMediaStreamDevices(false);
-#elif BUILDFLAG(IS_WIN)
-    SystemMediaSourceWin::GetInstance().SetMockStatus(
-        ContentSettingsType::MEDIASTREAM_CAMERA,
-        SystemMediaSourceWin::Status::kNotDetermined);
-    SystemMediaSourceWin::GetInstance().SetMockStatus(
-        ContentSettingsType::MEDIASTREAM_MIC,
-        SystemMediaSourceWin::Status::kNotDetermined);
 #endif
   }
   ~SystemPermissionSettingsBrowserTest() override = default;
@@ -58,12 +49,6 @@ class SystemPermissionSettingsBrowserTest : public InProcessBrowserTest {
 #if BUILDFLAG(IS_MAC)
     mac_test_helper_.reset();
     InProcessBrowserTest::TearDown();
-#elif BUILDFLAG(IS_WIN)
-    SystemMediaSourceWin::GetInstance().SetMockStatus(
-        ContentSettingsType::MEDIASTREAM_CAMERA, std::nullopt);
-    SystemMediaSourceWin::GetInstance().SetMockStatus(
-        ContentSettingsType::MEDIASTREAM_MIC, std::nullopt);
-    InProcessBrowserTest::TearDown();
 #else
     InProcessBrowserTest::TearDown();
 #endif
@@ -73,15 +58,6 @@ class SystemPermissionSettingsBrowserTest : public InProcessBrowserTest {
 #if BUILDFLAG(IS_MAC)
     mac_test_helper_->SetCameraStatus(is_denied);
     mac_test_helper_->SetMicStatus(is_denied);
-#elif BUILDFLAG(IS_WIN)
-    SystemMediaSourceWin::GetInstance().SetMockStatus(
-        ContentSettingsType::MEDIASTREAM_CAMERA,
-        is_denied ? SystemMediaSourceWin::Status::kDenied
-                  : SystemMediaSourceWin::Status::kAllowed);
-    SystemMediaSourceWin::GetInstance().SetMockStatus(
-        ContentSettingsType::MEDIASTREAM_MIC,
-        is_denied ? SystemMediaSourceWin::Status::kDenied
-                  : SystemMediaSourceWin::Status::kAllowed);
 #endif
   }
 

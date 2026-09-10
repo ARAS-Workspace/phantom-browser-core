@@ -290,12 +290,6 @@ void GetDawnTogglesForSkiaGraphite(
   force_enabled_toggles->push_back(
       "disable_lazy_clear_for_mapped_at_creation_buffer");
   force_enabled_toggles->push_back("dump_shaders_on_failure");
-#if BUILDFLAG(IS_WIN)
-  if (backend_type == wgpu::BackendType::D3D11) {
-    force_enabled_toggles->push_back(
-        "use_packed_depth24_unorm_stencil8_format");
-  }
-#endif  // BUILDFLAG(IS_WIN)
   if (backend_type == wgpu::BackendType::Vulkan) {
     force_enabled_toggles->push_back("vulkan_monolithic_pipeline_cache");
 #if BUILDFLAG(IS_ANDROID)
@@ -313,9 +307,7 @@ void ReportWebGPUAdapterMetrics(dawn::native::Instance* instance) {
 
   wgpu::RequestAdapterOptions adapter_options = {};
   // Search for the backend used for core WebGPU.
-#if BUILDFLAG(IS_WIN)
-  adapter_options.backendType = wgpu::BackendType::D3D12;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   adapter_options.backendType = wgpu::BackendType::Metal;
 #else
   adapter_options.backendType = wgpu::BackendType::Vulkan;
@@ -363,7 +355,7 @@ void ReportWebGPUAdapterMetrics(dawn::native::Instance* instance) {
 
 void ReportWebGPUSupportMetrics(dawn::native::Instance* instance) {
   static BASE_FEATURE(kCollectWebGPUSupportMetrics,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
                       base::FEATURE_DISABLED_BY_DEFAULT);
 #else
                       base::FEATURE_ENABLED_BY_DEFAULT);
@@ -391,9 +383,7 @@ void ReportWebGPUSupportMetrics(dawn::native::Instance* instance) {
 
   wgpu::RequestAdapterOptions adapter_options = {};
   // Search for the backend used for core WebGPU.
-#if BUILDFLAG(IS_WIN)
-  adapter_options.backendType = wgpu::BackendType::D3D12;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   adapter_options.backendType = wgpu::BackendType::Metal;
 #else
   adapter_options.backendType = wgpu::BackendType::Vulkan;
@@ -502,31 +492,14 @@ bool CollectGraphicsDeviceInfoFromCommandLine(
     base::StringToUint(device_id_str, &gpu.device_id);
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (command_line->HasSwitch(switches::kGpuSubSystemId)) {
-    const std::string syb_system_id_str =
-        command_line->GetSwitchValueASCII(switches::kGpuSubSystemId);
-    base::StringToUint(syb_system_id_str, &gpu.sub_sys_id);
-  }
-
-  if (command_line->HasSwitch(switches::kGpuRevision)) {
-    const std::string revision_str =
-        command_line->GetSwitchValueASCII(switches::kGpuRevision);
-    base::StringToUint(revision_str, &gpu.revision);
-  }
-#endif
-
   if (command_line->HasSwitch(switches::kGpuDriverVersion)) {
     gpu.driver_version =
         command_line->GetSwitchValueASCII(switches::kGpuDriverVersion);
   }
 
   bool info_updated = gpu.vendor_id || gpu.device_id ||
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
                       gpu.revision ||
-#endif
-#if BUILDFLAG(IS_WIN)
-                      gpu.sub_sys_id ||
 #endif
                       !gpu.driver_version.empty();
 
@@ -672,9 +645,6 @@ bool CollectGraphicsInfoGL(GPUInfo* gpu_info, gl::GLDisplay* display) {
   gpu_info->vertex_shader_version = glsl_version;
 
   bool active_gpu_identified = false;
-#if BUILDFLAG(IS_WIN)
-  active_gpu_identified = IdentifyActiveGPUWithLuid(gpu_info);
-#endif  // BUILDFLAG(IS_WIN)
 
   if (!active_gpu_identified)
     IdentifyActiveGPU(gpu_info);

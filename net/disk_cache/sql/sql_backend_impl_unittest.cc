@@ -255,9 +255,6 @@ class SqlBackendImplTest : public testing::Test {
                                        SqlPersistentStore::ResId res_id) {
     auto db = std::make_unique<sql::Database>(
         sql::DatabaseOptions()
-#if BUILDFLAG(IS_WIN)
-            .set_exclusive_database_file_lock(true)
-#endif  // IS_WIN
             .set_wal_mode(true),
         sql::Database::Tag("HttpCacheDiskCache"));
     CHECK(db->Open(temp_dir_.GetPath().AppendASCII(

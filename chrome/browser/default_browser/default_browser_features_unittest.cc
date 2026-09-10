@@ -14,11 +14,7 @@ TEST(DefaultBrowserFeaturesTest, IsDefaultBrowserPromptSurfacesEnabled) {
   {
     base::test::ScopedFeatureList feature_list;
     feature_list.InitAndEnableFeature(kDefaultBrowserPromptSurfaces);
-#if BUILDFLAG(IS_WIN)
-    EXPECT_TRUE(IsDefaultBrowserPromptSurfacesEnabled());
-#else
     EXPECT_FALSE(IsDefaultBrowserPromptSurfacesEnabled());
-#endif
   }
   {
     base::test::ScopedFeatureList feature_list;
@@ -31,11 +27,7 @@ TEST(DefaultBrowserFeaturesTest, IsDefaultBrowserChangedOsNotificationEnabled) {
   {
     base::test::ScopedFeatureList feature_list;
     feature_list.InitAndEnableFeature(kDefaultBrowserChangedOsNotification);
-#if BUILDFLAG(IS_WIN)
-    EXPECT_TRUE(IsDefaultBrowserChangedOsNotificationEnabled());
-#else
     EXPECT_FALSE(IsDefaultBrowserChangedOsNotificationEnabled());
-#endif
   }
   {
     base::test::ScopedFeatureList feature_list;
@@ -54,14 +46,8 @@ TEST(DefaultBrowserFeaturesTest, GetDefaultBrowserPromptSurface) {
           {{"prompt_surface", "modal_dialog_with_settings_illustration"}}},
          {kDefaultBrowserSetterSelection, {{"setter_option", "visual_guide"}}}},
         {});
-#if BUILDFLAG(IS_WIN)
-    EXPECT_EQ(
-        GetDefaultBrowserPromptSurface(),
-        DefaultBrowserPromptSurface::kModalDialogWithoutSettingsIllustration);
-#else
     EXPECT_EQ(GetDefaultBrowserPromptSurface(),
               DefaultBrowserPromptSurface::kInfobar);
-#endif
   }
 
   {
@@ -72,17 +58,8 @@ TEST(DefaultBrowserFeaturesTest, GetDefaultBrowserPromptSurface) {
          {kDefaultBrowserSetterSelection,
           {{"setter_option", "shell_integration"}}}},
         {});
-#if BUILDFLAG(IS_WIN)
-    DefaultBrowserPromptSurface surface = GetDefaultBrowserPromptSurface();
-    EXPECT_TRUE(
-        surface ==
-            DefaultBrowserPromptSurface::kModalDialogWithSettingsIllustration ||
-        surface == DefaultBrowserPromptSurface::
-                       kModalDialogWithoutSettingsIllustration);
-#else
     EXPECT_EQ(GetDefaultBrowserPromptSurface(),
               DefaultBrowserPromptSurface::kInfobar);
-#endif
   }
 
   {
@@ -91,14 +68,8 @@ TEST(DefaultBrowserFeaturesTest, GetDefaultBrowserPromptSurface) {
         {{kDefaultBrowserPromptSurfaces,
           {{"prompt_surface", "modal_dialog_without_settings_illustration"}}}},
         {});
-#if BUILDFLAG(IS_WIN)
-    EXPECT_EQ(
-        GetDefaultBrowserPromptSurface(),
-        DefaultBrowserPromptSurface::kModalDialogWithoutSettingsIllustration);
-#else
     EXPECT_EQ(GetDefaultBrowserPromptSurface(),
               DefaultBrowserPromptSurface::kInfobar);
-#endif
   }
 }
 

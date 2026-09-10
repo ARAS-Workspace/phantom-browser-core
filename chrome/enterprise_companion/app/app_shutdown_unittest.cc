@@ -89,10 +89,6 @@ class AppShutdownTest : public ::testing::Test {
                                   base::UnguessableToken::Create().ToString(),
                                   ".service.sk"}))
         .AsUTF8Unsafe();
-#elif BUILDFLAG(IS_WIN)
-    return base::UTF8ToWide(
-        base::StrCat({"org.chromium.ChromeEnterpriseCompanionTest",
-                      base::UnguessableToken::Create().ToString()}));
 #endif
   }
 };

@@ -24,10 +24,6 @@
 #include "extensions/buildflags/buildflags.h"
 #include "third_party/metrics_proto/system_profile.pb.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>  // Needed for STATUS_* codes
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/application_status_listener.h"
 #endif
@@ -39,14 +35,6 @@ namespace {
 // Converts an exit code into something that can be inserted into our
 // histograms (which expect non-negative numbers less than MAX_INT).
 int MapCrashExitCodeForHistogram(int exit_code) {
-#if BUILDFLAG(IS_WIN)
-  // Since |abs(STATUS_GUARD_PAGE_VIOLATION) == MAX_INT| it causes problems in
-  // histograms.cc. Solve this by remapping it to a smaller value, which
-  // hopefully doesn't conflict with other codes.
-  if (static_cast<DWORD>(exit_code) == STATUS_GUARD_PAGE_VIOLATION) {
-    return 0x1FCF7EC3;  // Randomly picked number.
-  }
-#endif
 
   return std::abs(exit_code);
 }
@@ -171,20 +159,12 @@ void StabilityMetricsHelper::BrowserUtilityProcessCrashed(
 void StabilityMetricsHelper::BrowserUtilityProcessLaunchFailed(
     const std::string& metrics_name,
     int launch_error_code
-#if BUILDFLAG(IS_WIN)
-    ,
-    DWORD last_error
-#endif
 ) {
   uint32_t hash = variations::HashName(metrics_name);
   base::UmaHistogramSparse("ChildProcess.LaunchFailed.UtilityProcessHash",
                            hash);
   base::UmaHistogramSparse("ChildProcess.LaunchFailed.UtilityProcessErrorCode",
                            launch_error_code);
-#if BUILDFLAG(IS_WIN)
-  base::UmaHistogramSparse("ChildProcess.LaunchFailed.WinLastError",
-                           last_error);
-#endif
   // TODO(wfh): Decide if this utility process launch failure should also
   // trigger a Stability Event.
 }
@@ -212,29 +192,15 @@ void StabilityMetricsHelper::CdmUtilityProcessCrashed(
 void StabilityMetricsHelper::CdmUtilityProcessLaunchFailed(
     const std::string& metrics_name,
     int launch_error_code
-#if BUILDFLAG(IS_WIN)
-    ,
-    DWORD last_error
-#endif
 ) {
   DVLOG(3) << __func__ << ": metrics_name=" << metrics_name
-#if BUILDFLAG(IS_WIN)
-           << ", launch_error_code=" << launch_error_code
-           << ", last_error=" << last_error;
-#else
            << ", launch_error_code=" << launch_error_code;
-#endif
 
   base::UmaHistogramBoolean(CdmMetricsNameToUmaPrefix(metrics_name) + "Launch",
                             false);
   base::UmaHistogramSparse(
       CdmMetricsNameToUmaPrefix(metrics_name) + "Launch.LaunchErrorCode",
       launch_error_code);
-#if BUILDFLAG(IS_WIN)
-  base::UmaHistogramSparse(
-      CdmMetricsNameToUmaPrefix(metrics_name) + "Launch.WinLastError",
-      last_error);
-#endif
 }
 
 void StabilityMetricsHelper::LogLoadStarted() {
@@ -298,13 +264,6 @@ void StabilityMetricsHelper::LogRendererCrash(
               ? StabilityEventType::kExtensionRendererFailedLaunch
               : StabilityEventType::kRendererFailedLaunch);
       break;
-#if BUILDFLAG(IS_WIN)
-    case base::TERMINATION_STATUS_INTEGRITY_FAILURE:
-      base::UmaHistogramEnumeration(
-          "BrowserRenderProcessHost.ChildCodeIntegrityFailures",
-          coarse_renderer_type);
-      break;
-#endif
     case base::TERMINATION_STATUS_MAX_ENUM:
       NOTREACHED();
   }

@@ -193,8 +193,7 @@ bool IsRegularOrGuestSession(const BrowserWindowInterface* browser) {
 bool IsGuestModeRequested(const base::CommandLine& command_line,
                           PrefService* local_state,
                           bool show_warning) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
   DCHECK(local_state);
 
   // Check if guest mode enforcement commandline switch or policy are provided.
@@ -230,7 +229,7 @@ bool IsGuestModeEnabled() {
     return false;
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // If there are any supervised profiles, disable guest mode.
   if (std::ranges::any_of(g_browser_process->profile_manager()
                               ->GetProfileAttributesStorage()
@@ -240,13 +239,13 @@ bool IsGuestModeEnabled() {
                           })) {
     return false;
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
   return true;
 }
 
 bool IsGuestModeEnabled(const Profile& profile) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   ProfileAttributesEntry* profile_attributes =
       g_browser_process->profile_manager()
           ->GetProfileAttributesStorage()
@@ -254,7 +253,7 @@ bool IsGuestModeEnabled(const Profile& profile) {
   if (profile_attributes && profile_attributes->IsSupervised()) {
     return false;
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
   return !IsGuestModeGloballyDisabledInternal();
 }

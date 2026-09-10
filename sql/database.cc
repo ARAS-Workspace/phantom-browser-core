@@ -74,11 +74,6 @@
 #include "third_party/perfetto/include/perfetto/tracing/track.h"
 #include "third_party/sqlite/sqlite3.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/escape.h"
-#include "base/strings/utf_string_conversions.h"
-#endif
-
 namespace sql {
 
 // When enabled, don't commit or rollback transactions if they have already been
@@ -200,9 +195,7 @@ bool ValidAttachmentPoint(std::string_view attachment_point) {
 }
 
 std::string AsUTF8ForSQL(const base::FilePath& path) {
-#if BUILDFLAG(IS_WIN)
-  return base::WideToUTF8(path.value());
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   return path.value();
 #endif
 }
@@ -807,9 +800,7 @@ base::FilePath Database::DbPath() const {
     return base::FilePath();
   }
   const std::string_view db_path(path);
-#if BUILDFLAG(IS_WIN)
-  return base::FilePath(base::UTF8ToWide(db_path));
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   return base::FilePath(db_path);
 #else
   NOTREACHED();
@@ -852,13 +843,7 @@ std::string Database::CollectErrorInfo(int sqlite_error_code,
 
 // System error information.  Interpretation of Windows errors is different
 // from posix.
-#if BUILDFLAG(IS_WIN)
-  int last_errno = GetLastErrno();
-  base::StringAppendF(&debug_info, "LastError: %d\n", last_errno);
-  if (diagnostics) {
-    diagnostics->last_errno = last_errno;
-  }
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   int last_errno = GetLastErrno();
   base::StringAppendF(&debug_info, "errno: %d\n", last_errno);
   if (diagnostics) {
@@ -1156,15 +1141,6 @@ bool Database::RazeInternal() {
   // TODO(shess): With this, "PRAGMA auto_vacuum" and "PRAGMA
   // page_size" can be used to query such a database.
   ScopedWritableSchema writable_schema(weak_factory_.GetWeakPtr());
-
-#if BUILDFLAG(IS_WIN)
-  // On Windows, truncate silently fails when applied to memory-mapped files.
-  // Disable memory-mapping so that the truncate succeeds.  Note that other
-  // Database connections may have memory-mapped the file, so this may not
-  // entirely prevent the problem.
-  // [Source: <https://sqlite.org/mmap.html> plus experiments.]
-  std::ignore = Execute("PRAGMA mmap_size = 0");
-#endif
 
   SqliteResultCode sqlite_result_code =
       BackupDatabaseForRaze(null_db.db(InternalApiToken()), db_);
@@ -1535,11 +1511,7 @@ bool Database::AttachDatabase(const base::FilePath& other_db_path,
   DCHECK(ValidAttachmentPoint(attachment_point));
 
   Statement statement(GetUniqueStatement("ATTACH ? AS ?"));
-#if BUILDFLAG(IS_WIN)
-  statement.BindString16(0, base::AsStringPiece16(other_db_path.value()));
-#else
   statement.BindString(0, other_db_path.value());
-#endif
   statement.BindString(1, attachment_point);
   return statement.Run();
 }
@@ -2160,23 +2132,8 @@ bool Database::OpenInternal(const std::string& db_file_path) {
 
   std::string uri_file_path = db_file_path;
   if (options_.exclusive_database_file_lock_) {
-#if BUILDFLAG(IS_WIN)
-    const bool in_memory = db_file_path == kSqliteOpenInMemoryPath;
-    if (!in_memory) {
-      // Do not allow query injection.
-      if (db_file_path.contains('?')) {
-        RecordOpenDatabaseFailureReason(
-            histogram_tag_, OpenDatabaseFailedReason::kIncorrectPath);
-        return false;
-      }
-      open_flags |= SQLITE_OPEN_URI;
-      uri_file_path = base::StrCat(
-          {"file:", base::EscapePath(db_file_path), "?exclusive=true"});
-    }
-#else
     NOTREACHED()
         << "exclusive_database_file_lock is only supported on Windows.";
-#endif  // BUILDFLAG(IS_WIN)
   }
 
   sqlite3* db = nullptr;

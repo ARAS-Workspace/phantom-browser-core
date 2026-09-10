@@ -24,10 +24,8 @@ std::string_view FileTypeToTag(FileType file_type) {
       return "WalJournalFile.";
     case FileType::kWalIndex:
       return "WalIndexFile.";
-#if !BUILDFLAG(IS_WIN)
     case FileType::kWalIndexReadOnly:
       return "WalIndexFileReadOnly.";
-#endif
     default:
       NOTREACHED();
   }

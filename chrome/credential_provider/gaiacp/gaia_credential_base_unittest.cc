@@ -1888,13 +1888,8 @@ TEST_F(GcpGaiaCredentialBaseAdScenariosTest,
 // This is the success scenario where all preconditions are met in the
 // AD login scenario. The user is successfully logged in.
 // TODO(crbug.com/327170900): Test is flaky on win-asan.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_GetSerialization_WithADSuccessScenario \
-  DISABLED_GetSerialization_WithADSuccessScenario
-#else
 #define MAYBE_GetSerialization_WithADSuccessScenario \
   GetSerialization_WithADSuccessScenario
-#endif
 TEST_F(GcpGaiaCredentialBaseAdScenariosTest,
        MAYBE_GetSerialization_WithADSuccessScenario) {
   // Add the user as a domain joined user.

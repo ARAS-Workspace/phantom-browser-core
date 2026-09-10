@@ -167,17 +167,7 @@ std::optional<base::Time> OnVersionReleasesFetched(
 GURL GetVersionReleasesUrl(base::Version version) {
 // CURRENT_PLATFORM is the platform name, as ingested by the VersionHistory API.
 // Use #define instead of a constant, so it concatenates at compile-time.
-#if BUILDFLAG(IS_WIN)
-
-#if defined(ARCH_CPU_ARM64)
-#define CURRENT_PLATFORM "win_arm64"
-#elif defined(ARCH_CPU_X86_64)
-#define CURRENT_PLATFORM "win64"
-#else
-#define CURRENT_PLATFORM "win"
-#endif
-
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 
 #define CURRENT_PLATFORM "linux"
 
@@ -197,7 +187,7 @@ GURL GetVersionReleasesUrl(base::Version version) {
 
 #error Unsupported platform
 
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX)
 
   return GURL(base::StringPrintf(
       "https://versionhistory.googleapis.com/v1/chrome/"

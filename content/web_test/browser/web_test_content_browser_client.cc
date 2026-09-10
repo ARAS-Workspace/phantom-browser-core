@@ -99,13 +99,6 @@
 #include "content/web_test/browser/web_test_pressure_manager.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#include "sandbox/policy/features.h"
-#include "sandbox/policy/mojom/sandbox.mojom.h"
-#include "sandbox/policy/win/sandbox_win.h"
-#include "sandbox/win/src/sandbox.h"
-#endif
 
 namespace content {
 namespace {
@@ -756,14 +749,6 @@ void WebTestContentBrowserClient::BindNonAssociatedWebTestControlHost(
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-bool WebTestContentBrowserClient::PreSpawnChild(
-    sandbox::TargetConfig* config,
-    sandbox::mojom::Sandbox sandbox_type,
-    ChildSpawnFlags flags) {
-  return true;
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 std::string WebTestContentBrowserClient::GetAcceptLangs(
     BrowserContext* context) {

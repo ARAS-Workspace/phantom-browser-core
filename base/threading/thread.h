@@ -151,18 +151,6 @@ class BASE_EXPORT Thread : PlatformThread::Delegate {
   // before it is destructed.
   ~Thread() override;
 
-#if BUILDFLAG(IS_WIN)
-  // Causes the thread to initialize COM.  This must be called before calling
-  // Start() or StartWithOptions().  If |use_mta| is false, the thread is also
-  // started with a TYPE_UI message loop.  It is an error to call
-  // init_com_with_mta(false) and then StartWithOptions() with any message loop
-  // type other than TYPE_UI.
-  void init_com_with_mta(bool use_mta) {
-    DCHECK(!delegate_);
-    com_status_ = use_mta ? MTA : STA;
-  }
-#endif
-
   // Starts the thread.  Returns true if the thread was successfully started;
   // otherwise, returns false.  Upon successful return, the message_loop()
   // getter will return non-null.
@@ -289,14 +277,6 @@ class BASE_EXPORT Thread : PlatformThread::Delegate {
   friend class MessageLoopTaskRunnerTest;
   friend class ScheduleWorkTest;
 
-#if BUILDFLAG(IS_WIN)
-  enum ComStatus {
-    NONE,
-    STA,
-    MTA,
-  };
-#endif
-
   Thread(const std::string& name,
          std::unique_ptr<Delegate> delegate,
          bool restartable);
@@ -305,11 +285,6 @@ class BASE_EXPORT Thread : PlatformThread::Delegate {
   void ThreadMain() override;
 
   void ThreadQuitHelper();
-
-#if BUILDFLAG(IS_WIN)
-  // Whether this thread needs to initialize COM, and if so, in what mode.
-  ComStatus com_status_ = NONE;
-#endif
 
   // Mirrors the Options::joinable field used to start this thread. Verified
   // on Stop() -- non-joinable threads can't be joined (must be leaked).

@@ -432,10 +432,6 @@ bool CopyStaticImagBitmapToWGPUTexture(
   // ensure the copies succeed. May be able to remove this check with some
   // better synchronization in the future.
   bool forceReadback = !image->IsTextureBacked();
-#elif BUILDFLAG(IS_WIN)
-  wgpu::AdapterInfo adapter_info = {};
-  device.GetAdapter().GetInfo(&adapter_info);
-  bool forceReadback = adapter_info.backendType == wgpu::BackendType::OpenGLES;
 #else
   bool forceReadback = false;
 #endif

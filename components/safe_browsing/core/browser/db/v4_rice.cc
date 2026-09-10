@@ -11,9 +11,7 @@
 #include "build/build_config.h"
 #include "components/safe_browsing/core/browser/db/v4_rice.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <winsock2.h>
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include <arpa/inet.h>
 #endif
 

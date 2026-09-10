@@ -19,13 +19,6 @@ struct GPU_COMMAND_BUFFER_COMMON_EXPORT SharedImageCapabilities {
 
   bool supports_scanout_shared_images = false;
 
-#if BUILDFLAG(IS_WIN)
-  // On Windows, overlays are in general not supported. However, in some cases
-  // they are supported for the software video frame use case in particular.
-  // This cap details whether that support is present.
-  bool supports_scanout_shared_images_for_software_video_frames = false;
-#endif
-
   bool supports_r16_shared_images = false;
   bool supports_ycbcr_nv12_sampling = false;
   bool supports_ycbcr_p010_sampling = false;
@@ -34,9 +27,6 @@ struct GPU_COMMAND_BUFFER_COMMON_EXPORT SharedImageCapabilities {
   bool disable_one_component_textures = false;
 
   bool shared_image_d3d = false;
-#if BUILDFLAG(IS_WIN)
-  bool shared_image_swap_chain = false;
-#endif
 
 #if BUILDFLAG(IS_MAC)
   uint32_t texture_target_for_io_surfaces = 0;

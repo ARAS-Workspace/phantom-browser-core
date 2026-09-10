@@ -107,7 +107,7 @@ TEST_F(CredentialManagerDialogControllerTest, ShowAccountChooser) {
 
   // Close the dialog.
   EXPECT_CALL(*prompt_ptr, ControllerGone());
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(feature_manager(), IsBiometricAuthenticationBeforeFillingEnabled)
       .WillOnce(testing::Return(false));
 #endif
@@ -135,7 +135,7 @@ TEST_F(CredentialManagerDialogControllerTest, ShowAccountChooserAndSignIn) {
 
   // Close the dialog.
   EXPECT_CALL(*prompt_ptr, ControllerGone());
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(feature_manager(), IsBiometricAuthenticationBeforeFillingEnabled)
       .WillOnce(testing::Return(false));
 #endif
@@ -278,7 +278,7 @@ TEST_F(CredentialManagerDialogControllerTest, AutoSigninPromoTurnOff) {
       password_manager::metrics_util::AUTO_SIGNIN_TURN_OFF, 1);
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 TEST_F(CredentialManagerDialogControllerTest, SignInBiometricsEnabled) {
   auto prompt = std::make_unique<StrictMock<MockPasswordPrompt>>();
   auto* prompt_ptr = prompt.get();

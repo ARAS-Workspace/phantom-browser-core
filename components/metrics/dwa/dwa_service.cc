@@ -263,9 +263,7 @@ void DwaService::RecordCoarseSystemInformation(
       break;
   }
 
-#if BUILDFLAG(IS_WIN)
-  coarse_system_info->set_platform(::dwa::CoarseSystemInfo::PLATFORM_WINDOWS);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   coarse_system_info->set_platform(::dwa::CoarseSystemInfo::PLATFORM_MACOS);
 #elif BUILDFLAG(IS_LINUX)
   coarse_system_info->set_platform(::dwa::CoarseSystemInfo::PLATFORM_LINUX);

@@ -302,33 +302,6 @@ TextDirection GetStringDirection(std::u16string_view text) {
   return (result == UNKNOWN_DIRECTION) ? LEFT_TO_RIGHT : result;
 }
 
-#if BUILDFLAG(IS_WIN)
-bool AdjustStringForLocaleDirection(std::u16string* text) {
-  if (!IsRTL() || text->empty()) {
-    return false;
-  }
-
-  // Marking the string as LTR if the locale is RTL and the string does not
-  // contain strong RTL characters. Otherwise, mark the string as RTL.
-  bool has_rtl_chars = StringContainsStrongRTLChars(*text);
-  if (!has_rtl_chars) {
-    WrapStringWithLTRFormatting(text);
-  } else {
-    WrapStringWithRTLFormatting(text);
-  }
-
-  return true;
-}
-
-bool UnadjustStringForLocaleDirection(std::u16string* text) {
-  if (!IsRTL() || text->empty()) {
-    return false;
-  }
-
-  *text = StripWrappingBidiControlCharacters(*text);
-  return true;
-}
-#else
 bool AdjustStringForLocaleDirection(std::u16string* text) {
   // On OS X & GTK the directionality of a label is determined by the first
   // strongly directional character.
@@ -407,8 +380,6 @@ bool UnadjustStringForLocaleDirection(std::u16string* text) {
   return true;
 }
 
-#endif  // !BUILDFLAG(IS_WIN)
-
 void EnsureTerminatedDirectionalFormatting(std::u16string* text) {
   int count = 0;
   for (auto c : *text) {
@@ -484,8 +455,6 @@ void WrapPathWithLTRFormatting(const FilePath& path,
   rtl_safe_path->push_back(kLeftToRightEmbeddingMark);
 #if BUILDFLAG(IS_APPLE)
   rtl_safe_path->append(UTF8ToUTF16(path.value()));
-#elif BUILDFLAG(IS_WIN)
-  rtl_safe_path->append(AsString16(path.value()));
 #else  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE)
   std::wstring wide_path = base::SysNativeMBToWide(path.value());
   rtl_safe_path->append(WideToUTF16(wide_path));

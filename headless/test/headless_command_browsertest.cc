@@ -54,10 +54,6 @@
 #include <unistd.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <Windows.h>
-#endif
-
 #if BUILDFLAG(ENABLE_PRINTING) && BUILDFLAG(ENABLE_PDF)
 #include "components/headless/test/pdf_utils.h"
 #endif
@@ -621,7 +617,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessPrintToPdfSvgEllipseWithStyleCommandBrowserTest,
 
 // Graceful signal handling is currently available only on Linux, Mac and
 // Windows.
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_POSIX)
 
 class HeadlessCommandSignalBrowserTest
     : public HeadlessDumpDomCommandBrowserTest {
@@ -635,8 +631,6 @@ class HeadlessCommandSignalBrowserTest
 #if BUILDFLAG(IS_POSIX)
     set_expected_exit_code(128 + SIGINT);
     raise(SIGINT);
-#elif BUILDFLAG(IS_WIN)
-    ::GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0);
 #endif
   }
 };
@@ -649,7 +643,7 @@ IN_PROC_BROWSER_TEST_F(HeadlessCommandSignalBrowserTest, SendCtrlCSignal) {
   // Command execution is expected to be Ctrl+C'ed gracefully.
 }
 
-#endif  // #if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 
 class HeadlessCommandHandlerInjectionBrowserTest
     : public HeadlessCommandBrowserTest {

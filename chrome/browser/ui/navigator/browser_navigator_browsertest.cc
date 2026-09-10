@@ -1189,48 +1189,6 @@ IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest, TargetContents_ForegroundTab) {
   EXPECT_EQ(2, browser()->tab_strip_model()->count());
 }
 
-#if BUILDFLAG(IS_WIN)
-// This tests adding a popup with a predefined WebContents.
-IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest, DISABLED_TargetContents_Popup) {
-  NavigateParams params(MakeNavigateParams());
-  params.disposition = WindowOpenDisposition::NEW_POPUP;
-  params.contents_to_insert = CreateWebContents(false);
-  params.window_features.bounds = gfx::Rect(10, 10, 500, 500);
-  Navigate(&params);
-
-  // Navigate() should have opened a new popup window.
-  EXPECT_NE(browser(), params.browser);
-  EXPECT_EQ(params.browser->GetType(),
-            BrowserWindowInterface::Type::TYPE_POPUP);
-  EXPECT_TRUE(BrowserWindow::FromBrowser(params.browser)->IsToolbarVisible());
-
-  // The web platform is weird. The window bounds specified in
-  // `params.window_features.bounds` are used as follows:
-  // - the origin is used to position the window
-  // - the size is used to size the WebContents of the window.
-  // As such the position of the resulting window will always match
-  // `params.window_features.bounds.origin()`, but its size will not. We need to
-  // match the size against the selected tab's view's container size.
-  // Only Windows positions the window according to
-  // `params.window_features.bounds.origin()` - on Mac the window is offset from
-  // the opener and on Linux it always opens at 0,0.
-  EXPECT_EQ(params.window_features.bounds.origin(),
-            params.browser->GetWindow()->GetRestoredBounds().origin());
-  // All platforms should respect size however provided width > 400 (Mac has a
-  // minimum window width of 400).
-  EXPECT_EQ(params.window_features.bounds.size(),
-            params.navigated_or_inserted_contents->GetContainerBounds().size());
-
-  // We should have two windows, the new popup and the browser() provided by the
-  // framework.
-  EXPECT_EQ(2u, GlobalBrowserCollection::GetInstance()->GetSize());
-  EXPECT_EQ(1, browser()->tab_strip_model()->count());
-  EXPECT_EQ(
-      1,
-      params.browser->GetBrowserForMigrationOnly()->tab_strip_model()->count());
-}
-#endif
-
 // This test checks that we can create WebContents with renderer process and
 // RenderFrame without navigating it.
 IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
@@ -1541,13 +1499,7 @@ IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
 }
 
 // This test makes sure a crashed singleton tab reloads from a new navigation.
-#if BUILDFLAG(IS_WIN)
-// TODO(crbug.com/477008551): Investigate this Windows timeout.
-#define MAYBE_NavigateToCrashedSingletonTab \
-  DISABLED_NavigateToCrashedSingletonTab
-#else
 #define MAYBE_NavigateToCrashedSingletonTab NavigateToCrashedSingletonTab
-#endif
 IN_PROC_BROWSER_TEST_F(BrowserNavigatorTest,
                        MAYBE_NavigateToCrashedSingletonTab) {
   const GURL singleton_url(GetContentSettingsURL());
@@ -2295,13 +2247,8 @@ class MockScreen : public display::ScreenBase {
 
 // Windows has assumptions that the screen is a ScreenWin, which causes a crash
 // when we inject the MockScreen.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_BrowserNavigatorTestWithMockScreen \
-  DISABLED_BrowserNavigatorTestWithMockScreen
-#else
 #define MAYBE_BrowserNavigatorTestWithMockScreen \
   BrowserNavigatorTestWithMockScreen
-#endif
 class MAYBE_BrowserNavigatorTestWithMockScreen : public BrowserNavigatorTest {
  public:
   void SetScreenInstance() override {

@@ -19,9 +19,9 @@
 #include "ui/base/accelerators/media_keys_listener.h"
 #include "ui/events/keycodes/keyboard_codes.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define USE_INSTANCED_SYSTEM_MEDIA_CONTROLS_FOR_WEB_APPS 1
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 namespace system_media_controls {
 class SystemMediaControls;

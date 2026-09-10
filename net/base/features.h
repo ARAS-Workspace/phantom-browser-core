@@ -383,34 +383,6 @@ NET_EXPORT BASE_DECLARE_FEATURE(kAlpsClientHintParsing);
 
 NET_EXPORT BASE_DECLARE_FEATURE(kEnableWebsocketsOverHttp3);
 
-#if BUILDFLAG(IS_WIN)
-// Whether or not to use the GetNetworkConnectivityHint API on modern Windows
-// versions for the Network Change Notifier.
-NET_EXPORT BASE_DECLARE_FEATURE(kEnableGetNetworkConnectivityHintAPI);
-
-// Whether or not to enable TCP port randomization via SO_RANDOMIZE_PORT on
-// Windows for versions >= kTcpPortRandomizationWinVersionMinimum.
-// See crbug.com/40744069 for more details.
-// This was launched in M141, but the finch flag was kept around in case it
-// ever causes issues (as some may take time to detect due to rarity).
-NET_EXPORT BASE_DECLARE_FEATURE(kTcpPortRandomizationWin);
-NET_EXPORT BASE_DECLARE_FEATURE_PARAM(int,
-                                      kTcpPortRandomizationWinVersionMinimum);
-
-// Whether or not TCP port reuse timing metrics are recorded.
-// See crbug.com/40744069 for more details.
-NET_EXPORT BASE_DECLARE_FEATURE(kTcpPortReuseMetricsWin);
-
-// Whether to use a TCP socket implementation which uses an IO completion
-// handler to be notified of completed reads and writes, instead of an event.
-NET_EXPORT BASE_DECLARE_FEATURE(kTcpSocketIoCompletionPortWin);
-
-// Whether to defer the initial connection type computation from the
-// NetworkChangeNotifierWin constructor to an async call in
-// WatchForAddressChange(), avoiding a synchronous cross-process call that can
-// block the UI thread for ~50ms during startup.
-NET_EXPORT BASE_DECLARE_FEATURE(kDeferConnectionTypeAtStartup);
-#endif
 
 #if BUILDFLAG(IS_MAC)
 // Whether or not to enable TCP port randomization on macOS by choosing a
@@ -703,10 +675,6 @@ NET_EXPORT extern const base::FeatureParam<base::TimeDelta>
 // When enabled HSTS upgrades will only apply to top-level navigations.
 NET_EXPORT BASE_DECLARE_FEATURE(kHstsTopLevelNavigationsOnly);
 
-#if BUILDFLAG(IS_WIN)
-// Whether or not to flush on MappedFile::Flush().
-NET_EXPORT BASE_DECLARE_FEATURE(kHttpCacheMappedFileFlushWin);
-#endif
 
 // Whether or not to apply No-Vary-Search processing in the HTTP disk cache.
 NET_EXPORT BASE_DECLARE_FEATURE(kHttpCacheNoVarySearch);
@@ -1047,10 +1015,6 @@ NET_EXPORT BASE_DECLARE_FEATURE_PARAM(
     base::TimeDelta,
     kMaxDelayForBrokenAlternativeServiceParam);
 
-#if BUILDFLAG(IS_WIN)
-// Disables SYN retransmissions for TCP loopback connections on Windows.
-NET_EXPORT BASE_DECLARE_FEATURE(kEnableWindowsTcpLoopbackFastFail);
-#endif
 
 }  // namespace net::features
 

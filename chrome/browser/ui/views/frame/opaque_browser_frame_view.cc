@@ -61,10 +61,6 @@
 #include "ui/views/controls/menu/menu_runner.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/display/win/screen_win.h"
-#endif
-
 using content::WebContents;
 
 namespace {
@@ -247,11 +243,6 @@ void OpaqueBrowserFrameView::InitViews() {
     AddChildViewRaw(window_title_.get());
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (GetBrowserView()->AppUsesWindowControlsOverlay()) {
-    UpdateCaptionButtonToolTipsForWindowControlsOverlay();
-  }
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -314,10 +305,6 @@ void OpaqueBrowserFrameView::WindowControlsOverlayEnabledChanged() {
     RemoveChildViewT(caption_button_placeholder_container_.get());
     caption_button_placeholder_container_ = nullptr;
   }
-
-#if BUILDFLAG(IS_WIN)
-  UpdateCaptionButtonToolTipsForWindowControlsOverlay();
-#endif
 
   layout_->SetWindowControlsOverlayEnabled(enabled, this);
   InvalidateLayout();
@@ -515,15 +502,9 @@ std::u16string OpaqueBrowserFrameView::GetWindowTitle() const {
 }
 
 int OpaqueBrowserFrameView::GetIconSize() const {
-#if BUILDFLAG(IS_WIN)
-  // This metric scales up if either the titlebar height or the titlebar font
-  // size are increased.
-  return display::win::GetScreenWin()->GetSystemMetricsInDIP(SM_CYSMICON);
-#else
   // The icon never shrinks below 16 px on a side.
   const int kIconMinimumSize = 16;
   return std::max(gfx::FontList().GetHeight(), kIconMinimumSize);
-#endif
 }
 
 gfx::Size OpaqueBrowserFrameView::GetBrowserViewMinimumSize() const {
@@ -952,27 +933,6 @@ void OpaqueBrowserFrameView::
             GetFrameColor(BrowserFrameActiveState::kUseCurrent)));
   }
 }
-
-#if BUILDFLAG(IS_WIN)
-void OpaqueBrowserFrameView::
-    UpdateCaptionButtonToolTipsForWindowControlsOverlay() {
-  if (GetBrowserView()->IsWindowControlsOverlayEnabled()) {
-    minimize_button_->SetTooltipText(
-        minimize_button_->GetViewAccessibility().GetCachedName());
-    maximize_button_->SetTooltipText(
-        maximize_button_->GetViewAccessibility().GetCachedName());
-    restore_button_->SetTooltipText(
-        restore_button_->GetViewAccessibility().GetCachedName());
-    close_button_->SetTooltipText(
-        close_button_->GetViewAccessibility().GetCachedName());
-  } else {
-    minimize_button_->SetTooltipText(u"");
-    maximize_button_->SetTooltipText(u"");
-    restore_button_->SetTooltipText(u"");
-    close_button_->SetTooltipText(u"");
-  }
-}
-#endif
 
 BEGIN_METADATA(OpaqueBrowserFrameView)
 ADD_READONLY_PROPERTY_METADATA(gfx::Rect, IconBounds)

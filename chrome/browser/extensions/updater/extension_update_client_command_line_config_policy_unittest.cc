@@ -20,11 +20,7 @@ TEST(ExtensionUpdateClientCommandLineConfigPolicyTest, CommandLine) {
   {
     const ExtensionUpdateClientCommandLineConfigPolicy config_policy(&cmdline);
 
-#if BUILDFLAG(IS_WIN)
-    EXPECT_TRUE(config_policy.BackgroundDownloadsEnabled());
-#else
     EXPECT_FALSE(config_policy.BackgroundDownloadsEnabled());
-#endif
     EXPECT_TRUE(config_policy.DeltaUpdatesEnabled());
     EXPECT_TRUE(config_policy.PingsEnabled());
     EXPECT_FALSE(config_policy.FastUpdate());

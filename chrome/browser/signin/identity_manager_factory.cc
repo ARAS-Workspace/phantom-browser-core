@@ -44,11 +44,6 @@
 #include "chromeos/ash/components/account_manager/account_manager_factory.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/functional/bind.h"
-#include "chrome/browser/signin/signin_util_win.h"
-#endif
-
 void IdentityManagerFactory::RegisterProfilePrefs(
     user_prefs::PrefRegistrySyncable* registry) {
   signin::IdentityManager::RegisterProfilePrefs(registry);
@@ -154,12 +149,6 @@ IdentityManagerFactory::BuildServiceInstanceForBrowserContext(
             profile->GetPath().value());
     params.is_regular_profile = true;
   }
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  params.reauth_callback =
-      base::BindRepeating(&signin_util::ReauthWithCredentialProviderIfPossible,
-                          base::Unretained(profile));
 #endif
 
   params.profile_metrics_service =

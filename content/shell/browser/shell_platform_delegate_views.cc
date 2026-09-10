@@ -52,11 +52,6 @@
 #include "ui/wm/core/wm_state.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <fcntl.h>
-#include <io.h>
-#endif
-
 namespace content {
 
 struct ShellPlatformDelegate::ShellData {
@@ -326,10 +321,6 @@ ShellView* ShellViewForWidget(views::Widget* widget) {
 ShellPlatformDelegate::ShellPlatformDelegate() = default;
 
 void ShellPlatformDelegate::Initialize(const gfx::Size& default_window_size) {
-#if BUILDFLAG(IS_WIN)
-  _setmode(_fileno(stdout), _O_BINARY);
-  _setmode(_fileno(stderr), _O_BINARY);
-#endif
 
   platform_ = std::make_unique<PlatformData>();
 

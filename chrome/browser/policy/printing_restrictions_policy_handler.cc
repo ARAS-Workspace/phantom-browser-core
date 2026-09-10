@@ -306,7 +306,7 @@ bool PrintPdfAsImageDefaultPolicyHandler::CheckPolicySettings(
   if (!TypeCheckingPolicyHandler::CheckPolicySettings(policies, errors))
     return false;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // Platforms which require a policy to enable the "Print as image" option
   // should have that policy specified with availability enabled before trying
   // to specify a default behavior for the option.
@@ -321,7 +321,7 @@ bool PrintPdfAsImageDefaultPolicyHandler::CheckPolicySettings(
       return false;
     }
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
   return true;
 }
 

@@ -33,12 +33,6 @@
 #include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/web_contents.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/install_static/install_util.h"
-#include "chrome/installer/util/install_util.h"
-#include "chrome/installer/util/shell_util.h"
-#endif  // #if BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/startup/default_browser_prompt/pin_infobar/pin_infobar_mac_util.h"
 #endif  // BUILDFLAG(IS_MAC)
@@ -58,7 +52,7 @@ void RecordUserInteractionHistogram(PinInfoBarUserInteraction interaction) {
                                 interaction);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 struct ExperimentalString {
   int message_id;
   int button_id;
@@ -66,28 +60,7 @@ struct ExperimentalString {
 
 const ExperimentalString kExperimentalStrings[] = {
     {0, 0},  // Version 0 (Standard)
-#if BUILDFLAG(IS_WIN)
-    {IDS_PIN_INFOBAR_EXPERIMENTAL_MESSAGE_1,
-     IDS_PIN_INFOBAR_EXPERIMENTAL_BUTTON_1},
-    {IDS_PIN_INFOBAR_EXPERIMENTAL_MESSAGE_2,
-     IDS_PIN_INFOBAR_EXPERIMENTAL_BUTTON_2},
-    {IDS_PIN_INFOBAR_EXPERIMENTAL_MESSAGE_3,
-     IDS_PIN_INFOBAR_EXPERIMENTAL_BUTTON_3},
-    {IDS_PIN_INFOBAR_EXPERIMENTAL_MESSAGE_4,
-     IDS_PIN_INFOBAR_EXPERIMENTAL_BUTTON_4},
-    {IDS_PIN_INFOBAR_EXPERIMENTAL_MESSAGE_5,
-     IDS_PIN_INFOBAR_EXPERIMENTAL_BUTTON_5},
-    {IDS_PIN_INFOBAR_EXPERIMENTAL_MESSAGE_6,
-     IDS_PIN_INFOBAR_EXPERIMENTAL_BUTTON_6},
-    {IDS_PIN_INFOBAR_EXPERIMENTAL_MESSAGE_7,
-     IDS_PIN_INFOBAR_EXPERIMENTAL_BUTTON_7},
-    {IDS_PIN_INFOBAR_EXPERIMENTAL_MESSAGE_8,
-     IDS_PIN_INFOBAR_EXPERIMENTAL_BUTTON_8},
-    {IDS_PIN_INFOBAR_EXPERIMENTAL_MESSAGE_9,
-     IDS_PIN_INFOBAR_EXPERIMENTAL_BUTTON_9},
-    {IDS_PIN_INFOBAR_EXPERIMENTAL_MESSAGE_10,
-     IDS_PIN_INFOBAR_EXPERIMENTAL_BUTTON_10},
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     {IDS_PIN_INFOBAR_EXPERIMENTAL_DOCK_MESSAGE_1,
      IDS_PIN_INFOBAR_EXPERIMENTAL_DOCK_BUTTON_1},
     {IDS_PIN_INFOBAR_EXPERIMENTAL_DOCK_MESSAGE_2,
@@ -116,7 +89,7 @@ const ExperimentalString kExperimentalStrings[] = {
 
 // static
 std::u16string PinInfoBarController::GetMessageText() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (base::FeatureList::IsEnabled(features::kSeparateDefaultAndPinPrompt)) {
     const int version =
         features::kSeparateDefaultAndPinPromptMessageVersion.Get();
@@ -129,16 +102,14 @@ std::u16string PinInfoBarController::GetMessageText() {
   }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  return l10n_util::GetStringUTF16(IDS_PIN_INFOBAR_TEXT);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return l10n_util::GetStringUTF16(IDS_PIN_INFOBAR_DOCK_TEXT);
 #endif
 }
 
 // static
 std::u16string PinInfoBarController::GetButtonLabel() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (base::FeatureList::IsEnabled(features::kSeparateDefaultAndPinPrompt)) {
     const int version =
         features::kSeparateDefaultAndPinPromptMessageVersion.Get();
@@ -150,9 +121,7 @@ std::u16string PinInfoBarController::GetButtonLabel() {
   }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  return l10n_util::GetStringUTF16(IDS_PIN_INFOBAR_BUTTON);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return l10n_util::GetStringUTF16(IDS_PIN_INFOBAR_DOCK_BUTTON);
 #endif
 }
@@ -160,12 +129,7 @@ std::u16string PinInfoBarController::GetButtonLabel() {
 // static
 void PinInfoBarController::OnAccept(content::WebContents* /*web_contents*/) {
   RecordUserInteractionHistogram(PinInfoBarUserInteraction::kAccepted);
-#if BUILDFLAG(IS_WIN)
-  browser_util::PinAppToTaskbar(
-      ShellUtil::GetBrowserModelId(InstallUtil::IsPerUserInstall()),
-      browser_util::PinAppToTaskbarChannel::kPinToTaskbarInfoBar,
-      base::DoNothing());
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   PinChromeToDock();
 #endif
 }
@@ -255,7 +219,7 @@ void PinInfoBarController::OnIsDefaultBrowserResult(
     shell_integration::DefaultWebClientState default_state) {
   const bool can_proceed =
       (default_state == shell_integration::DefaultWebClientState::IS_DEFAULT)
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
       || base::FeatureList::IsEnabled(features::kSeparateDefaultAndPinPrompt)
 #endif
       ;
@@ -263,14 +227,7 @@ void PinInfoBarController::OnIsDefaultBrowserResult(
     std::move(done_callback).Run(false);
     return;
   }
-#if BUILDFLAG(IS_WIN)
-  // Check if Chrome can be pinned to the taskbar.
-  browser_util::ShouldOfferToPin(
-      ShellUtil::GetBrowserModelId(InstallUtil::IsPerUserInstall()),
-      browser_util::PinAppToTaskbarChannel::kPinToTaskbarInfoBar,
-      base::BindOnce(&PinInfoBarController::OnShouldOfferToPinResult,
-                     weak_factory_.GetWeakPtr(), std::move(done_callback)));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   OnShouldOfferToPinResult(std::move(done_callback), ShouldOfferToPin());
 #endif
 }

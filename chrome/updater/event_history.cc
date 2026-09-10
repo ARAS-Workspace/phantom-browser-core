@@ -37,16 +37,6 @@
 #include "chrome/updater/updater_scope.h"
 #include "chrome/updater/util/util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <aclapi.h>
-#include <sddl.h>
-
-#include "base/win/security_descriptor.h"
-#include "base/win/sid.h"
-#endif
-
 namespace updater {
 namespace {
 
@@ -149,24 +139,6 @@ std::string UpdateResultToString(UpdateService::Result result) {
 }
 
 void SetWorldReadablePermissions(const base::FilePath& path) {
-#if BUILDFLAG(IS_WIN)
-  // Grant read access to non-admin users.
-  std::optional<base::win::SecurityDescriptor> sd =
-      base::win::SecurityDescriptor::FromFile(path, DACL_SECURITY_INFORMATION);
-  if (!sd) {
-    VPLOG(1) << "Failed to read security descriptor for " << path;
-    return;
-  }
-  if (!sd->SetDaclEntry(base::win::Sid(base::win::WellKnownSid::kWorld),
-                        base::win::SecurityAccessMode::kGrant,
-                        FILE_GENERIC_READ, 0)) {
-    VPLOG(1) << "Failed to grant read access to " << path;
-    return;
-  }
-  if (!sd->WriteToFile(path, DACL_SECURITY_INFORMATION)) {
-    VPLOG(1) << "Failed to write security descriptor for " << path;
-  }
-#else
   if (!base::SetPosixFilePermissions(
           path, base::FILE_PERMISSION_READ_BY_USER |
                     base::FILE_PERMISSION_WRITE_BY_USER |
@@ -174,7 +146,6 @@ void SetWorldReadablePermissions(const base::FilePath& path) {
                     base::FILE_PERMISSION_READ_BY_OTHERS)) {
     VPLOG(1) << "Failed to set permissions on " << path;
   }
-#endif
 }
 
 }  // namespace
@@ -209,11 +180,6 @@ void InitHistoryLogging(const base::FilePath& path,
   }
 
   uint32_t flags = base::File::FLAG_OPEN_ALWAYS | base::File::FLAG_APPEND;
-#if BUILDFLAG(IS_WIN)
-  // base::File opens with FILE_SHARE_READ and FILE_SHARE_WRITE by default if
-  // exclusivity flags are not provided.
-  flags |= base::File::FLAG_WIN_SHARE_DELETE;
-#endif
   GetLogFile() = base::File(path, flags);
 
   if (GetUpdaterScope() == UpdaterScope::kSystem) {

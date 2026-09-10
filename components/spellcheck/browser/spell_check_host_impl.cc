@@ -75,13 +75,6 @@ void SpellCheckHostImpl::RequestTextCheck(
   session_bridge_.RequestTextCheck(text, spelling_markers, std::move(callback));
 }
 
-#if BUILDFLAG(IS_WIN)
-void SpellCheckHostImpl::InitializeDictionaries(
-    InitializeDictionariesCallback callback) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  NOTREACHED();
-}
-#endif  // BUILDFLAG(IS_WIN)
 #endif  //  BUILDFLAG(USE_BROWSER_SPELLCHECKER) &&
         //  !BUILDFLAG(ENABLE_SPELLING_SERVICE)
 

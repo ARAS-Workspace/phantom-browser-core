@@ -479,16 +479,6 @@ void VerticalTabStripRegionView::HandleMouseExited() {
   // On Windows, we get mouse exit events when moving between the caption area
   // and client as well as when we transition between web contents area
   // underneath the expanded on hover overlay to outside it.
-#if BUILDFLAG(IS_WIN)
-  constexpr base::TimeDelta kMouseExitDebounceTimer = base::Milliseconds(100);
-  if (IsMouseHovered()) {
-    mouse_exit_timer_.Start(
-        FROM_HERE, kMouseExitDebounceTimer,
-        base::BindOnce(&VerticalTabStripRegionView::HandleMouseExited,
-                       base::Unretained(this)));
-    return;
-  }
-#endif
   UpdateExpandOnHoverState(false);
 }
 

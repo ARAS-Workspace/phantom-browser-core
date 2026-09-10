@@ -146,12 +146,7 @@ TEST_F(BrowserBoundKeyStoreDesktopTest, DeleteBrowserBoundKey_NullKeyProvider) {
 TEST_F(BrowserBoundKeyStoreDesktopTest, GetDeviceSupportsHardwareKeys) {
 #if BUILDFLAG(IS_MAC)
   EXPECT_TRUE(key_store()->GetDeviceSupportsHardwareKeys());
-#elif BUILDFLAG(IS_WIN)
-  EXPECT_CALL(*key_provider(), SelectAlgorithm(_))
-      .WillRepeatedly(
-          Return(SignatureVerifier::SignatureAlgorithm::ECDSA_SHA256));
-  EXPECT_TRUE(key_store()->GetDeviceSupportsHardwareKeys());
-#else  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#else
   EXPECT_FALSE(key_store()->GetDeviceSupportsHardwareKeys());
 #endif
 }
@@ -162,25 +157,6 @@ TEST_F(BrowserBoundKeyStoreDesktopTest,
       base::MakeRefCounted<BrowserBoundKeyStoreDesktop>(nullptr);
   EXPECT_FALSE(key_store->GetDeviceSupportsHardwareKeys());
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(BrowserBoundKeyStoreDesktopTest,
-       GetDeviceSupportsHardwareKeys_NullOptAlgorithm) {
-  EXPECT_CALL(*key_provider(), SelectAlgorithm(_))
-      .WillRepeatedly(Return(std::nullopt));
-  EXPECT_FALSE(key_store()->GetDeviceSupportsHardwareKeys());
-}
-
-TEST_F(BrowserBoundKeyStoreDesktopTest,
-       GetDeviceSupportsHardwareKeys_MultipleCallsCachesData) {
-  EXPECT_CALL(*key_provider(), SelectAlgorithm(_))
-      .Times(1)
-      .WillOnce(Return(SignatureVerifier::SignatureAlgorithm::ECDSA_SHA256));
-
-  EXPECT_TRUE(key_store()->GetDeviceSupportsHardwareKeys());
-  EXPECT_TRUE(key_store()->GetDeviceSupportsHardwareKeys());
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_F(BrowserBoundKeyStoreDesktopTest,
        Metrics_GetOrCreateBrowserBoundKeyForCredentialId_Get) {
@@ -280,19 +256,7 @@ TEST_F(BrowserBoundKeyStoreDesktopTest, Metrics_GetDeviceSupportsHardwareKeys) {
       "DeviceSupportsHardwareKeysLatency.Supported",
       base::Microseconds(0),
       /*expected_bucket_count=*/1);
-#elif BUILDFLAG(IS_WIN)
-  base::TimeDelta latency = base::Microseconds(24);
-  EXPECT_CALL(*key_provider(), SelectAlgorithm(_))
-      .WillOnce(
-          DoAll([this, &latency] { task_environment_.FastForwardBy(latency); },
-                Return(SignatureVerifier::SignatureAlgorithm::ECDSA_SHA256)));
-  EXPECT_TRUE(key_store()->GetDeviceSupportsHardwareKeys());
-  histogram_tester.ExpectUniqueTimeSample(
-      "PaymentRequest.SecurePaymentConfirmation.BrowserBoundKeyStore."
-      "DeviceSupportsHardwareKeysLatency.Supported",
-      latency,
-      /*expected_bucket_count=*/1);
-#else  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#else
   EXPECT_FALSE(key_store()->GetDeviceSupportsHardwareKeys());
   histogram_tester.ExpectUniqueTimeSample(
       "PaymentRequest.SecurePaymentConfirmation.BrowserBoundKeyStore."

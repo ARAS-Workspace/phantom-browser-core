@@ -16,11 +16,6 @@ BASE_DECLARE_FEATURE(kEncryptedPrefHashing);
 // Enables encrypted tracked preferences for enterprise users.
 BASE_DECLARE_FEATURE(kEnableEncryptedTrackedPrefOnEnterprise);
 
-#if BUILDFLAG(IS_WIN)
-// Reject weak ciphertext if a stronger algorithm is available.
-BASE_DECLARE_FEATURE(kRejectWeakCiphertext);
-#endif  // BUILDFLAG(IS_WIN)
-
 // When enabled, disables the legacy HMAC fallback upgrade path during
 // validation with os_crypt. Missing encrypted hashes will not be healed via
 // legacy MACs, preventing downgrade attacks.

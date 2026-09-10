@@ -112,20 +112,12 @@ TEST(CookieUtilTest, GetCookieDomainWithString_UnknownSchemeUrl) {
 
   const GURL url3("o://%2e");
   CookieInclusionStatus status3;
-#if BUILDFLAG(IS_WIN)
-  // GURL canonicalizes URLs with file scheme, for windows-style drive://path
-  // type urls. The "file://" scheme makes a URL "special"
-  // (https://url.spec.whatwg.org/#is-special)
-  ASSERT_EQ(url3.spec(), "file:///O://");
-  EXPECT_TRUE(cookie_util::GetCookieDomainWithString(url3, "", status3));
-#else
   // `GURL` doesn't canonicalize the below URL, since it doesn't recognize the
   // scheme. In this case %2e is not decoded to dot(.). So when URL host is
   // passed for canonicalization process, it returns dot(.) and if it is at
   // start, then it is an error.
   ASSERT_EQ(url3.spec(), "o://%2e");
   EXPECT_FALSE(cookie_util::GetCookieDomainWithString(url3, "", status3));
-#endif  // IS_WIN
 }
 
 // An invalid domain with a non-special scheme should return std::nullopt,

@@ -18,12 +18,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/strings/utf_string_conversions.h"
-#endif
-
 namespace enterprise_companion {
 
 namespace {
@@ -32,13 +26,7 @@ using ::testing::Return;
 
 std::unique_ptr<ScopedLock> CreateLockForTest(base::TimeDelta) {
   std::string lock_name = base::UnguessableToken::Create().ToString();
-#if BUILDFLAG(IS_WIN)
-  SECURITY_ATTRIBUTES sa = {sizeof(SECURITY_ATTRIBUTES), nullptr, FALSE};
-  return ScopedLock::Create(base::ASCIIToWide(lock_name), &sa,
-                            base::Seconds(0));
-#else
   return ScopedLock::Create(lock_name, base::Seconds(0));
-#endif
 }
 
 }  // namespace

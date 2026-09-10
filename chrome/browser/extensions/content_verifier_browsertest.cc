@@ -1186,7 +1186,7 @@ IN_PROC_BROWSER_TEST_F(ContentVerifierTest,
 
   auto* web_contents = GetActiveWebContents();
   GURL page_url = extension->GetResourceURL(kIncorrectCasePath);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // Some platforms are case insensitive, load should succeed.
   ASSERT_TRUE(NavigateToURL(web_contents, page_url));
   ASSERT_TRUE(content::WaitForLoadStop(web_contents));

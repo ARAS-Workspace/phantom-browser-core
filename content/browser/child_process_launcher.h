@@ -31,10 +31,6 @@
 #include "content/public/browser/android/child_process_importance.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#endif
-
 #if BUILDFLAG(IS_POSIX)
 #include "base/files/scoped_file.h"
 #endif
@@ -79,12 +75,6 @@ enum LaunchResultCode {
   // Placeholder for last item of the enum.
   LAUNCH_RESULT_CODE_LAST_CODE
 };
-
-#if BUILDFLAG(IS_WIN)
-static_assert(static_cast<int>(LAUNCH_RESULT_START) >
-                  static_cast<int>(sandbox::SBOX_ERROR_LAST),
-              "LaunchResultCode must not overlap with sandbox::ResultCode");
-#endif
 
 struct RenderProcessPriority {
   RenderProcessPriority(bool visible,
@@ -337,9 +327,6 @@ class CONTENT_EXPORT ChildProcessLauncher
 
   // Notifies the client about the result of the operation.
   void Notify(internal::ChildProcessLauncherHelper::Process process,
-#if BUILDFLAG(IS_WIN)
-              DWORD last_error,
-#endif
               int error_code);
 
 #if BUILDFLAG(IS_ANDROID)

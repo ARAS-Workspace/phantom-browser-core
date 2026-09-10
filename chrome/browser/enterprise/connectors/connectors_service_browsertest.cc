@@ -88,9 +88,7 @@ constexpr char kDomain1[] = "domain1.com";
 constexpr char kTestUrl[] = "https://foo.com";
 
 std::string ExpectedOsPlatform() {
-#if BUILDFLAG(IS_WIN)
-  return "Windows";
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return "Mac OS X";
 #elif BUILDFLAG(IS_CHROMEOS)
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)

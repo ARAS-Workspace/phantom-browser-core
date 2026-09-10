@@ -53,10 +53,6 @@
 #include "ui/views/test/scoped_views_test_helper.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/ui/views/bookmarks/bookmark_bar_view.h"
-#endif
-
 using base::ASCIIToUTF16;
 using bookmarks::BookmarkModel;
 using bookmarks::BookmarkNode;

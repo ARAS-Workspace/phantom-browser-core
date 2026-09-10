@@ -53,9 +53,6 @@ class HEADLESS_EXPORT HeadlessContentMainDelegate
       const std::string& process_type,
       content::MainFunctionParams main_function_params) override;
   std::optional<int> PreBrowserMain() override;
-#if BUILDFLAG(IS_WIN)
-  bool ShouldHandleConsoleControlEvents() override;
-#endif
   content::ContentClient* CreateContentClient() override;
   content::ContentBrowserClient* CreateContentBrowserClient() override;
   content::ContentUtilityClient* CreateContentUtilityClient() override;

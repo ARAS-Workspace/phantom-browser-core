@@ -29,9 +29,7 @@ TEST(NativeLibraryTest, LoadFailureWithNullError) {
 
 TEST(NativeLibraryTest, GetNativeLibraryName) {
   const char kExpectedName[] =
-#if BUILDFLAG(IS_WIN)
-      "mylib.dll";
-#elif BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
       "mylib.framework/mylib";
 #elif BUILDFLAG(IS_MAC)
       "libmylib.dylib";
@@ -43,9 +41,7 @@ TEST(NativeLibraryTest, GetNativeLibraryName) {
 
 TEST(NativeLibraryTest, GetLoadableModuleName) {
   const char kExpectedName[] =
-#if BUILDFLAG(IS_WIN)
-      "mylib.dll";
-#elif BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
       "mylib.framework";
 #elif BUILDFLAG(IS_MAC)
       "mylib.so";
@@ -61,9 +57,7 @@ TEST(NativeLibraryTest, GetLoadableModuleName) {
 #if !defined(ADDRESS_SANITIZER)
 
 const char kTestLibraryName[] =
-#if BUILDFLAG(IS_WIN)
-    "test_shared_library.dll";
-#elif BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
     "Frameworks/test_shared_library_ios.framework/test_shared_library_ios";
 #elif BUILDFLAG(IS_MAC)
     "libtest_shared_library.dylib";

@@ -194,7 +194,7 @@ class LoginDatabase : public EncryptDecryptInterface {
   // time.
   std::unique_ptr<sql::Transaction> CreateTransaction();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   void SetIsUserDataDirPolicySet(bool is_set) {
     is_user_data_dir_policy_set_ = is_set;
   }

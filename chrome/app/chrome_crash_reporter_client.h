@@ -7,8 +7,6 @@
 
 #include "build/build_config.h"
 
-#if !BUILDFLAG(IS_WIN)
-
 #include <memory>
 
 #include "base/no_destructor.h"
@@ -68,7 +66,5 @@ class ChromeCrashReporterClient : public crash_reporter::CrashReporterClient {
   ChromeCrashReporterClient();
   ~ChromeCrashReporterClient() override;
 };
-
-#endif  // BUILDFLAG(IS_WIN)
 
 #endif  // CHROME_APP_CHROME_CRASH_REPORTER_CLIENT_H_

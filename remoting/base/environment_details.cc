@@ -22,9 +22,7 @@ std::string GetBuildVersion() {
 // Get the Operating System Name, removing the need to check for OS definitions
 // and keeps the keys used consistent.
 std::string GetOperatingSystemName() {
-#if BUILDFLAG(IS_WIN)
-  return "Windows";
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   return "Mac";
 #elif BUILDFLAG(IS_CHROMEOS)
   return "ChromeOS";

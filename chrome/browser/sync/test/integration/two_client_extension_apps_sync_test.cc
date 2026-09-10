@@ -453,7 +453,7 @@ IN_PROC_BROWSER_TEST_F(TwoClientExtensionAppsSyncTest,
                    .Contains(kHostedAppId0));
 }
 
-#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 IN_PROC_BROWSER_TEST_F(TwoClientExtensionAppsSyncTest,
                        UninstallOnWML) {

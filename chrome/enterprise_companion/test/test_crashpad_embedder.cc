@@ -13,10 +13,6 @@
 #include "chrome/enterprise_companion/enterprise_companion.h"
 #include "chrome/enterprise_companion/flags.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace enterprise_companion {
 namespace {
 constexpr char kCrashDatabaseSwitch[] = "crash-database-path";
@@ -49,11 +45,5 @@ int TestCrashpadEmbedderMain(int argc, const char* const* argv) {
 #if BUILDFLAG(IS_POSIX)
 int main(int argc, const char* argv[]) {
   return enterprise_companion::TestCrashpadEmbedderMain(argc, argv);
-}
-#elif BUILDFLAG(IS_WIN)
-int APIENTRY wWinMain(HINSTANCE instance, HINSTANCE prev, wchar_t*, int) {
-  // `argc` and `argv` are ignored by `base::CommandLine` for Windows. Instead,
-  // the implementation parses `GetCommandLineW()` directly.
-  return enterprise_companion::TestCrashpadEmbedderMain(0, nullptr);
 }
 #endif

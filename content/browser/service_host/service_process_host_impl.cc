@@ -34,11 +34,6 @@ bool ShouldEnableSandbox(sandbox::mojom::Sandbox sandbox) {
   if (sandbox == sandbox::mojom::Sandbox::kNetwork) {
     return GetContentClient()->browser()->ShouldSandboxNetworkService();
   }
-#if BUILDFLAG(IS_WIN)
-  if (sandbox == sandbox::mojom::Sandbox::kWebNNModelCompilation) {
-    return GetContentClient()->browser()->ShouldSandboxWebNNCompilerService();
-  }
-#endif
   return true;
 }
 
@@ -67,11 +62,6 @@ void LaunchServiceProcess(mojo::GenericPendingReceiver receiver,
   if (service_options.child_flags) {
     utility_options.WithChildFlags(*service_options.child_flags);
   }
-#if BUILDFLAG(IS_WIN)
-  if (!service_options.preload_libraries.empty()) {
-    utility_options.WithPreloadLibraries(service_options.preload_libraries);
-  }
-#endif  // BUILDFLAG(IS_WIN)
   if (service_options.allow_gpu_client.has_value() &&
       service_options.allow_gpu_client.value()) {
     utility_options.WithGpuClientAllowed();

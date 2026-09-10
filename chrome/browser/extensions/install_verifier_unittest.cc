@@ -132,7 +132,7 @@ TEST_F(InstallVerifierTest, TestIsFromStoreAndMustRemainDisabled) {
   }
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // Test the behavior of the InstallVerifier when an extension is
 // force-installed in different trust environments.
 TEST_F(InstallVerifierTest, ForceInstalledExtensionBehaviorWithTrustLevels) {

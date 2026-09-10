@@ -259,9 +259,6 @@ const NetLogWithSource& UDPClientSocket::NetLog() const {
 }
 
 void UDPClientSocket::UseNonBlockingIO() {
-#if BUILDFLAG(IS_WIN)
-  socket_.UseNonBlockingIO();
-#endif
 }
 
 int UDPClientSocket::SetMulticastInterface(uint32_t interface_index) {

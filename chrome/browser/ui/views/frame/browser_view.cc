@@ -391,18 +391,6 @@
 #include "ui/aura/window_tree_host.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/taskbar/taskbar_decorator_win.h"
-#include "chrome/browser/win/jumplist.h"
-#include "chrome/browser/win/jumplist_factory.h"
-#include "ui/gfx/color_palette.h"
-#include "ui/gfx/win/hwnd_util.h"
-#include "ui/native_theme/native_theme_win.h"
-#include "ui/views/win/scoped_fullscreen_visibility.h"
-
-// To avoid conflicts with the macro from the Windows SDK...
-#undef LoadAccelerators
-#endif
 
 using base::UserMetricsAction;
 using content::WebContents;
@@ -846,31 +834,6 @@ class BrowserView::ExclusiveAccessContextImpl
   base::WeakPtrFactory<ExclusiveAccessContextImpl> weak_ptr_factory_{this};
 };
 
-#if BUILDFLAG(IS_WIN)
-class BrowserView::PipExclusionObserverImpl
-    : public content::desktop_capture::PipScreenCaptureExclusionObserver {
- public:
-  explicit PipExclusionObserverImpl(views::Widget* widget) : widget_(widget) {
-    CHECK(widget_);
-    content::desktop_capture::AddPipExclusionObserver(this);
-  }
-
-  PipExclusionObserverImpl(const PipExclusionObserverImpl&) = delete;
-  PipExclusionObserverImpl& operator=(const PipExclusionObserverImpl&) = delete;
-
-  ~PipExclusionObserverImpl() override {
-    content::desktop_capture::RemovePipExclusionObserver(this);
-  }
-
-  // content::desktop_capture::PipScreenCaptureExclusionObserver:
-  void OnExcludeFromScreenCaptureChanged(bool is_excluded) override {
-    widget_->SetExcludeFromScreenCapture(is_excluded);
-  }
-
- private:
-  const raw_ptr<views::Widget> widget_;
-};
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // BrowserView, public:
@@ -1017,18 +980,6 @@ BrowserView::BrowserView(Browser* browser)
   window_scrim_view_ = AddChildView(std::make_unique<ScrimView>());
   window_scrim_view_->layer()->SetName("WindowScrimView");
 
-#if BUILDFLAG(IS_WIN)
-  // Create a custom JumpList and add it to an observer of TabRestoreService
-  // so we can update the custom JumpList when a tab is added or removed.
-  // JumpList is created asynchronously with a low priority to not delay the
-  // startup.
-  if (JumpList::Enabled()) {
-    content::BrowserThread::PostBestEffortTask(
-        FROM_HERE, base::SingleThreadTaskRunner::GetCurrentDefault(),
-        base::BindOnce(&BrowserView::CreateJumpList,
-                       weak_ptr_factory_.GetWeakPtr()));
-  }
-#endif
 
   registrar_.Init(GetProfile()->GetPrefs());
   registrar_.Add(
@@ -1591,7 +1542,7 @@ void BrowserView::Show() {
     }
   }
 
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_CHROMEOS)
   // The Browser associated with this browser window must become the active
   // browser at the time |Show()| is called. This is the natural behavior under
   // Windows and Chrome OS, but other platforms will not trigger
@@ -1696,7 +1647,7 @@ void BrowserView::Activate() {
     }
   }
 
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_CHROMEOS)
   // Update the list managed by `BrowserList` synchronously the same way
   // `BrowserView::Show()` does.
   BrowserActiveStateManager::From(browser_)->DidBecomeActive();
@@ -1740,37 +1691,13 @@ bool BrowserView::IsOnCurrentWorkspace() const {
 
 #if BUILDFLAG(IS_CHROMEOS)
   return chromeos::DesksHelper::Get()->BelongsToActiveDesk(native_win);
-#elif BUILDFLAG(IS_WIN)
-  std::optional<bool> on_current_workspace =
-      native_win->GetHost()->on_current_workspace();
-  if (on_current_workspace.has_value()) {
-    return on_current_workspace.value();
-  }
-
-  // If the window is not cloaked, it is not on another desktop because
-  // windows on another virtual desktop are always cloaked.
-  if (!gfx::IsWindowCloaked(native_win->GetHost()->GetAcceleratedWidget())) {
-    return true;
-  }
-
-  Microsoft::WRL::ComPtr<IVirtualDesktopManager> virtual_desktop_manager;
-  if (!SUCCEEDED(::CoCreateInstance(_uuidof(VirtualDesktopManager), nullptr,
-                                    CLSCTX_ALL,
-                                    IID_PPV_ARGS(&virtual_desktop_manager)))) {
-    return true;
-  }
-  // If a IVirtualDesktopManager method failed, we assume the window is on
-  // the current virtual desktop.
-  return gfx::IsWindowOnCurrentVirtualDesktop(
-             native_win->GetHost()->GetAcceleratedWidget(),
-             virtual_desktop_manager) != false;
 #else
   return true;
 #endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 bool BrowserView::IsVisibleOnScreen() const {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   // TODO(crbug.com/405283740): currently only works for mac and windows. See
   // comments around Widget::IsVisibleOnScreen() for more details. Eventually
   // this should work for all platforms.
@@ -2309,7 +2236,7 @@ void BrowserView::SetFocusToLocationBar(bool is_user_initiated) {
   // already. On Chrome OS, changing focus makes a view believe it has a focus
   // even if the widget doens't have a focus. Either cases, we need to ignore
   // this when the browser window isn't active.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
   if (!IsActive()) {
     return;
   }
@@ -4914,18 +4841,6 @@ void BrowserView::AddedToWidget() {
 
   views::ClientView::AddedToWidget();
 
-#if BUILDFLAG(IS_WIN)
-  // Register for screen capture exclusion updates. This is specific to
-  // Document PiP windows, which are fully-fledged BrowserViews.
-  if (GetIsPictureInPictureType() &&
-      base::FeatureList::IsEnabled(features::kExcludePipFromScreenCapture)) {
-    pip_exclusion_observer_ =
-        std::make_unique<PipExclusionObserverImpl>(GetWidget());
-    bool is_excluded =
-        content::desktop_capture::IsPipExcludedFromScreenCapture();
-    GetWidget()->SetExcludeFromScreenCapture(is_excluded);
-  }
-#endif
 
   widget_observation_.Observe(GetWidget());
 
@@ -5105,9 +5020,6 @@ void BrowserView::AddedToWidget() {
 
 void BrowserView::RemovedFromWidget() {
   CHECK(GetFocusManager());
-#if BUILDFLAG(IS_WIN)
-  pip_exclusion_observer_.reset();
-#endif
 
   focus_manager_observation_.Reset();
 }
@@ -5247,13 +5159,6 @@ void BrowserView::LoadingAnimationCallback(base::TimeTicks timestamp) {
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-void BrowserView::CreateJumpList() {
-  // Ensure that this browser's Profile has a JumpList so that the JumpList is
-  // kept up to date.
-  JumpListFactory::GetForProfile(browser_->GetProfile());
-}
-#endif
 
 bool BrowserView::ShouldShowAvatarToolbarIPH() {
   if (GetGuestSession() || GetIncognito()) {
@@ -5496,10 +5401,10 @@ void BrowserView::ProcessFullscreen(bool fullscreen, const int64_t display_id) {
 }
 
 void BrowserView::RequestFullscreen(bool fullscreen, int64_t display_id) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
   // Request target display fullscreen from lower layers on supported platforms.
   browser_widget_->SetFullscreen(fullscreen, display_id);
-#else   // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#else
   // TODO(crbug.com/40111909): Reimplement this at lower layers on all
   // platforms.
   if (fullscreen && display_id != display::kInvalidDisplayId) {
@@ -5556,7 +5461,7 @@ void BrowserView::RequestFullscreen(bool fullscreen, int64_t display_id) {
   if (!fullscreen && restore_pre_fullscreen_bounds_callback_) {
     std::move(restore_pre_fullscreen_bounds_callback_).Run();
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 }
 
 void BrowserView::LoadAccelerators() {
@@ -5624,52 +5529,8 @@ void BrowserView::LoadAccelerators() {
 }
 
 int BrowserView::GetCommandIDForAppCommandID(int app_command_id) const {
-#if BUILDFLAG(IS_WIN)
-  switch (app_command_id) {
-    // NOTE: The order here matches the APPCOMMAND declaration order in the
-    // Windows headers.
-    case APPCOMMAND_BROWSER_BACKWARD:
-      return IDC_BACK;
-    case APPCOMMAND_BROWSER_FORWARD:
-      return IDC_FORWARD;
-    case APPCOMMAND_BROWSER_REFRESH:
-      return IDC_RELOAD;
-    case APPCOMMAND_BROWSER_HOME:
-      return IDC_HOME;
-    case APPCOMMAND_BROWSER_STOP:
-      return IDC_STOP;
-    case APPCOMMAND_BROWSER_SEARCH:
-      return IDC_FOCUS_SEARCH;
-    case APPCOMMAND_HELP:
-      return IDC_HELP_PAGE_VIA_KEYBOARD;
-    case APPCOMMAND_NEW:
-      return IDC_NEW_TAB;
-    case APPCOMMAND_OPEN:
-      return IDC_OPEN_FILE;
-    case APPCOMMAND_CLOSE:
-      return IDC_CLOSE_TAB;
-    case APPCOMMAND_SAVE:
-      return IDC_SAVE_PAGE;
-    case APPCOMMAND_PRINT:
-      return IDC_PRINT;
-    case APPCOMMAND_COPY:
-      return IDC_COPY;
-    case APPCOMMAND_CUT:
-      return IDC_CUT;
-    case APPCOMMAND_PASTE:
-      return IDC_PASTE;
-
-      // TODO(pkasting): http://b/1113069 Handle these.
-    case APPCOMMAND_UNDO:
-    case APPCOMMAND_REDO:
-    case APPCOMMAND_SPELL_CHECK:
-    default:
-      return -1;
-  }
-#else
   // App commands are Windows-specific so there's nothing to do here.
   return -1;
-#endif
 }
 
 void BrowserView::UpdateAcceleratorMetrics(const ui::Accelerator& accelerator,
@@ -5781,7 +5642,7 @@ void BrowserView::MaybeShowProfileSwitchIPH() {
 }
 
 void BrowserView::MaybeShowSupervisedUserProfileSignInIPH() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (!ShouldShowAvatarToolbarIPH()) {
     return;
   }
@@ -5792,14 +5653,14 @@ void BrowserView::MaybeShowSupervisedUserProfileSignInIPH() {
 }
 
 void BrowserView::MaybeShowSignInBenefitsIPH() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (!ShouldShowAvatarToolbarIPH()) {
     return;
   }
   ToolbarButtonProvider::From(browser_)
       ->GetAvatarToolbarButtonInterface()
       ->MaybeShowSignInBenefitsIPH();
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 }
 
 void BrowserView::ShowHatsDialog(
@@ -6075,10 +5936,6 @@ void BrowserView::OnFirstPresentation(
 
 #if BUILDFLAG(ENTERPRISE_SCREENSHOT_PROTECTION)
 void BrowserView::ApplyScreenshotSettings(bool allow) {
-#if BUILDFLAG(IS_WIN)
-  DCHECK_NE(GetWidget()->GetNativeWindow()->GetHost()->GetAcceleratedWidget(),
-            gfx::kNullAcceleratedWidget);
-#endif  // BUILDFLAG(IS_WIN)
   GetWidget()->SetAllowScreenshots(allow);
 }
 #endif  // BUILDFLAG(ENTERPRISE_SCREENSHOT_PROTECTION)

@@ -186,31 +186,17 @@
 #include "chrome/browser/signin/chrome_signin_and_sync_status_metrics_provider.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/windows_version.h"
-#include "chrome/browser/metrics/antivirus_metrics_provider_win.h"
-#include "chrome/browser/metrics/google_update_metrics_provider_win.h"
-#include "chrome/browser/metrics/system_memory_list_metrics_provider_win.h"
-#include "chrome/browser/metrics/system_pdh_metrics_provider_win.h"
-#include "chrome/browser/metrics/tpm_metrics_provider_win.h"
-#include "chrome/install_static/install_util.h"
-#include "chrome/installer/util/util_constants.h"
-#include "chrome/notification_helper/notification_helper_constants.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/metrics/google_update_metrics_provider_mac.h"
 #include "chrome/browser/metrics/power/power_metrics_provider_mac.h"
 #include "chrome/browser/metrics/task_info_metrics_provider_mac.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include "components/metrics/motherboard_metrics_provider.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/metrics/chrome_metrics_service_crash_reporter.h"
 #endif
 
@@ -218,9 +204,9 @@
 #include "chrome/browser/metrics/bluetooth_metrics_provider.h"
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/updates/update_metrics_provider.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 namespace {
 
@@ -237,18 +223,12 @@ const int kMaxHistogramGatheringWaitDuration = 60000;  // 60 seconds.
 // Needs to be kept in sync with the writer in
 // third_party/crashpad/crashpad/handler/handler_main.cc.
 const char kCrashpadHistogramAllocatorName[] = "CrashpadMetrics";
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 ChromeMetricsServiceCrashReporter& GetCrashReporter() {
   static base::NoDestructor<ChromeMetricsServiceCrashReporter> crash_reporter;
   return *crash_reporter;
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_WIN)
-// Needs to be kept in sync with the writer in PlatformExperienceHelper.
-const char kPlatformExperienceHelperHistogramAllocatorName[] =
-    "PlatformExperienceHelperMetrics";
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 
 void RegisterFileMetricsPreferences(PrefRegistrySimple* registry) {
   metrics::FileMetricsProvider::RegisterSourcePrefs(registry,
@@ -260,15 +240,6 @@ void RegisterFileMetricsPreferences(PrefRegistrySimple* registry) {
   metrics::FileMetricsProvider::RegisterSourcePrefs(
       registry, kCrashpadHistogramAllocatorName);
 
-#if BUILDFLAG(IS_WIN)
-  metrics::FileMetricsProvider::RegisterSourcePrefs(
-      registry, installer::kSetupHistogramAllocatorName);
-
-  metrics::FileMetricsProvider::RegisterSourcePrefs(
-      registry, notification_helper::kNotificationHelperHistogramAllocatorName);
-  metrics::FileMetricsProvider::RegisterSourcePrefs(
-      registry, kPlatformExperienceHelperHistogramAllocatorName);
-#endif
 }
 
 std::unique_ptr<metrics::FileMetricsProvider> CreateFileMetricsProvider(
@@ -329,40 +300,7 @@ std::unique_ptr<metrics::FileMetricsProvider> CreateFileMetricsProvider(
             FileMetricsProvider::ASSOCIATE_CURRENT_RUN),
         metrics_reporting_enabled);
 
-#if BUILDFLAG(IS_WIN)
-    using notification_helper::kNotificationHelperHistogramAllocatorName;
-    FileMetricsProvider::Params notification_helper_metrics_params(
-        user_data_dir.AppendASCII(kNotificationHelperHistogramAllocatorName),
-        FileMetricsProvider::SOURCE_HISTOGRAMS_ATOMIC_DIR,
-        FileMetricsProvider::ASSOCIATE_CURRENT_RUN,
-        kNotificationHelperHistogramAllocatorName);
-    file_metrics_provider->RegisterSource(notification_helper_metrics_params,
-                                          metrics_reporting_enabled);
-
-    FileMetricsProvider::Params platform_experience_metrics_params(
-        user_data_dir.AppendASCII(
-            kPlatformExperienceHelperHistogramAllocatorName),
-        FileMetricsProvider::SOURCE_HISTOGRAMS_ATOMIC_DIR,
-        FileMetricsProvider::ASSOCIATE_CURRENT_RUN,
-        kPlatformExperienceHelperHistogramAllocatorName);
-    file_metrics_provider->RegisterSource(platform_experience_metrics_params,
-                                          metrics_reporting_enabled);
-#endif  // BUILDFLAG(IS_WIN)
   }
-
-#if BUILDFLAG(IS_WIN)
-  // Read metrics file from setup.exe.
-  base::FilePath program_dir;
-  if (base::PathService::Get(base::DIR_EXE, &program_dir)) {
-    file_metrics_provider->RegisterSource(
-        FileMetricsProvider::Params(
-            program_dir.AppendASCII(installer::kSetupHistogramAllocatorName),
-            FileMetricsProvider::SOURCE_HISTOGRAMS_ATOMIC_DIR,
-            FileMetricsProvider::ASSOCIATE_CURRENT_RUN,
-            installer::kSetupHistogramAllocatorName),
-        metrics_reporting_enabled);
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   return file_metrics_provider;
 }
@@ -376,16 +314,7 @@ bool IsProcessRunning(base::ProcessId pid) {
     return g_is_process_running(pid);
   }
 
-#if BUILDFLAG(IS_WIN)
-  HANDLE process = OpenProcess(SYNCHRONIZE, FALSE, pid);
-  if (process) {
-    DWORD ret = WaitForSingleObject(process, 0);
-    CloseHandle(process);
-    if (ret == WAIT_TIMEOUT) {
-      return true;
-    }
-  }
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   // Sending a signal value of 0 will cause error checking to be performed
   // with no signal being sent.
   if (kill(pid, 0) == 0 || errno != ESRCH) {
@@ -573,16 +502,14 @@ void ChromeMetricsServiceClient::RegisterPrefs(PrefRegistrySimple* registry) {
   metrics::PerUserStateManagerChromeOS::RegisterPrefs(registry);
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
   metrics::structured::StructuredMetricsService::RegisterPrefs(registry);
 
 #if !BUILDFLAG(IS_CHROMEOS)
   metrics::structured::ChromeStructuredMetricsRecorder::RegisterLocalState(
       registry);
 #endif  // !BUILDFLAG(IS_CHROMEOS)
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // \ BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 }
 
 #if BUILDFLAG(IS_CHROMEOS)
@@ -671,12 +598,12 @@ std::string ChromeMetricsServiceClient::GetVersionString() {
 void ChromeMetricsServiceClient::OnEnvironmentUpdate(std::string* environment) {
   // TODO(https://bugs.chromium.org/p/crashpad/issues/detail?id=135): call this
   // on Mac when the Crashpad API supports it.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
   // Register the environment with the crash reporter. Note that there is a
   // window from startup to this point during which crash reports will not have
   // an environment set.
   GetCrashReporter().OnEnvironmentUpdate(*environment);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 }
 
 void ChromeMetricsServiceClient::MergeSubprocessHistograms() {
@@ -770,8 +697,7 @@ void ChromeMetricsServiceClient::Initialize() {
     puma_service_ = std::make_unique<metrics::private_metrics::PumaService>(
         this, local_state);
   }
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
   metrics::structured::Recorder::GetInstance()->SetUiTaskRunner(
       base::SequencedTaskRunner::GetCurrentDefault());
 #endif
@@ -831,7 +757,7 @@ void ChromeMetricsServiceClient::RegisterMetricsServiceProviders() {
   metrics_service_->RegisterMetricsProvider(
       std::make_unique<metrics::CPUMetricsProvider>());
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   metrics_service_->RegisterMetricsProvider(
       std::make_unique<metrics::MotherboardMetricsProvider>());
 #endif
@@ -909,23 +835,6 @@ void ChromeMetricsServiceClient::RegisterMetricsServiceProviders() {
   metrics_service_->RegisterMetricsProvider(
       std::make_unique<performance_manager::MetricsProviderCommon>());
 
-#if BUILDFLAG(IS_WIN)
-  metrics_service_->RegisterMetricsProvider(
-      std::make_unique<GoogleUpdateMetricsProviderWin>());
-  metrics_service_->RegisterMetricsProvider(
-      std::make_unique<AntiVirusMetricsProvider>());
-  metrics_service_->RegisterMetricsProvider(
-      std::make_unique<TPMMetricsProvider>());
-  metrics_service_->RegisterMetricsProvider(
-      std::make_unique<SystemMemoryListMetricsProvider>());
-  // Process V2 metrics are only guaranteed to be supported on Win11.
-  if (base::win::GetVersion() >= base::win::Version::WIN11 &&
-      base::FeatureList::IsEnabled(features::kSystemPdhMetrics)) {
-    metrics_service_->RegisterMetricsProvider(
-        std::make_unique<SystemPdhMetricsProvider>());
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_MAC)
   metrics_service_->RegisterMetricsProvider(
       std::make_unique<GoogleUpdateMetricsProviderMac>());
@@ -935,10 +844,10 @@ void ChromeMetricsServiceClient::RegisterMetricsServiceProviders() {
   }
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   metrics_service_->RegisterMetricsProvider(
       std::make_unique<DesktopPlatformFeaturesMetricsProvider>());
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_CHROMEOS)
   metrics_service_->RegisterMetricsProvider(
@@ -1045,12 +954,12 @@ void ChromeMetricsServiceClient::RegisterMetricsServiceProviders() {
       std::make_unique<PowerMetricsProvider>());
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   metrics_service_->RegisterMetricsProvider(
       metrics::CreateDesktopSessionMetricsProvider());
   metrics_service_->RegisterMetricsProvider(
       std::make_unique<UpdateMetricsProvider>());
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   metrics_service_->RegisterMetricsProvider(
       std::make_unique<glic::GlicMetricsProvider>());
@@ -1258,7 +1167,7 @@ bool ChromeMetricsServiceClient::RegisterForProfileEvents(Profile* profile) {
   }
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // This creates the DesktopProfileSessionDurationsServices if it didn't exist
   // already.
   metrics::DesktopProfileSessionDurationsServiceFactory::GetForBrowserContext(
@@ -1652,7 +1561,7 @@ void ChromeMetricsServiceClient::CreateStructuredMetricsService() {
   recorder =
       std::make_unique<metrics::structured::AshStructuredMetricsRecorder>(
           cros_system_profile_provider_.get());
-#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
   // Make sure that Structured Metrics recording delegates have been created
   // before the service is created. This is handled in other places for ChromeOS

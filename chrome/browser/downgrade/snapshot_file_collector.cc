@@ -19,11 +19,6 @@
 #include "components/webdata/common/webdata_constants.h"
 #include "content/public/browser/browsing_data_remover.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/profiles/profile_shortcut_manager_win.h"
-#include "chrome/browser/web_applications/chrome_pwa_launcher/last_browser_file_util.h"
-#endif
-
 namespace downgrade {
 
 // Returns a list of items to snapshot that should be directly under the user
@@ -34,10 +29,6 @@ std::vector<SnapshotItemDetails> CollectUserDataItems() {
                           SnapshotItemDetails::ItemType::kFile, 0),
       SnapshotItemDetails(base::FilePath(profiles::kHighResAvatarFolderName),
                           SnapshotItemDetails::ItemType::kDirectory, 0)};
-#if BUILDFLAG(IS_WIN)
-  user_data_items.emplace_back(base::FilePath(web_app::kLastBrowserFilename),
-                               SnapshotItemDetails::ItemType::kFile, 0);
-#endif  // BUILDFLAG(IS_WIN)
   return user_data_items;
 }
 
@@ -120,11 +111,6 @@ std::vector<SnapshotItemDetails> CollectProfileItems() {
                           SnapshotItemDetails::ItemType::kFile,
                           content::BrowsingDataRemover::DATA_TYPE_COOKIES)};
 
-#if BUILDFLAG(IS_WIN)
-  // Sign-in state
-  profile_items.emplace_back(base::FilePath(profiles::kProfileIconFileName),
-                             SnapshotItemDetails::ItemType::kFile, 0);
-#endif  // BUILDFLAG(IS_WIN)
   return profile_items;
 }
 

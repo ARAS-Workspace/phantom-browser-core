@@ -138,12 +138,6 @@ bool DelegatedFrameHost::HasSavedFrame() const {
 
 void DelegatedFrameHost::WasHidden(HiddenCause cause) {
   tab_switch_time_recorder_.TabWasHidden();
-#if BUILDFLAG(IS_WIN)
-  // Ignore if the native window was occluded.
-  // Windows needs the frame host to display tab previews.
-  if (cause == HiddenCause::kOccluded)
-    return;
-#endif
   frame_evictor_->SetVisible(false);
 }
 
@@ -346,7 +340,7 @@ void DelegatedFrameHost::EmbedSurface(
 
   if (!primary_surface_id ||
       primary_surface_id->local_surface_id() != local_surface_id_) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     // On Windows, Linux, and macOS, we would like to produce new content as
     // soon as possible or the OS will create an additional black gutter.
     // Until we can block resize on surface synchronization on these
@@ -361,7 +355,7 @@ void DelegatedFrameHost::EmbedSurface(
         current_frame_size_in_dip_ != surface_dip_size_) {
       deadline_policy = client_->GetResizeDeadlinePolicy();
     }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     if (force_specified_deadline_.has_value()) {
       deadline_policy =
           cc::DeadlinePolicy::UseSpecifiedDeadline(*force_specified_deadline_);

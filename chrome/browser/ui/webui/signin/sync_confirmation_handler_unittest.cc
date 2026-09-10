@@ -82,7 +82,7 @@ class SyncConfirmationHandlerTest : public testing::Test,
   static const char kConsentText5[];
 
   static bool IsMinorModeEnabled() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     return true;
 #else
     return false;

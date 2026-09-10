@@ -44,10 +44,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/media/webrtc/desktop_capture_devices_util_win.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_MAC)
 #include "third_party/webrtc/modules/desktop_capture/mac/window_list_utils.h"
 #endif  // BUILDFLAG(IS_MAC)
@@ -441,20 +437,6 @@ void OnAudioDeviceIdObtained(
       std::move(on_media_stream_capture_indicator_ui_created_callback));
 }
 
-#if BUILDFLAG(IS_WIN)
-std::optional<std::string> ProcessIdToApplicationLoopbackDeviceId(
-    base::ProcessId process_id,
-    bool restrict_own_audio) {
-  if (process_id == base::kNullProcessId) {
-    return std::nullopt;
-  }
-  if (restrict_own_audio && base::GetCurrentProcId() == process_id) {
-    return media::CreateRestrictOwnAudioBrowserLoopbackDeviceId();
-  }
-  return media::CreateApplicationLoopbackDeviceId(process_id);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_MAC)
 void OnGetApplicationAudioCaptureId(
     bool restrict_own_audio,
@@ -488,16 +470,6 @@ void GetApplicationAudioDeviceIdAsync(
       desktop_media_id,
       base::BindOnce(&OnGetApplicationAudioCaptureId, restrict_own_audio,
                      std::move(callback)));
-#elif BUILDFLAG(IS_WIN)
-  base::ThreadPool::PostTaskAndReplyWithResult(
-      FROM_HERE,
-      base::BindOnce(
-          [](intptr_t window_id, bool restrict_own_audio) {
-            return ProcessIdToApplicationLoopbackDeviceId(
-                GetAppMainProcessId(window_id), restrict_own_audio);
-          },
-          desktop_media_id.id, restrict_own_audio),
-      std::move(callback));
 #else
   // Linux/ChromeOS don't support this yet. Post a task to avoid re-entrancy.
   base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(

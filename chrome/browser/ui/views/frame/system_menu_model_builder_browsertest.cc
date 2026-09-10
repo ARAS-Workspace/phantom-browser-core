@@ -123,24 +123,6 @@ class SystemMenuModelBuilderSimplificationTest : public InProcessBrowserTest {
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(SystemMenuModelBuilderSimplificationTest,
-                       WindowsMenuOrder) {
-  ui::MenuModel* menu = BrowserView::GetBrowserViewForBrowser(browser())
-                            ->browser_widget()
-                            ->GetSystemMenuModel();
-
-  EXPECT_EQ(menu->GetCommandIdAt(0), IDC_RESTORE_WINDOW);
-  EXPECT_EQ(menu->GetCommandIdAt(1), IDC_MOVE_WINDOW);
-  EXPECT_EQ(menu->GetCommandIdAt(2), IDC_SIZE_WINDOW);
-  EXPECT_EQ(menu->GetCommandIdAt(3), IDC_MINIMIZE_WINDOW);
-  EXPECT_EQ(menu->GetCommandIdAt(4), IDC_MAXIMIZE_WINDOW);
-
-  size_t count = menu->GetItemCount();
-  EXPECT_EQ(menu->GetCommandIdAt(count - 1), IDC_CLOSE_WINDOW);
-}
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 // On Linux the system menu is much more dynamic than that of Windows. In order
 // to accommodate all the variations that could run in the commit queue this

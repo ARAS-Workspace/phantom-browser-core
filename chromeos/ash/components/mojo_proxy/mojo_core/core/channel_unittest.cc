@@ -376,7 +376,7 @@ TEST(ChannelTest, DeserializeMessage_BadExtraHeaderSize) {
 }
 
 // This test is only enabled for Linux-based platforms.
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_APPLE)
+#if !BUILDFLAG(IS_APPLE)
 TEST(ChannelTest, DeserializeMessage_NonZeroExtraHeaderSize) {
   // Verifies that a message payload is rejected when the extra header chunk
   // size anything but zero on Linux, even if it's aligned.

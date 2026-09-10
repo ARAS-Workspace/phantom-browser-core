@@ -152,9 +152,7 @@ struct InsecureDownloadData {
     }
 
     // Extract extension.
-#if BUILDFLAG(IS_WIN)
-    extension_ = base::WideToUTF8(path.FinalExtension());
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
     // If the file path is a content URI, extension should come from the file
     // name.
     if (path.IsContentUri()) {

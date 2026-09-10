@@ -536,12 +536,6 @@ void TaskEnvironment::InitializeThreadPool() {
 
   ThreadPoolInstance::InitParams init_params(kNumForegroundThreadPoolThreads);
   init_params.suggested_reclaim_time = TimeDelta::Max();
-#if BUILDFLAG(IS_WIN)
-  if (thread_pool_com_environment_ == ThreadPoolCOMEnvironment::COM_MTA) {
-    init_params.common_thread_pool_environment =
-        ThreadPoolInstance::InitParams::CommonThreadPoolEnvironment::COM_MTA;
-  }
-#endif
   ThreadPoolInstance::Get()->Start(init_params);
 }
 

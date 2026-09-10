@@ -30,10 +30,6 @@
 #include "services/webnn/public/mojom/webnn_service_introspection.mojom.h"
 #include "services/webnn/webnn_context_impl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/types/expected.h"
-#include "services/webnn/public/cpp/ep_device_info.h"
-#endif
 
 namespace gpu {
 class Scheduler;
@@ -43,12 +39,6 @@ namespace webnn {
 
 class GpuTaskScheduler;
 
-#if BUILDFLAG(IS_WIN)
-namespace ort {
-class DispatchContextImplOrt;
-class Environment;
-}
-#endif
 
 // Maintain a set of WebNNContextImpl instances that are created by the context
 // provider.
@@ -112,10 +102,6 @@ class COMPONENT_EXPORT(WEBNN_SERVICE) WebNNContextProviderImpl
   // `handle`.
   void DestroyAndRemoveGpuSequence(const blink::WebNNContextToken& handle);
 
-#if BUILDFLAG(IS_WIN)
-  // Kill the GPU process to destroy all contexts.
-  void DestroyAllContextsAndKillGpuProcess();
-#endif  // BUILDFLAG(IS_WIN)
 
   using WebNNContextImplPtr =
       std::unique_ptr<WebNNContextImpl, OnTaskRunnerDeleter>;
@@ -139,17 +125,6 @@ class COMPONENT_EXPORT(WEBNN_SERVICE) WebNNContextProviderImpl
 
   void CreateWeightsFile(base::OnceCallback<void(base::File)> callback);
 
-#if BUILDFLAG(IS_WIN)
-  // Called when a renderer requests a new CompilerContext for an existing
-  // context (e.g. after a Compiler process crash or idle shutdown).
-  void ReconnectCompilerContext(
-      mojom::CreateContextOptionsPtr options,
-      ContextProperties properties,
-      EpDeviceInfo target_device,
-      mojo::PendingReceiver<mojom::WebNNCompilerContext>
-          compiler_context_receiver,
-      mojo::PendingRemote<mojom::WebNNModelLoader> model_loader_remote);
-#endif  // BUILDFLAG(IS_WIN)
 
   static void SetBackendForTesting(BackendForTesting* backend_for_testing);
   static bool HasBackendForTesting();
@@ -200,18 +175,6 @@ class COMPONENT_EXPORT(WEBNN_SERVICE) WebNNContextProviderImpl
       gpu::CommandBufferId command_buffer_id,
       WebNNContextImplPtr context_impl);
 
-#if BUILDFLAG(IS_WIN)
-  // Called when a DispatchContextImplOrt is created with the Compiler process
-  // enabled. Launches the compiler and requests a CompilerContext before
-  // completing context creation.
-  void OnDispatchContextCreated(
-      CreateWebNNContextCallback callback,
-      mojo::PendingRemote<mojom::WebNNContext> remote,
-      mojo::ScopedDataPipeProducerHandle write_tensor_producer,
-      mojo::ScopedDataPipeConsumerHandle read_tensor_consumer,
-      gpu::SequenceId sequence_id,
-      WebNNContextImplPtr context_impl);
-#endif  // BUILDFLAG(IS_WIN)
 
 
 #if BUILDFLAG(WEBNN_USE_LITERT)
@@ -225,40 +188,6 @@ class COMPONENT_EXPORT(WEBNN_SERVICE) WebNNContextProviderImpl
       scoped_refptr<gpu::MemoryTracker> memory_tracker);
 #endif  // BUILDFLAG(WEBNN_USE_LITERT)
 
-#if BUILDFLAG(IS_WIN)
-  void OnOrtEnvCreated(ScopedTrace scoped_trace,
-                       mojom::CreateContextOptionsPtr options,
-                       std::unique_ptr<GpuTaskScheduler> gpu_task_scheduler,
-                       scoped_refptr<base::SingleThreadTaskRunner> task_runner,
-                       CreateWebNNContextCallback callback,
-                       bool is_incognito,
-                       scoped_refptr<gpu::MemoryTracker> memory_tracker,
-                       base::expected<scoped_refptr<ort::Environment>,
-                                      std::string> env_creation_results);
-
-  void DidEnsureWebNNExecutionProvidersReady(
-      ScopedTrace scoped_trace,
-      mojom::CreateContextOptionsPtr options,
-      std::unique_ptr<GpuTaskScheduler> gpu_task_scheduler,
-      scoped_refptr<base::SingleThreadTaskRunner> task_runner,
-      CreateWebNNContextCallback callback,
-      bool is_incognito,
-      scoped_refptr<gpu::MemoryTracker> memory_tracker,
-      base::flat_map<std::string, mojom::EpPackageInfoPtr> ep_package_info);
-
-  void DidEnsureWebNNExecutionProvidersReadyForIntrospection(
-      scoped_refptr<base::SingleThreadTaskRunner> task_runner,
-      ForceOrtEnvironmentCreationForIntrospectionCallback callback,
-      base::flat_map<std::string, mojom::EpPackageInfoPtr> ep_package_info);
-
-  void OnOrtEnvCreatedForIntrospection(
-      ForceOrtEnvironmentCreationForIntrospectionCallback callback,
-      base::expected<scoped_refptr<ort::Environment>, std::string>
-          env_creation_results);
-
-  void ForceOrtEnvironmentCreationForIntrospection(
-      ForceOrtEnvironmentCreationForIntrospectionCallback callback) override;
-#endif  // BUILDFLAG(IS_WIN)
 
   const gpu::GpuFeatureInfo gpu_feature_info_;
   const gpu::GPUInfo gpu_info_;

@@ -1687,8 +1687,7 @@ TEST_F(GlicEnablingCombinedObserverTest,
   EXPECT_TRUE(callback_called);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 constexpr char kPrefProjectId[] = "pref-project";
 constexpr char kPrefAppId[] = "pref-engine";

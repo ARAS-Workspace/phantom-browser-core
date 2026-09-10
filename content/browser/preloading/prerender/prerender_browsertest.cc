@@ -3649,13 +3649,8 @@ IN_PROC_BROWSER_TEST_F(
 // Tests that the prerendering started by a hidden initiator page will be
 // canceled after timeout.
 // TODO(b/40234240): Flaky on win.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_BackgroundedPageTimeout_TargetBlank_WithTargetHintBlank \
-  DISABLED_BackgroundedPageTimeout_TargetBlank_WithTargetHintBlank
-#else
 #define MAYBE_BackgroundedPageTimeout_TargetBlank_WithTargetHintBlank \
   BackgroundedPageTimeout_TargetBlank_WithTargetHintBlank
-#endif
 IN_PROC_BROWSER_TEST_F(
     PrerenderTargetHintBrowserTest,
     MAYBE_BackgroundedPageTimeout_TargetBlank_WithTargetHintBlank) {
@@ -10117,13 +10112,8 @@ IN_PROC_BROWSER_TEST_F(PrerenderBrowserTestFallbackDisabled,
 // is triggered and it blocks prerender. Prefetch in a background tab is not
 // scheduled. So, the prerender is never unblocked. Skip the test as it is not
 // testable.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PrerenderWhenInitiatorInBackground_Queue_Processing \
-  DISABLED_PrerenderWhenInitiatorInBackground_Queue_Processing
-#else
 #define MAYBE_PrerenderWhenInitiatorInBackground_Queue_Processing \
   PrerenderWhenInitiatorInBackground_Queue_Processing
-#endif
 IN_PROC_BROWSER_TEST_F(
     PrerenderBrowserTestFallbackDisabled,
     MAYBE_PrerenderWhenInitiatorInBackground_Queue_Processing) {
@@ -14102,13 +14092,8 @@ IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest, ColorSchemeDarkInNonPrimaryPage) {
 }
 
 // TODO(b/335786567): Flaky on win-asan.
-#if (BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER))
-#define MAYBE_ThemeColorSchemeChangeInNonPrimaryPage \
-  DISABLED_ThemeColorSchemeChangeInNonPrimaryPage
-#else
 #define MAYBE_ThemeColorSchemeChangeInNonPrimaryPage \
   ThemeColorSchemeChangeInNonPrimaryPage
-#endif
 // Tests that theme color in a prerendered page does not affect
 // the primary page.
 IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest,

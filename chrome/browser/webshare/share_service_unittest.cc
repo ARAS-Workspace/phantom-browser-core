@@ -38,9 +38,6 @@ using blink::mojom::ShareError;
 #include "chrome/browser/webshare/mac/sharing_service_operation.h"
 #include "third_party/blink/public/mojom/webshare/webshare.mojom.h"
 #endif
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/webshare/win/scoped_share_operation_fake_components.h"
-#endif
 
 class ShareServiceUnitTest : public ChromeRenderViewHostTestHarness {
  public:
@@ -58,9 +55,6 @@ class ShareServiceUnitTest : public ChromeRenderViewHostTestHarness {
 #if BUILDFLAG(IS_MAC)
     webshare::SharingServiceOperation::SetSharePickerCallbackForTesting(
         base::BindRepeating(&ShareServiceUnitTest::AcceptShareRequest));
-#endif
-#if BUILDFLAG(IS_WIN)
-    ASSERT_NO_FATAL_FAILURE(scoped_fake_components_.SetUp());
 #endif
   }
 
@@ -161,9 +155,6 @@ class ShareServiceUnitTest : public ChromeRenderViewHostTestHarness {
   }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  webshare::ScopedShareOperationFakeComponents scoped_fake_components_;
-#endif
  protected:
   mojo::Remote<blink::mojom::ShareService> share_service_remote_;
 };
@@ -241,19 +232,6 @@ TEST_F(ShareServiceUnitTest, ShareInvalidURLScheme) {
 TEST_F(ShareServiceUnitTest, PortableDocumentFormat) {
   EXPECT_EQ(ShareError::OK, ShareGeneratedFileData(".pdf", "application/pdf"));
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(ShareServiceUnitTest, ReservedNames) {
-  EXPECT_TRUE(IsDangerousFilename(FILE_PATH_LITERAL("CON")));
-  EXPECT_TRUE(IsDangerousFilename(FILE_PATH_LITERAL("PRN")));
-  EXPECT_TRUE(IsDangerousFilename(FILE_PATH_LITERAL("AUX")));
-  EXPECT_TRUE(IsDangerousFilename(FILE_PATH_LITERAL("NUL")));
-  EXPECT_TRUE(IsDangerousFilename(FILE_PATH_LITERAL("COM1")));
-  EXPECT_TRUE(IsDangerousFilename(FILE_PATH_LITERAL("COM9")));
-  EXPECT_TRUE(IsDangerousFilename(FILE_PATH_LITERAL("LPT1")));
-  EXPECT_TRUE(IsDangerousFilename(FILE_PATH_LITERAL("LPT9")));
-}
-#endif
 
 #if BUILDFLAG(IS_CHROMEOS)
 // On Chrome OS, like Android, we prevent sharing of Android applications.

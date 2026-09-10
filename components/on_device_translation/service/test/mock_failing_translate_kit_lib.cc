@@ -16,11 +16,7 @@
 #include "build/build_config.h"
 #include "components/on_device_translation/service/translate_kit_structs.h"
 
-#if BUILDFLAG(IS_WIN)
-#define TRANSLATE_KIT_EXPORT __declspec(dllexport)
-#else
 #define TRANSLATE_KIT_EXPORT __attribute__((visibility("default")))
-#endif
 
 extern "C" {
 

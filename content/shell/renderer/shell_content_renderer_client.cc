@@ -262,7 +262,7 @@ ShellContentRendererClient::~ShellContentRendererClient() {
 }
 
 void ShellContentRendererClient::SetUpWebAssemblyTrapHandler() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // Mac and Windows use the default implementation (where the default v8 trap
   // handler gets set up).
   ContentRendererClient::SetUpWebAssemblyTrapHandler();
@@ -312,7 +312,7 @@ void ShellContentRendererClient::SetUpWebAssemblyTrapHandler() {
   // As the registration of the callback failed, we don't enable trap
   // handlers.
 #endif  // defined(ENABLE_WEB_ASSEMBLY_TRAP_HANDLER_LINUX)
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 }
 
 void ShellContentRendererClient::RenderThreadStarted() {

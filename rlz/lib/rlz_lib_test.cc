@@ -38,10 +38,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <Windows.h>
-#include "rlz/win/lib/machine_deal.h"
-#endif
 
 #include "base/apple/scoped_nsautorelease_pool.h"
 #include "base/threading/thread.h"
@@ -87,17 +83,10 @@ const char kDefaultGoodPingResponse[] =
 }  // namespace
 
 class MachineDealCodeHelper
-#if BUILDFLAG(IS_WIN)
-    : public rlz_lib::MachineDealCode
-#endif
 {
  public:
   static bool Clear() {
-#if BUILDFLAG(IS_WIN)
-    return rlz_lib::MachineDealCode::Clear();
-#else
     return true;
-#endif
   }
 
  private:
@@ -408,12 +397,7 @@ TEST_F(RlzLibTest, GetPingParams) {
                                      cgi, 2048));
   EXPECT_STREQ("rep=2&rlz=T4:TbRlzValue", cgi);
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(rlz_lib::MachineDealCode::Set("dcc_value"));
-#define DCC_PARAM "&dcc=dcc_value"
-#else
 #define DCC_PARAM ""
-#endif
 
   EXPECT_TRUE(rlz_lib::SetAccessPointRlz(rlz_lib::IETB_SEARCH_BOX, ""));
   EXPECT_TRUE(rlz_lib::GetPingParams(rlz_lib::TOOLBAR_NOTIFIER, points,
@@ -529,9 +513,6 @@ TEST_F(RlzLibTest, ParsePingResponse) {
     "dcc: dcc_value\r\n"
     "crc32: F9070F81";
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(rlz_lib::MachineDealCode::Set("dcc_value2"));
-#endif
 
   // Record some product events to check that they get cleared.
   EXPECT_TRUE(rlz_lib::RecordProductEvent(rlz_lib::TOOLBAR_NOTIFIER,
@@ -539,9 +520,6 @@ TEST_F(RlzLibTest, ParsePingResponse) {
   EXPECT_TRUE(rlz_lib::RecordProductEvent(rlz_lib::TOOLBAR_NOTIFIER,
       rlz_lib::IE_HOME_PAGE, rlz_lib::INSTALL));
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(rlz_lib::MachineDealCode::Set("dcc_value"));
-#endif
   EXPECT_TRUE(rlz_lib::ParsePingResponse(rlz_lib::TOOLBAR_NOTIFIER,
                                          kPingResponse));
 
@@ -657,9 +635,6 @@ TEST_F(RlzLibTest, SendFinancialPing) {
       test_url_loader_factory.GetSafeWeakWrapper().get());
 
   MachineDealCodeHelper::Clear();
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(rlz_lib::MachineDealCode::Set("dcc_value"));
-#endif
 
   EXPECT_TRUE(rlz_lib::SetAccessPointRlz(rlz_lib::IETB_SEARCH_BOX,
       "TbRlzValue"));
@@ -788,122 +763,6 @@ TEST_F(RlzLibTest, ClearProductState) {
   EXPECT_STREQ("", cgi);
 }
 
-#if BUILDFLAG(IS_WIN)
-template<class T>
-class typed_buffer_ptr {
-  std::unique_ptr<char[]> buffer_;
-
- public:
-  typed_buffer_ptr() {
-  }
-
-  explicit typed_buffer_ptr(size_t size) : buffer_(new char[size]) {
-  }
-
-  void reset(size_t size) {
-    buffer_.reset(new char[size]);
-  }
-
-  operator T*() {
-    return reinterpret_cast<T*>(buffer_.get());
-  }
-};
-
-namespace rlz_lib {
-bool HasAccess(PSID sid, ACCESS_MASK access_mask, ACL* dacl);
-}
-
-bool EmptyAcl(ACL* acl) {
-  ACL_SIZE_INFORMATION info;
-  bool ret = GetAclInformation(acl, &info, sizeof(info), AclSizeInformation);
-  EXPECT_TRUE(ret);
-
-  for (DWORD i = 0; i < info.AceCount && ret; ++i) {
-    ret = DeleteAce(acl, 0);
-    EXPECT_TRUE(ret);
-  }
-
-  return ret;
-}
-
-TEST_F(RlzLibTest, HasAccess) {
-  // Create a SID that represents ALL USERS.
-  DWORD users_sid_size = SECURITY_MAX_SID_SIZE;
-  typed_buffer_ptr<SID> users_sid(users_sid_size);
-  CreateWellKnownSid(WinBuiltinUsersSid, NULL, users_sid, &users_sid_size);
-
-  // RLZ always asks for KEY_ALL_ACCESS access to the key.  This is what we
-  // test here.
-
-  // No ACL mean no access.
-  EXPECT_FALSE(rlz_lib::HasAccess(users_sid, KEY_ALL_ACCESS, NULL));
-
-  // Create an ACL for these tests.
-  const DWORD kMaxAclSize = 1024;
-  typed_buffer_ptr<ACL> dacl(kMaxAclSize);
-  InitializeAcl(dacl, kMaxAclSize, ACL_REVISION);
-
-  // Empty DACL mean no access.
-  EXPECT_FALSE(rlz_lib::HasAccess(users_sid, KEY_ALL_ACCESS, dacl));
-
-  // ACE without all needed privileges should mean no access.
-  EXPECT_TRUE(AddAccessAllowedAce(dacl, ACL_REVISION, KEY_READ, users_sid));
-  EXPECT_FALSE(rlz_lib::HasAccess(users_sid, KEY_ALL_ACCESS, dacl));
-
-  // ACE without all needed privileges should mean no access.
-  EXPECT_TRUE(EmptyAcl(dacl));
-  EXPECT_TRUE(AddAccessAllowedAce(dacl, ACL_REVISION, KEY_WRITE, users_sid));
-  EXPECT_FALSE(rlz_lib::HasAccess(users_sid, KEY_ALL_ACCESS, dacl));
-
-  // A deny ACE before an allow ACE should not give access.
-  EXPECT_TRUE(EmptyAcl(dacl));
-  EXPECT_TRUE(AddAccessDeniedAce(dacl, ACL_REVISION, KEY_ALL_ACCESS,
-                                 users_sid));
-  EXPECT_TRUE(AddAccessAllowedAce(dacl, ACL_REVISION, KEY_ALL_ACCESS,
-                                  users_sid));
-  EXPECT_FALSE(rlz_lib::HasAccess(users_sid, KEY_ALL_ACCESS, dacl));
-
-  // A deny ACE before an allow ACE should not give access.
-  EXPECT_TRUE(EmptyAcl(dacl));
-  EXPECT_TRUE(AddAccessDeniedAce(dacl, ACL_REVISION, KEY_READ, users_sid));
-  EXPECT_TRUE(AddAccessAllowedAce(dacl, ACL_REVISION, KEY_ALL_ACCESS,
-                                  users_sid));
-  EXPECT_FALSE(rlz_lib::HasAccess(users_sid, KEY_ALL_ACCESS, dacl));
-
-
-  // An allow ACE without all required bits should not give access.
-  EXPECT_TRUE(EmptyAcl(dacl));
-  EXPECT_TRUE(AddAccessAllowedAce(dacl, ACL_REVISION, KEY_WRITE, users_sid));
-  EXPECT_FALSE(rlz_lib::HasAccess(users_sid, KEY_ALL_ACCESS, dacl));
-
-  // An allow ACE with all required bits should give access.
-  EXPECT_TRUE(EmptyAcl(dacl));
-  EXPECT_TRUE(AddAccessAllowedAce(dacl, ACL_REVISION, KEY_ALL_ACCESS,
-                                  users_sid));
-  EXPECT_TRUE(rlz_lib::HasAccess(users_sid, KEY_ALL_ACCESS, dacl));
-
-  // A deny ACE after an allow ACE should not give access.
-  EXPECT_TRUE(EmptyAcl(dacl));
-  EXPECT_TRUE(AddAccessAllowedAce(dacl, ACL_REVISION, KEY_ALL_ACCESS,
-                                  users_sid));
-  EXPECT_TRUE(AddAccessDeniedAce(dacl, ACL_REVISION, KEY_READ, users_sid));
-  EXPECT_TRUE(rlz_lib::HasAccess(users_sid, KEY_ALL_ACCESS, dacl));
-
-  // An inherit-only allow ACE should not give access.
-  EXPECT_TRUE(EmptyAcl(dacl));
-  EXPECT_TRUE(AddAccessAllowedAceEx(dacl, ACL_REVISION, INHERIT_ONLY_ACE,
-                                    KEY_ALL_ACCESS, users_sid));
-  EXPECT_FALSE(rlz_lib::HasAccess(users_sid, KEY_ALL_ACCESS, dacl));
-
-  // An inherit-only deny ACE should not apply.
-  EXPECT_TRUE(EmptyAcl(dacl));
-  EXPECT_TRUE(AddAccessDeniedAceEx(dacl, ACL_REVISION, INHERIT_ONLY_ACE,
-                                   KEY_ALL_ACCESS, users_sid));
-  EXPECT_TRUE(AddAccessAllowedAce(dacl, ACL_REVISION, KEY_ALL_ACCESS,
-                                  users_sid));
-  EXPECT_TRUE(rlz_lib::HasAccess(users_sid, KEY_ALL_ACCESS, dacl));
-}
-#endif
 
 TEST_F(RlzLibTest, BrandingRecordProductEvent) {
   // Don't run these tests if a supplementary brand is already in place.  That

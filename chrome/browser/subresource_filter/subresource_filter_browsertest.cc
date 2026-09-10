@@ -609,13 +609,8 @@ IN_PROC_BROWSER_TEST_F(SubresourceFilterBrowserTest,
 
 // Disable the test as it's flaky on Win7 dbg.
 // crbug.com/40125372
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-#define MAYBE_RendererDebugURL_NoLeakedThrottlePtrs \
-  DISABLED_RendererDebugURL_NoLeakedThrottlePtrs
-#else
 #define MAYBE_RendererDebugURL_NoLeakedThrottlePtrs \
   RendererDebugURL_NoLeakedThrottlePtrs
-#endif
 
 IN_PROC_BROWSER_TEST_F(SubresourceFilterBrowserTest,
                        MAYBE_RendererDebugURL_NoLeakedThrottlePtrs) {

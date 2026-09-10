@@ -1111,10 +1111,6 @@ TEST_F(OpenscreenSessionHostTest,
 }
 
 TEST_F(OpenscreenSessionHostTest, ShouldEnableHardwareH264EncodingIfSupported) {
-#if BUILDFLAG(IS_WIN)
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(media::kCastStreamingWinHardwareH264);
-#endif
 
   CreateSession(SessionType::VIDEO_ONLY);
 
@@ -1186,9 +1182,6 @@ TEST_F(OpenscreenSessionHostTest, TwoStageNegotiationFallback) {
   std::vector<base::test::FeatureRef> features = {
       media::kCastStreamingVp9,
       mirroring::features::kCastStreamingOfferHardwareFirst};
-#if BUILDFLAG(IS_WIN)
-  features.push_back(media::kCastStreamingWinHardwareH264);
-#endif
   base::test::ScopedFeatureList feature_list;
   feature_list.InitWithFeatures(features, {});
 
@@ -1234,9 +1227,6 @@ TEST_F(OpenscreenSessionHostTest, SingleStageOfferOffersAllSupportedCodecs) {
   std::vector<base::test::FeatureRef> features = {
       media::kCastStreamingVp9,
   };
-#if BUILDFLAG(IS_WIN)
-  features.push_back(media::kCastStreamingWinHardwareH264);
-#endif
   base::test::ScopedFeatureList feature_list;
   feature_list.InitWithFeatures(
       features, {mirroring::features::kCastStreamingOfferHardwareFirst});
@@ -1358,11 +1348,6 @@ TEST_F(OpenscreenSessionHostTest,
 
 TEST_F(OpenscreenSessionHostTest, CodecParameterInOffer) {
   CreateSession(SessionType::VIDEO_ONLY);
-
-#if BUILDFLAG(IS_WIN)
-  base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(media::kCastStreamingWinHardwareH264);
-#endif
 
   SetSupportedProfiles(
       std::vector<media::VideoEncodeAccelerator::SupportedProfile>{

@@ -30,9 +30,7 @@ class TestBrowserSwitcherPrefs : public BrowserSwitcherPrefs {
 };
 
 StringType UTF8ToNative(std::string_view src) {
-#if BUILDFLAG(IS_WIN)
-  return base::UTF8ToWide(src);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   return std::string(src);
 #else
 #error "Invalid platform for browser_switcher"
@@ -102,9 +100,7 @@ TEST_F(AlternativeBrowserDriverTest, CreateCommandLineExpandsUrl) {
 }
 
 TEST_F(AlternativeBrowserDriverTest, GetBrowserName) {
-#if BUILDFLAG(IS_WIN)
-  std::string expected = "Internet Explorer";
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   std::string expected = "Safari";
 #else
   std::string expected;
@@ -116,14 +112,7 @@ TEST_F(AlternativeBrowserDriverTest, GetBrowserName) {
   actual = driver()->GetBrowserName();
   EXPECT_EQ("", actual);
 
-#if BUILDFLAG(IS_WIN)
-  SetBrowserPath("${ie}");
-  actual = driver()->GetBrowserName();
-  EXPECT_EQ("Internet Explorer", actual);
-
-#endif
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   SetBrowserPath("${safari}");
   actual = driver()->GetBrowserName();
   EXPECT_EQ("Safari", actual);
@@ -143,9 +132,7 @@ TEST_F(AlternativeBrowserDriverTest, GetBrowserName) {
 }
 
 TEST_F(AlternativeBrowserDriverTest, GetBrowserType) {
-#if BUILDFLAG(IS_WIN)
-  BrowserType expected = BrowserType::kIE;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   BrowserType expected = BrowserType::kSafari;
 #else
   BrowserType expected = BrowserType::kUnknown;
@@ -157,31 +144,7 @@ TEST_F(AlternativeBrowserDriverTest, GetBrowserType) {
   actual = driver()->GetBrowserType();
   EXPECT_EQ(BrowserType::kUnknown, actual);
 
-#if BUILDFLAG(IS_WIN)
-  SetBrowserPath("${ie}");
-  actual = driver()->GetBrowserType();
-  EXPECT_EQ(BrowserType::kIE, actual);
-
-  SetBrowserPath("C:\\Program Files (x86)\\Internet Explorer\\IExplore.exe");
-  actual = driver()->GetBrowserType();
-  EXPECT_EQ(BrowserType::kIE, actual);
-
-  SetBrowserPath("C:\\Program Files\\Mozilla Firefox\\firefox.exe");
-  actual = driver()->GetBrowserType();
-  EXPECT_EQ(BrowserType::kFirefox, actual);
-
-  SetBrowserPath(
-      "C:\\users\\HongGilDong\\AppData\\Local\\Programs\\Opera\\launcher.exe");
-  actual = driver()->GetBrowserType();
-  EXPECT_EQ(BrowserType::kOpera, actual);
-
-  SetBrowserPath(
-      "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe");
-  actual = driver()->GetBrowserType();
-  EXPECT_EQ(BrowserType::kChrome, actual);
-#endif
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   SetBrowserPath("${safari}");
   actual = driver()->GetBrowserType();
   EXPECT_EQ(BrowserType::kSafari, actual);
@@ -199,45 +162,6 @@ TEST_F(AlternativeBrowserDriverTest, GetBrowserType) {
   actual = driver()->GetBrowserType();
   EXPECT_EQ(BrowserType::kOpera, actual);
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(AlternativeBrowserDriverTest, CreateCommandLineExpandsEnvVars) {
-  _putenv("A=AAA");
-  _putenv("B=BBB");
-  _putenv("CC=CCC");
-  _putenv("D=DDD");
-  SetBrowserPath("something.exe");
-  auto params = UTF8VectorToValueList(
-      {"%A%", "%B%", "before_%CC%_between_%D%_after", "%NONEXISTENT%"});
-  SetBrowserParameters(params);
-  auto cmd_line = driver()->CreateCommandLine(GURL("http://example.com/"));
-  const base::CommandLine::StringVector& argv = cmd_line.argv();
-  EXPECT_EQ(6u, argv.size());
-  EXPECT_EQ(L"something.exe", argv[0]);
-  EXPECT_EQ(L"AAA", argv[1]);
-  EXPECT_EQ(L"BBB", argv[2]);
-  EXPECT_EQ(L"before_CCC_between_DDD_after", argv[3]);
-  EXPECT_EQ(L"%NONEXISTENT%", argv[4]);
-  EXPECT_EQ(L"http://example.com/", argv[5]);
-}
-
-TEST_F(AlternativeBrowserDriverTest,
-       AppendCommandLineArgumentDoesntExpandUrlContent) {
-  _putenv("A=AAA");
-  SetBrowserPath("something.exe");
-  auto cmd_line = driver()->CreateCommandLine(GURL("http://evil.com/%A%"));
-  EXPECT_EQ(2u, cmd_line.argv().size());
-  EXPECT_EQ(L"something.exe", cmd_line.argv()[0]);
-  EXPECT_EQ(L"http://evil.com/%A%", cmd_line.argv()[1]);
-
-  auto params = UTF8VectorToValueList({"${url}"});
-  SetBrowserParameters(params);
-  cmd_line = driver()->CreateCommandLine(GURL("http://evil.com/%A%"));
-  EXPECT_EQ(2u, cmd_line.argv().size());
-  EXPECT_EQ(L"something.exe", cmd_line.argv()[0]);
-  EXPECT_EQ(L"http://evil.com/%A%", cmd_line.argv()[1]);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
 TEST_F(AlternativeBrowserDriverTest, CreateCommandLineUsesOpen) {

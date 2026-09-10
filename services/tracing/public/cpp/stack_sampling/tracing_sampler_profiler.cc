@@ -260,10 +260,10 @@ struct FrameDetails {
 #endif
 };
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN) && defined(_WIN64) ||          \
-    ANDROID_ARM64_UNWINDING_SUPPORTED || ANDROID_CFI_UNWINDING_SUPPORTED || \
-    (BUILDFLAG(IS_CHROMEOS) &&                                              \
-     (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64))) ||              \
+#if BUILDFLAG(IS_APPLE) || ANDROID_ARM64_UNWINDING_SUPPORTED || \
+    ANDROID_CFI_UNWINDING_SUPPORTED ||                          \
+    (BUILDFLAG(IS_CHROMEOS) &&                                  \
+     (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64))) ||  \
     BUILDFLAG(IS_LINUX)
 // Returns whether stack sampling is supported on the current platform.
 bool IsStackSamplingSupported() {
@@ -651,10 +651,10 @@ void TracingSamplerProfiler::RegisterDataSource() {
 
 // static
 bool TracingSamplerProfiler::IsStackUnwindingSupportedForTesting() {
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN) && defined(_WIN64) ||          \
-    ANDROID_ARM64_UNWINDING_SUPPORTED || ANDROID_CFI_UNWINDING_SUPPORTED || \
-    (BUILDFLAG(IS_CHROMEOS) &&                                              \
-     (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64))) ||              \
+#if BUILDFLAG(IS_APPLE) || ANDROID_ARM64_UNWINDING_SUPPORTED || \
+    ANDROID_CFI_UNWINDING_SUPPORTED ||                          \
+    (BUILDFLAG(IS_CHROMEOS) &&                                  \
+     (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64))) ||  \
     BUILDFLAG(IS_LINUX)
   return IsStackSamplingSupported();
 #else

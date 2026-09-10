@@ -1678,7 +1678,6 @@ class BrowserFeaturePromoControllerViewsTest
 // out during Chrome resource compilation. To avoid issues, simply don't run
 // these tests on those specific bots.
 // See https://crbug.com/434261108 and https://crbug.com/40750695 for more info.
-#if !BUILDFLAG(GOOGLE_CHROME_BRANDING) || !BUILDFLAG(IS_WIN)
 
 namespace {
 const int kStringWithSingleSubstitution =
@@ -1871,8 +1870,6 @@ TEST_F(BrowserFeaturePromoControllerStringSubstitutionTest,
                   CheckAccessibleText(l10n_util::GetPluralStringFUTF16(
                       kStringWithPluralSubstitution, 3)));
 }
-
-#endif  // !BUILDFLAG(GOOGLE_CHROME_BRANDING) || !BUILDFLAG(IS_WIN)
 
 namespace {
 

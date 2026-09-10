@@ -18,12 +18,12 @@
 #include "content/public/test/browser_test.h"
 #include "ui/actions/actions.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 namespace {
 const auto kCustomizeMenuItem =
@@ -104,7 +104,7 @@ IN_PROC_BROWSER_TEST_F(FooterContextMenuBrowserTest, OpensCustomizeChrome) {
                                         1);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 class FooterContextMenuEnterpriseTest : public FooterContextMenuBrowserTest {
  public:
   void SetUpOnMainThread() override {
@@ -139,4 +139,4 @@ IN_PROC_BROWSER_TEST_F(FooterContextMenuEnterpriseTest, PolicyDisablesHideMenuOp
   EXPECT_FALSE(IsCommandIdVisible(kHideMenuItem));
   EXPECT_TRUE(IsCommandIdVisible(kCustomizeMenuItem));
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

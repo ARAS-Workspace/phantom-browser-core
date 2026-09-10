@@ -54,7 +54,7 @@ struct BLINK_COMMON_EXPORT RendererPreferences {
   bool allow_cross_origin_auth_prompt{false};
   bool enable_do_not_track{false};
   bool enable_encrypted_media{true};
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
   bool use_overlay_scrollbar{false};
 #endif
   blink::mojom::WebRtcIpHandlingPolicy webrtc_ip_handling_policy =
@@ -69,18 +69,6 @@ struct BLINK_COMMON_EXPORT RendererPreferences {
   bool send_subresource_notification{false};
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   std::string system_font_family_name;
-#endif
-#if BUILDFLAG(IS_WIN)
-  std::u16string caption_font_family_name;
-  int32_t caption_font_height{0};
-  std::u16string small_caption_font_family_name;
-  int32_t small_caption_font_height{0};
-  std::u16string menu_font_family_name;
-  int32_t menu_font_height{0};
-  std::u16string status_font_family_name;
-  int32_t status_font_height{0};
-  std::u16string message_font_family_name;
-  int32_t message_font_height{0};
 #endif
 #if BUILDFLAG(IS_OZONE)
   bool selection_clipboard_buffer_available{false};

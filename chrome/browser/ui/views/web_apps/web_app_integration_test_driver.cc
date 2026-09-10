@@ -208,13 +208,6 @@
 #include "skia/ext/skia_utils_mac.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/test/test_reg_util_win.h"
-#include "base/win/shortcut.h"
-#include "chrome/browser/web_applications/os_integration/web_app_handler_registration_utils_win.h"
-#include "chrome/installer/util/shell_util.h"
-#endif
-
 namespace web_app::integration_tests {
 
 namespace {
@@ -565,8 +558,7 @@ std::string GetFileExtension(FileExtension file_extension) {
   return std::string();
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 SiteConfig GetSiteConfigurationFromAppName(const std::string& app_name) {
   SiteConfig config;
   bool is_app_found = false;
@@ -2323,7 +2315,7 @@ void WebAppIntegrationTestDriver::DeletePlatformShortcut(Site site) {
   if (app_name.empty()) {
     app_name = GetSiteConfiguration(site).app_name;
   }
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   ASSERT_TRUE(override_registration_->test_override().IsShortcutCreated(
       profile(), app_id, app_name));
   ASSERT_TRUE(
@@ -2970,31 +2962,7 @@ void WebAppIntegrationTestDriver::UninstallPolicyApp(Site site) {
 }
 
 void WebAppIntegrationTestDriver::UninstallFromOs(Site site) {
-#if BUILDFLAG(IS_WIN)
-  if (!BeforeStateChangeAction(__FUNCTION__)) {
-    return;
-  }
-  webapps::AppId app_id = GetAppIdBySiteMode(site);
-  ASSERT_TRUE(provider()->registrar_unsafe().GetAppById(app_id))
-      << "No app installed for site: " << static_cast<int>(site);
-
-  UninstallCompleteWaiter uninstall_waiter(profile(), app_id);
-
-  // Trigger app uninstall via command line.
-  extensions::ScopedTestDialogAutoConfirm auto_confirm(
-      extensions::ScopedTestDialogAutoConfirm::ACCEPT);
-  base::CommandLine command_line(base::CommandLine::NO_PROGRAM);
-  command_line.AppendSwitchASCII(switches::kUninstallAppId, app_id);
-  StartupBrowserCreator::ProcessCommandLineAlreadyRunning(
-      command_line, {},
-      {profile()->GetPath(), StartupProfileMode::kBrowserWindow});
-
-  uninstall_waiter.Wait();
-  site_remember_deny_open_file_.erase(site);
-  AfterStateChangeAction();
-#else
   NOTREACHED() << "Not supported on non-Windows platforms";
-#endif
 }
 
 #if BUILDFLAG(IS_MAC)
@@ -3755,17 +3723,7 @@ void WebAppIntegrationTestDriver::CheckRunOnOsLoginEnabled(Site site) {
   ASSERT_TRUE(app_state);
   EXPECT_EQ(app_state->run_on_os_login_mode, apps::RunOnOsLoginMode::kWindowed);
   base::ScopedAllowBlockingForTesting allow_blocking;
-#if BUILDFLAG(IS_WIN)
-  ASSERT_TRUE(override_registration_->test_override().IsRunOnOsLoginEnabled(
-      profile(), app_state->id, app_state->name));
-  SiteConfig site_config = GetSiteConfigurationFromAppName(app_state->name);
-  std::optional<SkColor> icon_color =
-      override_registration_->test_override().GetShortcutIconTopLeftColor(
-          profile(), override_registration_->test_override().startup(),
-          app_state->id, app_state->name);
-  ASSERT_TRUE(icon_color.has_value());
-  ASSERT_THAT(site_config.icon_color, testing::Eq(icon_color.value()));
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   ASSERT_TRUE(override_registration_->test_override().IsRunOnOsLoginEnabled(
       profile(), app_state->id, app_state->name));
 #endif
@@ -3780,7 +3738,7 @@ void WebAppIntegrationTestDriver::CheckRunOnOsLoginDisabled(Site site) {
       GetAppBySiteMode(after_state_change_action_state_.get(), profile(), site);
   ASSERT_TRUE(app_state);
   base::ScopedAllowBlockingForTesting allow_blocking;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   ASSERT_FALSE(override_registration_->test_override().IsRunOnOsLoginEnabled(
       profile(), app_state->id, app_state->name));
 #endif
@@ -3790,7 +3748,7 @@ void WebAppIntegrationTestDriver::CheckRunOnOsLoginDisabled(Site site) {
 void WebAppIntegrationTestDriver::CheckSiteHandlesFile(
     Site site,
     FileExtension file_extension) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (!BeforeStateCheckAction(__FUNCTION__)) {
     return;
   }
@@ -3806,7 +3764,7 @@ void WebAppIntegrationTestDriver::CheckSiteHandlesFile(
 void WebAppIntegrationTestDriver::CheckSiteNotHandlesFile(
     Site site,
     FileExtension file_extension) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (!BeforeStateCheckAction(__FUNCTION__)) {
     return;
   }
@@ -4612,7 +4570,7 @@ base::FilePath WebAppIntegrationTestDriver::GetShortcutPath(
     base::FilePath shortcut_dir,
     const std::string& app_name,
     const webapps::AppId& app_id) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   return override_registration_->test_override().GetShortcutPath(
       profile(), shortcut_dir, app_id, app_name);
 #else
@@ -4817,7 +4775,7 @@ bool WebAppIntegrationTestDriver::IsShortcutAndIconCreated(
     const webapps::AppId& id) {
   base::ScopedAllowBlockingForTesting allow_blocking;
   bool is_shortcut_and_icon_correct = false;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   bool is_shortcut_correct =
       override_registration_->test_override().IsShortcutCreated(profile, id,
                                                                 name);
@@ -4833,24 +4791,7 @@ bool WebAppIntegrationTestDriver::DoIconColorsMatch(Profile* profile,
                                                     const std::string& name,
                                                     const webapps::AppId& id) {
   bool do_icon_colors_match = false;
-#if BUILDFLAG(IS_WIN)
-  SkColor expected_icon_pixel_color =
-      GetSiteConfigurationFromAppName(name).icon_color;
-  std::optional<SkColor> shortcut_pixel_color_desktop =
-      override_registration_->test_override().GetShortcutIconTopLeftColor(
-          profile, override_registration_->test_override().desktop(), id, name);
-  std::optional<SkColor> shortcut_pixel_color_application_menu =
-      override_registration_->test_override().GetShortcutIconTopLeftColor(
-          profile, override_registration_->test_override().application_menu(),
-          id, name);
-  if (shortcut_pixel_color_desktop.has_value() &&
-      shortcut_pixel_color_application_menu.has_value()) {
-    do_icon_colors_match =
-        (expected_icon_pixel_color == shortcut_pixel_color_desktop.value() &&
-         expected_icon_pixel_color ==
-             shortcut_pixel_color_application_menu.value());
-  }
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   SkColor expected_icon_pixel_color =
       GetSiteConfigurationFromAppName(name).icon_color;
   std::optional<SkColor> shortcut_pixel_color_apps_folder =

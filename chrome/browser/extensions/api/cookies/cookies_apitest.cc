@@ -112,7 +112,7 @@ INSTANTIATE_TEST_SUITE_P(All,
 
 // TODO(crbug.com/40839864): Flaky on Windows.
 // TODO(crbug.com/371423073): Flaky on desktop Android.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_Cookies DISABLED_Cookies
 #else
 #define MAYBE_Cookies Cookies

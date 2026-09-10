@@ -22,11 +22,11 @@ UserRemoteCommandsFactory::BuildJobForType(
   switch (type) {
     case enterprise_management::RemoteCommand_Type_BROWSER_CLEAR_BROWSING_DATA:
       return std::make_unique<ClearBrowsingDataJob>(profile_);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     case enterprise_management::
         RemoteCommand_Type_BROWSER_EXTENSION_UPDATE_CHECK:
       return std::make_unique<ExtensionUpdateCheckJob>(profile_);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     default:
       NOTREACHED() << "Received an unsupported remote command type: " << type;
   }

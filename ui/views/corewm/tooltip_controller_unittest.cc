@@ -42,10 +42,6 @@
 #include "ui/wm/public/activation_client.h"
 #include "ui/wm/public/tooltip_observer.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/base/win/scoped_ole_initializer.h"
-#endif
-
 #if BUILDFLAG(ENABLE_DESKTOP_AURA)
 #include "ui/views/widget/desktop_aura/desktop_native_widget_aura.h"
 #endif
@@ -58,7 +54,7 @@ std::unique_ptr<views::Widget> CreateWidget(aura::Window* root) {
   views::Widget::InitParams params(Widget::InitParams::CLIENT_OWNS_WIDGET);
   params.type = views::Widget::InitParams::TYPE_WINDOW_FRAMELESS;
   params.accept_events = true;
-#if !BUILDFLAG(ENABLE_DESKTOP_AURA) || BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(ENABLE_DESKTOP_AURA)
   params.parent = root;
 #endif
   params.bounds = gfx::Rect(0, 0, 200, 100);
@@ -86,7 +82,7 @@ class TooltipControllerTest : public ViewsTestBase {
     ViewsTestBase::SetUp();
 
     aura::Window* root_window = GetContext();
-#if !BUILDFLAG(ENABLE_DESKTOP_AURA) || BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(ENABLE_DESKTOP_AURA)
     if (root_window) {
       tooltip_ = new views::corewm::TooltipAura();
       controller_ = std::make_unique<TooltipController>(
@@ -110,7 +106,7 @@ class TooltipControllerTest : public ViewsTestBase {
     // Reset the tooltip in case tests end with a visible tooltip.
     helper_->state_manager()->HideAndReset();
 
-#if !BUILDFLAG(ENABLE_DESKTOP_AURA) || BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(ENABLE_DESKTOP_AURA)
     aura::Window* root_window = GetContext();
     if (root_window) {
       root_window->RemovePreTargetHandler(controller_.get());
@@ -161,16 +157,13 @@ class TooltipControllerTest : public ViewsTestBase {
   std::unique_ptr<ui::test::EventGenerator> generator_;
 
  protected:
-#if !BUILDFLAG(ENABLE_DESKTOP_AURA) || BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(ENABLE_DESKTOP_AURA)
   raw_ptr<TooltipAura> tooltip_;  // not owned.
 #endif
 
  private:
   std::unique_ptr<TooltipController> controller_;
 
-#if BUILDFLAG(IS_WIN)
-  ui::ScopedOleInitializer ole_initializer_;
-#endif
 };
 
 TEST_F(TooltipControllerTest, ViewTooltip) {
@@ -239,7 +232,7 @@ TEST_F(TooltipControllerTest, DontShowTooltipOnTouch) {
   EXPECT_EQ(GetWindow(), helper_->GetTooltipParentWindow());
 }
 
-#if !BUILDFLAG(ENABLE_DESKTOP_AURA) || BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(ENABLE_DESKTOP_AURA)
 // crbug.com/664370.
 TEST_F(TooltipControllerTest, MaxWidth) {
   std::u16string text =
@@ -746,7 +739,7 @@ TEST_F(TooltipControllerTest, DISABLED_CloseOnCaptureLost) {
 // Disabled on Linux as X11ScreenOzone::GetAcceleratedWidgetAtScreenPoint
 // and WaylandScreen::GetAcceleratedWidgetAtScreenPoint don't consider z-order.
 // Disabled on Windows due to failing bots. http://crbug.com/604479
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_Capture DISABLED_Capture
 #else
 #define MAYBE_Capture Capture
@@ -1181,10 +1174,6 @@ class TooltipControllerTest3 : public ViewsTestBase {
 
  private:
   std::unique_ptr<TooltipController> controller_;
-
-#if BUILDFLAG(IS_WIN)
-  ui::ScopedOleInitializer ole_initializer_;
-#endif
 
   aura::Window* GetRootWindow() { return GetWindow()->GetRootWindow(); }
 };

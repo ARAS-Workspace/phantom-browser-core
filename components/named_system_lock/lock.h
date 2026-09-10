@@ -10,10 +10,6 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace base {
 class TimeDelta;
 }  // namespace base
@@ -38,10 +34,6 @@ class ScopedLock {
   // Mac: A bootstrap service name (see `man bootstrap_check_in`).
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   static std::unique_ptr<ScopedLock> Create(const std::string& name,
-                                            base::TimeDelta timeout);
-#elif BUILDFLAG(IS_WIN)
-  static std::unique_ptr<ScopedLock> Create(const std::wstring& mutex_name,
-                                            SECURITY_ATTRIBUTES* sa,
                                             base::TimeDelta timeout);
 #endif
 

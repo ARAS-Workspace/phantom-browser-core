@@ -149,14 +149,14 @@ void RegisterProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterBooleanPref(prefs::kChildAccountStatusKnown, false);
   registry->RegisterStringPref(prefs::kFamilyLinkUserMemberRole, std::string());
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE) && \
-    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
+    (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
   registry->RegisterIntegerPref(
       prefs::kLocallyParentApprovedExtensionsMigrationState,
       static_cast<int>(
           supervised_user::LocallyParentApprovedExtensionsMigrationState::
               kNeedToRun));
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE) && (BUILDFLAG(IS_WIN) ||
-        // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
+#endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE) && (BUILDFLAG(IS_MAC) ||
+        // BUILDFLAG(IS_LINUX))
 }
 
 void EnableParentalControls(PrefService& pref_service) {

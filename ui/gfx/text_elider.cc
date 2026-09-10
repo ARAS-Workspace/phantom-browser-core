@@ -182,12 +182,7 @@ std::u16string StringSlicer::CutString(size_t length,
 std::u16string ElideFilename(const base::FilePath& filename,
                              const FontList& font_list,
                              float available_pixel_width) {
-#if BUILDFLAG(IS_WIN)
-  std::u16string filename_utf16 = WideToUTF16(filename.value());
-  std::u16string extension = WideToUTF16(filename.Extension());
-  std::u16string rootname =
-      WideToUTF16(filename.BaseName().RemoveExtension().value());
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   std::u16string filename_utf16 =
       WideToUTF16(base::SysNativeMBToWide(filename.value()));
   std::u16string extension =

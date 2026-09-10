@@ -178,7 +178,7 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUITabsFromOtherDevicesSidePanelHost,
       kChromeUITermsHost,
 #endif
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #endif
       kChromeUIUserActionsHost,
       kChromeUIVersionHost,
@@ -240,21 +240,17 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       ash::kChromeUIInternetConfigDialogHost,
       ash::kChromeUIInternetDetailDialogHost,
 #endif
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_DESKTOP_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
+    BUILDFLAG(IS_DESKTOP_ANDROID)
       kChromeUIDiscardsHost,
 #endif
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #endif
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
       kChromeUILinuxProxyConfigHost,
 #endif
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
       kChromeUISandboxHost,
-#endif
-#if BUILDFLAG(IS_WIN)
-      kChromeUIConflictsHost,
 #endif
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
       kChromeUIExtensionsHost,
@@ -310,11 +306,6 @@ base::span<const base::cstring_view> ChromeDebugURLs() {
        blink::kChromeUIMemoryExhaustURL,
        blink::kChromeUIMemoryPressureCriticalURL,
        blink::kChromeUIMemoryPressureModerateURL,
-#if BUILDFLAG(IS_WIN)
-       blink::kChromeUIBrowserHeapCorruptionURL,
-       blink::kChromeUICfgViolationCrashURL,
-       blink::kChromeUIHeapCorruptionCrashURL,
-#endif
 #if BUILDFLAG(IS_ANDROID)
        blink::kChromeUIGpuJavaCrashURL,
        kChromeUIJavaCrashURL,

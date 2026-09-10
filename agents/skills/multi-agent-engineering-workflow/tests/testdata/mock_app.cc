@@ -10,10 +10,6 @@
 #include "thread_safe_manager.h"
 #include "type_converter.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "file_manager_win.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "socket_handler_linux.h"
 #endif
@@ -34,10 +30,6 @@ void RunMockApp() {
   // Use callback helper
   BindPostTaskHelper helper;
   helper.ScheduleWork();
-
-#if BUILDFLAG(IS_WIN)
-  ProcessFile();
-#endif
 
 #if BUILDFLAG(IS_LINUX)
   ReadConfig();

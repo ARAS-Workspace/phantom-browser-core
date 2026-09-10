@@ -32,33 +32,4 @@ bool KillProcesses(const FilePath::StringType& executable_name,
   return result;
 }
 
-#if BUILDFLAG(IS_WIN)
-// Common implementation for platforms under which |process| is a handle to
-// the process, rather than an identifier that must be "reaped".
-void EnsureProcessTerminated(Process process) {
-  DCHECK(!process.is_current());
-
-  if (process.WaitForExitWithTimeout(TimeDelta(), nullptr)) {
-    return;
-  }
-
-  ThreadPool::PostDelayedTask(
-      FROM_HERE,
-      {TaskPriority::BEST_EFFORT, TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN},
-      BindOnce(
-          [](Process process) {
-            if (process.WaitForExitWithTimeout(TimeDelta(), nullptr)) {
-              return;
-            }
-#if BUILDFLAG(IS_WIN)
-            process.Terminate(win::kProcessKilledExitCode, false);
-#else
-            process.Terminate(-1, false);
-#endif
-          },
-          std::move(process)),
-      Seconds(2));
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 }  // namespace base

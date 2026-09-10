@@ -7,15 +7,11 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/test/chromedriver/net/pipe_connection_win.h"
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include "chrome/test/chromedriver/net/pipe_connection_posix.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-using PipeConnection = PipeConnectionWin;
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 using PipeConnection = PipeConnectionPosix;
 #else
 class PipeConnection {};

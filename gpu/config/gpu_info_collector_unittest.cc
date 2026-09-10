@@ -202,13 +202,7 @@ INSTANTIATE_TEST_SUITE_P(GPUConfig,
 TEST_P(GPUInfoCollectorTest, CollectGraphicsInfoGL) {
   GPUInfo gpu_info;
   CollectGraphicsInfoGL(&gpu_info, gl::GetDefaultDisplay());
-#if BUILDFLAG(IS_WIN)
-  if (GetParam() == kMockedWindows) {
-    EXPECT_EQ(test_values_.gpu.driver_vendor, gpu_info.gpu.driver_vendor);
-    // Skip testing the driver version on Windows because it's
-    // obtained from the bot's registry.
-  }
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (GetParam() == kMockedMacOSX) {
     EXPECT_EQ(test_values_.gpu.driver_vendor, gpu_info.gpu.driver_vendor);
     EXPECT_EQ(test_values_.gpu.driver_version, gpu_info.gpu.driver_version);

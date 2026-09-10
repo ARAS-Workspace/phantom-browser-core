@@ -23,9 +23,6 @@
 #if BUILDFLAG(IS_MAC)
 #include "device/bluetooth/bluetooth_adapter_mac_permission.h"
 #endif
-#if BUILDFLAG(IS_WIN)
-#include "device/bluetooth/bluetooth_adapter_win.h"
-#endif
 
 namespace device {
 
@@ -41,8 +38,8 @@ BluetoothAdapterFactory* BluetoothAdapterFactory::Get() {
 
 static constexpr bool kBluetoothSupportedByPlatform =
 #if !defined(NO_PLATFORM_BLUETOOTH)
-    BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) ||
-    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_APPLE);
+    BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
+    BUILDFLAG(IS_APPLE);
 #else
     false;
 #endif
@@ -96,31 +93,7 @@ void BluetoothAdapterFactory::GetAdapter(AdapterCallback callback) {
 }
 
 void BluetoothAdapterFactory::GetClassicAdapter(AdapterCallback callback) {
-#if BUILDFLAG(IS_WIN)
-  DCHECK(IsBluetoothSupported());
-
-  if (!classic_adapter_) {
-    classic_adapter_callbacks_.push_back(std::move(callback));
-
-    classic_adapter_under_initialization_ =
-        BluetoothAdapterWin::CreateClassicAdapter();
-    classic_adapter_ = classic_adapter_under_initialization_->GetWeakPtr();
-    classic_adapter_->Initialize(
-        base::BindOnce(&BluetoothAdapterFactory::ClassicAdapterInitialized,
-                       base::Unretained(this)));
-    return;
-  }
-
-  if (!classic_adapter_->IsInitialized()) {
-    classic_adapter_callbacks_.push_back(std::move(callback));
-    return;
-  }
-
-  std::move(callback).Run(
-      scoped_refptr<BluetoothAdapter>(classic_adapter_.get()));
-#else
   GetAdapter(std::move(callback));
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
@@ -140,9 +113,6 @@ void BluetoothAdapterFactory::SetAdapterForTesting(
     adapter->Initialize(base::BindOnce(
         &BluetoothAdapterFactory::AdapterInitialized, base::Unretained(Get())));
   }
-#if BUILDFLAG(IS_WIN)
-  Get()->classic_adapter_ = adapter->GetWeakPtrForTesting();
-#endif
 }
 
 // static
@@ -179,21 +149,5 @@ void BluetoothAdapterFactory::AdapterInitialized() {
   for (auto& callback : callbacks)
     std::move(callback).Run(adapter);
 }
-
-#if BUILDFLAG(IS_WIN)
-void BluetoothAdapterFactory::ClassicAdapterInitialized() {
-  DCHECK(classic_adapter_);
-  DCHECK(classic_adapter_under_initialization_);
-
-  // Move |adapter_under_initialization_| and |adapter_callbacks_| to avoid
-  // potential re-entrancy issues while looping over the callbacks.
-  scoped_refptr<BluetoothAdapter> adapter =
-      std::move(classic_adapter_under_initialization_);
-  std::vector<AdapterCallback> callbacks =
-      std::move(classic_adapter_callbacks_);
-  for (auto& callback : callbacks)
-    std::move(callback).Run(adapter);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace device

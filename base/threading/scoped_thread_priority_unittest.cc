@@ -45,21 +45,6 @@ class ScopedThreadPriorityTest : public testing::Test {
 
 using ScopedThreadPriorityDeathTest = ScopedThreadPriorityTest;
 
-#if BUILDFLAG(IS_WIN)
-void FunctionThatBoostsPriorityOnFirstInvoke(ThreadType expected_priority) {
-  SCOPED_MAY_LOAD_LIBRARY_AT_BACKGROUND_PRIORITY();
-  EXPECT_EQ(expected_priority,
-            PlatformThread::GetCurrentEffectiveThreadTypeForTest());
-}
-
-void FunctionThatBoostsPriorityOnEveryInvoke() {
-  SCOPED_MAY_LOAD_LIBRARY_AT_BACKGROUND_PRIORITY_REPEATEDLY();
-  EXPECT_EQ(base::ThreadType::kDefault,
-            PlatformThread::GetCurrentEffectiveThreadTypeForTest());
-}
-
-#endif  // BUILDFLAG(IS_WIN)
-
 }  // namespace
 
 TEST_F(ScopedThreadPriorityTest, BasicTest) {
@@ -86,7 +71,7 @@ TEST_F(ScopedThreadPriorityTest, BasicTest) {
             {
               ScopedBoostPriority scoped_boost_priority(to);
               if (will_boost_priority) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
                 // Apple priority boost doesn't reflect in the effective
                 // ThreadType.
                 EXPECT_EQ(
@@ -136,7 +121,7 @@ void TestPriorityResultingFromBoost(ThreadType initial_thread_type,
           thread_boosted.Wait();
           scoped_boostable_priority_ptr = nullptr;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
           // Apple priority boost doesn't reflect in the effective ThreadType.
           if (will_boost_priority) {
             EXPECT_EQ(PlatformThread::GetCurrentEffectiveThreadTypeForTest(),
@@ -190,77 +175,5 @@ TEST_F(ScopedThreadPriorityTest, WithoutPriorityBoost) {
   EXPECT_EQ(ThreadType::kDefault,
             PlatformThread::GetCurrentEffectiveThreadTypeForTest());
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(ScopedThreadPriorityTest, WithPriorityBoost) {
-  ASSERT_RUNS_ONCE();
-
-  // Validates that a thread at background priority is boosted to normal
-  // priority.
-  PlatformThread::SetDefaultThreadType(ThreadType::kBackground);
-  {
-    SCOPED_MAY_LOAD_LIBRARY_AT_BACKGROUND_PRIORITY();
-    EXPECT_EQ(ThreadType::kDefault,
-              PlatformThread::GetCurrentEffectiveThreadTypeForTest());
-  }
-  EXPECT_EQ(ThreadType::kBackground,
-            PlatformThread::GetCurrentEffectiveThreadTypeForTest());
-
-  // Put back the default thread priority.
-  PlatformThread::SetDefaultThreadType(ThreadType::kDefault);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(ScopedThreadPriorityTest, NestedScope) {
-  ASSERT_RUNS_ONCE();
-
-  PlatformThread::SetDefaultThreadType(ThreadType::kBackground);
-
-  {
-    SCOPED_MAY_LOAD_LIBRARY_AT_BACKGROUND_PRIORITY();
-    EXPECT_EQ(ThreadType::kDefault,
-              PlatformThread::GetCurrentEffectiveThreadTypeForTest());
-    {
-      SCOPED_MAY_LOAD_LIBRARY_AT_BACKGROUND_PRIORITY();
-      EXPECT_EQ(ThreadType::kDefault,
-                PlatformThread::GetCurrentEffectiveThreadTypeForTest());
-    }
-    EXPECT_EQ(ThreadType::kDefault,
-              PlatformThread::GetCurrentEffectiveThreadTypeForTest());
-  }
-
-  EXPECT_EQ(ThreadType::kBackground,
-            PlatformThread::GetCurrentEffectiveThreadTypeForTest());
-
-  // Put back the default thread priority.
-  PlatformThread::SetDefaultThreadType(ThreadType::kDefault);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(ScopedThreadPriorityTest, FunctionThatBoostsPriorityOnFirstInvoke) {
-  ASSERT_RUNS_ONCE();
-
-  PlatformThread::SetDefaultThreadType(ThreadType::kBackground);
-
-  FunctionThatBoostsPriorityOnFirstInvoke(base::ThreadType::kDefault);
-  FunctionThatBoostsPriorityOnFirstInvoke(base::ThreadType::kBackground);
-
-  // Put back the default thread priority.
-  PlatformThread::SetDefaultThreadType(ThreadType::kDefault);
-}
-
-TEST_F(ScopedThreadPriorityTest, FunctionThatBoostsPriorityOnEveryInvoke) {
-  PlatformThread::SetDefaultThreadType(ThreadType::kBackground);
-
-  FunctionThatBoostsPriorityOnEveryInvoke();
-  FunctionThatBoostsPriorityOnEveryInvoke();
-
-  // Put back the default thread priority.
-  PlatformThread::SetDefaultThreadType(ThreadType::kDefault);
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace base

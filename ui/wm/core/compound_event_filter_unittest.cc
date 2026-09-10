@@ -20,11 +20,11 @@
 
 namespace {
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
 base::TimeTicks GetTime() {
   return ui::EventTimeForNow();
 }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 namespace wm {
@@ -117,7 +117,7 @@ TEST_F(CompoundEventFilterTest, CursorVisibilityChange) {
 }
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
 // Touch visually hides the cursor on ChromeOS and Windows.
 TEST_F(CompoundEventFilterTest, TouchHidesCursor) {
   std::unique_ptr<CompoundEventFilter> compound_filter(new CompoundEventFilter);
@@ -178,7 +178,7 @@ TEST_F(CompoundEventFilterTest, TouchHidesCursor) {
   EXPECT_FALSE(cursor_client.IsCursorVisible());
   aura::Env::GetInstance()->RemovePreTargetHandler(compound_filter.get());
 }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Tests that if an event filter consumes a gesture, then it doesn't focus the
 // window.
@@ -240,39 +240,5 @@ TEST_F(CompoundEventFilterTest, DontHideWhenMouseDown) {
   EXPECT_TRUE(cursor_client.IsMouseEventsEnabled());
   aura::Env::GetInstance()->RemovePreTargetHandler(compound_filter.get());
 }
-
-#if BUILDFLAG(IS_WIN)
-// Windows synthesizes mouse messages for touch events. We should not be
-// showing the cursor when we receive such messages.
-TEST_F(CompoundEventFilterTest, DontShowCursorOnMouseMovesFromTouch) {
-  std::unique_ptr<CompoundEventFilter> compound_filter(new CompoundEventFilter);
-  aura::Env::GetInstance()->AddPreTargetHandler(compound_filter.get());
-  aura::test::TestWindowDelegate delegate;
-  std::unique_ptr<aura::Window> window =
-      aura::test::CreateTestWindow({.delegate = &delegate,
-                                    .parent = root_window(),
-                                    .bounds = {5, 5, 100, 100},
-                                    .window_id = 1234});
-  window->Show();
-  window->SetCapture();
-
-  aura::test::TestCursorClient cursor_client(root_window());
-  cursor_client.DisableMouseEvents();
-  EXPECT_FALSE(cursor_client.IsMouseEventsEnabled());
-
-  ui::MouseEvent mouse0(ui::EventType::kMouseMoved, gfx::Point(10, 10),
-                        gfx::Point(10, 10), ui::EventTimeForNow(), 0, 0);
-  mouse0.SetFlags(mouse0.flags() | ui::EF_FROM_TOUCH);
-
-  DispatchEventUsingWindowDispatcher(&mouse0);
-  EXPECT_FALSE(cursor_client.IsMouseEventsEnabled());
-
-  mouse0.SetFlags(mouse0.flags() & ~ui::EF_FROM_TOUCH);
-  DispatchEventUsingWindowDispatcher(&mouse0);
-  EXPECT_TRUE(cursor_client.IsMouseEventsEnabled());
-
-  aura::Env::GetInstance()->RemovePreTargetHandler(compound_filter.get());
-}
-#endif
 
 }  // namespace wm

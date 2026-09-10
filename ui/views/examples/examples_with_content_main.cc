@@ -19,12 +19,6 @@
 #include "sandbox/mac/seatbelt_exec.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#include "content/public/app/sandbox_helper_win.h"
-#include "sandbox/win/src/sandbox_types.h"
-#endif
-
 namespace {
 
 void OnResourcesLoaded() {
@@ -58,17 +52,6 @@ void ShowContentExampleWindow(ui::ViewsContentClient* views_content_client,
 
 }  // namespace
 
-#if BUILDFLAG(IS_WIN)
-int APIENTRY wWinMain(HINSTANCE instance, HINSTANCE, wchar_t*, int) {
-  base::CommandLine::Init(0, nullptr);
-
-  ui::ColorProviderManager::Get().AppendColorProviderInitializer(
-      base::BindRepeating(&views::examples::AddExamplesColorMixers));
-
-  sandbox::SandboxInterfaceInfo sandbox_info = {nullptr};
-  content::InitializeSandboxInfo(&sandbox_info);
-  ui::ViewsContentClient views_content_client(instance, &sandbox_info);
-#else
 int main(int argc, const char** argv) {
   base::CommandLine::Init(argc, argv);
 
@@ -76,7 +59,6 @@ int main(int argc, const char** argv) {
       base::BindRepeating(&views::examples::AddExamplesColorMixers));
 
   ui::ViewsContentClient views_content_client(argc, argv);
-#endif
 
   if (views::examples::CheckCommandLineUsage()) {
     return 0;

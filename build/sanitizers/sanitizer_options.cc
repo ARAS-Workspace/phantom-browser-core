@@ -47,16 +47,9 @@ const char kAsanDefaultOptions[] =
     "detect_stack_use_after_return=1 symbolize=1 detect_leaks=0 "
     "external_symbolizer_path=%d/../../third_party/llvm-build/Release+Asserts/"
     "bin/llvm-symbolizer";
-#elif BUILDFLAG(IS_WIN)
-const char* kAsanDefaultOptions =
-    "strip_path_prefix=\\..\\..\\ fast_unwind_on_fatal=1 "
-    "detect_stack_use_after_return=1 symbolize=1 "
-    "external_symbolizer_path=%d/../../third_party/"
-    "llvm-build/Release+Asserts/bin/llvm-symbolizer.exe";
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_APPLE) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_APPLE)
 
 SANITIZER_HOOK_ATTRIBUTE const char *__asan_default_options() {
   return kAsanDefaultOptions;
@@ -68,7 +61,6 @@ SANITIZER_HOOK_ATTRIBUTE const char *__asan_default_suppressions() {
   return kASanDefaultSuppressions;
 }
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_APPLE)
-        // || BUILDFLAG(IS_WIN)
 #endif  // ADDRESS_SANITIZER
 
 #if defined(THREAD_SANITIZER) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))

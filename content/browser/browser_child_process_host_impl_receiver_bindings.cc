@@ -30,15 +30,7 @@
 #include "content/common/sandbox_support.mojom.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "content/browser/renderer_host/dwrite_font_proxy_impl_win.h"
-#include "content/browser/sandbox_support_impl.h"
-#include "content/common/sandbox_support.mojom.h"
-#include "content/public/common/font_cache_dispatcher_win.h"
-#include "content/public/common/font_cache_win.mojom.h"
-#endif
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include "components/services/font_data/font_data_service_impl.h"
 #endif
 
@@ -92,35 +84,7 @@ void BrowserChildProcessHostImpl::BindHostReceiver(
   }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  if (auto r = receiver.As<mojom::FontCacheWin>()) {
-    FontCacheDispatcher::Create(std::move(r));
-    return;
-  }
-  if (auto r = receiver.As<mojom::SandboxSupport>()) {
-    static base::NoDestructor<SandboxSupportImpl> sandbox_support;
-    sandbox_support->BindReceiver(std::move(r));
-    return;
-  }
-  if (!base::FeatureList::IsEnabled(
-          features::kFontDataServiceForCSSLocalFonts)) {
-    if (auto r = receiver.As<blink::mojom::DWriteFontProxy>()) {
-      // Skip DWriteFontProxy when FontDataService handles all font lookups. CSS
-      // Local fonts are the last remaining use-case requiring DWriteFontProxy.
-      base::ThreadPool::CreateSequencedTaskRunner(
-          {base::TaskPriority::USER_BLOCKING, base::MayBlock()})
-          ->PostTask(FROM_HERE, base::BindOnce(&DWriteFontProxyImpl::Create,
-                                               std::move(r)));
-      return;
-    }
-  } else {
-    // If we don't initialize DWriteFontProxy, we should have FontDataService
-    // enabled.
-    CHECK(features::IsFontDataServiceEnabled());
-  }
-#endif
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   if (features::IsFontDataServiceEnabled()) {
     if (auto font_data_receiver =
             receiver.As<font_data_service::mojom::FontDataService>()) {

@@ -13,10 +13,6 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/buildflags.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 // static
 NotificationDisplayService* NotificationDisplayServiceFactory::GetForProfile(
     Profile* profile) {

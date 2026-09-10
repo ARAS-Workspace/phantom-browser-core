@@ -257,7 +257,7 @@ IN_PROC_BROWSER_TEST_F(FullscreenControlViewTest, MouseExitFullscreen) {
 
 // TODO(https://crbug.com/374539762): Deflake and re-enable on Windows.
 // TODO(crbug.com/524685085): Flaky on ASAN.
-#if BUILDFLAG(IS_WIN) || defined(ADDRESS_SANITIZER)
+#if defined(ADDRESS_SANITIZER)
 #define MAYBE_MouseExitFullscreen_TimeoutAndRetrigger \
   DISABLED_MouseExitFullscreen_TimeoutAndRetrigger
 #else

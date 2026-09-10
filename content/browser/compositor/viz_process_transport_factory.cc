@@ -51,10 +51,6 @@
 #include "ui/base/ozone_buildflags.h"
 #include "ui/base/ui_base_features.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/gfx/win/rendering_window_manager.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "ui/compositor/display_link_mac_mojo.h"
 #include "ui/display/mac/display_link_mac.h"
@@ -106,17 +102,6 @@ class HostDisplayClient : public viz::HostDisplayClient {
     compositor_->OnCompleteSwapWithNewSize(size);
   }
 #endif  // BUILDFLAG(IS_LINUX) && BUILDFLAG(SUPPORTS_OZONE_X11)
-
-#if BUILDFLAG(IS_WIN)
-  void AddChildWindowToBrowser(gpu::SurfaceHandle child_window) override {
-    content::GpuProcessHost* gpu_process_host = content::GpuProcessHost::Get(
-        GPU_PROCESS_KIND_SANDBOXED, /*force_create=*/false);
-    if (!gpu_process_host) {
-      return;
-    }
-    gpu_process_host->gpu_host()->AddChildWindow(widget(), child_window);
-  }
-#endif
 
 #if BUILDFLAG(IS_CHROMEOS)
   void SetPreferredRefreshRate(float refresh_rate) override {
@@ -188,10 +173,6 @@ void VizProcessTransportFactory::ConnectHostFrameSinkManager() {
 
 void VizProcessTransportFactory::CreateLayerTreeFrameSink(
     base::WeakPtr<ui::Compositor> compositor) {
-#if BUILDFLAG(IS_WIN)
-  gfx::RenderingWindowManager::GetInstance()->UnregisterParent(
-      compositor->widget());
-#endif
 
 #if BUILDFLAG(IS_MAC)
   CreateDisplayLinkMacMojoIfNeeded(compositor);
@@ -229,10 +210,6 @@ VizProcessTransportFactory::SharedMainThreadRasterContextProvider() {
 }
 
 void VizProcessTransportFactory::RemoveCompositor(ui::Compositor* compositor) {
-#if BUILDFLAG(IS_WIN)
-  gfx::RenderingWindowManager::GetInstance()->UnregisterParent(
-      compositor->widget());
-#endif
 
   compositor_data_map_.erase(compositor);
 }
@@ -377,10 +354,6 @@ void VizProcessTransportFactory::OnEstablishedGpuChannel(
     worker_context_provider = worker_context_provider_;
   }
 
-#if BUILDFLAG(IS_WIN)
-  gfx::RenderingWindowManager::GetInstance()->RegisterParent(
-      compositor->widget());
-#endif
   auto& compositor_data = compositor_data_map_[compositor];
 
   auto root_params = viz::mojom::RootCompositorFrameSinkParams::New();
@@ -429,35 +402,8 @@ void VizProcessTransportFactory::OnEstablishedGpuChannel(
   // Enable VideoConferenceMatcher on desktop platforms.
   root_params->enable_video_conference_matcher = true;
 
-#if BUILDFLAG(IS_WIN)
-  const bool using_direct_composition = GpuDataManagerImpl::GetInstance()
-                                            ->GetGPUInfo()
-                                            .overlay_info.direct_composition;
-  // The wait_on_destruction flag governs whether InvalidateFrameSinkId calls
-  // DestroyCompositorFrameSink synchronously, thus ensuring that the surface
-  // that draws to the HWND gets destroyed before the HWND, itself, gets
-  // destroyed.
-
-  // Skipping DestroyCompositorFrameSink is safe when we're using direct
-  // composition mode. In DComp mode, we create a child popup HWND (to which we
-  // attach a visual tree) and ask the browser process to parent it to its HWND
-  // via AddChildWindowToBrowser. Thus, it is safe to delete the parent window.
-
-  // In non-DComp hardware modes, failure to call DestroyCompositorFrameSink
-  // leads to a race condition where the HWND can be deleted out from under the
-  // GPU process. API calls with the HWND will fail and lead to the GPU process
-  // falling back to software mode.
-
-  // CreateRootCompositorFrameSink connects the viz process end of
-  // CompositorFrameSink message pipes. The browser compositor may request a new
-  // CompositorFrameSink on context loss, which will destroy the existing
-  // CompositorFrameSink.
-  GetHostFrameSinkManager()->CreateRootCompositorFrameSink(
-      std::move(root_params), !using_direct_composition);
-#else
   GetHostFrameSinkManager()->CreateRootCompositorFrameSink(
       std::move(root_params));
-#endif  // BUILDFLAG(IS_WIN)
 
   // Create LayerTreeFrameSink with the browser end of CompositorFrameSink.
   cc::mojo_embedder::AsyncLayerTreeFrameSink::InitParams params;

@@ -29,9 +29,7 @@
 #include "ui/accessibility/ax_tree_update.h"
 #include "ui/gfx/skia_span_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "content/public/child/font_integration_init.h"
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #include "third_party/blink/public/platform/platform.h"
 #include "third_party/skia/include/core/SkFontMgr.h"
 #elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
@@ -85,11 +83,6 @@ PrintCompositorImpl::PrintCompositorImpl(
   if (!initialize_environment)
     return;
 
-#if BUILDFLAG(IS_WIN)
-  // Initialize child process font integration so skia can use it.
-  content::InitializeFontIntegration();
-#endif
-
   // Hook up blink's codecs so skia can call them.
   SkGraphics::SetImageGeneratorFromEncodedDataFactory(
       blink::WebImageGenerator::CreateAsSkImageGenerator);
@@ -112,9 +105,6 @@ PrintCompositorImpl::PrintCompositorImpl(
 }
 
 PrintCompositorImpl::~PrintCompositorImpl() {
-#if BUILDFLAG(IS_WIN)
-  content::UninitializeFontIntegration();
-#endif
 }
 
 void PrintCompositorImpl::SetAddonForTesting(std::unique_ptr<Addon> addon) {

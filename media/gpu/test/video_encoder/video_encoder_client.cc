@@ -27,10 +27,6 @@
 #include "media/gpu/test/video_test_helpers.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "gpu/config/gpu_info_collector.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace media {
 namespace test {
 
@@ -538,10 +534,6 @@ void VideoEncoderClient::CreateEncoderTask(const RawVideo* video,
   }
 
   gpu::GPUInfo gpu_info;
-
-#if BUILDFLAG(IS_WIN)
-  gpu::CollectGraphicsInfoForTesting(&gpu_info);
-#endif  // BUILDFLAG(IS_WIN)
 
   auto encoder_or_error = GpuVideoEncodeAcceleratorFactory::CreateVEA(
       config, this, gpu::GpuPreferences(), gpu::GpuDriverBugWorkarounds(),

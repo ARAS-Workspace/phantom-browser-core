@@ -10,7 +10,6 @@
 
 namespace ui_test_utils {
 
-#if !BUILDFLAG(IS_WIN)
 void HideNativeWindow(gfx::NativeWindow window) {
   HideNativeWindowAura(window);
 }
@@ -18,7 +17,6 @@ void HideNativeWindow(gfx::NativeWindow window) {
 bool ShowAndFocusNativeWindow(gfx::NativeWindow window) {
   return ShowAndFocusNativeWindowAura(window);
 }
-#endif
 
 void HideNativeWindowAura(gfx::NativeWindow window) {
   window->Hide();

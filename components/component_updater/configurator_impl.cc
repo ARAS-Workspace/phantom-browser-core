@@ -27,10 +27,6 @@
 #include "net/base/network_change_notifier.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#endif
-
 namespace component_updater {
 
 ConfiguratorImpl::ConfiguratorImpl(
@@ -163,11 +159,11 @@ update_client::UpdaterStateProvider ConfiguratorImpl::GetUpdaterStateProvider()
 
 std::optional<bool> ConfiguratorImpl::IsMachineExternallyManaged() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return base::IsManagedOrEnterpriseDevice();
 #else
   return std::nullopt;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 }
 
 bool ConfiguratorImpl::IsConnectionMetered() const {

@@ -31,7 +31,7 @@ class RegionalCapabilitiesServiceFactory : public ProfileKeyedServiceFactory {
 
   static RegionalCapabilitiesServiceFactory* GetInstance();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Returns whether the system profile is in a region where we can show a
   // search engine choice screen. If the profile is not a system profile, this
   // function crashes. Used for clients associated with system profiles (where

@@ -22,10 +22,6 @@
 #include "chrome/enterprise_companion/installer_paths.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#endif
-
 namespace enterprise_companion {
 
 constexpr char kCompanionAppId[] = ENTERPRISE_COMPANION_APPID;
@@ -38,10 +34,6 @@ constexpr char kDMServerUrlKey[] = "dm_server_url";
 constexpr char kEventLoggingUrlKey[] = "event_logging_url";
 extern const char kEventLoggerMinTimeoutSecKey[] =
     "event-logger-min-timeout-sec";
-#if BUILDFLAG(IS_WIN)
-constexpr char kNamedPipeSecurityDescriptorKey[] =
-    "named-pipe-security-descriptor";
-#endif
 
 namespace {
 
@@ -75,12 +67,6 @@ class GlobalConstantsImpl : public GlobalConstants {
     return event_logger_min_timeout_;
   }
 
-#if BUILDFLAG(IS_WIN)
-  std::wstring NamedPipeSecurityDescriptor() const override {
-    return named_pipe_security_descriptor_;
-  }
-#endif
-
  private:
   GURL crash_upload_url_ = GURL(CRASH_UPLOAD_URL);
   GURL device_management_encrypted_reporting_url_ =
@@ -91,11 +77,6 @@ class GlobalConstantsImpl : public GlobalConstants {
   GURL enterprise_companion_event_logging_url_ =
       GURL(ENTERPRISE_COMPANION_EVENT_LOGGING_URL);
   base::TimeDelta event_logger_min_timeout_ = base::Minutes(15);
-
-#if BUILDFLAG(IS_WIN)
-  // By default allow access from the local system account only.
-  std::wstring named_pipe_security_descriptor_ = L"D:(A;;GA;;;SY)";
-#endif
 
 #ifdef ENTERPRISE_COMPANION_TEST_ONLY
   void ApplyOverrides() {
@@ -135,10 +116,6 @@ class GlobalConstantsImpl : public GlobalConstants {
     ApplyOverride(overrides, kEventLoggerMinTimeoutSecKey,
                   event_logger_min_timeout_);
 
-#if BUILDFLAG(IS_WIN)
-    ApplyOverride(overrides, kNamedPipeSecurityDescriptorKey,
-                  named_pipe_security_descriptor_);
-#endif
   }
 
   void ApplyOverride(const base::DictValue& overrides,
@@ -161,17 +138,6 @@ class GlobalConstantsImpl : public GlobalConstants {
     }
   }
 
-#if BUILDFLAG(IS_WIN)
-  void ApplyOverride(const base::DictValue& overrides,
-                     const std::string& key,
-                     std::wstring& value) {
-    const std::string* str = overrides.FindString(key);
-    if (str) {
-      VLOG(2) << __func__ << ": " << key << " = " << *str;
-      value = base::UTF8ToWide(*str);
-    }
-  }
-#endif
 #endif  // ENTERPRISE_COMPANION_TEST_ONLY
 };
 

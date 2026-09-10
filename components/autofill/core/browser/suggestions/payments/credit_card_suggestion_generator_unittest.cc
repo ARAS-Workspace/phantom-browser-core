@@ -1735,8 +1735,8 @@ TEST_F(CreditCardSuggestionGeneratorTest, IsCreditCardFooterSuggestion) {
 }
 
 // BNPL is currently only available for desktop and android platforms.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
+    BUILDFLAG(IS_ANDROID)
 class CreditCardSuggestionGeneratorBnplTest
     : public CreditCardSuggestionGeneratorTest {
  public:
@@ -3335,8 +3335,8 @@ TEST_F(CreditCardSuggestionGeneratorBnplTest,
 }
 
 #endif  // BUILDFLAG(IS_ANDROID)
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
+        // BUILDFLAG(IS_ANDROID)
 
 TEST_F(CreditCardSuggestionGeneratorTest, CreateBnplSuggestion_OneIssuer) {
   base::test::ScopedFeatureList scoped_feature_list{
@@ -3560,8 +3560,8 @@ TEST_F(CreditCardSuggestionGeneratorTest,
       ShouldShowVirtualCardOptionForTest(local_card, autofill_client()));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
+    BUILDFLAG(IS_IOS)
 TEST_F(CreditCardSuggestionGeneratorTest,
        GenerateLocalSaveAndFillSuggestion_CreditCardUploadDisabled) {
 #if BUILDFLAG(IS_IOS)
@@ -3986,8 +3986,8 @@ TEST_F(CreditCardSuggestionGeneratorTest,
                   EqualsManagePaymentsMethodsSuggestion(
                       /*with_gpay_logo=*/!BUILDFLAG(IS_IOS))));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
+        // BUILDFLAG(IS_IOS)
 
 #if BUILDFLAG(IS_IOS)
 TEST_F(CreditCardSuggestionGeneratorTest, CreateSaveAndFillSuggestion_IOS) {

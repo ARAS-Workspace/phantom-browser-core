@@ -11,10 +11,6 @@
 #include "partition_alloc/partition_alloc_base/compiler_specific.h"
 #include "partition_alloc/partition_alloc_check.h"
 
-#if PA_BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 #if PA_BUILDFLAG(IS_POSIX)
 #include <pthread.h>
 #endif
@@ -27,7 +23,8 @@
 #include <cerrno>
 #endif  // PA_CONFIG(HAS_LINUX_KERNEL)
 
-#if !PA_CONFIG(HAS_LINUX_KERNEL) && !PA_BUILDFLAG(IS_WIN) && !PA_BUILDFLAG(IS_APPLE) && !PA_BUILDFLAG(IS_POSIX)
+#if !PA_CONFIG(HAS_LINUX_KERNEL) && !PA_BUILDFLAG(IS_APPLE) && \
+    !PA_BUILDFLAG(IS_POSIX)
 #include "partition_alloc/partition_alloc_base/threading/platform_thread.h"
 
 #if PA_BUILDFLAG(IS_POSIX)
@@ -286,12 +283,6 @@ void SpinningMutex::LockSlow() {
 }
 
 #endif  // PA_BUILDFLAG(ENABLE_PARTITION_LOCK_PRIORITY_INHERITANCE)
-
-#elif PA_BUILDFLAG(IS_WIN)
-
-void SpinningMutex::LockSlow() {
-  ::AcquireSRWLockExclusive(reinterpret_cast<PSRWLOCK>(&lock_));
-}
 
 #elif PA_BUILDFLAG(IS_APPLE)
 

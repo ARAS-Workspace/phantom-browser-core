@@ -94,13 +94,6 @@ void SystemMenuModelBuilder::Init() {
   ui::SimpleMenuModel* model = new ui::SimpleMenuModel(&menu_delegate_);
   menu_model_.reset(model);
   BuildMenu(model);
-#if BUILDFLAG(IS_WIN)
-  // On Windows we put the menu items in the system menu (not at the end). Doing
-  // this necessitates adding a trailing separator.
-  if (!features::IsMenuSimplificationEnabled()) {
-    model->AddSeparator(ui::NORMAL_SEPARATOR);
-  }
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 void SystemMenuModelBuilder::BuildMenu(ui::SimpleMenuModel* model) {
@@ -115,24 +108,6 @@ void SystemMenuModelBuilder::BuildMenu(ui::SimpleMenuModel* model) {
 
 void SystemMenuModelBuilder::BuildSystemMenuForBrowserWindow(
     ui::SimpleMenuModel* model) {
-#if BUILDFLAG(IS_WIN)
-  if (features::IsMenuSimplificationEnabled()) {
-    AddItemWithIconMaybe(model, IDC_RESTORE_WINDOW, IDS_RESTORE_WINDOW_MENU_WIN,
-                         views::kChromeRestoreIcon);
-    model->SetElementIdentifierAt(
-        model->GetIndexOfCommandId(IDC_RESTORE_WINDOW).value(),
-        kSystemMenuRestoreItemElementId);
-    model->AddItemWithStringId(IDC_MOVE_WINDOW, IDS_MOVE_WINDOW_MENU_WIN);
-    model->AddItemWithStringId(IDC_SIZE_WINDOW, IDS_SIZE_WINDOW_MENU_WIN);
-    AddItemWithIconMaybe(model, IDC_MINIMIZE_WINDOW,
-                         IDS_MINIMIZE_WINDOW_MENU_WIN,
-                         views::kChromeMinimizeIcon);
-    AddItemWithIconMaybe(model, IDC_MAXIMIZE_WINDOW,
-                         IDS_MAXIMIZE_WINDOW_MENU_WIN,
-                         views::kChromeMaximizeIcon);
-    model->AddSeparator(ui::NORMAL_SEPARATOR);
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_LINUX)
   AddItemWithIconMaybe(model, IDC_MINIMIZE_WINDOW, IDS_MINIMIZE_WINDOW_MENU,
@@ -165,15 +140,7 @@ void SystemMenuModelBuilder::BuildSystemMenuForBrowserWindow(
   model->AddItemWithStringId(IDC_TAB_SEARCH_TOGGLE_PIN,
                              IDS_TAB_STRIP_PIN_TAB_SEARCH);
 
-#if BUILDFLAG(IS_WIN)
-  // On Windows we can not remove an item when showing the menu. So only add
-  // the glic toggle option if glic is enabled when building the menu.
-  if (glic::GlicEnabling::IsEnabledForProfile(browser()->GetProfile())) {
-#endif  // BUILDFLAG(IS_WIN)
     model->AddItemWithStringId(IDC_GLIC_TOGGLE_PIN, IDS_GLIC_PIN);
-#if BUILDFLAG(IS_WIN)
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   if (auto* controller =
           tabs::VerticalTabStripStateController::From(browser())) {
@@ -251,13 +218,6 @@ void SystemMenuModelBuilder::BuildSystemMenuForBrowserWindow(
   model->AddItemWithStringId(IDC_CLOSE_WINDOW, IDS_CLOSE_WINDOW_MENU);
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN)
-  if (features::IsMenuSimplificationEnabled()) {
-    model->AddSeparator(ui::NORMAL_SEPARATOR);
-    AddItemWithIconMaybe(model, IDC_CLOSE_WINDOW, IDS_CLOSE_WINDOW_MENU_WIN,
-                         kCloseChromeRefreshOldIcon);
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_CHROMEOS)
   AppendMoveToDesksMenu(model);

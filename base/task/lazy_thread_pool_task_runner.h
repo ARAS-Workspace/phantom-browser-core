@@ -78,12 +78,6 @@ using LazyThreadPoolSequencedTaskRunner =
 using LazyThreadPoolSingleThreadTaskRunner =
     internal::LazyThreadPoolTaskRunner<SingleThreadTaskRunner, false>;
 
-#if BUILDFLAG(IS_WIN)
-// Lazy COM-STA enabled SingleThreadTaskRunner.
-using LazyThreadPoolCOMSTATaskRunner =
-    internal::LazyThreadPoolTaskRunner<SingleThreadTaskRunner, true>;
-#endif
-
 // Use the macros below to initialize a LazyThreadPoolTaskRunner. These macros
 // verify that their arguments are constexpr, which is important to prevent the
 // generation of a static initializer.
@@ -195,10 +189,6 @@ class BASE_EXPORT ScopedLazyTaskRunnerListForTesting {
  private:
   friend class LazyThreadPoolTaskRunner<SequencedTaskRunner, false>;
   friend class LazyThreadPoolTaskRunner<SingleThreadTaskRunner, false>;
-
-#if BUILDFLAG(IS_WIN)
-  friend class LazyThreadPoolTaskRunner<SingleThreadTaskRunner, true>;
-#endif
 
   // Add |callback| to the list of callbacks to run on destruction.
   void AddCallback(OnceClosure callback);

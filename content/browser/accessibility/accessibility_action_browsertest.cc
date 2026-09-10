@@ -1406,13 +1406,7 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest, OpenSelectPopup) {
   EXPECT_EQ(1U, target->InternalChildCount());
   EXPECT_TRUE(target->HasState(ax::mojom::State::kCollapsed));
   EXPECT_FALSE(target->HasState(ax::mojom::State::kExpanded));
-#if BUILDFLAG(IS_WIN)
-  // On Windows, a collapsed menulist is not in the platform tree, to prevent
-  // screen readers from reading all options -- AXNode::IsLeaf() returns true.
-  EXPECT_EQ(nullptr, FindNode(ax::mojom::Role::kMenuListPopup, ""));
-#else
   EXPECT_NE(nullptr, FindNode(ax::mojom::Role::kMenuListPopup, ""));
-#endif
   ui::BrowserAccessibility* closed_popup = target->InternalGetChild(0);
   EXPECT_EQ(ax::mojom::Role::kMenuListPopup, closed_popup->GetRole());
   EXPECT_TRUE(closed_popup->HasState(ax::mojom::State::kInvisible));

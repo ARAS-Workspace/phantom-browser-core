@@ -7,12 +7,6 @@
 #include "base/logging.h"
 #include "base/memory/ptr_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/memory/writable_shared_memory_region.h"
-#endif
-
 namespace remoting {
 
 //////////////////////////////////////////////////////////////////////////////
@@ -24,37 +18,11 @@ std::unique_ptr<SharedVideoMemory> SharedVideoMemory::Create(
     int id,
     base::OnceClosure on_deleted_callback) {
   webrtc::SharedMemory::Handle handle = webrtc::SharedMemory::kInvalidHandle;
-#if BUILDFLAG(IS_WIN)
-  // webrtc::ScreenCapturer uses webrtc::SharedMemory::handle() only on
-  // windows. This handle must be writable. A WritableSharedMemoryRegion is
-  // created, and then it is converted to read-only.  On the windows platform,
-  // it happens to be the case that converting a region to read-only does not
-  // change the status of existing handles. This is not true on all other
-  // platforms, so please don't emulate this behavior!
-  base::WritableSharedMemoryRegion region =
-      base::WritableSharedMemoryRegion::Create(size);
-  if (!region.IsValid()) {
-    return nullptr;
-  }
-  base::WritableSharedMemoryMapping mapping = region.Map();
-  // Converting |region| to read-only will close its associated handle, so we
-  // must duplicate it into the handle used for |webrtc::ScreenCapturer|.
-  HANDLE process = ::GetCurrentProcess();
-  BOOL success =
-      ::DuplicateHandle(process, region.UnsafeGetPlatformHandle(), process,
-                        &handle, 0, FALSE, DUPLICATE_SAME_ACCESS);
-  if (!success) {
-    return nullptr;
-  }
-  base::ReadOnlySharedMemoryRegion read_only_region =
-      base::WritableSharedMemoryRegion::ConvertToReadOnly(std::move(region));
-#else
   base::MappedReadOnlyRegion region_mapping =
       base::ReadOnlySharedMemoryRegion::Create(size);
   base::ReadOnlySharedMemoryRegion read_only_region =
       std::move(region_mapping.region);
   base::WritableSharedMemoryMapping mapping = std::move(region_mapping.mapping);
-#endif
   if (!mapping.IsValid()) {
     return nullptr;
   }
@@ -76,10 +44,6 @@ SharedVideoMemory::SharedVideoMemory(base::ReadOnlySharedMemoryRegion region,
                                      base::OnceClosure on_deleted_callback)
     : SharedMemory(mapping.memory(), mapping.size(), handle, id),
       on_deleted_callback_(std::move(on_deleted_callback))
-#if BUILDFLAG(IS_WIN)
-      ,
-      writable_handle_(handle)
-#endif
 {
   region_ = std::move(region);
   mapping_ = std::move(mapping);

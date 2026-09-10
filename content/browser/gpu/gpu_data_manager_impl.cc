@@ -177,61 +177,6 @@ void GpuDataManagerImpl::UpdateGpuInfo(
   private_->UpdateGpuInfo(gpu_info, gpu_info_for_hardware_gpu);
 }
 
-#if BUILDFLAG(IS_WIN)
-
-void GpuDataManagerImpl::UpdateDirectXInfo(uint32_t d3d12_feature_level,
-                                           uint32_t directml_feature_level) {
-  base::AutoLock auto_lock(lock_);
-  private_->UpdateDirectXInfo(d3d12_feature_level, directml_feature_level);
-}
-
-void GpuDataManagerImpl::UpdateDevicePerfInfo(
-    const gpu::DevicePerfInfo& device_perf_info) {
-  base::AutoLock auto_lock(lock_);
-  private_->UpdateDevicePerfInfo(device_perf_info);
-}
-
-void GpuDataManagerImpl::UpdateOverlayInfo(
-    const gpu::OverlayInfo& overlay_info) {
-  base::AutoLock auto_lock(lock_);
-  private_->UpdateOverlayInfo(overlay_info);
-}
-void GpuDataManagerImpl::UpdateDXGIInfo(gfx::mojom::DXGIInfoPtr dxgi_info) {
-  base::AutoLock auto_lock(lock_);
-  private_->UpdateDXGIInfo(std::move(dxgi_info));
-}
-
-void GpuDataManagerImpl::UpdateDirectXRequestStatus(bool request_continues) {
-  base::AutoLock auto_lock(lock_);
-  private_->UpdateDirectXRequestStatus(request_continues);
-}
-
-bool GpuDataManagerImpl::DirectXRequested() const {
-  base::AutoLock auto_lock(lock_);
-  return private_->DirectXRequested();
-}
-
-void GpuDataManagerImpl::TerminateInfoCollectionGpuProcess() {
-  base::AutoLock auto_lock(lock_);
-  private_->TerminateInfoCollectionGpuProcess();
-}
-
-void GpuDataManagerImpl::SetUseAdapterLuid(const CHROME_LUID& luid) {
-  base::AutoLock auto_lock(lock_);
-  private_->SetUseAdapterLuid(luid);
-}
-
-void GpuDataManagerImpl::ClearUseAdapterLuid() {
-  base::AutoLock auto_lock(lock_);
-  private_->ClearUseAdapterLuid();
-}
-
-std::optional<CHROME_LUID> GpuDataManagerImpl::GetUseAdapterLuid() const {
-  base::AutoLock auto_lock(lock_);
-  return private_->GetUseAdapterLuid();
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 void GpuDataManagerImpl::PostCreateThreads() {
   base::AutoLock auto_lock(lock_);
   private_->PostCreateThreads();

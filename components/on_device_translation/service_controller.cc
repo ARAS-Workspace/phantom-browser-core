@@ -38,10 +38,6 @@
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace on_device_translation {
 namespace {
 

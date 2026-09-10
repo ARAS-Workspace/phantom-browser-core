@@ -329,7 +329,7 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_FALSE(IsBubbleShowing());
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(
     PasswordBubbleInteractiveUiTest,
     BiometricAuthenticationForFillingPromo_ActorOperating_NoBubble) {
@@ -348,7 +348,7 @@ IN_PROC_BROWSER_TEST_F(
 
   EXPECT_FALSE(IsBubbleShowing());
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 
 // Same as 'BasicOpenAndClose', but use the command rather than the static
 // method directly.

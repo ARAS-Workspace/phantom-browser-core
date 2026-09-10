@@ -12,10 +12,6 @@
 #include "mojo/public/cpp/bindings/remote.h"
 #include "ui/gfx/image/image.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/display/win/dpi.h"
-#endif
-
 using IconLoaderBrowserTest = InProcessBrowserTest;
 
 class TestIconLoader {
@@ -68,10 +64,6 @@ IN_PROC_BROWSER_TEST_F(IconLoaderBrowserTest, LoadGroup) {
   constexpr base::FilePath::CharType kGroupOnlyFilename[] =
       FILE_PATH_LITERAL("unlikely-to-exist-file.txt");
 
-#if BUILDFLAG(IS_WIN)
-  scale = display::win::GetDPIScale();
-#endif
-
   // Test that an icon for a file type (group) can be loaded even
   // where a file does not exist. Should work cross platform.
   base::RunLoop runner;
@@ -85,36 +77,3 @@ IN_PROC_BROWSER_TEST_F(IconLoaderBrowserTest, LoadGroup) {
 
 #endif  // !((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) &&
         // defined(MEMORY_SANITIZER))
-
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(IconLoaderBrowserTest, LoadExeIcon) {
-  float scale = display::win::GetDPIScale();
-  base::RunLoop runner;
-
-  TestIconLoader test_loader(runner.QuitClosure());
-
-  base::FilePath exe_path;
-  base::PathService::Get(base::FILE_EXE, &exe_path);
-  test_loader.TryLoadIcon(exe_path, IconLoader::NORMAL, scale);
-
-  runner.Run();
-  EXPECT_TRUE(test_loader.load_succeeded());
-}
-
-const base::FilePath::CharType kNotExistingExeFile[] =
-    FILE_PATH_LITERAL("unlikely-to-exist-file.exe");
-
-IN_PROC_BROWSER_TEST_F(IconLoaderBrowserTest, LoadDefaultExeIcon) {
-  float scale = display::win::GetDPIScale();
-
-  base::RunLoop runner;
-
-  TestIconLoader test_loader(runner.QuitClosure());
-
-  test_loader.TryLoadIcon(base::FilePath(kNotExistingExeFile),
-                          IconLoader::NORMAL, scale);
-
-  runner.Run();
-  EXPECT_TRUE(test_loader.load_succeeded());
-}
-#endif  // BUILDFLAG(IS_WIN)

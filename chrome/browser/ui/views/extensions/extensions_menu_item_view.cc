@@ -44,10 +44,6 @@
 #include "ui/views/vector_icons.h"
 #include "ui/views/view_class_properties.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/accessibility/ax_mode.h"
-#endif
-
 namespace {
 
 constexpr int EXTENSION_CONTEXT_MENU = 13;
@@ -89,12 +85,6 @@ class ExtensionsMenuHoverButton : public HoverButton {
     views::LabelButton::StateChanged(old_state);
 
     if (GetState() == STATE_HOVERED && old_state != STATE_PRESSED) {
-#if BUILDFLAG(IS_WIN)
-      if (ui::AXPlatform::GetInstance().GetMode().has_mode(
-              ui::AXMode::kScreenReader)) {
-        return;
-      }
-#endif
       RequestFocus();
     } else if (GetState() == STATE_NORMAL && HasFocus()) {
       GetFocusManager()->SetFocusedView(nullptr);

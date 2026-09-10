@@ -14,11 +14,7 @@ using UsbManualApiTest = ExtensionApiTest;
 
 // TODO(crbug.com/40656552): The win7 bots do not seem to recognize the MANUAL_
 // prefix, so we explicitly disable this test.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_MANUAL_ListInterfaces DISABLED_MANUAL_ListInterfaces
-#else
 #define MAYBE_MANUAL_ListInterfaces MANUAL_ListInterfaces
-#endif
 IN_PROC_BROWSER_TEST_F(UsbManualApiTest, MAYBE_MANUAL_ListInterfaces) {
   auto dialog_action_reset =
       PermissionsRequestFunction::SetDialogActionForTests(

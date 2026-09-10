@@ -199,9 +199,7 @@ bool TypefaceHasColorEmojiTable(SkTypeface* typeface) {
 // Returns the system color emoji font family name on this platform, or
 // nullptr when there is no well-defined platform color emoji font.
 const char* GetPlatformColorEmojiFontName() {
-#if BUILDFLAG(IS_WIN)
-  return "Segoe UI Emoji";
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   return "Apple Color Emoji";
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   return "Noto Color Emoji";
@@ -219,11 +217,7 @@ const char* GetPlatformColorEmojiFontName() {
 // appropriate monochrome fallback after skipping their color emoji fonts, so
 // they do not need a hard-coded text-emoji family here.
 const char* GetPlatformTextEmojiFontName() {
-#if BUILDFLAG(IS_WIN)
-  return "Segoe UI Symbol";
-#else
   return nullptr;
-#endif
 }
 
 // Returns true for the platform's well-known color emoji family even when
@@ -1809,18 +1803,10 @@ SelectionModel RenderTextHarfBuzz::AdjacentWordSelectionModel(
     if (run == run_list->size())
       break;
     size_t cursor = current.caret_pos();
-#if BUILDFLAG(IS_WIN)
-    // Windows generally advances to the start of a word in either direction.
-    // TODO: Break on the end of a word when the neighboring text is
-    // punctuation.
-    if (iter.IsStartOfWord(cursor))
-      break;
-#else
     const bool is_forward =
         run_list->runs()[run]->font_params.is_rtl == (direction == CURSOR_LEFT);
     if (is_forward ? iter.IsEndOfWord(cursor) : iter.IsStartOfWord(cursor))
       break;
-#endif  // BUILDFLAG(IS_WIN)
   }
   return current;
 }
@@ -2466,30 +2452,6 @@ bool RenderTextHarfBuzz::ShapeRuns(
                    TRACE_STR_COPY(uscript_getShortName(font_params.script)));
       fallback_font_list = GetFallbackFonts(primary_font);
 
-#if BUILDFLAG(IS_WIN)
-      // Append fonts in the fallback list of the fallback fonts.
-      // TODO(tapted): Investigate whether there's a case that benefits from
-      // this on Mac.
-      for (const auto& fallback_font : fallback_font_candidates) {
-        std::vector<Font> fallback_fonts = GetFallbackFonts(fallback_font);
-        fallback_font_list.insert(fallback_font_list.end(),
-                                  fallback_fonts.begin(), fallback_fonts.end());
-      }
-
-      // Add Segoe UI and its associated linked fonts to the fallback font list
-      // to ensure that the fallback list covers the basic cases.
-      // http://crbug.com/467459. On some Windows configurations the default
-      // font could be a raster font like System, which would not give us a
-      // reasonable fallback font list.
-      Font segoe("Segoe UI", 13);
-      if (!FontWasAlreadyTried(segoe.platform_font()->GetNativeSkTypeface(),
-                               &fallback_fonts_already_tried)) {
-        std::vector<Font> default_fallback_families = GetFallbackFonts(segoe);
-        fallback_font_list.insert(fallback_font_list.end(),
-                                  default_fallback_families.begin(),
-                                  default_fallback_families.end());
-      }
-#endif
     }
 
     // Use a set to track the fallback fonts and avoid duplicate entries.

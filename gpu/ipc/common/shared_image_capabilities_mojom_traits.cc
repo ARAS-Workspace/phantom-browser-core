@@ -13,11 +13,6 @@ bool StructTraits<gpu::mojom::SharedImageCapabilitiesDataView,
          gpu::SharedImageCapabilities* out) {
   out->supports_scanout_shared_images = data.supports_scanout_shared_images();
 
-#if BUILDFLAG(IS_WIN)
-  out->supports_scanout_shared_images_for_software_video_frames =
-      data.supports_scanout_shared_images_for_software_video_frames();
-#endif
-
   out->supports_r16_shared_images = data.supports_r16_shared_images();
   out->supports_ycbcr_nv12_sampling = data.supports_ycbcr_nv12_sampling();
   out->supports_ycbcr_p010_sampling = data.supports_ycbcr_p010_sampling();
@@ -26,9 +21,6 @@ bool StructTraits<gpu::mojom::SharedImageCapabilitiesDataView,
   out->disable_one_component_textures = data.disable_one_component_textures();
 
   out->shared_image_d3d = data.shared_image_d3d();
-#if BUILDFLAG(IS_WIN)
-  out->shared_image_swap_chain = data.shared_image_swap_chain();
-#endif
 
 #if BUILDFLAG(IS_MAC)
   out->texture_target_for_io_surfaces = data.texture_target_for_io_surfaces();

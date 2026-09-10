@@ -195,10 +195,7 @@ class SnapshotAuraTest : public testing::Test {
   std::vector<unsigned char> png_representation_;
 };
 
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-// https://crbug.com/852512
-#define MAYBE_FullScreenWindow DISABLED_FullScreenWindow
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // https://crbug.com/1143031
 #define MAYBE_FullScreenWindow DISABLED_FullScreenWindow
 #else
@@ -212,12 +209,6 @@ TEST_F(SnapshotAuraTest, MAYBE_FullScreenWindow) {
       FROM_HERE, TestTimeouts::action_max_timeout());
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/41393300): Make work on Windows.
-  if (::testing::internal::AlwaysTrue()) {
-    GTEST_SKIP();
-  }
-#endif
   SetupTestWindow(root_window()->bounds());
   WaitForDraw();
 
@@ -228,12 +219,6 @@ TEST_F(SnapshotAuraTest, MAYBE_FullScreenWindow) {
 }
 
 TEST_F(SnapshotAuraTest, PartialBounds) {
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/41393300): Make work on Windows.
-  if (::testing::internal::AlwaysTrue()) {
-    GTEST_SKIP();
-  }
-#endif
   gfx::Rect test_bounds(100, 100, 300, 200);
   SetupTestWindow(test_bounds);
   WaitForDraw();
@@ -244,12 +229,6 @@ TEST_F(SnapshotAuraTest, PartialBounds) {
 }
 
 TEST_F(SnapshotAuraTest, Rotated) {
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/41393300): Make work on Windows.
-  if (::testing::internal::AlwaysTrue()) {
-    GTEST_SKIP();
-  }
-#endif
   test_screen()->SetDisplayRotation(display::Display::ROTATE_90);
 
   gfx::Rect test_bounds(100, 100, 300, 200);
@@ -262,12 +241,6 @@ TEST_F(SnapshotAuraTest, Rotated) {
 }
 
 TEST_F(SnapshotAuraTest, UIScale) {
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/41393300): Make work on Windows.
-  if (::testing::internal::AlwaysTrue()) {
-    GTEST_SKIP();
-  }
-#endif
   const float kUIScale = 0.5f;
   test_screen()->SetUIScale(kUIScale);
 
@@ -286,12 +259,6 @@ TEST_F(SnapshotAuraTest, UIScale) {
 }
 
 TEST_F(SnapshotAuraTest, DeviceScaleFactor) {
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/41393300): Make work on Windows.
-  if (::testing::internal::AlwaysTrue()) {
-    GTEST_SKIP();
-  }
-#endif
   test_screen()->SetDeviceScaleFactor(2.0f);
 
   gfx::Rect test_bounds(100, 100, 150, 100);
@@ -309,12 +276,6 @@ TEST_F(SnapshotAuraTest, DeviceScaleFactor) {
 }
 
 TEST_F(SnapshotAuraTest, RotateAndUIScale) {
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/41393300): Make work on Windows.
-  if (::testing::internal::AlwaysTrue()) {
-    GTEST_SKIP();
-  }
-#endif
   const float kUIScale = 0.5f;
   test_screen()->SetUIScale(kUIScale);
   test_screen()->SetDisplayRotation(display::Display::ROTATE_90);
@@ -334,12 +295,6 @@ TEST_F(SnapshotAuraTest, RotateAndUIScale) {
 }
 
 TEST_F(SnapshotAuraTest, RotateAndUIScaleAndScaleFactor) {
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/41393300): Make work on Windows.
-  if (::testing::internal::AlwaysTrue()) {
-    GTEST_SKIP();
-  }
-#endif
   test_screen()->SetDeviceScaleFactor(2.0f);
   const float kUIScale = 0.5f;
   test_screen()->SetUIScale(kUIScale);

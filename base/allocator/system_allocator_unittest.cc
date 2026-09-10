@@ -15,11 +15,7 @@ namespace base {
 TEST(SystemAllocatorTest, HelperBinary) {
   base::FilePath exe_path;
   ASSERT_TRUE(base::PathService::Get(base::DIR_EXE, &exe_path));
-#if BUILDFLAG(IS_WIN)
-  exe_path = exe_path.AppendASCII("system_allocator_test_helper.exe");
-#else
   exe_path = exe_path.AppendASCII("system_allocator_test_helper");
-#endif
 
   base::LaunchOptions options;
   base::Process process =

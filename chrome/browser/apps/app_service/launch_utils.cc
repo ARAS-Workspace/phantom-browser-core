@@ -73,11 +73,7 @@ std::vector<base::FilePath> GetLaunchFilesFromCommandLine(
 
   launch_files.reserve(command_line.GetArgs().size());
   for (const auto& arg : command_line.GetArgs()) {
-#if BUILDFLAG(IS_WIN)
-    GURL url(base::AsStringPiece16(arg));
-#else
     GURL url(arg);
-#endif
     if (url.is_valid() && !url.SchemeIsFile()) {
       continue;
     }

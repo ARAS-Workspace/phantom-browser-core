@@ -260,10 +260,6 @@
 #include "chrome/browser/sessions/session_service_factory.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-#include "chrome/browser/spellchecker/spellcheck_service.h"
-#endif
-
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #endif
@@ -431,12 +427,8 @@ void ProfileImpl::RegisterProfilePrefs(
   registry->RegisterBooleanPref(prefs::kPrintPreviewDisabled, false);
   registry->RegisterStringPref(
       prefs::kPrintPreviewDefaultDestinationSelectionRules, std::string());
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   registry->RegisterBooleanPref(prefs::kPrintPdfAsImageAvailability, false);
-#endif
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_PRINTING)
-  registry->RegisterIntegerPref(prefs::kPrintPostScriptMode, 0);
-  registry->RegisterIntegerPref(prefs::kPrintRasterizationMode, 0);
 #endif
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
   registry->RegisterIntegerPref(prefs::kPrintRasterizePdfDpi, 0);
@@ -508,12 +500,6 @@ ProfileImpl::ProfileImpl(
     profile_metrics::SetBrowserProfileType(
         this, profile_metrics::BrowserProfileType::kRegular);
   }
-
-#if BUILDFLAG(IS_WIN)
-  if (base::FeatureList::IsEnabled(features::kProfileLoadTracker)) {
-    profile_load_tracker_ = std::make_unique<ProfileLoadTracker>(*this);
-  }
-#endif
 
   if (delegate_) {
     delegate_->OnProfileCreationStarted(this, create_mode);
@@ -640,7 +626,7 @@ void ProfileImpl::LoadPrefsForNormalStartup(bool async_prefs) {
   policy_provider = GetUserCloudPolicyManagerAsh();
 #else  // !BUILDFLAG(IS_CHROMEOS)
   {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     if (GetTestingCloudPolicyManagerFactory()) {
       auto result = GetTestingCloudPolicyManagerFactory().Run(this);
       if (std::holds_alternative<
@@ -656,10 +642,10 @@ void ProfileImpl::LoadPrefsForNormalStartup(bool async_prefs) {
         cloud_policy_manager = user_cloud_policy_manager_.get();
       }
     }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
     if (!cloud_policy_manager) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       ProfileAttributesEntry* entry = nullptr;
       if (g_browser_process->profile_manager()) {
         entry = g_browser_process->profile_manager()
@@ -679,7 +665,7 @@ void ProfileImpl::LoadPrefsForNormalStartup(bool async_prefs) {
       } else {
 #else
       {
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
         user_cloud_policy_manager_ = policy::UserCloudPolicyManager::Create(
             GetPath(), GetPolicySchemaRegistryService()->registry(),
             force_immediate_policy_load, io_task_runner_,
@@ -873,17 +859,6 @@ void ProfileImpl::DoFinalInit(CreateMode create_mode) {
 
   content::URLDataSource::Add(this,
                               std::make_unique<PrefsInternalsSource>(this));
-
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-  if (IsNewProfile()) {
-    // The installed Windows language packs aren't determined until
-    // the spellcheck service is initialized. Make sure the primary
-    // preferred language is enabled for spellchecking until the user
-    // opts out later. If there is no dictionary support for the language
-    // then it will later be automatically disabled.
-    SpellcheckService::EnableFirstUserLanguageForSpellcheck(prefs_.get());
-  }
-#endif
 
   if (delegate_) {
     TRACE_EVENT0("browser",
@@ -1668,14 +1643,6 @@ bool ProfileImpl::IsNewProfile() const {
 void ProfileImpl::SetCreationTimeForTesting(base::Time creation_time) {
   prefs_->SetTime(prefs::kProfileCreationTime, creation_time);
 }
-
-#if BUILDFLAG(IS_WIN)
-void ProfileImpl::AckCrashForTracking() {
-  if (profile_load_tracker_) {
-    profile_load_tracker_->AckCrashForTracking();
-  }
-}
-#endif
 
 bool ProfileImpl::IsSignedIn() {
   signin::IdentityManager* identity_manager =

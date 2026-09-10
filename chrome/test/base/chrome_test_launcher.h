@@ -52,9 +52,6 @@ class ChromeTestChromeMainDelegate
   content::ContentRendererClient* CreateContentRendererClient() override;
   content::ContentUtilityClient* CreateContentUtilityClient() override;
   std::optional<int> PostEarlyInitialization(InvokedIn invoked_in) override;
-#if BUILDFLAG(IS_WIN)
-  bool ShouldHandleConsoleControlEvents() override;
-#endif
   void CreateThreadPool(std::string_view name) override;
   bool IsInitFeatureListEarly() override;
 
@@ -84,11 +81,6 @@ class ChromeTestLauncherDelegate : public content::TestLauncherDelegate {
   void OnDoneRunningTests() override;
 
  private:
-#if BUILDFLAG(IS_WIN)
-  class ScopedFirewallRules;
-
-  std::unique_ptr<ScopedFirewallRules> firewall_rules_;
-#endif
 
   raw_ptr<ChromeTestSuiteRunner> runner_;
 };

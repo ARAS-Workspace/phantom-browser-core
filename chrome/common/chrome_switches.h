@@ -264,33 +264,11 @@ extern const char kUniqueTempDirSuffix[];
 extern const char kNoOpForTestingProcess[];
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-extern const char kEnableProfileShortcutManager[];
-extern const char kFromBrowserSwitcher[];
-extern const char kFromInstaller[];
-extern const char kHideIcons[];
-extern const char kNoNetworkProfileWarning[];
-extern const char kNoPreReadMainDll[];
-extern const char kNotificationInlineReply[];
-extern const char kNotificationLaunchId[];
-extern const char kPrefetchArgumentBrowserBackground[];
-extern const char kPwaLauncherVersion[];
-extern const char kShowIcons[];
-extern const char kSourceAppId[];
-extern const char kSourceShortcut[];
-extern const char kStartupForegroundLaunch[];
-extern const char kUninstall[];
-extern const char kUninstallAppId[];
-extern const char kIsolated[];
-extern const char kWaitForParentHandle[];
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW) && !defined(OFFICIAL_BUILD)
 extern const char kDebugPrint[];
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 extern const char kGuest[];
 #endif
 
@@ -314,7 +292,7 @@ extern const char kGlicGuestUrlPresetStaging[];
 extern const char kGlicGuestUrlPresetPreprod[];
 extern const char kGlicGuestUrlPresetProd[];
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 extern const char kListApps[];
 extern const char kProfileBaseName[];
 extern const char kProfileManagementAttributes[];

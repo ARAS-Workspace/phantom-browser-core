@@ -965,31 +965,6 @@ TEST_F(ChromeContentBrowserClientGetLoggingFileTest, GetLoggingFile) {
   EXPECT_FALSE(client.GetLoggingFileName(cmd_line).empty());
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST_F(ChromeContentBrowserClientGetLoggingFileTest,
-       GetLoggingFileFromCommandLine) {
-  base::CommandLine cmd_line(base::CommandLine::NO_PROGRAM);
-  cmd_line.AppendSwitchASCII(switches::kLogFile, "c:\\path\\test_log.txt");
-  ChromeContentBrowserClient client;
-  base::FilePath log_file_name;
-  EXPECT_EQ(base::FilePath(FILE_PATH_LITERAL("test_log.txt")).value(),
-            client.GetLoggingFileName(cmd_line).BaseName().value());
-  // Path must be absolute.
-  EXPECT_TRUE(client.GetLoggingFileName(cmd_line).IsAbsolute());
-}
-TEST_F(ChromeContentBrowserClientGetLoggingFileTest,
-       GetLoggingFileFromCommandLineFallback) {
-  base::CommandLine cmd_line(base::CommandLine::NO_PROGRAM);
-  cmd_line.AppendSwitchASCII(switches::kLogFile, "test_log.txt");
-  ChromeContentBrowserClient client;
-  base::FilePath log_file_name;
-  // Windows falls back to the default if an absolute path is not provided.
-  EXPECT_EQ(base::FilePath(FILE_PATH_LITERAL("chrome_debug.log")).value(),
-            client.GetLoggingFileName(cmd_line).BaseName().value());
-  // Path must be absolute.
-  EXPECT_TRUE(client.GetLoggingFileName(cmd_line).IsAbsolute());
-}
-#else
 TEST_F(ChromeContentBrowserClientGetLoggingFileTest,
        GetLoggingFileFromCommandLine) {
   base::CommandLine cmd_line(base::CommandLine::NO_PROGRAM);
@@ -999,7 +974,6 @@ TEST_F(ChromeContentBrowserClientGetLoggingFileTest,
   EXPECT_EQ(base::FilePath(FILE_PATH_LITERAL("test_log.txt")).value(),
             client.GetLoggingFileName(cmd_line).value());
 }
-#endif  // BUILDFLAG(IS_WIN)
 
 class TestChromeContentBrowserClient : public ChromeContentBrowserClient {
  public:
@@ -1364,8 +1338,7 @@ TEST_F(ChromeContentSettingsRedirectTest, RedirectHelpURL) {
 }
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(ChromeContentSettingsRedirectTest, RedirectAddressesURL) {
   TestChromeContentBrowserClient test_content_browser_client;
@@ -1386,8 +1359,7 @@ TEST_F(ChromeContentSettingsRedirectTest, RedirectSearchSettingsURL) {
   EXPECT_EQ(GURL("chrome://settings/search"), dest_url);
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 class CaptivePortalCheckNetworkContext final
     : public network::TestNetworkContext {
@@ -2419,7 +2391,7 @@ class ChromeContentBrowserClientAIPrefsTest
   base::test::ScopedFeatureList feature_list_;
 };
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 class ChromeContentBrowserClientTouchDragDropTest
     : public ChromeRenderViewHostTestHarness {
  protected:
@@ -2442,7 +2414,7 @@ TEST_F(ChromeContentBrowserClientTouchDragDropTest,
   EXPECT_TRUE(web_preferences.touch_drag_drop_enabled);
   EXPECT_TRUE(web_preferences.touch_dragend_context_menu);
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX)
 
 // Verifies the web preference is enabled in DevTools when
 // kDevToolsAiOriginTrialsApis is enabled.
@@ -2704,8 +2676,7 @@ TEST_F(ChromeContentBrowserClientMimeHandlerFilePickerTest,
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 class ChromeContentBrowserClientHandleExternalProtocolTest
     : public ChromeRenderViewHostTestHarness {};
 

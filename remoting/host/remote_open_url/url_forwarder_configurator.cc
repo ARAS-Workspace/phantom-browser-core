@@ -13,7 +13,7 @@ UrlForwarderConfigurator::UrlForwarderConfigurator() = default;
 
 UrlForwarderConfigurator::~UrlForwarderConfigurator() = default;
 
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_LINUX)
 
 // static
 std::unique_ptr<UrlForwarderConfigurator> UrlForwarderConfigurator::Create() {
@@ -23,6 +23,6 @@ std::unique_ptr<UrlForwarderConfigurator> UrlForwarderConfigurator::Create() {
   return nullptr;
 }
 
-#endif  // !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_WIN)
+#endif  // !BUILDFLAG(IS_LINUX)
 
 }  // namespace remoting

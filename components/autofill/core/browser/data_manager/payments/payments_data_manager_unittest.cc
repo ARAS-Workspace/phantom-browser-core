@@ -1676,8 +1676,7 @@ TEST_F(PaymentsDataManagerSyncTransportModeTest,
 }
 
 // Sync Transport mode is only for Win, Mac, and Linux.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 TEST_F(PaymentsDataManagerSyncTransportModeTest,
        ServerCardsShowInTransportMode) {
   SetUpTwoCardTypes();
@@ -1703,8 +1702,7 @@ TEST_F(PaymentsDataManagerSyncTransportModeTest,
   EXPECT_EQ(payments_data_manager().GetLocalCreditCards().size(), 1U);
   EXPECT_EQ(payments_data_manager().GetServerCreditCards().size(), 0U);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 // Test that ensure local data is not lost on sign-in.
 // Clearing/changing the primary account is not supported on CrOS.
@@ -2401,8 +2399,7 @@ TEST_F(
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Tests that no linked BNPL issuers are returned if the BNPL sync flag is off.
 TEST_P(PaymentsDataManagerServerTest, GetLinkedBnplIssuers_FlagOff) {
   base::test::ScopedFeatureList scoped_feature_list;
@@ -2697,8 +2694,7 @@ TEST_P(PaymentsDataManagerServerTest,
           DenseSet({PaymentInstrument::ActionRequired::kAcceptTos})));
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(PaymentsDataManagerTest,
        OnBenefitsPrefChange_PrefIsOn_LoadsCardBenefits) {
@@ -3738,7 +3734,7 @@ TEST_F(PaymentsDataManagerTest,
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 // Test that setting the `kAutofillEnablePaymentsMandatoryReauth` pref works
 // correctly.
 TEST_F(PaymentsDataManagerTest, AutofillPaymentMethodsMandatoryReauthEnabled) {
@@ -3756,10 +3752,9 @@ TEST_F(PaymentsDataManagerTest, AutofillPaymentMethodsMandatoryReauthEnabled) {
   EXPECT_FALSE(
       payments_data_manager().IsPaymentMethodsMandatoryReauthEnabled());
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
 // Test that
 // `PaymentsDataManager::ShouldShowPaymentMethodsMandatoryReauthPromo()`
 // only returns that we should show the promo when we are below the max counter
@@ -3842,8 +3837,7 @@ TEST_F(PaymentsDataManagerTest,
       "ReauthOfferOptInDecision2",
       autofill_metrics::MandatoryReauthOfferOptInDecision::kAlreadyOptedOut, 1);
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(PaymentsDataManagerTest, SaveCardLocallyIfNewWithNewCard) {
   CreditCard credit_card(base::Uuid::GenerateRandomV4().AsLowercaseString());
@@ -4120,8 +4114,7 @@ TEST_P(PaymentsDataManagerServerTest,
               testing::IsEmpty());
 }
 #endif  // BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 TEST_P(
     PaymentsDataManagerServerTest,
     GetUnlinkedBnplIssuersWhenBnplSyncFeatureDisabled_UnlinkedBnplIssuersNotCached) {
@@ -4644,8 +4637,7 @@ TEST_P(PaymentsDataManagerServerTest, ShouldShowBnplSettings_FlagOff) {
   EXPECT_FALSE(payments_data_manager().ShouldShowBnplSettings());
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(PaymentsDataManagerTest, GetWeakPtr_InvalidatedAfterManagerDestroyed) {
   base::WeakPtr<const PaymentsDataManager> weak_ptr_local =

@@ -29,15 +29,6 @@
 #include "content/public/browser/browser_thread.h"
 #include "crypto/sha2.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <aclapi.h>
-
-#include "base/win/scoped_localalloc.h"
-#include "base/win/sid.h"
-#endif
-
 namespace component_updater {
 namespace {
 
@@ -54,7 +45,7 @@ static_assert(std::size(kSodaPublicKeySHA256) == crypto::kSHA256Length);
 
 constexpr char kSodaManifestName[] = "SODA Library";
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 
 constexpr base::FilePath::CharType kSodaIndicatorFile[] =
 #if defined(ARCH_CPU_X86)
@@ -103,41 +94,6 @@ void SodaComponentInstallerPolicy::UpdateSodaComponentOnDemand() {
 update_client::CrxInstaller::Result
 SodaComponentInstallerPolicy::SetComponentDirectoryPermission(
     const base::FilePath& install_dir) {
-#if BUILDFLAG(IS_WIN)
-  const std::optional<base::win::Sid> users_sid =
-      base::win::Sid::FromKnownSid(base::win::WellKnownSid::kBuiltinUsers);
-  if (!users_sid) {
-    return update_client::CrxInstaller::Result(
-        update_client::InstallError::SET_PERMISSIONS_FAILED);
-  }
-
-  // Initialize an EXPLICIT_ACCESS structure for an ACE.
-  EXPLICIT_ACCESS explicit_access[1] = {};
-  explicit_access[0].grfAccessPermissions = GENERIC_READ | GENERIC_EXECUTE;
-  explicit_access[0].grfAccessMode = GRANT_ACCESS;
-  explicit_access[0].grfInheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
-  explicit_access[0].Trustee.TrusteeForm = TRUSTEE_IS_SID;
-  explicit_access[0].Trustee.TrusteeType = TRUSTEE_IS_WELL_KNOWN_GROUP;
-  explicit_access[0].Trustee.ptstrName =
-      reinterpret_cast<LPTSTR>(users_sid->GetPSID());
-
-  PACL acl_ptr = nullptr;
-  if (::SetEntriesInAcl(std::size(explicit_access), explicit_access, nullptr,
-                        &acl_ptr) != ERROR_SUCCESS) {
-    return update_client::CrxInstaller::Result(
-        update_client::InstallError::SET_PERMISSIONS_FAILED);
-  }
-  base::win::ScopedLocalAllocTyped<ACL> acl =
-      base::win::TakeLocalAlloc(acl_ptr);
-
-  // Change the security attributes.
-  if (::SetNamedSecurityInfo(const_cast<LPWSTR>(install_dir.value().c_str()),
-                             SE_FILE_OBJECT, DACL_SECURITY_INFORMATION, nullptr,
-                             nullptr, acl.get(), nullptr) != ERROR_SUCCESS) {
-    return update_client::CrxInstaller::Result(
-        update_client::InstallError::SET_PERMISSIONS_FAILED);
-  }
-#endif
 
   return update_client::CrxInstaller::Result(update_client::InstallError::NONE);
 }
@@ -164,7 +120,7 @@ void SodaComponentInstallerPolicy::OnCustomUninstall() {}
 bool SodaComponentInstallerPolicy::VerifyInstallation(
     const base::DictValue& manifest,
     const base::FilePath& install_dir) const {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   bool missing_indicator_file =
       !base::PathExists(install_dir.Append(kSodaIndicatorFile));
 

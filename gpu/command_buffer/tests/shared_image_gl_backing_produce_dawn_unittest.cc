@@ -65,13 +65,7 @@ class SharedImageGLBackingProduceDawnTest : public WebGPUTest {
 
   bool ShouldSkipTest() {
 // Windows is the only platform enabled passthrough in this test.
-#if BUILDFLAG(IS_WIN)
-    // Skip the test if there is no GPU service holder. It is not created if
-    // Dawn is not supported on the platform (Win7).
-    return GetGpuServiceHolder() == nullptr;
-#else
     return true;
-#endif  // BUILDFLAG(IS_WIN)
   }
 
   gles2::GLES2Implementation* gl() { return gl_context_->GetImplementation(); }

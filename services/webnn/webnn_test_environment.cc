@@ -24,10 +24,6 @@
 #include "services/webnn/public/cpp/in_process_context_provider.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "services/webnn/public/cpp/ep_device_info.h"
-#endif
-
 namespace webnn::test {
 
 namespace {
@@ -159,30 +155,6 @@ void FakeGpuHostForTesting::StoreBlobToDisk(
     const std::string& shader) {}
 
 void FakeGpuHostForTesting::ClearGrShaderDiskCache() {}
-
-#if BUILDFLAG(IS_WIN)
-void FakeGpuHostForTesting::DidUpdateOverlayInfo(
-    const gpu::OverlayInfo& overlay_info) {}
-
-void FakeGpuHostForTesting::DidUpdateDXGIInfo(
-    gfx::mojom::DXGIInfoPtr dxgi_info) {}
-
-void FakeGpuHostForTesting::EnsureWebNNExecutionProvidersReady(
-    EnsureWebNNExecutionProvidersReadyCallback callback) {
-  // Initializes the execution providers used by the WebNN ORT backend.
-  webnn::EnsureExecutionProvidersReady(std::move(callback));
-}
-
-void FakeGpuHostForTesting::RequestWebNNCompilerContext(
-    webnn::mojom::CreateContextOptionsPtr context_options,
-    const webnn::ContextProperties& context_properties,
-    const webnn::EpDeviceInfo& target_device,
-    mojo::PendingReceiver<webnn::mojom::WebNNCompilerContext>
-        compiler_context_receiver,
-    mojo::PendingRemote<webnn::mojom::WebNNModelLoader> model_loader_remote) {
-  // No-op for testing; drop the endpoints so the peer endpoints disconnect.
-}
-#endif
 
 void FakeGpuHostForTesting::CreateWebNNWeightsFile(
     CreateWebNNWeightsFileCallback callback) {

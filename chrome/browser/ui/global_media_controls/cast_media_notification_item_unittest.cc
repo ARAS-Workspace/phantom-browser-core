@@ -323,11 +323,7 @@ TEST_F(CastMediaNotificationItemTest, DownloadImage) {
 }
 
 // TODO(crbug.com/327498504): Fix the test flakiness on Win Arm64.
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-#define MAYBE_MediaPositionUpdate DISABLED_MediaPositionUpdate
-#else
 #define MAYBE_MediaPositionUpdate MediaPositionUpdate
-#endif
 TEST_F(CastMediaNotificationItemTest, MAYBE_MediaPositionUpdate) {
   SetView();
   const base::TimeDelta duration = base::Seconds(100);

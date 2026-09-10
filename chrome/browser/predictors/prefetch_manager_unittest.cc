@@ -483,7 +483,7 @@ TEST_P(PrefetchManagerTest, Stop) {
 
 // Flaky on Mac/Linux/CrOS/Android/Windows. http://crbug.com/40784662
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+    BUILDFLAG(IS_ANDROID)
 #define MAYBE_StopAndStart DISABLED_StopAndStart
 #else
 #define MAYBE_StopAndStart StopAndStart

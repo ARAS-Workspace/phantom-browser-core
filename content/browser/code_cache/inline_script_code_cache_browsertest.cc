@@ -303,7 +303,7 @@ INSTANTIATE_TEST_SUITE_P(All,
 // TODO(crbug.com/498265776): Test is expected to time out on some slow
 // builders.
 #if defined(MEMORY_SANITIZER) || defined(THREAD_SANITIZER) || \
-    ((BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)) && !defined(NDEBUG))
+    (BUILDFLAG(IS_LINUX) && !defined(NDEBUG))
 #define MAYBE_DefaultCacheHint DISABLED_DefaultCacheHint
 #else
 #define MAYBE_DefaultCacheHint DefaultCacheHint
@@ -353,8 +353,7 @@ IN_PROC_BROWSER_TEST_P(InlineScriptCacheHintBrowserTest,
 
 // TODO(crbug.com/498265776): Test is expected to time out on some slow
 // builders.
-#if defined(MEMORY_SANITIZER) || defined(THREAD_SANITIZER) || \
-    (BUILDFLAG(IS_WIN) && !defined(NDEBUG))
+#if defined(MEMORY_SANITIZER) || defined(THREAD_SANITIZER)
 #define MAYBE_EagerCacheHint DISABLED_EagerCacheHint
 #else
 #define MAYBE_EagerCacheHint EagerCacheHint
@@ -397,7 +396,7 @@ IN_PROC_BROWSER_TEST_P(InlineScriptCacheHintBrowserTest, MAYBE_EagerCacheHint) {
 // TODO(crbug.com/498265776): Test is expected to time out on some slow
 // builders.
 #if defined(MEMORY_SANITIZER) || defined(THREAD_SANITIZER) || \
-    ((BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)) && !defined(NDEBUG))
+    (BUILDFLAG(IS_LINUX) && !defined(NDEBUG))
 #define MAYBE_NeverCacheHint DISABLED_NeverCacheHint
 #else
 #define MAYBE_NeverCacheHint NeverCacheHint
@@ -641,8 +640,7 @@ IN_PROC_BROWSER_TEST_P(InlineScriptCodeCacheBrowserTest,
 
 // TODO(crbug.com/498265776): Test timed out on some slow builders like MSan,
 // TSan, and Win 10 (dbg).
-#if defined(MEMORY_SANITIZER) || defined(THREAD_SANITIZER) || \
-    (BUILDFLAG(IS_WIN) && !defined(NDEBUG))
+#if defined(MEMORY_SANITIZER) || defined(THREAD_SANITIZER)
 #define MAYBE_ProducedCacheHitsOnAnotherProcess \
   DISABLED_ProducedCacheHitsOnAnotherProcess
 #else

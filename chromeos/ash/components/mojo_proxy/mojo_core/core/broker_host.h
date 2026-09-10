@@ -38,11 +38,6 @@ class BrokerHost : public Channel::Delegate,
   // Send |handle| to the client, to be used to establish a NodeChannel to us.
   bool SendChannel(PlatformHandle handle);
 
-#if BUILDFLAG(IS_WIN)
-  // Sends a named channel to the client. Like above, but for named pipes.
-  void SendNamedChannel(std::wstring_view pipe_name);
-#endif
-
  private:
   ~BrokerHost() override;
 
@@ -60,10 +55,6 @@ class BrokerHost : public Channel::Delegate,
   void OnBufferRequest(uint32_t num_bytes);
 
   const ProcessErrorCallback process_error_callback_;
-
-#if BUILDFLAG(IS_WIN)
-  base::Process client_process_;
-#endif
 
   scoped_refptr<Channel> channel_;
 };

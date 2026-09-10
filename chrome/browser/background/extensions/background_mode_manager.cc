@@ -74,11 +74,6 @@
 #include "ui/gfx/image/image_family.h"
 #include "ui/gfx/image/image_skia.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/startup/startup_launch_manager.h"
-#include "chrome/browser/win/app_icon.h"
-#endif
-
 using base::UserMetricsAction;
 using extensions::Extension;
 
@@ -396,9 +391,6 @@ bool BackgroundModeManager::UnregisterProfile(Profile* profile) {
   background_mode_data_.erase(it);
   // If there are no background mode profiles any longer, then turn off
   // background mode.
-#if BUILDFLAG(IS_WIN)
-  startup_launch_client_.SetLaunchOnStartup(ShouldLaunchOnStartup());
-#endif
   if (!ShouldBeInBackgroundMode()) {
     EndBackgroundMode();
   }
@@ -477,9 +469,6 @@ void BackgroundModeManager::OnExtensionsReady(Profile* profile) {
 }
 
 void BackgroundModeManager::OnBackgroundModeEnabledPrefChanged() {
-#if BUILDFLAG(IS_WIN)
-  startup_launch_client_.SetLaunchOnStartup(ShouldLaunchOnStartup());
-#endif
   if (IsBackgroundModePrefEnabled()) {
     EnableBackgroundMode();
   } else {
@@ -708,9 +697,6 @@ void BackgroundModeManager::EnableBackgroundMode() {
   if (!in_background_mode_ && ShouldBeInBackgroundMode()) {
     StartBackgroundMode();
 
-#if BUILDFLAG(IS_WIN)
-    startup_launch_client_.SetLaunchOnStartup(ShouldLaunchOnStartup());
-#endif
   }
 }
 
@@ -769,9 +755,6 @@ void BackgroundModeManager::OnClientsChanged(
         HasPersistentBackgroundClientForProfile(profile));
   }
 
-#if BUILDFLAG(IS_WIN)
-  startup_launch_client_.SetLaunchOnStartup(ShouldLaunchOnStartup());
-#endif
   if (!ShouldBeInBackgroundMode()) {
     // We've uninstalled our last background client, make sure we exit
     // background mode and no longer launch on startup.
@@ -853,25 +836,7 @@ namespace {
 // Gets the image for the status tray icon, at the correct size for the current
 // platform and display settings.
 gfx::ImageSkia GetStatusTrayIcon() {
-#if BUILDFLAG(IS_WIN)
-  // On Windows, use GetSmallAppIconSize to get the correct image size. The
-  // user's "text size" setting in Windows determines how large the system tray
-  // icon should be.
-  gfx::Size size = GetSmallAppIconSize();
-
-  // This loads all of the icon images, which is a bit wasteful because we're
-  // going to pick one and throw the rest away, but that is the price of using
-  // the ImageFamily abstraction. Note: We could just use the LoadImage function
-  // from the Windows API, but that does a *terrible* job scaling images.
-  // Therefore, we fetch the images and do our own high-quality scaling.
-  std::unique_ptr<gfx::ImageFamily> family = GetAppIconImageFamily();
-  DCHECK(family);
-  if (!family) {
-    return gfx::ImageSkia();
-  }
-
-  return family->CreateExact(size).AsImageSkia();
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   return *ui::ResourceBundle::GetSharedInstance().GetImageSkiaNamed(
       IDR_PRODUCT_LOGO_128);
 #elif BUILDFLAG(IS_MAC)

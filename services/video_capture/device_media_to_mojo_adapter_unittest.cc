@@ -34,9 +34,6 @@ class DeviceMediaToMojoAdapterTest : public ::testing::Test {
     adapter_ = std::make_unique<DeviceMediaToMojoAdapter>(
         std::move(mock_device), base::DoNothing(),
         base::SingleThreadTaskRunner::GetCurrentDefault());
-#elif BUILDFLAG(IS_WIN)
-    adapter_ = std::make_unique<DeviceMediaToMojoAdapter>(
-        std::move(mock_device), nullptr);
 #else
     adapter_ =
         std::make_unique<DeviceMediaToMojoAdapter>(std::move(mock_device));

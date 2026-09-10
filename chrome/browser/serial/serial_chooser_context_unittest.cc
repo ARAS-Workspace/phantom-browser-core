@@ -87,9 +87,6 @@ device::mojom::SerialPortInfoPtr CreatePersistentUsbPort(
   auto port = device::mojom::SerialPortInfo::New();
   port->token = base::UnguessableToken::Create();
   port->display_name = std::move(name);
-#if BUILDFLAG(IS_WIN)
-  port->device_instance_id = persistent_id;
-#else
   port->has_vendor_id = true;
   port->vendor_id = 0;
   port->has_product_id = true;
@@ -98,7 +95,6 @@ device::mojom::SerialPortInfoPtr CreatePersistentUsbPort(
 #if BUILDFLAG(IS_MAC)
   port->usb_driver_name = "AppleUSBCDC";
 #endif
-#endif  // BUILDFLAG(IS_WIN)
   return port;
 }
 

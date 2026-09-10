@@ -67,10 +67,6 @@ class DeviceFactoryImpl : public DeviceFactory {
       mojo::PendingRemote<mojom::DevicesChangedObserver> observer,
       bool raise_event_if_virtual_devices_already_present) override;
 
-#if BUILDFLAG(IS_WIN)
-  void OnGpuInfoUpdate(const CHROME_LUID& luid) override;
-#endif
-
  private:
   void CreateAndAddNewDevice(const std::string& device_id,
                              CreateDeviceCallback create_callback);

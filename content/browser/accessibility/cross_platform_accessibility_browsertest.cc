@@ -47,12 +47,6 @@
 #include "ui/accessibility/platform/browser_accessibility_manager.h"
 #include "ui/base/buildflags.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/atl.h"
-#include "base/win/scoped_com_initializer.h"
-#include "ui/base/win/atl_module.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/mac/mac_util.h"
 #endif
@@ -243,10 +237,6 @@ class CrossPlatformAccessibilityBrowserTest : public ContentBrowserTest {
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
 
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<base::win::ScopedCOMInitializer> com_initializer_;
-#endif
-
   std::optional<ScopedAccessibilityModeOverride> accessibility_mode_;
 };
 
@@ -270,10 +260,6 @@ void CrossPlatformAccessibilityBrowserTest::ChooseFeatures(
     std::vector<base::test::FeatureRef>* disabled_features) {}
 
 void CrossPlatformAccessibilityBrowserTest::SetUpOnMainThread() {
-#if BUILDFLAG(IS_WIN)
-  com_initializer_ = std::make_unique<base::win::ScopedCOMInitializer>();
-  ui::win::CreateATLModuleIfNeeded();
-#endif
   // For OOPIF tests.
   host_resolver()->AddRule("*", "127.0.0.1");
   accessibility_mode_.emplace(ui::kAXModeComplete);
@@ -2785,7 +2771,7 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
 
 // TODO(crbug.com/40923912):  Enable once thread flakiness is resolved.
 // TODO(crbug.com/332652840): It is flaky with SkiaGraphite enabled on Windows.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_NonInteractiveChangesAreBatched \
   DISABLED_NonInteractiveChangesAreBatched
 #else
@@ -2845,7 +2831,7 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
 #if defined(IS_FAST_BUILD)  // Avoid flakiness on slower debug/sanitizer builds.
 // TODO(crbug.com/40749521): Fix disabled flaky test.
 // TODO(crbug.com/332652840): It is flaky with SkiaGraphite enabled on Windows.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_DocumentSelectionChangesAreNotBatched \
   DISABLED_DocumentSelectionChangesAreNotBatched
 #else
@@ -2901,7 +2887,7 @@ IN_PROC_BROWSER_TEST_F(CrossPlatformAccessibilityBrowserTest,
 #if defined(IS_FAST_BUILD)  // Avoid flakiness on slower debug/sanitizer builds.
 // TODO(crbug.com/40749521): Fix disabled flaky test.
 // TODO(crbug.com/332652840): It is flaky with SkiaGraphite enabled on Windows.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ActiveDescendantChangesAreNotBatched \
   DISABLED_ActiveDescendantChangesAreNotBatched
 #else

@@ -122,14 +122,6 @@
 #include "components/sync/model/string_ordinal.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include "base/process/process.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/web_applications/os_integration/os_integration_manager.h"
-#include "chrome/browser/web_applications/os_integration/web_app_shortcut.h"
-#include "components/keep_alive_registry/keep_alive_types.h"
-#include "components/keep_alive_registry/scoped_keep_alive.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 namespace base {
 class FilePath;
@@ -146,38 +138,6 @@ struct UninstallDialogState {
   std::vector<SubAppUninstallMetadata> sub_apps;
 };
 
-#if BUILDFLAG(IS_WIN)
-void UninstallWebAppWithDialogFromStartupSwitch(
-    std::unique_ptr<ScopedKeepAlive> scoped_keep_alive,
-    const webapps::AppId& app_id,
-    WebAppProvider* provider) {
-  if (provider->registrar_unsafe().CanUserUninstallWebApp(app_id)) {
-    provider->ui_manager().PresentUserUninstallDialog(
-        app_id, webapps::WebappUninstallSource::kOsSettings,
-        gfx::NativeWindow(),
-        base::BindOnce(
-            [](std::unique_ptr<ScopedKeepAlive> scoped_keep_alive,
-               webapps::UninstallResultCode code) {
-              // This ensures that the scoped_keep_alive will be deleted in the
-              // next message loop, giving objects like DialogDelegate enough
-              // time to shut itself down. See crbug.com/40946953 for more
-              // information.
-              base::SequencedTaskRunner::GetCurrentDefault()->DeleteSoon(
-                  FROM_HERE, std::move(scoped_keep_alive));
-            },
-            std::move(scoped_keep_alive)));
-  } else {
-    // This is necessary to remove all OS integrations if the app has
-    // been uninstalled.
-    SynchronizeOsOptions synchronize_options;
-    synchronize_options.force_unregister_os_integration = true;
-    provider->scheduler().SynchronizeOsIntegration(
-        app_id, base::DoNothingWithBoundArgs(std::move(scoped_keep_alive)),
-        synchronize_options);
-  }
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_CHROMEOS)
 void ShowNonclosableAppToast(const web_app::WebAppRegistrar& registrar,
@@ -347,8 +307,7 @@ bool WebAppUiManagerImpl::IsAppMigrationDialogShowing(
   if (!controller) {
     return false;
   }
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(window);
   return browser_view &&
          browser_view->GetProperty(kIsPwaUpdateDialogShowingKey) &&
@@ -848,21 +807,6 @@ void WebAppUiManagerImpl::OnTabCloseCancelled(const tabs::TabInterface* tab) {
 }
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-void WebAppUiManagerImpl::UninstallWebAppFromStartupSwitch(
-    const webapps::AppId& app_id) {
-  WebAppProvider* provider = WebAppProvider::GetForWebApps(profile_);
-  // ScopedKeepAlive not only keeps the process from terminating early
-  // during uninstall, it also ensures the process will terminate in the next
-  // message loop if there are no active browser windows.
-  provider->on_registry_ready().Post(
-      FROM_HERE, base::BindOnce(&UninstallWebAppWithDialogFromStartupSwitch,
-                                std::make_unique<ScopedKeepAlive>(
-                                    KeepAliveOrigin::WEB_APP_UNINSTALL,
-                                    KeepAliveRestartOption::DISABLED),
-                                app_id, provider));
-}
-#endif  //  BUILDFLAG(IS_WIN)
 
 bool WebAppUiManagerImpl::IsBrowserForInstalledApp(
     const BrowserWindowInterface* browser) const {
@@ -1019,8 +963,7 @@ void WebAppUiManagerImpl::ClearWebAppSiteDataIfNeeded(
   }
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 const base::Feature& GetPromoFeatureEngagementFromBrowser(
     const BrowserWindowInterface* browser) {
@@ -1127,8 +1070,7 @@ void WebAppUiManagerImpl::OnTabChangedDuringIph(
   }
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_CHROMEOS)
 void WebAppUiManagerImpl::OnBrowserCloseCancelled(

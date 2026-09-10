@@ -256,12 +256,6 @@ int LaunchUnitTestsInternal(RunTestSuiteCallback run_test_suite,
           // Please keep these in alphabetic order within each platform type.
           base::DIR_SRC_TEST_DATA_ROOT,
           base::DIR_USER_DESKTOP,
-#if BUILDFLAG(IS_WIN)
-          base::DIR_COMMON_DESKTOP,
-          base::DIR_START_MENU,
-          base::DIR_USER_STARTUP,
-
-#endif  // BUILDFLAG(IS_WIN)
       },
       ([](const base::FilePath& path) {
         ADD_FAILURE()
@@ -280,28 +274,6 @@ void InitGoogleTestChar(int* argc, char** argv) {
   MaybeInitFuzztest(*argc, argv);
 }
 
-#if BUILDFLAG(IS_WIN)
-
-// PRECONDITIONS: As is normal in command lines, argc and argv must correspond
-// to one another. Otherwise there will be out-of-bounds accesses.
-UNSAFE_BUFFER_USAGE void InitGoogleTestWChar(int* argc, wchar_t** argv) {
-  testing::InitGoogleTest(argc, argv);
-  // Fuzztest requires a narrow command-line.
-  CHECK(*argc >= 0);
-  const auto argc_s = static_cast<size_t>(*argc);
-  span<wchar_t*> wide_command_line = UNSAFE_BUFFERS(span(argv, argc_s));
-  std::vector<std::string> narrow_command_line;
-  std::vector<char*> narrow_command_line_pointers;
-  narrow_command_line.reserve(argc_s);
-  narrow_command_line_pointers.reserve(argc_s);
-  for (size_t i = 0; i < argc_s; ++i) {
-    narrow_command_line.push_back(WideToUTF8(wide_command_line[i]));
-    narrow_command_line_pointers.push_back(narrow_command_line[i].data());
-  }
-  MaybeInitFuzztest(*argc, narrow_command_line_pointers.data());
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 }  // namespace
 
 MergeTestFilterSwitchHandler::~MergeTestFilterSwitchHandler() = default;
@@ -314,11 +286,7 @@ void MergeTestFilterSwitchHandler::ResolveDuplicate(
     return;
   }
   if (!out_value.empty()) {
-#if BUILDFLAG(IS_WIN)
-    StrAppend(&out_value, {L";"});
-#else
     StrAppend(&out_value, {";"});
-#endif
   }
   StrAppend(&out_value, {new_value});
 }
@@ -362,24 +330,6 @@ int LaunchUnitTestsWithOptions(int argc,
                                  timeout_callback,
                                  BindOnce(&InitGoogleTestChar, &argc, argv));
 }
-
-#if BUILDFLAG(IS_WIN)
-int LaunchUnitTests(int argc,
-                    wchar_t** argv,
-                    bool use_job_objects,
-                    RunTestSuiteCallback run_test_suite) {
-  // Windows CommandLine::Init ignores argv anyway.
-  CommandLine::Init(argc, NULL);
-  size_t parallel_jobs = NumParallelJobs(/*cores_per_job=*/1);
-  if (parallel_jobs == 0U) {
-    return 1;
-  }
-  return LaunchUnitTestsInternal(std::move(run_test_suite), parallel_jobs,
-                                 kDefaultTestBatchLimit, 1U, use_job_objects,
-                                 DoNothing(),
-                                 BindOnce(&InitGoogleTestWChar, &argc, argv));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 DefaultUnitTestPlatformDelegate::DefaultUnitTestPlatformDelegate() = default;
 

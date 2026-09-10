@@ -61,7 +61,7 @@ RegionalCapabilitiesServiceFactory::GetInstance() {
   return instance.get();
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // static
 bool RegionalCapabilitiesServiceFactory::
     IsInSearchEngineChoiceScreenRegionForSystemProfile(Profile* profile) {

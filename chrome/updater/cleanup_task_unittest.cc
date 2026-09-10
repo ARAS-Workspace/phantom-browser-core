@@ -24,10 +24,6 @@
 #include "components/update_client/utils.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/updater/util/win_util.h"
-#endif
-
 namespace updater {
 
 class CleanupTaskTest : public testing::Test {
@@ -45,15 +41,6 @@ TEST_F(CleanupTaskTest, RunCleanupObsoleteFiles) {
     GTEST_SKIP();
   }
 #endif  // BUILDFLAG(IS_POSIX)
-
-#if BUILDFLAG(IS_WIN)
-  // Set up a mock `GoogleUpdate.exe`, and the following mock directories:
-  // `Download`, `Install`, and a versioned `1.2.3.4` directory.
-  const std::optional<base::FilePath> google_update_exe =
-      GetGoogleUpdateExePath(GetUpdaterScopeForTesting());
-  ASSERT_TRUE(google_update_exe.has_value());
-  test::SetupMockUpdater(google_update_exe.value());
-#endif  // BUILDFLAG(IS_WIN)
 
   base::FilePath chrome_url_fetcher_dir;
   base::FilePath chrome_unpacker_dir;
@@ -105,11 +92,6 @@ TEST_F(CleanupTaskTest, RunCleanupObsoleteFiles) {
   EXPECT_TRUE(base::PathExists(random_temp_dir));
   EXPECT_TRUE(base::DeletePathRecursively(random_temp_dir));
 
-#if BUILDFLAG(IS_WIN)
-  // Expect only a single file `GoogleUpdate.exe` and nothing else under
-  // `\Google\Update`.
-  test::ExpectOnlyMockUpdater(google_update_exe.value());
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 }  // namespace updater

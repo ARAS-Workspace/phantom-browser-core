@@ -38,10 +38,6 @@
 #include "net/traffic_annotation/network_traffic_annotation_test_helper.h"
 #include "net/websockets/websocket_frame.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <Winsock2.h>
-#endif
-
 namespace {
 
 bool ResolveHost(const std::string& host,

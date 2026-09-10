@@ -52,9 +52,6 @@
 #elif defined(USE_AURA)
 #include "ui/native_theme/native_theme_aura.h"
 #include "ui/native_theme/native_theme_fluent.h"
-#if BUILDFLAG(IS_WIN)
-#include "ui/native_theme/native_theme_win.h"
-#endif
 #else
 #include "ui/native_theme/native_theme_mobile.h"
 #endif
@@ -67,11 +64,7 @@ namespace {
 using NativeUiTheme = NativeThemeMac;
 using WebUiTheme = NativeThemeAura;
 #elif defined(USE_AURA)
-#if BUILDFLAG(IS_WIN)
-using NativeUiTheme = NativeThemeWin;
-#else
 using NativeUiTheme = NativeThemeAura;
-#endif
 NativeTheme* GetInstanceForWebImpl() {
   static const bool use_fluent = IsFluentScrollbarEnabled();
   if (use_fluent) {

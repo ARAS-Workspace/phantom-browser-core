@@ -42,9 +42,9 @@ class SourceImpl : public device::SystemGeolocationSource {
   void RemovePositionUpdateObserver(PositionObserver* observer) override {}
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE)
   void RequestPermission() override {}
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_APPLE)
 
   // Helper function to force observer notification (normally done by
   // implementations of PermissionProvider).

@@ -33,13 +33,6 @@
 #if BUILDFLAG(IS_MAC)
 #include "base/files/scoped_temp_dir.h"
 #include "chrome/updater/util/mac_util.h"
-#elif BUILDFLAG(IS_WIN)
-#include "base/strings/sys_string_conversions.h"
-#include "base/test/test_reg_util_win.h"
-#include "base/win/registry.h"
-#include "base/win/windows_types.h"
-#include "chrome/updater/util/win_util.h"
-#include "chrome/updater/win/win_constants.h"
 #endif
 
 namespace updater {
@@ -89,58 +82,15 @@ class UsageStatsPermissionsTest : public testing::Test {
                                                 fake_permission_provider_);
   }
 
-#elif BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
-  void SetAppUsageStats(const std::string& app_id,
-                        bool enabled,
-                        UpdaterScope scope) {
-    std::wstring path =
-        IsSystemInstall(scope) ? system_key_path_ : user_key_path_;
-    base::win::RegKey key;
-    ASSERT_EQ(key.Open(hive_, path.c_str(), Wow6432(KEY_WRITE)), ERROR_SUCCESS);
-    ASSERT_EQ(
-        key.CreateKey(base::SysUTF8ToWide(app_id).c_str(), Wow6432(KEY_WRITE)),
-        ERROR_SUCCESS);
-    ASSERT_EQ(key.WriteValue(L"usagestats", enabled ? 1 : 0), ERROR_SUCCESS);
-    installed_app_ids_.push_back(app_id);
-  }
-
-  void SetUp() override {
-    base::win::RegKey key;
-    ASSERT_EQ(key.Create(hive_, user_key_path_.c_str(), Wow6432(KEY_WRITE)),
-              ERROR_SUCCESS);
-    ASSERT_EQ(key.Create(hive_, system_key_path_.c_str(), Wow6432(KEY_WRITE)),
-              ERROR_SUCCESS);
-  }
-
-  void TearDown() override {
-    for (const std::wstring& key_path :
-         std::vector<std::wstring>({user_key_path_, system_key_path_})) {
-      LONG result = base::win::RegKey(hive_, key_path.c_str(), Wow6432(DELETE))
-                        .DeleteKey(L"");
-      EXPECT_TRUE(result == ERROR_SUCCESS || result == ERROR_FILE_NOT_FOUND ||
-                  result == ERROR_INVALID_HANDLE);
-    }
-  }
-
-  bool AnyAppEnablesUsageStats() {
-    return ::updater::AnyAppEnablesUsageStats(hive_, InstallRegistryPaths());
-  }
-
-  bool RemoteEventLoggingAllowed() {
-    return ::updater::RemoteEventLoggingAllowed(hive_, InstallRegistryPaths(),
-                                                installed_app_ids_,
-                                                fake_permission_provider_);
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   void SetExemptAppsUsageStats(bool enabled, UpdaterScope scope) {
     SetAppUsageStats(kUpdaterAppId, enabled, scope);
     SetAppUsageStats(enterprise_companion::kCompanionAppId, enabled, scope);
     SetAppUsageStats(kPlatformExperienceHelperAppId, enabled, scope);
   }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
   UpdaterScope scope_ = GetUpdaterScopeForTesting();
 
@@ -155,20 +105,6 @@ class UsageStatsPermissionsTest : public testing::Test {
     }
     return application_support_directories;
   }
-#elif BUILDFLAG(IS_WIN)
-
-  std::vector<std::wstring> InstallRegistryPaths() {
-    std::vector<std::wstring> key_paths({user_key_path_});
-    if (IsSystemInstall(scope_)) {
-      key_paths.push_back(system_key_path_);
-    }
-    return key_paths;
-  }
-  HKEY hive_ = UpdaterScopeToHKeyRoot(GetUpdaterScopeForTesting());
-  std::wstring user_key_path_ =
-      base::StrCat({UPDATER_KEY, L"UsageStatsProviderTestUserKey\\"});
-  std::wstring system_key_path_ =
-      base::StrCat({UPDATER_KEY, L"UsageStatsProviderTestSystemkey\\"});
 #endif
 
   std::vector<std::string> installed_app_ids_;

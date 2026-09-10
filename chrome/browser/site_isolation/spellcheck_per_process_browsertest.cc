@@ -135,41 +135,6 @@ class MockSpellCheckHost : spellcheck::mojom::SpellCheckHost {
   void FillSuggestionList(const std::u16string& word,
                           FillSuggestionListCallback) override {}
 
-#if BUILDFLAG(IS_WIN)
-  void InitializeDictionaries(
-      InitializeDictionariesCallback callback) override {
-    SpellcheckService* spellcheck = SpellcheckServiceFactory::GetForContext(
-        process_host()->GetBrowserContext());
-
-    if (!spellcheck) {  // Teardown.
-      std::move(callback).Run(/*dictionaries=*/{}, /*custom_words=*/{},
-                              /*enable=*/false);
-      return;
-    }
-
-    dictionaries_loaded_callback_ = std::move(callback);
-
-    spellcheck->InitializeDictionaries(
-        base::BindOnce(&MockSpellCheckHost::OnDictionariesInitialized,
-                       base::Unretained(this)));
-    return;
-  }
-
-  void OnDictionariesInitialized() {
-    if (dictionaries_loaded_callback_) {
-      std::vector<spellcheck::mojom::SpellCheckBDictLanguagePtr> dictionaries;
-      dictionaries.push_back(spellcheck::mojom::SpellCheckBDictLanguage::New(
-          base::File(), "en-US"));
-
-      std::move(dictionaries_loaded_callback_)
-          .Run(std::move(dictionaries), {}, true);
-    }
-  }
-
-  // Callback passed as argument to InitializeDictionaries, and invoked when
-  // the dictionaries are loaded for the first time.
-  InitializeDictionariesCallback dictionaries_loaded_callback_;
-#endif  // BUILDFLAG(IS_WIN)
 #endif  // BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 
 #if BUILDFLAG(IS_ANDROID)
@@ -339,12 +304,7 @@ IN_PROC_BROWSER_TEST_F(ChromeSitePerProcessSpellCheckTest,
   RunOOPIFSpellCheckTest();
 }
 
-#if BUILDFLAG(IS_WIN)
-// TODO(crbug.com/477010953): Investigate this Windows test failure.
-#define MAYBE_OOPIFDisabledSpellCheckTest DISABLED_OOPIFDisabledSpellCheckTest
-#else
 #define MAYBE_OOPIFDisabledSpellCheckTest OOPIFDisabledSpellCheckTest
-#endif
 IN_PROC_BROWSER_TEST_F(ChromeSitePerProcessSpellCheckTest,
                        MAYBE_OOPIFDisabledSpellCheckTest) {
   RunOOPIFDisabledSpellCheckTest();

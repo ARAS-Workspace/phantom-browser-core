@@ -165,10 +165,6 @@ void RunTests(content::BrowserMainRunner* main_runner) {
 }  // namespace
 
 void WebTestBrowserMainRunner::Initialize() {
-#if BUILDFLAG(IS_WIN)
-  bool layout_system_deps_ok = content::WebTestBrowserCheckLayoutSystemDeps();
-  CHECK(layout_system_deps_ok);
-#endif
 
   base::CommandLine& command_line = *base::CommandLine::ForCurrentProcess();
 
@@ -305,8 +301,7 @@ void WebTestBrowserMainRunner::Initialize() {
   // Disable the backgrounding of renderers to make running tests faster.
   command_line.AppendSwitch(switches::kDisableRendererBackgrounding);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   content::WebTestBrowserPlatformInitialize();
 #endif
 

@@ -870,11 +870,7 @@ TestAXNodeWrapper::TestAXNodeWrapper(AXTree* tree, AXNode* node)
       node_(node),
       unique_id_(AXUniqueId::Create()),
       platform_node_(AXPlatformNode::Create(*this)) {
-#if BUILDFLAG(IS_WIN)
-  native_event_target_ = gfx::kMockAcceleratedWidget;
-#else
   native_event_target_ = gfx::kNullAcceleratedWidget;
-#endif
   observation_.Observe(tree);
 }
 

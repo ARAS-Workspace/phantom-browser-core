@@ -8,7 +8,7 @@
 #include "base/fuzzing_buildflags.h"
 #include "build/build_config.h"
 
-#if !(defined(OFFICIAL_BUILD) || BUILDFLAG(IS_WIN))
+#if !defined(OFFICIAL_BUILD)
 #include <stdlib.h>
 #endif
 
@@ -172,7 +172,7 @@ namespace base {
   }
 #endif  // BUILDFLAG(USE_FUZZING_ENGINE) && BUILDFLAG(IS_LINUX)
 
-#if defined(OFFICIAL_BUILD) || BUILDFLAG(IS_WIN)
+#if defined(OFFICIAL_BUILD)
   // We can't use abort() on Windows because it results in the
   // abort/retry/ignore dialog which disrupts automated tests.
   // TODO(crbug.com/40948553): investigate if such dialogs can
@@ -181,7 +181,7 @@ namespace base {
 #if defined(__clang__) || defined(COMPILER_GCC)
   __builtin_unreachable();
 #endif  // defined(__clang__) || defined(COMPILER_GCC)
-#else   // defined(OFFICIAL_BUILD) || BUILDFLAG(IS_WIN)
+#else
   abort();
 #endif  // defined(OFFICIAL_BUILD)
 }

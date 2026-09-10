@@ -40,10 +40,6 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 using testing::ElementsAre;
 
 namespace blink {
@@ -156,8 +152,6 @@ class HarfBuzzShaperTest : public FontTestBase {
   const char* kSystemColorEmojiFont = "Apple Color Emoji";
 #elif BUILDFLAG(IS_ANDROID)
   const char* kSystemColorEmojiFont = "Noto Color Emoji";
-#elif BUILDFLAG(IS_WIN)
-  const char* kSystemColorEmojiFont = "Segoe UI Emoji";
 #endif
 
 #if BUILDFLAG(IS_MAC)
@@ -165,8 +159,6 @@ class HarfBuzzShaperTest : public FontTestBase {
   const char* kSystemMonoTextDefaultEmojiFont = "Hiragino Mincho ProN";
 #elif BUILDFLAG(IS_ANDROID)
   const char* kSystemMonoEmojiFont = "Noto Sans Symbols";
-#elif BUILDFLAG(IS_WIN)
-  const char* kSystemMonoEmojiFont = "Segoe UI Symbol";
 #endif
 
   String GetShapedFontFamilyNameForEmojiVS(Font& font, String text) {
@@ -800,7 +792,7 @@ TEST_F(HarfBuzzShaperTest, IdeographicSpace) {
   EXPECT_EQ(run_font_data.size(), 1u);
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 TEST_F(HarfBuzzShaperTest, SystemEmojiVS15) {
 
   Font* mono_font = CreateNotoEmoji();
@@ -918,7 +910,7 @@ TEST_F(HarfBuzzShaperTest, FontVariantEmojiTextSystemFallback) {
     GTEST_SKIP();
   }
   const char* mono_font_name = "STIX Two Math";
-#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#elif BUILDFLAG(IS_ANDROID)
   const char* mono_font_name = kSystemMonoEmojiFont;
 #endif
   String text(u"\u26CE");

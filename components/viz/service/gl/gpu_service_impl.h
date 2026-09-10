@@ -54,9 +54,6 @@
 #include "ui/gfx/gpu_extra_info.h"
 #include "ui/gfx/native_ui_types.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/gl/direct_composition_support.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 namespace gpu {
 class DawnContextProvider;
@@ -89,9 +86,6 @@ class VulkanContextProvider;
 // the connection to clients, allocating/free'ing gpu memory etc.
 class VIZ_SERVICE_EXPORT GpuServiceImpl
     : public gpu::GpuChannelManagerDelegate,
-#if BUILDFLAG(IS_WIN)
-      public gl::DirectCompositionOverlayCapsObserver,
-#endif
       public mojom::GpuService,
       public BeginFrameObserverBase {
  public:
@@ -188,13 +182,6 @@ class VIZ_SERVICE_EXPORT GpuServiceImpl
           jea_receiver) override;
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-  void RegisterDCOMPSurfaceHandle(
-      mojo::PlatformHandle surface_handle,
-      RegisterDCOMPSurfaceHandleCallback callback) override;
-  void UnregisterDCOMPSurfaceHandle(
-      const base::UnguessableToken& token) override;
-#endif  // BUILDFLAG(IS_WIN)
 
   void CreateVideoEncodeAcceleratorProvider(
       mojo::PendingReceiver<media::mojom::VideoEncodeAcceleratorProvider>
@@ -219,9 +206,6 @@ class VIZ_SERVICE_EXPORT GpuServiceImpl
   void StartPeakMemoryMonitor(uint32_t sequence_num) override;
   void GetPeakMemoryUsage(uint32_t sequence_num,
                           GetPeakMemoryUsageCallback callback) override;
-#if BUILDFLAG(IS_WIN)
-  void RequestDXGIInfo(RequestDXGIInfoCallback callback) override;
-#endif
   void LoadedBlob(const gpu::GpuDiskCacheHandle& handle,
                   const std::string& key,
                   const std::string& data) override;
@@ -288,12 +272,6 @@ class VIZ_SERVICE_EXPORT GpuServiceImpl
   void SetMjpegDecodeAcceleratorBeginFrameCB(
       std::optional<base::RepeatingClosure> cb);
 
-#if BUILDFLAG(IS_WIN)
-  // DirectCompositionOverlayCapsObserver implementation.
-  // Update overlay info and HDR status on the GPU process and send the updated
-  // info back to the browser process if there is a change.
-  void OnOverlayCapsChanged() override;
-#endif
 
   bool is_initialized() const { return !!gpu_host_; }
 
@@ -404,9 +382,6 @@ class VIZ_SERVICE_EXPORT GpuServiceImpl
   gpu::Scheduler* CreateScheduler(gpu::SyncPointManager* sync_point_manager);
   base::WaitableEvent* CreateShutdownEvent();
 
-#if BUILDFLAG(IS_WIN)
-  void RequestDXGIInfoOnMainThread(RequestDXGIInfoCallback callback);
-#endif
 
   void OnBackgroundedOnMainThread();
   void OnForegroundedOnMainThread();
@@ -426,9 +401,6 @@ class VIZ_SERVICE_EXPORT GpuServiceImpl
 
   // Update overlay info and HDR status on the GPU process and send the updated
   // info back to the browser process if there is a change.
-#if BUILDFLAG(IS_WIN)
-  void UpdateOverlayAndDXGIInfo();
-#endif
 
   void GetDawnInfoOnMain(bool collect_metrics, GetDawnInfoCallback callback);
 
@@ -468,9 +440,6 @@ class VIZ_SERVICE_EXPORT GpuServiceImpl
 
   const gpu::GpuDriverBugWorkarounds gpu_driver_bug_workarounds_;
 
-#if BUILDFLAG(IS_WIN)
-  gfx::mojom::DXGIInfoPtr dxgi_info_;
-#endif
 
   // What we would have gotten if we haven't fallen back to SwiftShader or
   // pure software (in the viz case).

@@ -99,15 +99,8 @@ void FakeVideoCaptureDeviceLauncher::LaunchDeviceAsync(
   }
   std::unique_ptr<media::VideoCaptureDevice> device =
       device_or_error.ReleaseDevice();
-#if BUILDFLAG(IS_WIN)
-  auto buffer_pool = base::MakeRefCounted<media::VideoCaptureBufferPoolImpl>(
-      params.buffer_type, 10,
-      std::make_unique<media::VideoCaptureBufferTrackerFactoryImpl>(
-          system_->GetFactory()->GetDxgiDeviceManager()));
-#else
   auto buffer_pool = base::MakeRefCounted<media::VideoCaptureBufferPoolImpl>(
       media::VideoCaptureBufferType::kSharedMemory);
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_CHROMEOS)
   auto device_client = std::make_unique<media::VideoCaptureDeviceClient>(
       std::make_unique<media::VideoFrameReceiverOnTaskRunner>(

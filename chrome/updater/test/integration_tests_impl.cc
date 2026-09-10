@@ -84,14 +84,7 @@
 #include "third_party/re2/src/re2/re2.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/file_version_info_win.h"
-#include "base/win/elevation_util.h"
-#include "base/win/registry.h"
-#include "chrome/updater/util/win_util.h"
-#include "chrome/updater/win/test/test_executables.h"
-#include "chrome/updater/win/win_constants.h"
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include "chrome/updater/util/linux_util.h"
 #include "chrome/updater/util/posix_util.h"
 #endif
@@ -111,13 +104,6 @@ constexpr char kEnterpriseCompanionCRXRun[] = ".";
 // On Mac, the test companion app does not have a different name.
 constexpr base::FilePath::CharType kCompanionAppTestExecutableName[] =
     BROWSER_NAME_STRING "EnterpriseCompanion";
-#elif BUILDFLAG(IS_WIN)
-constexpr char kSelfUpdateCRXRun[] = "UpdaterSetup_test.exe";
-constexpr char kDoNothingCRXName[] = "updater_qualification_app_exe.crx";
-constexpr char kDoNothingCRXRun[] = "qualification_app.exe";
-constexpr char kEnterpriseCompanionCRXRun[] = "enterprise_companion_test.exe";
-constexpr base::FilePath::CharType kCompanionAppTestExecutableName[] =
-    FILE_PATH_LITERAL("enterprise_companion_test.exe");
 #elif BUILDFLAG(IS_LINUX)
 constexpr char kSelfUpdateCRXRun[] = "updater_test";
 constexpr char kDoNothingCRXName[] = "updater_qualification_app.crx";
@@ -555,16 +541,6 @@ void ExpectVersionActive(UpdaterScope scope, const std::string& version) {
   scoped_refptr<GlobalPrefs> prefs = CreateGlobalPrefs(scope);
   ASSERT_NE(prefs, nullptr) << "Failed to acquire GlobalPrefs.";
   EXPECT_EQ(prefs->GetActiveVersion(), version);
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(version, [scope] {
-    std::wstring version;
-    EXPECT_EQ(base::win::RegKey(UpdaterScopeToHKeyRoot(scope), UPDATER_KEY,
-                                Wow6432(KEY_READ))
-                  .ReadValue(kRegValueVersion, &version),
-              ERROR_SUCCESS);
-    return base::WideToUTF8(version);
-  }());
-#endif  // IS_WIN
 }
 
 void ExpectVersionNotActive(UpdaterScope scope, const std::string& version) {
@@ -622,25 +598,7 @@ void InstallUpdaterAndApp(UpdaterScope scope,
       ASSERT_EQ(exit_code, expected_exit_code);
     }
   } else {
-#if BUILDFLAG(IS_WIN)
-    ASSERT_TRUE(wait_for_the_installer);
-    Run(scope, command_line, nullptr);
-
-    std::u16string bundle_name;
-    std::wstring lang;
-    if (!tag.empty()) {
-      tagging::TagArgs tag_args;
-      ASSERT_EQ(tagging::ErrorCode::kSuccess,
-                tagging::Parse(tag, {}, tag_args));
-      bundle_name = base::UTF8ToUTF16(tag_args.bundle_name);
-      lang = base::UTF8ToWide(tag_args.language);
-    }
-    CloseInstallCompleteDialog(bundle_name, lang,
-                               base::UTF8ToWide(child_window_text_to_find),
-                               verify_app_logo_loaded);
-#else
     ADD_FAILURE();
-#endif
   }
 }
 
@@ -660,13 +618,6 @@ void PrintFile(const base::FilePath& file) {
 std::vector<base::FilePath> GetUpdaterLogFilesInTmp() {
   base::FilePath temp_dir;
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(
-      base::PathService::Get(IsSystemInstall(GetUpdaterScopeForTesting())
-                                 ? std::to_underlying(base::DIR_SYSTEM_TEMP)
-                                 : std::to_underlying(base::DIR_TEMP),
-                             &temp_dir));
-#endif
   if (temp_dir.empty()) {
     return {};
   }
@@ -806,15 +757,8 @@ void ExpectAppsUpdateSequence(UpdaterScope scope,
     const base::FilePath crx_path = exe_path.Append(app.crx_relative_path);
     const base::FilePath base_name = crx_path.BaseName().RemoveExtension();
 
-#if BUILDFLAG(IS_WIN)
-    const base::FilePath run_action =
-        base_name.Extension().empty()
-            ? base_name.AddExtension(FILE_PATH_LITERAL(".exe"))
-            : base_name;
-#else
     const base::FilePath run_action =
         base_name.Extension().empty() ? base::FilePath(".") : base_name;
-#endif  // BUILDFLAG(IS_WIN)
     app_response_providers.push_back(base::BindRepeating(
         [](const std::string& app_id, const std::string& url,
            const base::Version& to_version, const base::FilePath& crx_path,
@@ -1296,18 +1240,6 @@ void Run(
 void RunDeElevated(UpdaterScope scope,
                    base::CommandLine command_line,
                    int* exit_code) {
-#if BUILDFLAG(IS_WIN)
-  if (IsElevatedWithUACOn()) {
-    Run(scope, command_line, exit_code,
-        [](const base::CommandLine& command_line) {
-          auto process = base::win::RunDeElevated(command_line);
-          VPLOG_IF(0, !process.has_value() || !process->IsValid())
-              << process.error();
-          return process.has_value() ? process->Duplicate() : base::Process();
-        });
-    return;
-  }
-#endif
   Run(scope, command_line, exit_code);
 }
 
@@ -1717,19 +1649,6 @@ std::set<base::FilePath::StringType> GetTestProcessNames() {
 #if BUILDFLAG(IS_MAC)
   return {GetExecutableRelativePath().BaseName().value(),
           GetSetupExecutablePath().BaseName().value()};
-#elif BUILDFLAG(IS_WIN)
-  return {
-      GetExecutableRelativePath().BaseName().value(),
-      GetSetupExecutablePath().BaseName().value(),
-      kTestProcessExecutableName,
-      [] {
-        const base::FilePath test_executable =
-            base::FilePath::FromUTF8Unsafe(kExecutableName).BaseName();
-        return base::StrCat({test_executable.RemoveExtension().value(),
-                             base::UTF8ToWide(kExecutableSuffix),
-                             test_executable.Extension()});
-      }(),
-  };
 #else
   return {GetExecutableRelativePath().BaseName().value(), kLauncherName};
 #endif
@@ -1742,51 +1661,8 @@ std::set<base::FilePath::StringType> GetCompanionAppProcessNames() {
           kCompanionAppTestExecutableName};
 }
 
-#if BUILDFLAG(IS_WIN)
-VersionProcessFilter::VersionProcessFilter()
-    : versions_([] {
-        std::vector<base::Version> versions;
-        for (const auto& updater_version : GetRealUpdaterVersions()) {
-          versions.push_back(updater_version.version);
-        }
-        for (const auto& updater_version :
-             GetRealUpdaterLowerVersions("_sans_iid")) {
-          versions.push_back(updater_version.version);
-        }
-        return versions;
-      }()) {}
-
-VersionProcessFilter::~VersionProcessFilter() = default;
-
-bool VersionProcessFilter::Includes(const base::ProcessEntry& entry) const {
-  const base::Process process(::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION,
-                                            false, entry.th32ProcessID));
-  if (!process.IsValid()) {
-    return false;
-  }
-
-  wchar_t path[MAX_PATH] = {};
-  DWORD path_len = std::size(path);
-  if (!::QueryFullProcessImageName(process.Handle(), 0, path, &path_len)) {
-    return false;
-  }
-
-  const std::unique_ptr<FileVersionInfoWin> version_info =
-      FileVersionInfoWin::CreateFileVersionInfoWin(base::FilePath(path));
-  if (!version_info) {
-    return false;
-  }
-  const base::Version version(base::UTF16ToUTF8(version_info->file_version()));
-  return version.IsValid() && std::ranges::contains(versions_, version);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 void CleanProcesses() {
   base::ProcessFilter* filter = nullptr;
-#if BUILDFLAG(IS_WIN)
-  VersionProcessFilter version_filter;
-  filter = &version_filter;
-#endif
 
   for (const base::FilePath::StringType& process_name : GetTestProcessNames()) {
     EXPECT_TRUE(KillProcesses(process_name, -1, filter)) << process_name;
@@ -1799,10 +1675,6 @@ void CleanProcesses() {
 
 void ExpectCleanProcesses() {
   base::ProcessFilter* filter = nullptr;
-#if BUILDFLAG(IS_WIN)
-  VersionProcessFilter version_filter;
-  filter = &version_filter;
-#endif
 
   for (const base::FilePath::StringType& process_name : GetTestProcessNames()) {
     EXPECT_FALSE(IsProcessRunning(process_name, filter))
@@ -1811,7 +1683,6 @@ void ExpectCleanProcesses() {
 }
 
 // Standalone installers are supported for Windows only.
-#if !BUILDFLAG(IS_WIN)
 void RunOfflineInstall(UpdaterScope scope,
                        bool is_legacy_install,
                        bool is_silent_install,
@@ -1842,7 +1713,6 @@ void RunMockOfflineMetaInstall(UpdaterScope scope,
                                bool expect_success) {
   ADD_FAILURE();
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 void DMPushEnrollmentToken(const std::string& enrollment_token) {
   scoped_refptr<device_management_storage::DMStorage> storage =
@@ -1870,12 +1740,6 @@ void DMCleanup(UpdaterScope scope) {
   EXPECT_TRUE(storage->DeleteDMToken());
   EXPECT_TRUE(base::DeletePathRecursively(storage->policy_cache_folder()));
 
-#if BUILDFLAG(IS_WIN)
-  RegDeleteKey(HKEY_LOCAL_MACHINE, kRegKeyCompanyLegacyCloudManagement);
-  RegDeleteKey(HKEY_LOCAL_MACHINE, kRegKeyCompanyCloudManagement);
-  RegDeleteKey(HKEY_LOCAL_MACHINE, UPDATER_POLICIES_KEY);
-  RegDeleteKey(HKEY_LOCAL_MACHINE, COMPANY_POLICIES_KEY);
-#endif
 }
 
 void InstallEnterpriseCompanionApp() {
@@ -1902,14 +1766,7 @@ void InstallEnterpriseCompanionAppOverrides(
   EXPECT_TRUE(json_path);
   EXPECT_TRUE(base::CreateDirectory(json_path->DirName()));
   JSONFileValueSerializer json_serializer(*json_path);
-#if BUILDFLAG(IS_WIN)
-  // Allow admin to access companion app's Mojo service named pipe.
-  EXPECT_TRUE(json_serializer.Serialize(external_overrides.Clone().Set(
-      enterprise_companion::kNamedPipeSecurityDescriptorKey,
-      "D:(A;;GA;;;BA)")));
-#else
   EXPECT_TRUE(json_serializer.Serialize(external_overrides));
-#endif
   VLOG(1) << "Enterprise companion app overrides installed.";
 }
 

@@ -103,7 +103,7 @@ const ProfilePickerTestParam kTestParams[] = {
                              .window_size = PixelTestParam::kSmallWindowSize},
         .use_multiple_profiles = true,
     },
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     {.pixel_test_param = {.test_suffix = "MultipleProfiles_Kite"},
      .use_multiple_profiles = true,
      .has_supervised_user = true},
@@ -429,7 +429,7 @@ class ProfilePickerUIPixelTest
                                  is_glic_version);
     }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     if (GetParam().is_enterprise_badging_enabled) {
       policy::ScopedManagementServiceOverrideForTesting platform_management(
           policy::ManagementServiceFactory::GetForProfile(

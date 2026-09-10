@@ -117,7 +117,7 @@ bool ShouldCrashOnExtensionJsErrorInDevelopmentBuild(
     const Extension* extension,
     content::BrowserContext* context);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // Represents the type of settings override configured by the extension.
 // DSE = Default Search Engine.
 // NTP = New Tab Page.

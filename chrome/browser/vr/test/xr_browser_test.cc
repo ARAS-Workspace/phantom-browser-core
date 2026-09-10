@@ -57,16 +57,9 @@ constexpr char XrBrowserTestBase::kOpenXrConfigPathVal[];
 constexpr char XrBrowserTestBase::kTestFileDir[];
 constexpr char XrBrowserTestBase::kSwitchIgnoreRuntimeRequirements[];
 const std::vector<std::string> XrBrowserTestBase::kRequiredTestSwitches{
-#if BUILDFLAG(IS_WIN)
-    "enable-gpu", "enable-pixel-output-in-tests",
-    "run-through-xr-wrapper-script", "enable-unsafe-swiftshader"
-#endif
 };
 const std::vector<std::pair<std::string, std::string>>
     XrBrowserTestBase::kRequiredTestSwitchesWithValues{
-#if BUILDFLAG(IS_WIN)
-        std::pair<std::string, std::string>("test-launcher-jobs", "1")
-#endif
     };
 
 XrBrowserTestBase::XrBrowserTestBase() : env_(base::Environment::Create()) {
@@ -83,19 +76,11 @@ XrBrowserTestBase::XrBrowserTestBase() : env_(base::Environment::Create()) {
 XrBrowserTestBase::~XrBrowserTestBase() = default;
 
 base::FilePath::StringType UTF8ToWideIfNecessary(std::string input) {
-#if BUILDFLAG(IS_WIN)
-  return base::UTF8ToWide(input);
-#else
   return input;
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 std::string WideToUTF8IfNecessary(base::FilePath::StringType input) {
-#if BUILDFLAG(IS_WIN)
-  return base::WideToUTF8(input);
-#else
   return input;
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 // Returns an std::string consisting of the given path relative to the test
@@ -302,12 +287,6 @@ void XrBrowserTestBase::LoadFileAndAwaitInitialization(
                                     GetCurrentWebContents()))
       << "Timed out waiting for JavaScript test initialization.";
 
-#if BUILDFLAG(IS_WIN)
-  // Now that the browser is opened and has focus, keep track of this window so
-  // that we can restore the proper focus after entering each session. This is
-  // required for tests that create multiple sessions to work properly.
-  hwnd_ = GetForegroundWindow();
-#endif
 }
 
 void XrBrowserTestBase::RunJavaScriptOrFail(

@@ -31,8 +31,6 @@ using GetFeatureFuture =
 
 #if BUILDFLAG(IS_MAC)
 const uint64_t kTestDeviceId = 123;
-#elif BUILDFLAG(IS_WIN)
-const wchar_t* kTestDeviceId = L"123";
 #else
 const char* kTestDeviceId = "123";
 #endif

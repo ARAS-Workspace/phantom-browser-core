@@ -52,7 +52,7 @@
 #include "net/base/url_util.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/common/extensions/manifest_handlers/settings_overrides_handler.h"
 #include "extensions/common/manifest_handlers/chrome_url_overrides_handler.h"
 #endif
@@ -397,7 +397,7 @@ bool ShouldCrashOnExtensionJsErrorInDevelopmentBuild(
       ->ShouldCrashOnJsErrorInDevelopmentBuild(extension);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 DseNtpOverrideType GetDseNtpOverrideType(const Extension& extension) {
   enum Flags {
     kNone = 0,

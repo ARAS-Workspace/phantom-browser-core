@@ -842,7 +842,7 @@ TEST_F(ChromePasswordProtectionServiceTest, VerifyCanSendSamplePing) {
                           /*is_extended_reporting=*/false);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // prefs::kEnterpriseCustomLabelForProfile is only registered on Windows, Mac,
 // and Linux.
 TEST_F(ChromePasswordProtectionServiceTest, VerifyGetOrganizationPrefEmpty) {
@@ -1679,7 +1679,7 @@ TEST_F(ChromePasswordProtectionServiceTest,
   reused_password_type.set_is_account_syncing(true);
   CoreAccountInfo core_account_info = SetPrimaryAccount(kTestEmail);
   SetUpSyncAccount(std::string("example.com"), core_account_info);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // prefs::kEnterpriseCustomLabelForProfile is only registered on Windows, Mac,
   // and Linux.
   profile()->GetPrefs()->SetString(prefs::kEnterpriseCustomLabelForProfile,

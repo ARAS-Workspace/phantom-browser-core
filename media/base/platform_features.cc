@@ -17,9 +17,6 @@ bool IsVp9kSVCHWDecodingEnabled() {
   // - V4L2 state*ful* API decoder is capable of decoding, but is driver
   // dependent. x86: Always supported.
   return true;
-#elif BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/40286220): Experiment to enable on Windows.
-  return base::FeatureList::IsEnabled(media::kD3D11Vp9kSVCHWDecoding);
 #else
   return false;
 #endif

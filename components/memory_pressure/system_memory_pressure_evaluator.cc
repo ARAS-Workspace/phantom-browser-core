@@ -12,8 +12,6 @@
 
 #if BUILDFLAG(IS_APPLE)
 #include "components/memory_pressure/system_memory_pressure_evaluator_mac.h"
-#elif BUILDFLAG(IS_WIN)
-#include "components/memory_pressure/system_memory_pressure_evaluator_win.h"
 #endif
 
 namespace memory_pressure {
@@ -28,11 +26,6 @@ SystemMemoryPressureEvaluator::CreateDefaultSystemEvaluator(
 #if BUILDFLAG(IS_APPLE)
   return std::make_unique<memory_pressure::mac::SystemMemoryPressureEvaluator>(
       monitor->CreateVoter());
-#elif BUILDFLAG(IS_WIN)
-  auto evaluator =
-      std::make_unique<memory_pressure::win::SystemMemoryPressureEvaluator>(
-          monitor->CreateVoter());
-  return evaluator;
 #else
   // Chrome OS and Chromecast evaluators are created in separate components.
   return nullptr;

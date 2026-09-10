@@ -25,10 +25,6 @@
 #include "base/allocator/buildflags.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/renderer/font_prewarmer.h"
-#endif
-
 namespace {
 
 void BindWebRTCLoggingAgent(
@@ -70,9 +66,4 @@ void ExposeChromeRendererInterfacesToBrowser(
       base::SequencedTaskRunner::GetCurrentDefault());
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  binders->Add<chrome::mojom::FontPrewarmer>(
-      base::BindRepeating(&FontPrewarmer::Bind),
-      base::SequencedTaskRunner::GetCurrentDefault());
-#endif
 }

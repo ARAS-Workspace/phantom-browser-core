@@ -35,21 +35,13 @@ class WebAppInteractiveUiTest : public WebAppBrowserTestBase {};
 // solution is possible using display::Screen::SetScreenInstance on other
 // platforms, window placement doesn't work right with a faked Screen
 // instance. See: //docs/ui/display/multiscreen_testing.md
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_TabOpensOnCorrectDisplayMultiScreen \
   TabOpensOnCorrectDisplayMultiScreen
 #else
 #define MAYBE_TabOpensOnCorrectDisplayMultiScreen \
   DISABLED_TabOpensOnCorrectDisplayMultiScreen
 #endif
-#if BUILDFLAG(IS_WIN)
-// TODO(crbug.com/371121282): Re-enable the test.
-// TODO(crbug.com/365126887): Re-enable the test.
-#undef MAYBE_TabOpensOnCorrectDisplayMultiScreen
-#define MAYBE_TabOpensOnCorrectDisplayMultiScreen \
-  DISABLED_TabOpensOnCorrectDisplayMultiScreen
-#endif  // BUILDFLAG(IS_WIN)
-// Tests that PWAs that open in a tab open tabs on the correct display.
 IN_PROC_BROWSER_TEST_F(WebAppInteractiveUiTest,
                        MAYBE_TabOpensOnCorrectDisplayMultiScreen) {
   std::unique_ptr<display::test::VirtualDisplayUtil> virtual_display_util;

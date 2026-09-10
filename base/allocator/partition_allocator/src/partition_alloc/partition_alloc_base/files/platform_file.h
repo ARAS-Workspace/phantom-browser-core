@@ -7,26 +7,13 @@
 
 #include "partition_alloc/build_config.h"
 
-#if PA_BUILDFLAG(IS_WIN)
-#include "partition_alloc/partition_alloc_base/win/windows_types.h"
-#endif
-
 // This file defines platform-independent types for dealing with
 // platform-dependent files. If possible, use the higher-level base::File class
 // rather than these primitives.
 
 namespace partition_alloc::internal::base {
 
-#if PA_BUILDFLAG(IS_WIN)
-
-using PlatformFile = HANDLE;
-
-// It would be nice to make this constexpr but INVALID_HANDLE_VALUE is a
-// ((void*)(-1)) which Clang rejects since reinterpret_cast is technically
-// disallowed in constexpr. Visual Studio accepts this, however.
-const PlatformFile kInvalidPlatformFile = INVALID_HANDLE_VALUE;
-
-#elif PA_BUILDFLAG(IS_POSIX)
+#if PA_BUILDFLAG(IS_POSIX)
 
 using PlatformFile = int;
 

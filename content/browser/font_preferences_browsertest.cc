@@ -72,9 +72,7 @@ class FontPreferencesBrowserTest : public DevToolsProtocolTest {
     // taken into account for text rendering.
     const std::u16string default_system_font =
         default_preferences_font_family_map[blink::web_pref::kCommonScript];
-#if BUILDFLAG(IS_WIN)
-    const std::string non_default_system_font = "Lucida Console";
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     const std::string non_default_system_font = "Monaco";
 #elif BUILDFLAG(IS_IOS)
     const std::string non_default_system_font = "Verdana";

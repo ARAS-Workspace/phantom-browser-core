@@ -6,10 +6,6 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <winsock2.h>
-#endif
-
 #include <utility>
 #include <vector>
 
@@ -22,10 +18,6 @@
 #include "net/base/network_anonymization_key.h"
 #include "net/base/test_completion_callback.h"
 #include "testing/gtest/include/gtest/gtest.h"
-
-#if BUILDFLAG(IS_WIN)
-#include "net/base/winsock_init.h"
-#endif
 
 #if BUILDFLAG(IS_POSIX)
 #include "base/notimplemented.h"
@@ -58,15 +50,6 @@ void OnSortComplete(std::vector<IPEndPoint>* sorted_buf,
 TEST(AddressSorterTest, Sort) {
   base::test::TaskEnvironment task_environment;
   int expected_result = OK;
-#if BUILDFLAG(IS_WIN)
-  EnsureWinsockInit();
-  SOCKET sock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-  if (sock == INVALID_SOCKET) {
-    expected_result = ERR_FAILED;
-  } else {
-    closesocket(sock);
-  }
-#endif
   std::unique_ptr<AddressSorter> sorter(AddressSorter::CreateAddressSorter());
   std::vector<IPEndPoint> endpoints;
   endpoints.push_back(MakeEndPoint("10.0.0.1"));

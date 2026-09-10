@@ -31,10 +31,7 @@ TEST(ChromePaths, UserCacheDir) {
   base::FilePath test_profile_dir;  // Platform-specific profile directory path.
   base::FilePath expected_cache_dir;
 
-#if BUILDFLAG(IS_WIN)
-  test_profile_dir = base::FilePath(FILE_PATH_LITERAL("C:\\Users\\Foo\\Bar"));
-  expected_cache_dir = base::FilePath(FILE_PATH_LITERAL("C:\\Users\\Foo\\Bar"));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   ASSERT_TRUE(base::PathService::Get(base::DIR_APP_DATA, &test_profile_dir));
   test_profile_dir = test_profile_dir.Append("foobar");
   ASSERT_TRUE(base::PathService::Get(base::DIR_CACHE, &expected_cache_dir));
@@ -53,7 +50,7 @@ TEST(ChromePaths, UserCacheDir) {
   expected_cache_dir = homedir.Append(".cache/foobar");
 #else
 #error Unsupported platform
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
   // Verify the expectations above for the platform-specific profile directory.
   // On Linux and Mac the platform-specific profile directory is in a special

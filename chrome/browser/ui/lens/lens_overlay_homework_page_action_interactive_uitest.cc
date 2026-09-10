@@ -230,13 +230,8 @@ IN_PROC_BROWSER_TEST_F(LensOverlayHomeworkPageActionTest,
 }
 
 // fix
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_OpensNewTabWhenEnteredThroughKeyboard \
-  DISABLED_OpensNewTabWhenEnteredThroughKeyboard
-#else
 #define MAYBE_OpensNewTabWhenEnteredThroughKeyboard \
   OpensNewTabWhenEnteredThroughKeyboard
-#endif
 // Flaky failures on Windows; see https://crbug.com/419308044.
 IN_PROC_BROWSER_TEST_F(LensOverlayHomeworkPageActionTest,
                        MAYBE_OpensNewTabWhenEnteredThroughKeyboard) {

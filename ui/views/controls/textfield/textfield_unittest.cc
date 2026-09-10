@@ -71,10 +71,6 @@
 #include "ui/views/widget/widget_utils.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "ui/linux/fake_linux_ui.h"
 #include "ui/linux/linux_ui.h"
@@ -231,17 +227,6 @@ class MockInputMethod : public ui::InputMethodBase {
       count_show_virtual_keyboard_++;
     }
   }
-
-#if BUILDFLAG(IS_WIN)
-  bool OnUntranslatedIMEMessage(
-      const CHROME_MSG event,
-      InputMethod::NativeEventResult* result) override {
-    return false;
-  }
-  void OnInputLocaleChanged() override {}
-  bool IsInputLocaleCJK() const override { return false; }
-  void OnUrlChanged() override {}
-#endif
 
   bool untranslated_ime_message_called() const {
     return untranslated_ime_message_called_;
@@ -1145,7 +1130,7 @@ TEST_F(TextfieldTest, KeyTestControlModifier) {
 }
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_KeysWithModifiersTest KeysWithModifiersTest
 #else
 // TODO(crbug.com/41274325): Implement keyboard layout changing for other
@@ -1284,13 +1269,7 @@ TEST_F(TextfieldTest, ControlAndSelectTest) {
 
   // Test word select.
   SendWordEvent(ui::VKEY_RIGHT, true);
-#if BUILDFLAG(IS_WIN)  // Windows breaks on word starts and includes spaces.
-  EXPECT_EQ(u"one ", textfield_->GetSelectedText());
-  SendWordEvent(ui::VKEY_RIGHT, true);
-  EXPECT_EQ(u"one two ", textfield_->GetSelectedText());
-#else  // Non-Windows breaks on word ends and does NOT include spaces.
   EXPECT_EQ(u"one two", textfield_->GetSelectedText());
-#endif
   SendWordEvent(ui::VKEY_RIGHT, true);
   EXPECT_EQ(u"one two three", textfield_->GetSelectedText());
   SendWordEvent(ui::VKEY_LEFT, true);
@@ -1327,11 +1306,7 @@ TEST_F(TextfieldTest, WordSelection) {
 
   // Select word towards right.
   SendWordEvent(ui::VKEY_RIGHT, true);
-#if BUILDFLAG(IS_WIN)  // Select word right includes space/punctuation.
-  EXPECT_EQ(u"67 ", textfield_->GetSelectedText());
-#else  // Non-Win: select word right does NOT include space/punctuation.
   EXPECT_EQ(u"67", textfield_->GetSelectedText());
-#endif
   SendWordEvent(ui::VKEY_RIGHT, true);
   EXPECT_EQ(u"67 89", textfield_->GetSelectedText());
 
@@ -1578,11 +1553,7 @@ TEST_F(TextfieldTest, InsertionDeletionTest) {
   shift = false;
   SendHomeEvent(shift);
   SendWordEvent(ui::VKEY_DELETE, shift);
-#if BUILDFLAG(IS_WIN)  // Delete word incldes space/punctuation.
-  EXPECT_EQ(u"two three four", textfield_->GetText());
-#else  // Non-Windows: delete word does NOT include space/punctuation.
   EXPECT_EQ(u" two three four", textfield_->GetText());
-#endif
   // Delete to a line break on Linux and ChromeOS, to a word break on Windows
   // and Mac.
   SendWordEvent(ui::VKEY_RIGHT, shift);
@@ -1590,8 +1561,6 @@ TEST_F(TextfieldTest, InsertionDeletionTest) {
   SendWordEvent(ui::VKEY_DELETE, shift);
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   EXPECT_EQ(u" two", textfield_->GetText());
-#elif BUILDFLAG(IS_WIN)
-  EXPECT_EQ(u"two four", textfield_->GetText());
 #else
   EXPECT_EQ(u" two four", textfield_->GetText());
 #endif
@@ -1951,20 +1920,6 @@ TEST_F(TextfieldTest, CursorMovement) {
   EXPECT_EQ(u"one two thre ", textfield_->GetText());
   EXPECT_EQ(u"one two thre ", last_contents_);
 
-#if BUILDFLAG(IS_WIN)  // Move right by word includes space/punctuation.
-  // Ctrl+Right should move the cursor to the end of the last word.
-  SendWordEvent(ui::VKEY_RIGHT, shift);
-  SendKeyEvent(ui::VKEY_E);
-  EXPECT_EQ(u"one two thre e", textfield_->GetText());
-  EXPECT_EQ(u"one two thre e", last_contents_);
-
-  // Ctrl+Right again should not move the cursor, because
-  // it is aleady at the end.
-  SendWordEvent(ui::VKEY_RIGHT, shift);
-  SendKeyEvent(ui::VKEY_BACK);
-  EXPECT_EQ(u"one two thre ", textfield_->GetText());
-  EXPECT_EQ(u"one two thre ", last_contents_);
-#else  // Non-Windows: move right by word does NOT include space/punctuation.
   // Ctrl+Right should move the cursor to the end of the last word.
   SendWordEvent(ui::VKEY_RIGHT, shift);
   SendKeyEvent(ui::VKEY_E);
@@ -1976,7 +1931,6 @@ TEST_F(TextfieldTest, CursorMovement) {
   SendKeyEvent(ui::VKEY_BACK);
   EXPECT_EQ(u"one two three", textfield_->GetText());
   EXPECT_EQ(u"one two three", last_contents_);
-#endif
   // Test with leading whitespace.
   textfield_->SetText(u" ne two");
 
@@ -1986,10 +1940,6 @@ TEST_F(TextfieldTest, CursorMovement) {
   // Ctrl+Right, then Ctrl+Left should move the cursor to the beginning of the
   // first word.
   SendWordEvent(ui::VKEY_RIGHT, shift);
-#if BUILDFLAG(IS_WIN)  // Windows breaks on word start, move further to pass
-                       // "ne".
-  SendWordEvent(ui::VKEY_RIGHT, shift);
-#endif
   SendWordEvent(ui::VKEY_LEFT, shift);
   SendKeyEvent(ui::VKEY_O);
   EXPECT_EQ(u" one two", textfield_->GetText());
@@ -2273,64 +2223,6 @@ TEST_F(TextfieldTest, DragUpOrDownSelectsToEnd) {
   DragMouseTo(gfx::Point(left_x, 500));
   EXPECT_EQ(expected_left, textfield_->GetSelectedText());  // SW.
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(TextfieldTest, DragAndDrop_AcceptDrop) {
-  InitTextfield();
-  textfield_->SetText(u"hello world");
-
-  ui::OSExchangeData data;
-  std::u16string string(u"string ");
-  data.SetString(string);
-  int formats = 0;
-  std::set<ui::ClipboardFormatType> format_types;
-
-  // Ensure that disabled textfields do not accept drops.
-  textfield_->SetEnabled(false);
-  EXPECT_FALSE(textfield_->GetDropFormats(&formats, &format_types));
-  EXPECT_EQ(0, formats);
-  EXPECT_TRUE(format_types.empty());
-  EXPECT_FALSE(textfield_->CanDrop(data));
-  textfield_->SetEnabled(true);
-
-  // Ensure that read-only textfields do not accept drops.
-  textfield_->SetReadOnly(true);
-  EXPECT_FALSE(textfield_->GetDropFormats(&formats, &format_types));
-  EXPECT_EQ(0, formats);
-  EXPECT_TRUE(format_types.empty());
-  EXPECT_FALSE(textfield_->CanDrop(data));
-  textfield_->SetReadOnly(false);
-
-  // Ensure that enabled and editable textfields do accept drops.
-  EXPECT_TRUE(textfield_->GetDropFormats(&formats, &format_types));
-  EXPECT_EQ(ui::OSExchangeData::STRING, formats);
-  EXPECT_TRUE(format_types.empty());
-  EXPECT_TRUE(textfield_->CanDrop(data));
-  gfx::PointF drop_point(GetCursorPositionX(6), 0);
-  ui::DropTargetEvent drop(
-      data, drop_point, drop_point,
-      ui::DragDropTypes::DRAG_COPY | ui::DragDropTypes::DRAG_MOVE);
-  EXPECT_EQ(ui::DragDropTypes::DRAG_COPY | ui::DragDropTypes::DRAG_MOVE,
-            textfield_->OnDragUpdated(drop));
-  ui::mojom::DragOperation output_drag_op = ui::mojom::DragOperation::kNone;
-  auto cb = textfield_->GetDropCallback(drop);
-  std::move(cb).Run(drop, output_drag_op, /*drag_image_layer_owner=*/nullptr);
-  EXPECT_EQ(ui::mojom::DragOperation::kCopy, output_drag_op);
-  EXPECT_EQ(u"hello string world", textfield_->GetText());
-
-  // Ensure that textfields do not accept non-OSExchangeData::STRING types.
-  ui::OSExchangeData bad_data;
-  bad_data.SetFilename(base::FilePath(FILE_PATH_LITERAL("x")));
-  ui::ClipboardFormatType fmt = ui::ClipboardFormatType::BitmapType();
-  bad_data.SetPickledData(fmt, base::Pickle());
-  bad_data.SetFileContents(base::FilePath(L"x"),
-                           base::byte_span_from_cstring("x"));
-  bad_data.SetHtml(std::u16string(u"x"), GURL("x.org"));
-  ui::DownloadFileInfo download(base::FilePath(), nullptr);
-  bad_data.provider().SetDownloadFileInfo(&download);
-  EXPECT_FALSE(textfield_->CanDrop(bad_data));
-}
-#endif
 
 TEST_F(TextfieldTest, DragAndDrop_InitiateDrag) {
   InitTextfield();
@@ -3605,7 +3497,7 @@ TEST_F(TextfieldTest, CommitEmptyComposingTextTest) {
   EXPECT_EQ(composed_text_length, 0u);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // SetCompositionFromExistingText is only available on Windows and Chrome OS.
 TEST_F(TextfieldTest, SetCompositionFromExistingTextTest) {
   InitTextfield();
@@ -4449,59 +4341,6 @@ TEST_F(TextfieldTest, SetAccessibleNameNotifiesAccessibilityEvent) {
 // TODO(crbug.com/40672441): Remove this once ViewsAX is enabled on Windows.
 // kTextChanged from SetValue() is only fired on Windows so that UIA fires
 // UIA_Text_TextChangedEventId.
-#if BUILDFLAG(IS_WIN)
-// Changing the value of the textfield should trigger a kTextChanged event.
-TEST_F(TextfieldTest, SetValueAccessibilityEvents) {
-  InitTextfield();
-  std::u16string value = u"hello world";
-  test::AXEventCounter counter(views::AXUpdateNotifier::Get());
-  EXPECT_EQ(0, counter.GetCount(ax::mojom::Event::kTextChanged));
-  textfield_->GetViewAccessibility().SetValue(value);
-  EXPECT_EQ(1, counter.GetCount(ax::mojom::Event::kTextChanged));
-  EXPECT_EQ(value, textfield_->GetViewAccessibility().GetValue());
-}
-#endif
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(TextfieldTest, AccessibilityAttributes) {
-  InitTextfield();
-
-  ViewAXPlatformNodeDelegate* delegate =
-      static_cast<ViewAXPlatformNodeDelegate*>(
-          &textfield_->GetViewAccessibility());
-
-  textfield_->GetViewAccessibility().EnsureAtomicViewAXTreeManager();
-  textfield_->SetText(u"this is the textfield");
-  textfield_->SetBounds(1, 2, 3, 4);
-
-  ui::AXNodeData actual =
-      delegate->GetAtomicViewAXTreeManagerForTesting()->GetRoot()->data();
-
-  EXPECT_EQ(ax::mojom::Role::kTextField, actual.role);
-  EXPECT_TRUE(actual.HasState(ax::mojom::State::kEditable) &&
-              actual.HasState(ax::mojom::State::kFocusable));
-  EXPECT_EQ(textfield_->GetAccessibleName(),
-            actual.GetString16Attribute(ax::mojom::StringAttribute::kName));
-  EXPECT_EQ(textfield_->GetText(),
-            actual.GetString16Attribute(ax::mojom::StringAttribute::kValue));
-  EXPECT_EQ(
-      textfield_->GetPlaceholderText(),
-      actual.GetString16Attribute(ax::mojom::StringAttribute::kPlaceholder));
-
-  EXPECT_EQ(static_cast<const int>(textfield_->GetSelectedRange().start()),
-            actual.GetIntAttribute(ax::mojom::IntAttribute::kTextSelStart));
-  EXPECT_EQ(static_cast<const int>(textfield_->GetSelectedRange().end()),
-            actual.GetIntAttribute(ax::mojom::IntAttribute::kTextSelEnd));
-
-  EXPECT_EQ(gfx::Rect(1, 2, 3, 4),
-            gfx::ToEnclosingRect(actual.relative_bounds.bounds));
-
-  EXPECT_EQ(
-      textfield_->GetBoundsInScreen(),
-      delegate->GetBoundsRect(ui::AXCoordinateSystem::kScreenDIPs,
-                              ui::AXClippingBehavior::kUnclipped, nullptr));
-}
-#endif
 
 TEST_F(TextfieldTest, AccessiblePlaceholderTest) {
   InitTextfield();

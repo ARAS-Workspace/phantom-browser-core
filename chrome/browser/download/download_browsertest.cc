@@ -794,68 +794,6 @@ IN_PROC_BROWSER_TEST_F(DownloadTest, DownloadMimeType) {
   CheckDownload(browser(), file, file);
 }
 
-#if BUILDFLAG(IS_WIN)
-// Download a file and confirm that the file is correctly quarantined.
-//
-// TODO(asanka): We should enable the test on Mac as well, but currently
-// |browser_tests| aren't run from a process that has LSFileQuarantineEnabled
-// bit set.
-// TODO(crbug.com/500937645): Re-enable the test
-IN_PROC_BROWSER_TEST_F(DownloadTest, DISABLED_Quarantine_DependsOnLocalConfig) {
-  embedded_test_server()->ServeFilesFromDirectory(GetTestDataDirectory());
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL url =
-      embedded_test_server()->GetURL("/" + std::string(kDownloadTest1Path));
-
-  // Download the file and wait.  We do not expect the Select File dialog.
-  DownloadAndWait(browser(), url);
-
-  // Check state.  Special file state must be checked before CheckDownload,
-  // as CheckDownload will delete the output file.
-  EXPECT_EQ(1, browser()->tab_strip_model()->count());
-  base::FilePath file(FILE_PATH_LITERAL("download-test1.lib"));
-  base::FilePath downloaded_file(DestinationFile(browser(), file));
-  base::ScopedAllowBlockingForTesting allow_blocking;
-  EXPECT_TRUE(quarantine::IsFileQuarantined(downloaded_file, url, GURL()));
-  CheckDownload(browser(), file, file);
-}
-
-// A couple of Windows specific tests to make sure we respect OS specific
-// restrictions on Mark-Of-The-Web can be applied. While Chrome doesn't directly
-// apply these policies, Chrome still needs to make sure the correct APIs are
-// invoked during the download process that result in the expected MOTW
-// behavior.
-
-// Downloading a file from the local host shouldn't cause the application of a
-// zone identifier.
-IN_PROC_BROWSER_TEST_F(DownloadTest, CheckLocalhostZone_DependsOnLocalConfig) {
-  embedded_test_server()->ServeFilesFromDirectory(GetTestDataDirectory());
-  ASSERT_TRUE(embedded_test_server()->Start());
-
-  // Assumes that localhost maps to 127.0.0.1. Otherwise the test will fail
-  // since EmbeddedTestServer is listening on that address.
-  GURL url =
-      embedded_test_server()->GetURL("localhost", "/downloads/a_zip_file.zip");
-  DownloadAndWait(browser(), url);
-  base::FilePath file(FILE_PATH_LITERAL("a_zip_file.zip"));
-  base::FilePath downloaded_file(DestinationFile(browser(), file));
-  EXPECT_FALSE(quarantine::IsFileQuarantined(downloaded_file, GURL(), GURL()));
-}
-
-// Same as the test above, but uses a file:// URL to a local file.
-IN_PROC_BROWSER_TEST_F(DownloadTest, CheckLocalFileZone_DependsOnLocalConfig) {
-  base::FilePath source_file = GetTestDataDirectory()
-                                   .AppendASCII("downloads")
-                                   .AppendASCII("a_zip_file.zip");
-
-  GURL url = net::FilePathToFileURL(source_file);
-  DownloadAndWait(browser(), url);
-  base::FilePath file(FILE_PATH_LITERAL("a_zip_file.zip"));
-  base::FilePath downloaded_file(DestinationFile(browser(), file));
-  EXPECT_FALSE(quarantine::IsFileQuarantined(downloaded_file, GURL(), GURL()));
-}
-#endif
-
 // Put up a Select File dialog when the file is downloaded, due to
 // downloads preferences settings.
 IN_PROC_BROWSER_TEST_F(DownloadTest, DownloadMimeTypeSelect) {
@@ -1641,12 +1579,7 @@ ServerRedirectRequestHandler(const net::test_server::HttpRequest& request) {
   return std::move(response);
 }
 
-#if BUILDFLAG(IS_WIN)
-// https://crbug.com/40551416
-#define MAYBE_DownloadHistoryCheck DISABLED_DownloadHistoryCheck
-#else
 #define MAYBE_DownloadHistoryCheck DownloadHistoryCheck
-#endif
 IN_PROC_BROWSER_TEST_F(DownloadTest, MAYBE_DownloadHistoryCheck) {
   // Rediret to the actual download URL.
   embedded_test_server()->RegisterRequestHandler(
@@ -2806,8 +2739,7 @@ IN_PROC_BROWSER_TEST_P(PdfDownloadTestSplitCacheEnabled,
 // recent browser window for that profile. This test is in the PDF download test
 // suite because this behavior requires that the file type is both downloadable
 // and openable by the browser, and PDFs fit the bill.
-#if (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)) && \
-    BUILDFLAG(ENABLE_PDF)
+#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)) && BUILDFLAG(ENABLE_PDF)
 IN_PROC_BROWSER_TEST_P(PdfDownloadTestSplitCacheEnabled,
                        OpenDownloadInMostRecentBrowser) {
   https_test_server()->ServeFilesFromDirectory(GetTestDataDirectory());
@@ -2965,8 +2897,7 @@ IN_PROC_BROWSER_TEST_F(DownloadTestWithHistogramTester,
 // Times out often on debug ChromeOS because test is slow.
 #if BUILDFLAG(IS_CHROMEOS) && (!defined(NDEBUG) || defined(MEMORY_SANITIZER))
 #define MAYBE_SaveLargeImage DISABLED_SaveLargeImage
-#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Flaking on Windows, macOS, Linux, ChromeOS. https://crbug.com/40727061
 #define MAYBE_SaveLargeImage DISABLED_SaveLargeImage
 #else
@@ -4043,11 +3974,7 @@ IN_PROC_BROWSER_TEST_F(DownloadTest, DownloadTest_Renaming) {
 
 // Test that the entire download pipeline handles unicode correctly.
 // Disabled on Windows due to flaky timeouts: crbug.com/41150886
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DownloadTest_CrazyFilenames DISABLED_DownloadTest_CrazyFilenames
-#else
 #define MAYBE_DownloadTest_CrazyFilenames DownloadTest_CrazyFilenames
-#endif
 IN_PROC_BROWSER_TEST_F(DownloadTest, MAYBE_DownloadTest_CrazyFilenames) {
   constexpr static const auto kCrazyFilenames = std::to_array<const wchar_t*>({
       L"a_file_name.zip",
@@ -4085,9 +4012,7 @@ IN_PROC_BROWSER_TEST_F(DownloadTest, MAYBE_DownloadTest_CrazyFilenames) {
     const wchar_t* const crazy_w = kCrazyFilenames[index];
     ASSERT_TRUE(base::WideToUTF8(crazy_w, wcslen(crazy_w), &crazy8));
     base::FilePath file_path(origin_directory.Append(
-#if BUILDFLAG(IS_WIN)
-        crazy_w
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
         crazy8
 #endif
         ));

@@ -21,10 +21,6 @@
 #include "media/media_buildflags.h"
 #include "media/mojo/buildflags.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 // External Clear Key is a test-only key system that has mostly the same
 // functionality as Clear Key key system. Unlike Clear Key, which is implemented
 // by AesDecryptor in the render process directly, External Clear Key is

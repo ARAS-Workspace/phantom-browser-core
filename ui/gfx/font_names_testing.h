@@ -35,8 +35,6 @@ inline constexpr char kTestFontName[] = "Arial";
 inline constexpr char kSymbolFontName[] = "DejaVu Sans";
 #elif BUILDFLAG(IS_ANDROID)
 inline constexpr char kSymbolFontName[] = "monospace";
-#elif BUILDFLAG(IS_WIN)
-inline constexpr char kSymbolFontName[] = "Segoe UI Symbol";
 #else
 inline constexpr char kSymbolFontName[] = "Symbol";
 #endif

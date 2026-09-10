@@ -732,14 +732,8 @@ TEST_F(AudioRendererMixerManagerTest, MixerParamsLatencyPlayback) {
     EXPECT_EQ(44100, mixer->get_output_params_for_testing().sample_rate());
 
 // 20 ms at 44100 is 882 frames per buffer.
-#if BUILDFLAG(IS_WIN)
-    // Round up 882 to the nearest multiple of the output buffer size (128).
-    // which is 7 * 128 = 896
-    EXPECT_EQ(896, mixer->get_output_params_for_testing().frames_per_buffer());
-#else
     // Round up 882 to the power of 2.
     EXPECT_EQ(1024, mixer->get_output_params_for_testing().frames_per_buffer());
-#endif  // BUILDFLAG(IS_WIN)
   }
 
   ReturnMixer(mixer);
@@ -802,13 +796,8 @@ TEST_F(AudioRendererMixerManagerTest, MixerParamsLatencyPlaybackFakeAudio) {
   EXPECT_EQ(32000, mixer->get_output_params_for_testing().sample_rate());
 
   // 20 ms at 32000 is 640 frames per buffer.
-#if BUILDFLAG(IS_WIN)
-  // Use 20 ms buffer.
-  EXPECT_EQ(640, mixer->get_output_params_for_testing().frames_per_buffer());
-#else
   // Ignore device buffer size, round up 640 to the power of 2.
   EXPECT_EQ(1024, mixer->get_output_params_for_testing().frames_per_buffer());
-#endif  // BUILDFLAG(IS_WIN)
 
   ReturnMixer(mixer);
 }

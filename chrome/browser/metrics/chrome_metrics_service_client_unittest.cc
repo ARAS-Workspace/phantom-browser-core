@@ -33,7 +33,7 @@
 #include "components/ukm/ukm_service.h"
 #include "components/ukm/ukm_test_helper.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/metrics/desktop_session_duration/desktop_session_duration_tracker.h"
 #endif
 
@@ -63,9 +63,6 @@
 #include "chromeos/ash/components/install_attributes/stub_install_attributes.h"
 #include "chromeos/ash/components/login/login_state/login_state.h"
 #include "chromeos/dbus/power/power_manager_client.h"
-#elif BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#include "chrome/browser/metrics/system_pdh_metrics_provider_win.h"
 #endif
 namespace {
 
@@ -142,11 +139,6 @@ class ChromeMetricsServiceClientTest : public testing::Test {
     // initialized before they can be instantiated.
     chromeos::PowerManagerClient::InitializeFake();
     ash::LoginState::Initialize();
-#elif BUILDFLAG(IS_WIN)
-    scoped_feature_list_.InitWithFeatures(
-        {metrics::dwa::kDwaFeature, switches::kDynamicProfileCountry,
-         features::kSystemPdhMetrics},
-        {});
 #elif BUILDFLAG(IS_ANDROID)
     scoped_feature_list_.InitWithFeatures({metrics::dwa::kDwaFeature}, {});
 #else
@@ -286,10 +278,10 @@ TEST_F(ChromeMetricsServiceClientTest, TestRegisterMetricsServiceProviders) {
     expected_providers++;
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   // MotherboardMetricProvider.
   expected_providers++;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   // ExtensionsMetricsProvider.
@@ -304,18 +296,6 @@ TEST_F(ChromeMetricsServiceClientTest, TestRegisterMetricsServiceProviders) {
   // performance_manager::MetricsProvider
   expected_providers += 1;
 #endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_WIN)
-  // GoogleUpdateMetricsProviderWin, AntiVirusMetricsProvider,
-  // TPMMetricsProvider, SystemMemoryListMetricsProvider.
-  expected_providers += 4;
-
-  // SystemPdhMetricsProvider is only supported on Win11.
-  if (base::win::GetVersion() >= base::win::Version::WIN11 &&
-      base::FeatureList::IsEnabled(features::kSystemPdhMetrics)) {
-    ++expected_providers;
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_CHROMEOS)
   // AmbientModeMetricsProvider,
@@ -342,20 +322,18 @@ TEST_F(ChromeMetricsServiceClientTest, TestRegisterMetricsServiceProviders) {
   expected_providers += 2;
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // DesktopPlatformFeaturesMetricsProvider
   // DesktopSessionMetricsProvider
   // UpdateMetricsProvider
   expected_providers += 3;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   // TabMetricsProvider
   // SkillsMetricsProvider
   expected_providers += 2;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   // BluetoothMetricsProvider
@@ -468,7 +446,7 @@ TEST_F(ChromeMetricsServiceClientTest,
       {ukm::kUkmFeature, metrics::features::kRestructureMetricsConsentSettings},
       {});
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   metrics::DesktopSessionDurationTracker::Initialize();
 #endif
 
@@ -524,7 +502,7 @@ TEST_F(ChromeMetricsServiceClientTest,
 
   client.reset();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   metrics::DesktopSessionDurationTracker::CleanupForTesting();
 #endif
 }
@@ -536,7 +514,7 @@ TEST_F(ChromeMetricsServiceClientTest,
       {ukm::kUkmFeature, metrics::features::kRestructureMetricsConsentSettings},
       {});
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   metrics::DesktopSessionDurationTracker::Initialize();
 #endif
 
@@ -596,7 +574,7 @@ TEST_F(ChromeMetricsServiceClientTest,
 
   client.reset();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   metrics::DesktopSessionDurationTracker::CleanupForTesting();
 #endif
 }

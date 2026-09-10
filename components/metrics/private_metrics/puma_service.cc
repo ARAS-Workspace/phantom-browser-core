@@ -68,9 +68,7 @@ RcCoarseSystemProfile_Channel MapChannelToRcChannel(
 }
 
 Platform GetCurrentPlatform() {
-#if BUILDFLAG(IS_WIN)
-  return Platform::PLATFORM_WINDOWS;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return Platform::PLATFORM_MACOS;
 #elif BUILDFLAG(IS_LINUX)
   return Platform::PLATFORM_LINUX;

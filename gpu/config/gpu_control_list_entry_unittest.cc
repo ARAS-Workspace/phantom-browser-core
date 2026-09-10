@@ -1045,18 +1045,6 @@ TEST_F(GpuControlListEntryTest, GpuGenerationSecondary) {
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST_F(GpuControlListEntryTest, HardwareOverlay) {
-  const Entry& entry = GetEntry(kGpuControlListEntryTest_HardwareOverlay);
-  GPUInfo gpu_info;
-  gpu_info.gpu.vendor_id = 0x8086;
-  gpu_info.overlay_info.supports_overlays = true;
-  EXPECT_FALSE(entry.Contains(kOsWin, "10.0", gpu_info));
-
-  gpu_info.overlay_info.supports_overlays = false;
-  EXPECT_TRUE(entry.Contains(kOsWin, "10.0", gpu_info));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_F(GpuControlListEntryTest, TestSubpixelFontRendering) {
   const Entry& entry = GetEntry(kGpuControlListEntryTest_SubpixelFontRendering);
@@ -1151,39 +1139,6 @@ TEST_F(GpuControlListEntryTest, NativeAngleRenderer) {
   EXPECT_TRUE(entry.Contains(kOsAndroid, "4.4.2", gpu_info));
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST_F(GpuControlListEntryTest, DeviceRevisionEntry) {
-  const Entry& entry = GetEntry(kGpuControlListEntryTest_DeviceRevisionEntry);
-  GPUInfo gpu_info;
-  gpu_info.gpu.vendor_id = 0x1002;
-  gpu_info.gpu.device_id = 0x15DD;
-  gpu_info.gpu.revision = 0x86;
-  gpu_info.gpu.driver_version = "26.20.12055.1000";
-  EXPECT_TRUE(entry.Contains(kOsWin, "", gpu_info));
-  gpu_info.gpu.driver_version = "26.20.15023.6032";
-  EXPECT_FALSE(entry.Contains(kOsWin, "", gpu_info));
-  gpu_info.gpu.device_id = 0x15D8;
-  gpu_info.gpu.revision = 0xE1;
-  gpu_info.gpu.driver_version = "26.20.12055.1000";
-  EXPECT_FALSE(entry.Contains(kOsWin, "", gpu_info));
-  gpu_info.gpu.revision = 0xE3;
-  EXPECT_TRUE(entry.Contains(kOsWin, "", gpu_info));
-}
-
-TEST_F(GpuControlListEntryTest, DeviceRevisionUnspecifiedEntry) {
-  const Entry& entry =
-      GetEntry(kGpuControlListEntryTest_DeviceRevisionUnspecifiedEntry);
-  GPUInfo gpu_info;
-  gpu_info.gpu.vendor_id = 0x1002;
-  gpu_info.gpu.device_id = 0x15DD;
-  gpu_info.gpu.revision = 0x86;
-  EXPECT_TRUE(entry.Contains(kOsWin, "", gpu_info));
-  gpu_info.gpu.revision = 0x91;
-  EXPECT_TRUE(entry.Contains(kOsWin, "", gpu_info));
-  gpu_info.gpu.revision = 0x0;
-  EXPECT_TRUE(entry.Contains(kOsWin, "", gpu_info));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_F(GpuControlListEntryTest, GLES30Exception) {
   const Entry& entry = GetEntry(kGpuControlListEntryTest_GLES30Exception);

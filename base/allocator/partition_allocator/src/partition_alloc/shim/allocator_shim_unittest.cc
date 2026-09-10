@@ -25,11 +25,7 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if PA_BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <malloc.h>
-#elif PA_BUILDFLAG(IS_APPLE)
+#if PA_BUILDFLAG(IS_APPLE)
 #include <malloc/malloc.h>
 
 #include "partition_alloc/shim/allocator_interception_apple.h"
@@ -38,9 +34,7 @@
 #include <malloc.h>
 #endif
 
-#if !PA_BUILDFLAG(IS_WIN)
 #include <unistd.h>
-#endif
 
 #if PA_BUILDFLAG(PA_LIBC_GLIBC)
 extern "C" void* __libc_memalign(size_t align, size_t s);
@@ -478,7 +472,6 @@ TEST_F(AllocatorShimTest, InterceptLibcSymbols) {
   ASSERT_NE(nullptr, zero_alloc_ptr);
   ASSERT_GE(zero_allocs_intercepted_by_size[2 * 23], 1u);
 
-#if !PA_BUILDFLAG(IS_WIN)
   void* posix_memalign_ptr = nullptr;
   int res = posix_memalign(&posix_memalign_ptr, 256, 59);
   ASSERT_EQ(0, res);
@@ -498,9 +491,7 @@ TEST_F(AllocatorShimTest, InterceptLibcSymbols) {
   ASSERT_GE(allocs_intercepted_by_size[61], 1u);
 #endif  // !PA_BUILDFLAG(IS_ANDROID)
 
-#endif  // !PA_BUILDFLAG(IS_WIN)
-
-#if !PA_BUILDFLAG(IS_WIN) && !PA_BUILDFLAG(IS_APPLE)
+#if !PA_BUILDFLAG(IS_APPLE)
   void* memalign_ptr = memalign(128, 53);
   ASSERT_NE(nullptr, memalign_ptr);
   ASSERT_EQ(0u, reinterpret_cast<uintptr_t>(memalign_ptr) % 128);
@@ -516,7 +507,7 @@ TEST_F(AllocatorShimTest, InterceptLibcSymbols) {
   ASSERT_GE(allocs_intercepted_by_size[kPageSize], 1u);
 #endif  // PA_BUILDFLAG(IS_POSIX) && !PA_BUILDFLAG(IS_ANDROID)
 
-#endif  // !PA_BUILDFLAG(IS_WIN) && !PA_BUILDFLAG(IS_APPLE)
+#endif  // !PA_BUILDFLAG(IS_APPLE)
 
 // See allocator_shim_override_glibc_weak_symbols.h for why we intercept
 // internal libc symbols.
@@ -557,7 +548,7 @@ TEST_F(AllocatorShimTest, InterceptLibcSymbols) {
   free(zero_alloc_ptr);
   ASSERT_GE(frees_intercepted_by_addr[Hash(zero_alloc_ptr)], 1u);
 
-#if !PA_BUILDFLAG(IS_WIN) && !PA_BUILDFLAG(IS_APPLE)
+#if !PA_BUILDFLAG(IS_APPLE)
   free(memalign_ptr);
   ASSERT_GE(frees_intercepted_by_addr[Hash(memalign_ptr)], 1u);
 
@@ -566,9 +557,8 @@ TEST_F(AllocatorShimTest, InterceptLibcSymbols) {
   ASSERT_GE(frees_intercepted_by_addr[Hash(pvalloc_ptr)], 1u);
 #endif  // PA_BUILDFLAG(IS_POSIX) && !PA_BUILDFLAG(IS_ANDROID)
 
-#endif  // !PA_BUILDFLAG(IS_WIN) && !PA_BUILDFLAG(IS_APPLE)
+#endif  // !PA_BUILDFLAG(IS_APPLE)
 
-#if !PA_BUILDFLAG(IS_WIN)
   free(posix_memalign_ptr);
   ASSERT_GE(frees_intercepted_by_addr[Hash(posix_memalign_ptr)], 1u);
 
@@ -576,8 +566,6 @@ TEST_F(AllocatorShimTest, InterceptLibcSymbols) {
   free(valloc_ptr);
   ASSERT_GE(frees_intercepted_by_addr[Hash(valloc_ptr)], 1u);
 #endif  // !PA_BUILDFLAG(IS_ANDROID)
-
-#endif  // !PA_BUILDFLAG(IS_WIN)
 
 #if PA_BUILDFLAG(PA_LIBC_GLIBC) && PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
   free(libc_memalign_ptr);
@@ -638,32 +626,6 @@ TEST_F(AllocatorShimTest, InterceptLibcSymbolsFreeWithSize) {
 #endif  // PA_BUILDFLAG(IS_APPLE) &&
         // !PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
 
-#if PA_BUILDFLAG(IS_WIN)
-TEST_F(AllocatorShimTest, InterceptUcrtAlignedAllocationSymbols) {
-  InsertAllocatorDispatch(&g_mock_dispatch);
-
-  constexpr size_t kAlignment = 32;
-  void* alloc_ptr = _aligned_malloc(123, kAlignment);
-  EXPECT_GE(allocs_intercepted_by_size[123], 1u);
-
-  void* new_alloc_ptr = _aligned_realloc(alloc_ptr, 1234, kAlignment);
-  EXPECT_GE(aligned_reallocs_intercepted_by_size[1234], 1u);
-  EXPECT_GE(aligned_reallocs_intercepted_by_addr[Hash(alloc_ptr)], 1u);
-
-  _aligned_free(new_alloc_ptr);
-  EXPECT_GE(frees_intercepted_by_addr[Hash(new_alloc_ptr)], 1u);
-
-  RemoveAllocatorDispatchForTesting(&g_mock_dispatch);
-}
-
-TEST_F(AllocatorShimTest, AlignedReallocSizeZeroFrees) {
-  void* alloc_ptr = _aligned_malloc(123, 16);
-  ASSERT_TRUE(alloc_ptr);
-  alloc_ptr = _aligned_realloc(alloc_ptr, 0, 16);
-  ASSERT_TRUE(!alloc_ptr);
-}
-#endif  // PA_BUILDFLAG(IS_WIN)
-
 // PartitionAlloc disallows large allocations to avoid errors with int
 // overflows.
 #if PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
@@ -714,17 +676,7 @@ TEST_F(AllocatorShimTest, NewHandlerConcurrency) {
   ASSERT_EQ(kNumThreads, GetNumberOfNewHandlerCalls());
 }
 
-#if PA_BUILDFLAG(IS_WIN)
-TEST_F(AllocatorShimTest, ShimReplacesCRTHeapWhenEnabled) {
-  ASSERT_EQ(::GetProcessHeap(), reinterpret_cast<HANDLE>(_get_heap_handle()));
-}
-#endif  // PA_BUILDFLAG(IS_WIN)
-
-#if PA_BUILDFLAG(IS_WIN)
-static size_t GetUsableSize(void* ptr) {
-  return _msize(ptr);
-}
-#elif PA_BUILDFLAG(IS_APPLE)
+#if PA_BUILDFLAG(IS_APPLE)
 static size_t GetUsableSize(void* ptr) {
   return malloc_size(ptr);
 }

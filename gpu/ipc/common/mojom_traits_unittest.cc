@@ -87,19 +87,11 @@ TEST_F(StructTraitsTest, GPUDevice) {
   // Using the values from gpu/config/gpu_info_collector_unittest.cc::nvidia_gpu
   const uint32_t vendor_id = 0x10de;
   const uint32_t device_id = 0x0df8;
-#if BUILDFLAG(IS_WIN)
-  const uint32_t sub_sys_id = 0xc0d8144d;
-  const uint32_t revision = 4u;
-#endif  // BUILDFLAG(IS_WIN)
   const std::string vendor_string = "vendor_string";
   const std::string device_string = "device_string";
 
   input.vendor_id = vendor_id;
   input.device_id = device_id;
-#if BUILDFLAG(IS_WIN)
-  input.sub_sys_id = sub_sys_id;
-  input.revision = revision;
-#endif  // BUILDFLAG(IS_WIN)
   input.vendor_string = vendor_string;
   input.device_string = device_string;
   input.active = false;
@@ -109,10 +101,6 @@ TEST_F(StructTraitsTest, GPUDevice) {
 
   EXPECT_EQ(vendor_id, output.vendor_id);
   EXPECT_EQ(device_id, output.device_id);
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(sub_sys_id, output.sub_sys_id);
-  EXPECT_EQ(revision, output.revision);
-#endif  // BUILDFLAG(IS_WIN)
   EXPECT_FALSE(output.active);
   EXPECT_TRUE(vendor_string.compare(output.vendor_string) == 0);
   EXPECT_TRUE(device_string.compare(output.device_string) == 0);
@@ -146,15 +134,6 @@ TEST_F(StructTraitsTest, GpuInfo) {
   const bool sandboxed = true;
   const bool in_process_gpu = true;
   const bool passthrough_cmd_decoder = true;
-#if BUILDFLAG(IS_WIN)
-  const bool direct_composition = true;
-  const bool supports_overlays = true;
-  const OverlaySupport yuy2_overlay_support = OverlaySupport::kScaling;
-  const OverlaySupport nv12_overlay_support = OverlaySupport::kNone;
-  const OverlaySupport bgra8_overlay_support = OverlaySupport::kDirect;
-  const OverlaySupport rgb10a2_overlay_support = OverlaySupport::kScaling;
-  const OverlaySupport p010_overlay_support = OverlaySupport::kScaling;
-#endif
   const VideoDecodeAcceleratorSupportedProfiles
       video_decode_accelerator_supported_profiles;
   const VideoEncodeAcceleratorSupportedProfiles
@@ -187,15 +166,6 @@ TEST_F(StructTraitsTest, GpuInfo) {
   input.sandboxed = sandboxed;
   input.in_process_gpu = in_process_gpu;
   input.passthrough_cmd_decoder = passthrough_cmd_decoder;
-#if BUILDFLAG(IS_WIN)
-  input.overlay_info.direct_composition = direct_composition;
-  input.overlay_info.supports_overlays = supports_overlays;
-  input.overlay_info.yuy2_overlay_support = yuy2_overlay_support;
-  input.overlay_info.nv12_overlay_support = nv12_overlay_support;
-  input.overlay_info.bgra8_overlay_support = bgra8_overlay_support;
-  input.overlay_info.rgb10a2_overlay_support = rgb10a2_overlay_support;
-  input.overlay_info.p010_overlay_support = p010_overlay_support;
-#endif
   input.video_decode_accelerator_supported_profiles =
       video_decode_accelerator_supported_profiles;
   input.video_encode_accelerator_supported_profiles =
@@ -210,10 +180,6 @@ TEST_F(StructTraitsTest, GpuInfo) {
   EXPECT_EQ(amd_switchable, output.amd_switchable);
   EXPECT_EQ(gpu.vendor_id, output.gpu.vendor_id);
   EXPECT_EQ(gpu.device_id, output.gpu.device_id);
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(gpu.sub_sys_id, output.gpu.sub_sys_id);
-  EXPECT_EQ(gpu.revision, output.gpu.revision);
-#endif  // BUILDFLAG(IS_WIN)
   EXPECT_EQ(gpu.active, output.gpu.active);
   EXPECT_EQ(gpu.vendor_string, output.gpu.vendor_string);
   EXPECT_EQ(gpu.device_string, output.gpu.device_string);
@@ -223,10 +189,6 @@ TEST_F(StructTraitsTest, GpuInfo) {
     const gpu::GPUInfo::GPUDevice& actual_gpu = output.secondary_gpus[i];
     EXPECT_EQ(expected_gpu.vendor_id, actual_gpu.vendor_id);
     EXPECT_EQ(expected_gpu.device_id, actual_gpu.device_id);
-#if BUILDFLAG(IS_WIN)
-    EXPECT_EQ(expected_gpu.sub_sys_id, actual_gpu.sub_sys_id);
-    EXPECT_EQ(expected_gpu.revision, actual_gpu.revision);
-#endif  // BUILDFLAG(IS_WIN)
     EXPECT_EQ(expected_gpu.active, actual_gpu.active);
     EXPECT_EQ(expected_gpu.vendor_string, actual_gpu.vendor_string);
     EXPECT_EQ(expected_gpu.device_string, actual_gpu.device_string);
@@ -252,16 +214,6 @@ TEST_F(StructTraitsTest, GpuInfo) {
   EXPECT_EQ(sandboxed, output.sandboxed);
   EXPECT_EQ(in_process_gpu, output.in_process_gpu);
   EXPECT_EQ(passthrough_cmd_decoder, output.passthrough_cmd_decoder);
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(direct_composition, output.overlay_info.direct_composition);
-  EXPECT_EQ(supports_overlays, output.overlay_info.supports_overlays);
-  EXPECT_EQ(yuy2_overlay_support, output.overlay_info.yuy2_overlay_support);
-  EXPECT_EQ(nv12_overlay_support, output.overlay_info.nv12_overlay_support);
-  EXPECT_EQ(bgra8_overlay_support, output.overlay_info.bgra8_overlay_support);
-  EXPECT_EQ(rgb10a2_overlay_support,
-            output.overlay_info.rgb10a2_overlay_support);
-  EXPECT_EQ(p010_overlay_support, output.overlay_info.p010_overlay_support);
-#endif
   for (size_t i = 0; i < video_decode_accelerator_supported_profiles.size();
        i++) {
     const gpu::VideoDecodeAcceleratorSupportedProfile& expected =

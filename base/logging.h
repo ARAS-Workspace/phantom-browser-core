@@ -25,10 +25,6 @@
 #include <cstdio>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#endif
-
 //
 // Optional message capabilities
 // -----------------------------
@@ -329,20 +325,6 @@ BASE_EXPORT LogMessageHandlerFunction GetLogMessageHandler();
 #define COMPACT_GOOGLE_LOG_FATAL COMPACT_GOOGLE_LOG_EX_FATAL(LogMessage)
 #define COMPACT_GOOGLE_LOG_DFATAL COMPACT_GOOGLE_LOG_EX_DFATAL(LogMessage)
 
-#if BUILDFLAG(IS_WIN)
-// wingdi.h defines ERROR to be 0. When we call LOG(ERROR), it gets
-// substituted with 0, and it expands to COMPACT_GOOGLE_LOG_0. To allow us
-// to keep using this syntax, we define this macro to do the same thing
-// as COMPACT_GOOGLE_LOG_ERROR, and also define ERROR the same way that
-// the Windows SDK does for consistency.
-#define ERROR 0
-#define COMPACT_GOOGLE_LOG_EX_0(ClassName, ...) \
-  COMPACT_GOOGLE_LOG_EX_ERROR(ClassName, ##__VA_ARGS__)
-#define COMPACT_GOOGLE_LOG_0 COMPACT_GOOGLE_LOG_ERROR
-// Needed for LOG_IS_ON(ERROR).
-constexpr LogSeverity LOGGING_0 = LOGGING_ERROR;
-#endif
-
 // As special cases, we can assume that LOG_IS_ON(FATAL) always holds. Also,
 // LOG_IS_ON(DFATAL) always holds in debug mode. In particular, CHECK()s will
 // always fire if they fail.
@@ -399,12 +381,7 @@ constexpr LogSeverity LOGGING_0 = LOGGING_ERROR;
   LAZY_STREAM(VLOG_STREAM(verbose_level), \
               VLOG_IS_ON(verbose_level) && (condition))
 
-#if BUILDFLAG(IS_WIN)
-#define VPLOG_STREAM(verbose_level)                                     \
-  ::logging::Win32ErrorLogMessage(__FILE__, __LINE__, -(verbose_level), \
-                                  ::logging::GetLastSystemErrorCode())  \
-      .stream()
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #define VPLOG_STREAM(verbose_level)                                \
   ::logging::ErrnoLogMessage(__FILE__, __LINE__, -(verbose_level), \
                              ::logging::GetLastSystemErrorCode())  \
@@ -424,12 +401,7 @@ constexpr LogSeverity LOGGING_0 = LOGGING_ERROR;
   LOG_IF(FATAL, !(ANALYZER_ASSUME_TRUE(condition))) \
       << "Assert failed: " #condition ". "
 
-#if BUILDFLAG(IS_WIN)
-#define PLOG_STREAM(severity)                                           \
-  COMPACT_GOOGLE_LOG_EX_##severity(Win32ErrorLogMessage,                \
-                                   ::logging::GetLastSystemErrorCode()) \
-      .stream()
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #define PLOG_STREAM(severity)                                           \
   COMPACT_GOOGLE_LOG_EX_##severity(ErrnoLogMessage,                     \
                                    ::logging::GetLastSystemErrorCode()) \
@@ -587,9 +559,7 @@ class LogMessageVoidify {
   void operator&(std::ostream&) {}
 };
 
-#if BUILDFLAG(IS_WIN)
-typedef unsigned long SystemErrorCode;
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 typedef int SystemErrorCode;
 #endif
 
@@ -598,34 +568,7 @@ typedef int SystemErrorCode;
 BASE_EXPORT SystemErrorCode GetLastSystemErrorCode();
 BASE_EXPORT std::string SystemErrorCodeToString(SystemErrorCode error_code);
 
-#if BUILDFLAG(IS_WIN)
-// Appends a formatted system message of the GetLastError() type.
-class BASE_EXPORT Win32ErrorLogMessage : public LogMessage {
- public:
-  Win32ErrorLogMessage(const char* file,
-                       int line,
-                       LogSeverity severity,
-                       SystemErrorCode err);
-  Win32ErrorLogMessage(const Win32ErrorLogMessage&) = delete;
-  Win32ErrorLogMessage& operator=(const Win32ErrorLogMessage&) = delete;
-  // Appends the error message before destructing the encapsulated class.
-  ~Win32ErrorLogMessage() override;
-
- protected:
-  void AppendError();
-
- private:
-  SystemErrorCode err_;
-};
-
-class BASE_EXPORT Win32ErrorLogMessageFatal final
-    : public Win32ErrorLogMessage {
- public:
-  using Win32ErrorLogMessage::Win32ErrorLogMessage;
-  [[noreturn]] ~Win32ErrorLogMessageFatal() override;
-};
-
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 // Appends a formatted system message of the errno type
 class BASE_EXPORT ErrnoLogMessage : public LogMessage {
  public:
@@ -651,7 +594,7 @@ class BASE_EXPORT ErrnoLogMessageFatal final : public ErrnoLogMessage {
   [[noreturn]] ~ErrnoLogMessageFatal() override;
 };
 
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 
 // Closes the log file explicitly if open.
 // NOTE: Since the log file is opened as necessary by the action of logging
@@ -672,17 +615,6 @@ BASE_EXPORT void RawLog(int level, const char* message);
 
 #define RAW_LOG(level, message) \
   ::logging::RawLog(::logging::LOGGING_##level, message)
-
-#if BUILDFLAG(IS_WIN)
-// Returns true if logging to file is enabled.
-BASE_EXPORT bool IsLoggingToFileEnabled();
-
-// Returns the default log file path.
-BASE_EXPORT std::wstring GetLogFileFullPath();
-
-// Duplicates the log file handle to send into a child process.
-BASE_EXPORT HANDLE DuplicateLogFileHandle();
-#endif
 
 }  // namespace logging
 

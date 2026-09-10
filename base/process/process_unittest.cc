@@ -26,20 +26,9 @@
 #include "base/process/internal_linux.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/base_win_buildflags.h"
-#include "base/win/windows_version.h"
-#endif
-
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-constexpr int kExpectedStillRunningExitCode = 0x102;
-#else
 constexpr int kExpectedStillRunningExitCode = 0;
-#endif
 
 constexpr int kDummyExitCode = 42;
 
@@ -152,11 +141,6 @@ TEST_F(ProcessTest, CreationTimeOtherProcess) {
       // 1-second resolution. Tolerate 1 second for the imprecise boot time and
       // 100 ms for the imprecise clock.
       Milliseconds(1100);
-#elif BUILDFLAG(IS_WIN)
-      // On Windows, process creation time is based on the system clock while
-      // Time::Now() is a combination of system clock and
-      // QueryPerformanceCounter(). Tolerate 100 ms for the clock mismatch.
-      Milliseconds(100);
 #elif BUILDFLAG(IS_APPLE)
       // On Mac and Fuchsia, process creation time should be very precise.
       Milliseconds(0);
@@ -190,10 +174,6 @@ TEST_F(ProcessTest, Terminate) {
 
   EXPECT_NE(TERMINATION_STATUS_STILL_RUNNING,
             GetTerminationStatus(process.Handle(), &exit_code));
-#if BUILDFLAG(IS_WIN)
-  // Only Windows propagates the |exit_code| set in Terminate().
-  EXPECT_EQ(kExpectedExitCode, exit_code);
-#endif
 }
 
 TEST_F(ProcessTest, TerminateProcessForBadMessage) {
@@ -287,36 +267,6 @@ TEST_F(ProcessTest, WaitForExitWithNegativeTimeout) {
   process.Terminate(kDummyExitCode, false);
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST_F(ProcessTest, WaitForExitOrEventWithProcessExit) {
-  Process process(SpawnChild("FastSleepyChildProcess"));
-  ASSERT_TRUE(process.IsValid());
-
-  base::win::ScopedHandle stop_watching_handle(
-      CreateEvent(nullptr, TRUE, FALSE, nullptr));
-
-  int exit_code = kDummyExitCode;
-  EXPECT_EQ(process.WaitForExitOrEvent(stop_watching_handle, &exit_code),
-            base::Process::WaitExitStatus::PROCESS_EXITED);
-  EXPECT_EQ(0, exit_code);
-}
-
-TEST_F(ProcessTest, WaitForExitOrEventWithEventSet) {
-  Process process(SpawnChild("SleepyChildProcess"));
-  ASSERT_TRUE(process.IsValid());
-
-  base::win::ScopedHandle stop_watching_handle(
-      CreateEvent(nullptr, TRUE, TRUE, nullptr));
-
-  int exit_code = kDummyExitCode;
-  EXPECT_EQ(process.WaitForExitOrEvent(stop_watching_handle, &exit_code),
-            base::Process::WaitExitStatus::STOP_EVENT_SIGNALED);
-  EXPECT_EQ(kDummyExitCode, exit_code);
-
-  process.Terminate(kDummyExitCode, false);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 // Ensure that the priority of a process is restored correctly after
 // backgrounding and restoring.
 // Note: a platform may not be willing or able to lower the priority of
@@ -347,30 +297,7 @@ TEST_F(ProcessTest, SetProcessPriority) {
   EXPECT_EQ(process.GetPriority(), Process::Priority::kUserBlocking);
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(process.SetPriority(base::Process::Priority::kUserVisible));
-  // Eco QoS level read & write are not supported prior to WIN11_22H2,
-  // Priority::kUserVisible has same behavior as Priority::kUserBlocking, and
-  // is translated as Priority::kUserBlocking.
-  if (base::win::OSInfo::GetInstance()->version() >=
-      base::win::Version::WIN11_22H2) {
-    EXPECT_EQ(process.GetPriority(), Process::Priority::kUserVisible);
-  } else {
-    EXPECT_EQ(process.GetPriority(), Process::Priority::kUserBlocking);
-  }
-
-  EXPECT_TRUE(process.SetPriority(base::Process::Priority::kBestEffort));
-  EXPECT_EQ(process.GetPriority(), Process::Priority::kBestEffort);
-  EXPECT_TRUE(process.SetPriority(base::Process::Priority::kUserVisible));
-  if (base::win::OSInfo::GetInstance()->version() >=
-      base::win::Version::WIN11_22H2) {
-    EXPECT_EQ(process.GetPriority(), Process::Priority::kUserVisible);
-  } else {
-    EXPECT_EQ(process.GetPriority(), Process::Priority::kUserBlocking);
-  }
-  EXPECT_TRUE(process.SetPriority(base::Process::Priority::kUserBlocking));
-  EXPECT_EQ(process.GetPriority(), Process::Priority::kUserBlocking);
-#elif !BUILDFLAG(IS_APPLE)
+#if !BUILDFLAG(IS_APPLE)
   // On other platforms, Process::Priority::kUserVisible is translated as
   // Process::Priority::kUserBlocking.
   EXPECT_TRUE(process.SetPriority(base::Process::Priority::kUserVisible));
@@ -403,30 +330,6 @@ TEST_F(ProcessTest, PredefinedProcessIsRunning) {
 // Test is disabled on Windows AMR64 because
 // TerminateWithHeapCorruption() isn't expected to work there.
 // See: https://crbug.com/1054423
-#if BUILDFLAG(IS_WIN)
-#if defined(ARCH_CPU_ARM64)
-#define MAYBE_HeapCorruption DISABLED_HeapCorruption
-#else
-#define MAYBE_HeapCorruption HeapCorruption
-#endif
-TEST_F(ProcessTest, MAYBE_HeapCorruption) {
-  EXPECT_EXIT(base::debug::win::TerminateWithHeapCorruption(),
-              ::testing::ExitedWithCode(STATUS_HEAP_CORRUPTION), "");
-}
-
-#if BUILDFLAG(WIN_ENABLE_CFG_GUARDS)
-#define MAYBE_ControlFlowViolation ControlFlowViolation
-#else
-#define MAYBE_ControlFlowViolation DISABLED_ControlFlowViolation
-#endif
-TEST_F(ProcessTest, MAYBE_ControlFlowViolation) {
-  // CFG causes ntdll!RtlFailFast2 to be called resulting in uncatchable
-  // 0xC0000409 (STATUS_STACK_BUFFER_OVERRUN) exception.
-  EXPECT_EXIT(base::debug::win::TerminateWithControlFlowViolation(),
-              ::testing::ExitedWithCode(STATUS_STACK_BUFFER_OVERRUN), "");
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_F(ProcessTest, ChildProcessIsRunning) {
   Process process(SpawnChild("SleepyChildProcess"));

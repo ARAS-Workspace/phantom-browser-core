@@ -87,11 +87,6 @@
 #include "base/apple/scoped_nsautorelease_pool.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "content/child/dwrite_font_proxy/dwrite_font_proxy_init_impl_win.h"
-#include "content/test/dwrite_font_fake_sender_win.h"
-#endif
-
 using blink::WebGestureEvent;
 using blink::WebInputEvent;
 using blink::WebLocalFrame;
@@ -444,15 +439,6 @@ void RenderViewTest::SetUp() {
   content_client_.reset(CreateContentClient());
   SetContentClient(content_client_.get());
 
-#if BUILDFLAG(IS_WIN)
-  // This needs to happen sometime before PlatformInitialize.
-  // This isn't actually necessary for most tests: most tests are able to
-  // connect to their browser process which runs the real proxy host. However,
-  // some tests route IPCs to MockRenderThread, which is unable to process the
-  // font IPCs, causing all font loading to fail.
-  SetDWriteFontProxySenderForTesting(CreateFakeCollectionSender());
-#endif
-
 #if BUILDFLAG(IS_MAC)
   autorelease_pool_.emplace();
 #endif
@@ -574,10 +560,6 @@ void RenderViewTest::TearDown() {
   // some new tasks which need to be processed before shutting down WebKit
   // (http://crbug.com/21508).
   base::RunLoop().RunUntilIdle();
-
-#if BUILDFLAG(IS_WIN)
-  ClearDWriteFontProxySenderForTesting();
-#endif
 
 #if BUILDFLAG(IS_MAC)
   autorelease_pool_.reset();

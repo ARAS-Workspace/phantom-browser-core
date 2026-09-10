@@ -19,9 +19,6 @@
 #include "partition_alloc/partition_alloc_config.h"
 #include "partition_alloc/yield_processor.h"
 
-#if PA_BUILDFLAG(IS_WIN)
-#include "partition_alloc/partition_alloc_base/win/windows_types.h"
-#endif
 
 #if PA_BUILDFLAG(IS_POSIX)
 #include <pthread.h>
@@ -137,8 +134,6 @@ class PA_LOCKABLE PA_COMPONENT_EXPORT(PARTITION_ALLOC) SpinningMutex {
   PA_ALWAYS_INLINE static bool ShouldUsePriorityInheritance();
   PA_ALWAYS_INLINE bool IsLockMigrated() const;
 #endif  // PA_BUILDFLAG(ENABLE_PARTITION_LOCK_PRIORITY_INHERITANCE)
-#elif PA_BUILDFLAG(IS_WIN)
-  PA_CHROME_SRWLOCK lock_ = SRWLOCK_INIT;
 #elif PA_BUILDFLAG(IS_APPLE)
   os_unfair_lock unfair_lock_ = OS_UNFAIR_LOCK_INIT;
 #elif PA_BUILDFLAG(IS_POSIX)
@@ -257,16 +252,6 @@ PA_ALWAYS_INLINE void SpinningMutex::Release() {
     // kernel, and is what bionic (Android's libc) also does.
     FutexWake();
   }
-}
-
-#elif PA_BUILDFLAG(IS_WIN)
-
-PA_ALWAYS_INLINE bool SpinningMutex::Try() {
-  return !!::TryAcquireSRWLockExclusive(reinterpret_cast<PSRWLOCK>(&lock_));
-}
-
-PA_ALWAYS_INLINE void SpinningMutex::Release() {
-  ::ReleaseSRWLockExclusive(reinterpret_cast<PSRWLOCK>(&lock_));
 }
 
 #elif PA_BUILDFLAG(IS_APPLE)

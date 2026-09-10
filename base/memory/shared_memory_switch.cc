@@ -33,13 +33,6 @@
 #include "base/posix/global_descriptors.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/types/expected.h"
-#include "base/win/scoped_handle.h"
-#include "base/win/windows_handle_util.h"
-#endif
 
 
 // This file supports passing a shared memory region between a parent process
@@ -96,19 +89,7 @@ std::string Serialize(HandleType shmem_handle,
   std::string serialized;
   serialized.reserve(kSerializedReservedSize);
 
-#if BUILDFLAG(IS_WIN)
-  // If the child is launched in elevated privilege mode, it will query the
-  // parent for the handle. Otherwise, in non-elevated mode, the handle will
-  // be passed via process inheritance.
-  if (!launch_options->elevated) {
-    launch_options->handles_to_inherit.push_back(shmem_handle);
-  }
-
-  // Tell the child process the name of the HANDLE and whether to handle can
-  // be inherited ('i') or must be duplicate from the parent process ('p').
-  StrAppend(&serialized, {NumberToString(win::HandleToUint32(shmem_handle)),
-                          (launch_options->elevated ? ",p," : ",i,")});
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #if !BUILDFLAG(IS_IOS_TVOS)
   auto& rendezvous_key = shared_memory_switch->rendezvous_key;
   // In the receiving child, the handle is looked up using the rendezvous key.
@@ -182,39 +163,7 @@ expected<PlatformSharedMemoryRegion, SharedMemoryError> Deserialize(
   // token[1] has a fixed value but is ignored on all platforms except
   // Windows, where it can be 'i' or 'p' to indicate that the handle is
   // inherited or must be obtained from the parent.
-#if BUILDFLAG(IS_WIN)
-  HANDLE handle = win::Uint32ToHandle(checked_cast<uint32_t>(shmem_handle));
-  if (tokens[1] == "p") {
-    DCHECK(IsCurrentProcessElevated());
-    // LaunchProcess doesn't have a way to duplicate the handle, but this
-    // process can since by definition it's not sandboxed.
-    if (ProcessId parent_pid = GetParentProcessId(GetCurrentProcessHandle());
-        parent_pid == kNullProcessId) {
-      return unexpected(SharedMemoryError::kInvalidHandle);
-    } else if (auto parent =
-                   Process::OpenWithAccess(parent_pid, PROCESS_ALL_ACCESS);
-               !parent.IsValid() ||
-               !::DuplicateHandle(parent.Handle(), handle,
-                                  ::GetCurrentProcess(), &handle, 0, FALSE,
-                                  DUPLICATE_SAME_ACCESS)) {
-      return unexpected(SharedMemoryError::kInvalidHandle);
-    }
-  } else if (tokens[1] != "i") {
-    return unexpected(SharedMemoryError::kUnexpectedHandleType);
-  }
-  // Under some situations, the handle value provided on the command line does
-  // not refer to a valid Section object. Fail gracefully rather than wrapping
-  // the value in a ScopedHandle, as that will lead to a crash when CloseHandle
-  // fails; see https://crbug.com/40071993.
-  win::ScopedHandle scoped_handle;
-  if (auto handle_or_error = win::TakeHandleOfType(
-          std::exchange(handle, kNullProcessHandle), L"Section");
-      !handle_or_error.has_value()) {
-    return unexpected(SharedMemoryError::kInvalidHandle);
-  } else {
-    scoped_handle = *std::move(handle_or_error);
-  }
-#elif BUILDFLAG(IS_IOS_TVOS)
+#if BUILDFLAG(IS_IOS_TVOS)
   // Create an empty handle to prevent a build failure when returning a writable
   // shared memory region at the end of the function.
   apple::ScopedMachSendRight scoped_handle;
@@ -274,17 +223,11 @@ void AddToLaunchParametersImpl(const RegionType& memory_region,
                                SharedMemorySwitch* shared_memory_switch,
                                CommandLine* command_line,
                                LaunchOptions* launch_options) {
-#if BUILDFLAG(IS_WIN)
-  auto token = memory_region.GetGUID();
-  auto size = memory_region.GetSize();
-  auto handle = memory_region.GetPlatformHandle();
-#else
   auto region =
       RegionType::TakeHandleForSerialization(memory_region.Duplicate());
   auto token = region.GetGUID();
   auto size = region.GetSize();
   auto handle = region.PassPlatformHandle();
-#endif  // !BUILDFLAG(IS_WIN)
   constexpr bool is_read_only =
       std::is_same<RegionType, ReadOnlySharedMemoryRegion>::value;
   std::string switch_value =

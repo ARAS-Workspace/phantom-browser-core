@@ -103,9 +103,6 @@
 #include <vulkan/vulkan_xcb.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <vulkan/vulkan_win32.h>
-#endif
 
 namespace gpu {
 
@@ -231,11 +228,6 @@ struct COMPONENT_EXPORT(VULKAN) VulkanFunctionPointers {
       vkGetPhysicalDeviceXcbPresentationSupportKHR;
 #endif  // defined(USE_VULKAN_XCB)
 
-#if BUILDFLAG(IS_WIN)
-  VulkanFunction<PFN_vkCreateWin32SurfaceKHR> vkCreateWin32SurfaceKHR;
-  VulkanFunction<PFN_vkGetPhysicalDeviceWin32PresentationSupportKHR>
-      vkGetPhysicalDeviceWin32PresentationSupportKHR;
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
   VulkanFunction<PFN_vkCreateAndroidSurfaceKHR> vkCreateAndroidSurfaceKHR;
@@ -334,22 +326,12 @@ struct COMPONENT_EXPORT(VULKAN) VulkanFunctionPointers {
   VulkanFunction<PFN_vkImportSemaphoreFdKHR> vkImportSemaphoreFdKHR;
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-  VulkanFunction<PFN_vkGetSemaphoreWin32HandleKHR> vkGetSemaphoreWin32HandleKHR;
-  VulkanFunction<PFN_vkImportSemaphoreWin32HandleKHR>
-      vkImportSemaphoreWin32HandleKHR;
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_POSIX)
   VulkanFunction<PFN_vkGetMemoryFdKHR> vkGetMemoryFdKHR;
   VulkanFunction<PFN_vkGetMemoryFdPropertiesKHR> vkGetMemoryFdPropertiesKHR;
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-  VulkanFunction<PFN_vkGetMemoryWin32HandleKHR> vkGetMemoryWin32HandleKHR;
-  VulkanFunction<PFN_vkGetMemoryWin32HandlePropertiesKHR>
-      vkGetMemoryWin32HandlePropertiesKHR;
-#endif  // BUILDFLAG(IS_WIN)
 
 
 
@@ -596,23 +578,6 @@ vkGetPhysicalDeviceXcbPresentationSupportKHR(VkPhysicalDevice physicalDevice,
 }
 #endif  // defined(USE_VULKAN_XCB)
 
-#if BUILDFLAG(IS_WIN)
-ALWAYS_INLINE VkResult
-vkCreateWin32SurfaceKHR(VkInstance instance,
-                        const VkWin32SurfaceCreateInfoKHR* pCreateInfo,
-                        const VkAllocationCallbacks* pAllocator,
-                        VkSurfaceKHR* pSurface) {
-  return gpu::GetVulkanFunctionPointers()->vkCreateWin32SurfaceKHR(
-      instance, pCreateInfo, pAllocator, pSurface);
-}
-ALWAYS_INLINE VkBool32
-vkGetPhysicalDeviceWin32PresentationSupportKHR(VkPhysicalDevice physicalDevice,
-                                               uint32_t queueFamilyIndex) {
-  return gpu::GetVulkanFunctionPointers()
-      ->vkGetPhysicalDeviceWin32PresentationSupportKHR(physicalDevice,
-                                                       queueFamilyIndex);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
 ALWAYS_INLINE VkResult
@@ -1209,22 +1174,6 @@ ALWAYS_INLINE VkResult vkImportSemaphoreFdKHR(
 }
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-ALWAYS_INLINE VkResult vkGetSemaphoreWin32HandleKHR(
-    VkDevice device,
-    const VkSemaphoreGetWin32HandleInfoKHR* pGetWin32HandleInfo,
-    HANDLE* pHandle) {
-  return gpu::GetVulkanFunctionPointers()->vkGetSemaphoreWin32HandleKHR(
-      device, pGetWin32HandleInfo, pHandle);
-}
-ALWAYS_INLINE VkResult
-vkImportSemaphoreWin32HandleKHR(VkDevice device,
-                                const VkImportSemaphoreWin32HandleInfoKHR*
-                                    pImportSemaphoreWin32HandleInfo) {
-  return gpu::GetVulkanFunctionPointers()->vkImportSemaphoreWin32HandleKHR(
-      device, pImportSemaphoreWin32HandleInfo);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_POSIX)
 ALWAYS_INLINE VkResult vkGetMemoryFdKHR(VkDevice device,
@@ -1243,23 +1192,6 @@ vkGetMemoryFdPropertiesKHR(VkDevice device,
 }
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-ALWAYS_INLINE VkResult vkGetMemoryWin32HandleKHR(
-    VkDevice device,
-    const VkMemoryGetWin32HandleInfoKHR* pGetWin32HandleInfo,
-    HANDLE* pHandle) {
-  return gpu::GetVulkanFunctionPointers()->vkGetMemoryWin32HandleKHR(
-      device, pGetWin32HandleInfo, pHandle);
-}
-ALWAYS_INLINE VkResult vkGetMemoryWin32HandlePropertiesKHR(
-    VkDevice device,
-    VkExternalMemoryHandleTypeFlagBits handleType,
-    HANDLE handle,
-    VkMemoryWin32HandlePropertiesKHR* pMemoryWin32HandleProperties) {
-  return gpu::GetVulkanFunctionPointers()->vkGetMemoryWin32HandlePropertiesKHR(
-      device, handleType, handle, pMemoryWin32HandleProperties);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 
 

@@ -78,9 +78,6 @@ bool SadTab::ShouldShow(base::TerminationStatus status) {
     case base::TERMINATION_STATUS_PROCESS_WAS_KILLED_BY_OOM:
 #endif
     case base::TERMINATION_STATUS_PROCESS_CRASHED:
-#if BUILDFLAG(IS_WIN)
-    case base::TERMINATION_STATUS_INTEGRITY_FAILURE:
-#endif
     case base::TERMINATION_STATUS_OOM:
     case base::TERMINATION_STATUS_EVICTED_FOR_MEMORY:
       return true;
@@ -106,9 +103,6 @@ int SadTab::GetTitle() {
       return IDS_SAD_TAB_RELOAD_TITLE;
 #endif
     case SAD_TAB_KIND_OOM:
-#if BUILDFLAG(IS_WIN)  // Only Windows has OOM sad tab strings.
-      return IDS_SAD_TAB_OOM_TITLE;
-#endif
     case SAD_TAB_KIND_CRASHED:
     case SAD_TAB_KIND_KILLED:
       return IDS_SAD_TAB_RELOAD_TITLE;

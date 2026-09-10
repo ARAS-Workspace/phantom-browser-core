@@ -11,10 +11,6 @@
 #include "remoting/base/file_host_settings.h"
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN)
-#include "remoting/base/host_settings_win.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace remoting {
 
 namespace {
@@ -47,8 +43,6 @@ HostSettings* HostSettings::GetInstance() {
 #if BUILDFLAG(IS_APPLE) || (BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS))
   static base::NoDestructor<FileHostSettings> instance(
       FileHostSettings::GetSettingsFilePath());
-#elif BUILDFLAG(IS_WIN)
-  static base::NoDestructor<HostSettingsWin> instance;
 #else
   // HostSettings is currently neither implemented nor used on other platforms.
   static base::NoDestructor<EmptyHostSettings> instance;

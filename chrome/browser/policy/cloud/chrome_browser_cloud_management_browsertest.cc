@@ -642,11 +642,7 @@ class ChromeBrowserCloudManagementEnrollmentTest
 };
 
 // Consistently timing out on Windows. http://crbug.com/40659096
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_Test DISABLED_Test
-#else
 #define MAYBE_Test Test
-#endif
 IN_PROC_BROWSER_TEST_P(ChromeBrowserCloudManagementEnrollmentTest, MAYBE_Test) {
 #undef MAYBE_Test
   // Test body is run only if enrollment is succeeded or failed without error
@@ -787,8 +783,7 @@ class MachineLevelUserCloudPolicyPolicyFetchTest
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 // TODO(crbug.com/40782028): Test is flaky.
 IN_PROC_BROWSER_TEST_P(MachineLevelUserCloudPolicyPolicyFetchTest,
                        DISABLED_Test) {
@@ -1305,8 +1300,7 @@ class MachineLevelUserCloudPolicyRobotAuthTest : public PlatformBrowserTest {
 };  // namespace policy
 
 // Flaky on linux & win: https://crbug.com/40705662
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #define MAYBE_Test DISABLED_Test
 #else
 #define MAYBE_Test Test

@@ -131,23 +131,12 @@ DownloadInterruptReason BaseFile::Initialize(
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   DCHECK(!detached_);
 
-#if BUILDFLAG(IS_WIN)
-  constexpr uint32_t kTempFileFlags =
-      base::File::FLAG_READ | base::File::FLAG_WRITE |
-      base::File::FLAG_WIN_EXCLUSIVE_WRITE | base::File::FLAG_WIN_SHARE_DELETE;
-#endif
-
   if (full_path.empty()) {
     base::FilePath temp_file;
     base::File temp_base_file;
     if (!default_directory.empty()) {
-#if BUILDFLAG(IS_WIN)
-      temp_base_file = base::CreateAndOpenTemporaryFileInDirWithFlags(
-          default_directory, &temp_file, kTempFileFlags);
-#else
       temp_base_file =
           base::CreateAndOpenTemporaryFileInDir(default_directory, &temp_file);
-#endif
     }
 
     if (!temp_base_file.IsValid()) {
@@ -156,13 +145,8 @@ DownloadInterruptReason BaseFile::Initialize(
         return LogInterruptReason("Unable to find temp directory", 0,
                                   DOWNLOAD_INTERRUPT_REASON_FILE_FAILED);
       }
-#if BUILDFLAG(IS_WIN)
-      temp_base_file = base::CreateAndOpenTemporaryFileInDirWithFlags(
-          system_temp_dir, &temp_file, kTempFileFlags);
-#else
       temp_base_file =
           base::CreateAndOpenTemporaryFileInDir(system_temp_dir, &temp_file);
-#endif
       if (!temp_base_file.IsValid()) {
         return LogInterruptReason("Unable to create temporary file", 0,
                                   DOWNLOAD_INTERRUPT_REASON_FILE_FAILED);
@@ -679,12 +663,7 @@ void BaseFile::OnFileQuarantined(
 
 void BaseFile::OnQuarantineServiceError(const GURL& source_url,
                                         const GURL& referrer_url) {
-#if BUILDFLAG(IS_WIN)
-  OnFileQuarantined(quarantine::SetInternetZoneIdentifierDirectly(
-      full_path_, source_url, referrer_url));
-#else   // !BUILDFLAG(IS_WIN)
   NOTREACHED() << "In-process quarantine service should not have failed.";
-#endif  // !BUILDFLAG(IS_WIN)
 }
 
 void BaseFile::AnnotateWithSourceInformation(
@@ -697,14 +676,8 @@ void BaseFile::AnnotateWithSourceInformation(
   GURL authority_url =
       GetEffectiveAuthorityURL(source_url, referrer_url, request_initiator);
   if (!remote_quarantine) {
-#if BUILDFLAG(IS_WIN)
-    quarantine::mojom::QuarantineFileResult result =
-        quarantine::SetInternetZoneIdentifierDirectly(full_path_, authority_url,
-                                                      referrer_url);
-#else
     quarantine::mojom::QuarantineFileResult result =
         quarantine::mojom::QuarantineFileResult::ANNOTATION_FAILED;
-#endif
     std::move(on_annotation_done_callback)
         .Run(QuarantineFileResultToReason(result));
   } else {

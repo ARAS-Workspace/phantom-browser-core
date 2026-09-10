@@ -13,7 +13,7 @@
 #include "third_party/blink/renderer/platform/runtime_enabled_features.h"
 #include "third_party/blink/renderer/platform/wtf/text/string_builder.h"
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_MAC)
 #include <sys/utsname.h>
 #include "third_party/blink/renderer/platform/wtf/thread_specific.h"
 #include "third_party/blink/renderer/platform/wtf/threading.h"
@@ -28,8 +28,6 @@ String GetReducedNavigatorPlatform() {
   return "Linux armv81";
 #elif BUILDFLAG(IS_MAC)
   return "MacIntel";
-#elif BUILDFLAG(IS_WIN)
-  return "Win32";
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   return "Linux x86_64";
 #elif BUILDFLAG(IS_IOS)

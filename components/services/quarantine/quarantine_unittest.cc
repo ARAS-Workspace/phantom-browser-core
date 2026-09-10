@@ -18,10 +18,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#endif
-
 namespace quarantine {
 
 namespace {
@@ -40,9 +36,6 @@ class QuarantineTest : public QuarantineTestBase {
  public:
   void SetUp() override {
     QuarantineTestBase::SetUp();
-#if BUILDFLAG(IS_WIN)
-    ASSERT_TRUE(com_initializer_.Succeeded());
-#endif
     ASSERT_TRUE(test_dir_.CreateUniqueTempDir());
     ASSERT_TRUE(
         base::WriteFile(GetTestFilePath(), {kTestData, std::size(kTestData)}));
@@ -54,9 +47,6 @@ class QuarantineTest : public QuarantineTestBase {
   }
 
  private:
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedCOMInitializer com_initializer_;
-#endif
   base::test::SingleThreadTaskEnvironment task_environment_;
   base::ScopedTempDir test_dir_;
 };

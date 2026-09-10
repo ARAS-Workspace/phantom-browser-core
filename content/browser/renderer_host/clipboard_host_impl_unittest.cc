@@ -504,12 +504,7 @@ TEST_F(ClipboardHostImplWriteTest, WriteBookmark_ValidUrl) {
   ui::clipboard_test_util::ReadBookmark(system_clipboard(),
                                         /*data_dst=*/nullptr, &title, &url);
   EXPECT_EQ(kUrl, url);
-#if !BUILDFLAG(IS_WIN)
   EXPECT_EQ(kTitle, title);
-#else
-  // ClipboardWin::ReadURL does not round-trip the title.
-  EXPECT_TRUE(title.empty()) << "Got title='" << title << "'";
-#endif
   // ValidateClipboardSource() is intentionally not called: WriteBookmark does
   // not go through IsClipboardCopyAllowedByPolicy, so no SourceRFHToken is
   // pickled into the clipboard.
@@ -1928,11 +1923,7 @@ TEST_F(ClipboardHostImplRaceConditionTest,
   EXPECT_TRUE(result);
   EXPECT_EQ(result->files.size(), 1u);
   EXPECT_EQ(result->files[0]->path,
-#if BUILDFLAG(IS_WIN)
-            base::FilePath(FILE_PATH_LITERAL("\\test\\file")));
-#else
             base::FilePath(FILE_PATH_LITERAL("/test/file")));
-#endif
 }
 
 TEST_F(ClipboardHostImplRaceConditionTest,

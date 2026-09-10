@@ -463,11 +463,7 @@ IN_PROC_BROWSER_TEST_F(SharedTabGroupInteractiveUiTest,
 // that pressing the leave group buttons displays a dialog.
 
 // Disable flaky test under Windows ASAN.  http://crbug.com/421907007
-#if defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_WIN)
-#define MAYBE_LeaveGroupPressed DISABLED_LeaveGroupPressed
-#else
 #define MAYBE_LeaveGroupPressed LeaveGroupPressed
-#endif
 IN_PROC_BROWSER_TEST_F(SharedTabGroupInteractiveUiTest,
                        MAYBE_LeaveGroupPressed) {
   TabGroupId group_id = CreateNewTabGroup();

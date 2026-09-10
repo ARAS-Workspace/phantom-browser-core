@@ -516,8 +516,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxAimWebUiInteractiveTest,
 
 // TODO(crbug.com/505548434, crbug.com/517370516): Flaky on Mac, Win and Linux.
 // TODO(crbug.com/524892796): Broken on ChromeOS.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_ClassicContextMenuOpensDeepSearch \
   DISABLED_ClassicContextMenuOpensDeepSearch
 #else
@@ -618,16 +617,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxAimWebUiInteractiveTest,
           WaitForStateChange(kClassicPopupWebView, visible_in_viewport)),
 
   // 4. Click the context menu and select the first tab.
-#if BUILDFLAG(IS_WIN)
-      // On Windows with pixel tests enabled, physical clicks fail because
-      // the element is outside the omnibox frame bounds. We call the Mojo
-      // method directly via JS to bypass bounds checks.
-      InSameContext(ExecuteJsAt(
-          kClassicPopupWebView, kOmniboxPopup,
-          "el => el.popupPageHandler_.showContextMenu({x: 0, y: 0})")),
-#else
       InSameContext(ClickElement(kClassicPopupWebView, kClassicContextMenu)),
-#endif
       InAnyContext(WaitForShow(
           OmniboxContextMenuController::kFirstTabMenuItemIdForTesting)),
       InSameContext(SelectMenuItem(

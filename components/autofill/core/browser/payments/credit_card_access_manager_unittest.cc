@@ -53,7 +53,7 @@
 #include "base/android/device_info.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 #include "components/autofill/core/browser/payments/test_credit_card_fido_authenticator.h"
 #include "components/autofill/core/browser/strike_databases/payments/fido_authentication_strike_database.h"
 #endif
@@ -78,7 +78,7 @@ using PaymentsRpcCardType =
     payments::PaymentsAutofillClient::PaymentsRpcCardType;
 using PaymentsRpcResult = payments::PaymentsAutofillClient::PaymentsRpcResult;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 std::string BytesToBase64(const std::vector<uint8_t>& bytes) {
   return base::Base64Encode(bytes);
 }
@@ -109,7 +109,7 @@ class CreditCardAccessManagerAuthFlowTest
     if (!IsMaskedServerCardRiskBasedAuthEnabled()) {
       return;
     }
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
     credit_card_access_manager().OnRiskBasedAuthenticationResponseReceived(
         CreditCardRiskBasedAuthenticator::RiskBasedAuthenticationResponse()
             .with_result(CreditCardRiskBasedAuthenticator::
@@ -124,7 +124,7 @@ class CreditCardAccessManagerAuthFlowTest
   void SetUp() override {
     CreditCardAccessManagerTestBase::SetUp();
     if (IsMaskedServerCardRiskBasedAuthEnabled()) {
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
       GTEST_SKIP() << "Skipping test because masked server card risk-based "
                       "flow should only happen on WIN, MAC or ANDROID";
 #endif
@@ -351,7 +351,7 @@ TEST_P(CreditCardAccessManagerAuthFlowTest, FetchServerCardCVCTryAgainFailure) {
   EXPECT_EQ(accessor().number(), kTestNumber16);
   EXPECT_EQ(accessor().cvc(), kTestCvc16);
 }
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 // Ensures that FetchCreditCard() returns the full PAN upon a successful
 // WebAuthn verification and response from payments.
 TEST_P(CreditCardAccessManagerAuthFlowTest, FetchServerCardFIDOSuccess) {
@@ -1708,7 +1708,7 @@ TEST_F(CreditCardAccessManagerTest, PreflightCallRateLimited) {
   histogram_tester.ExpectTotalCount(preflight_call_metric, 1);
 }
 #endif  // !BUILDFLAG(IS_APPLE)
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 
 // Ensures that UnmaskAuthFlowEvents also log to a ".ServerCard" subhistogram
 // when a masked server card is selected.
@@ -2254,7 +2254,7 @@ TEST_F(CreditCardAccessManagerTest, Prefetching_RiskData) {
       autofill_client().GetPaymentsAutofillClient()->risk_data_loaded());
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 // Ensures that the virtual card risk-based unmasking response is handled
 // correctly and authentication is delegated to the FIDO authenticator, when
 // only the FIDO challenge options is returned.
@@ -2490,7 +2490,7 @@ TEST_F(
       1);
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 #endif  // !BUILDFLAG(IS_IOS)
 
 // Ensures that the virtual card risk-based unmasking response is handled
@@ -2504,7 +2504,7 @@ TEST_F(CreditCardAccessManagerTest,
   // |is_user_verifiable_| related logic from CreditCardAccessManager to
   // CreditCardFidoAuthenticator.
   test_api(credit_card_access_manager()).set_is_user_verifiable(true);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
   fido_authenticator().set_is_user_opted_in(true);
 #endif
   NiceMock<MockCreditCardAccessManagerObserver> observer;
@@ -2528,7 +2528,7 @@ TEST_F(CreditCardAccessManagerTest,
 
   // Expect the CreditCardAccessManager to end the session.
   EXPECT_FALSE(otp_authenticator().on_challenge_option_selected_invoked());
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(fido_authenticator().authenticate_invoked());
 #endif
   credit_card_access_manager().RemoveObserver(&observer);
@@ -2552,7 +2552,7 @@ TEST_F(CreditCardAccessManagerTest,
   // is_user_veriable_ related logic from CreditCardAccessManager to
   // CreditCardFidoAuthenticator.
   test_api(credit_card_access_manager()).set_is_user_verifiable(true);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
   fido_authenticator().set_is_user_opted_in(true);
 #endif
   NiceMock<MockCreditCardAccessManagerObserver> observer;
@@ -2579,7 +2579,7 @@ TEST_F(CreditCardAccessManagerTest,
   EXPECT_TRUE(autofill_client()
                   .GetPaymentsAutofillClient()
                   ->autofill_error_dialog_shown());
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(fido_authenticator().authenticate_invoked());
 #endif
   credit_card_access_manager().RemoveObserver(&observer);
@@ -2643,7 +2643,7 @@ TEST_F(CreditCardAccessManagerTest,
   // is_user_veriable_ related logic from CreditCardAccessManager to
   // CreditCardFidoAuthenticator.
   test_api(credit_card_access_manager()).set_is_user_verifiable(true);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
   fido_authenticator().set_is_user_opted_in(true);
 #endif
   NiceMock<MockCreditCardAccessManagerObserver> observer;
@@ -2663,7 +2663,7 @@ TEST_F(CreditCardAccessManagerTest,
   credit_card_access_manager().RemoveObserver(&observer);
 
   EXPECT_FALSE(otp_authenticator().on_challenge_option_selected_invoked());
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
   EXPECT_FALSE(fido_authenticator().authenticate_invoked());
 #endif
 

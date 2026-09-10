@@ -15,11 +15,6 @@ BASE_FEATURE(kEncryptedPrefHashing, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kEnableEncryptedTrackedPrefOnEnterprise,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_WIN)
-// Reject weak ciphertext if a stronger algorithm is available.
-BASE_FEATURE(kRejectWeakCiphertext, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN)
-
 // When enabled, disables the legacy HMAC fallback upgrade path during
 // validation with os_crypt.
 BASE_FEATURE(kDisallowLegacyPrefMacFallback, base::FEATURE_DISABLED_BY_DEFAULT);

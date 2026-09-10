@@ -51,10 +51,6 @@ std::ostream& operator<<(std::ostream& os, MessagePumpType type) {
 
 #if BUILDFLAG(IS_POSIX)
 #include "base/threading/platform_thread_internal_posix.h"
-#elif BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/threading/platform_thread_win.h"
 #endif
 
 #if BUILDFLAG(IS_APPLE)
@@ -392,17 +388,6 @@ TEST(PlatformThreadTest, SetDefaultThreadType) {
   TestSetDefaultThreadType();
 }
 
-#if BUILDFLAG(IS_WIN)
-// Test changing a created thread's priority in an IDLE_PRIORITY_CLASS process
-// (regression test for https://crbug.com/901483).
-TEST(PlatformThreadTest,
-     SetDefaultThreadTypeWithThreadModeBackgroundIdleProcess) {
-  ::SetPriorityClass(Process::Current().Handle(), IDLE_PRIORITY_CLASS);
-  TestSetDefaultThreadType();
-  ::SetPriorityClass(Process::Current().Handle(), NORMAL_PRIORITY_CLASS);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 // Ideally PlatformThread::CanChangeThreadType() would be true on all
 // platforms for all priorities. This not being the case. This test documents
 // and hardcodes what we know. Please inform scheduler-dev@chromium.org if this
@@ -455,17 +440,10 @@ TEST(PlatformThreadTest, SetDefaultThreadTypeTest) {
                                       ThreadType::kPresentation);
   TestPriorityResultingFromThreadType(ThreadType::kRealtimeAudio,
                                       ThreadType::kRealtimeAudio);
-#if BUILDFLAG(IS_WIN)
-  // Currently only on Windows, kInteractive maps to a higher priority than
-  // kDisplayCritical.
-  TestPriorityResultingFromThreadType(ThreadType::kAudioProcessing,
-                                      ThreadType::kAudioProcessing);
-#else
   // On other platforms, kInteractive maps to the same priority as
   // kDisplayCritical.
   TestPriorityResultingFromThreadType(ThreadType::kAudioProcessing,
                                       ThreadType::kPresentation);
-#endif
 }
 
 TEST(PlatformThreadTest, SetHugeThreadName) {
@@ -481,7 +459,9 @@ TEST(PlatformThreadTest, GetDefaultThreadStackSize) {
   size_t stack_size = PlatformThread::GetDefaultThreadStackSize();
 #if BUILDFLAG(IS_IOS)
   EXPECT_EQ(1024u * 1024u, stack_size);
-#elif BUILDFLAG(IS_WIN) || ((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(__GLIBC__) && !defined(THREAD_SANITIZER)) || (BUILDFLAG(IS_ANDROID) && !defined(ADDRESS_SANITIZER))
+#elif ((BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) &&   \
+       defined(__GLIBC__) && !defined(THREAD_SANITIZER)) || \
+    (BUILDFLAG(IS_ANDROID) && !defined(ADDRESS_SANITIZER))
   EXPECT_EQ(0u, stack_size);
 #else
   EXPECT_GT(stack_size, 0u);

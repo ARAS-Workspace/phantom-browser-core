@@ -76,10 +76,6 @@ class StringWrapper {
 const bool kPlatformHasDefaultLocale = true;
 const bool kUseLocaleFromEnvironment = true;
 const bool kSupportsLocalePreference = false;
-#elif BUILDFLAG(IS_WIN)
-const bool kPlatformHasDefaultLocale = true;
-const bool kUseLocaleFromEnvironment = false;
-const bool kSupportsLocalePreference = true;
 #else
 const bool kPlatformHasDefaultLocale = false;
 const bool kUseLocaleFromEnvironment = false;
@@ -484,18 +480,6 @@ TEST_F(L10nUtilTest, GetAppLocale_NoSupportsLocalePreference_Nb) {
     EXPECT_EQ("nb", l10n_util::GetApplicationLocale(std::string(), true));
   }
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(L10nUtilTest, GetAppLocaleWin) {
-  SetUpLocales(kDefaultLocalesOnDisk);
-  base::i18n::SetICUDefaultLocale("am");
-  EXPECT_EQ("am", l10n_util::GetApplicationLocale(""));
-  EXPECT_STREQ("am", icu::Locale::getDefault().getLanguage());
-  base::i18n::SetICUDefaultLocale("en-GB");
-  EXPECT_EQ("am", l10n_util::GetApplicationLocale("am"));
-  EXPECT_STREQ("am", icu::Locale::getDefault().getLanguage());
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #else
 using L10nUtilTest = PlatformTest;

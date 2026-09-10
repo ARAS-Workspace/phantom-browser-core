@@ -665,7 +665,7 @@ IN_PROC_BROWSER_TEST_F(PopupTrackerBrowserTest,
 }
 
 // TODO(crbug.com/40749954): Test is flaky on Windows and Linux.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_PopupJavascriptRenavigation_RedirectCountZero \
   DISABLED_PopupJavascriptRenavigation_RedirectCountZero
 #else

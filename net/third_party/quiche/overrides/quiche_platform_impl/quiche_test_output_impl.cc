@@ -64,11 +64,7 @@ void QuicheRecordTraceImpl(std::string_view identifier, std::string_view data) {
   // TODO(vasilvv): replace this with absl::Time once it's usable in Chromium.
   time_t now_ts = time(nullptr);
   tm now;
-#if BUILDFLAG(IS_WIN)
-  gmtime_s(&now, &now_ts);
-#else
   gmtime_r(&now_ts, &now);
-#endif
 
   char timestamp[2048];
   strftime(timestamp, sizeof(timestamp), "%Y%m%d%H%M%S", &now);

@@ -22,7 +22,7 @@ namespace gl {
 // static
 GLDisplay* GLTestSupport::InitializeGL(
     std::optional<GLImplementationParts> prefered_impl) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   gpu::TrySetNonSoftwareDevicePreferenceForTesting(
       gl::GpuPreference ::kDefault);
 #endif

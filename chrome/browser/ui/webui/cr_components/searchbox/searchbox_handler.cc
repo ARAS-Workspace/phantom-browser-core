@@ -221,9 +221,6 @@ constexpr char kTrendingUpIconResourceName[] =
 #if BUILDFLAG(IS_MAC)
 constexpr char kMacShareIconResourceName[] =
     "//resources/cr_components/searchbox/icons/mac_share_cr23.svg";
-#elif BUILDFLAG(IS_WIN)
-constexpr char kWinShareIconResourceName[] =
-    "//resources/cr_components/searchbox/icons/win_share_cr23.svg";
 #elif BUILDFLAG(IS_LINUX)
 constexpr char kLinuxShareIconResourceName[] =
     "//resources/cr_components/searchbox/icons/share_cr23.svg";
@@ -742,12 +739,6 @@ std::string SearchboxHandler::AutocompleteIconToResourceName(
                         ? omnibox::kIosShareIcon.name
                         : omnibox::kShareMacChromeRefreshOldIcon.name)) {
     resource_name = kMacShareIconResourceName;
-  }
-#elif BUILDFLAG(IS_WIN)
-  if (icon.name == (features::IsRoundedIconsEnabled()
-                        ? omnibox::kShareWindowsIcon.name
-                        : omnibox::kShareWinChromeRefreshOldIcon.name)) {
-    resource_name = kWinShareIconResourceName;
   }
 #elif BUILDFLAG(IS_LINUX)
   if (icon.name == (features::IsRoundedIconsEnabled()

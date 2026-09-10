@@ -23,11 +23,7 @@ namespace {
 
 FilePath::StringType GenerateNativeString(FuzzedDataProvider& provider) {
   const std::string raw_string = provider.ConsumeRandomLengthString();
-#if BUILDFLAG(IS_WIN)
-  return UTF8ToWide(raw_string);
-#else
   return raw_string;
-#endif
 }
 
 bool IsValidExtension(const FilePath::StringType& text) {

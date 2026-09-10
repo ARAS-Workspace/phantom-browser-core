@@ -90,12 +90,7 @@ IN_PROC_BROWSER_TEST_F(ProfilePickerGlicFlowControllerBrowserTest,
 }
 
 // TODO(crbug.com/404425678): Re-enable failing test on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PickProfileWithCurrentProfile \
-  DISABLED_PickProfileWithCurrentProfile
-#else
 #define MAYBE_PickProfileWithCurrentProfile PickProfileWithCurrentProfile
-#endif
 IN_PROC_BROWSER_TEST_F(ProfilePickerGlicFlowControllerBrowserTest,
                        MAYBE_PickProfileWithCurrentProfile) {
   base::MockCallback<base::OnceClosure> clear_host_callback;

@@ -95,11 +95,6 @@
 #include "ui/wm/core/window_properties.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/base/win/window_event_target.h"
-#include "ui/views/win/hwnd_util.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/mac/mac_util.h"
 #endif
@@ -522,105 +517,6 @@ TEST_F(WidgetTest, NativeWindowProperty) {
   widget->SetNativeWindowProperty(key, nullptr);
   EXPECT_EQ(nullptr, widget->GetNativeWindowProperty(key));
 }
-
-#if BUILDFLAG(IS_WIN)
-using WidgetExcludeFromScreenCaptureTest = DesktopWidgetTest;
-
-TEST_F(WidgetExcludeFromScreenCaptureTest,
-       ExcludeFromScreenCaptureInheritance) {
-  Widget parent_widget;
-  Widget::InitParams parent_params = CreateParams(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  parent_widget.Init(std::move(parent_params));
-  parent_widget.SetExcludeFromScreenCapture(true);
-
-  Widget child_widget;
-  Widget::InitParams child_params = CreateParams(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  // Use context instead of parent to ensure the child can be a desktop widget.
-  child_params.context = parent_widget.GetNativeWindow();
-  child_widget.Init(std::move(child_params));
-
-  EXPECT_TRUE(child_widget.GetNativeView()->GetProperty(
-      wm::kExcludeFromScreenCaptureKey));
-}
-
-TEST_F(WidgetExcludeFromScreenCaptureTest,
-       ExcludeFromScreenCaptureInheritanceContext) {
-  Widget context_widget;
-  Widget::InitParams context_params = CreateParams(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  context_widget.Init(std::move(context_params));
-  context_widget.SetExcludeFromScreenCapture(true);
-
-  Widget child_widget;
-  Widget::InitParams child_params = CreateParams(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  child_params.context = context_widget.GetNativeWindow();
-  child_widget.Init(std::move(child_params));
-
-  EXPECT_TRUE(child_widget.GetNativeView()->GetProperty(
-      wm::kExcludeFromScreenCaptureKey));
-}
-
-TEST_F(WidgetExcludeFromScreenCaptureTest, SetExcludeFromScreenCapture) {
-  Widget widget;
-  Widget::InitParams params = CreateParams(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  widget.Init(std::move(params));
-
-  EXPECT_FALSE(
-      widget.GetNativeView()->GetProperty(wm::kExcludeFromScreenCaptureKey));
-
-  widget.SetExcludeFromScreenCapture(true);
-  EXPECT_TRUE(
-      widget.GetNativeView()->GetProperty(wm::kExcludeFromScreenCaptureKey));
-
-  widget.SetExcludeFromScreenCapture(false);
-  EXPECT_FALSE(
-      widget.GetNativeView()->GetProperty(wm::kExcludeFromScreenCaptureKey));
-}
-
-TEST_F(WidgetExcludeFromScreenCaptureTest,
-       SetExcludeFromScreenCapturePropagation) {
-  Widget parent_widget;
-  Widget::InitParams parent_params = CreateParams(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  parent_widget.Init(std::move(parent_params));
-
-  Widget child_widget;
-  Widget::InitParams child_params = CreateParams(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  child_params.parent = parent_widget.GetNativeView();
-  // Force DesktopNativeWidgetAura to ensure the logic there is exercised.
-  child_params.native_widget = new DesktopNativeWidgetAura(&child_widget);
-  child_widget.Init(std::move(child_params));
-
-  Widget grandchild_widget;
-  Widget::InitParams grandchild_params = CreateParams(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  grandchild_params.parent = child_widget.GetNativeView();
-  grandchild_params.native_widget =
-      new DesktopNativeWidgetAura(&grandchild_widget);
-  grandchild_widget.Init(std::move(grandchild_params));
-
-  parent_widget.SetExcludeFromScreenCapture(true);
-  EXPECT_TRUE(parent_widget.GetNativeView()->GetProperty(
-      wm::kExcludeFromScreenCaptureKey));
-  EXPECT_TRUE(child_widget.GetNativeView()->GetProperty(
-      wm::kExcludeFromScreenCaptureKey));
-  EXPECT_TRUE(grandchild_widget.GetNativeView()->GetProperty(
-      wm::kExcludeFromScreenCaptureKey));
-
-  parent_widget.SetExcludeFromScreenCapture(false);
-  EXPECT_FALSE(parent_widget.GetNativeView()->GetProperty(
-      wm::kExcludeFromScreenCaptureKey));
-  EXPECT_FALSE(child_widget.GetNativeView()->GetProperty(
-      wm::kExcludeFromScreenCaptureKey));
-  EXPECT_FALSE(grandchild_widget.GetNativeView()->GetProperty(
-      wm::kExcludeFromScreenCaptureKey));
-}
-#endif
 
 TEST_F(WidgetTest, GetParent) {
   // Create a hierarchy of native widgets.
@@ -2657,15 +2553,8 @@ TEST_F(DesktopWidgetTest, GetWindowPlacement) {
   widget->SetFullscreen(true);
   native_widget->GetWindowPlacement(&restored_bounds, &show_state);
 
-#if BUILDFLAG(IS_WIN)
-  // Desktop Aura widgets on Windows currently don't update show_state when
-  // going fullscreen, and report restored_bounds as the full screen size.
-  // See http://crbug.com/475813.
-  EXPECT_EQ(ui::mojom::WindowShowState::kNormal, show_state);
-#else
   EXPECT_EQ(ui::mojom::WindowShowState::kFullscreen, show_state);
   EXPECT_EQ(expected_bounds, restored_bounds);
-#endif
 
   widget->SetFullscreen(false);
   native_widget->GetWindowPlacement(&restored_bounds, &show_state);
@@ -2717,30 +2606,6 @@ TEST_F(DesktopWidgetTest, MinimumSizeConstraints) {
   widget->SetSize(smaller_size);
   EXPECT_EQ(minimum_size, widget->GetClientAreaBoundsInScreen().size());
 }
-
-#if BUILDFLAG(IS_WIN)
-// On Windows, size constraints are client-sized but SetBounds()
-// operates on window size which includes insets. Ensure the window
-// is clamped correctly if it exceeds its constraints.
-// https://crbug.com/506480944
-TEST_F(DesktopWidgetTest, SetBoundsRespectsMaximumSize) {
-  TestDesktopWidgetDelegate delegate;
-  const gfx::Size maximum_size(400, 300);
-
-  // Start with a smaller preferred/min size to ensure that minimum
-  // size enforcement does not pass the test by itself.
-  auto contents = std::make_unique<StaticSizedView>(gfx::Size(200, 200));
-  contents->set_maximum_size(maximum_size);
-  delegate.set_contents_view(contents.release());
-  delegate.InitWidget(CreateParams(Widget::InitParams::CLIENT_OWNS_WIDGET,
-                                   Widget::InitParams::TYPE_WINDOW));
-  Widget* widget = delegate.GetWidget();
-  widget->Show();
-
-  widget->SetBounds(gfx::Rect(0, 0, 4000, 3000));
-  EXPECT_EQ(maximum_size, widget->GetClientAreaBoundsInScreen().size());
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // When a non-desktop widget has a desktop child widget, due to the
 // async nature of desktop widget shutdown, the parent can be destroyed before
@@ -2924,26 +2789,6 @@ TEST_F(WidgetTest, BubbleControlsResetOnInit) {
 
   anchor->Hide();
 }
-
-#if BUILDFLAG(IS_WIN)
-// Test to ensure that after minimize, view width is set to zero. This is only
-// the case for desktop widgets on Windows. Other platforms retain the window
-// size while minimized.
-TEST_F(DesktopWidgetTest, TestViewWidthAfterMinimizingWidget) {
-  // Create a widget.
-  std::unique_ptr<Widget> widget = CreateTestWidget(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  NonClientView* non_client_view = widget->non_client_view();
-  non_client_view->SetFrameView(CreateMinimumSizeFrameView(widget.get()));
-  // Setting the frame view doesn't do a layout, so force one.
-  non_client_view->InvalidateLayout();
-  views::test::RunScheduledLayout(non_client_view);
-  widget->Show();
-  EXPECT_NE(0, non_client_view->frame_view()->width());
-  widget->Minimize();
-  EXPECT_EQ(0, non_client_view->frame_view()->width());
-}
-#endif
 
 // Desktop native widget Aura tests are for non Chrome OS platforms.
 // This class validates whether paints are received for a visible Widget.
@@ -4278,13 +4123,8 @@ END_METADATA
 
 // Checks if RootView::*_handler_ fields are unset when widget is hidden.
 // Fails on chromium.webkit Windows bot, see crbug.com/264872.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DisableTestRootViewHandlersWhenHidden \
-  DISABLED_TestRootViewHandlersWhenHidden
-#else
 #define MAYBE_DisableTestRootViewHandlersWhenHidden \
   TestRootViewHandlersWhenHidden
-#endif
 TEST_F(WidgetTest, MAYBE_DisableTestRootViewHandlersWhenHidden) {
   Widget* widget = CreateTopLevelNativeWidget();
   widget->SetBounds(gfx::Rect(0, 0, 300, 300));
@@ -5379,175 +5219,6 @@ TEST_F(WidgetTest, NonClientWindowValidAfterInit) {
   EXPECT_EQ(test_rect, root_view->bounds());
 }
 
-#if BUILDFLAG(IS_WIN)
-// Provides functionality to subclass a window and keep track of messages
-// received.
-class SubclassWindowHelper {
- public:
-  explicit SubclassWindowHelper(HWND window)
-      : window_(window), message_to_destroy_on_(0) {
-    EXPECT_EQ(instance_, nullptr);
-    instance_ = this;
-    EXPECT_TRUE(Subclass());
-  }
-
-  SubclassWindowHelper(const SubclassWindowHelper&) = delete;
-  SubclassWindowHelper& operator=(const SubclassWindowHelper&) = delete;
-
-  ~SubclassWindowHelper() {
-    Unsubclass();
-    instance_ = nullptr;
-  }
-
-  // Returns true if the |message| passed in was received.
-  bool received_message(unsigned int message) {
-    return (messages_.find(message) != messages_.end());
-  }
-
-  void Clear() { messages_.clear(); }
-
-  void set_message_to_destroy_on(unsigned int message) {
-    message_to_destroy_on_ = message;
-  }
-
- private:
-  bool Subclass() {
-    old_proc_ = reinterpret_cast<WNDPROC>(::SetWindowLongPtr(
-        window_, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WndProc)));
-    return old_proc_ != nullptr;
-  }
-
-  void Unsubclass() {
-    ::SetWindowLongPtr(window_, GWLP_WNDPROC,
-                       reinterpret_cast<LONG_PTR>(old_proc_));
-  }
-
-  static LRESULT CALLBACK WndProc(HWND window,
-                                  unsigned int message,
-                                  WPARAM w_param,
-                                  LPARAM l_param) {
-    EXPECT_NE(instance_, nullptr);
-    EXPECT_EQ(window, instance_->window_);
-
-    // Keep track of messags received for this window.
-    instance_->messages_.insert(message);
-
-    LRESULT ret = ::CallWindowProc(instance_->old_proc_, window, message,
-                                   w_param, l_param);
-    if (message == instance_->message_to_destroy_on_) {
-      instance_->Unsubclass();
-      ::DestroyWindow(window);
-    }
-    return ret;
-  }
-
-  WNDPROC old_proc_;
-  HWND window_;
-  static SubclassWindowHelper* instance_;
-  std::set<unsigned int> messages_;
-  unsigned int message_to_destroy_on_;
-};
-
-SubclassWindowHelper* SubclassWindowHelper::instance_ = nullptr;
-
-// This test validates whether the WM_SYSCOMMAND message for SC_MOVE is
-// received when we post a WM_NCLBUTTONDOWN message for the caption in the
-// following scenarios:-
-// 1. Posting a WM_NCMOUSEMOVE message for a different location.
-// 2. Posting a WM_NCMOUSEMOVE message with a different hittest code.
-// 3. Posting a WM_MOUSEMOVE message.
-// Disabled because of flaky timeouts: http://crbug.com/592742
-TEST_F(DesktopWidgetTest,
-       DISABLED_SysCommandMoveOnNCLButtonDownOnCaptionAndMoveTest) {
-  std::unique_ptr<Widget> widget = CreateTestWidget(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  widget->Show();
-  ::SetCursorPos(500, 500);
-
-  HWND window = widget->GetNativeWindow()->GetHost()->GetAcceleratedWidget();
-
-  SubclassWindowHelper subclass_helper(window);
-
-  // Posting just a WM_NCLBUTTONDOWN message should not result in a
-  // WM_SYSCOMMAND
-  ::PostMessage(window, WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(100, 100));
-  RunPendingMessages();
-  EXPECT_TRUE(subclass_helper.received_message(WM_NCLBUTTONDOWN));
-  EXPECT_FALSE(subclass_helper.received_message(WM_SYSCOMMAND));
-
-  subclass_helper.Clear();
-  // Posting a WM_NCLBUTTONDOWN message followed by a WM_NCMOUSEMOVE at the
-  // same location should not result in a WM_SYSCOMMAND message.
-  ::PostMessage(window, WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(100, 100));
-  ::PostMessage(window, WM_NCMOUSEMOVE, HTCAPTION, MAKELPARAM(100, 100));
-  RunPendingMessages();
-
-  EXPECT_TRUE(subclass_helper.received_message(WM_NCLBUTTONDOWN));
-  EXPECT_TRUE(subclass_helper.received_message(WM_NCMOUSEMOVE));
-  EXPECT_FALSE(subclass_helper.received_message(WM_SYSCOMMAND));
-
-  subclass_helper.Clear();
-  // Posting a WM_NCLBUTTONDOWN message followed by a WM_NCMOUSEMOVE at a
-  // different location should result in a WM_SYSCOMMAND message.
-  ::PostMessage(window, WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(100, 100));
-  ::PostMessage(window, WM_NCMOUSEMOVE, HTCAPTION, MAKELPARAM(110, 110));
-  RunPendingMessages();
-
-  EXPECT_TRUE(subclass_helper.received_message(WM_NCLBUTTONDOWN));
-  EXPECT_TRUE(subclass_helper.received_message(WM_NCMOUSEMOVE));
-  EXPECT_TRUE(subclass_helper.received_message(WM_SYSCOMMAND));
-
-  subclass_helper.Clear();
-  // Posting a WM_NCLBUTTONDOWN message followed by a WM_NCMOUSEMOVE at a
-  // different location with a different hittest code should result in a
-  // WM_SYSCOMMAND message.
-  ::PostMessage(window, WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(100, 100));
-  ::PostMessage(window, WM_NCMOUSEMOVE, HTTOP, MAKELPARAM(110, 102));
-  RunPendingMessages();
-
-  EXPECT_TRUE(subclass_helper.received_message(WM_NCLBUTTONDOWN));
-  EXPECT_TRUE(subclass_helper.received_message(WM_NCMOUSEMOVE));
-  EXPECT_TRUE(subclass_helper.received_message(WM_SYSCOMMAND));
-
-  subclass_helper.Clear();
-  // Posting a WM_NCLBUTTONDOWN message followed by a WM_MOUSEMOVE should
-  // result in a WM_SYSCOMMAND message.
-  ::PostMessage(window, WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(100, 100));
-  ::PostMessage(window, WM_MOUSEMOVE, HTCLIENT, MAKELPARAM(110, 110));
-  RunPendingMessages();
-
-  EXPECT_TRUE(subclass_helper.received_message(WM_NCLBUTTONDOWN));
-  EXPECT_TRUE(subclass_helper.received_message(WM_MOUSEMOVE));
-  EXPECT_TRUE(subclass_helper.received_message(WM_SYSCOMMAND));
-}
-
-// This test validates that destroying the window in the context of the
-// WM_SYSCOMMAND message with SC_MOVE does not crash.
-// Disabled because of flaky timeouts: http://crbug.com/592742
-TEST_F(DesktopWidgetTest, DISABLED_DestroyInSysCommandNCLButtonDownOnCaption) {
-  std::unique_ptr<Widget> widget = CreateTestWidget(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  widget->Show();
-  ::SetCursorPos(500, 500);
-
-  HWND window = widget->GetNativeWindow()->GetHost()->GetAcceleratedWidget();
-
-  SubclassWindowHelper subclass_helper(window);
-
-  // Destroying the window in the context of the WM_SYSCOMMAND message
-  // should not crash.
-  subclass_helper.set_message_to_destroy_on(WM_SYSCOMMAND);
-
-  ::PostMessage(window, WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(100, 100));
-  ::PostMessage(window, WM_NCMOUSEMOVE, HTCAPTION, MAKELPARAM(110, 110));
-  RunPendingMessages();
-
-  EXPECT_TRUE(subclass_helper.received_message(WM_NCLBUTTONDOWN));
-  EXPECT_TRUE(subclass_helper.received_message(WM_SYSCOMMAND));
-}
-
-#endif
-
 // Test that the z-order levels round-trip.
 TEST_F(WidgetTest, ZOrderLevel) {
   WidgetAutoclosePtr widget(CreateTopLevelNativeWidget());
@@ -6248,122 +5919,6 @@ TEST_F(WidgetShadowTest, MAYBE_ShadowsInRootWindow) {
   other_top_level->Close();
 }
 
-#if BUILDFLAG(IS_WIN)
-
-// Tests the case where an intervening owner popup window is destroyed out from
-// under the currently active modal top-level window. In this instance, the
-// remaining top-level windows should be re-enabled.
-TEST_F(DesktopWidgetTest, WindowModalOwnerDestroyedEnabledTest) {
-  // top_level_widget owns owner_dialog_widget which owns owned_dialog_widget.
-  std::unique_ptr<Widget> top_level_widget =
-      CreateTestWidget(Widget::InitParams::CLIENT_OWNS_WIDGET);
-  top_level_widget->Show();
-
-  // Create the owner modal dialog.
-  const auto create_params = [this](Widget* widget, gfx::NativeView parent) {
-    Widget::InitParams init_params =
-        CreateParamsForTestWidget(Widget::InitParams::TYPE_WINDOW);
-    init_params.delegate = new WidgetDelegate();
-    init_params.delegate->SetModalType(ui::mojom::ModalType::kWindow);
-    init_params.parent = parent;
-    init_params.native_widget =
-        new test::TestPlatformNativeWidget<DesktopNativeWidgetAura>(
-            widget, false, nullptr);
-    return init_params;
-  };
-  Widget owner_dialog_widget;
-  owner_dialog_widget.Init(
-      create_params(&owner_dialog_widget, top_level_widget->GetNativeView()));
-  owner_dialog_widget.Show();
-  HWND owner_hwnd = HWNDForWidget(&owner_dialog_widget);
-
-  // Create the owned modal dialog.
-  Widget owned_dialog_widget;
-  owned_dialog_widget.Init(
-      create_params(&owned_dialog_widget, owner_dialog_widget.GetNativeView()));
-  owned_dialog_widget.Show();
-  HWND owned_hwnd = HWNDForWidget(&owned_dialog_widget);
-
-  RunPendingMessages();
-
-  HWND top_hwnd = HWNDForWidget(top_level_widget.get());
-
-  EXPECT_FALSE(!!IsWindowEnabled(owner_hwnd));
-  EXPECT_FALSE(!!IsWindowEnabled(top_hwnd));
-  EXPECT_TRUE(!!IsWindowEnabled(owned_hwnd));
-
-  owner_dialog_widget.CloseNow();
-  RunPendingMessages();
-
-  EXPECT_FALSE(!!IsWindow(owner_hwnd));
-  EXPECT_FALSE(!!IsWindow(owned_hwnd));
-  EXPECT_TRUE(!!IsWindowEnabled(top_hwnd));
-
-  top_level_widget->CloseNow();
-}
-
-TEST_F(DesktopWidgetTest, StackAboveTest) {
-  WidgetAutoclosePtr root_one(CreateTopLevelNativeWidget());
-  WidgetAutoclosePtr root_two(CreateTopLevelNativeWidget());
-  Widget* child_one = CreateChildNativeWidgetWithParent(root_one->AsWidget());
-  Widget* child_one_b = CreateChildNativeWidgetWithParent(root_one->AsWidget());
-  Widget* child_two = CreateChildNativeWidgetWithParent(root_two->AsWidget());
-  Widget* grandchild_one =
-      CreateChildNativeWidgetWithParent(child_one->AsWidget());
-  Widget* grandchild_two =
-      CreateChildNativeWidgetWithParent(child_two->AsWidget());
-
-  root_one->ShowInactive();
-  child_one->ShowInactive();
-  child_one_b->ShowInactive();
-  grandchild_one->ShowInactive();
-  root_two->ShowInactive();
-  child_two->ShowInactive();
-  grandchild_two->ShowInactive();
-
-  // Creates the following where Z-Order is from Left to Right.
-  //            root_one                    root_two
-  //             /    \                         /
-  //       child_one_b  child_one           child_two
-  //                       /                  /
-  //                 grandchild_one    grandchild_two
-  //
-  // Note: child_one and grandchild_one were brought to front
-  //       when grandchild_one was shown.
-
-  // Child elements are stacked above parent.
-  EXPECT_TRUE(child_one->IsStackedAbove(root_one->GetNativeView()));
-  EXPECT_TRUE(child_one_b->IsStackedAbove(root_one->GetNativeView()));
-  EXPECT_TRUE(grandchild_one->IsStackedAbove(child_one->GetNativeView()));
-  EXPECT_TRUE(grandchild_two->IsStackedAbove(root_two->GetNativeView()));
-
-  // Siblings with higher z-order are stacked correctly.
-  EXPECT_TRUE(child_one->IsStackedAbove(child_one_b->GetNativeView()));
-  EXPECT_TRUE(grandchild_one->IsStackedAbove(child_one_b->GetNativeView()));
-
-  // Root elements are stacked above child of a root with lower z-order.
-  EXPECT_TRUE(root_two->IsStackedAbove(root_one->GetNativeView()));
-  EXPECT_TRUE(root_two->IsStackedAbove(child_one_b->GetNativeView()));
-
-  // Child elements are stacked above child of root with lower z-order.
-  EXPECT_TRUE(child_two->IsStackedAbove(child_one_b->GetNativeView()));
-  EXPECT_TRUE(child_two->IsStackedAbove(grandchild_one->GetNativeView()));
-  EXPECT_TRUE(grandchild_two->IsStackedAbove(child_one->GetNativeView()));
-  EXPECT_TRUE(grandchild_two->IsStackedAbove(root_one->GetNativeView()));
-
-  // False cases to verify function is not just returning true for all cases.
-  EXPECT_FALSE(root_one->IsStackedAbove(grandchild_two->GetNativeView()));
-  EXPECT_FALSE(root_one->IsStackedAbove(grandchild_one->GetNativeView()));
-  EXPECT_FALSE(child_two->IsStackedAbove(grandchild_two->GetNativeView()));
-  EXPECT_FALSE(child_one->IsStackedAbove(grandchild_two->GetNativeView()));
-  EXPECT_FALSE(child_one_b->IsStackedAbove(child_two->GetNativeView()));
-  EXPECT_FALSE(grandchild_one->IsStackedAbove(grandchild_two->GetNativeView()));
-  EXPECT_FALSE(grandchild_one->IsStackedAbove(root_two->GetNativeView()));
-  EXPECT_FALSE(child_one_b->IsStackedAbove(grandchild_one->GetNativeView()));
-}
-
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(ENABLE_DESKTOP_AURA) || BUILDFLAG(IS_MAC)
 
 namespace {
@@ -6400,12 +5955,6 @@ class CompositingWidgetTest : public DesktopWidgetTest {
 #if BUILDFLAG(IS_MAC)
       // Tooltips are native on Mac. See NativeWidgetNSWindowBridge::Init.
       if (widget_type == Widget::InitParams::TYPE_TOOLTIP) {
-        continue;
-      }
-#elif BUILDFLAG(IS_WIN)
-      // Other widget types would require to create a parent window and the
-      // the purpose of this test is mainly X11 in the first place.
-      if (widget_type != Widget::InitParams::TYPE_WINDOW) {
         continue;
       }
 #endif

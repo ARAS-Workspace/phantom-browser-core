@@ -425,7 +425,7 @@ IN_PROC_BROWSER_TEST_F(TurnSyncOnHelperBrowserTest, UndoSyncRemoveAccount) {
   // tokens should be sufficient to invalidate cookies.
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 // Tests that aborting a Sync opt-in flow started with a web only signed in
 // account reverts the account to the initial web only signed in state.
 IN_PROC_BROWSER_TEST_F(TurnSyncOnHelperBrowserTest,
@@ -595,4 +595,4 @@ IN_PROC_BROWSER_TEST_F(
                                   signin::ConsentLevel::kSignin));
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

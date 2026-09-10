@@ -211,15 +211,9 @@ TEST_F(FileSelectHelperTest, GetSanitizedFileName) {
             FileSelectHelper::GetSanitizedFileName(
                 base::FilePath(FILE_PATH_LITERAL("path/components/in/name"))));
 
-#if BUILDFLAG(IS_WIN)
-  // Invalid UTF-16. However, note that on Windows, the invalid UTF-16 will pass
-  // through without error.
-  base::FilePath::CharType kBadName[] = {0xd801, 0xdc37, 0xdc17, 0};
-#else
   // Invalid UTF-8
   base::FilePath::CharType kBadName[] = {'\xe3', '\x81', '\x81',
                                          '\x81', '\x82', '\0'};
-#endif
   base::FilePath bad_filename(kBadName);
   ASSERT_FALSE(bad_filename.empty());
   // The only thing we are testing is that if the source filename was non-empty,
@@ -597,11 +591,7 @@ TEST_F(FileSelectHelperTest, GetFileTypesFromAcceptType) {
 
   std::vector<std::vector<base::FilePath::StringType>> expected_extensions{
       std::vector<base::FilePath::StringType>{
-#if BUILDFLAG(IS_WIN)
-          L"mp4", L"斤拷锟", L"🔥", L"png"}};
-#else
           "mp4", "斤拷锟", "🔥", "png"}};
-#endif
   ASSERT_EQ(expected_extensions, file_type_info->extensions);
 }
 
@@ -620,13 +610,8 @@ TEST_F(FileSelectHelperTest, MultipleFileExtensionsForMime) {
       file_select_helper->GetFileTypesFromAcceptType(accept_types);
 
   std::vector<base::FilePath::StringType> expected_extensions {
-#if BUILDFLAG(IS_WIN)
-    L"ppt", L"pot", L"pps"
-  };
-#else
     "ppt", "pot", "pps"
   };
-#endif
   std::sort(expected_extensions.begin(), expected_extensions.end());
 
   ASSERT_EQ(file_type_info->extensions.size(), 1u);

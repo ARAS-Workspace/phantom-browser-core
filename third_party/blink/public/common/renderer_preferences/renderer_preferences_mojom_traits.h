@@ -130,7 +130,7 @@ struct BLINK_COMMON_EXPORT
     return data.enable_encrypted_media;
   }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
   static const bool& use_overlay_scrollbar(
       const ::blink::RendererPreferences& data) {
     return data.use_overlay_scrollbar;
@@ -200,49 +200,6 @@ struct BLINK_COMMON_EXPORT
   static const bool& middle_click_paste_allowed(
       const ::blink::RendererPreferences& data) {
     return data.middle_click_paste_allowed;
-  }
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  static const std::u16string& caption_font_family_name(
-      const ::blink::RendererPreferences& data) {
-    return data.caption_font_family_name;
-  }
-  static const int32_t& caption_font_height(
-      const ::blink::RendererPreferences& data) {
-    return data.caption_font_height;
-  }
-  static const std::u16string& small_caption_font_family_name(
-      const ::blink::RendererPreferences& data) {
-    return data.small_caption_font_family_name;
-  }
-  static const int32_t& small_caption_font_height(
-      const ::blink::RendererPreferences& data) {
-    return data.small_caption_font_height;
-  }
-  static const std::u16string& menu_font_family_name(
-      const ::blink::RendererPreferences& data) {
-    return data.menu_font_family_name;
-  }
-  static const int32_t& menu_font_height(
-      const ::blink::RendererPreferences& data) {
-    return data.menu_font_height;
-  }
-  static const std::u16string& status_font_family_name(
-      const ::blink::RendererPreferences& data) {
-    return data.status_font_family_name;
-  }
-  static const int32_t& status_font_height(
-      const ::blink::RendererPreferences& data) {
-    return data.status_font_height;
-  }
-  static const std::u16string& message_font_family_name(
-      const ::blink::RendererPreferences& data) {
-    return data.message_font_family_name;
-  }
-  static const int32_t& message_font_height(
-      const ::blink::RendererPreferences& data) {
-    return data.message_font_height;
   }
 #endif
 

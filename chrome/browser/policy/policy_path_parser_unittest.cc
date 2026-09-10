@@ -88,29 +88,6 @@ TEST_F(PolicyPathParserTests, MacVariables) {
                        FILE_PATH_LITERAL("${documents}"));
 }
 
-#elif BUILDFLAG(IS_WIN)
-
-TEST_F(PolicyPathParserTests, WinVariables) {
-  CheckForSubstitution(FILE_PATH_LITERAL("//$C/${documents}"),
-                       FILE_PATH_LITERAL("${documents}"));
-  CheckForSubstitution(FILE_PATH_LITERAL("//$C/${local_app_data}"),
-                       FILE_PATH_LITERAL("${local_app_data}"));
-  CheckForSubstitution(FILE_PATH_LITERAL("//$C/${roaming_app_data}"),
-                       FILE_PATH_LITERAL("${roaming_app_data}"));
-  CheckForSubstitution(FILE_PATH_LITERAL("//$C/${profile}"),
-                       FILE_PATH_LITERAL("${profile}"));
-  CheckForSubstitution(FILE_PATH_LITERAL("//$C/${global_app_data}"),
-                       FILE_PATH_LITERAL("${global_app_data}"));
-  CheckForSubstitution(FILE_PATH_LITERAL("//$C/${program_files}"),
-                       FILE_PATH_LITERAL("${program_files}"));
-  CheckForSubstitution(FILE_PATH_LITERAL("//$C/${windows}"),
-                       FILE_PATH_LITERAL("${windows}"));
-  CheckForSubstitution(FILE_PATH_LITERAL("//$C/${client_name}"),
-                       FILE_PATH_LITERAL("${client_name}"));
-  CheckForSubstitution(FILE_PATH_LITERAL("//$C/${session_name}"),
-                       FILE_PATH_LITERAL("${session_name}"));
-}
-
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace policy

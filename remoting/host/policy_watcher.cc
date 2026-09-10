@@ -34,9 +34,7 @@
 #include "base/json/json_reader.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "components/policy/core/common/policy_loader_win.h"
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #include "base/apple/foundation_util.h"
 #include "base/strings/sys_string_conversions.h"
 #include "components/policy/core/common/policy_loader_mac.h"
@@ -51,14 +49,6 @@ namespace remoting {
 namespace key = ::policy::key;
 
 namespace {
-
-#if BUILDFLAG(IS_WIN)
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-constexpr wchar_t kChromePolicyKey[] = L"SOFTWARE\\Policies\\Google\\Chrome";
-#else
-constexpr wchar_t kChromePolicyKey[] = L"SOFTWARE\\Policies\\Chromium";
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#endif  // BUILDFLAG(IS_WIN)
 
 // Copies all policy values from one dictionary to another, using values from
 // |default_values| if they are not set in |from|.
@@ -195,9 +185,6 @@ base::DictValue PolicyWatcher::GetDefaultPolicies() {
   result.Set(key::kRemoteAccessHostAllowRemoteAccessConnections, true);
   result.Set(key::kRemoteAccessHostMaximumSessionDurationMinutes, 0);
   result.Set(key::kRemoteAccessHostAllowPinAuthentication, base::Value());
-#endif
-#if BUILDFLAG(IS_WIN)
-  result.Set(key::kRemoteAccessHostAllowUiAccessForRemoteAssistance, false);
 #endif
   return result;
 }
@@ -354,9 +341,6 @@ void PolicyWatcher::OnPolicyServiceInitialized(policy::PolicyDomain domain) {
   const policy::PolicyMap& current = policy_service_->GetPolicies(ns);
   OnPolicyUpdated(ns, current, current);
 
-#if BUILDFLAG(IS_WIN)
-  WatchForRegistryChanges();
-#endif
 }
 
 std::unique_ptr<PolicyWatcher> PolicyWatcher::CreateFromPolicyLoader(
@@ -385,35 +369,6 @@ std::unique_ptr<PolicyWatcher> PolicyWatcher::CreateWithPolicyService(
                                             CreateSchemaRegistry()));
 }
 
-#if BUILDFLAG(IS_WIN)
-void PolicyWatcher::WatchForRegistryChanges() {
-  if (!policy_key_.Valid()) {
-    auto open_result =
-        policy_key_.Open(HKEY_LOCAL_MACHINE, kChromePolicyKey, KEY_NOTIFY);
-    if (open_result != ERROR_SUCCESS) {
-      LOG(WARNING) << "Failed to open Chrome policy registry key due to error: "
-                   << open_result;
-      return;
-    }
-  }
-
-  // base::Unretained is sound as |policy_key_| is destroyed before we start
-  // tearing down the various policy service members. Once the PolicyService has
-  // finished refreshing the policy list, we need to set up our watcher again as
-  // it only fires once.
-  auto watch_result = policy_key_.StartWatching(
-      base::BindOnce(&policy::PolicyService::RefreshPolicies,
-                     base::Unretained(policy_service_),
-                     base::BindOnce(&PolicyWatcher::WatchForRegistryChanges,
-                                    base::Unretained(this)),
-                     policy::PolicyFetchReason::kCrdHostPolicyWatcher));
-  if (!watch_result) {
-    LOG(WARNING) << "Failed to register for Chrome policy registry key changes";
-    policy_key_.Close();
-  }
-}
-#endif
-
 std::unique_ptr<PolicyWatcher> PolicyWatcher::CreateWithTaskRunner(
     const scoped_refptr<base::SingleThreadTaskRunner>& file_task_runner,
     policy::ManagementService* management_service) {
@@ -421,10 +376,7 @@ std::unique_ptr<PolicyWatcher> PolicyWatcher::CreateWithTaskRunner(
   // (even on Chromium) so that policy enforcement can't be bypassed by running
   // Chromium.
   std::unique_ptr<policy::AsyncPolicyLoader> policy_loader;
-#if BUILDFLAG(IS_WIN)
-  policy_loader = std::make_unique<policy::PolicyLoaderWin>(
-      file_task_runner, management_service, kChromePolicyKey);
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
   // Explicitly watch the "com.google.Chrome" bundle ID, no matter what this
   // app's bundle ID actually is. All channels of Chrome should obey the same

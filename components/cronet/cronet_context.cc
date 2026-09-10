@@ -401,12 +401,7 @@ CronetContext::NetworkTasks::BuildDefaultURLRequestContext(
 
   // Set up pref file if storage path is specified.
   if (!context_config_->storage_path.empty()) {
-#if BUILDFLAG(IS_WIN)
-    base::FilePath storage_path(
-        base::FilePath::FromUTF8Unsafe(context_config_->storage_path));
-#else
     base::FilePath storage_path(context_config_->storage_path);
-#endif
     // Currently only the default context uses a PrefManager, this means that
     // contexts for specific networks do not maintain state between restarts.
     // Part of that is by design, part of that is due to CronetPrefsManager's
@@ -669,11 +664,7 @@ CronetContext::GetNetworkTaskRunner() const {
 
 bool CronetContext::StartNetLogToFile(const std::string& file_name,
                                       bool log_all) {
-#if BUILDFLAG(IS_WIN)
-  base::FilePath file_path(base::FilePath::FromUTF8Unsafe(file_name));
-#else
   base::FilePath file_path(file_name);
-#endif
   base::ScopedFILE file(base::OpenFile(file_path, "w"));
   if (!file) {
     LOG(ERROR) << "Failed to open NetLog file for writing.";
@@ -849,11 +840,7 @@ void CronetContext::NetworkTasks::StartNetLogToBoundedFile(
 
   // TODO(eroman): The cronet API passes a directory here. But it should now
   // just pass a file path.
-#if BUILDFLAG(IS_WIN)
-  base::FilePath file_path(base::FilePath::FromUTF8Unsafe(dir_path));
-#else
   base::FilePath file_path(dir_path);
-#endif
   file_path = file_path.AppendASCII("netlog.json");
 
   {

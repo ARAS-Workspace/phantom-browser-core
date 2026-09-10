@@ -733,9 +733,6 @@ TEST_F(GpuDataManagerImplPrivateTest, NoDefaultFallbackToSwiftShaderForGanesh) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitWithFeatures({}, {
                                         features::kAllowSwiftShaderFallback,
-#if BUILDFLAG(IS_WIN)
-                                        features::kAllowD3D11WarpFallback,
-#endif  // BUILDFLAG(IS_WIN)
                                     });
 
   ScopedGpuDataManagerImplPrivate manager;
@@ -828,7 +825,7 @@ TEST_F(GpuDataManagerImplPrivateTest,
   EXPECT_EQ(expected_mode, manager->GetGpuMode());
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 TEST_F(GpuDataManagerImplPrivateTest,
        ExplicitFallbackToSwiftShaderForGraphite) {
   base::CommandLine::ForCurrentProcess()->AppendSwitch(
@@ -897,15 +894,12 @@ TEST_F(GpuDataManagerImplPrivateTest,
   gpu::GpuMode expected_mode = gpu::GpuMode::DISPLAY_COMPOSITOR;
   EXPECT_EQ(expected_mode, manager->GetGpuMode());
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 TEST_F(GpuDataManagerImplPrivateTest, GpuStartsWithGpuDisabled) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitWithFeatures({}, {
                                         features::kAllowSwiftShaderFallback,
-#if BUILDFLAG(IS_WIN)
-                                        features::kAllowD3D11WarpFallback,
-#endif  // BUILDFLAG(IS_WIN)
                                     });
 
   // Ensure --enable-unsafe-swiftshader is not in the command line. It is used
@@ -962,9 +956,6 @@ TEST_F(GpuDataManagerImplPrivateTest, VulkanInitializationFails) {
 #if BUILDFLAG(ENABLE_SWIFTSHADER)
                                     features::kAllowSwiftShaderFallback,
 #endif  // BUILDFLAG(ENABLE_SWIFTSHADER)
-#if BUILDFLAG(IS_WIN)
-                                    features::kAllowD3D11WarpFallback,
-#endif  // BUILDFLAG(IS_WIN)
                                 });
 
   ScopedGpuDataManagerImplPrivate manager;
@@ -1001,9 +992,6 @@ TEST_F(GpuDataManagerImplPrivateTest, FallbackFromVulkanWithGLDisabled) {
   feature_list.InitWithFeatures({features::kVulkan},
                                 {
                                     features::kAllowSwiftShaderFallback,
-#if BUILDFLAG(IS_WIN)
-                                    features::kAllowD3D11WarpFallback,
-#endif  // BUILDFLAG(IS_WIN)
                                 });
   ScopedGpuDataManagerImplPrivate manager;
   EXPECT_EQ(gpu::GpuMode::HARDWARE_VULKAN, manager->GetGpuMode());

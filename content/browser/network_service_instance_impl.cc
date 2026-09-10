@@ -94,10 +94,6 @@
 #include "content/browser/network_sandbox.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "content/browser/network/network_service_process_tracker_win.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include "content/browser/system_dns_resolution/system_dns_resolver.h"
 #include "services/network/public/mojom/system_dns_resolution.mojom-forward.h"
@@ -274,22 +270,6 @@ void CreateInProcessNetworkServiceOnThread(
 
 void MaybeInitializeSocketBrokers(
     network::mojom::NetworkContextParams* params) {
-#if BUILDFLAG(IS_WIN)
-  // If the browser has started shutting down, it is possible that either a)
-  // `g_client` was never created if shutdown started before the network service
-  // was created, or b) the network service might have crashed meaning
-  // `g_client` is the client for the already-crashed Network Service, and a new
-  // network service never started. It's not safe to bind the socket broker in
-  // either of these cases so skip the binding since the browser is shutting
-  // down anyway.
-  if (!GetContentClient()->browser()->IsShuttingDown() &&
-      GetContentClient()->browser()->ShouldSandboxNetworkService() &&
-      !params->socket_brokers) {
-    params->socket_brokers = network::mojom::SocketBrokerRemotes::New();
-    params->socket_brokers->client = g_client->BindSocketBroker();
-    params->socket_brokers->server = g_client->BindSocketBroker();
-  }
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 void CreateNetworkContextInternal(
@@ -741,13 +721,7 @@ network::mojom::NetworkService* GetNetworkService() {
         if (env_str.has_value()) {
           UMA_HISTOGRAM_ENUMERATION(kSSLKeyLogFileHistogram,
                                     SSLKeyLogFileAction::kEnvVarFound);
-#if BUILDFLAG(IS_WIN)
-          // base::Environment returns environment variables in UTF-8 on
-          // Windows.
-          ssl_key_log_path = base::FilePath(base::UTF8ToWide(*env_str));
-#else
           ssl_key_log_path = base::FilePath(*env_str);
-#endif
         }
       }
 

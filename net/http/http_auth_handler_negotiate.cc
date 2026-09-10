@@ -60,9 +60,6 @@ std::unique_ptr<HttpAuthMechanism> CreateAuthSystem(
     return negotiate_auth_system_factory.Run(prefs);
 #if BUILDFLAG(IS_ANDROID)
   return std::make_unique<android::HttpAuthNegotiateAndroid>(prefs);
-#elif BUILDFLAG(IS_WIN)
-  return std::make_unique<HttpAuthSSPI>(auth_library,
-                                        HttpAuth::AUTH_SCHEME_NEGOTIATE);
 #elif BUILDFLAG(IS_POSIX)
   return std::make_unique<HttpAuthGSSAPI>(auth_library,
                                           CHROME_GSS_SPNEGO_MECH_OID_DESC);
@@ -95,17 +92,7 @@ int HttpAuthHandlerNegotiate::Factory::CreateAuthHandler(
     const NetLogWithSource& net_log,
     HostResolver* host_resolver,
     std::unique_ptr<HttpAuthHandler>* handler) {
-#if BUILDFLAG(IS_WIN)
-  if (is_unsupported_ || reason == CREATE_PREEMPTIVE)
-    return ERR_UNSUPPORTED_AUTH_SCHEME;
-  // TODO(cbentzel): Move towards model of parsing in the factory
-  //                 method and only constructing when valid.
-  std::unique_ptr<HttpAuthHandler> tmp_handler(
-      std::make_unique<HttpAuthHandlerNegotiate>(
-          CreateAuthSystem(auth_library_.get(), http_auth_preferences(),
-                           negotiate_auth_system_factory_),
-          http_auth_preferences(), host_resolver));
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   if (is_unsupported_ || !http_auth_preferences() ||
       http_auth_preferences()->AuthAndroidNegotiateAccountType().empty() ||
       reason == CREATE_PREEMPTIVE)
@@ -286,9 +273,7 @@ std::string HttpAuthHandlerNegotiate::CreateSPN(
   // and IE. Users can override the behavior so aliases are allowed and
   // non-standard ports are included.
   int port = scheme_host_port.port();
-#if BUILDFLAG(IS_WIN)
-  static const char kSpnSeparator = '/';
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   static const char kSpnSeparator = '@';
 #endif
   if (port != 80 && port != 443 &&

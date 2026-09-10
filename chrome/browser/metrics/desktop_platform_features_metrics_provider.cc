@@ -25,10 +25,6 @@
 #include "ui/native_theme/native_theme.h"
 #include "ui/native_theme/os_settings_provider.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/win/isolated_browser_support.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace {
 
 // These values are persisted to logs. Entries should not be renumbered and
@@ -104,8 +100,4 @@ void DesktopPlatformFeaturesMetricsProvider::ProvideCurrentSessionData(
         return true;
       });
 
-#if BUILDFLAG(IS_WIN)
-  base::UmaHistogramBoolean("Windows.RunningIsolated",
-                            chrome::IsRunningIsolated());
-#endif  // BUILDFLAG(IS_WIN)
 }

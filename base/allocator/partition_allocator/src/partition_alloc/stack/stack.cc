@@ -13,11 +13,7 @@
 #include "partition_alloc/partition_alloc_base/compiler_specific.h"
 #include "partition_alloc/partition_alloc_check.h"
 
-#if PA_BUILDFLAG(IS_WIN)
-#include <windows.h>
-#else
 #include <pthread.h>
-#endif
 
 #if PA_BUILDFLAG(PA_LIBC_GLIBC)
 extern "C" void* __libc_stack_end;
@@ -25,27 +21,7 @@ extern "C" void* __libc_stack_end;
 
 namespace partition_alloc::internal {
 
-#if PA_BUILDFLAG(IS_WIN)
-
-void* GetStackTop() {
-#if PA_BUILDFLAG(PA_ARCH_CPU_X86_64)
-  return reinterpret_cast<void*>(
-      reinterpret_cast<NT_TIB64*>(NtCurrentTeb())->StackBase);
-#elif PA_BUILDFLAG(PA_ARCH_CPU_32_BITS)
-  return reinterpret_cast<void*>(
-      reinterpret_cast<NT_TIB*>(NtCurrentTeb())->StackBase);
-#elif PA_BUILDFLAG(PA_ARCH_CPU_ARM64)
-  // Windows 8 and later, see
-  // https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentthreadstacklimits
-  ULONG_PTR lowLimit, highLimit;
-  ::GetCurrentThreadStackLimits(&lowLimit, &highLimit);
-  return reinterpret_cast<void*>(highLimit);
-#else
-#error "Unsupported GetStackStart"
-#endif
-}
-
-#elif PA_BUILDFLAG(IS_APPLE)
+#if PA_BUILDFLAG(IS_APPLE)
 
 void* GetStackTop() {
   return pthread_get_stackaddr_np(pthread_self());
@@ -76,9 +52,9 @@ void* GetStackTop() {
 #endif  // PA_BUILDFLAG(PA_LIBC_GLIBC)
 }
 
-#else  // PA_BUILDFLAG(IS_WIN)
+#else
 #error "Unsupported GetStackTop"
-#endif  // PA_BUILDFLAG(IS_WIN)
+#endif  // PA_BUILDFLAG(IS_APPLE)
 
 using IterateStackCallback = void (*)(const Stack*, StackVisitor*, uintptr_t*);
 extern "C" void PAPushAllRegistersAndIterateStack(const Stack*,

@@ -11,11 +11,9 @@
 
 #include "build/build_config.h"
 
-#if !BUILDFLAG(IS_WIN)
 namespace base {
 class FilePath;
 }
-#endif
 
 namespace crash_reporter {
 
@@ -55,7 +53,7 @@ class CrashReporterClient {
   CrashReporterClient();
   virtual ~CrashReporterClient();
 
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
   // Sets the crash reporting client ID, a unique identifier for the client
   // that is sending crash reports. After it is set, it should not be changed.
   // |client_guid| may either be a full GUID or a GUID that was already stripped
@@ -66,26 +64,7 @@ class CrashReporterClient {
   virtual void SetCrashReporterClientIdFromGUID(const std::string& client_guid);
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  // Returns true if an alternative location to store the minidump files was
-  // specified. Returns true if |crash_dir| was set.
-  virtual bool GetAlternativeCrashDumpLocation(std::wstring* crash_dir);
-
-  // Returns a textual description of the product type and version to include
-  // in the crash report.
-  virtual void GetProductNameAndVersion(const std::wstring& exe_path,
-                                        std::wstring* product_name,
-                                        std::wstring* version,
-                                        std::wstring* special_build,
-                                        std::wstring* channel_name);
-
-  // Returns the fully-qualified path for a registered out of process exception
-  // helper module. The module is optional. Return an empty string to indicate
-  // that no module should be registered.
-  virtual std::wstring GetWerRuntimeExceptionModule();
-#endif
-
-#if BUILDFLAG(IS_WIN) || (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC))
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
   // Returns true if larger crash dumps should be dumped.
   virtual bool GetShouldDumpLargerDumps();
 #endif
@@ -106,21 +85,13 @@ class CrashReporterClient {
   // |crash_dir| was set. Windows has to use std::wstring because this code
   // needs to work in chrome_elf, where only kernel32.dll is allowed, and
   // base::FilePath and its dependencies pull in other DLLs.
-#if BUILDFLAG(IS_WIN)
-  virtual bool GetCrashDumpLocation(std::wstring* crash_dir);
-#else
   virtual bool GetCrashDumpLocation(base::FilePath* crash_dir);
-#endif
 
   // The location where metrics files should be written. Returns true if
   // |metrics_dir| was set. Windows has to use std::wstring because this code
   // needs to work in chrome_elf, where only kernel32.dll is allowed, and
   // base::FilePath and its dependencies pull in other DLLs.
-#if BUILDFLAG(IS_WIN)
-  virtual bool GetCrashMetricsLocation(std::wstring* metrics_dir);
-#else
   virtual bool GetCrashMetricsLocation(base::FilePath* metrics_dir);
-#endif
 
   // Returns a textual description of the product info (product name, version,
   // etc.) to include in the crash report.

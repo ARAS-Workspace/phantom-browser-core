@@ -17,10 +17,6 @@
 #include "remoting/host/chromoting_host_services_client.h"
 #include "remoting/host/security_key/security_key_ipc_constants.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <Windows.h>
-#endif
-
 namespace remoting {
 
 SecurityKeyIpcClient::SecurityKeyIpcClient()

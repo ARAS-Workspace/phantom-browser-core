@@ -15,11 +15,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/ui_base_switches.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/test/scoped_os_info_override_win.h"
-#include "base/win/windows_version.h"
-#endif
-
 namespace captions {
 class CaptionUtilTest : public testing::Test {
  public:
@@ -84,12 +79,6 @@ TEST_F(CaptionUtilTest, ReturnsCorrectCaptionSettingsUrl) {
   EXPECT_EQ(GetCaptionSettingsUrl(), "chrome://os-settings/audioAndCaptions");
 #elif BUILDFLAG(IS_LINUX)
   EXPECT_EQ(GetCaptionSettingsUrl(), "chrome://settings/captions");
-#elif BUILDFLAG(IS_WIN)
-  {
-    base::test::ScopedOSInfoOverride os_override(
-        base::test::ScopedOSInfoOverride::Type::kWin10Pro);
-    EXPECT_EQ(GetCaptionSettingsUrl(), "chrome://settings/accessibility");
-  }
 #elif BUILDFLAG(IS_MAC)
   EXPECT_EQ(GetCaptionSettingsUrl(), "chrome://settings/accessibility");
 #endif  // BUILDFLAG(IS_LINUX)

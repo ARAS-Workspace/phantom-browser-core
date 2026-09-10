@@ -41,11 +41,7 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <aclapi.h>
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include <sys/stat.h>
 #endif
 
@@ -68,8 +64,7 @@ namespace {
 
 base::AtomicSequenceNumber g_next_delegate_id;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 // inotify fires two events - one for each file creation + modification.
 constexpr size_t kExpectedEventsForNewFileWrite = 2;
 #else
@@ -78,7 +73,7 @@ constexpr size_t kExpectedEventsForNewFileWrite = 1;
 
 #define CHANGE_INFO_SUPPORTED                                               \
   BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-      BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+      BUILDFLAG(IS_MAC)
 
 #if CHANGE_INFO_SUPPORTED
 // Only the inotify FilePathWatcher's usage can change while watching a file
@@ -185,8 +180,7 @@ inline constexpr auto HasMovedFromPath = [](const base::FilePath& path) {
       &Event::change_info,
       testing::Field(&FilePathWatcher::ChangeInfo::moved_from_path, path));
 };
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // CHANGE_INFO_SUPPORTED
 inline constexpr auto HasNoMovedFromPath = []() {
   return testing::Field(
       &Event::change_info,
@@ -201,8 +195,7 @@ inline constexpr auto IsType =
                          change_type));
     };
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 inline constexpr auto IsFile = []() {
   return testing::Field(
       &Event::change_info,
@@ -263,7 +256,7 @@ inline constexpr auto ModifiedMatcher = [](base::FilePath reported_path,
                      HasModifiedPath(modified_path), HasNoMovedFromPath()));
 };
 
-#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#elif BUILDFLAG(IS_MAC)
 // Windows figures out if a file path is a directory or file with `GetFileInfo`,
 // but since the file is deleted, it can't know.
 //
@@ -862,11 +855,6 @@ TEST_F(FilePathWatcherTest, ModifiedFile) {
 
   // Now make sure we get notified if the file is modified.
   ASSERT_TRUE(WriteFile(test_file(), "new content"));
-#if BUILDFLAG(IS_WIN)
-  // WriteFile causes two writes on Windows because it calls two syscalls:
-  // ::CreateFile and ::WriteFile.
-  event_expecter.AddExpectedEventForPath(test_file());
-#endif
   event_expecter.AddExpectedEventForPath(test_file());
   delegate.RunUntilEventsMatch(event_expecter);
 }
@@ -1059,44 +1047,6 @@ TEST_F(FilePathWatcherTest, DeleteWhileFSEventsPendingDeterministic) {
 }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-TEST_F(FilePathWatcherTest, WindowsBufferOverflow) {
-  FilePathWatcher watcher;
-  TestDelegate delegate;
-  AccumulatingEventExpecter event_expecter;
-  ASSERT_TRUE(SetupWatch(test_file(), &watcher, &delegate,
-                         FilePathWatcher::Type::kNonRecursive));
-
-  {
-    // Block the Watch thread.
-    base::AutoLock auto_lock(watcher.GetWatchThreadLockForTest());
-
-    // Generate an event that will try to acquire the lock on the watch thread.
-    ASSERT_TRUE(WriteFile(test_file(), "content"));
-
-    // The packet size plus the path size. `WriteFile` generates two events so
-    // it's twice that.
-    const size_t kWriteFileEventSize =
-        (sizeof(FILE_NOTIFY_INFORMATION) + test_file().AsUTF8Unsafe().size()) *
-        2;
-
-    // The max size that's allowed for network drives:
-    // https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-readdirectorychangesw#remarks.
-    const size_t kMaxBufferSize = 64 * 1024;
-
-    for (size_t bytes_in_buffer = 0; bytes_in_buffer < kMaxBufferSize;
-         bytes_in_buffer += kWriteFileEventSize) {
-      WriteFile(test_file(), "content");
-    }
-  }
-
-  // The initial `WriteFile` generates an event.
-  event_expecter.AddExpectedEventForPath(test_file());
-  // The rest should only appear as a buffer overflow.
-  event_expecter.AddExpectedEventForPath(test_file());
-  delegate.RunUntilEventsMatch(event_expecter);
-}
-#endif
 
 namespace {
 
@@ -1206,11 +1156,6 @@ TEST_F(FilePathWatcherTest, NonExistentDirectory) {
 
   ASSERT_TRUE(WriteFile(file, "content v2"));
   VLOG(1) << "Waiting for file change";
-#if BUILDFLAG(IS_WIN)
-  // WriteFile causes two writes on Windows because it calls two syscalls:
-  // ::CreateFile and ::WriteFile.
-  event_expecter.AddExpectedEventForPath(file);
-#endif
   event_expecter.AddExpectedEventForPath(file);
   delegate.RunUntilEventsMatch(event_expecter);
 
@@ -1260,18 +1205,12 @@ TEST_F(FilePathWatcherTest, DirectoryChain) {
 
   ASSERT_TRUE(WriteFile(file, "content v2"));
   VLOG(1) << "Waiting for file modification";
-#if BUILDFLAG(IS_WIN)
-  // WriteFile causes two writes on Windows because it calls two syscalls:
-  // ::CreateFile and ::WriteFile.
-  event_expecter.AddExpectedEventForPath(file);
-#endif
   event_expecter.AddExpectedEventForPath(file);
   delegate.RunUntilEventsMatch(event_expecter);
 }
 
 // Windows doesn't allow the target directory to be deleted while there is a
 // FilePathWatcher watching it.
-#if !BUILDFLAG(IS_WIN)
 TEST_F(FilePathWatcherTest, DisappearingDirectory) {
   FilePathWatcher watcher;
   base::FilePath dir(temp_dir_.GetPath().AppendASCII("dir"));
@@ -1294,7 +1233,6 @@ TEST_F(FilePathWatcherTest, DisappearingDirectory) {
         // BUILDFLAG(IS_ANDROID)
   delegate.RunUntilEventsMatch(event_expecter);
 }
-#endif
 
 // Tests that a file that is deleted and reappears is tracked correctly.
 TEST_F(FilePathWatcherTest, DeleteAndRecreate) {
@@ -1351,11 +1289,6 @@ TEST_F(FilePathWatcherTest, WatchDirectoryWriteToFile) {
   // does on other platforms.
   VLOG(1) << "Waiting for file1 modification";
   event_expecter.AddExpectedEventForPath(dir);
-#if BUILDFLAG(IS_WIN)
-  // WriteFile causes two writes on Windows because it calls two syscalls:
-  // ::CreateFile and ::WriteFile.
-  event_expecter.AddExpectedEventForPath(dir);
-#endif
   delegate.RunUntilEventsMatch(event_expecter);
 #endif  // !BUILDFLAG(IS_APPLE)
 }
@@ -1524,11 +1457,6 @@ TEST_F(FilePathWatcherTest, RecursiveWatch) {
   // Write into "$dir/subdir/subdir_child_dir/child_dir_file1".
   ASSERT_TRUE(WriteFile(child_dir_file1, "content"));
   event_expecter.AddExpectedEventForPath(dir);
-#if BUILDFLAG(IS_WIN)
-  // WriteFile causes two writes on Windows because it calls two syscalls:
-  // ::CreateFile and ::WriteFile.
-  event_expecter.AddExpectedEventForPath(dir);
-#endif
   delegate.RunUntilEventsMatch(event_expecter);
 
   // Delete "$dir/subdir/subdir_file1".
@@ -2694,12 +2622,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, DeletedDirectory) {
   ASSERT_TRUE(SetupWatchWithChangeInfo(test_file(), &watcher, &delegate,
                                        GetWatchOptions()));
 
-#if BUILDFLAG(IS_WIN)
-  // Windows doesn't allow the target directory to be deleted while there is a
-  // FilePathWatcher watching it.
-  ASSERT_FALSE(DeletePathRecursively(test_file()));
-  delegate.SpinAndExpectNoEvents();
-#else
   ASSERT_TRUE(DeletePathRecursively(test_file()));
 
   EventExpecterWithChangeInfo event_expecter;
@@ -2708,7 +2630,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, DeletedDirectory) {
       IsType(FilePathWatcher::ChangeType::kDeleted),
       HasModifiedPath(test_file()), HasNoMovedFromPath()));
   delegate.RunUntilEventsMatch(event_expecter);
-#endif
 }
 
 TEST_P(FilePathWatcherWithChangeInfoTest, MultipleWatchersSingleFile) {
@@ -2821,7 +2742,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, DirectoryChain) {
 
 // Windows doesn't allow the target directory to be deleted while there is a
 // FilePathWatcher watching it.
-#if !BUILDFLAG(IS_WIN)
 TEST_P(FilePathWatcherWithChangeInfoTest, DisappearingDirectory) {
   EventExpecterWithChangeInfo event_expecter;
 
@@ -2858,7 +2778,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, DisappearingDirectory) {
   ASSERT_TRUE(DeletePathRecursively(dir));
   delegate.RunUntilEventsMatch(matcher);
 }
-#endif
 
 TEST_P(FilePathWatcherWithChangeInfoTest, DeleteAndRecreate) {
   EventExpecterWithChangeInfo event_expecter;
@@ -3613,17 +3532,9 @@ TEST_P(FilePathWatcherWithChangeInfoTest, MAYBE_NestedDirectoryInDirectory) {
   } else {
     // Do not expect changes to `grandchild` when watching `parent`
     // non-recursively.
-#if BUILDFLAG(IS_WIN)
-    // Modified events on directories may or may not get filtered because the
-    // directories get deleted too fast before we can see they're directories.
-    sequence_matcher =
-        testing::IsSupersetOf({reported_child_path_created_matcher,
-                               reported_child_path_deleted_matcher});
-#else
     sequence_matcher =
         testing::ElementsAre(reported_child_path_created_matcher,
                              reported_child_path_deleted_matcher);
-#endif
   }
   const auto matcher = testing::AllOf(each_event_matcher, sequence_matcher);
 
@@ -3666,7 +3577,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, MAYBE_NestedDirectoryInDirectory) {
 
 // Windows doesn't allow the target directory to be deleted while there is a
 // FilePathWatcher watching it.
-#if !BUILDFLAG(IS_WIN)
 TEST_P(FilePathWatcherWithChangeInfoTest, DeleteDirectoryRecursively) {
   base::FilePath grandparent(temp_dir_.GetPath());
   base::FilePath parent(grandparent.AppendASCII("parent"));
@@ -3719,7 +3629,6 @@ TEST_P(FilePathWatcherWithChangeInfoTest, DeleteDirectoryRecursively) {
   ASSERT_TRUE(DeletePathRecursively(grandparent));
   delegate.RunUntilEventsMatch(matcher);
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 TEST_P(FilePathWatcherWithChangeInfoTest, UsageChanges_InitialWatch) {
   ASSERT_TRUE(CreateDirectory(test_file()));
@@ -3892,7 +3801,6 @@ TEST_F(FilePathWatcherTest, UseDummyChangeInfoIfNotSupported) {
   delegate.RunUntilEventsMatch(event_expecter);
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // CHANGE_INFO_SUPPORTED
 
 }  // namespace content

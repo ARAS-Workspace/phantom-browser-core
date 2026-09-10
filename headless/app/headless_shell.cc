@@ -30,12 +30,6 @@
 #include "net/base/filename_util.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#include "components/crash/core/app/crash_switches.h"  // nogncheck
-#include "components/crash/core/app/run_as_crashpad_handler_win.h"
-#include "sandbox/win/src/sandbox_types.h"
-#endif
 
 #if defined(HEADLESS_ENABLE_COMMANDS)
 #include "components/headless/command_handler/headless_command_handler.h"  // nogncheck
@@ -45,18 +39,10 @@ namespace headless {
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-const wchar_t kAboutBlank[] = L"about:blank";
-#else
 const char kAboutBlank[] = "about:blank";
-#endif
 
 GURL ConvertArgumentToURL(const base::CommandLine::StringType& arg) {
-#if BUILDFLAG(IS_WIN)
-  GURL url(base::WideToUTF8(arg));
-#else
   GURL url(arg);
-#endif
   if (url.is_valid() && url.has_scheme())
     return url;
 
@@ -220,11 +206,7 @@ int HeadlessBrowserMain(content::ContentMainParams params) {
 }  // namespace
 
 int HeadlessShellMain(content::ContentMainParams params) {
-#if BUILDFLAG(IS_WIN)
-  base::CommandLine::Init(0, nullptr);
-#else
   base::CommandLine::Init(params.argc, params.argv);
-#endif  // BUILDFLAG(IS_WIN)
   base::CommandLine& command_line(*base::CommandLine::ForCurrentProcess());
   std::string process_type =
       command_line.GetSwitchValueASCII(::switches::kProcessType);

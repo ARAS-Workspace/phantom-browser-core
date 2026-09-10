@@ -79,13 +79,6 @@ BASE_EXPORT BASE_DECLARE_FEATURE(kUseTerminationStatusMemoryExhaustion);
 
 BASE_EXPORT BASE_DECLARE_FEATURE(kUtfConversionAsciiFastPath);
 
-#if BUILDFLAG(IS_WIN)
-BASE_EXPORT BASE_DECLARE_FEATURE(kUserBlockingAboveNormalPriority);
-BASE_EXPORT BASE_DECLARE_FEATURE(kRetryCreateFileMappingOnCommitLimit);
-
-BASE_EXPORT BASE_DECLARE_FEATURE(kPreventReparsePointTraversal);
-#endif
-
 #if BUILDFLAG(IS_POSIX)
 BASE_EXPORT BASE_DECLARE_FEATURE(kBaseLockTrySpin);
 #if defined(ARCH_CPU_X86_FAMILY)

@@ -82,9 +82,7 @@ std::optional<SqliteVfsFileSet> SqliteVfsFileSet::Bind(
   }
   return SqliteVfsFileSet(
       std::move(db_file), std::move(journal_file), std::move(wal_file),
-#if !BUILDFLAG(IS_WIN)
       std::move(pending_file_set.wal_index_file_read_only),
-#endif
       std::move(pending_file_set.shared_lock), pending_file_set.wal_mode);
 }
 
@@ -92,18 +90,14 @@ SqliteVfsFileSet::SqliteVfsFileSet(
     std::unique_ptr<SandboxedFile> db_file,
     std::unique_ptr<SandboxedFile> journal_file,
     std::unique_ptr<SandboxedFile> wal_journal_file,
-#if !BUILDFLAG(IS_WIN)
     base::File wal_index_file_read_only,
-#endif
     base::UnsafeSharedMemoryRegion shared_lock,
     bool wal_mode)
     : shared_lock_(std::move(shared_lock)),
       db_file_(std::move(db_file)),
       journal_file_(std::move(journal_file)),
       wal_journal_file_(std::move(wal_journal_file)),
-#if !BUILDFLAG(IS_WIN)
       wal_index_file_read_only_(std::move(wal_index_file_read_only)),
-#endif
       virtual_fs_path_(base::FilePath::FromASCII(
           base::NumberToString(g_file_set_id_generator.fetch_add(1)))),
       read_only_(db_file_->access_rights() ==
@@ -123,12 +117,10 @@ SqliteVfsFileSet::SqliteVfsFileSet(
   if (wal_journal_file_) {
     CHECK_EQ(db_file_->access_rights(), wal_journal_file_->access_rights());
   }
-#if !BUILDFLAG(IS_WIN)
   // Only shareable read-write sets with a WAL file have a read-only handle to
   // the WAL-index.
   CHECK_EQ(shared_lock_.IsValid() && !read_only_ && wal_journal_file_,
            wal_index_file_read_only_.IsValid());
-#endif
 }
 
 SqliteVfsFileSet::SqliteVfsFileSet(SqliteVfsFileSet&& other) = default;

@@ -50,10 +50,6 @@
 #include "ui/gfx/geometry/size_f.h"
 #include "ui/touch_selection/touch_selection_controller.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "content/browser/renderer_host/input/stylus_handwriting_controller_win.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace content {
 
 // static
@@ -502,60 +498,6 @@ RenderWidgetHostViewBase* RenderWidgetHostViewChildFrame::GetRootView() {
   return frame_connector_ ? frame_connector_->GetRootRenderWidgetHostView()
                           : nullptr;
 }
-
-#if BUILDFLAG(IS_WIN)
-bool RenderWidgetHostViewChildFrame::ShouldInitiateStylusWriting() {
-  auto* root = GetRootView();
-  return root ? root->ShouldInitiateStylusWriting()
-              : RenderWidgetHostViewBase::ShouldInitiateStylusWriting();
-}
-
-void RenderWidgetHostViewChildFrame::OnStartStylusWriting() {
-  auto* root = GetRootView();
-  if (!root) {
-    return;
-  }
-  root->StartStylusWritingFromChildHostView(
-      this, base::BindRepeating(
-                &RenderWidgetHostViewChildFrame::OnFocusHandwritingTarget,
-                weak_factory_.GetWeakPtr()));
-}
-
-void RenderWidgetHostViewChildFrame::OnEditElementFocusedForStylusWriting(
-    blink::mojom::StylusWritingFocusResultPtr focus_result) {
-  auto* root = GetRootView();
-  if (!root) {
-    if (StylusHandwritingControllerWin::GetInstance()) {
-      StylusHandwritingControllerWin::GetInstance()->OnFocusFailed();
-    }
-    return;
-  }
-  // Transform proximate character bounds from child frame widget space to root
-  // view widget space before forwarding.
-  if (focus_result && focus_result->proximate_bounds) {
-    for (auto& rect : focus_result->proximate_bounds->widget_bounds_in_dips) {
-      RenderWidgetHostViewBase::TransformPointAndRectToRootView(this, root,
-                                                                nullptr, &rect);
-    }
-  }
-  root->OnEditElementFocusedForStylusWriting(std::move(focus_result));
-}
-
-void RenderWidgetHostViewChildFrame::OnFocusHandwritingTarget(
-    const gfx::Rect& focus_screen_rect_in_dips,
-    const gfx::Size& tolerance_screen_distance_in_dips) {
-  // TODO(crbug.com/355578906): Consider `tolerance_screen_distance_in_dips`.
-  if (!host()) {
-    return;
-  }
-
-  // Convert the screen rect to child frame local coordinates by subtracting
-  // screen origin.
-  gfx::Rect local_rect = focus_screen_rect_in_dips;
-  local_rect.Offset(-GetViewBounds().OffsetFromOrigin());
-  host()->UpdateElementFocusForStylusWriting(local_rect);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 void RenderWidgetHostViewChildFrame::InitAsPopup(
     RenderWidgetHostView* parent_host_view,

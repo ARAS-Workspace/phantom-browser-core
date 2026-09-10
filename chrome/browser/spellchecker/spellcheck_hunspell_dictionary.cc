@@ -70,15 +70,6 @@ bool SaveDictionaryData(std::string data, const base::FilePath& path) {
 
   if (!base::WriteFile(path, data)) {
     bool success = false;
-#if BUILDFLAG(IS_WIN)
-    base::FilePath dict_dir;
-    base::PathService::Get(chrome::DIR_USER_DATA, &dict_dir);
-    base::FilePath fallback_file_path =
-        dict_dir.Append(path.BaseName());
-    if (base::WriteFile(fallback_file_path, data)) {
-      success = true;
-    }
-#endif
 
     if (!success) {
       base::DeleteFile(path);
@@ -186,13 +177,7 @@ const std::string& SpellcheckHunspellDictionary::GetLanguage() const {
 
 const std::string& SpellcheckHunspellDictionary::GetPlatformSpellcheckLanguage()
     const {
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-  // Currently the platform spellcheck language is only distinguished for
-  // Windows.
-  return platform_spellcheck_language_;
-#else
   return language_;
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 }
 
 bool SpellcheckHunspellDictionary::HasPlatformSupport() const {
@@ -350,19 +335,7 @@ SpellcheckHunspellDictionary::OpenDictionaryFile(base::TaskRunner* task_runner,
   // download is chrome::DIR_USER_DATA.
   DictionaryFile dictionary(task_runner);
 
-#if BUILDFLAG(IS_WIN)
-  // Check if the dictionary exists in the fallback location. If so, use it
-  // rather than downloading anew.
-  base::FilePath user_dir;
-  base::PathService::Get(chrome::DIR_USER_DATA, &user_dir);
-  base::FilePath fallback = user_dir.Append(path.BaseName());
-  if (!base::PathExists(path) && base::PathExists(fallback))
-    dictionary.path = fallback;
-  else
-    dictionary.path = path;
-#else
   dictionary.path = path;
-#endif  // BUILDFLAG(IS_WIN)
 
   // Open the dictionary file and verify there is no corruption. If verification
   // fails the file must be deleted.

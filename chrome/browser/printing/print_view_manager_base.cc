@@ -256,12 +256,6 @@ void PrintViewManagerBase::PrintDocument(
   }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  // Print using GDI, which first requires conversion to EMF.
-  print_job_->StartConversionToNativeFormat(
-      print_data, page_size, content_area, offsets,
-      web_contents()->GetLastCommittedURL());
-#else
   std::unique_ptr<MetafileSkia> metafile = std::make_unique<MetafileSkia>();
   CHECK(metafile->InitFromData(*print_data));
 
@@ -269,7 +263,6 @@ void PrintViewManagerBase::PrintDocument(
   PrintedDocument* document = print_job_->document();
   document->SetDocument(std::move(metafile));
   ShouldQuitFromInnerMessageLoop();
-#endif
 }
 
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW)
@@ -293,11 +286,6 @@ void PrintViewManagerBase::OnPrintSettingsDone(
     if (ShouldPrintJobOop()) {
       UnregisterSystemPrintClient();
     }
-#endif
-#if BUILDFLAG(IS_WIN)
-    content::GetUIThreadTaskRunner({})->PostTask(
-        FROM_HERE, base::BindOnce(&PrintViewManagerBase::SystemDialogCancelled,
-                                  weak_ptr_factory_.GetWeakPtr()));
 #endif
     std::move(callback).Run(base::Value());
     return;
@@ -367,10 +355,6 @@ void PrintViewManagerBase::StartLocalPrintJob(
     std::move(callback).Run(base::Value("Failed to print"));
     return;
   }
-
-#if BUILDFLAG(IS_WIN)
-  print_job_->ResetPageMapping();
-#endif
 
   const printing::PrintSettings& settings = print_job_->settings();
   gfx::Size page_size = settings.page_setup_device_units().physical_size();
@@ -737,16 +721,6 @@ void PrintViewManagerBase::RenderFrameDeleted(
     TerminatePrintJob(!document->IsComplete());
   }
 }
-
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_PRINT_PREVIEW)
-void PrintViewManagerBase::SystemDialogCancelled() {
-  // System dialog was cancelled. Clean up the print job and notify the
-  // BackgroundPrintingManager.
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  ReleasePrinterQuery();
-  TerminatePrintJob(true);
-}
-#endif
 
 bool PrintViewManagerBase::GetPrintingEnabledBooleanPref() const {
   return printing_enabled_.GetValue();

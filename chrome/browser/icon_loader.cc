@@ -49,12 +49,10 @@ void IconLoader::Start() {
       base::BindOnce(&IconLoader::ReadGroup, base::Unretained(this)));
 }
 
-#if !BUILDFLAG(IS_WIN)
 void IconLoader::ReadGroup() {
   group_ = GroupForFilepath(file_path_);
 
   GetReadIconTaskRunner()->PostTask(
       FROM_HERE, base::BindOnce(&IconLoader::ReadIcon, base::Unretained(this)));
 }
-#endif  // !BUILDFLAG(IS_WIN)
 #endif  // !BUILDFLAG(IS_CHROMEOS)

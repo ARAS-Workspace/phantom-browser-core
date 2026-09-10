@@ -469,12 +469,7 @@ TEST_F(EditableComboboxTest, LeftOrRightKeysMoveInTextfield) {
   EXPECT_EQ(u"abcde", combobox_->GetText());
 }
 
-#if BUILDFLAG(IS_WIN)
-// Flaky on Windows. https://crbug.com/965601
-#define MAYBE_UpOrDownKeysMoveInMenu DISABLED_UpOrDownKeysMoveInMenu
-#else
 #define MAYBE_UpOrDownKeysMoveInMenu UpOrDownKeysMoveInMenu
-#endif
 TEST_F(EditableComboboxTest, MAYBE_UpOrDownKeysMoveInMenu) {
   InitEditableCombobox();
   FocusTextfield();
@@ -570,13 +565,7 @@ TEST_F(EditableComboboxTest, CtrlLeftOrRightMovesToNextWords) {
   SendKeyEvent(ui::VKEY_RIGHT, /*alt=*/false, /*shift=*/false,
                /*ctrl_cmd=*/true);
   SendKeyEvent(ui::VKEY_Y);
-#if BUILDFLAG(IS_WIN)
-  // Matches Windows-specific logic in
-  // RenderTextHarfBuzz::AdjacentWordSelectionModel.
-  EXPECT_EQ(u"foo xbar yfoobar", combobox_->GetText());
-#else
   EXPECT_EQ(u"foo xbary foobar", combobox_->GetText());
-#endif
 }
 
 #endif
@@ -611,14 +600,8 @@ TEST_F(EditableComboboxTest, EnterClosesMenuWhileSelectingHighlightedMenuItem) {
   EXPECT_EQ(u"item[0]", combobox_->GetText());
 }
 
-#if BUILDFLAG(IS_WIN)
-// Flaky on Windows. https://crbug.com/965601
-#define MAYBE_F4ClosesMenuWhileSelectingHighlightedMenuItem \
-  DISABLED_F4ClosesMenuWhileSelectingHighlightedMenuItem
-#else
 #define MAYBE_F4ClosesMenuWhileSelectingHighlightedMenuItem \
   F4ClosesMenuWhileSelectingHighlightedMenuItem
-#endif
 TEST_F(EditableComboboxTest,
        MAYBE_F4ClosesMenuWhileSelectingHighlightedMenuItem) {
   InitEditableCombobox();
@@ -667,7 +650,7 @@ TEST_F(EditableComboboxTest, SpaceIsReflectedInTextfield) {
   EXPECT_EQ(u"a  b", combobox_->GetText());
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // Flaky on Windows and Linux. https://crbug.com/965601
 #define MAYBE_MenuCanAdaptToContentChange DISABLED_MenuCanAdaptToContentChange
 #else

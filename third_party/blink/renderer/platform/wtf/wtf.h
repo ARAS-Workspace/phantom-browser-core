@@ -46,7 +46,7 @@ WTF_EXPORT void InitializeWtf();
 // thread_local variables can't be exported on Windows, so we use an extra
 // function call on component builds. Also, thread_local on Android is emulated
 // by the runtime lib; gettid(3) in bionic already caches tid in a TLS variable.
-#if BUILDFLAG(IS_ANDROID) || (defined(COMPONENT_BUILD) && BUILDFLAG(IS_WIN))
+#if BUILDFLAG(IS_ANDROID)
 WTF_EXPORT bool IsMainThread();
 #else
 WTF_EXPORT constinit extern thread_local bool g_is_main_thread;

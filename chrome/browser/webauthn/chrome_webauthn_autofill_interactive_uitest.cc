@@ -75,11 +75,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "device/fido/win/fake_webauthn_api.h"
-#include "device/fido/win/util.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_MAC)
 #include "device/fido/mac/util.h"
 #endif  // BUILDFLAG(IS_MAC)
@@ -263,10 +258,6 @@ class WebAuthnAutofillIntegrationTest : public CertVerifierBrowserTest {
     biometrics_override_.reset();
     biometrics_override_ =
         std::make_unique<device::fido::mac::ScopedBiometricsOverride>(true);
-#elif BUILDFLAG(IS_WIN)
-    biometrics_override_.reset();
-    biometrics_override_ =
-        std::make_unique<device::fido::win::ScopedBiometricsOverride>(true);
 #endif
 
     ASSERT_TRUE(ui_test_utils::NavigateToURL(
@@ -445,10 +436,7 @@ class WebAuthnAutofillIntegrationTest : public CertVerifierBrowserTest {
   std::unique_ptr<crypto::ScopedFakeUnexportableKeyProvider> fake_hw_provider_;
   std::unique_ptr<crypto::ScopedFakeUserVerifyingKeyProvider> fake_uv_provider_;
 
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<device::fido::win::ScopedBiometricsOverride>
-      biometrics_override_;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   std::unique_ptr<device::fido::mac::ScopedBiometricsOverride>
       biometrics_override_;
 #endif
@@ -518,74 +506,6 @@ IN_PROC_BROWSER_TEST_F(WebAuthnDevtoolsAutofillIntegrationTest,
       "Sakuya Izayoi");
   RunSelectAccountTest(kConditionalUIRequestFiltered);
 }
-
-#if BUILDFLAG(IS_WIN)
-// Autofill integration test using the Windows fake API.
-class WebAuthnWindowsAutofillIntegrationTest
-    : public WebAuthnAutofillIntegrationTest {
- public:
-  void SetUpOnMainThread() override {
-    WebAuthnAutofillIntegrationTest::SetUpOnMainThread();
-
-    // Set up the fake Windows platform authenticator.
-    fake_webauthn_api_ = std::make_unique<device::FakeWinWebAuthnApi>();
-    fake_webauthn_api_->set_version(WEBAUTHN_API_VERSION_4);
-    fake_webauthn_api_->set_is_uvpaa(true);
-    fake_webauthn_api_->set_supports_silent_discovery(true);
-    device::PublicKeyCredentialUserEntity user({1, 2, 3, 4}, "flandre",
-                                               "Flandre Scarlet");
-    device::PublicKeyCredentialRpEntity rp(kRpId);
-    fake_webauthn_api_->InjectDiscoverableCredential(
-        kCredentialID1, std::move(rp), std::move(user),
-        /*provider_name=*/std::nullopt);
-
-    win_webauthn_api_override_ =
-        std::make_unique<device::WinWebAuthnApi::ScopedOverride>(
-            fake_webauthn_api_.get());
-  }
-
-  void PostRunTestOnMainThread() override {
-    // To avoid dangling raw_ptr's, these objects need to be destroyed before
-    // the test class.
-    win_webauthn_api_override_.reset();
-    WebAuthnAutofillIntegrationTest::PostRunTestOnMainThread();
-  }
-
-  std::u16string GetDeviceString() override {
-    return l10n_util::GetStringUTF16(
-        IDS_PASSWORD_MANAGER_PASSKEY_FROM_WINDOWS_HELLO);
-  }
-
- protected:
-  std::unique_ptr<device::FakeWinWebAuthnApi> fake_webauthn_api_;
-  std::unique_ptr<device::WinWebAuthnApi::ScopedOverride>
-      win_webauthn_api_override_;
-};
-
-IN_PROC_BROWSER_TEST_F(WebAuthnWindowsAutofillIntegrationTest, SelectAccount) {
-  RunSelectAccountTest(kConditionalUIRequest);
-}
-
-IN_PROC_BROWSER_TEST_F(WebAuthnWindowsAutofillIntegrationTest,
-                       SelectAccountWithAllowCredentials) {
-  RunSelectAccountTest(kConditionalUIRequestFiltered);
-}
-
-IN_PROC_BROWSER_TEST_F(WebAuthnWindowsAutofillIntegrationTest,
-                       SelectAccountWithAllowCredentialsFiltered) {
-  device::PublicKeyCredentialUserEntity user({6, 7, 8, 9}, "sakuya",
-                                             "Sakuya Izayoi");
-  device::PublicKeyCredentialRpEntity rp(kRpId);
-  fake_webauthn_api_->InjectDiscoverableCredential(
-      kCredentialID2, std::move(rp), std::move(user),
-      /*provider_name=*/std::nullopt);
-  RunSelectAccountTest(kConditionalUIRequestFiltered);
-}
-
-IN_PROC_BROWSER_TEST_F(WebAuthnWindowsAutofillIntegrationTest, Abort) {
-  RunAbortTest();
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 class WebAuthnMagiChromeQrAutofillIntegrationTest

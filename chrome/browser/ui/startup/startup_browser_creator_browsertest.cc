@@ -140,7 +140,7 @@
 #include "components/policy/core/common/policy_map.h"
 #include "components/policy/core/common/policy_types.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "base/json/json_string_value_serializer.h"
 #include "chrome/browser/ui/views/web_apps/protocol_handler_launch_dialog_view.h"
 #include "chrome/browser/ui/web_applications/app_browser_controller.h"
@@ -163,11 +163,6 @@ using testing::Return;
 #include "chrome/browser/chrome_browser_application_mac.h"
 #include "chrome/browser/web_applications/os_integration/mac/app_shim_registry.h"
 #endif
-
-#if BUILDFLAG(IS_WIN)
-#include "base/base_paths_win.h"
-#include "base/test/scoped_path_override.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 using extensions::Extension;
 using testing::_;
@@ -672,12 +667,7 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
   for (const auto& expected_name : test_names) {
     base::CommandLine command_line(base::CommandLine::NO_PROGRAM);
     command_line.AppendSwitch(switches::kOpenInNewWindow);
-#if BUILDFLAG(IS_WIN)
-    command_line.AppendSwitchNative(switches::kWindowName,
-                                    base::UTF8ToWide(expected_name));
-#else
     command_line.AppendSwitchNative(switches::kWindowName, expected_name);
-#endif
 
     ui_test_utils::BrowserCreatedObserver browser_created_observer;
 
@@ -700,15 +690,8 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
   // as if name empty.
   base::CommandLine command_line(base::CommandLine::NO_PROGRAM);
   command_line.AppendSwitch(switches::kOpenInNewWindow);
-#if BUILDFLAG(IS_WIN)
-  // On Windows, command line is natively Wide. Pass an invalid UTF-16 string
-  // (unpaired surrogate) directly to test the conversion failure.
-  std::wstring invalid_wide = L"\xD800";
-  command_line.AppendSwitchNative(switches::kWindowName, invalid_wide);
-#else
   std::string invalid_utf8 = "\xFF\xFF";
   command_line.AppendSwitchNative(switches::kWindowName, invalid_utf8);
-#endif
 
   ui_test_utils::BrowserCreatedObserver browser_created_observer;
 
@@ -718,15 +701,8 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
 
   Browser* new_browser = browser_created_observer.Wait();
   ASSERT_TRUE(new_browser);
-#if BUILDFLAG(IS_WIN)
-  // On Windows, the invalid UTF-16 is converted with "best effort" replacement,
-  // resulting in the Unicode replacement character "\xEF\xBF\xBD".
-  EXPECT_EQ("\xEF\xBF\xBD",
-            WindowMetadataController::From(new_browser)->user_title());
-#else
   // On POSIX/Linux, the invalid UTF-8 is strictly rejected, falling back to "".
   EXPECT_EQ("", WindowMetadataController::From(new_browser)->user_title());
-#endif
 
   CloseBrowserSynchronously(new_browser);
 }
@@ -735,7 +711,7 @@ namespace {
 
 enum class ChromeAppDeprecationFeatureValue {
   kDefault,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   kEnabledWithNoLaunch,
   kDisabled,
 #endif
@@ -749,7 +725,7 @@ std::string ChromeAppDeprecationFeatureValueToString(
     case ChromeAppDeprecationFeatureValue::kDefault:
       result = "ChromeAppDeprecationFeatureDefault";
       break;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     case ChromeAppDeprecationFeatureValue::kEnabledWithNoLaunch:
       result = "ChromeAppDeprecationFeatureEnabledWithNoLaunch";
       break;
@@ -771,7 +747,7 @@ class StartupBrowserCreatorChromeAppShortcutTest
     switch (GetParam()) {
       case ChromeAppDeprecationFeatureValue::kDefault:
         break;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       case ChromeAppDeprecationFeatureValue::kEnabledWithNoLaunch:
         scoped_feature_list_.InitAndEnableFeature(
             features::kChromeAppsDeprecation);
@@ -792,7 +768,7 @@ class StartupBrowserCreatorChromeAppShortcutTest
     ASSERT_EQ(2u,
               ProfileBrowserCollection::GetForProfile(browser()->GetProfile())
                   ->GetSize());
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     auto waiter = views::NamedWidgetShownWaiter(
         views::test::AnyWidgetTestPasskey{},
         force_install_dialog ? "ForceInstalledDeprecatedAppsDialogView"
@@ -814,7 +790,7 @@ class StartupBrowserCreatorChromeAppShortcutTest
     EXPECT_FALSE(other_browser->GetType() == BrowserWindowInterface::TYPE_APP);
     EXPECT_TRUE(other_browser->GetType() ==
                 BrowserWindowInterface::TYPE_NORMAL);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
     GURL expected_url =
         force_install_dialog
@@ -829,7 +805,7 @@ class StartupBrowserCreatorChromeAppShortcutTest
 #endif
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   void ExpectBlockLaunchWithLaunchBehavior(const std::string& app_id,
                                            bool force_install_dialog) {
     EXPECT_EQ(2u,
@@ -893,10 +869,10 @@ class StartupBrowserCreatorChromeAppShortcutTest
         ui_test_utils::GetBrowserNotInSet(initial_browsers);
     EXPECT_EQ(app_browser, nullptr);
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   bool IsExpectedToAllowLaunch() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     return false;
 #else
     return true;
@@ -1098,7 +1074,7 @@ INSTANTIATE_TEST_SUITE_P(
     All,
     StartupBrowserCreatorChromeAppShortcutTest,
     ::testing::Values(ChromeAppDeprecationFeatureValue::kDefault
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
                       ,
                       ChromeAppDeprecationFeatureValue::kEnabledWithNoLaunch,
                       ChromeAppDeprecationFeatureValue::kDisabled
@@ -1106,7 +1082,7 @@ INSTANTIATE_TEST_SUITE_P(
                       ),
     ChromeAppDeprecationFeatureValueToString);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 using StartupBrowserCreatorChromeAppShortcutTestWithLaunch =
     StartupBrowserCreatorChromeAppShortcutTest;
@@ -1228,79 +1204,9 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::Values(ChromeAppDeprecationFeatureValue::kEnabledWithNoLaunch),
     ChromeAppDeprecationFeatureValueToString);
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #endif  // !BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest, ValidNotificationLaunchId) {
-  // Simulate a launch from the notification_helper process which appends the
-  // kNotificationLaunchId switch to the command line.
-  base::CommandLine command_line(base::CommandLine::NO_PROGRAM);
-  command_line.AppendSwitchNative(
-      switches::kNotificationLaunchId,
-      L"1|1|0|Default|aumi|0|https://example.com/|notification_id");
-
-  ASSERT_TRUE(StartupBrowserCreator().ProcessCmdLineImpl(
-      command_line, base::FilePath(), chrome::startup::IsProcessStartup::kNo,
-      {browser()->GetProfile(), StartupProfileMode::kBrowserWindow}, {}));
-
-  // The launch delegates to the notification system and doesn't open any new
-  // browser window.
-  ASSERT_EQ(1u, ProfileBrowserCollection::GetForProfile(browser()->GetProfile())
-                    ->GetSize());
-}
-
-IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest, InvalidNotificationLaunchId) {
-  // Simulate a launch with invalid launch id, which will fail.
-  base::CommandLine command_line(base::CommandLine::NO_PROGRAM);
-  command_line.AppendSwitchNative(switches::kNotificationLaunchId, L"");
-  StartupBrowserCreator browser_creator;
-  ASSERT_FALSE(StartupBrowserCreator().ProcessCmdLineImpl(
-      command_line, base::FilePath(), chrome::startup::IsProcessStartup::kNo,
-      {browser()->GetProfile(), StartupProfileMode::kBrowserWindow}, {}));
-
-  // No new browser window is open.
-  ASSERT_EQ(1u, ProfileBrowserCollection::GetForProfile(browser()->GetProfile())
-                    ->GetSize());
-}
-
-IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
-                       NotificationLaunchIdDisablesLastOpenProfiles) {
-  Profile* default_profile = browser()->GetProfile();
-
-  ProfileManager* profile_manager = g_browser_process->profile_manager();
-  // Create another profile.
-  base::FilePath dest_path = profile_manager->user_data_dir();
-  dest_path = dest_path.Append(FILE_PATH_LITERAL("New Profile 1"));
-
-  Profile& other_profile =
-      profiles::testing::CreateProfileSync(profile_manager, dest_path);
-
-  // Close the browser.
-  CloseBrowserAsynchronously(browser());
-
-  // Simulate a launch.
-  base::CommandLine command_line(base::CommandLine::NO_PROGRAM);
-  command_line.AppendSwitchNative(
-      switches::kNotificationLaunchId,
-      L"1|1|0|Default|0|https://example.com/|notification_id");
-
-  std::vector<Profile*> last_opened_profiles;
-  last_opened_profiles.push_back(&other_profile);
-
-  StartupBrowserCreator browser_creator;
-  browser_creator.Start(command_line, profile_manager->user_data_dir(),
-                        {default_profile, StartupProfileMode::kBrowserWindow},
-                        last_opened_profiles);
-
-  // When the kNotificationLaunchId switch is present, any last opened profile
-  // is ignored. Thus there is no browser for other_profile.
-  ASSERT_EQ(0u,
-            ProfileBrowserCollection::GetForProfile(&other_profile)->GetSize());
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
                        ReadingWasRestartedAfterRestart) {
@@ -2015,7 +1921,7 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorTest,
 }
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 webapps::AppId InstallPWAWithName(Profile* profile,
                                   const GURL& start_url,
                                   const std::string& app_name) {
@@ -2246,7 +2152,7 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserWithListAppsFeature,
     ASSERT_EQ(expected_info, file_contents);
   }
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 #if !BUILDFLAG(IS_CHROMEOS)
 webapps::AppId InstallPWA(Profile* profile, const GURL& start_url) {
@@ -2523,7 +2429,7 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserWithWebAppTest,
 
 // TODO(crbug.com/327256043): Flaky on win
 // TODO(crbug.com/459538706): Fails on Linux
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_LastUsedProfilesWithWebApp DISABLED_LastUsedProfilesWithWebApp
 #else
 #define MAYBE_LastUsedProfilesWithWebApp LastUsedProfilesWithWebApp
@@ -2865,7 +2771,7 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserWithRealWebAppTest,
 }
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 class StartupBrowserWebAppProtocolHandlingTest : public InProcessBrowserTest {
  protected:
@@ -2914,13 +2820,6 @@ class StartupBrowserWebAppProtocolHandlingTest : public InProcessBrowserTest {
  private:
   web_app::OsIntegrationTestOverrideBlockingRegistration faked_os_integration_;
   base::test::ScopedFeatureList scoped_feature_list_;
-#if BUILDFLAG(IS_WIN)
-  // This is needed to stop StartupBrowserWebAppProtocolHandlingTests creating a
-  // shortcut in the Windows start menu. The override needs to last until the
-  // test is destroyed, because Windows shortcut tasks which create the shortcut
-  // can run after the test body returns.
-  base::ScopedPathOverride override_start_dir{base::DIR_START_MENU};
-#endif  // BUILDFLAG(IS_WIN)
 };
 
 IN_PROC_BROWSER_TEST_F(
@@ -3300,7 +3199,7 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserWebAppProtocolAndFileHandlingTest,
   observer.Wait();
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // These tests are not applicable to Chrome OS as neither initial preferences
 // nor the onboarding promos exist there.
@@ -3404,9 +3303,6 @@ IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorFirstRunTest, AddFirstRunTabs) {
 #endif
 IN_PROC_BROWSER_TEST_F(StartupBrowserCreatorFirstRunTest,
                        MAYBE_RestoreOnStartupURLsPolicySpecified) {
-#if BUILDFLAG(IS_WIN)
-  return;
-#endif  // BUILDFLAG(IS_WIN)
 
   ASSERT_TRUE(embedded_test_server()->Start());
   StartupBrowserCreator browser_creator;
@@ -4107,7 +4003,7 @@ INSTANTIATE_TEST_SUITE_P(
     StartupBrowserCreatorPickerTest,
     ::testing::Values(
 // Flaky: https://crbug.com/40148327
-#if !BUILDFLAG(IS_OZONE) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_OZONE)
         // Picker should be shown in normal multi-profile startup situation.
         ProfilePickerSetup{/*expected_to_show=*/true},
 #endif
@@ -4561,7 +4457,6 @@ INSTANTIATE_TEST_SUITE_P(
 
 // TODO(crbug.com/40265712): Mocking the logger appears to not work correctly on
 // Windows. Investigate why it is not working and enable the test on Windows.
-#if !BUILDFLAG(IS_WIN)
 class StartupBrowserCreatorIwaCommandLineInstallProfilePickerErrorTest
     : public StartupBrowserCreatorPickerTestBase {
  protected:
@@ -4611,7 +4506,6 @@ IN_PROC_BROWSER_TEST_F(
   // The `EXPECT_CALL` call in `SetUp()` will check that an error message about
   // the IWA not being installable is logged.
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 class StartupBrowserCreatorOpenUrlsInNextProfileCreatedTest
     : public StartupBrowserCreatorPickerTestBase {

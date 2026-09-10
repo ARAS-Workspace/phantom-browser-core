@@ -6,13 +6,7 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <tuple>
-
-#include "ui/accessibility/platform/ax_platform_node_win.h"
-#else
 #include "ui/accessibility/platform/ax_platform_node_base.h"
-#endif
 
 namespace ui {
 
@@ -36,15 +30,7 @@ void ProvideAXPlatformForTests::OnTestEnd(
   // Dear reader: If your test is failing here, it is because the test is either
   // leaking UX objects (e.g., Views, Widgets, etc) or is using accessibility
   // APIs that are leaking AXPlatformNode instances.
-#if BUILDFLAG(IS_WIN)
-  auto [instance_count, dormant_count, live_count, ghost_count] =
-      ui::AXPlatformNodeWin::ResetCountsForTesting();
-  EXPECT_EQ(ghost_count, 0U)
-      << "This test is leaking COM interface references. If the test is not "
-         "explicitly using facilities such as IAccessible, then you may have "
-         "just found a bug in ui/accessibility/platform. Contact a member of "
-         "ui/accessibility/OWNERS for guidance.";
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   // The `AuraLinuxApplication` singleton is never destroyed, so one node is
   // leaked in all unit tests that create a ViewAXPlatformNodeDelegate. It's not
   // possible to distinguish between a leak of an arbitrary node and a leak of

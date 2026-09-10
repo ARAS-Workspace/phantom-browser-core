@@ -1156,59 +1156,6 @@ TEST(StringUtilTest, RemovePrefix) {
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result.value(), u"123");
   }
-#if BUILDFLAG(IS_WIN)
-  {
-    std::optional<std::wstring_view> result;
-
-    result = RemovePrefix(L"", L"");
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), L"");
-    result = RemovePrefix(L"", L"", CompareCase::INSENSITIVE_ASCII);
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), L"");
-
-    EXPECT_FALSE(RemovePrefix(L"", L"xyz"));
-    EXPECT_FALSE(RemovePrefix(L"", L"xyZ", CompareCase::INSENSITIVE_ASCII));
-
-    result = RemovePrefix(L"xyz", L"");
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), L"xyz");
-    result = RemovePrefix(L"Xyz", L"", CompareCase::INSENSITIVE_ASCII);
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), L"Xyz");
-
-    EXPECT_FALSE(RemovePrefix(L"abc", L"xyz"));
-    EXPECT_FALSE(RemovePrefix(L"abc", L"xyz", CompareCase::INSENSITIVE_ASCII));
-
-    result = RemovePrefix(L"xyz", L"xyz");
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), L"");
-    result = RemovePrefix(L"Xyz", L"xyZ", CompareCase::INSENSITIVE_ASCII);
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), L"");
-
-    EXPECT_FALSE(RemovePrefix(L"Xyz", L"xyZ"));
-
-    result = RemovePrefix(L"xyz123", L"xyz");
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), L"123");
-    result = RemovePrefix(L"Xyz123", L"xyz", CompareCase::INSENSITIVE_ASCII);
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), L"123");
-
-    // Non-ASCII
-    result = RemovePrefix(L"你好世界", L"你好");
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), L"世界");
-    EXPECT_FALSE(RemovePrefix(L"你好世界", L"世界"));
-
-    // Case-insensitivity is ASCII-only.
-    result = RemovePrefix(L"ÄBC", L"Äbc", CompareCase::INSENSITIVE_ASCII);
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), L"");
-    EXPECT_FALSE(RemovePrefix(L"ÄBC", L"äbc", CompareCase::INSENSITIVE_ASCII));
-  }
-#endif
 }
 
 TEST(StringUtilTest, RemoveSuffix) {
@@ -1896,22 +1843,6 @@ TEST(StringUtilTest, EqualsCaseInsensitiveASCII) {
   EXPECT_FALSE(EqualsCaseInsensitiveASCII("aaa \xc3\x84", "AAA \xc3\xa4"));
 
   // The `std::wstring_view` overloads are only defined on Windows.
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(EqualsCaseInsensitiveASCII(L"", L""));
-  EXPECT_TRUE(EqualsCaseInsensitiveASCII(L"Asdf", L"aSDF"));
-  EXPECT_FALSE(EqualsCaseInsensitiveASCII(L"bsdf", L"aSDF"));
-  EXPECT_FALSE(EqualsCaseInsensitiveASCII(L"Asdf", L"aSDFz"));
-
-  EXPECT_TRUE(EqualsCaseInsensitiveASCII(L"", ""));
-  EXPECT_TRUE(EqualsCaseInsensitiveASCII(L"Asdf", "aSDF"));
-  EXPECT_FALSE(EqualsCaseInsensitiveASCII(L"bsdf", "aSDF"));
-  EXPECT_FALSE(EqualsCaseInsensitiveASCII(L"Asdf", "aSDFz"));
-
-  EXPECT_TRUE(EqualsCaseInsensitiveASCII("", L""));
-  EXPECT_TRUE(EqualsCaseInsensitiveASCII("Asdf", L"aSDF"));
-  EXPECT_FALSE(EqualsCaseInsensitiveASCII("bsdf", L"aSDF"));
-  EXPECT_FALSE(EqualsCaseInsensitiveASCII("Asdf", L"aSDFz"));
-#endif
 }
 
 TEST(StringUtilTest, IsUnicodeWhitespace) {

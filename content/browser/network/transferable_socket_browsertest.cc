@@ -52,13 +52,7 @@ class TransferableSocketBrowserTest : public ContentBrowserTest {
   }
 
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    if (!sandbox::policy::features::IsNetworkSandboxSupported()) {
-      // On *some* Windows, sandboxing cannot be enabled. We skip all the tests
-      // on such platforms.
-      GTEST_SKIP();
-    }
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
     if (base::android::android_info::sdk_int() <
         base::android::android_info::SdkVersion::SDK_VERSION_R) {
       // Android below R does not support transfer of sockets.
@@ -129,21 +123,6 @@ IN_PROC_BROWSER_TEST_F(TransferableSocketBrowserTest, TransferSocket) {
       }));
   connect_run_loop.Run();
   socket->DetachFromThread();
-#if BUILDFLAG(IS_WIN)
-  // Obtain the running process id of the network service, as this is needed to
-  // duplicate the socket on Windows only.
-  auto processes = ServiceProcessHost::GetRunningProcessInfo();
-  base::Process network_process;
-  for (const auto& process : processes) {
-    if (process.IsService<network::mojom::NetworkService>()) {
-      ASSERT_FALSE(network_process.IsValid());
-      network_process = process.GetProcess().Duplicate();
-    }
-  }
-  ASSERT_TRUE(network_process.IsValid());
-  network::TransferableSocket transferable(
-      socket->ReleaseSocketDescriptorForTesting(), network_process.Pid());
-#else
   base::test::TestFuture<net::SocketDescriptor> socket_descriptor;
   GetIOThreadTaskRunner({})->PostTaskAndReplyWithResult(
       FROM_HERE, base::BindLambdaForTesting([&]() {
@@ -151,7 +130,6 @@ IN_PROC_BROWSER_TEST_F(TransferableSocketBrowserTest, TransferSocket) {
       }),
       socket_descriptor.GetCallback());
   network::TransferableSocket transferable(socket_descriptor.Get());
-#endif
 
   {
     base::RunLoop network_service_runloop;

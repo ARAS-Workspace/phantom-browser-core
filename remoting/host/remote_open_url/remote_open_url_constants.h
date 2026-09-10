@@ -11,16 +11,6 @@ namespace remoting {
 
 extern const char kRemoteOpenUrlDataChannelName[];
 
-#if BUILDFLAG(IS_WIN)
-
-// The ProgID of the URL forwarder.
-extern const wchar_t kUrlForwarderProgId[];
-
-// The ProgID for undecided default browser, which launches OpenWith.exe.
-extern const wchar_t kUndecidedProgId[];
-
-#endif  // BUILDFLAG(IS_WIN)
-
 }  // namespace remoting
 
 #endif  // REMOTING_HOST_REMOTE_OPEN_URL_REMOTE_OPEN_URL_CONSTANTS_H_

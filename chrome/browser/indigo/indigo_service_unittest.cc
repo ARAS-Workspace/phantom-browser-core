@@ -40,7 +40,7 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "base/enterprise_util.h"
 #elif BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ash/settings/scoped_cros_settings_test_helper.h"
@@ -757,24 +757,6 @@ TEST_P(IndigoServiceManagementPolicyDefaultEnabledTest,
                                   ? LocalEligibility::kEligible
                                   : LocalEligibility::kEnterpriseDisallowed));
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_P(IndigoServiceManagementPolicyDefaultEnabledTest, EnterpriseDeviceWin) {
-  CreateService();
-  auto scoped_device_override = base::SetIsEnterpriseDeviceForTesting(true);
-  MakeAccountAvailableAndCapable();
-  EXPECT_TRUE(
-      LocalEligibilityBecomes(IsIndigoAllowedForEnterprise()
-                                  ? LocalEligibility::kEligible
-                                  : LocalEligibility::kEnterpriseDisallowed));
-
-  SetPolicySettings(prefs::Policy::kDisallowed);
-  EXPECT_TRUE(
-      LocalEligibilityBecomes(IsIndigoAllowedForEnterprise()
-                                  ? LocalEligibility::kDisabledByPolicy
-                                  : LocalEligibility::kEnterpriseDisallowed));
-}
-#endif
 
 #if BUILDFLAG(IS_CHROMEOS)
 TEST_P(IndigoServiceManagementPolicyDefaultEnabledTest,

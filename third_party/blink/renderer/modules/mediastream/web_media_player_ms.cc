@@ -141,16 +141,6 @@ base::TimeDelta GetFrameTime(scoped_refptr<media::VideoFrame> frame) {
 constexpr base::TimeDelta kForceBeginFramesTimeout = base::Seconds(1);
 }  // namespace
 
-#if BUILDFLAG(IS_WIN)
-// Since we do not have native MappableSharedImage support in Windows, using
-// mappable SharedImages can cause a CPU regression. This is more apparent and
-// can have adverse affects in lower resolution content which are defined by
-// these thresholds, see https://crbug.com/835752.
-// static
-const gfx::Size WebMediaPlayerMS::kUseMappableSIVideoFramesMinResolution =
-    gfx::Size(1920, 1080);
-#endif  // BUILDFLAG(IS_WIN)
-
 // FrameDeliverer is responsible for delivering frames received on
 // the video task runner by calling of EnqueueFrame() method of |compositor_|.
 //
@@ -205,14 +195,6 @@ class WebMediaPlayerMS::FrameDeliverer {
     // MappableSharedImage-backed frames is unnecessary, because the frames are
     // not going to be shown for the time period.
     bool skip_creating_mappable_si = render_frame_suspended_;
-
-#if BUILDFLAG(IS_WIN)
-    skip_creating_mappable_si |=
-        frame->visible_rect().width() <
-            kUseMappableSIVideoFramesMinResolution.width() ||
-        frame->visible_rect().height() <
-            kUseMappableSIVideoFramesMinResolution.height();
-#endif  // BUILDFLAG(IS_WIN)
 
     if (skip_creating_mappable_si) {
       media::VideoFrame::ID original_frame_id = frame->unique_id();

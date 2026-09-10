@@ -25,9 +25,7 @@
 #include "content/web_test/browser/web_test_storage_access_manager.h"
 #include "services/device/public/cpp/test/scoped_geolocation_overrider.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/base_paths_win.h"
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include "base/nix/xdg_util.h"
 #elif BUILDFLAG(IS_MAC)
 #include "base/apple/foundation_util.h"

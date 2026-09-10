@@ -32,9 +32,6 @@
 #else
 #include <malloc.h>
 #endif
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 #include <features.h>
@@ -61,89 +58,6 @@ namespace {
 BASE_FEATURE(kMallocDumpProviderPopulateDiscardableBytes,
              base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
-
-#if BUILDFLAG(IS_WIN)
-internal::WinHeapInfo WinHeapInfoFromHandle(HANDLE heap_handle) {
-  internal::WinHeapInfo info;
-  ::HeapLock(heap_handle);
-  PROCESS_HEAP_ENTRY heap_entry;
-  heap_entry.lpData = nullptr;
-
-  // HeapWalk emits a PROCESS_HEAP_REGION header before the blocks inside
-  // that region; large VirtualAlloc-backed allocations have no header and
-  // appear as orphan busy entries. See:
-  // https://learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-process_heap_entry
-  uintptr_t last_region_start = 0;
-  uintptr_t last_region_end = 0;
-
-  while (::HeapWalk(heap_handle, &heap_entry) != FALSE) {
-    const uintptr_t entry_addr = reinterpret_cast<uintptr_t>(heap_entry.lpData);
-    if ((heap_entry.wFlags & PROCESS_HEAP_ENTRY_BUSY) != 0) {
-      info.allocated_size += heap_entry.cbData;
-      info.block_count++;
-      if (entry_addr < last_region_start || entry_addr >= last_region_end) {
-        // Large allocations are returned by HeapWalk as orphan busy entries
-        // outside any PROCESS_HEAP_REGION. They are always committed since
-        // HeapAlloc never returns uncommitted memory.
-        info.committed_size +=
-            static_cast<size_t>(heap_entry.cbData) + heap_entry.cbOverhead;
-      }
-    } else if ((heap_entry.wFlags & PROCESS_HEAP_REGION) != 0) {
-      // dwCommittedSize / dwUnCommittedSize are documented as optional and
-      // reported as zero when unavailable. When their sum does not match
-      // cbData, fall back to treating the full reserved range as committed
-      // so the dump does not under-report.
-      if (heap_entry.Region.dwCommittedSize +
-              heap_entry.Region.dwUnCommittedSize ==
-          heap_entry.cbData) {
-        info.committed_size += heap_entry.Region.dwCommittedSize;
-        info.uncommitted_size += heap_entry.Region.dwUnCommittedSize;
-      } else {
-        info.committed_size += heap_entry.cbData;
-      }
-      last_region_start = entry_addr;
-      last_region_end = entry_addr + heap_entry.cbData;
-    }
-  }
-  CHECK(::HeapUnlock(heap_handle) == TRUE);
-
-  return info;
-}
-
-void ReportWinHeapStats(MemoryDumpLevelOfDetail level_of_detail,
-                        ProcessMemoryDump* pmd,
-                        size_t* total_virtual_size,
-                        size_t* resident_size,
-                        size_t* allocated_objects_size,
-                        size_t* allocated_objects_count) {
-  // This is too expensive on Windows, crbug.com/780735.
-  if (level_of_detail == MemoryDumpLevelOfDetail::kDetailed) {
-    // NOTE: crbug.com/665516. Unfortunately, there is no safe way to collect
-    // information from secondary heaps due to limitations and racy nature of
-    // this piece of WinAPI. Walk only whichever heap our CRT is using.
-    auto main_heap_info =
-        WinHeapInfoFromHandle(reinterpret_cast<HANDLE>(_get_heap_handle()));
-
-    *total_virtual_size +=
-        main_heap_info.committed_size + main_heap_info.uncommitted_size;
-    // Resident size is approximated with committed heap size. Note that it is
-    // possible to do this with better accuracy on windows by intersecting the
-    // working set with the virtual memory ranges occuipied by the heap. It's
-    // not clear that this is worth it, as it's fairly expensive to do.
-    *resident_size += main_heap_info.committed_size;
-    *allocated_objects_size += main_heap_info.allocated_size;
-    *allocated_objects_count += main_heap_info.block_count;
-
-    if (pmd) {
-      MemoryAllocatorDump* win_heap_dump =
-          pmd->CreateAllocatorDump("malloc/win_heap");
-      win_heap_dump->AddScalar(MemoryAllocatorDump::kNameSize,
-                               MemoryAllocatorDump::kUnitsBytes,
-                               main_heap_info.allocated_size);
-    }
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
 void ReportPartitionAllocStats(ProcessMemoryDump* pmd,
@@ -225,7 +139,8 @@ void ReportAppleAllocStats(size_t* total_virtual_size,
 }
 #endif
 
-#if (PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC) && BUILDFLAG(IS_ANDROID)) || (!PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_APPLE))
+#if (PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC) && BUILDFLAG(IS_ANDROID)) || \
+    (!PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC) && !BUILDFLAG(IS_APPLE))
 void ReportMallinfoStats(ProcessMemoryDump* pmd,
                          size_t* total_virtual_size,
                          size_t* resident_size,
@@ -345,17 +260,6 @@ void ReportExtremeLightweightDetectorQuarantineStats(
 
 }  // namespace
 
-#if BUILDFLAG(IS_WIN)
-namespace internal {
-
-WinHeapInfo WinHeapInfo::FromHandleForTesting(void* heap) {
-  HANDLE heap_handle = static_cast<HANDLE>(heap);
-  return WinHeapInfoFromHandle(heap_handle);
-}
-
-}  // namespace internal
-#endif  // BUILDFLAG(IS_WIN)
-
 // static
 const char MallocDumpProvider::kAllocatedObjects[] = "malloc/allocated_objects";
 
@@ -424,19 +328,11 @@ bool MallocDumpProvider::OnMemoryDump(const MemoryDumpArgs& args,
 #if BUILDFLAG(IS_ANDROID)
   ReportMallinfoStats(pmd, &total_virtual_size, &resident_size,
                       &allocated_objects_size, &allocated_objects_count);
-#elif BUILDFLAG(IS_WIN)
-  ReportWinHeapStats(args.level_of_detail, pmd, &total_virtual_size,
-                     &resident_size, &allocated_objects_size,
-                     &allocated_objects_count);
-#endif  // BUILDFLAG(IS_ANDROID), BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #elif BUILDFLAG(IS_APPLE)
   ReportAppleAllocStats(&total_virtual_size, &resident_size,
                         &allocated_objects_size);
-#elif BUILDFLAG(IS_WIN)
-  ReportWinHeapStats(args.level_of_detail, nullptr, &total_virtual_size,
-                     &resident_size, &allocated_objects_size,
-                     &allocated_objects_count);
 #else
   ReportMallinfoStats(/*pmd=*/nullptr, &total_virtual_size, &resident_size,
                       &allocated_objects_size, &allocated_objects_count);

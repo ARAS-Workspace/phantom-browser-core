@@ -24,10 +24,6 @@
 #include "mojo/public/cpp/bindings/default_construct_tag.h"
 #include "third_party/dawn/include/dawn/dawn_proc.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/task/thread_pool.h"
-#endif
-
 namespace on_device_model {
 namespace {
 
@@ -48,19 +44,7 @@ constexpr uint32_t kCacheFlags =
 void PrefetchFile(const base::FilePath& path) {
   constexpr bool kIsExecutable = false;
   constexpr bool kSequential = true;
-#if BUILDFLAG(IS_WIN)
-  // On Windows PreReadFile() can take on the order of hundreds of milliseconds,
-  // so run on a separate thread.
-  base::ThreadPool::PostTask(
-      FROM_HERE, {base::TaskPriority::USER_BLOCKING, base::MayBlock()},
-      base::BindOnce(
-          [](const base::FilePath& path) {
-            base::PreReadFile(path, kIsExecutable, kSequential);
-          },
-          path));
-#else
   base::PreReadFile(path, kIsExecutable, kSequential);
-#endif
 }
 
 base::File OpenAndValidateProgramCache(const base::FilePath& path) {

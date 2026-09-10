@@ -255,11 +255,7 @@ scoped_refptr<BrowserUpdaterClient> BrowserUpdaterClient::GetClient(
 scoped_refptr<BrowserUpdaterClient> BrowserUpdaterClient::Create(
     UpdaterScope scope) {
   return Create(base::BindRepeating(
-#if BUILDFLAG(IS_WIN)
-                    &CreateUpdateServiceProxyMojo,
-#else   // BUILDFLAG(IS_WIN)
                     &CreateUpdateServiceProxy,
-#endif  // BUILDFLAG(IS_WIN)
                     scope, base::Seconds(15)),
                 scope);
 }

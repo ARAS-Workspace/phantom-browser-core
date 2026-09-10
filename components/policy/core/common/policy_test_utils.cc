@@ -51,9 +51,6 @@ bool PolicyServiceIsEmpty(const PolicyService* service) {
     for (const auto& it : map)
       dict.Set(it.first, it.second.value_unsafe()->Clone());
     LOG(WARNING) << "There are pre-existing policies in this machine: " << dict;
-#if BUILDFLAG(IS_WIN)
-    LOG(WARNING) << "From: " << kRegistryChromePolicyKey;
-#endif
   }
   return map.empty();
 }

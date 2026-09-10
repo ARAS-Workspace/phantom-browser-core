@@ -27,14 +27,6 @@
 #include "chrome/updater/update_service.h"
 #include "chrome/updater/updater_version.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <wrl/client.h>
-
-#include "chrome/updater/app/server/win/updater_legacy_idl.h"
-#endif
-
 class GURL;
 
 namespace base {
@@ -111,20 +103,6 @@ base::FilePath GetSetupExecutablePath();
 // during unit tests.
 std::set<base::FilePath::StringType> GetTestProcessNames();
 
-#if BUILDFLAG(IS_WIN)
-// Filters to processes that match the current and older updater versions.
-class VersionProcessFilter : public base::ProcessFilter {
- public:
-  VersionProcessFilter();
-  ~VersionProcessFilter() override;
-
-  bool Includes(const base::ProcessEntry& entry) const override;
-
- private:
-  const std::vector<base::Version> versions_;
-};
-#endif  // BUILDFLAG(IS_WIN)
-
 // Ensures test processes are not running after the function is called.
 void CleanProcesses();
 
@@ -145,11 +123,6 @@ void PrintLog(UpdaterScope scope);
 // start of each test in case a previous crash or timeout on the machine running
 // the test left the updater in an installed or partially installed state.
 void Clean(UpdaterScope scope);
-
-#if BUILDFLAG(IS_WIN)
-// Expects that the no temporary directories created by `update_client` remain.
-void ExpectCleanUpdateClientTempDirectories(UpdaterScope scope);
-#endif  // BUILDFLAG(IS_WIN)
 
 // Expects that the system is in a clean state, i.e. no updater is installed and
 // no traces of an updater exist. Should be run at the start and end of each
@@ -379,52 +352,6 @@ void RegisterAppByValue(UpdaterScope scope,
 
 [[nodiscard]] bool WaitForUpdaterExit();
 
-#if BUILDFLAG(IS_WIN)
-void ExpectInterfacesRegistered(UpdaterScope scope);
-void ExpectMarshalInterfaceSucceeds(UpdaterScope scope);
-void ExpectLegacyUpdate3WebSucceeds(
-    UpdaterScope scope,
-    const std::string& app_id,
-    AppBundleWebCreateMode app_bundle_web_create_mode,
-    int expected_final_state,
-    int expected_error_code,
-    bool cancel_when_downloading);
-void ExpectLegacyProcessLauncherSucceeds(UpdaterScope scope);
-void ExpectProcessLauncherLaunchCmdLineSucceeds(UpdaterScope scope);
-void ExpectLegacyAppCommandWebSucceeds(UpdaterScope scope,
-                                       const std::string& app_id,
-                                       const std::string& command_id,
-                                       const base::ListValue& parameters,
-                                       int expected_exit_code);
-void ExpectPolicyStatusValues(
-    Microsoft::WRL::ComPtr<IPolicyStatusValue> policy_status_value,
-    const std::wstring& expected_source,
-    const std::wstring& expected_value,
-    VARIANT_BOOL expected_has_conflict);
-void ExpectLegacyPolicyStatusSucceeds(UpdaterScope scope,
-                                      const base::Version& updater_version);
-
-void LegacyInstallApp(UpdaterScope scope,
-                      const std::string& app_id,
-                      const base::Version& version);
-
-// Calls a function defined in test/service/win/rpc_client.py.
-// Entries of the `arguments` dictionary should be the function's parameter
-// name/value pairs.
-void InvokeTestServiceFunction(const std::string& function_name,
-                               const base::DictValue& arguments);
-
-void RunUninstallCmdLine(UpdaterScope scope);
-void RunHandoff(UpdaterScope scope, const std::string& app_id);
-
-void InstallScheduledTask(const std::string& task_name,
-                          bool use_task_subfolders);
-void IsScheduledTaskRegistered(const std::string& task_name,
-                               bool use_task_subfolders);
-void DeleteScheduledTask(const std::string& task_name,
-                         bool use_task_subfolders);
-#endif  // BUILDFLAG(IS_WIN)
-
 // Returns the number of files in the directory, not including directories,
 // links, or dot dot.
 int CountDirectoryFiles(const base::FilePath& dir);
@@ -509,17 +436,6 @@ void CallServiceUpdate(UpdaterScope updater_scope,
                        bool same_version_update_allowed);
 
 void SetupFakeLegacyUpdater(UpdaterScope scope);
-
-#if BUILDFLAG(IS_WIN)
-void RunFakeLegacyUpdater(UpdaterScope scope);
-
-// Dismiss the installation completion dialog, then wait for the process
-// exit.
-void CloseInstallCompleteDialog(const std::u16string& bundle_name,
-                                const std::wstring& lang,
-                                const std::wstring& child_window_text_to_find,
-                                bool verify_app_logo_loaded = false);
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
 void PrivilegedHelperInstall(UpdaterScope scope);

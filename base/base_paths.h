@@ -10,9 +10,7 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/base_paths_win.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "base/base_paths_mac.h"
 #elif BUILDFLAG(IS_IOS)
 #include "base/base_paths_ios.h"

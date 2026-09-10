@@ -7,7 +7,7 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 // On Linux, we need to export this symbol so it can be used by binaries that
 // link against remoting_core.so.
 #if defined(WIN32)
@@ -19,7 +19,7 @@
 #else   // !defined(WIN32)
 #define REMOTING_EXPORT __attribute__((visibility("default")))
 #endif  // !defined(WIN32)
-#else   // !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#else
 #define REMOTING_EXPORT
 #endif
 

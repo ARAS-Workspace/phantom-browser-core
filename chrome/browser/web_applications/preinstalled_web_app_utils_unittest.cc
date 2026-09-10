@@ -197,11 +197,7 @@ INSTANTIATE_TEST_SUITE_P(All,
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
 // TODO(crbug.com/40145619): Loading icon.png is flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_OfflineManifestValid DISABLED_OfflineManifestValid
-#else
 #define MAYBE_OfflineManifestValid OfflineManifestValid
-#endif
 TEST_F(PreinstalledWebAppUtilsTest, MAYBE_OfflineManifestValid) {
   std::unique_ptr<WebAppInstallInfo> app_info = ParseOfflineManifest(R"(
     {
@@ -313,11 +309,7 @@ TEST_F(PreinstalledWebAppUtilsTest, OfflineManifestScope) {
 }
 
 // TODO(crbug.com/40145619): Loading icon.png is flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_OfflineManifestDisplay DISABLED_OfflineManifestDisplay
-#else
 #define MAYBE_OfflineManifestDisplay OfflineManifestDisplay
-#endif
 TEST_F(PreinstalledWebAppUtilsTest, MAYBE_OfflineManifestDisplay) {
   EXPECT_FALSE(ParseOfflineManifest(R"(
     {

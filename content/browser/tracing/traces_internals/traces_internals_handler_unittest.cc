@@ -93,20 +93,6 @@ class MockTracingDelegate : public TracingDelegate {
               (bool, base::TimeTicks),
               (const, override));
   MOCK_METHOD(bool, ShouldSaveUnuploadedTrace, (), (const, override));
-#if BUILDFLAG(IS_WIN)
-  MOCK_METHOD(void,
-              GetSystemTracingState,
-              (base::OnceCallback<void(bool, bool)>),
-              (override));
-  MOCK_METHOD(void,
-              EnableSystemTracing,
-              (base::OnceCallback<void(bool)>),
-              (override));
-  MOCK_METHOD(void,
-              DisableSystemTracing,
-              (base::OnceCallback<void(bool)>),
-              (override));
-#endif
 };
 
 class TracesInternalsHandlerForTesting : public TracesInternalsHandler {
@@ -407,28 +393,5 @@ TEST_F(TracesInternalsHandlerTest, DownloadTrace) {
       });
   handler_->DownloadTrace(uuid, callback.Get());
 }
-
-#if BUILDFLAG(IS_WIN)
-// Tests that TracesInternalsHandler delegates GetSystemTracingState to the
-// TracingDelegate.
-TEST_F(TracesInternalsHandlerTest, GetSystemTracingState) {
-  EXPECT_CALL(mock_tracing_delegate_, GetSystemTracingState(testing::_));
-  handler_->GetSystemTracingState({});
-}
-
-// Tests that TracesInternalsHandler delegates EnableSystemTracing to the
-// TracingDelegate.
-TEST_F(TracesInternalsHandlerTest, EnableSystemTracing) {
-  EXPECT_CALL(mock_tracing_delegate_, EnableSystemTracing(testing::_));
-  handler_->EnableSystemTracing({});
-}
-
-// Tests that TracesInternalsHandler delegates DisableSystemTracing to the
-// TracingDelegate.
-TEST_F(TracesInternalsHandlerTest, DisableSystemTracing) {
-  EXPECT_CALL(mock_tracing_delegate_, DisableSystemTracing(testing::_));
-  handler_->DisableSystemTracing({});
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace content

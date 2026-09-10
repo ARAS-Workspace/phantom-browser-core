@@ -23,9 +23,7 @@ namespace diagnostics {
 
 // This is the count of diagnostic tests on each platform.  This should
 // only be used by testing code.
-#if BUILDFLAG(IS_WIN)
-const int DiagnosticsModel::kDiagnosticsTestCount = 17;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 const int DiagnosticsModel::kDiagnosticsTestCount = 14;
 #elif BUILDFLAG(IS_POSIX)
 #if BUILDFLAG(IS_CHROMEOS)
@@ -33,7 +31,7 @@ const int DiagnosticsModel::kDiagnosticsTestCount = 18;
 #else
 const int DiagnosticsModel::kDiagnosticsTestCount = 16;
 #endif  // BUILDFLAG(IS_CHROMEOS)
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 namespace {
 
@@ -127,34 +125,7 @@ class DiagnosticsModelImpl : public DiagnosticsModel {
 
 // Each platform can have their own tests. For the time being there is only
 // one test that works on all platforms.
-#if BUILDFLAG(IS_WIN)
-class DiagnosticsModelWin : public DiagnosticsModelImpl {
- public:
-  DiagnosticsModelWin() {
-    tests_.push_back(MakeOperatingSystemTest());
-    tests_.push_back(MakeInstallTypeTest());
-    tests_.push_back(MakeVersionTest());
-    tests_.push_back(MakeUserDirTest());
-    tests_.push_back(MakeLocalStateFileTest());
-    tests_.push_back(MakeDictionaryDirTest());
-    tests_.push_back(MakeResourcesFileTest());
-    tests_.push_back(MakeDiskSpaceTest());
-    tests_.push_back(MakePreferencesTest());
-    tests_.push_back(MakeLocalStateTest());
-    tests_.push_back(MakeLocalOrSyncableBookmarksTest());
-    tests_.push_back(MakeAccountBookmarksTest());
-    tests_.push_back(MakeSqliteWebDataDbTest());
-    tests_.push_back(MakeSqliteCookiesDbTest());
-    tests_.push_back(MakeSqliteFaviconsDbTest());
-    tests_.push_back(MakeSqliteHistoryDbTest());
-    tests_.push_back(MakeSqliteTopSitesDbTest());
-  }
-
-  DiagnosticsModelWin(const DiagnosticsModelWin&) = delete;
-  DiagnosticsModelWin& operator=(const DiagnosticsModelWin&) = delete;
-};
-
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 class DiagnosticsModelMac : public DiagnosticsModelImpl {
  public:
   DiagnosticsModelMac() {
@@ -217,9 +188,7 @@ DiagnosticsModel* MakeDiagnosticsModel(const base::CommandLine& cmdline) {
       cmdline.GetSwitchValuePath(switches::kUserDataDir);
   if (!user_data_dir.empty())
     base::PathService::Override(chrome::DIR_USER_DATA, user_data_dir);
-#if BUILDFLAG(IS_WIN)
-  return new DiagnosticsModelWin();
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return new DiagnosticsModelMac();
 #elif BUILDFLAG(IS_POSIX)
   return new DiagnosticsModelPosix();

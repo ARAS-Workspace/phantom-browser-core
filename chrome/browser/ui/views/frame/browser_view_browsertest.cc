@@ -110,131 +110,6 @@
 #include "chrome/browser/ui/ash/test_util.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-
-class BrowserViewPipTest : public InProcessBrowserTest {
- public:
-  BrowserViewPipTest() {
-    feature_list_.InitAndEnableFeature(features::kExcludePipFromScreenCapture);
-  }
-
- protected:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(BrowserViewPipTest, DynamicStatePropagation) {
-  content::ScopedPipExclusionOverride exclusion_override(false);
-
-  // Create a PIP browser.
-  BrowserWindowCreateParams params(
-      BrowserWindowInterface::TYPE_PICTURE_IN_PICTURE, browser()->GetProfile(),
-      /*from_user_gesture=*/true);
-  BrowserWindowInterface* pip_browser = CreateBrowserWindow(std::move(params));
-  pip_browser->GetWindow()->Show();
-  BrowserView* pip_browser_view =
-      BrowserView::GetBrowserViewForBrowser(pip_browser);
-
-  // Use the override to flip the global state.
-  exclusion_override.SetExcluded(true);
-  EXPECT_TRUE(pip_browser_view->GetWidget()->GetNativeView()->GetProperty(
-      wm::kExcludeFromScreenCaptureKey));
-
-  exclusion_override.SetExcluded(false);
-  EXPECT_FALSE(pip_browser_view->GetWidget()->GetNativeView()->GetProperty(
-      wm::kExcludeFromScreenCaptureKey));
-
-  CloseBrowserSynchronously(pip_browser);
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserViewPipTest, InitialStateVerification) {
-  // Mock coordinator to return true for exclusion.
-  content::ScopedPipExclusionOverride exclusion_override(true);
-
-  // Create a PIP browser.
-  BrowserWindowCreateParams params(
-      BrowserWindowInterface::TYPE_PICTURE_IN_PICTURE, browser()->GetProfile(),
-      /*from_user_gesture=*/true);
-  BrowserWindowInterface* pip_browser = CreateBrowserWindow(std::move(params));
-  pip_browser->GetWindow()->Show();
-  BrowserView* pip_browser_view =
-      BrowserView::GetBrowserViewForBrowser(pip_browser);
-
-  // Verify it's excluded immediately.
-  EXPECT_TRUE(pip_browser_view->GetWidget()->GetNativeView()->GetProperty(
-      wm::kExcludeFromScreenCaptureKey));
-
-  CloseBrowserSynchronously(pip_browser);
-}
-
-class BrowserViewPipDisabledTest : public InProcessBrowserTest {
- public:
-  BrowserViewPipDisabledTest() {
-    feature_list_.InitAndDisableFeature(features::kExcludePipFromScreenCapture);
-  }
-
- protected:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(BrowserViewPipDisabledTest, FeatureFlagEnforcement) {
-  content::ScopedPipExclusionOverride exclusion_override(false);
-
-  // Create a PIP browser.
-  BrowserWindowCreateParams params(
-      BrowserWindowInterface::TYPE_PICTURE_IN_PICTURE, browser()->GetProfile(),
-      /*from_user_gesture=*/true);
-  BrowserWindowInterface* pip_browser = CreateBrowserWindow(std::move(params));
-  pip_browser->GetWindow()->Show();
-  BrowserView* pip_browser_view =
-      BrowserView::GetBrowserViewForBrowser(pip_browser);
-
-  // Flip the global state.
-  exclusion_override.SetExcluded(true);
-
-  // Property should still be false because of the gate.
-  EXPECT_FALSE(pip_browser_view->GetWidget()->GetNativeView()->GetProperty(
-      wm::kExcludeFromScreenCaptureKey));
-
-  CloseBrowserSynchronously(pip_browser);
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserViewPipTest, WindowTypeIsolation) {
-  content::ScopedPipExclusionOverride exclusion_override(false);
-
-  // Normal browser (already exists as browser()).
-  BrowserView* normal_view = BrowserView::GetBrowserViewForBrowser(browser());
-
-  // Flip the global state.
-  exclusion_override.SetExcluded(true);
-
-  // Property should remain false.
-  EXPECT_FALSE(normal_view->GetWidget()->GetNativeView()->GetProperty(
-      wm::kExcludeFromScreenCaptureKey));
-}
-
-IN_PROC_BROWSER_TEST_F(BrowserViewPipTest, NewWindowInitializationIsolation) {
-  // Mock coordinator to return true for exclusion.
-  content::ScopedPipExclusionOverride exclusion_override(true);
-
-  // Create a normal browser.
-  BrowserWindowCreateParams params(BrowserWindowInterface::TYPE_NORMAL,
-                                   browser()->GetProfile(),
-                                   /*from_user_gesture=*/true);
-  BrowserWindowInterface* new_normal_browser =
-      CreateBrowserWindow(std::move(params));
-  new_normal_browser->GetWindow()->Show();
-
-  BrowserView* new_normal_view =
-      BrowserView::GetBrowserViewForBrowser(new_normal_browser);
-
-  // Property should remain false because normal windows are not excluded.
-  EXPECT_FALSE(new_normal_view->GetWidget()->GetNativeView()->GetProperty(
-      wm::kExcludeFromScreenCaptureKey));
-
-  CloseBrowserSynchronously(new_normal_browser);
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 class BrowserViewTest : public InProcessBrowserTest {
  public:
@@ -843,13 +718,9 @@ IN_PROC_BROWSER_TEST_F(BrowserViewTest, GetAccessibleTabModalDialogTree) {
       browser_view()->GetWidget()->GetRootView()->GetNativeViewAccessible());
 // We expect this conversion to be safe on Windows, but can't guarantee that it
 // is safe on other platforms.
-#if BUILDFLAG(IS_WIN)
-  ASSERT_TRUE(ax_node);
-#else
   if (!ax_node) {
     return;
   }
-#endif
 
   // There is no dialog, but the browser UI should be visible. So we expect the
   // browser's app menu button and no "OK" button from a dialog.
@@ -1449,7 +1320,7 @@ class BrowserViewDataProtectionTest : public InProcessBrowserTest {
 
 }  // namespace
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
 IN_PROC_BROWSER_TEST_F(BrowserViewDataProtectionTest, DC_Screenshot) {
   data_controls::SetDataControls(browser()->GetProfile()->GetPrefs(), {R"(
@@ -1471,7 +1342,7 @@ IN_PROC_BROWSER_TEST_F(BrowserViewDataProtectionTest, DC_Screenshot) {
   EXPECT_TRUE(widget->AreScreenshotsAllowed());
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_CHROMEOS)
 IN_PROC_BROWSER_TEST_F(BrowserViewChromeOSTest, EnsureViewTreeOrder) {

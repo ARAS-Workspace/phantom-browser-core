@@ -34,11 +34,6 @@
 #endif
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_handle.h"
-#include "base/win/windows_types.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
     BUILDFLAG(IS_AIX)
 #include <string>
@@ -92,10 +87,6 @@ struct ProcessMemoryInfo {
   uint64_t vm_swap_bytes = 0;
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
         // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_WIN)
-  uint64_t private_bytes = 0;
-#endif  // BUILDFLAG(IS_WIN)
 
   // On iOS,
   //   TBD: https://crbug.com/41315025
@@ -255,11 +246,7 @@ class BASE_EXPORT ProcessMetrics {
   mach_port_t TaskForHandle(ProcessHandle process_handle) const;
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  win::ScopedHandle process_;
-#else
   ProcessHandle process_;
-#endif
 
   // Used to store the previous times and CPU usage counts so we can
   // compute the CPU usage between calls.
@@ -308,7 +295,8 @@ BASE_EXPORT size_t GetHandleLimit();
 BASE_EXPORT void IncreaseFdLimitTo(unsigned int max_descriptors);
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
+    BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
 // Data about system-wide memory consumption. Available on Windows, Mac, Linux,
 // Android and Chrome OS.
 //
@@ -329,18 +317,7 @@ struct BASE_EXPORT SystemMemoryInfo {
 
   ByteSize total;
 
-#if !BUILDFLAG(IS_WIN)
   ByteSize free;
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  // "This is the amount of physical memory that can be immediately reused
-  // without having to write its contents to disk first. It is the sum of the
-  // size of the standby, free, and zero lists." (MSDN).
-  // Standby: not modified pages of physical ram (file-backed memory) that are
-  // not actively being used.
-  ByteSize avail_phys;
-#endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
     BUILDFLAG(IS_AIX)
@@ -393,7 +370,8 @@ struct BASE_EXPORT SystemMemoryInfo {
 // Exposed for memory debugging widget.
 BASE_EXPORT bool GetSystemMemoryInfo(SystemMemoryInfo* meminfo);
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+        // || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
     BUILDFLAG(IS_AIX)
@@ -580,9 +558,6 @@ class BASE_EXPORT SystemMetrics {
 #if BUILDFLAG(IS_CHROMEOS)
   SwapInfo swap_info_;
   GraphicsMemoryInfoKB gpu_memory_info_;
-#endif
-#if BUILDFLAG(IS_WIN)
-  SystemPerformanceInfo performance_;
 #endif
 };
 

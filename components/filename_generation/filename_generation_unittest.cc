@@ -20,11 +20,7 @@ namespace filename_generation {
 
 #define FPL FILE_PATH_LITERAL
 #define HTML_EXTENSION ".html"
-#if BUILDFLAG(IS_WIN)
-#define FPL_HTML_EXTENSION L".html"
-#else
 #define FPL_HTML_EXTENSION ".html"
-#endif
 
 namespace {
 
@@ -60,11 +56,7 @@ static const auto kExtensionTestCases = std::to_array<ExtensionTestCases>({
 });
 
 // Crashing on Windows, see http://crbug.com/79365
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TestEnsureHtmlExtension DISABLED_TestEnsureHtmlExtension
-#else
 #define MAYBE_TestEnsureHtmlExtension TestEnsureHtmlExtension
-#endif
 TEST(FilenameGenerationTest, MAYBE_TestEnsureHtmlExtension) {
   for (size_t i = 0; i < std::size(kExtensionTestCases); ++i) {
     base::FilePath original = base::FilePath(kExtensionTestCases[i].page_title);
@@ -77,11 +69,7 @@ TEST(FilenameGenerationTest, MAYBE_TestEnsureHtmlExtension) {
 }
 
 // Crashing on Windows, see http://crbug.com/79365
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TestEnsureMimeExtension DISABLED_TestEnsureMimeExtension
-#else
 #define MAYBE_TestEnsureMimeExtension TestEnsureMimeExtension
-#endif
 TEST(FilenameGenerationTest, MAYBE_TestEnsureMimeExtension) {
   struct ExtensionTests {
     const base::FilePath::CharType* page_title;
@@ -92,11 +80,7 @@ TEST(FilenameGenerationTest, MAYBE_TestEnsureMimeExtension) {
       {FPL("filename.html"), FPL("filename.html"), "text/html"},
       {FPL("filename.htm"), FPL("filename.htm"), "text/html"},
       {FPL("filename.xhtml"), FPL("filename.xhtml"), "text/html"},
-#if BUILDFLAG(IS_WIN)
-      {FPL("filename"), FPL("filename.htm"), "text/html"},
-#else   // BUILDFLAG(IS_WIN)
       {FPL("filename"), FPL("filename.html"), "text/html"},
-#endif  // BUILDFLAG(IS_WIN)
       {FPL("filename.html"), FPL("filename.html"), "text/xml"},
       {FPL("filename.xml"), FPL("filename.xml"), "text/xml"},
       {FPL("filename"), FPL("filename.xml"), "text/xml"},
@@ -165,11 +149,7 @@ static const auto kGenerateFilenameCases =
     });
 
 // Crashing on Windows, see http://crbug.com/79365
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TestGenerateFilename DISABLED_TestGenerateFilename
-#else
 #define MAYBE_TestGenerateFilename TestGenerateFilename
-#endif
 TEST(FilenameGenerationTest, MAYBE_TestGenerateFilename) {
   for (size_t i = 0; i < std::size(kGenerateFilenameCases); ++i) {
     base::FilePath save_name = GenerateFilename(
@@ -195,7 +175,7 @@ TEST(FilenameGenerationTest, TestBasicTruncation) {
 
 // The file path will only be truncated o the platforms that have known
 // encoding. Otherwise no truncation will be performed.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS)
   // The file name length is truncated to max_length.
   EXPECT_TRUE(TruncateFilename(&truncated_path, max_length));
   EXPECT_EQ(size_t(max_length), truncated_path.BaseName().value().size());

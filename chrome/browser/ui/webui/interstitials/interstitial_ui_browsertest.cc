@@ -239,7 +239,7 @@ IN_PROC_BROWSER_TEST_F(InterstitialUITest, BlockedInterceptionInterstitial) {
                    u"Anything you type");
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 // Tests that the interstitials have the expected title and content.
 IN_PROC_BROWSER_TEST_F(InterstitialUITest,
                        SupervisedUserVerificationInterstitial) {
@@ -307,12 +307,7 @@ IN_PROC_BROWSER_TEST_F(InterstitialUITest, InterstitialViewSource) {
 // chrome://interstitials (using chrome://interstitials/ssl).
 
 // Test is currently flaky on Windows (crbug.com/41437969)
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_InterstitialWithPathViewSource \
-  DISABLED_InterstitialWithPathViewSource
-#else
 #define MAYBE_InterstitialWithPathViewSource InterstitialWithPathViewSource
-#endif
 
 IN_PROC_BROWSER_TEST_F(InterstitialUITest,
                        MAYBE_InterstitialWithPathViewSource) {

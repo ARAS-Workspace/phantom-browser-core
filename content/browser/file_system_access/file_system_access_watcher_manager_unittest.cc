@@ -68,23 +68,19 @@ void SpinEventLoopForABit() {
 }
 
 bool ReportsModifiedPathForLocalObservations() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
   return true;
 #else
   return false;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) ||
-        // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 }
 
 bool ReportsChangeInfoForLocalObservations() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
   return true;
 #else
   return false;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) ||
-        // BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 }
 
 #endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
@@ -267,11 +263,7 @@ class FileSystemAccessWatcherManagerTestBase : public testing::Test {
       : task_environment_(std::forward<TaskEnvironmentTraits>(traits)...) {}
 
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    ASSERT_TRUE(dir_.CreateUniqueTempDir());
-    // Convert path to long format to avoid mixing long and 8.3 formats in test.
-    ASSERT_TRUE(dir_.Set(base::MakeLongFilePath(dir_.Take())));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     // Temporary files in Mac are created under /var/, which is a symlink that
     // resolves to /private/var/. Set `dir_` directly to the resolved file
     // path, given that the expected FSEvents event paths are reported as
@@ -676,15 +668,6 @@ TEST_F(FileSystemAccessWatcherManagerTest, IgnoreSwapFileChanges) {
   SpinEventLoopForABit();
 
   FilePathType file_path_type = FilePathType::kFile;
-#if BUILDFLAG(IS_WIN)
-  // There is no way to know the correct handle type on Windows in this
-  // scenario.
-  //
-  // Window's content::FilePathWatcher uses base::GetFileInfo to figure out the
-  // file path type. Since `fileInDir` is deleted, there is nothing to call
-  // base::GetFileInfo on.
-  file_path_type = FilePathType::kUnknown;
-#endif  // BUILDFLAG(IS_WIN)
 
   auto expected_url =
       manager_->CreateFileSystemURLFromPath(PathInfo(non_swap_file_path));
@@ -1176,22 +1159,11 @@ TEST_F(FileSystemAccessWatcherManagerTest, WatchLocalFile) {
   // Deleting the watched file should notify `accumulator`.
   DeleteFile(file_path);
 
-#if BUILDFLAG(IS_WIN)
-  // There is no way to know the correct handle type on Windows in this
-  // scenario.
-  //
-  // Window's content::FilePathWatcher uses base::GetFileInfo to figure out the
-  // file path type. Since `fileInDir` is deleted, there is nothing to call
-  // base::GetFileInfo on.
-  ChangeInfo change_info(FilePathType::kUnknown, ChangeType::kDeleted,
-                         file_url.path());
-#else
   ChangeInfo change_info =
       ReportsChangeInfoForLocalObservations()
           ? ChangeInfo(FilePathType::kFile, ChangeType::kDeleted,
                        file_url.path())
           : ChangeInfo();
-#endif
   std::list<Change> expected_changes = {{file_url, change_info}};
   EXPECT_TRUE(base::test::RunUntil([&]() {
     return testing::Matches(testing::ContainerEq(expected_changes))(
@@ -1236,22 +1208,11 @@ TEST_F(FileSystemAccessWatcherManagerTest,
   // Deleting the watched file should notify each `accumulator`.
   DeleteFile(file_path);
 
-#if BUILDFLAG(IS_WIN)
-  // There is no way to know the correct handle type on Windows in this
-  // scenario.
-  //
-  // Window's content::FilePathWatcher uses base::GetFileInfo to figure out the
-  // file path type. Since `fileInDir` is deleted, there is nothing to call
-  // base::GetFileInfo on.
-  ChangeInfo change_info(FilePathType::kUnknown, ChangeType::kDeleted,
-                         file_url.path());
-#else
   ChangeInfo change_info =
       ReportsChangeInfoForLocalObservations()
           ? ChangeInfo(FilePathType::kFile, ChangeType::kDeleted,
                        file_url.path())
           : ChangeInfo();
-#endif
   std::list<Change> expected_changes = {{file_url, change_info}};
   const auto expected_changes_matcher = testing::ContainerEq(expected_changes);
   EXPECT_TRUE(base::test::RunUntil([&]() {

@@ -942,12 +942,6 @@ bool DrawingBuffer::Initialize(const gfx::Size& size, bool use_multisampling) {
 
   bool supports_implicit_resolve = extensions_util_->SupportsExtension(
       "GL_EXT_multisampled_render_to_texture");
-#if BUILDFLAG(IS_WIN)
-  // We can't use anything other than explicit resolve for swap chain, as the
-  // D3D11 texture backing the back buffer is single-sampled.
-  supports_implicit_resolve =
-      supports_implicit_resolve && !can_use_low_latency_;
-#endif
 
   const auto& gpu_feature_info = ContextProvider()->GetGpuFeatureInfo();
   // With graphite, Skia is not using ANGLE, so ANGLE will never be able to know
@@ -2081,9 +2075,7 @@ scoped_refptr<DrawingBuffer::ColorBuffer> DrawingBuffer::CreateColorBuffer(
                                ? kTopLeft_GrSurfaceOrigin
                                : kBottomLeft_GrSurfaceOrigin;
 
-#if !BUILDFLAG(IS_WIN)
   const gpu::Capabilities& caps = ContextProvider()->GetCapabilities();
-#endif
 
 #if BUILDFLAG(IS_MAC)
   // For Mac, explicitly specify BGRA/X instead of RGBA/X so that IOSurface
@@ -2107,7 +2099,7 @@ scoped_refptr<DrawingBuffer::ColorBuffer> DrawingBuffer::CreateColorBuffer(
   if (SharedGpuContext::IsGpuCompositingEnabled()) {
     bool use_as_overlay = UseOverlaysForWebGL() || can_use_low_latency_;
     if (use_as_overlay) {
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_ANDROID)
       // Android's SharedImage backing for ChromiumImage does not support BGRX,
       // and the adjustments below were historically not made on Windows.
 
@@ -2129,19 +2121,15 @@ scoped_refptr<DrawingBuffer::ColorBuffer> DrawingBuffer::CreateColorBuffer(
               viz::SinglePlaneFormat::kBGRX_8888, caps)) {
         color_buffer_format_ = viz::SinglePlaneFormat::kBGRX_8888;
       }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_WIN)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_WIN)
       // This check was historically not made on Windows.
       if (IsScanoutSupportedForCanvasWithFormat(color_buffer_format_, caps)) {
-#endif
         usage = usage | gpu::SHARED_IMAGE_USAGE_SCANOUT;
         if (can_use_low_latency_) {
           usage = usage | gpu::SHARED_IMAGE_USAGE_CONCURRENT_READ_WRITE;
         }
-#if !BUILDFLAG(IS_WIN)
       }
-#endif
     }
   }
 

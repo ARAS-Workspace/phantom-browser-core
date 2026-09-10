@@ -17,9 +17,6 @@
 #include "build/buildflag.h"
 #include "ui/accessibility/ax_tree_observer.h"
 #include "ui/accessibility/platform/browser_accessibility.h"
-#if BUILDFLAG(IS_WIN)
-#include "ui/accessibility/platform/browser_accessibility_win.h"
-#endif
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/accessibility/ax_common.h"
@@ -44,11 +41,7 @@ struct FiredGeneratedEvent {
 
 #if !BUILDFLAG(IS_ANDROID)
 gfx::AcceleratedWidget MakeAcceleratedWidget(uintptr_t value) {
-#if BUILDFLAG(IS_WIN)
-  return reinterpret_cast<gfx::AcceleratedWidget>(value);
-#else
   return static_cast<gfx::AcceleratedWidget>(value);
-#endif
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
@@ -185,7 +178,7 @@ TEST_F(BrowserAccessibilityManagerTest, TestErrorOnUpdate) {
 
 // This test depends on hypertext, which is only used on
 // Linux and Windows.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#if BUILDFLAG(USE_ATK)
 TEST_F(BrowserAccessibilityManagerTest, BoundsForRange) {
   ui::AXNodeData root;
   root.id = 1;
@@ -292,7 +285,7 @@ TEST_F(BrowserAccessibilityManagerTest, BoundsForRange) {
                     0, 13, ui::AXClippingBehavior::kUnclipped)
                 .ToString());
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#endif  // BUILDFLAG(USE_ATK)
 
 TEST_F(BrowserAccessibilityManagerTest, BoundsForRangeMultiElement) {
   ui::AXNodeData root;
@@ -403,7 +396,7 @@ TEST_F(BrowserAccessibilityManagerTest, BoundsForRangeMultiElement) {
 
 // This test depends on hypertext, which is only used on
 // Linux and Windows.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#if BUILDFLAG(USE_ATK)
 TEST_F(BrowserAccessibilityManagerTest, BoundsForRangeBiDi) {
   // In this example, we assume that the string "123abc" is rendered with
   // "123" going left-to-right and "abc" going right-to-left. In other
@@ -505,11 +498,11 @@ TEST_F(BrowserAccessibilityManagerTest, BoundsForRangeBiDi) {
                     2, 2, ui::AXClippingBehavior::kUnclipped)
                 .ToString());
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#endif  // BUILDFLAG(USE_ATK)
 
 // This test depends on hypertext, which is only used on
 // Linux and Windows.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#if BUILDFLAG(USE_ATK)
 TEST_F(BrowserAccessibilityManagerTest, BoundsForRangeScrolledWindow) {
   ui::AXNodeData root;
   root.id = 1;
@@ -565,11 +558,11 @@ TEST_F(BrowserAccessibilityManagerTest, BoundsForRangeScrolledWindow) {
                   .ToString());
   }
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#endif  // BUILDFLAG(USE_ATK)
 
 // This test depends on hypertext, which is only used on
 // Linux and Windows.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#if BUILDFLAG(USE_ATK)
 TEST_F(BrowserAccessibilityManagerTest, BoundsForRangeOnParentElement) {
   ui::AXNodeData root;
   root.id = 1;
@@ -677,7 +670,7 @@ TEST_F(BrowserAccessibilityManagerTest, BoundsForRangeOnParentElement) {
                     0, 5, ui::AXClippingBehavior::kUnclipped)
                 .ToString());
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#endif  // BUILDFLAG(USE_ATK)
 
 TEST_F(BrowserAccessibilityManagerTest, TestNextPreviousInTreeOrder) {
   ui::TestAXTreeUpdate update(std::string(R"HTML(
@@ -895,7 +888,7 @@ TEST_F(BrowserAccessibilityManagerTest, TestNextPreviousTextOnlyObject) {
 
 // This test depends on hypertext, which is only used on
 // Linux and Windows.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#if BUILDFLAG(USE_ATK)
 TEST_F(BrowserAccessibilityManagerTest, TestFindIndicesInCommonParent) {
   ui::TestAXTreeUpdate update(std::string(R"HTML(
     ++1 kRootWebArea
@@ -1003,11 +996,11 @@ TEST_F(BrowserAccessibilityManagerTest, TestFindIndicesInCommonParent) {
   EXPECT_EQ(0u, child_index1);
   EXPECT_EQ(1u, child_index2);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#endif  // BUILDFLAG(USE_ATK)
 
 // This test depends on hypertext, which is only used on
 // Linux and Windows.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#if BUILDFLAG(USE_ATK)
 TEST_F(BrowserAccessibilityManagerTest, TestGetTextForRange) {
   ui::AXNodeData root;
   root.id = 1;
@@ -1189,7 +1182,7 @@ TEST_F(BrowserAccessibilityManagerTest, TestGetTextForRange) {
                                  *paragraph_line2_accessible, 6,
                                  *paragraph_line1_accessible, 0));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#endif  // BUILDFLAG(USE_ATK)
 
 TEST_F(BrowserAccessibilityManagerTest, DeletingFocusedNodeDoesNotCrash) {
   // Create a really simple tree with one root node and one focused child.

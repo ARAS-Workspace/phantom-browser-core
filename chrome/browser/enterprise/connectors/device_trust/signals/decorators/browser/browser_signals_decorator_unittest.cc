@@ -30,10 +30,6 @@
 #include "components/policy/proto/device_management_backend.pb.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "components/device_signals/core/common/win/win_types.h"
-#endif
-
 using testing::_;
 using testing::Return;
 using testing::StrictMock;
@@ -410,93 +406,5 @@ TEST_F(BrowserSignalsDecoratorTest, Decorate_NoAgentSignals) {
 
   histogram_tester_.ExpectTotalCount(kLatencyHistogram, 1);
 }
-
-#if BUILDFLAG(IS_WIN)
-class AntiVirusBrowserSignalsDecoratorTest
-    : public BrowserSignalsDecoratorTest {
- protected:
-  device_signals::SignalsAggregationResponse CreateFilledResponse() override {
-    auto response = BrowserSignalsDecoratorTest::CreateFilledResponse();
-    response.av_signal_response = av_response_;
-    return response;
-  }
-
-  std::optional<device_signals::AntiVirusSignalResponse> av_response_{
-      std::nullopt};
-};
-
-TEST_F(AntiVirusBrowserSignalsDecoratorTest, NoAvResponse) {
-  SetUpAggregatorExpectations();
-
-  auto decorator = CreateDecorator();
-  base::RunLoop run_loop;
-  base::DictValue signals;
-  decorator.Decorate(signals, run_loop.QuitClosure());
-
-  run_loop.Run();
-
-    auto value = signals.FindInt(device_signals::names::kAntivirusState);
-    ASSERT_TRUE(value);
-    EXPECT_EQ(value.value(), 0);
-}
-
-TEST_F(AntiVirusBrowserSignalsDecoratorTest, AvResponse_None) {
-  SetUpAggregatorExpectations();
-
-  av_response_ = device_signals::AntiVirusSignalResponse();
-  av_response_->antivirus_state =
-      device_signals::InstalledAntivirusState::kNone;
-
-  auto decorator = CreateDecorator();
-  base::RunLoop run_loop;
-  base::DictValue signals;
-  decorator.Decorate(signals, run_loop.QuitClosure());
-
-  run_loop.Run();
-
-  auto value = signals.FindInt(device_signals::names::kAntivirusState);
-  ASSERT_TRUE(value);
-  EXPECT_EQ(value.value(), 0);
-}
-
-TEST_F(AntiVirusBrowserSignalsDecoratorTest, AvResponse_Enabled) {
-  SetUpAggregatorExpectations();
-
-  av_response_ = device_signals::AntiVirusSignalResponse();
-  av_response_->antivirus_state =
-      device_signals::InstalledAntivirusState::kEnabled;
-
-  auto decorator = CreateDecorator();
-  base::RunLoop run_loop;
-  base::DictValue signals;
-  decorator.Decorate(signals, run_loop.QuitClosure());
-
-  run_loop.Run();
-
-  auto value = signals.FindInt(device_signals::names::kAntivirusState);
-  ASSERT_TRUE(value);
-  EXPECT_EQ(value.value(), 2);
-}
-
-TEST_F(AntiVirusBrowserSignalsDecoratorTest, AvResponse_Disabled) {
-  SetUpAggregatorExpectations();
-
-  av_response_ = device_signals::AntiVirusSignalResponse();
-  av_response_->antivirus_state =
-      device_signals::InstalledAntivirusState::kDisabled;
-
-  auto decorator = CreateDecorator();
-  base::RunLoop run_loop;
-  base::DictValue signals;
-  decorator.Decorate(signals, run_loop.QuitClosure());
-
-  run_loop.Run();
-
-  auto value = signals.FindInt(device_signals::names::kAntivirusState);
-  ASSERT_TRUE(value);
-  EXPECT_EQ(value.value(), 1);
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace enterprise_connectors

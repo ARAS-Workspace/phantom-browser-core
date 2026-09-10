@@ -47,7 +47,7 @@ constexpr const char* kStartupMetrics[] = {
     "Startup.FirstWebContents.NonEmptyPaint3",
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     "Startup.BrowserMessageLoopStartHardFaultBytes",
     "Startup.BrowserMessageLoopStartHardFaultCount",
     "Startup.Temperature",
@@ -63,11 +63,7 @@ void AddProcessCreateMetrics(std::vector<const char*>& v) {
 
 // Verify that startup histograms are logged on browser startup.
 // TODO(crbug.com/40919406): Re-enable this test
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_X86_64)
-#define MAYBE_ReportsValues DISABLED_ReportsValues
-#else
 #define MAYBE_ReportsValues ReportsValues
-#endif
 IN_PROC_BROWSER_TEST_F(StartupMetricsTest, MAYBE_ReportsValues) {
   std::vector<const char*> startup_metrics{std::begin(kStartupMetrics),
                                            std::end(kStartupMetrics)};

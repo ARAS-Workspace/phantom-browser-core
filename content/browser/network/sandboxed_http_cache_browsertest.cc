@@ -114,13 +114,6 @@ class SandboxedHttpCacheBrowserTest : public ContentBrowserTest {
   }
 
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    if (!sandbox::policy::features::IsNetworkSandboxSupported()) {
-      // On *some* Windows, sandboxing cannot be enabled. We skip all the tests
-      // on such platforms.
-      GTEST_SKIP();
-    }
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
     {

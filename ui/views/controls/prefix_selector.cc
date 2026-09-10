@@ -18,10 +18,6 @@
 #include "ui/views/view.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <vector>
-#endif
-
 namespace views {
 
 PrefixSelector::PrefixSelector(PrefixDelegate* delegate, View* host_view)
@@ -96,21 +92,6 @@ gfx::Rect PrefixSelector::GetSelectionBoundingBox() const {
   NOTIMPLEMENTED_LOG_ONCE();
   return gfx::Rect();
 }
-
-#if BUILDFLAG(IS_WIN)
-std::optional<gfx::Rect> PrefixSelector::GetProximateCharacterBounds(
-    const gfx::Range& range) const {
-  NOTIMPLEMENTED_LOG_ONCE();
-  return std::nullopt;
-}
-
-std::optional<size_t> PrefixSelector::GetProximateCharacterIndexFromPoint(
-    const gfx::Point& screen_point_in_dips,
-    ui::IndexFromPointFlags flags) const {
-  NOTIMPLEMENTED_LOG_ONCE();
-  return std::nullopt;
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 bool PrefixSelector::GetCompositionCharacterBounds(size_t index,
                                                    gfx::Rect* rect) const {
@@ -193,7 +174,7 @@ bool PrefixSelector::ShouldDoLearning() {
   return false;
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 bool PrefixSelector::SetCompositionFromExistingText(
     const gfx::Range& range,
     const std::vector<ui::ImeTextSpan>& ui_ime_text_spans) {
@@ -219,13 +200,6 @@ bool PrefixSelector::SetAutocorrectRange(const gfx::Range& range) {
   NOTIMPLEMENTED_LOG_ONCE();
   return false;
 }
-#endif
-
-#if BUILDFLAG(IS_WIN)
-void PrefixSelector::SetActiveCompositionForAccessibility(
-    const gfx::Range& range,
-    const std::u16string& active_composition_text,
-    bool is_composition_committed) {}
 #endif
 
 void PrefixSelector::GetActiveTextInputControlLayoutBounds(

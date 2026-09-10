@@ -24,11 +24,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/base_paths_win.h"
-#include "base/test/scoped_path_override.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace {
 
 using apps_helper::AllProfilesHaveSameApps;
@@ -103,12 +98,6 @@ class SingleClientExtensionAppsSyncTest : public SyncTest {
   }
 
  private:
-#if BUILDFLAG(IS_WIN)
-  // This stops extension installation from creating a shortcut in the real
-  // desktop startup dir. This prevents Chrome launching with the extension
-  // on startup on trybots and developer machines.
-  base::ScopedPathOverride override_start_menu_dir_{base::DIR_START_MENU};
-#endif  // BUILDFLAG(IS_WIN)
 };
 
 IN_PROC_BROWSER_TEST_F(SingleClientExtensionAppsSyncTest, StartWithNoApps) {

@@ -30,12 +30,7 @@ const char kChromeVersion[] = CHROME_VERSION_STRING;
 // in the UITest class we support switching to that version when told to
 // do so.
 
-#if BUILDFLAG(IS_WIN)
-const base::FilePath::CharType kBrowserProcessExecutableName[] =
-    FPL("chrome.exe");
-const base::FilePath::CharType kHelperProcessExecutableName[] =
-    FPL("chrome.exe");
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 const base::FilePath::CharType kBrowserProcessExecutableName[] =
     FPL(PRODUCT_FULLNAME_STRING);
 const base::FilePath::CharType kHelperProcessExecutableName[] =
@@ -52,12 +47,7 @@ const base::FilePath::CharType kBrowserProcessExecutableName[] = FPL("chrome");
 const base::FilePath::CharType kHelperProcessExecutableName[] = FPL("exe");
 #endif  // OS_*
 
-#if BUILDFLAG(IS_WIN)
-const base::FilePath::CharType kBrowserProcessExecutablePath[] =
-    FPL("chrome.exe");
-const base::FilePath::CharType kHelperProcessExecutablePath[] =
-    FPL("chrome.exe");
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 const base::FilePath::CharType kBrowserProcessExecutablePath[] =
     FPL(PRODUCT_FULLNAME_STRING ".app/Contents/MacOS/" PRODUCT_FULLNAME_STRING);
 const base::FilePath::CharType

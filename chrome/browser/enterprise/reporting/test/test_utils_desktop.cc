@@ -72,18 +72,6 @@ void VerifyOsReportSignals(const em::OSReport& os_report,
 
     EXPECT_EQ(os_report.screen_lock_secured(),
               TranslateSettingValue(device_signals::GetScreenlockSecured()));
-#if BUILDFLAG(IS_WIN)
-    EXPECT_EQ(os_report.secure_boot_mode(),
-              TranslateSettingValue(device_signals::GetSecureBootEnabled()));
-    CheckReportMatchSignal(os_report.windows_machine_domain(),
-                           device_signals::GetWindowsMachineDomain());
-    CheckReportMatchSignal(os_report.windows_user_domain(),
-                           device_signals::GetWindowsUserDomain());
-    CheckReportMatchSignal(os_report.machine_guid(),
-                           can_collect_pii_signals
-                               ? device_signals::GetMachineGuid()
-                               : std::nullopt);
-#endif  // BUILDFLAG(IS_WIN)
     base::RunLoop run_loop;
     base::ThreadPool::PostTask(
         FROM_HERE, {base::MayBlock()},
@@ -98,10 +86,6 @@ void VerifyOsReportSignals(const em::OSReport& os_report,
     ASSERT_FALSE(os_report.has_screen_lock_secured());
 
     EXPECT_EQ(0, os_report.mac_addresses_size());
-#if BUILDFLAG(IS_WIN)
-    EXPECT_EQ(0, os_report.antivirus_info_size());
-    EXPECT_EQ(0, os_report.hotfixes_size());
-#endif  // BUILDFLAG(IS_WIN)
   }
 }
 

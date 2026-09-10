@@ -28,12 +28,6 @@ BASE_FEATURE(kGamepadRawInputChangeEvent, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kClaimDuplicateGamepadsProductIdentifier,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_WIN)
-// Ignores PlayStation 5 gamepads (DualSense, DualSense Edge) in
-// WgiDataFetcherWin to avoid double enumeration.
-BASE_FEATURE(kIgnorePS5GamepadsInWgi, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Enabling this feature causes GamepadPlatformDataFetcherLinux to check device
 // IDs before opening the hidraw device node to avoid interfering with devices
@@ -50,11 +44,6 @@ BASE_FEATURE(kXboxUseGameControllerDataFetcherMac,
 BASE_FEATURE(kPlayStationUseGameControllerDataFetcherMac,
              base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_APPLE)
-
-#if BUILDFLAG(IS_WIN)
-BASE_FEATURE(kEnableWindowsGameInputDataFetcher,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN)
 
 bool IsGamepadMultitouchEnabled() {
   if (base::FeatureList::IsEnabled(kEnableGamepadMultitouch)) {

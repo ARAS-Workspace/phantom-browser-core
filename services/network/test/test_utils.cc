@@ -14,10 +14,6 @@
 #include "services/network/public/mojom/network_context.mojom.h"
 #include "services/network/public/mojom/url_response_head.mojom.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/dcheck_is_on.h"
-#endif
-
 namespace network {
 
 std::string GetUploadData(const network::ResourceRequest& request) {
@@ -53,11 +49,6 @@ void AddCookiesToURLResponseHead(const std::vector<std::string>& cookies,
 mojom::NetworkContextParamsPtr CreateNetworkContextParamsForTesting() {
   mojom::NetworkContextParamsPtr params = mojom::NetworkContextParams::New();
   params->file_paths = mojom::NetworkContextFilePaths::New();
-#if BUILDFLAG(IS_WIN) && DCHECK_IS_ON()
-  // For unit tests, no need to verify that permissions on the files are
-  // correct, as this testing is done in integration tests.
-  params->win_permissions_set = true;
-#endif
   // Use a fixed proxy config, to avoid dependencies on local network
   // configuration.
   params->initial_proxy_config = net::ProxyConfigWithAnnotation::CreateDirect();

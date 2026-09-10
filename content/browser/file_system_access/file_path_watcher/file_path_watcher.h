@@ -124,13 +124,15 @@ class CONTENT_EXPORT FilePathWatcher {
   struct WatchOptions {
     Type type = Type::kNonRecursive;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(IS_MAC)
     // The callback will return the full path to a changed file instead of
     // the watched path supplied as |path| when Watch is called.
     // So the full path can be different from the watched path when a folder is
     // watched. In case of any error, it behaves as the original Watch.
     bool report_modified_path = false;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
+        // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC)
   };
 
   // Callback type for Watch(). |path| points to the file that was updated,
@@ -182,13 +184,6 @@ class CONTENT_EXPORT FilePathWatcher {
     // Stop watching. This is called from FilePathWatcher's dtor in order to
     // allow to shut down properly while the object is still alive.
     virtual void Cancel() = 0;
-
-#if BUILDFLAG(IS_WIN)
-    // Gets the Lock associated with the content::FilePathWatcher
-    // implementation's Watch thread. Tests can use this to block that thread
-    // and cause a buffer overflow.
-    virtual base::Lock& GetWatchThreadLockForTest() = 0;
-#endif
 
    protected:
     friend class FilePathWatcher;
@@ -251,13 +246,6 @@ class CONTENT_EXPORT FilePathWatcher {
       const WatchOptions& options,
       const CallbackWithChangeInfo& callback,
       const UsageChangeCallback& usage_callback);
-
-#if BUILDFLAG(IS_WIN)
-  // Gets the Lock associated with the content::FilePathWatcher implementation's
-  // Watch thread. Tests can use this to block that thread and cause a buffer
-  // overflow.
-  base::Lock& GetWatchThreadLockForTest();
-#endif
 
 #if BUILDFLAG(IS_MAC)
   // Creates a watcher with a test hook for FSEvents.

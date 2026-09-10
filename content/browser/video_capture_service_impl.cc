@@ -30,12 +30,8 @@
 #include "media/media_buildflags.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#define CREATE_IN_PROCESS_TASK_RUNNER base::ThreadPool::CreateCOMSTATaskRunner
-#else
 #define CREATE_IN_PROCESS_TASK_RUNNER \
   base::ThreadPool::CreateSingleThreadTaskRunner
-#endif
 
 namespace content {
 

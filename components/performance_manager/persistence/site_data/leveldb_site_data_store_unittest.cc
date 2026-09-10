@@ -48,11 +48,7 @@ ScopedReadOnlyDirectory::ScopedReadOnlyDirectory(
       root_dir, FILE_PATH_LITERAL("read_only_path"), &read_only_path_));
   permission_restorer_ =
       std::make_unique<base::FilePermissionRestorer>(read_only_path_);
-#if BUILDFLAG(IS_WIN)
-  base::DenyFilePermission(read_only_path_, GENERIC_WRITE);
-#else  // BUILDFLAG(IS_WIN)
   EXPECT_TRUE(base::MakeFileUnwritable(read_only_path_));
-#endif
   EXPECT_FALSE(base::PathIsWritable(read_only_path_));
 }
 

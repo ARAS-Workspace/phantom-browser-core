@@ -31,9 +31,7 @@
 #include "net/url_request/url_request.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "net/base/network_change_notifier_win.h"
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include "net/base/network_change_notifier_linux.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
 #elif BUILDFLAG(IS_APPLE)
@@ -301,12 +299,7 @@ std::unique_ptr<NetworkChangeNotifier> NetworkChangeNotifier::CreateIfNeeded(
         initial_type, initial_subtype);
   }
 
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<NetworkChangeNotifierWin> network_change_notifier =
-      std::make_unique<NetworkChangeNotifierWin>();
-  network_change_notifier->WatchForAddressChange();
-  return network_change_notifier;
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // Fallback to use NetworkChangeNotifierPassive if
   // NetworkChangeNotifierFactory is not set. Currently used for tests and when
   // running network service in a separate process.
@@ -584,10 +577,6 @@ NetworkChangeNotifier::ConnectionTypeFromInterfaceList(
   bool first = true;
   ConnectionType result = CONNECTION_NONE;
   for (const auto& network_interface : interfaces) {
-#if BUILDFLAG(IS_WIN)
-    if (network_interface.friendly_name == "Teredo Tunneling Pseudo-Interface")
-      continue;
-#endif
 #if BUILDFLAG(IS_APPLE)
     // Ignore link-local addresses as they aren't globally routable.
     // Mac assigns these to disconnected interfaces like tunnel interfaces

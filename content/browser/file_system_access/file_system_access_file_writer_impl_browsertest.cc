@@ -31,10 +31,6 @@
 #include "ui/shell_dialogs/select_file_dialog_factory.h"
 #include "ui/shell_dialogs/select_file_policy.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace content {
 
 using testing::_;
@@ -362,11 +358,7 @@ IN_PROC_BROWSER_TEST_F(FileSystemAccessFileWriterBrowserTest,
 
 // TODO(crbug.com/40639570): Files are only quarantined on windows in
 // browsertests unfortunately. Change this when more platforms are enabled.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_FileAnnotated FileAnnotated
-#else
 #define MAYBE_FileAnnotated DISABLED_FileAnnotated
-#endif  // BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_F(FileSystemAccessFileWriterBrowserTest,
                        MAYBE_FileAnnotated) {
   auto [test_file, swap_file] = CreateQuarantineTestFilesAndEntry();
@@ -387,7 +379,7 @@ IN_PROC_BROWSER_TEST_F(FileSystemAccessFileWriterBrowserTest,
   }
 }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_POSIX)
 IN_PROC_BROWSER_TEST_F(FileSystemAccessFileWriterBrowserTest,
                        RespectOSPermissions) {
   auto [test_file, swap_file] = CreateTestFilesAndEntry("");
@@ -398,11 +390,6 @@ IN_PROC_BROWSER_TEST_F(FileSystemAccessFileWriterBrowserTest,
 #if BUILDFLAG(IS_POSIX)
     int mode = 0444;
     EXPECT_TRUE(base::SetPosixFilePermissions(test_file, mode));
-#elif BUILDFLAG(IS_WIN)
-    DWORD attributes = ::GetFileAttributes(test_file.value().c_str());
-    ASSERT_NE(attributes, INVALID_FILE_ATTRIBUTES);
-    attributes |= FILE_ATTRIBUTE_READONLY;
-    EXPECT_TRUE(::SetFileAttributes(test_file.value().c_str(), attributes));
 #endif  // BUILDFLAG(IS_POSIX)
   }
 
@@ -413,7 +400,7 @@ IN_PROC_BROWSER_TEST_F(FileSystemAccessFileWriterBrowserTest,
                           "Cannot write to a read-only file.")))
       << result;
 }
-#endif  // BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 
 struct WriteModeTestParams {
   // The test name suffix.

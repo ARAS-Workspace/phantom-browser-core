@@ -149,11 +149,7 @@ std::string AudioDeviceDescription::GetDefaultDeviceName() {
 
 // static
 std::string AudioDeviceDescription::GetCommunicationsDeviceName() {
-#if BUILDFLAG(IS_WIN)
-  return GetLocalizedStringUTF8(COMMUNICATIONS_AUDIO_DEVICE_NAME);
-#else
   NOTREACHED();
-#endif
 }
 
 // static

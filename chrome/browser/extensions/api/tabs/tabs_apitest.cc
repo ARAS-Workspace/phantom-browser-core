@@ -45,11 +45,6 @@
 #include "chrome/browser/ui/browser_window.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/aura/window.h"
-#include "ui/aura/window_tree_host.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 class ExtensionApiTabTest : public extensions::ExtensionApiTest {
@@ -391,8 +386,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiCaptureTest,
 
 // https://crbug.com/40707203 Flaky on Windows, Linux, ChromeOS.
 // TODO(crbug.com/488154807): Flaky on desktop Android.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 #define MAYBE_CaptureVisibleFile DISABLED_CaptureVisibleFile
 #else
 #define MAYBE_CaptureVisibleFile CaptureVisibleFile
@@ -451,8 +445,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTabTest, DISABLED_HostPermission) {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 
 // Flaky on Windows, Mac and Linux. http://crbug.com/41375473.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_UpdateWindowResize DISABLED_UpdateWindowResize
 #else
 #define MAYBE_UpdateWindowResize UpdateWindowResize
@@ -460,19 +453,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTabTest, DISABLED_HostPermission) {
 IN_PROC_BROWSER_TEST_F(ExtensionApiTabTest, MAYBE_UpdateWindowResize) {
   ASSERT_TRUE(RunExtensionTest("window_update/resize")) << message_;
 }
-
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(ExtensionApiTabTest, FocusWindowDoesNotUnmaximize) {
-  HWND window = browser()
-                    ->GetWindow()
-                    ->GetNativeWindow()
-                    ->GetHost()
-                    ->GetAcceleratedWidget();
-  ::SendMessage(window, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
-  ASSERT_TRUE(RunExtensionTest("window_update/focus")) << message_;
-  ASSERT_TRUE(::IsZoomed(window));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if defined(USE_AURA) || BUILDFLAG(IS_MAC)
 // Maximizing/fullscreen popup window doesn't work on aura's managed mode.
@@ -670,7 +650,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionApiTabPrerenderingTest, DISABLED_Prerendering) {
 }
 
 // TODO(crbug.com/497838105): Flaky.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_PrerenderingIntoANewTab DISABLED_PrerenderingIntoANewTab
 #else
 #define MAYBE_PrerenderingIntoANewTab PrerenderingIntoANewTab

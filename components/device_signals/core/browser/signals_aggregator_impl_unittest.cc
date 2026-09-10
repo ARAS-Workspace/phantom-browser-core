@@ -31,11 +31,11 @@ using testing::Return;
 
 namespace device_signals {
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 namespace {
 constexpr GaiaId::Literal kGaiaId("gaia-id");
 }  // namespace
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 class SignalsAggregatorImplTest : public testing::Test {
  protected:
@@ -58,12 +58,12 @@ class SignalsAggregatorImplTest : public testing::Test {
         &mock_permission_service_, std::move(collectors));
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   void GrantUserPermission() {
     EXPECT_CALL(mock_permission_service_, CanUserCollectSignals(user_context_))
         .WillOnce(Return(UserPermission::kGranted));
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   std::unique_ptr<MockSignalsCollector> GetFakeCollector(
       SignalName signal_name) {
@@ -96,14 +96,14 @@ class SignalsAggregatorImplTest : public testing::Test {
   // Collectors that does not require user consent.
   raw_ptr<MockSignalsCollector> av_signal_collector_;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   UserContext user_context_{kGaiaId};
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   base::HistogramTester histogram_tester_;
 };
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Tests that the aggregator will return an empty value when given an empty
 // parameter dictionary.
 TEST_F(SignalsAggregatorImplTest, GetSignalsForUser_NoSignal) {
@@ -225,7 +225,7 @@ TEST_F(SignalsAggregatorImplTest, GetSignalsForUser_InvalidUserPermissions) {
         "Enterprise.DeviceSignals.UserPermission", test_case.first, 1);
   }
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // Tests how the aggregator behaves when given a parameter with a single signal
 // which is supported by one of the collectors. Specifically tests the API that
@@ -369,10 +369,6 @@ TEST_F(SignalsAggregatorImplTest, GetSignals_NoSignal) {
   EXPECT_FALSE(response.agent_signals_response);
   EXPECT_FALSE(response.settings_response);
   EXPECT_FALSE(response.file_system_info_response);
-#if BUILDFLAG(IS_WIN)
-  EXPECT_FALSE(response.av_signal_response);
-  EXPECT_FALSE(response.hotfix_signal_response);
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 // Tests that the aggregator will return an empty value when given a request
@@ -384,9 +380,6 @@ TEST_F(SignalsAggregatorImplTest, GetSignals_MultipleSignals_Supported) {
   SignalsAggregationRequest request;
   request.signal_names.emplace(SignalName::kSystemSettings);
   request.signal_names.emplace(SignalName::kFileSystemInfo);
-#if BUILDFLAG(IS_WIN)
-  request.signal_names.emplace(SignalName::kAntiVirus);
-#endif  // BUILDFLAG(IS_WIN)
 
   FileSystemItem file_item;
   ASSERT_TRUE(base::GetCurrentDirectory(&file_item.file_path));
@@ -420,36 +413,12 @@ TEST_F(SignalsAggregatorImplTest, GetSignals_MultipleSignals_Supported) {
         std::move(done_closure).Run();
       });
 
-#if BUILDFLAG(IS_WIN)
-  AvProduct av_product;
-  av_product.display_name = "some_name";
-  av_product.state = device_signals::AvProductState::kOn;
-  AntiVirusSignalResponse av_response;
-  av_response.av_products.push_back(av_product);
-
-  EXPECT_CALL(
-      *av_signal_collector_,
-      GetSignal(SignalName::kAntiVirus, UserPermission::kGranted, _, _, _))
-      .WillOnce([&](SignalName signal_name, UserPermission permission,
-                    const SignalsAggregationRequest& request,
-                    SignalsAggregationResponse& response,
-                    base::OnceClosure done_closure) {
-        response.av_signal_response = av_response;
-        std::move(done_closure).Run();
-      });
-#endif  // BUILDFLAG(IS_WIN)
-
   base::test::TestFuture<SignalsAggregationResponse> future;
   aggregator_->GetSignals(request, future.GetCallback());
 
   const auto& response = future.Get();
   EXPECT_FALSE(response.top_level_error);
   EXPECT_FALSE(response.agent_signals_response);
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(response.av_signal_response);
-  EXPECT_EQ(response.av_signal_response->av_products.size(), 1U);
-  EXPECT_FALSE(response.hotfix_signal_response);
-#endif  // BUILDFLAG(IS_WIN)
 
   ASSERT_TRUE(response.settings_response);
   EXPECT_EQ(response.settings_response->settings_items.size(), 1U);

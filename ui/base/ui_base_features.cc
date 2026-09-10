@@ -35,48 +35,6 @@ BASE_FEATURE_PARAM(bool,
                    "filter_out_empty_updates",
                    false);
 
-#if BUILDFLAG(IS_WIN)
-// If enabled, calculate native window occlusion - Windows-only.
-BASE_FEATURE(kCalculateNativeWinOcclusion, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Once enabled, the exact behavior is dictated by the field trial param
-// name `kApplyNativeOcclusionToCompositorType`.
-BASE_FEATURE(kApplyNativeOcclusionToCompositor,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// If enabled, native window occlusion tracking will always be used, even if
-// CHROME_HEADLESS is set.
-BASE_FEATURE(kAlwaysTrackNativeWindowOcclusionForTest,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// If enabled, native window occlusion tracking listens for
-// EVENT_OBJECT_DESTROY on top-level windows that previously occluded a tracked
-// window, and recalculates occlusion when one of them is destroyed. This
-// covers the case where the owning process is forcibly terminated (e.g., via
-// TerminateProcess), which doesn't reliably fire EVENT_OBJECT_HIDE or
-// EVENT_SYSTEM_FOREGROUND. Enabled by default; behind a feature flag so it
-// can be disabled remotely via Finch if a regression is observed. See
-// https://crbug.com/510416850 for context.
-BASE_FEATURE(kRecalculateNativeWinOcclusionOnWindowDestroy,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Field trial param name for `kApplyNativeOcclusionToCompositor`.
-const base::FeatureParam<std::string> kApplyNativeOcclusionToCompositorType{
-    &kApplyNativeOcclusionToCompositor, "type", /*default=*/""};
-
-// When the WindowTreeHost is occluded or hidden, resources are released and
-// the compositor is hidden. See WindowTreeHost for specifics on what this
-// does.
-const char kApplyNativeOcclusionToCompositorTypeRelease[] = "release";
-// When the WindowTreeHost is occluded the frame rate is throttled.
-const char kApplyNativeOcclusionToCompositorTypeThrottle[] = "throttle";
-// Release when hidden, throttle when occluded.
-const char kApplyNativeOcclusionToCompositorTypeThrottleAndRelease[] =
-    "throttle_and_release";
-
-BASE_FEATURE(kHideCursorWhileTyping, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_MAC)
 BASE_FEATURE(kOnlyUseWindowResizeHelperOnResize,
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -158,11 +116,7 @@ BASE_FEATURE(kGlobalShortcutsPortalPreferredTrigger,
 // blink. Currently enabled by default on Windows only.
 // TODO(crbug.com/40845719) - Implement for other platforms.
 BASE_FEATURE(kSystemCursorSizeSupported,
-#if BUILDFLAG(IS_WIN)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 bool IsSystemCursorSizeSupported() {
@@ -204,7 +158,7 @@ BASE_FEATURE(kUiCompositorUsesLayerLists, base::FEATURE_DISABLED_BY_DEFAULT);
 // Enables the use of a touch fling curve that is based on the behavior of
 // native apps on Windows.
 BASE_FEATURE(kExperimentalFlingAnimation,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -277,8 +231,7 @@ bool IsTouchTextEditingRedesignEnabled() {
 
 // This feature enables drag and drop using touch input devices.
 BASE_FEATURE(kTouchDragAndDrop,
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -304,8 +257,7 @@ bool IsForcedColorsEnabled() {
 // and Linux. This feature will be released for other platforms in later
 // milestones.
 BASE_FEATURE(kEyeDropper,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -430,11 +382,6 @@ bool IsVariableRefreshRateAlwaysOn() {
 }
 
 BASE_FEATURE(kBubbleMetricsApi, base::FEATURE_DISABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_WIN)
-BASE_FEATURE(kUseGammaContrastRegistrySettings,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN)
 
 BASE_FEATURE(kBubbleFrameViewTitleIsHeading, base::FEATURE_ENABLED_BY_DEFAULT);
 

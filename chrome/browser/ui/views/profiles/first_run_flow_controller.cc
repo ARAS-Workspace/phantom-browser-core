@@ -78,12 +78,6 @@
 #include "services/audio/public/cpp/sounds/sounds_manager.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/win/taskbar_manager.h"
-#include "chrome/installer/util/install_util.h"
-#include "chrome/installer/util/shell_util.h"
-#endif
-
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "base/check_deref.h"
 #include "chrome/browser/browser_process.h"
@@ -148,12 +142,6 @@ std::optional<std::vector<std::string>> GetForcedStepsFromCommandLine() {
   }
   return std::nullopt;
 }
-
-#if BUILDFLAG(IS_WIN)
-void PinToTaskbarResult(bool result) {
-  base::UmaHistogramBoolean("Windows.TaskbarPinFromFRESucceeded", result);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 std::string_view GetOnToggleMediaEffectsHistogram(bool active) {
   return active ? "ProfilePicker.FREFlow.MediaEffects.Enable"
@@ -334,19 +322,7 @@ class DefaultBrowserStepController : public ProfileManagementStepController {
     timeout_closure_.Cancel();
 
     if (is_eligible) {
-#if BUILDFLAG(IS_WIN)
-      // Check if Chrome can pin to the taskbar, which is an async call. When it
-      // finishes, the result will be recorded and
-      // `show_default_browser_screen_callback_` will be run.
-      browser_util::ShouldOfferToPin(
-          ShellUtil::GetBrowserModelId(InstallUtil::IsPerUserInstall()),
-          browser_util::PinAppToTaskbarChannel::kFirstRunExperience,
-          base::BindOnce(&DefaultBrowserStepController::OnCanPinToTaskbarResult,
-                         weak_ptr_factory_.GetWeakPtr()));
-      return;
-#else
       std::move(show_default_browser_screen_callback_).Run(/*can_pin=*/false);
-#endif  // BUILDFLAG(IS_WIN)
     } else {
       // Mark that this step was skipped and proceed with the next one.
       std::move(step_shown_callback_.value()).Run(false);
@@ -383,14 +359,6 @@ class DefaultBrowserStepController : public ProfileManagementStepController {
       // freed once all its tasks have finished.
       base::MakeRefCounted<shell_integration::DefaultBrowserWorker>()
           ->StartSetAsDefault(base::BindOnce(&MaybeLogSetAsDefaultSuccess));
-#if BUILDFLAG(IS_WIN)
-      if (can_pin) {
-        browser_util::PinAppToTaskbar(
-            ShellUtil::GetBrowserModelId(InstallUtil::IsPerUserInstall()),
-            browser_util::PinAppToTaskbarChannel::kFirstRunExperience,
-            base::BindOnce(&PinToTaskbarResult));
-      }
-#endif  // BUILDFLAG(IS_WIN)
     }
     base::UmaHistogramEnumeration("ProfilePicker.FirstRun.DefaultBrowser",
                                   choice);
@@ -721,29 +689,8 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
           GetFeatureShowcaseStep(step_id));
     }
 
-#if BUILDFLAG(IS_WIN)
-    if (std::find(eligible_steps_.begin(), eligible_steps_.end(),
-                  kFeatureShowcaseDefaultBrowserStepIdentifier) !=
-        eligible_steps_.end()) {
-      browser_util::ShouldOfferToPin(
-          ShellUtil::GetBrowserModelId(InstallUtil::IsPerUserInstall()),
-          browser_util::PinAppToTaskbarChannel::kFirstRunExperience,
-          base::BindOnce(
-              &FeatureShowcaseStepController::OnCanPinToTaskbarResult,
-              weak_ptr_factory_.GetWeakPtr(), eligible_steps));
-      return;
-    }
-#endif
-
     ShowScreen(eligible_steps_, /*can_pin=*/false);
   }
-
-#if BUILDFLAG(IS_WIN)
-  void OnCanPinToTaskbarResult(const std::vector<std::string>& eligible_steps,
-                               bool can_pin) {
-    ShowScreen(eligible_steps, can_pin);
-  }
-#endif
 
   void ShowScreen(const std::vector<std::string>& eligible_steps,
                   bool can_pin) {

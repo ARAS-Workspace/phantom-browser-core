@@ -59,10 +59,6 @@
 #include "chromeos/ash/experiences/arc/app/arc_app_constants.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/default_apps_util.h"
-#endif
-
 namespace {
 
 const char kFileHandlingLearnMore[] =
@@ -104,11 +100,7 @@ bool ShouldHideStoragePermission(const std::string& app_id) {
 // setting default apps/file type associations. If false, a "Learn More" link
 // will be shown instead.
 bool CanShowDefaultAppAssociationsUi() {
-#if BUILDFLAG(IS_WIN)
-  return true;
-#else
   return false;
-#endif
 }
 
 std::optional<std::string> MaybeFormatBytes(std::optional<uint64_t> bytes) {

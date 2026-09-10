@@ -162,24 +162,6 @@ class SandboxedZipAnalyzerTest : public ::testing::Test {
     output_file.WriteAtCurrentPos(base::span(result.value()));
   }
 
-#if BUILDFLAG(IS_WIN)
-  void ExpectPEHeaders(
-      const BinaryData& data,
-      const safe_browsing::ClientDownloadRequest_ArchivedBinary& binary) {
-    ASSERT_EQ(data.is_signed, binary.has_signature());
-    if (data.is_signed) {
-      ASSERT_LT(0, binary.signature().signed_data_size());
-      ASSERT_NE(0U, binary.signature().signed_data(0).size());
-    }
-    ASSERT_TRUE(binary.has_image_headers());
-    ASSERT_TRUE(binary.image_headers().has_pe_headers());
-    EXPECT_TRUE(binary.image_headers().pe_headers().has_dos_header());
-    EXPECT_TRUE(binary.image_headers().pe_headers().has_file_header());
-    EXPECT_TRUE(binary.image_headers().pe_headers().has_optional_headers32());
-    EXPECT_FALSE(binary.image_headers().pe_headers().has_optional_headers64());
-  }
-#endif
-
 #if BUILDFLAG(IS_MAC)
   void ExpectMachOHeaders(
       const BinaryData& data,
@@ -212,14 +194,6 @@ class SandboxedZipAnalyzerTest : public ::testing::Test {
     EXPECT_FALSE(binary.digests().has_md5());
     ASSERT_TRUE(binary.has_length());
     EXPECT_EQ(data.length, binary.length());
-#if BUILDFLAG(IS_WIN)
-    // ExtractImageFeatures for Windows, which only works on PE
-    // files.
-    if (binary.file_path().find(".exe") != std::string::npos) {
-      ExpectPEHeaders(data, binary);
-      return;
-    }
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_MAC)
     // ExtractImageFeatures for Mac, which only works on MachO
     // files.

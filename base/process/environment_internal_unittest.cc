@@ -16,89 +16,6 @@ using EnvironmentInternalTest = PlatformTest;
 
 namespace base::internal {
 
-#if BUILDFLAG(IS_WIN)
-
-namespace {
-void ExpectEnvironmentBlock(const std::vector<std::wstring>& vars,
-                            const std::wstring& block) {
-  std::wstring expected;
-  for (const auto& var : vars) {
-    expected += var;
-    expected.push_back('\0');
-  }
-  expected.push_back('\0');
-  EXPECT_EQ(expected, block);
-}
-
-std::vector<wchar_t> MakeBlock(const std::vector<std::wstring>& vars) {
-  std::vector<wchar_t> block;
-  for (const auto& var : vars) {
-    block.insert(block.end(), var.begin(), var.end());
-    block.push_back(L'\0');
-  }
-  block.push_back(L'\0');
-  return block;
-}
-}  // namespace
-
-TEST_F(EnvironmentInternalTest, AlterEnvironment) {
-  EnvironmentMap changes;
-  NativeEnvironmentString e;
-
-  e = AlterEnvironment(base::span<const wchar_t>(), changes);
-  ExpectEnvironmentBlock({}, e);
-
-  changes[L"A"] = L"1";
-  e = AlterEnvironment(base::span<const wchar_t>(), changes);
-  ExpectEnvironmentBlock({L"A=1"}, e);
-
-  changes.clear();
-  changes[L"A"] = std::wstring();
-  e = AlterEnvironment(base::span<const wchar_t>(), changes);
-  ExpectEnvironmentBlock({}, e);
-
-  changes.clear();
-  auto a2 = MakeBlock({L"A=2"});
-  e = AlterEnvironment(a2, changes);
-  ExpectEnvironmentBlock({L"A=2"}, e);
-
-  changes.clear();
-  changes[L"A"] = L"1";
-  e = AlterEnvironment(a2, changes);
-  ExpectEnvironmentBlock({L"A=1"}, e);
-
-  changes.clear();
-  changes[L"A"] = std::wstring();
-  e = AlterEnvironment(a2, changes);
-  ExpectEnvironmentBlock({}, e);
-
-  changes.clear();
-  changes[L"A"] = std::wstring();
-  changes[L"B"] = std::wstring();
-  auto a2b3 = MakeBlock({L"A=2", L"B=3"});
-  e = AlterEnvironment(a2b3, changes);
-  ExpectEnvironmentBlock({}, e);
-
-  changes.clear();
-  changes[L"A"] = std::wstring();
-  e = AlterEnvironment(a2b3, changes);
-  ExpectEnvironmentBlock({L"B=3"}, e);
-
-  changes.clear();
-  changes[L"B"] = std::wstring();
-  e = AlterEnvironment(a2b3, changes);
-  ExpectEnvironmentBlock({L"A=2"}, e);
-
-  changes.clear();
-  changes[L"A"] = L"1";
-  changes[L"C"] = L"4";
-  e = AlterEnvironment(a2b3, changes);
-  // AlterEnvironment() currently always puts changed entries at the end.
-  ExpectEnvironmentBlock({L"B=3", L"A=1", L"C=4"}, e);
-}
-
-#else  // !BUILDFLAG(IS_WIN)
-
 TEST_F(EnvironmentInternalTest, AlterEnvironment) {
   // SAFETY: The environment blocks used in these tests are static and
   // null-terminated, satisfying AlterEnvironment's requirements.
@@ -165,7 +82,5 @@ TEST_F(EnvironmentInternalTest, AlterEnvironment) {
   EXPECT_EQ(std::string("C=4"), e[2]);
   EXPECT_TRUE(e[3] == nullptr);
 }
-
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace base::internal

@@ -59,11 +59,7 @@ AcceptOption BuildAcceptOption(const std::string& description,
   return option;
 }
 
-#if BUILDFLAG(IS_WIN)
-#define ToStringType base::UTF8ToWide
-#else
 #define ToStringType
-#endif
 
 }  // namespace
 
@@ -181,7 +177,6 @@ TEST(FileSystemApiUnitTest, FileSystemChooseEntryFunctionSuggestionTest) {
   EXPECT_EQ(suggested_name.MaybeAsASCII(), "path");
   EXPECT_TRUE(suggested_extension.empty());
 
-#if !BUILDFLAG(IS_WIN)
   // TODO(thorogood): Fix this test on Windows.
   // Filter out absolute paths with no basename.
   opt_name = std::string("/");
@@ -190,7 +185,6 @@ TEST(FileSystemApiUnitTest, FileSystemChooseEntryFunctionSuggestionTest) {
   EXPECT_FALSE(suggested_name.IsAbsolute());
   EXPECT_TRUE(suggested_name.MaybeAsASCII().empty());
   EXPECT_TRUE(suggested_extension.empty());
-#endif
 }
 
 }  // namespace extensions

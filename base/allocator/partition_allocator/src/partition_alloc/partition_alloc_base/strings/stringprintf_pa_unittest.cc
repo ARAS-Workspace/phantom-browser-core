@@ -12,17 +12,7 @@
 
 namespace partition_alloc::internal::base {
 
-#if PA_BUILDFLAG(IS_WIN) && PA_BUILDFLAG(IS_COMPONENT_BUILD) && \
-    PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
-// TODO(crbug.com/1429450): TruncatingStringPrintf() defined in
-// allocator_base.dll allocates string from system allocator, but
-// base_unittests deallocates the string by using PartitionAlloc. This causes
-// crashes.
-#define MAYBE_PartitionAllocStringPrintfTest \
-  DISABLED_PartitionAllocStringPrintfTest
-#else
 #define MAYBE_PartitionAllocStringPrintfTest PartitionAllocStringPrintfTest
-#endif
 
 TEST(MAYBE_PartitionAllocStringPrintfTest, TruncatingStringPrintfEmpty) {
   EXPECT_EQ("", TruncatingStringPrintf("%s", ""));

@@ -33,8 +33,6 @@
 
 #if BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
 #include "base/apple/mach_logging.h"
-#elif BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
 #endif
 
 namespace mojo::core {
@@ -183,10 +181,7 @@ struct ComplexMessage final : public Channel::Message {
 
   std::vector<PlatformHandleInTransit> handle_vector_;
 
-#if BUILDFLAG(IS_WIN)
-  // On Windows, handles are serialised into the extra header section.
-  raw_ptr<HandleEntry, AllowPtrArithmetic> handles_ = nullptr;
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#if BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
   // On OSX, handles are serialised into the extra header section.
   raw_ptr<MachPortsExtraHeader, AllowPtrArithmetic> mach_ports_header_ =
       nullptr;
@@ -493,9 +488,7 @@ Channel::MessagePtr Channel::Message::Deserialize(
     return nullptr;
   }
 
-#if BUILDFLAG(IS_WIN)
-  uint32_t max_handles = extra_header_size / sizeof(HandleEntry);
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#if BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
   if (extra_header_size > 0 &&
       extra_header_size < sizeof(MachPortsExtraHeader)) {
     DLOG(ERROR) << "Decoding invalid message: " << extra_header_size << " < "
@@ -514,7 +507,7 @@ Channel::MessagePtr Channel::Message::Deserialize(
     DLOG(ERROR) << "Decoding invalid message: unexpected extra_header_size > 0";
     return nullptr;
   }
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
 
   const uint16_t num_handles =
       header ? header->num_handles : legacy_header->num_handles;
@@ -552,26 +545,6 @@ Channel::MessagePtr Channel::Message::Deserialize(
     message->legacy_header()->num_handles = legacy_header->num_handles;
   }
 
-#if BUILDFLAG(IS_WIN)
-  std::vector<PlatformHandleInTransit> handles(num_handles);
-  for (size_t i = 0; i < num_handles; i++) {
-    HANDLE handle = base::win::Uint32ToHandle(
-        UNSAFE_TODO(static_cast<ComplexMessage*>(message.get())->handles_[i])
-            .handle);
-    if (PlatformHandleInTransit::IsPseudoHandle(handle)) {
-      return nullptr;
-    }
-    if (from_process == base::kNullProcessHandle) {
-      handles[i] = PlatformHandleInTransit(
-          PlatformHandle(base::win::ScopedHandle(handle)));
-    } else {
-      handles[i] = PlatformHandleInTransit(
-          PlatformHandleInTransit::TakeIncomingRemoteHandle(handle,
-                                                            from_process));
-    }
-  }
-  message->SetHandles(std::move(handles));
-#endif
 
   return message;
 }
@@ -682,10 +655,7 @@ ComplexMessage::ComplexMessage(size_t capacity,
 
   const bool is_legacy_message = (message_type == MessageType::NORMAL_LEGACY);
   size_t extra_header_size = 0;
-#if BUILDFLAG(IS_WIN)
-  // On Windows we serialize HANDLEs into the extra header space.
-  extra_header_size = max_handles_ * sizeof(HandleEntry);
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#if BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
   // On OSX, some of the platform handles may be mach ports, which are
   // serialised into the message buffer. Since there could be a mix of fds and
   // mach ports, we store the mach ports as an <index, port> pair (of uint32_t),
@@ -731,14 +701,7 @@ ComplexMessage::ComplexMessage(size_t capacity,
   }
 
   if (max_handles_ > 0) {
-#if BUILDFLAG(IS_WIN)
-    handles_ = reinterpret_cast<HandleEntry*>(mutable_extra_header());
-    // Initialize all handles to invalid values.
-    for (size_t i = 0; i < max_handles_; ++i) {
-      UNSAFE_TODO(handles_[i]).handle =
-          base::win::HandleToUint32(INVALID_HANDLE_VALUE);
-    }
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#if BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
     mach_ports_header_ =
         reinterpret_cast<MachPortsExtraHeader*>(mutable_extra_header());
     mach_ports_header_->num_ports = 0;
@@ -773,9 +736,7 @@ bool ComplexMessage::ExtendPayload(size_t new_payload_size) {
     if (max_handles_ > 0) {
 // We also need to update the cached extra header addresses in case the
 // payload buffer has been relocated.
-#if BUILDFLAG(IS_WIN)
-      handles_ = reinterpret_cast<HandleEntry*>(mutable_extra_header());
-#elif BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
+#if BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
       mach_ports_header_ =
           reinterpret_cast<MachPortsExtraHeader*>(mutable_extra_header());
 #endif
@@ -818,16 +779,6 @@ void ComplexMessage::SetHandles(
   CHECK_LE(new_handles.size(), max_handles_);
   header()->num_handles = static_cast<uint16_t>(new_handles.size());
   std::swap(handle_vector_, new_handles);
-#if BUILDFLAG(IS_WIN)
-  UNSAFE_TODO(memset(handles_, 0, extra_header_size()));
-  for (size_t i = 0; i < handle_vector_.size(); i++) {
-    HANDLE handle = handle_vector_[i].remote_handle();
-    if (handle == INVALID_HANDLE_VALUE) {
-      handle = handle_vector_[i].handle().GetHandle().Get();
-    }
-    UNSAFE_TODO(handles_[i]).handle = base::win::HandleToUint32(handle);
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(MOJO_USE_APPLE_CHANNEL)
   if (mach_ports_header_) {

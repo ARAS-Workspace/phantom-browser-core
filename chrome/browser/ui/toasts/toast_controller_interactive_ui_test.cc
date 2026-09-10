@@ -465,13 +465,8 @@ IN_PROC_BROWSER_TEST_F(ToastControllerInteractiveTest,
 // menu is open. If that happens, the `ToastView` is closed once the menu
 // closes via clicking the menu button again.
 // TODO(crbug.com/398296825): Flaky on Windows builds.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ToastDoesNotCloseWhileMenuIsOpen_Mouse \
-  DISABLED_ToastDoesNotCloseWhileMenuIsOpen_Mouse
-#else
 #define MAYBE_ToastDoesNotCloseWhileMenuIsOpen_Mouse \
   ToastDoesNotCloseWhileMenuIsOpen_Mouse
-#endif
 IN_PROC_BROWSER_TEST_F(ToastControllerInteractiveTest,
                        MAYBE_ToastDoesNotCloseWhileMenuIsOpen_Mouse) {
 #if BUILDFLAG(IS_OZONE)

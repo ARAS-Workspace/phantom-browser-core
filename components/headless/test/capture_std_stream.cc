@@ -10,11 +10,7 @@
 #include "base/check_op.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <io.h>
-#else
 #include <unistd.h>
-#endif
 
 namespace headless {
 
@@ -24,11 +20,7 @@ static constexpr char kPipeEnd = '\xff';
 }  // namespace
 
 CaptureStdStream::CaptureStdStream(FILE* stream) : stream_(stream) {
-#if BUILDFLAG(IS_WIN)
-  CHECK_EQ(_pipe(pipes_.data(), 4096, O_BINARY), 0);
-#else
   CHECK_EQ(pipe(pipes_.data()), 0);
-#endif
   fileno_ = dup(fileno(stream_));
   CHECK_NE(fileno_, -1);
 }

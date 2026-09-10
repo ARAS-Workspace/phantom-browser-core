@@ -61,7 +61,7 @@
 #include "content/public/common/content_descriptors.h"
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
-#if (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)) && defined(HEADLESS_USE_PREFS)
+#if BUILDFLAG(IS_LINUX) && defined(HEADLESS_USE_PREFS)
 #include "content/public/browser/network_service_util.h"
 #endif
 
@@ -479,14 +479,6 @@ HeadlessContentBrowserClient::GetGeolocationSystemPermissionManager() {
   return nullptr;
 #endif
 }
-
-#if BUILDFLAG(IS_WIN)
-void HeadlessContentBrowserClient::SessionEnding(
-    std::optional<DWORD> control_type) {
-  DCHECK_LT(control_type.value_or(0), 0x7fu);
-  browser_->ShutdownWithExitCode(control_type.value_or(0) + 0x80u);
-}
-#endif
 
 void HeadlessContentBrowserClient::OnNetworkServiceCreated(
     ::network::mojom::NetworkService* network_service) {

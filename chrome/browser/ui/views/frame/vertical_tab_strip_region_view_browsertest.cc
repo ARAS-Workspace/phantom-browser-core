@@ -1803,7 +1803,7 @@ IN_PROC_BROWSER_TEST_F(VerticalTabStripFocusSwipeTest,
 }
 
 // TODO(crbug.com/546848427): Fix wall-clock timing race with kGestureResetTimeout.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_SwipeTriggersOnlyOncePerGesture \
   DISABLED_SwipeTriggersOnlyOncePerGesture
 #else

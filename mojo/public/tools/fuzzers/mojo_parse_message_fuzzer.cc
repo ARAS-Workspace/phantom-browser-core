@@ -19,10 +19,6 @@
 #include "base/test/test_support_android.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/at_exit.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 void FuzzMessage(const uint8_t* data, size_t size, base::RunLoop* run) {
   mojo::PendingRemote<fuzz::mojom::FuzzInterface> fuzz;
   auto impl = std::make_unique<FuzzImpl>(fuzz.InitWithNewPipeAndPassReceiver());
@@ -67,12 +63,6 @@ struct Environment {
         "MojoParseMessageFuzzerProcess");
     mojo::core::Init();
   }
-
-#if BUILDFLAG(IS_WIN)
-  // Windows thread executor has a dependency on AtExitManager.
-  std::unique_ptr<base::AtExitManager> at_exit_manager_ =
-      std::make_unique<base::AtExitManager>();
-#endif  // BUILDFLAG(IS_WIN)
 
   // TaskExecutor loop to send and handle messages on.
   std::unique_ptr<base::SingleThreadTaskExecutor> main_thread_task_executor;

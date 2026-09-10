@@ -55,10 +55,6 @@ TEST(ExtensionPathUtilTest, ResolveHomeDirTest) {
   const FilePath rel_path_with_tilde_no_separator(FILE_PATH_LITERAL("~foobar"));
 
 // This function is a no-op on Windows.
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(rel_path_with_tilde,
-            path_util::ResolveHomeDirectory(rel_path_with_tilde));
-#else
   EXPECT_EQ(home_dir.Append("foo/bar"),
             path_util::ResolveHomeDirectory(rel_path_with_tilde));
   // Make sure tilde without any relative path works as expected.
@@ -66,7 +62,6 @@ TEST(ExtensionPathUtilTest, ResolveHomeDirTest) {
             path_util::ResolveHomeDirectory(FilePath(FILE_PATH_LITERAL("~"))));
   EXPECT_EQ(home_dir,
             path_util::ResolveHomeDirectory(FilePath(FILE_PATH_LITERAL("~/"))));
-#endif
 
   // An absolute path without a ~ should be untouched.
   EXPECT_EQ(abs_path, path_util::ResolveHomeDirectory(abs_path));

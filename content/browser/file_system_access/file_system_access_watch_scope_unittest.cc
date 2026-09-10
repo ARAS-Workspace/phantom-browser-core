@@ -19,10 +19,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/common/storage_key/storage_key.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/files/file_util.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace content {
 
 class FileSystemAccessWatchScopeTest : public testing::Test {
@@ -32,10 +28,6 @@ class FileSystemAccessWatchScopeTest : public testing::Test {
 
   void SetUp() override {
     ASSERT_TRUE(dir_.CreateUniqueTempDir());
-#if BUILDFLAG(IS_WIN)
-    // Convert path to long format to avoid mixing long and 8.3 formats in test.
-    ASSERT_TRUE(dir_.Set(base::MakeLongFilePath(dir_.Take())));
-#endif  // BUILDFLAG(IS_WIN)
 
     file_system_context_ = storage::CreateFileSystemContextForTesting(
         /*quota_manager_proxy=*/nullptr, dir_.GetPath());

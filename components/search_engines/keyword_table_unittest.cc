@@ -140,11 +140,7 @@ TEST_F(KeywordTableTest, Keywords) {
 
   KeywordTable::Keywords keywords(GetKeywords());
   constexpr base::HistogramBase::Sample32 expected_bucket =
-#if BUILDFLAG(IS_WIN)
-      0;  // HashValidationStatus::kSuccess;
-#else
       5;  // HashValidationStatus::kNotVerifiedFeatureDisabled;
-#endif  // BUILDFLAG(IS_WIN)
   histograms.ExpectUniqueSample("Search.KeywordTable.HashValidationStatus",
                                 expected_bucket, 1);
 
@@ -294,121 +290,6 @@ TEST_F(KeywordTableTest, SanitizeShortName) {
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-namespace {
-
-enum class Tamper { kNone, kUrl, kKeyword };
-
-struct TestCase {
-  bool encryption_enabled;
-  Tamper tamper;
-  base::HistogramBase::Sample32 expected_histogram_sample;
-  size_t expected_keyword_count;
-
-  std::string Name() const {
-    std::string tamper_str = "NoTamper";
-    if (tamper == Tamper::kUrl) {
-      tamper_str = "TamperUrl";
-    }
-    if (tamper == Tamper::kKeyword) {
-      tamper_str = "TamperKeyword";
-    }
-    return base::StrCat(
-        {encryption_enabled ? "Encryption" : "NoEncryption", tamper_str});
-  }
-};
-
-}  // namespace
-
-class KeywordTableTestEncryption
-    : public KeywordTableTest,
-      public ::testing::WithParamInterface<::TestCase> {
-};
-
-TEST_P(KeywordTableTestEncryption, KeywordBadHash) {
-  TemplateURLData keyword(CreateAndAddKeyword());
-  {
-    KeywordTable::Keywords keywords(GetKeywords());
-    EXPECT_EQ(1U, keywords.size());
-  }
-  CloseDatabase();
-  if (GetParam().tamper != Tamper::kNone) {
-    sql::Database db(sql::test::kTestTag);
-    ASSERT_TRUE(db.Open(file_));
-    if (GetParam().tamper == Tamper::kUrl) {
-      EXPECT_TRUE(
-          db.Execute("UPDATE keywords SET url='http://bad.com/' WHERE id=1"));
-    } else {
-      EXPECT_TRUE(
-          db.Execute("UPDATE keywords SET keyword='badkeyword' WHERE id=1"));
-    }
-  }
-  encryptor_->set_decryption_available_for_testing(
-      GetParam().encryption_enabled);
-  base::HistogramTester histograms;
-  InitDatabase();
-  KeywordTable::Keywords keywords(GetKeywords());
-  // If decryption is not available, the hash is skipped, otherwise the hash
-  // should be invalid and the row dropped.
-  histograms.ExpectUniqueSample("Search.KeywordTable.HashValidationStatus",
-                                GetParam().expected_histogram_sample, 1);
-  EXPECT_EQ(GetParam().expected_keyword_count, keywords.size());
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    /*empty*/,
-    KeywordTableTestEncryption,
-    ::testing::Values(
-        ::TestCase{.encryption_enabled = false,
-                   .tamper = Tamper::kUrl,
-                   .expected_histogram_sample = /*kNotVerifiedNoCrypto*/ 4,
-                   .expected_keyword_count = 1u},
-        ::TestCase{.encryption_enabled = true,
-                   .tamper = Tamper::kUrl,
-                   .expected_histogram_sample = /*kIncorrectHash*/ 3,
-                   .expected_keyword_count = 0},
-        ::TestCase{.encryption_enabled = false,
-                   .tamper = Tamper::kKeyword,
-                   .expected_histogram_sample = /*kNotVerifiedNoCrypto*/ 4,
-                   .expected_keyword_count = 1u},
-        ::TestCase{.encryption_enabled = true,
-                   .tamper = Tamper::kKeyword,
-                   .expected_histogram_sample = /*kIncorrectHash*/ 3,
-                   .expected_keyword_count = 0},
-        ::TestCase{.encryption_enabled = false,
-                   .tamper = Tamper::kNone,
-                   .expected_histogram_sample = /*kNotVerifiedNoCrypto*/ 4,
-                   .expected_keyword_count = 1u},
-        ::TestCase{.encryption_enabled = true,
-                   .tamper = Tamper::kNone,
-                   .expected_histogram_sample = /*kSuccess*/ 0,
-                   .expected_keyword_count = 1u}),
-    [](const auto& info) { return info.param.Name(); });
-
-TEST_F(KeywordTableTest, KeywordBadCrypto) {
-  TemplateURLData keyword(CreateAndAddKeyword());
-  {
-    KeywordTable::Keywords keywords(GetKeywords());
-    EXPECT_EQ(1U, keywords.size());
-  }
-  CloseDatabase();
-  {
-    base::HistogramTester histograms;
-    // A replacement encryptor with a new key that will make decryption of the
-    // hash fail.
-    const auto new_encryptor = os_crypt_async::GetTestEncryptorForTesting();
-    InitDatabase(new_encryptor);
-    {
-      KeywordTable::Keywords keywords(GetKeywords());
-      EXPECT_TRUE(keywords.empty());
-    }
-
-    histograms.ExpectUniqueSample("Search.KeywordTable.HashValidationStatus",
-                                  /*HashValidationStatus::kDecryptFailed*/ 1,
-                                  1);
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_F(KeywordTableTest, KeywordBadUrl) {
   TemplateURLData keyword(CreateAndAddKeyword());

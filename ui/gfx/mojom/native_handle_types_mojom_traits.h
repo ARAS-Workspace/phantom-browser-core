@@ -96,39 +96,6 @@ struct COMPONENT_EXPORT(GFX_NATIVE_HANDLE_TYPES_SHARED_MOJOM_TRAITS)
 };
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
 
-#if BUILDFLAG(IS_WIN)
-template <>
-struct COMPONENT_EXPORT(GFX_NATIVE_HANDLE_TYPES_SHARED_MOJOM_TRAITS)
-    StructTraits<gfx::mojom::DXGIHandleDataView, gfx::DXGIHandle> {
-  static PlatformHandle buffer_handle(gfx::DXGIHandle& handle) {
-    return PlatformHandle(handle.TakeBufferHandle());
-  }
-
-  static const gfx::DXGIHandleToken& token(const gfx::DXGIHandle& handle) {
-    return handle.token();
-  }
-
-  static base::UnsafeSharedMemoryRegion& shared_memory_handle(
-      gfx::DXGIHandle& handle) {
-    return handle.region_;
-  }
-
-  static bool Read(gfx::mojom::DXGIHandleDataView data,
-                   gfx::DXGIHandle* handle);
-};
-
-template <>
-struct COMPONENT_EXPORT(GFX_NATIVE_HANDLE_TYPES_SHARED_MOJOM_TRAITS)
-    StructTraits<gfx::mojom::DXGIHandleTokenDataView, gfx::DXGIHandleToken> {
-  static const base::UnguessableToken& value(
-      const gfx::DXGIHandleToken& input) {
-    return input.value();
-  }
-
-  static bool Read(gfx::mojom::DXGIHandleTokenDataView& input,
-                   gfx::DXGIHandleToken* output);
-};
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_APPLE)
 struct COMPONENT_EXPORT(GFX_NATIVE_HANDLE_TYPES_SHARED_MOJOM_TRAITS)
@@ -202,11 +169,6 @@ struct COMPONENT_EXPORT(GFX_NATIVE_HANDLE_TYPES_SHARED_MOJOM_TRAITS)
   }
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
 
-#if BUILDFLAG(IS_WIN)
-  static gfx::DXGIHandle& dxgi_handle(gfx::GpuMemoryBufferHandle& handle) {
-    return handle.dxgi_handle_;
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
   static base::android::ScopedHardwareBufferHandle&

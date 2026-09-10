@@ -132,7 +132,7 @@ class ControlledHomeDialogControllerTest
 
 // Though the test harness should compile on all platforms, the behavior for
 // extensions to override the home page is limited to mac and windows.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(ControlledHomeDialogControllerTest,
                        ClickingExecuteDisablesTheExtension) {
   scoped_refptr<const extensions::Extension> extension =

@@ -114,13 +114,6 @@
 
 namespace blink {
 
-#if BUILDFLAG(IS_WIN)
-// Defined in v8_initializer_win.cc.
-v8::FilterETWSessionByURLResult FilterETWSessionByURLCallback(
-    v8::Local<v8::Context> context,
-    const std::string& json_payload);
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace {
 
 String ExtractMessageForConsole(v8::Isolate* isolate,
@@ -926,10 +919,6 @@ void V8Initializer::InitializeV8Common(v8::Isolate* isolate) {
   isolate->SetIsJSApiWrapperNativeErrorCallback(IsDOMExceptionWrapper);
   isolate->SetMetricsRecorder(std::make_shared<V8MetricsRecorder>(isolate));
 
-#if BUILDFLAG(IS_WIN)
-  isolate->SetFilterETWSessionByURL2Callback(FilterETWSessionByURLCallback);
-#endif  // BUILDFLAG(IS_WIN)
-
   V8ContextSnapshot::EnsureInterfaceTemplates(isolate);
 
   WasmResponseExtensions::Initialize(isolate);
@@ -1166,11 +1155,7 @@ v8::Isolate* V8Initializer::InitializeMainThread() {
 // reserved pages, followed by two guard pages, followed by the committed
 // memory for the stack, and the worker stack size need to be reduced
 // (https://crbug.com/1412239).
-#if defined(ARCH_CPU_32_BITS) && BUILDFLAG(IS_WIN)
-static const int kWorkerMaxStackSize = 492 * 1024;
-#else
 static const int kWorkerMaxStackSize = 500 * 1024;
-#endif
 
 void V8Initializer::InitializeWorker(v8::Isolate* isolate) {
   InitializeV8Common(isolate);

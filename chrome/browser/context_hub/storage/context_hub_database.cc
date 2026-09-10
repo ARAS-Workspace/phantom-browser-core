@@ -27,9 +27,6 @@ bool ContextHubDatabase::Init(const base::FilePath& db_path) {
 
   db_ = std::make_unique<sql::Database>(
       sql::DatabaseOptions()
-#if BUILDFLAG(IS_WIN)
-          .set_exclusive_database_file_lock(true)
-#endif
           .set_wal_mode(true),
       sql::Database::Tag("ContextHub"));
 

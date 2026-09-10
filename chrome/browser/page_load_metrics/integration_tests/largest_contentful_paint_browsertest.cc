@@ -603,11 +603,7 @@ IN_PROC_BROWSER_TEST_F(LargestContentfulPaintTypeTest, ImageType_WebP) {
 }
 
 // TODO(crbug.com/333963663): Flaky on Win.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ImageType_GIF DISABLED_ImageType_GIF
-#else
 #define MAYBE_ImageType_GIF ImageType_GIF
-#endif
 IN_PROC_BROWSER_TEST_F(LargestContentfulPaintTypeTest, MAYBE_ImageType_GIF) {
   auto flag_set = blink::LargestContentfulPaintType::kImage |
                   blink::LargestContentfulPaintType::kGIF |
@@ -639,11 +635,7 @@ IN_PROC_BROWSER_TEST_F(LargestContentfulPaintTypeTest, TextType) {
 // Case when text that is larger and comes before an image. The
 // LargestContentfulPaintType should be those of a text element.
 // TODO(crbug.com/333963663): Test is flaky.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_LargeTextAndImage_TextType DISABLED_LargeTextAndImage_TextType
-#else
 #define MAYBE_LargeTextAndImage_TextType LargeTextAndImage_TextType
-#endif
 IN_PROC_BROWSER_TEST_F(LargestContentfulPaintTypeTest,
                        MAYBE_LargeTextAndImage_TextType) {
   auto flag_set = blink::LargestContentfulPaintType::kText;
@@ -1045,7 +1037,7 @@ IN_PROC_BROWSER_TEST_F(LcpBreakdownTimingsTest, PreloadedImage) {
 }
 
 // TODO(crbug.com/333963663): Flaky on multiple platforms.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_PreloadedCacheableImage DISABLED_PreloadedCacheableImage
 #else
 #define MAYBE_PreloadedCacheableImage PreloadedCacheableImage
@@ -1094,7 +1086,7 @@ IN_PROC_BROWSER_TEST_F(LcpBreakdownTimingsTest, CssBackgroundImage) {
 }
 
 // TODO(crbug.com/41495170): Flaky test.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_WrittenAsInnerHtmlImage DISABLED_WrittenAsInnerHtmlImage
 #else
 #define MAYBE_WrittenAsInnerHtmlImage WrittenAsInnerHtmlImage

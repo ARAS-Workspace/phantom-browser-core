@@ -301,7 +301,7 @@ IN_PROC_BROWSER_TEST_F(FooterInteractiveTest, ContextMenuOpensCustomizeChrome) {
 }
 #endif  // !BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Tests in this class will have a managed browser, unless the test disables it
 // manually.
 class FooterEnterpriseInteractiveTest : public FooterInteractiveTestBase {
@@ -570,7 +570,7 @@ IN_PROC_BROWSER_TEST_F(FooterEnterpriseInteractiveTest,
       EnsureNotPresent(kFooterLocalElementId, kFooterBackgroundAttribution));
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 class FooterSideBySideInteractiveTest : public FooterInteractiveTest {
  public:

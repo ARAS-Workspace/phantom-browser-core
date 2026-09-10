@@ -50,10 +50,6 @@
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/mojom/frame/find_in_page.mojom.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/functional/callback_helpers.h"
-#include "base/test/bind.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 using testing::Contains;
 using testing::EndsWith;
@@ -637,37 +633,6 @@ IN_PROC_BROWSER_TEST_F(MHTMLGenerationTest, GenerateMHTML) {
               HasSubstr("Content-Transfer-Encoding: quoted-printable"));
 }
 
-#if BUILDFLAG(IS_WIN)
-// This Windows only test generates an MHTML file in a path that is explicitly
-// not in the temp directory and not in the user data dir. This is to test that
-// the mojo security constraints correctly allow this writeable handle to a
-// renderer process. See `mojo/core/platform_handle_security_util_win.cc`.
-IN_PROC_BROWSER_TEST_F(MHTMLGenerationTest, GenerateMHTMLInNonTempDir) {
-  base::FilePath local_app_data;
-  // This test creates a temporary directory in %LocalAppData% then deletes it
-  // afterwards.
-  EXPECT_TRUE(
-      base::PathService::Get(base::DIR_LOCAL_APP_DATA, &local_app_data));
-  base::FilePath new_dir;
-  {
-    base::ScopedAllowBlockingForTesting allow_blocking;
-    EXPECT_TRUE(base::CreateTemporaryDirInDir(
-        local_app_data, FILE_PATH_LITERAL("MHTMLGenerationTest"), &new_dir));
-  }
-  absl::Cleanup delete_dir = [new_dir] {
-    base::ScopedAllowBlockingForTesting allow_blocking;
-    base::DeletePathRecursively(new_dir);
-  };
-
-  base::FilePath path = new_dir.Append(FILE_PATH_LITERAL("test.mht"));
-
-  MHTMLFileInfo info =
-      GenerateMHTML(path, embedded_test_server()->GetURL("/simple_page.html"));
-
-  EXPECT_THAT(info.content(),
-              HasSubstr("Content-Transfer-Encoding: quoted-printable"));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // Regression test for the crash/race from https://crbug.com/612098.
 //
@@ -700,11 +665,7 @@ IN_PROC_BROWSER_TEST_F(MHTMLGenerationTest,
 }
 
 // TODO(crbug.com/41290169): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_InvalidPath DISABLED_InvalidPath
-#else
 #define MAYBE_InvalidPath InvalidPath
-#endif
 IN_PROC_BROWSER_TEST_F(MHTMLGenerationTest, MAYBE_InvalidPath) {
   base::FilePath path(FILE_PATH_LITERAL("/invalid/file/path"));
   DisableWellformednessCheck();

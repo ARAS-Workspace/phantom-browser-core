@@ -117,17 +117,6 @@ class LanguageSettingsPrivateApiTest : public ExtensionServiceTestBase {
  protected:
   void RunGetLanguageListTest();
 
-#if BUILDFLAG(IS_WIN)
-  virtual void AddSpellcheckLanguagesForTesting(
-      const std::vector<std::string>& spellcheck_languages_for_testing) {
-    SpellcheckServiceFactory::GetInstance()
-        ->GetForContext(profile())
-        ->InitWindowsDictionaryLanguages(spellcheck_languages_for_testing);
-  }
-
-  base::test::ScopedFeatureList feature_list_;
-#endif  // BUILDFLAG(IS_WIN)
-
  private:
   void SetUp() override {
     ExtensionServiceTestBase::SetUp();
@@ -322,13 +311,8 @@ void LanguageSettingsPrivateApiTest::RunGetLanguageListTest() {
   // Windows spellcheck support depending on the OS version. GetLanguageList
   // only reports spellchecking is supported for these languages if the language
   // pack is installed.
-#if BUILDFLAG(IS_WIN)
-  languages_to_test.push_back({"ar", "ar-SA", true, true});
-  languages_to_test.push_back({"bn", "bn-IN", false, true});
-#else
   languages_to_test.push_back({"ar", "ar-SA", true, false});
   languages_to_test.push_back({"bn", "bn-IN", false, false});
-#endif  // BUILDFLAG(IS_WIN)
 
   // Initialize accept languages prefs.
   std::vector<std::string> accept_languages;
@@ -343,21 +327,6 @@ void LanguageSettingsPrivateApiTest::RunGetLanguageListTest() {
            << accept_languages_string;
   profile()->GetPrefs()->SetString(language::prefs::kAcceptLanguages,
                                    accept_languages_string);
-
-#if BUILDFLAG(IS_WIN)
-  // Add fake Windows dictionaries using InitWindowsDictionaryLanguages.
-  std::vector<std::string> windows_spellcheck_languages_for_testing;
-  for (auto& language_to_test : languages_to_test) {
-    if (!language_to_test.windows_dictionary_name.empty()) {
-      windows_spellcheck_languages_for_testing.push_back(
-          language_to_test.windows_dictionary_name);
-      DVLOG(2) << "Will set fake Windows spellcheck dictionary for testing: "
-               << language_to_test.windows_dictionary_name;
-    }
-  }
-
-  AddSpellcheckLanguagesForTesting(windows_spellcheck_languages_for_testing);
-#endif  // BUILDFLAG(IS_WIN)
 
   auto function =
       base::MakeRefCounted<LanguageSettingsPrivateGetLanguageListFunction>();
@@ -698,26 +667,5 @@ TEST_F(LanguageSettingsPrivateApiTest, RemoveInputMethodTest) {
 }
 
 #endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_WIN)
-class LanguageSettingsPrivateApiTestDelayInit
-    : public LanguageSettingsPrivateApiTest {
- public:
-  LanguageSettingsPrivateApiTestDelayInit() = default;
-
- protected:
-  void AddSpellcheckLanguagesForTesting(
-      const std::vector<std::string>& spellcheck_languages_for_testing)
-      override {
-    SpellcheckServiceFactory::GetInstance()
-        ->GetForContext(profile())
-        ->AddSpellcheckLanguagesForTesting(spellcheck_languages_for_testing);
-  }
-};
-
-TEST_F(LanguageSettingsPrivateApiTestDelayInit, GetLanguageListTest) {
-  RunGetLanguageListTest();
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace extensions

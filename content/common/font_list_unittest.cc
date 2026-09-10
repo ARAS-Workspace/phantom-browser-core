@@ -44,11 +44,7 @@ TEST(FontList, GetFontList) {
       FROM_HERE, base::BindOnce([] {
         base::ListValue fonts = content::GetFontList_SlowBlocking();
 
-#if BUILDFLAG(IS_WIN)
-        EXPECT_TRUE(HasFontWithName(fonts, "MS Gothic", "MS Gothic"));
-        EXPECT_TRUE(HasFontWithName(fonts, "Segoe UI", "Segoe UI"));
-        EXPECT_TRUE(HasFontWithName(fonts, "Verdana", "Verdana"));
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
         EXPECT_TRUE(HasFontWithName(fonts, "Arimo", "Arimo"));
 #else
         EXPECT_TRUE(HasFontWithName(fonts, "Arial", "Arial"));
@@ -57,18 +53,6 @@ TEST(FontList, GetFontList) {
   task_environment.RunUntilIdle();
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_WIN)
-TEST(FontList, GetFontListLocalized) {
-  base::i18n::SetICUDefaultLocale("ja-JP");
-  base::ListValue ja_fonts = content::GetFontList_SlowBlocking();
-  EXPECT_TRUE(HasFontWithName(ja_fonts, "MS Gothic", "ＭＳ ゴシック"));
-
-  base::i18n::SetICUDefaultLocale("ko-KR");
-  base::ListValue ko_fonts = content::GetFontList_SlowBlocking();
-  EXPECT_TRUE(HasFontWithName(ko_fonts, "Malgun Gothic", "맑은 고딕"));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
 // On some macOS versions, CTFontManager returns LastResort and/or hidden fonts.

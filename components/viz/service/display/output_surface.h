@@ -64,22 +64,6 @@ class VIZ_SERVICE_EXPORT OutputSurface {
     kHardware,  // The orientation same to the hardware.
   };
 
-#if BUILDFLAG(IS_WIN)
-  // Level of DComp support. Each value implies support for the features
-  // provided by the values before it.
-  enum class DCSupportLevel {
-    // Direct composition is not supported.
-    kNone,
-    // Support for presenting `IDXGISwapChain3` and `IDCompositionSurface`.
-    kDCLayers,
-    // Support for presenting `IDCompositionTexture`.
-    kDCompTexture,
-    // Support for presenting multiple `IDCompositionTexture` to a persistent
-    // surface with incremental damage.
-    kDCompDynamicTexture,
-  };
-#endif
-
   struct Capabilities {
     Capabilities();
     ~Capabilities();
@@ -103,15 +87,6 @@ class VIZ_SERVICE_EXPORT OutputSurface {
     bool supports_viewporter = false;
     // OutputSurface's orientation mode.
     OrientationMode orientation_mode = OrientationMode::kLogic;
-#if BUILDFLAG(IS_WIN)
-    // Whether this OutputSurface supports direct composition layers.
-    DCSupportLevel dc_support_level = DCSupportLevel::kNone;
-    // Whether to 1) clear all drawn areas outside the viewport with a
-    // transparent background color when drawing a frame and 2) swap them. This
-    // is necessary if the surface clip rect can get out of sync with the
-    // viewport size (e.g., due to a race condition).
-    bool clear_drawn_areas_outside_viewport = false;
-#endif
     // Whether this OutputSurface should skip DrawAndSwap(). This is true for
     // the unified display on Chrome OS. All drawing is handled by the physical
     // displays so the unified display should skip that work.
@@ -306,16 +281,6 @@ class VIZ_SERVICE_EXPORT OutputSurface {
   std::unique_ptr<SoftwareOutputDevice> software_device_;
   SkM44 color_matrix_;
 };
-
-#if BUILDFLAG(IS_WIN)
-// Helper to check that DComp textures are supported before checking for
-// `features::IsDelegatedCompositingEnabled()`.
-bool IsDelegatedCompositingSupportedAndEnabled(
-    OutputSurface::DCSupportLevel support_level);
-
-bool IsBufferQueueSupportedAndEnabled(
-    OutputSurface::DCSupportLevel support_level);
-#endif
 
 }  // namespace viz
 

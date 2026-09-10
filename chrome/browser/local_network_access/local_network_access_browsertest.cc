@@ -253,10 +253,6 @@ class LocalNetworkAccessNullIPBrowserTest
 // public URL.
 IN_PROC_BROWSER_TEST_F(LocalNetworkAccessNullIPBrowserTest,
                        NullIPBlockedOnNonsecure) {
-  if constexpr (BUILDFLAG(IS_WIN)) {
-    GTEST_SKIP() << "0.0.0.0 behavior varies across platforms and is "
-                    "unreachable on Windows.";
-  }
 
   ASSERT_TRUE(content::NavigateToURL(
       web_contents(), public_server().GetURL("a.com", kNoFaviconPath)));

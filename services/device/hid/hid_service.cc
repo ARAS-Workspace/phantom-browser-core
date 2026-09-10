@@ -22,8 +22,6 @@
 #include "services/device/hid/hid_service_linux.h"
 #elif BUILDFLAG(IS_MAC)
 #include "services/device/hid/hid_service_mac.h"
-#elif BUILDFLAG(IS_WIN)
-#include "services/device/hid/hid_service_win.h"
 #endif
 
 namespace device {
@@ -39,8 +37,6 @@ std::string PlatformDeviceIdsToString(
     std::string id_string;
 #if BUILDFLAG(IS_MAC)
     id_string = base::StringPrintf("%llu", entry.platform_device_id);
-#elif BUILDFLAG(IS_WIN)
-    id_string = base::StringPrintf("'%ls'", entry.platform_device_id.c_str());
 #else
     id_string = base::StringPrintf("'%s'", entry.platform_device_id.c_str());
 #endif
@@ -68,8 +64,6 @@ std::unique_ptr<HidService> HidService::Create() {
   return std::make_unique<HidServiceLinux>();
 #elif BUILDFLAG(IS_MAC)
   return std::make_unique<HidServiceMac>();
-#elif BUILDFLAG(IS_WIN)
-  return std::make_unique<HidServiceWin>();
 #else
   return nullptr;
 #endif

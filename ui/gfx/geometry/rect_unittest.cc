@@ -15,10 +15,6 @@
 #include "ui/gfx/geometry/rect_conversions.h"
 #include "ui/gfx/geometry/test/geometry_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace gfx {
 
 constexpr int kMaxInt = std::numeric_limits<int>::max();
@@ -486,15 +482,6 @@ TEST(RectTest, ScaleToRoundedRect) {
   EXPECT_EQ(Rect(1, 1, 2, 3), ScaleToRoundedRect(Rect(2, 4, 9, 8), 0.3f));
   TestScaleRectOverflowClamp(ScaleToRoundedRect);
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST(RectTest, ConstructAndAssign) {
-  const RECT rect_1 = { 0, 0, 10, 10 };
-  const RECT rect_2 = { 0, 0, -10, -10 };
-  Rect test1(rect_1);
-  Rect test2(rect_2);
-}
-#endif
 
 TEST(RectTest, BoundingRect) {
   struct IntTests {

@@ -23,7 +23,7 @@ int DowngradeManagerDelegateImpl::GetMaxNumberOfSnapshots() const {
 
 bool DowngradeManagerDelegateImpl::UserDataSnapshotEnabled() const {
   return
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
       base::IsEnterpriseDevice() ||
 #endif
       policy::BrowserDMTokenStorage::Get()->RetrieveDMToken().is_valid();

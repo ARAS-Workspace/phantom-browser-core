@@ -30,10 +30,6 @@
 #include "components/update_client/utils.h"
 #include "third_party/abseil-cpp/absl/strings/str_format.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 #if defined(ARCH_CPU_X86_FAMILY)
 #include "base/cpu.h"
 #endif
@@ -49,13 +45,7 @@ int GetPhysicalMemoryGB() {
 }
 
 std::string GetOSVersion() {
-#if BUILDFLAG(IS_WIN)
-  const auto ver = base::win::OSInfo::GetInstance()->version_number();
-  return absl::StrFormat("%u.%u.%u.%u", ver.major, ver.minor, ver.build,
-                         ver.patch);
-#else
   return base::SysInfo().OperatingSystemVersion();
-#endif
 }
 
 std::string GetServicePack() {
@@ -134,12 +124,6 @@ protocol_request::Request MakeProtocolRequest(
   request.dlpref = download_preference;
   request.domain_joined = domain_joined;
   request.additional_attributes = additional_attributes;
-
-#if BUILDFLAG(IS_WIN)
-  if (base::win::OSInfo::GetInstance()->IsWowX86OnAMD64()) {
-    request.is_wow64 = true;
-  }
-#endif
 
   // HW platform information.
   request.hw.physmemory = GetPhysicalMemoryGB();

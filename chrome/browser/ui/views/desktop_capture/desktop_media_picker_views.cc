@@ -66,12 +66,6 @@
 #include "chrome/browser/ui/views/desktop_capture/audio_capture_permission_checker_mac.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/feature_list.h"
-#include "content/public/browser/desktop_capture.h"
-#include "content/public/browser/desktop_capture_pip_utils.h"
-#include "media/capture/capture_switches.h"
-#endif
 
 #if defined(USE_AURA)
 #include "ui/aura/window_tree_host.h"
@@ -124,11 +118,7 @@ enum class SelectedTabDiscardStatus {
 #if !BUILDFLAG(IS_CHROMEOS) && defined(USE_AURA)
 DesktopMediaID::Id AcceleratedWidgetToDesktopMediaId(
     gfx::AcceleratedWidget accelerated_widget) {
-#if BUILDFLAG(IS_WIN)
-  return reinterpret_cast<DesktopMediaID::Id>(accelerated_widget);
-#else
   return static_cast<DesktopMediaID::Id>(accelerated_widget);
-#endif
 }
 #endif
 
@@ -325,16 +315,7 @@ int GetLabelForShareSystemAudioToggle(bool suppress_local_audio_playback,
   if (suppress_local_audio_playback) {
     return IDS_DESKTOP_MEDIA_PICKER_AUDIO_SHARE_SCREEN_WITH_MUTE_WARNING;
   }
-#if BUILDFLAG(IS_WIN)
-  // Due to an API limitation on Windows we must share all output audio
-  // devices when restrict_own_audio is used. We use another string for that
-  // scenario.
-  return restrict_own_audio
-             ? IDS_DESKTOP_MEDIA_PICKER_ALSO_SHARE_ALL_AUDIO_OUTPUT
-             : IDS_DESKTOP_MEDIA_PICKER_ALSO_SHARE_SYSTEM_AUDIO;
-#else
   return IDS_DESKTOP_MEDIA_PICKER_ALSO_SHARE_SYSTEM_AUDIO;
-#endif
 }
 
 // Returns the audio type for the window capture by taking into consideration
@@ -717,44 +698,9 @@ DesktopMediaPickerDialogView::DesktopMediaPickerDialogView(
 
   GetSelectedController()->FocusView();
 
-#if BUILDFLAG(IS_WIN)
-  // Register the picker as a capturer to make sure the document
-  // Picture-in-Picture window is hidden from the preview. macOS manages screen
-  // capture exclusion through a different, platform-specific mechanism in
-  // ScreenCaptureKit.
-  if (base::FeatureList::IsEnabled(features::kExcludePipFromScreenCapture)) {
-    auto session_id =
-        content::desktop_capture::RegisterDesktopMediaPickerAsCapture(
-            capturer_global_id_);
-    if (!session_id.is_empty()) {
-      pip_exclusion_session_id_ = session_id;
-    }
-  }
-#endif
 }
 
 DesktopMediaPickerDialogView::~DesktopMediaPickerDialogView() {
-#if BUILDFLAG(IS_WIN)
-  if (!pip_exclusion_session_id_) {
-    return;
-  }
-
-  // To prevent flickering during the hand-off when the user confirms their
-  // selection, we delay the unregistration of the picker-dialog capture session
-  // by 500ms. When the user clicks Cancel, we unregister immediately to avoid
-  // keeping the Picture-in-Picture window hidden unnecessarily.
-  constexpr base::TimeDelta kPipExclusionUnregistrationDelay =
-      base::Milliseconds(500);
-  const base::TimeDelta delay =
-      accepted_ ? kPipExclusionUnregistrationDelay : base::TimeDelta();
-
-  content::GetUIThreadTaskRunner({})->PostDelayedTask(
-      FROM_HERE,
-      base::BindOnce(
-          &content::desktop_capture::UnregisterDesktopMediaPickerAsCapture,
-          *pip_exclusion_session_id_),
-      delay);
-#endif
 }
 
 void DesktopMediaPickerDialogView::RecordUmaDismissal() const {
@@ -1277,9 +1223,6 @@ views::View* DesktopMediaPickerDialogView::GetInitiallyFocusedView() {
 }
 
 bool DesktopMediaPickerDialogView::Accept() {
-#if BUILDFLAG(IS_WIN)
-  accepted_ = true;
-#endif
   CHECK(IsDialogButtonEnabled(ui::mojom::DialogButton::kOk));
 
   // Accept() can only be called if IsDialogButtonEnabled() for the OK button,

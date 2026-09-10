@@ -281,45 +281,8 @@ LanguageSettingsPrivateGetLanguageListFunction::Run() {
   }
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-  if (spellcheck::UseBrowserSpellChecker()) {
-    // Asynchronously load the dictionaries to determine platform support.
-    SpellcheckService* service =
-        SpellcheckServiceFactory::GetForContext(browser_context());
-    AddRef();  // Balanced in OnDictionariesInitialized
-    service->InitializeDictionaries(
-        base::BindOnce(&LanguageSettingsPrivateGetLanguageListFunction::
-                           OnDictionariesInitialized,
-                       base::Unretained(this)));
-    return RespondLater();
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   return RespondNow(WithArguments(std::move(language_list_)));
 }
-
-#if BUILDFLAG(IS_WIN)
-void LanguageSettingsPrivateGetLanguageListFunction::
-    OnDictionariesInitialized() {
-  UpdateSupportedPlatformDictionaries();
-  Respond(WithArguments(std::move(language_list_)));
-  // Matches the AddRef in Run().
-  Release();
-}
-
-void LanguageSettingsPrivateGetLanguageListFunction::
-    UpdateSupportedPlatformDictionaries() {
-  SpellcheckService* service =
-      SpellcheckServiceFactory::GetForContext(browser_context());
-  for (auto& language_val : language_list_) {
-    base::DictValue& language_val_dict = language_val.GetDict();
-    const std::string* str = language_val_dict.FindString("code");
-    if (str && service->UsesWindowsDictionary(*str)) {
-      language_val_dict.Set("supportsSpellcheck", true);
-    }
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 LanguageSettingsPrivateEnableLanguageFunction::
     LanguageSettingsPrivateEnableLanguageFunction() = default;

@@ -29,9 +29,7 @@
 #include "base/types/pass_key.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -46,19 +44,6 @@ namespace base {
 
 class Environment;
 class Time;
-
-#if BUILDFLAG(IS_WIN)
-class PreventExecuteMappingClasses {
- public:
-  using PassKey = base::PassKey<PreventExecuteMappingClasses>;
-
- private:
-  static PassKey GetPassKey() { return PassKey(); }
-
-  // Allowed to open log files in arbitrary locations.
-  friend class content::internal::ChildProcessLauncherHelper;
-};
-#endif
 
 //-----------------------------------------------------------------------------
 // Functions that involve filesystem access or modification:
@@ -134,33 +119,6 @@ GetDeleteFileCallback(const FilePath& path,
 BASE_EXPORT OnceClosure
 GetDeletePathRecursivelyCallback(const FilePath& path,
                                  OnceCallback<void(bool)> reply_callback = {});
-
-#if BUILDFLAG(IS_WIN)
-// Schedules to delete the given path, whether it's a file or a directory, until
-// the operating system is restarted.
-// Note:
-// 1) The file/directory to be deleted should exist in a temp folder.
-// 2) The directory to be deleted must be empty.
-BASE_EXPORT bool DeleteFileAfterReboot(const FilePath& path);
-
-// Prevents opening the file at `path` with EXECUTE access by adding a deny ACE
-// on the filesystem. This allows the file handle to be safely passed to an
-// untrusted process. See also `File::FLAG_WIN_NO_EXECUTE`.
-BASE_EXPORT bool PreventExecuteMapping(const FilePath& path);
-
-// Same as PreventExecuteMapping but DCHECK for known allowed paths is omitted.
-// Only call this if you know the path you are providing is safe to mark as
-// non-executable, such as log files.
-BASE_EXPORT bool PreventExecuteMappingUnchecked(
-    const FilePath& path,
-    base::PassKey<PreventExecuteMappingClasses> passkey);
-
-// Set `path_key` to the second of two valid paths that support safely marking a
-// file as non-execute. The first allowed path is always PATH_TEMP. This is
-// needed to avoid layering violations, as the user data dir is an embedder
-// concept and only known later at runtime.
-BASE_EXPORT void SetExtraNoExecuteAllowedPath(int path_key);
-#endif  // BUILDFLAG(IS_WIN)
 
 // Moves the given path, whether it's a file or a directory.
 // If a simple rename is not possible, such as in the case where the paths are
@@ -424,22 +382,6 @@ CreateAndOpenTemporaryFileInDir(const FilePath& dir,
                                 uint32_t additional_flags = 0,
                                 FilePath::StringViewType name_prefix = {});
 
-#if BUILDFLAG(IS_WIN)
-// Similar to `CreateAndOpenTemporaryFileInDir`, but allows the caller to
-// specify custom `base::File::Flags` (defined in base/files/file.h) when
-// opening the file.
-// The `base::File::FLAG_CREATE` flag is automatically added to ensure atomic
-// creation (i.e. it will fail if the file already exists).
-// These custom |flags| completely replace the default flags used by
-// `CreateAndOpenTemporaryFileInDir`.
-// `name_prefix`: refer to `CreateAndOpenTemporaryFileInDir` for details.
-BASE_EXPORT File CreateAndOpenTemporaryFileInDirWithFlags(
-    const FilePath& dir,
-    FilePath* temp_file,
-    uint32_t flags,
-    FilePath::StringViewType name_prefix = {});
-#endif
-
 // Returns the non-empty name prefix that can be inferred from `temp_file`
 // if the file is generated using CreateAndOpenTemporaryFileInDir(). Returns
 // nullopt for files with an empty prefix.
@@ -537,53 +479,6 @@ BASE_EXPORT OnceCallback<std::optional<int64_t>()> GetFileSizeCallback(
 // In addition, on Windows this function will fail if the resulting |real_path|
 // would exceed 'MAX_PATH' characters in length.
 BASE_EXPORT bool NormalizeFilePath(const FilePath& path, FilePath* real_path);
-
-#if BUILDFLAG(IS_WIN)
-
-// Returns `SystemTemp` (or `DIR_PROGRAM_FILES` if SystemTemp does not exist)
-// for security reasons if the caller is the default admin (i.e., no split
-// token, such as the SYSTEM user or the built-in administrator) to avoid
-// attacks from lower privilege processes. For non-default-admin cases, returns
-// `%TEMP%`. An override of `DIR_SYSTEM_TEMP` by tests is respected.
-BASE_EXPORT bool GetSecureTempDirectory(FilePath* temp_dir);
-
-// Removes the Windows extended-length path prefix from a prefixed path.
-// Exported for testing. Refer to the function implementation for details.
-BASE_EXPORT FilePath
-RemoveWindowsExtendedPathPrefixForTesting(std::wstring_view prefixed_path);
-
-// Given a path in NT native form ("\Device\HarddiskVolumeXX\..."),
-// return in |drive_letter_path| the equivalent path that starts with
-// a drive letter ("C:\...").  Return false if no such path exists.
-BASE_EXPORT bool DevicePathToDriveLetterPath(const FilePath& device_path,
-                                             FilePath* drive_letter_path);
-
-// Method that wraps the win32 GetLongPathName API, normalizing the specified
-// path to its long form. An example where this is needed is when comparing
-// temp file paths. If a username isn't a valid 8.3 short file name (even just a
-// lengthy name like "user with long name"), Windows will set the TMP and TEMP
-// environment variables to be 8.3 paths. ::GetTempPath (called in
-// base::GetTempDir) just uses the value specified by TMP or TEMP, and so can
-// return a short path. Returns an empty path on error.
-BASE_EXPORT FilePath MakeLongFilePath(const FilePath& input);
-
-// Creates a hard link named |to_file| to the file |from_file|. Both paths
-// must be on the same volume, and |from_file| may not name a directory.
-// Returns true if the hard link is created, false if it fails.
-BASE_EXPORT bool CreateWinHardLink(const FilePath& to_file,
-                                   const FilePath& from_file);
-
-// Like GetFileInfo(), but for cloud-backed placeholder files (e.g., OneDrive
-// Files On-Demand), opens the file to force the cloud provider to hydrate (and,
-// for files protected with a sensitivity label, decrypt) it before reading the
-// size, so the returned info reflects the full logical content rather than a
-// stub/placeholder size. For non-placeholder files, this behaves like
-// GetFileInfo(). May open the file and therefore block or trigger a network
-// download; only call from a context that allows blocking. Returns false on
-// failure.
-BASE_EXPORT bool GetHydratedFileInfo(const FilePath& file_path,
-                                     File::Info* info);
-#endif
 
 // This function will return if the given file is a symlink or not.
 BASE_EXPORT bool IsLink(const FilePath& file_path);
@@ -811,7 +706,7 @@ BASE_EXPORT std::optional<std::string> CopyFileToDownloadsCollection(
 
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 // Returns whether the specified file name is a reserved name on Windows.
 // This includes names like "com2.zip" (which correspond to devices) and
 // desktop.ini and thumbs.db which have special meaning to the Windows shell.
@@ -828,20 +723,6 @@ namespace internal {
 // Same as Move but allows paths with traversal components.
 // Use only with extreme care.
 BASE_EXPORT bool MoveUnsafe(const FilePath& from_path, const FilePath& to_path);
-
-#if BUILDFLAG(IS_WIN)
-// Copy from_path to to_path recursively and then delete from_path recursively.
-// Returns true if all operations succeed.
-// This function simulates Move(), but unlike Move() it works across volumes.
-// This function is not transactional.
-BASE_EXPORT bool CopyAndDeleteDirectory(const FilePath& from_path,
-                                        const FilePath& to_path);
-
-// Returns true if the user is an administrator with default elevation type,
-// i.e., no split token, such as the SYSTEM user or the built-in
-// administrator.
-BASE_EXPORT bool IsUserDefaultAdmin();
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 // CopyFileContentsWithSendfile will use the sendfile(2) syscall to perform a

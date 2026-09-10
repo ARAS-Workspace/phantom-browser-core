@@ -257,11 +257,7 @@ class DownloadBubbleUpdateServiceTest : public testing::Test {
       EXPECT_CALL(item, GetEndTime()).WillRepeatedly(Return(base::Time()));
     }
     base::FilePath::StringType filename;
-#if BUILDFLAG(IS_WIN)
-    filename = base::UTF8ToWide(guid);
-#else
     filename = guid;
-#endif
     EXPECT_CALL(item, GetTargetFilePath())
         .WillRepeatedly(ReturnRefOfCopy(base::FilePath(filename)));
     EXPECT_CALL(item, GetFileNameToReportUser())

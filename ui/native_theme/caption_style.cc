@@ -38,7 +38,7 @@ std::optional<CaptionStyle> CaptionStyle::FromSpec(const std::string& spec) {
   return style;
 }
 
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
 std::optional<CaptionStyle> CaptionStyle::FromSystemSettings() {
   return std::nullopt;
 }

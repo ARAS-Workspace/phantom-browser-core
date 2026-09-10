@@ -852,13 +852,8 @@ IN_PROC_BROWSER_TEST_F(MAYBE_DomSerializerTests,
 }
 
 // Flaky on win-asan. See https://crbug.com/1484904
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_SubResourceForElementsInNonHTMLNamespace \
-  DISABLED_SubResourceForElementsInNonHTMLNamespace
-#else
 #define MAYBE_SubResourceForElementsInNonHTMLNamespace \
   SubResourceForElementsInNonHTMLNamespace
-#endif
 IN_PROC_BROWSER_TEST_F(MAYBE_DomSerializerTests,
                        MAYBE_SubResourceForElementsInNonHTMLNamespace) {
   base::FilePath page_file_path =

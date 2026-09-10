@@ -27,8 +27,8 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/url_constants.h"
 
-// Batch upload is only available on Windows, Mac and Linux.
-static_assert(BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX));
+// Batch upload is only available on Mac and Linux.
+static_assert(BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX));
 
 namespace extensions {
 

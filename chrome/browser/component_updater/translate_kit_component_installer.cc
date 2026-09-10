@@ -37,13 +37,8 @@ namespace component_updater {
 namespace {
 
 // The location of the libtranslatekit binary within the installation directory.
-#if BUILDFLAG(IS_WIN)
-constexpr base::FilePath::CharType kTranslateKitBinaryRelativePath[] =
-    FILE_PATH_LITERAL("TranslateKitFiles/libtranslatekit.dll");
-#else
 constexpr base::FilePath::CharType kTranslateKitBinaryRelativePath[] =
     FILE_PATH_LITERAL("TranslateKitFiles/libtranslatekit.so");
-#endif
 
 // The manifest name of the TranslateKit component.
 // This matches:

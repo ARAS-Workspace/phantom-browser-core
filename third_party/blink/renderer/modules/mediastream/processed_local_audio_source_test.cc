@@ -567,7 +567,6 @@ TEST_P(ProcessedLocalAudioSourcePlatformEffectsTest,
   int expected_effects = expected_params.effects();
 
   if (echo_canceller.IsPlatformProvided()) {
-#if (!BUILDFLAG(IS_WIN))
     // Disable AGC and NS if not requested.
     if (!properties.auto_gain_control) {
       expected_effects &= ~media::AudioParameters::AUTOMATIC_GAIN_CONTROL;
@@ -580,7 +579,6 @@ TEST_P(ProcessedLocalAudioSourcePlatformEffectsTest,
       // the code works now.
       expected_effects &= ~media::AudioParameters::NOISE_SUPPRESSION;
     }
-#endif
   } else if (echo_canceller.GetApmLocation() ==
              EchoCanceller::ApmLocation::kAudioService) {
     // As of now, when processing runs in the audio service, all effects are

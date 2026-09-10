@@ -222,7 +222,7 @@ IN_PROC_BROWSER_TEST_F(FooterControllerExtensionTest, ShownTimeRecorded) {
   TestShownTimeRecorded();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 class FooterControllerEnterpriseTest
     : public FooterControllerExtensionTestBase,
       public testing::WithParamInterface<bool> {
@@ -325,7 +325,7 @@ IN_PROC_BROWSER_TEST_P(FooterControllerEnterpriseTest,
   VerifyNoticeMetricsRecorded(/*total_count= */ 3, /*management_count= */ 2,
                               /*extension_count= */ 1);
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 class FooterControllerSplitViewTest : public FooterControllerExtensionTestBase {
  public:

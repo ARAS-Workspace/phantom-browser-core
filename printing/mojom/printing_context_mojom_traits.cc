@@ -187,9 +187,6 @@ bool StructTraits<
   out->set_scale_factor(data.scale_factor());
   out->set_rasterize_pdf(data.rasterize_pdf());
 
-#if BUILDFLAG(IS_WIN)
-  out->set_printer_language_type(data.printer_language_type());
-#endif  // BUILDFLAG(IS_WIN)
   out->set_is_modifiable(data.is_modifiable());
 
   // `SetCustomMargins()` and `SetCustomMarginsForBackend()` have side effect of

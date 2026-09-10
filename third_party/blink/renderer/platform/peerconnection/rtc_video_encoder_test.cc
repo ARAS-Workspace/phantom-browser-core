@@ -1294,35 +1294,6 @@ TEST_F(RTCVideoEncoderEncodeTest, SoftwareFallbackAfterError) {
 }
 
 // On Windows we allow native input that is mappable.
-#if BUILDFLAG(IS_WIN)
-TEST_F(RTCVideoEncoderEncodeTest, NoSoftwareFallbackOnMappableNativeInput) {
-  // Make RTCVideoEncoder expect native input.
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(
-      switches::kVideoCaptureUseGpuMemoryBuffer);
-
-  const webrtc::VideoCodec codec = GetDefaultCodec(webrtc::kVideoCodecH264);
-  CreateEncoder(codec.codecType);
-  ExpectCreateInitAndDestroyVEA(
-      media::PIXEL_FORMAT_NV12,
-      media::VideoEncodeAccelerator::Config::StorageType::kGpuMemoryBuffer);
-  EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK,
-            rtc_encoder_->InitEncode(&codec, kVideoEncoderSettings));
-
-  webrtc::scoped_refptr<webrtc::VideoFrameBuffer> mapped_buffer(
-      webrtc::make_ref_counted<FakeNativeBufferI420>(480, 360,
-                                                     /*allow_to_i420=*/false));
-
-  std::vector<webrtc::VideoFrameType> frame_types;
-  EXPECT_EQ(WEBRTC_VIDEO_CODEC_OK,
-            rtc_encoder_->Encode(webrtc::VideoFrame::Builder()
-                                     .set_video_frame_buffer(mapped_buffer)
-                                     .set_rtp_timestamp(0)
-                                     .set_timestamp_us(0)
-                                     .set_rotation(webrtc::kVideoRotation_0)
-                                     .build(),
-                                 &frame_types));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_F(RTCVideoEncoderEncodeTest, SoftwareFallbackOnBadEncodeInput) {
   // Make RTCVideoEncoder expect native input.
@@ -1337,7 +1308,7 @@ TEST_F(RTCVideoEncoderEncodeTest, SoftwareFallbackOnBadEncodeInput) {
   ASSERT_EQ(WEBRTC_VIDEO_CODEC_OK,
             rtc_encoder_->InitEncode(&codec, kVideoEncoderSettings));
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   auto frame = media::VideoFrame::CreateEOSFrame();
 #else
   auto frame = media::VideoFrame::CreateBlackFrame(

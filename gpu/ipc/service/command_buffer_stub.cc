@@ -45,10 +45,6 @@
 #include "ui/gl/gl_switches.h"
 #include "ui/gl/init/gl_factory.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#endif
-
 namespace gpu {
 
 struct WaitForCommandState {

@@ -9,11 +9,7 @@
 #include "base/process/process_handle.h"
 #include "build/buildflag.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <cstdint>
-
-#include "base/win/scoped_handle.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include <bsm/libbsm.h>
 #elif BUILDFLAG(IS_LINUX)
 #include <sys/socket.h>
@@ -34,13 +30,6 @@ struct ConnectionInfo {
   audit_token_t audit_token{};
 #elif BUILDFLAG(IS_LINUX)
   ucred credentials{};
-#elif BUILDFLAG(IS_WIN)
-  // The process of the peer. Only valid if `include_peer_process_info` is true
-  // in EndpointOptions.
-  base::Process process;
-
-  // The Windows session ID of the peer.
-  uint32_t session_id = UINT32_MAX;
 #endif
 };
 

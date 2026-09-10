@@ -169,8 +169,7 @@ class MockPasswordManagerClient : public StubPasswordManagerClient {
               GetProfilePasswordStore,
               (),
               (const override));
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
   MOCK_METHOD(void,
               OpenPasswordDetailsBubble,
               (const password_manager::PasswordForm& form),
@@ -184,8 +183,7 @@ class MockPasswordManagerClient : public StubPasswordManagerClient {
                bool show_warning_text,
                base::OnceClosure confirmation_callback),
               (override));
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 };
 
 class MockAffiliationService : public affiliations::FakeAffiliationService {
@@ -1203,8 +1201,7 @@ TEST_F(PasswordManualFallbackFlowTest, NoFillingIfAuthFails) {
       1);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 class PasswordManualFallbackFlowCrossDomainConfirmationTest
     : public PasswordManualFallbackFlowTest,
       public testing::WithParamInterface<SuggestionType> {};
@@ -1257,8 +1254,7 @@ INSTANTIATE_TEST_SUITE_P(PasswordManualFallbackFlowTest,
                          Values(SuggestionType::kPasswordEntry,
                                 SuggestionType::kFillPassword));
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 
 // Tests that password value is filled if the authentication succeeds.
 TEST_F(PasswordManualFallbackFlowTest, FillsPasswordIfAuthSucceeds) {
@@ -1449,8 +1445,7 @@ TEST_F(PasswordManualFallbackFlowTest, AcceptManagePasswordsEntry) {
       metrics_util::PasswordDropdownSelectedOption::kShowAll, 1);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 TEST_F(PasswordManualFallbackFlowTest, ShowPasswordDetails) {
   PasswordForm form_com =
       CreateEntry("username@google.com", "password",
@@ -1476,8 +1471,7 @@ TEST_F(PasswordManualFallbackFlowTest, ShowPasswordDetails) {
               u"google.de", false)),
       AutofillSuggestionDelegate::SuggestionMetadata{.multi_index = {0, 0}});
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 
 // This class tests that "FillAfterSuggestion" password metrics are recorded
 // correctly.

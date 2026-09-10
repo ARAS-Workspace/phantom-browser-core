@@ -39,9 +39,6 @@
 #include "device/bluetooth/test/bluetooth_test_android.h"
 #elif BUILDFLAG(IS_APPLE)
 #include "device/bluetooth/test/bluetooth_test_mac.h"
-#elif BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#include "device/bluetooth/test/bluetooth_test_win.h"
 #elif defined(USE_CAST_BLUETOOTH_ADAPTER)
 #include "device/bluetooth/test/bluetooth_test_cast.h"
 #elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
@@ -737,11 +734,7 @@ TEST_F(BluetoothAdapterTest, StartDiscoverySessionError_Destroy) {
 #define MAYBE_ConstructDefaultAdapter DISABLED_ConstructDefaultAdapter
 #endif
 
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothTestWinrt, ConstructDefaultAdapter) {
-#else
 TEST_F(BluetoothTest, MAYBE_ConstructDefaultAdapter) {
-#endif
   InitWithDefaultAdapter();
   if (!adapter_->IsPresent() || !adapter_->IsPowered()) {
     GTEST_SKIP()
@@ -762,11 +755,7 @@ TEST_F(BluetoothTest, MAYBE_ConstructDefaultAdapter) {
   DISABLED_ConstructWithoutDefaultAdapter
 #endif
 
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothTestWinrt, ConstructWithoutDefaultAdapter) {
-#else
 TEST_F(BluetoothTest, MAYBE_ConstructWithoutDefaultAdapter) {
-#endif  // BUILDFLAG(IS_WIN)
   InitWithoutDefaultAdapter();
   EXPECT_EQ(adapter_->GetAddress(), "");
   EXPECT_EQ(adapter_->GetName(), "");
@@ -789,11 +778,7 @@ TEST_F(BluetoothTest, MAYBE_ConstructWithoutDefaultAdapter) {
 #define MAYBE_ConstructFakeAdapter DISABLED_ConstructFakeAdapter
 #endif
 
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothTestWinrt, ConstructFakeAdapter) {
-#else
 TEST_F(BluetoothTest, MAYBE_ConstructFakeAdapter) {
-#endif  // BUILDFLAG(IS_WIN)
   InitWithFakeAdapter();
 #if !BUILDFLAG(IS_IOS)
   EXPECT_EQ(adapter_->GetAddress(), kTestAdapterAddress);
@@ -810,30 +795,6 @@ TEST_F(BluetoothTest, MAYBE_ConstructFakeAdapter) {
   EXPECT_FALSE(adapter_->IsDiscoverable());
   EXPECT_FALSE(adapter_->IsDiscovering());
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothTestWinrt, ConstructFakeAdapterWithoutRadio) {
-  InitFakeAdapterWithoutRadio();
-  EXPECT_EQ(adapter_->GetAddress(), kTestAdapterAddress);
-  EXPECT_EQ(adapter_->GetName(), kTestAdapterName);
-  EXPECT_TRUE(adapter_->IsPresent());
-  EXPECT_FALSE(adapter_->CanPower());
-  EXPECT_FALSE(adapter_->IsPowered());
-  EXPECT_FALSE(adapter_->IsDiscoverable());
-  EXPECT_FALSE(adapter_->IsDiscovering());
-}
-
-TEST_P(BluetoothTestWinrt, ConstructFakeAdapterWithoutPowerControl) {
-  InitFakeAdapterWithRadioAccessDenied();
-  EXPECT_EQ(adapter_->GetAddress(), kTestAdapterAddress);
-  EXPECT_EQ(adapter_->GetName(), kTestAdapterName);
-  EXPECT_TRUE(adapter_->IsPresent());
-  EXPECT_FALSE(adapter_->CanPower());
-  EXPECT_TRUE(adapter_->IsPowered());
-  EXPECT_FALSE(adapter_->IsDiscoverable());
-  EXPECT_FALSE(adapter_->IsDiscovering());
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // TODO(scheib): Enable BluetoothTest fixture tests on all platforms.
 #if BUILDFLAG(IS_ANDROID)
@@ -945,11 +906,7 @@ TEST_F(BluetoothTest, NoLocationServices) {
 #define MAYBE_DiscoverLowEnergyDevice DISABLED_DiscoverLowEnergyDevice
 #endif
 // Discovers a device.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothTestWinrt, DiscoverLowEnergyDevice) {
-#else
 TEST_F(BluetoothTest, MAYBE_DiscoverLowEnergyDevice) {
-#endif
   InitWithFakeAdapter();
   TestBluetoothAdapterObserver observer(adapter_);
 
@@ -967,11 +924,7 @@ TEST_F(BluetoothTest, MAYBE_DiscoverLowEnergyDevice) {
 #define MAYBE_DiscoverLowEnergyDeviceTwice DISABLED_DiscoverLowEnergyDeviceTwice
 #endif
 // Discovers the same device multiple times.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothTestWinrt, DiscoverLowEnergyDeviceTwice) {
-#else
 TEST_F(BluetoothTest, MAYBE_DiscoverLowEnergyDeviceTwice) {
-#endif
   InitWithFakeAdapter();
   TestBluetoothAdapterObserver observer(adapter_);
 
@@ -1000,11 +953,7 @@ TEST_F(BluetoothTest, MAYBE_DiscoverLowEnergyDeviceTwice) {
 // Discovers a device, and then again with new Service UUIDs.
 // Makes sure we don't create another device when we've found the
 // device in the past.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothTestWinrt, DiscoverLowEnergyDeviceWithUpdatedUUIDs) {
-#else
 TEST_F(BluetoothTest, MAYBE_DiscoverLowEnergyDeviceWithUpdatedUUIDs) {
-#endif
   InitWithFakeAdapter();
   TestBluetoothAdapterObserver observer(adapter_);
 
@@ -1035,11 +984,7 @@ TEST_F(BluetoothTest, MAYBE_DiscoverLowEnergyDeviceWithUpdatedUUIDs) {
   DISABLED_DiscoverMultipleLowEnergyDevices
 #endif
 // Discovers multiple devices when addresses vary.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothTestWinrt, DiscoverMultipleLowEnergyDevices) {
-#else
 TEST_F(BluetoothTest, MAYBE_DiscoverMultipleLowEnergyDevices) {
-#endif
   InitWithFakeAdapter();
   TestBluetoothAdapterObserver observer(adapter_);
 
@@ -1051,119 +996,14 @@ TEST_F(BluetoothTest, MAYBE_DiscoverMultipleLowEnergyDevices) {
   EXPECT_EQ(2u, adapter_->GetDevices().size());
 }
 
-#if BUILDFLAG(IS_WIN)
-// Tests that the adapter responds to external changes to the power state.
-TEST_P(BluetoothTestWinrt, SimulateAdapterPoweredOffAndOn) {
-  InitWithFakeAdapter();
-  TestBluetoothAdapterObserver observer(adapter_);
-
-  ASSERT_TRUE(adapter_->IsPresent());
-  ASSERT_TRUE(adapter_->IsPowered());
-  EXPECT_EQ(0, observer.powered_changed_count());
-
-  SimulateAdapterPoweredOff();
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_FALSE(adapter_->IsPowered());
-  EXPECT_EQ(1, observer.powered_changed_count());
-  EXPECT_FALSE(observer.last_powered());
-
-  SimulateAdapterPoweredOn();
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_TRUE(adapter_->IsPowered());
-  EXPECT_EQ(2, observer.powered_changed_count());
-  EXPECT_TRUE(observer.last_powered());
-}
-
-// Tests that power change notifications are deduplicated.
-// Multiple StateChanged events with the same state only cause a
-// single AdapterPoweredChanged() call.
-TEST_P(BluetoothTestWinrt, SimulateDuplicateStateChanged) {
-  InitWithFakeAdapter();
-  TestBluetoothAdapterObserver observer(adapter_);
-
-  ASSERT_TRUE(adapter_->IsPresent());
-  ASSERT_TRUE(adapter_->IsPowered());
-  EXPECT_EQ(0, observer.powered_changed_count());
-
-  SimulateSpuriousRadioStateChangedEvent();
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_TRUE(adapter_->IsPowered());
-  EXPECT_EQ(0, observer.powered_changed_count());
-
-  SimulateAdapterPoweredOff();
-  SimulateSpuriousRadioStateChangedEvent();
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_FALSE(adapter_->IsPowered());
-  EXPECT_EQ(1, observer.powered_changed_count());
-  EXPECT_FALSE(observer.last_powered());
-
-  SimulateAdapterPoweredOn();
-  SimulateSpuriousRadioStateChangedEvent();
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_TRUE(adapter_->IsPowered());
-  EXPECT_EQ(2, observer.powered_changed_count());
-  EXPECT_TRUE(observer.last_powered());
-}
-
-// Tests that the adapter responds to external changes to the power state, even
-// if it failed to obtain the underlying radio.
-TEST_P(BluetoothTestWinrt, SimulateAdapterPoweredOnAndOffWithoutRadio) {
-  InitFakeAdapterWithoutRadio();
-  TestBluetoothAdapterObserver observer(adapter_);
-
-  ASSERT_TRUE(adapter_->IsPresent());
-  ASSERT_FALSE(adapter_->IsPowered());
-  EXPECT_EQ(0, observer.powered_changed_count());
-
-  SimulateAdapterPoweredOn();
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_TRUE(adapter_->IsPowered());
-  EXPECT_EQ(1, observer.powered_changed_count());
-  EXPECT_TRUE(observer.last_powered());
-
-  SimulateAdapterPoweredOff();
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_FALSE(adapter_->IsPowered());
-  EXPECT_EQ(2, observer.powered_changed_count());
-  EXPECT_FALSE(observer.last_powered());
-}
-
-// Makes sure the error callback gets run when changing the adapter power state
-// fails.
-// TODO(crbug.com/41410591): Implement SimulateAdapterPowerSuccess() and
-// enable on all platforms.
-TEST_P(BluetoothTestWinrt, SimulateAdapterPowerFailure) {
-  InitWithFakeAdapter();
-  ASSERT_TRUE(adapter_->IsPresent());
-  ASSERT_TRUE(adapter_->IsPowered());
-
-  adapter_->SetPowered(false, GetCallback(Call::NOT_EXPECTED),
-                       GetErrorCallback(Call::EXPECTED));
-  SimulateAdapterPowerFailure();
-  base::RunLoop().RunUntilIdle();
-  EXPECT_TRUE(adapter_->IsPowered());
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 // TODO(crbug.com/41366193): Enable this test on old Windows versions as
 // well.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothTestWinrt, TogglePowerFakeAdapter) {
-#else
 #if BUILDFLAG(IS_IOS)
 #define MAYBE_TogglePowerFakeAdapter DISABLED_TogglePowerFakeAdapter
 #else
 #define MAYBE_TogglePowerFakeAdapter TogglePowerFakeAdapter
 #endif
 TEST_F(BluetoothTest, MAYBE_TogglePowerFakeAdapter) {
-#endif
   InitWithFakeAdapter();
   TestBluetoothAdapterObserver observer(adapter_);
 
@@ -1195,11 +1035,7 @@ TEST_F(BluetoothTest, MAYBE_TogglePowerFakeAdapter) {
 // platforms the corresponding system APIs are blocking or use callbacks, so
 // that it is not necessary to store pending callbacks and wait for the
 // appropriate events.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothTestWinrt, TogglePowerFakeAdapter_Twice) {
-#else
 TEST_F(BluetoothTest, MAYBE_TogglePowerFakeAdapter_Twice) {
-#endif
   InitWithFakeAdapter();
   TestBluetoothAdapterObserver observer(adapter_);
 
@@ -1236,11 +1072,7 @@ TEST_F(BluetoothTest, MAYBE_TogglePowerFakeAdapter_Twice) {
   DISABLED_TogglePowerFakeAdapter_WithinCallback_On_Off
 #endif
 
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothTestWinrt, TogglePowerFakeAdapter_WithinCallback_On_Off) {
-#else
 TEST_F(BluetoothTest, MAYBE_TogglePowerFakeAdapter_WithinCallback_On_Off) {
-#endif
   InitWithFakeAdapter();
   TestBluetoothAdapterObserver observer(adapter_);
 
@@ -1268,11 +1100,7 @@ TEST_F(BluetoothTest, MAYBE_TogglePowerFakeAdapter_WithinCallback_On_Off) {
   DISABLED_TogglePowerFakeAdapter_WithinCallback_Off_On
 #endif
 
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothTestWinrt, TogglePowerFakeAdapter_WithinCallback_Off_On) {
-#else
 TEST_F(BluetoothTest, MAYBE_TogglePowerFakeAdapter_WithinCallback_Off_On) {
-#endif
   InitWithFakeAdapter();
   TestBluetoothAdapterObserver observer(adapter_);
 
@@ -1307,11 +1135,7 @@ TEST_F(BluetoothTest, MAYBE_TogglePowerFakeAdapter_WithinCallback_Off_On) {
   DISABLED_TogglePowerFakeAdapter_DestroyWithPending
 #endif
 
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothTestWinrt, TogglePowerFakeAdapter_DestroyWithPending) {
-#else
 TEST_F(BluetoothTest, MAYBE_TogglePowerFakeAdapter_DestroyWithPending) {
-#endif
   InitWithFakeAdapter();
   ASSERT_TRUE(adapter_->IsPresent());
   ASSERT_TRUE(adapter_->IsPowered());
@@ -1386,29 +1210,6 @@ TEST_F(BluetoothTest, MAYBE_TogglePowerBeforeScan) {
   EXPECT_TRUE(discovery_sessions_[0]->IsActive());
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothTestWinrt, DiscoverySessionFailure) {
-  InitWithFakeAdapter();
-  TestBluetoothAdapterObserver observer(adapter_);
-  EXPECT_FALSE(adapter_->IsDiscovering());
-
-  StartLowEnergyDiscoverySession();
-  EXPECT_EQ(1, callback_count_);
-  EXPECT_EQ(0, error_callback_count_);
-  EXPECT_TRUE(adapter_->IsDiscovering());
-  EXPECT_EQ(1, observer.discovering_changed_count());
-  EXPECT_TRUE(observer.last_discovering());
-  ASSERT_EQ((size_t)1, discovery_sessions_.size());
-  EXPECT_TRUE(discovery_sessions_[0]->IsActive());
-
-  SimulateLowEnergyDiscoveryFailure();
-  EXPECT_FALSE(adapter_->IsDiscovering());
-  EXPECT_FALSE(discovery_sessions_[0]->IsActive());
-  EXPECT_EQ(2, observer.discovering_changed_count());
-  EXPECT_FALSE(observer.last_discovering());
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_MAC)
 #define MAYBE_TurnOffAdapterWithConnectedDevice \
   TurnOffAdapterWithConnectedDevice
@@ -1438,270 +1239,6 @@ TEST_F(BluetoothTest, MAYBE_TurnOffAdapterWithConnectedDevice) {
   EXPECT_FALSE(device->IsConnected());
   EXPECT_FALSE(device->IsGattConnected());
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothTestWinrt, RegisterAdvertisement) {
-  auto advertisement_data = std::make_unique<BluetoothAdvertisement::Data>(
-      BluetoothAdvertisement::ADVERTISEMENT_TYPE_BROADCAST);
-  advertisement_data->set_manufacturer_data(
-      BluetoothAdvertisement::ManufacturerData());
-
-  InitWithFakeAdapter();
-  adapter_->RegisterAdvertisement(
-      std::move(advertisement_data),
-      GetCreateAdvertisementCallback(Call::EXPECTED),
-      GetAdvertisementErrorCallback(Call::NOT_EXPECTED));
-  auto pending_advertisements = adapter_->GetPendingAdvertisementsForTesting();
-  ASSERT_FALSE(pending_advertisements.empty());
-  SimulateAdvertisementStarted(pending_advertisements[0]);
-  base::RunLoop().RunUntilIdle();
-  EXPECT_TRUE(adapter_->GetPendingAdvertisementsForTesting().empty());
-}
-
-TEST_P(BluetoothTestWinrt, FailRegisterAdvertisement) {
-  auto advertisement_data = std::make_unique<BluetoothAdvertisement::Data>(
-      BluetoothAdvertisement::ADVERTISEMENT_TYPE_BROADCAST);
-  advertisement_data->set_manufacturer_data(
-      BluetoothAdvertisement::ManufacturerData());
-
-  InitWithFakeAdapter();
-  adapter_->RegisterAdvertisement(
-      std::move(advertisement_data),
-      GetCreateAdvertisementCallback(Call::NOT_EXPECTED),
-      GetAdvertisementErrorCallback(Call::EXPECTED));
-  auto pending_advertisements = adapter_->GetPendingAdvertisementsForTesting();
-  ASSERT_FALSE(pending_advertisements.empty());
-  SimulateAdvertisementError(pending_advertisements[0],
-                             BluetoothAdvertisement::ERROR_ADAPTER_POWERED_OFF);
-  base::RunLoop().RunUntilIdle();
-  EXPECT_EQ(BluetoothAdvertisement::ERROR_ADAPTER_POWERED_OFF,
-            last_advertisement_error_code_);
-  EXPECT_TRUE(adapter_->GetPendingAdvertisementsForTesting().empty());
-}
-
-TEST_P(BluetoothTestWinrt, RegisterAndUnregisterAdvertisement) {
-  auto advertisement_data = std::make_unique<BluetoothAdvertisement::Data>(
-      BluetoothAdvertisement::ADVERTISEMENT_TYPE_BROADCAST);
-  advertisement_data->set_manufacturer_data(
-      BluetoothAdvertisement::ManufacturerData());
-
-  InitWithFakeAdapter();
-  adapter_->RegisterAdvertisement(
-      std::move(advertisement_data),
-      GetCreateAdvertisementCallback(Call::EXPECTED),
-      GetAdvertisementErrorCallback(Call::NOT_EXPECTED));
-  auto pending_advertisements = adapter_->GetPendingAdvertisementsForTesting();
-  ASSERT_FALSE(pending_advertisements.empty());
-  auto* advertisement = pending_advertisements[0];
-  SimulateAdvertisementStarted(advertisement);
-  base::RunLoop().RunUntilIdle();
-
-  TestBluetoothAdvertisementObserver observer(advertisement);
-  advertisement->Unregister(GetCallback(Call::EXPECTED),
-                            GetAdvertisementErrorCallback(Call::NOT_EXPECTED));
-  SimulateAdvertisementStopped(advertisement);
-  base::RunLoop().RunUntilIdle();
-  EXPECT_TRUE(observer.released());
-  EXPECT_EQ(1u, observer.released_count());
-  EXPECT_TRUE(adapter_->GetPendingAdvertisementsForTesting().empty());
-}
-
-TEST_P(BluetoothTestWinrt, FailUnregisterAdvertisement) {
-  auto advertisement_data = std::make_unique<BluetoothAdvertisement::Data>(
-      BluetoothAdvertisement::ADVERTISEMENT_TYPE_BROADCAST);
-  advertisement_data->set_manufacturer_data(
-      BluetoothAdvertisement::ManufacturerData());
-
-  InitWithFakeAdapter();
-  adapter_->RegisterAdvertisement(
-      std::move(advertisement_data),
-      GetCreateAdvertisementCallback(Call::EXPECTED),
-      GetAdvertisementErrorCallback(Call::NOT_EXPECTED));
-  auto pending_advertisements = adapter_->GetPendingAdvertisementsForTesting();
-  ASSERT_FALSE(pending_advertisements.empty());
-  auto* advertisement = pending_advertisements[0];
-  SimulateAdvertisementStarted(advertisement);
-  base::RunLoop().RunUntilIdle();
-
-  TestBluetoothAdvertisementObserver observer(advertisement);
-  advertisement->Unregister(GetCallback(Call::NOT_EXPECTED),
-                            GetAdvertisementErrorCallback(Call::EXPECTED));
-  SimulateAdvertisementError(advertisement,
-                             BluetoothAdvertisement::ERROR_RESET_ADVERTISING);
-  base::RunLoop().RunUntilIdle();
-
-  // Expect no change to the observer status.
-  EXPECT_FALSE(observer.released());
-  EXPECT_EQ(0u, observer.released_count());
-  EXPECT_EQ(BluetoothAdvertisement::ERROR_RESET_ADVERTISING,
-            last_advertisement_error_code_);
-  EXPECT_TRUE(adapter_->GetPendingAdvertisementsForTesting().empty());
-}
-
-TEST_P(BluetoothTestWinrt, RegisterAdvertisementWithInvalidData) {
-  // WinRT only accepts ManufacturerData in the payload, other data should be
-  // rejected.
-  auto advertisement_data = std::make_unique<BluetoothAdvertisement::Data>(
-      BluetoothAdvertisement::ADVERTISEMENT_TYPE_BROADCAST);
-  advertisement_data->set_service_data(BluetoothAdvertisement::ServiceData());
-
-  InitWithFakeAdapter();
-  adapter_->RegisterAdvertisement(
-      std::move(advertisement_data),
-      GetCreateAdvertisementCallback(Call::NOT_EXPECTED),
-      GetAdvertisementErrorCallback(Call::EXPECTED));
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_EQ(BluetoothAdvertisement::ERROR_STARTING_ADVERTISEMENT,
-            last_advertisement_error_code_);
-  EXPECT_TRUE(adapter_->GetPendingAdvertisementsForTesting().empty());
-}
-
-TEST_P(BluetoothTestWinrt, RegisterMultipleAdvertisements) {
-  InitWithFakeAdapter();
-  constexpr size_t kNumAdvertisements = 10u;
-
-  for (size_t i = 0; i < kNumAdvertisements; ++i) {
-    auto advertisement_data = std::make_unique<BluetoothAdvertisement::Data>(
-        BluetoothAdvertisement::ADVERTISEMENT_TYPE_BROADCAST);
-    advertisement_data->set_manufacturer_data(
-        BluetoothAdvertisement::ManufacturerData());
-
-    adapter_->RegisterAdvertisement(
-        std::move(advertisement_data),
-        GetCreateAdvertisementCallback(Call::EXPECTED),
-        GetAdvertisementErrorCallback(Call::NOT_EXPECTED));
-  }
-
-  base::RunLoop().RunUntilIdle();
-  auto pending_advertisements = adapter_->GetPendingAdvertisementsForTesting();
-  ASSERT_EQ(kNumAdvertisements, pending_advertisements.size());
-  for (size_t i = 0; i < kNumAdvertisements; ++i)
-    SimulateAdvertisementStarted(pending_advertisements[i]);
-
-  base::RunLoop().RunUntilIdle();
-  EXPECT_TRUE(adapter_->GetPendingAdvertisementsForTesting().empty());
-}
-
-TEST_P(BluetoothTestWinrt, UnregisterAdvertisementWhilePendingUnregister) {
-  InitWithFakeAdapter();
-  auto advertisement_data = std::make_unique<BluetoothAdvertisement::Data>(
-      BluetoothAdvertisement::ADVERTISEMENT_TYPE_BROADCAST);
-  advertisement_data->set_manufacturer_data(
-      BluetoothAdvertisement::ManufacturerData());
-
-  adapter_->RegisterAdvertisement(
-      std::move(advertisement_data),
-      GetCreateAdvertisementCallback(Call::EXPECTED),
-      GetAdvertisementErrorCallback(Call::NOT_EXPECTED));
-
-  base::RunLoop().RunUntilIdle();
-  auto pending_advertisements = adapter_->GetPendingAdvertisementsForTesting();
-  ASSERT_EQ(1u, pending_advertisements.size());
-  auto* advertisement = pending_advertisements[0];
-  SimulateAdvertisementStarted(advertisement);
-  base::RunLoop().RunUntilIdle();
-
-  TestBluetoothAdvertisementObserver observer(advertisement);
-  advertisement->Unregister(GetCallback(Call::EXPECTED),
-                            GetAdvertisementErrorCallback(Call::NOT_EXPECTED));
-
-  // Schedule another Unregister, which is expected to fail.
-  advertisement->Unregister(GetCallback(Call::NOT_EXPECTED),
-                            GetAdvertisementErrorCallback(Call::EXPECTED));
-  base::RunLoop().RunUntilIdle();
-  // Expect no change to the observer status.
-  EXPECT_FALSE(observer.released());
-  EXPECT_EQ(0u, observer.released_count());
-  EXPECT_EQ(BluetoothAdvertisement::ERROR_RESET_ADVERTISING,
-            last_advertisement_error_code_);
-
-  // Simulate success of the first unregistration.
-  SimulateAdvertisementStopped(advertisement);
-  base::RunLoop().RunUntilIdle();
-
-  EXPECT_TRUE(observer.released());
-  EXPECT_EQ(1u, observer.released_count());
-  EXPECT_TRUE(adapter_->GetPendingAdvertisementsForTesting().empty());
-}
-
-TEST_P(BluetoothTestWinrt, DoubleUnregisterAdvertisement) {
-  InitWithFakeAdapter();
-  auto advertisement_data = std::make_unique<BluetoothAdvertisement::Data>(
-      BluetoothAdvertisement::ADVERTISEMENT_TYPE_BROADCAST);
-  advertisement_data->set_manufacturer_data(
-      BluetoothAdvertisement::ManufacturerData());
-
-  adapter_->RegisterAdvertisement(
-      std::move(advertisement_data),
-      GetCreateAdvertisementCallback(Call::EXPECTED),
-      GetAdvertisementErrorCallback(Call::NOT_EXPECTED));
-
-  base::RunLoop().RunUntilIdle();
-  auto pending_advertisements = adapter_->GetPendingAdvertisementsForTesting();
-  ASSERT_EQ(1u, pending_advertisements.size());
-  auto* advertisement = pending_advertisements[0];
-  SimulateAdvertisementStarted(advertisement);
-  base::RunLoop().RunUntilIdle();
-
-  // Perform two unregistrations after each other. Both should succeed.
-  TestBluetoothAdvertisementObserver observer(advertisement);
-  advertisement->Unregister(GetCallback(Call::EXPECTED),
-                            GetAdvertisementErrorCallback(Call::NOT_EXPECTED));
-  SimulateAdvertisementStopped(advertisement);
-  base::RunLoop().RunUntilIdle();
-  EXPECT_TRUE(observer.released());
-  EXPECT_EQ(1u, observer.released_count());
-
-  advertisement->Unregister(GetCallback(Call::EXPECTED),
-                            GetAdvertisementErrorCallback(Call::NOT_EXPECTED));
-  SimulateAdvertisementStopped(advertisement);
-  base::RunLoop().RunUntilIdle();
-  // The second unregister is a no-op, and should not notify observers again.
-  EXPECT_TRUE(observer.released());
-  EXPECT_EQ(1u, observer.released_count());
-
-  EXPECT_TRUE(adapter_->GetPendingAdvertisementsForTesting().empty());
-}
-
-TEST_P(BluetoothTestWinrt, SimulateAdvertisementStoppedByOS) {
-  InitWithFakeAdapter();
-  auto advertisement_data = std::make_unique<BluetoothAdvertisement::Data>(
-      BluetoothAdvertisement::ADVERTISEMENT_TYPE_BROADCAST);
-  advertisement_data->set_manufacturer_data(
-      BluetoothAdvertisement::ManufacturerData());
-
-  adapter_->RegisterAdvertisement(
-      std::move(advertisement_data),
-      GetCreateAdvertisementCallback(Call::EXPECTED),
-      GetAdvertisementErrorCallback(Call::NOT_EXPECTED));
-
-  base::RunLoop().RunUntilIdle();
-  auto pending_advertisements = adapter_->GetPendingAdvertisementsForTesting();
-  ASSERT_EQ(1u, pending_advertisements.size());
-  auto* advertisement = pending_advertisements[0];
-  SimulateAdvertisementStarted(advertisement);
-  base::RunLoop().RunUntilIdle();
-  EXPECT_TRUE(adapter_->GetPendingAdvertisementsForTesting().empty());
-
-  TestBluetoothAdvertisementObserver observer(advertisement);
-  // Simulate the OS stopping the advertisement. This should notify the
-  // |observer|.
-  SimulateAdvertisementStopped(advertisement);
-  base::RunLoop().RunUntilIdle();
-  EXPECT_TRUE(observer.released());
-  EXPECT_EQ(1u, observer.released_count());
-
-  // While Unregister() is a no-op now, we still expect an invocation of the
-  // success callback, but no change to the |observer| state.
-  advertisement->Unregister(GetCallback(Call::EXPECTED),
-                            GetAdvertisementErrorCallback(Call::NOT_EXPECTED));
-  base::RunLoop().RunUntilIdle();
-  EXPECT_TRUE(observer.released());
-  EXPECT_EQ(1u, observer.released_count());
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 #if (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)) && \
     !defined(USE_CAST_BLUETOOTH_ADAPTER)
@@ -2091,11 +1628,5 @@ TEST_F(BluetoothTest, DiscoverConnectedLowEnergyDeviceTwice) {
   EXPECT_EQ(1u, adapter_->GetDevices().size());
 }
 #endif  // BUILDFLAG(IS_APPLE)
-
-#if BUILDFLAG(IS_WIN)
-INSTANTIATE_TEST_SUITE_P(All,
-                         BluetoothTestWinrt,
-                         ::testing::ValuesIn(kBluetoothTestWinrtParam));
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace device

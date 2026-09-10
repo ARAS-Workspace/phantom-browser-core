@@ -44,19 +44,13 @@
 #include "chrome/browser/ui/tabs/tab_drag_api/desktop_tab_drag_impl/tab_drag_session_desktop_injector.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // This causes a gn error on Android builds, because gn does not understand
 // buildflags, so we include it only on platforms where it is used.
 #include "chrome/browser/default_browser/default_browser_manager.h"
 #include "chrome/browser/ui/startup/default_browser_prompt/default_browser_prompt_manager.h"
 #include "chrome/browser/ui/webui/whats_new/whats_new_registrar.h"
 #include "components/user_education/common/user_education_features.h"  // nogncheck
-#endif
-
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#include "chrome/browser/metrics/chrome_metrics_service_accessor.h"
-#include "chrome/browser/win/installer_downloader/installer_downloader_controller.h"
-#include "chrome/browser/win/installer_downloader/installer_downloader_infobar_delegate.h"
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)
@@ -66,10 +60,6 @@
 #include "chrome/browser/upgrade_detector/upgrade_detector.h"
 #include "chrome/common/chrome_features.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/startup/startup_launch_manager.h"
-#endif
 
 #if BUILDFLAG(ENABLE_DEVICE_BOUND_SESSIONS)
 #include "chrome/browser/signin/bound_session_credentials/unexportable_key_obsolete_profile_garbage_collector.h"  // nogncheck
@@ -113,11 +103,6 @@ void GlobalFeatures::ReplaceGlobalFeaturesForTesting(
 }
 
 void GlobalFeatures::PostBrowserProcessInit() {
-#if BUILDFLAG(IS_WIN)
-  startup_launch_manager_ =
-      GetUserDataFactory().CreateInstance<StartupLaunchManager>(
-          *g_browser_process, g_browser_process);
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   PostBrowserProcessInitCore();
 
@@ -194,7 +179,7 @@ void GlobalFeatures::PostBrowserProcessInitCore() {
   }
 #endif
   system_permissions_platform_handle_ = CreateSystemPermissionsPlatformHandle();
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // TODO(crbug.com/463742800): Migrate WhatsNewRegistry (and other non-core
   // features) to Init().
   whats_new_registry_ = CreateWhatsNewRegistry();
@@ -210,15 +195,6 @@ void GlobalFeatures::PostBrowserProcessInitCore() {
   application_locale_storage_ = std::make_unique<ApplicationLocaleStorage>();
 
   glic_global_enabling_ = std::make_unique<glic::GlicGlobalEnabling>();
-
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  installer_downloader_controller_ = std::make_unique<
-      installer_downloader::InstallerDownloaderController>(
-      base::BindRepeating(
-          &installer_downloader::InstallerDownloaderInfoBarDelegate::Show),
-      base::BindRepeating(static_cast<bool (*)()>(
-          &ChromeMetricsServiceAccessor::IsMetricsAndCrashReportingEnabled)));
-#endif
 
   optimization_guide_global_feature_ =
       std::make_unique<optimization_guide::OptimizationGuideGlobalFeature>();
@@ -277,18 +253,13 @@ void GlobalFeatures::PostMainMessageLoopRun() {
 
   glass_frame_service_.reset();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   DefaultBrowserPromptManager::GetInstance()->CloseAllPrompts(
       DefaultBrowserPromptManager::CloseReason::kDismiss);
 #endif
 }
 
 void GlobalFeatures::PostDestroyThreads() {
-#if BUILDFLAG(IS_WIN)
-  // Startup launch manager should be destroyed before GlobalBrowserCollection
-  // since its infobar manager observes GlobalBrowserCollection.
-  startup_launch_manager_.reset();
-#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 std::unique_ptr<system_permission_settings::PlatformHandle>
@@ -296,7 +267,7 @@ GlobalFeatures::CreateSystemPermissionsPlatformHandle() {
   return system_permission_settings::PlatformHandle::Create();
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 std::unique_ptr<whats_new::WhatsNewRegistry>
 GlobalFeatures::CreateWhatsNewRegistry() {
   return whats_new::CreateWhatsNewRegistry();

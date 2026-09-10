@@ -19,14 +19,7 @@ namespace {
 mojom::RelativeFilePathPtr CreateArbitraryRelativeFilePath(
     const base::FilePath& file_path) {
   auto mojo_file_path = mojom::RelativeFilePath::New();
-#if BUILDFLAG(IS_WIN)
-  const auto* data_ptr =
-      reinterpret_cast<const uint16_t*>(file_path.value().data());
-  mojo_file_path->path =
-      std::vector(data_ptr, UNSAFE_TODO(data_ptr + file_path.value().size()));
-#else
   mojo_file_path->path = file_path.value();
-#endif
   return mojo_file_path;
 }
 
@@ -52,11 +45,7 @@ TEST(FilePathTest, RelativeFilePath) {
 
   base::FilePath ignored_out;
   {
-#if BUILDFLAG(IS_WIN)
-    const base::FilePath in_path(FPL("C:\\\\Windows\\system32\\kernel32.dll"));
-#else
     const base::FilePath in_path(FPL("/vmlinuz"));
-#endif
     ASSERT_TRUE(in_path.IsAbsolute());
 
     EXPECT_CHECK_DEATH(
@@ -69,11 +58,7 @@ TEST(FilePathTest, RelativeFilePath) {
   }
 
   {
-#if BUILDFLAG(IS_WIN)
-    const base::FilePath in_path(FPL("relative\\path\\..\\with\\traversals"));
-#else
     const base::FilePath in_path(FPL("relative/path/../with/traversals"));
-#endif
     ASSERT_TRUE(!in_path.IsAbsolute());
     ASSERT_TRUE(in_path.ReferencesParent());
 

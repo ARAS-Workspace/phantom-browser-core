@@ -23,7 +23,8 @@ FilePathWatcher::~FilePathWatcher() {
 
 // static
 bool FilePathWatcher::RecursiveWatchAvailable() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
+    BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_AIX)
   return true;
 #else
   // FSEvents isn't available on iOS.
@@ -80,15 +81,5 @@ FilePathWatcher::FilePathWatcher(std::unique_ptr<PlatformDelegate> delegate) {
   DETACH_FROM_SEQUENCE(sequence_checker_);
   impl_ = std::move(delegate);
 }
-
-#if BUILDFLAG(IS_WIN)
-Lock& FilePathWatcher::GetWatchThreadLockForTest() {
-  return impl_->GetWatchThreadLockForTest();  // IN-TEST
-}
-
-const void* FilePathWatcher::GetOverlappedPointerForTest() {
-  return impl_->GetOverlappedPointerForTest();  // IN-TEST
-}
-#endif
 
 }  // namespace base

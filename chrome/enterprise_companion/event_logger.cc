@@ -61,10 +61,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 namespace enterprise_companion {
 
 namespace {
@@ -130,16 +126,9 @@ proto::EnterpriseCompanionMetadata GetMetadata() {
   metadata.set_os_platform(proto::LINUX);
 #elif BUILDFLAG(IS_MAC)
   metadata.set_os_platform(proto::MAC);
-#elif BUILDFLAG(IS_WIN)
-  metadata.set_os_platform(proto::WINDOWS);
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  const base::win::OSInfo::VersionNumber v =
-      base::win::OSInfo::GetInstance()->version_number();
-  metadata.set_os_version(
-      base::StringPrintf("%u.%u.%u", v.major, v.minor, v.build));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   int32_t os_major = 0, os_minor = 0, os_bugfix = 0;
   base::SysInfo::OperatingSystemVersionNumbers(&os_major, &os_minor,
                                                &os_bugfix);

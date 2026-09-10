@@ -283,7 +283,7 @@ TEST_P(UserPermissionServiceImplTest,
   EXPECT_TRUE(permission_service_->ShouldCollectConsent());
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 namespace {
 constexpr GaiaId::Literal kUserGaiaId("some-gaia-id");
 }  // namespace
@@ -402,7 +402,7 @@ TEST_P(UserPermissionServiceImplTest,
   EXPECT_EQ(permission_service_->CanUserCollectSignals(user_context),
             UserPermission::kGranted);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // Tests that signals can be collected if the user has already given their
 // consent.

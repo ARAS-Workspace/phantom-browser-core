@@ -45,15 +45,6 @@
 #include "base/apple/scoped_nsautorelease_pool.h"
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <commctrl.h>
-#include <shellapi.h>
-
-#include "remoting/base/crash/crash_reporting_breakpad.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace remoting {
 
 // Known entry points.
@@ -64,11 +55,6 @@ int DaemonProcessMain();
 int DesktopProcessMain();
 int PeerConnectionProcessMain();
 #endif
-#if BUILDFLAG(IS_WIN)
-int FileChooserMain();
-int RdpDesktopSessionMain();
-int UrlForwarderConfiguratorMain();
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_LINUX)
 int XSessionChooserMain();
 #endif  // BUILDFLAG(IS_LINUX)
@@ -135,55 +121,6 @@ void Usage(const base::FilePath& program_name) {
       program_name.MaybeAsASCII().c_str());
 }
 
-#if BUILDFLAG(IS_WIN)
-
-// Runs the binary specified by the command line, elevated.
-int RunElevated() {
-  const base::CommandLine::SwitchMap& switches =
-      base::CommandLine::ForCurrentProcess()->GetSwitches();
-  base::CommandLine::StringVector args =
-      base::CommandLine::ForCurrentProcess()->GetArgs();
-
-  // Create the child process command line by copying switches from the current
-  // command line.
-  base::CommandLine command_line(base::CommandLine::NO_PROGRAM);
-  for (base::CommandLine::SwitchMap::const_iterator i = switches.begin();
-       i != switches.end(); ++i) {
-    if (i->first != kElevateSwitchName) {
-      command_line.AppendSwitchNative(i->first, i->second);
-    }
-  }
-  for (base::CommandLine::StringVector::const_iterator i = args.begin();
-       i != args.end(); ++i) {
-    command_line.AppendArgNative(*i);
-  }
-
-  // Get the name of the binary to launch.
-  base::FilePath binary =
-      base::CommandLine::ForCurrentProcess()->GetSwitchValuePath(
-          kElevateSwitchName);
-  base::CommandLine::StringType parameters =
-      command_line.GetCommandLineString();
-
-  // Launch the child process requesting elevation.
-  SHELLEXECUTEINFO info = {};
-  info.cbSize = sizeof(info);
-  info.lpVerb = L"runas";
-  info.lpFile = binary.value().c_str();
-  info.lpParameters = parameters.c_str();
-  info.nShow = SW_SHOWNORMAL;
-
-  if (!ShellExecuteEx(&info)) {
-    DWORD exit_code = GetLastError();
-    PLOG(ERROR) << "Unable to launch '" << binary.value() << "'";
-    return exit_code;
-  }
-
-  return kSuccessExitCode;
-}
-
-#endif  // !BUILDFLAG(IS_WIN)
-
 // Select the entry point corresponding to the process type.
 MainRoutineFn SelectMainRoutine(const std::string& process_type) {
   MainRoutineFn main_routine = nullptr;
@@ -200,14 +137,6 @@ MainRoutineFn SelectMainRoutine(const std::string& process_type) {
   } else if (process_type == kProcessTypePeerConnection) {
     main_routine = &PeerConnectionProcessMain;
 #endif
-#if BUILDFLAG(IS_WIN)
-  } else if (process_type == kProcessTypeFileChooser) {
-    main_routine = &FileChooserMain;
-  } else if (process_type == kProcessTypeRdpDesktopSession) {
-    main_routine = &RdpDesktopSessionMain;
-  } else if (process_type == kProcessTypeUrlForwarderConfigurator) {
-    main_routine = &UrlForwarderConfiguratorMain;
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_LINUX)
   } else if (process_type == kProcessTypeXSessionChooser) {
     main_routine = &XSessionChooserMain;
@@ -244,12 +173,6 @@ int HostMain(int argc, char** argv) {
     return kSuccessExitCode;
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (command_line->HasSwitch(kElevateSwitchName)) {
-    return RunElevated();
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   // Assume the single-process host process by default.
   std::string process_type = kProcessTypeSingleProcessHost;
   if (command_line->HasSwitch(kProcessTypeSwitchName)) {
@@ -285,28 +208,9 @@ int HostMain(int argc, char** argv) {
   if (IsUsageStatsAllowed()) {
 #if BUILDFLAG(IS_LINUX)
     InitializeCrashpadReporting();
-#elif BUILDFLAG(IS_WIN)
-    // TODO: joedow - Enable crash reporting for the RDP process.
-    if (process_type == kProcessTypeDaemon) {
-      InitializeBreakpadReporting();
-    } else if (process_type == kProcessTypeDesktop) {
-      // TODO(garykac): Switch to use InitializeCrashpadReporting();
-      InitializeBreakpadReporting();
-    } else if (command_line->HasSwitch(kCrashServerPipeHandle)) {
-      InitializeOopCrashClient(
-          command_line->GetSwitchValueASCII(kCrashServerPipeHandle));
-    }
 #endif
   }
 #endif  // defined(REMOTING_ENABLE_CRASH_REPORTING)
-
-#if BUILDFLAG(IS_WIN)
-  // Register and initialize common controls.
-  INITCOMMONCONTROLSEX info;
-  info.dwSize = sizeof(info);
-  info.dwICC = ICC_STANDARD_CLASSES;
-  InitCommonControlsEx(&info);
-#endif  // BUILDFLAG(IS_WIN)
 
   MainRoutineFn main_routine = SelectMainRoutine(process_type);
   if (!main_routine) {

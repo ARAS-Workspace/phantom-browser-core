@@ -175,14 +175,6 @@
 #include "remoting/host/linux/pulse_audio_capturer.h"
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include <commctrl.h>
-
-#include "base/win/registry.h"
-#include "base/win/scoped_handle.h"
-#include "base/win/windows_version.h"
-#include "remoting/host/pairing_registry_delegate_win.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_LINUX)
 #include "remoting/base/crash/crash_reporting_crashpad.h"
@@ -493,11 +485,6 @@ class HostProcess : public ConfigWatcher::Delegate,
   // mojom::RemotingHostControl implementation.
 #if BUILDFLAG(REMOTING_MULTI_PROCESS)
   void ApplyHostConfig(base::DictValue serialized_config) override;
-#endif
-#if BUILDFLAG(IS_WIN)
-  void InitializePairingRegistry(
-      ::mojo::PlatformHandle privileged_handle,
-      ::mojo::PlatformHandle unprivileged_handle) override;
 #endif
 #if BUILDFLAG(IS_MAC)
   void BindChromotingHostServices(
@@ -1057,7 +1044,6 @@ void HostProcess::CreateAuthenticatorFactory() {
     if (allow_pairing_) {
       // On Windows |pairing_registry_| is initialized in
       // InitializePairingRegistry().
-#if !BUILDFLAG(IS_WIN)
       if (!pairing_registry_) {
         std::unique_ptr<PairingRegistry::Delegate> delegate =
             CreatePairingRegistryDelegate();
@@ -1067,7 +1053,6 @@ void HostProcess::CreateAuthenticatorFactory() {
                                                   std::move(delegate));
         }
       }
-#endif  // BUILDFLAG(IS_WIN)
 
       pairing_registry = pairing_registry_;
     }
@@ -1231,8 +1216,6 @@ void HostProcess::StartOnUiThread() {
   } else if (multi_process_) {
     desktop_environment_options_.set_enable_security_key(true);
   }
-#elif BUILDFLAG(IS_WIN)
-  desktop_environment_options_.set_enable_security_key(true);
 #endif
 
   // Create a desktop environment factory appropriate to the build type &
@@ -1391,42 +1374,6 @@ void HostProcess::ApplyHostConfig(base::DictValue config) {
 }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-void HostProcess::InitializePairingRegistry(
-    ::mojo::PlatformHandle privileged_handle,
-    ::mojo::PlatformHandle unprivileged_handle) {
-  // This IPC is handled on the UI thread and bounced over to the network thread
-  // so being called on any other thread is unexpected.
-  DCHECK(context_->ui_task_runner()->BelongsToCurrentThread() ||
-         context_->network_task_runner()->BelongsToCurrentThread());
-
-  if (context_->ui_task_runner()->BelongsToCurrentThread()) {
-    context_->network_task_runner()->PostTask(
-        FROM_HERE, base::BindOnce(&HostProcess::InitializePairingRegistry, this,
-                                  std::move(privileged_handle),
-                                  std::move(unprivileged_handle)));
-    return;
-  }
-  DCHECK(context_->network_task_runner()->BelongsToCurrentThread());
-
-  // |pairing_registry_| must only be initialized once.
-  DCHECK(!pairing_registry_) << "Received multiple calls to initialize the "
-                             << "pairing registry";
-
-  std::unique_ptr<PairingRegistryDelegateWin> delegate(
-      new PairingRegistryDelegateWin());
-  delegate->SetRootKeys(static_cast<HKEY>(privileged_handle.ReleaseHandle()),
-                        static_cast<HKEY>(unprivileged_handle.ReleaseHandle()));
-
-  pairing_registry_ =
-      new PairingRegistry(context_->file_task_runner(), std::move(delegate));
-
-  // (Re)Create the authenticator factory now that |pairing_registry_| has been
-  // initialized.
-  CreateAuthenticatorFactory();
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
 void HostProcess::BindChromotingHostServices(
@@ -1876,10 +1823,6 @@ std::optional<ErrorCode> HostProcess::OnSessionPoliciesReceived(
     return std::nullopt;
   }
 
-#if BUILDFLAG(IS_WIN)
-  // The Windows host is always multi-process.
-  NOTREACHED();
-#else  // BUILDFLAG(IS_WIN) #else
 
 #if BUILDFLAG(IS_APPLE)
   // On Mac, we run as root at the login screen, so the username won't match.
@@ -1910,7 +1853,6 @@ std::optional<ErrorCode> HostProcess::OnSessionPoliciesReceived(
   // TODO: crbug.com/359977809 - Add a new error code for mismatched username.
   return ErrorCode::DISALLOWED_BY_POLICY;
 
-#endif  // BUILDFLAG(IS_WIN) #else
 }
 
 void HostProcess::InitializeSignaling() {
@@ -2121,14 +2063,6 @@ void HostProcess::StartHost() {
 
   desktop_environment_options_.set_enable_remote_webauthn(true);
 
-#if BUILDFLAG(IS_WIN)
-  // Set a default value for whether to allow the dxgi capturer. This value can
-  // be explicitly disallowed by the client when session options are applied.
-  // The desktop process will check whether DXGI is supported in the session
-  // it is capturing before attempting to use it.
-  desktop_environment_options_.desktop_capture_options()
-      ->set_allow_directx_capturer(true);
-#endif
 
   std::unique_ptr<PeerSessionFactory> peer_session_factory;
 #if BUILDFLAG(REMOTING_MULTI_PROCESS)

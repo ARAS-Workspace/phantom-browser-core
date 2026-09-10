@@ -185,104 +185,6 @@ TEST_F(DefaultBrowserPromptManagerTest, InfoBarRepromptDuration) {
       /*expect_infobar_exists=*/true);
 }
 
-#if BUILDFLAG(IS_WIN)
-constexpr int kFrameworkMaxPromptCount = 5;
-constexpr int kFrameworkRepromptDurationDays = 14;
-
-TEST_F(DefaultBrowserPromptManagerTest, FrameworkInfoBarMaxPromptCount) {
-  scoped_feature_list_.InitWithFeatures(
-      /*enabled_features=*/{default_browser::kDefaultBrowserPromptSurfaces},
-      /*disabled_features=*/{features::kSeparateDefaultAndPinPrompt});
-
-  // Show if the declined count is less than the max prompt count.
-  TestShouldShowInfoBarPrompt(
-      /*last_declined_time_delta=*/base::Days(kFrameworkRepromptDurationDays) +
-          base::Microseconds(1),
-      /*declined_count=*/kFrameworkMaxPromptCount - 1,
-      /*expect_infobar_exists=*/true,
-      /*use_framework_prefs=*/true);
-  TestShouldShowInfoBarPrompt(
-      /*last_declined_time_delta=*/base::Days(kFrameworkRepromptDurationDays) +
-          base::Microseconds(1),
-      /*declined_count=*/kFrameworkMaxPromptCount,
-      /*expect_infobar_exists=*/false,
-      /*use_framework_prefs=*/true);
-}
-
-TEST_F(DefaultBrowserPromptManagerTest, FrameworkInfoBarRepromptDuration) {
-  scoped_feature_list_.InitWithFeatures(
-      /*enabled_features=*/{default_browser::kDefaultBrowserPromptSurfaces},
-      /*disabled_features=*/{features::kSeparateDefaultAndPinPrompt});
-
-  // After the prompt is declined once, show the prompt again if the time since
-  // the last time the prompt was declined is strictly longer than the base
-  // reprompt duration.
-  TestShouldShowInfoBarPrompt(
-      /*last_declined_time_delta=*/base::Days(kFrameworkRepromptDurationDays),
-      /*declined_count=*/1,
-      /*expect_infobar_exists=*/false,
-      /*use_framework_prefs=*/true);
-  TestShouldShowInfoBarPrompt(
-      /*last_declined_time_delta=*/base::Days(kFrameworkRepromptDurationDays) +
-          base::Microseconds(1),
-      /*declined_count=*/1,
-      /*expect_infobar_exists=*/true,
-      /*use_framework_prefs=*/true);
-
-  // If the user has declined the prompt multiple times, the next reprompt
-  // duration should be equal to the reprompt duration.
-
-  TestShouldShowInfoBarPrompt(
-      /*last_declined_time_delta=*/base::Days(kFrameworkRepromptDurationDays),
-      /*declined_count=*/2,
-      /*expect_infobar_exists=*/false,
-      /*use_framework_prefs=*/true);
-  TestShouldShowInfoBarPrompt(
-      /*last_declined_time_delta=*/base::Days(kFrameworkRepromptDurationDays) +
-          base::Microseconds(1),
-      /*declined_count=*/2,
-      /*expect_infobar_exists=*/true,
-      /*use_framework_prefs=*/true);
-
-  TestShouldShowInfoBarPrompt(
-      /*last_declined_time_delta=*/base::Days(kFrameworkRepromptDurationDays),
-      /*declined_count=*/3,
-      /*expect_infobar_exists=*/false,
-      /*use_framework_prefs=*/true);
-  TestShouldShowInfoBarPrompt(
-      /*last_declined_time_delta=*/base::Days(kFrameworkRepromptDurationDays) +
-          base::Microseconds(1),
-      /*declined_count=*/3,
-      /*expect_infobar_exists=*/true,
-      /*use_framework_prefs=*/true);
-}
-
-TEST_F(DefaultBrowserPromptManagerTest, FrameworkPromptSurfaceBecomesInfoBar) {
-  scoped_feature_list_.InitWithFeaturesAndParameters(
-      /*enabled_features=*/{{default_browser::kDefaultBrowserPromptSurfaces,
-                             {{default_browser::
-                                   kDefaultBrowserPromptSurfaceParam.name,
-                               "bubble_dialog"}}}},
-      /*disabled_features=*/{features::kSeparateDefaultAndPinPrompt});
-
-  // When decline count is < 3, the surface should be bubble_dialog, so no
-  // infobar is shown.
-  TestShouldShowInfoBarPrompt(
-      /*last_declined_time_delta=*/base::Days(kFrameworkRepromptDurationDays) +
-          base::Microseconds(1),
-      /*declined_count=*/2,
-      /*expect_infobar_exists=*/false,
-      /*use_framework_prefs=*/true);
-
-  // When decline count is >= 3, the surface should become an infobar.
-  TestShouldShowInfoBarPrompt(
-      /*last_declined_time_delta=*/base::Days(kFrameworkRepromptDurationDays) +
-          base::Microseconds(1),
-      /*declined_count=*/3,
-      /*expect_infobar_exists=*/true,
-      /*use_framework_prefs=*/true);
-}
-#else
 TEST_F(DefaultBrowserPromptManagerTest, PromptSurfacesIgnoredOnNonWin) {
   scoped_feature_list_.InitAndEnableFeatureWithParameters(
       default_browser::kDefaultBrowserPromptSurfaces,
@@ -299,4 +201,3 @@ TEST_F(DefaultBrowserPromptManagerTest, PromptSurfacesIgnoredOnNonWin) {
       /*expect_infobar_exists=*/true,
       /*use_framework_prefs=*/false);
 }
-#endif

@@ -831,11 +831,7 @@ IN_PROC_BROWSER_TEST_F(PermissionsSecurityModelInteractiveUITest,
 }
 
 // Flaky - https://crbug.com/40817826
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_UniversalAccessFromFileUrls UniversalAccessFromFileUrls
-#else
 #define MAYBE_UniversalAccessFromFileUrls DISABLED_UniversalAccessFromFileUrls
-#endif
 IN_PROC_BROWSER_TEST_F(PermissionsSecurityModelInteractiveUITest,
                        MAYBE_UniversalAccessFromFileUrls) {
   ASSERT_TRUE(embedded_test_server()->Start());

@@ -40,26 +40,6 @@
 #include "third_party/crashpad/crashpad/util/misc/tri_state.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <algorithm>
-#include <iterator>
-
-#include "base/strings/utf_string_conversions.h"
-#include "base/win/wrapped_window_proc.h"
-
-namespace {
-
-int __cdecl HandleWinProcException(EXCEPTION_POINTERS* exception_pointers) {
-  crashpad::CrashpadClient::DumpAndCrash(exception_pointers);
-  return EXCEPTION_CONTINUE_SEARCH;
-}
-
-}  // namespace
-
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace enterprise_companion {
 
 namespace {
@@ -86,16 +66,7 @@ std::vector<std::string> MakeCrashHandlerArgs() {
 
   // The first element in the command line arguments is the program name,
   // which must be skipped.
-#if BUILDFLAG(IS_WIN)
-  std::vector<std::string> args;
-  std::ranges::transform(++command_line.argv().begin(),
-                         command_line.argv().end(), std::back_inserter(args),
-                         [](const auto& arg) { return base::WideToUTF8(arg); });
-
-  return args;
-#else
   return {++command_line.argv().begin(), command_line.argv().end()};
-#endif
 }
 
 class CrashClient {
@@ -126,13 +97,6 @@ class CrashClient {
 
     base::debug::SetDumpWithoutCrashingFunction(
         [] { CRASHPAD_SIMULATE_CRASH(); });
-
-#if BUILDFLAG(IS_WIN)
-    // Catch exceptions thrown from a window procedure.
-    base::win::WinProcExceptionFilter exception_filter =
-        base::win::SetWinProcExceptionFilter(&HandleWinProcException);
-    LOG_IF(DFATAL, exception_filter) << "Exception filter already present";
-#endif  // BUILDFLAG(IS_WIN)
 
     std::vector<crashpad::CrashReportDatabase::Report> reports_completed;
     const crashpad::CrashReportDatabase::OperationStatus status_completed =
@@ -267,11 +231,7 @@ int CrashReporterMain() {
   auto argv_as_utf8 = std::make_unique<char*[]>(argv.size() + 1);
   storage.reserve(argv.size());
   for (size_t i = 0; i < argv.size(); ++i) {
-#if BUILDFLAG(IS_WIN)
-    storage.push_back(base::WideToUTF8(argv[i]));
-#else
     storage.push_back(argv[i]);
-#endif
     UNSAFE_TODO(argv_as_utf8[i]) = &storage[i][0];
   }
   UNSAFE_TODO(argv_as_utf8[argv.size()]) = nullptr;

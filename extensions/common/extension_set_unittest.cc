@@ -23,11 +23,7 @@ namespace {
 scoped_refptr<Extension> CreateTestExtension(const std::string& name,
                                              const std::string& launch_url,
                                              const std::string& extent) {
-#if BUILDFLAG(IS_WIN)
-  base::FilePath path(FILE_PATH_LITERAL("c:\\"));
-#else
   base::FilePath path(FILE_PATH_LITERAL("/"));
-#endif
   path = path.AppendASCII(name);
 
   auto manifest = base::DictValue()

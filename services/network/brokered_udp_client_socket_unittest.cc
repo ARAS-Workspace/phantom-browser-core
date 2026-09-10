@@ -32,32 +32,11 @@
 #include "net/base/network_change_notifier.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "services/network/broker_helper_win.h"
-#endif
-
 using net::test::IsError;
 using net::test::IsOk;
 using testing::Not;
 
 namespace network {
-
-#if BUILDFLAG(IS_WIN)
-// A BrokerHelper delegate to manually set whether a socket needs to be
-// brokered. This is necessary to make sure we can test connecting unbrokered
-// sockets on Windows, since otherwise ShouldBroker would return true for
-// localhost addresses.
-class TestBrokerHelperDelegate : public BrokerHelperWin::Delegate {
- public:
-  explicit TestBrokerHelperDelegate(bool should_broker)
-      : should_broker_(should_broker) {}
-
-  bool ShouldBroker() const override { return should_broker_; }
-
- private:
-  bool should_broker_;
-};
-#endif
 
 // This class's only purpose is to return a BrokeredUdpClientSocket instead of a
 // DatagramClientSocket. This is necessary as BrokeredUdpClientSocket has
@@ -215,39 +194,9 @@ TEST_F(BrokeredUdpClientSocketTest, Connect) {
                                  /*port=*/8080);
   int rv = net::OK;
 
-#if BUILDFLAG(IS_WIN)
-  // Pretending we don't need to broker a localhost address to be able to
-  // reliably test connecting synchronously.
-  client_socket_factory_.SetBrokerHelperDelegateForTesting(
-      std::make_unique<TestBrokerHelperDelegate>(false));
-  rv = socket_->Connect(server_address);
-  ASSERT_EQ(rv, net::OK);
-  EXPECT_EQ(net::handles::kInvalidNetworkHandle, socket_->GetBoundNetwork());
-
-  // ConnectUsingNetwork and ConnectUsingDefaultNetwork should return
-  // ERR_NOT_IMPLEMENTED even if brokering is not required on windows.
-  auto socket2 = client_socket_factory_.CreateBrokeredUdpClientSocket(
-      net::DatagramSocket::DEFAULT_BIND, net::NetLog::Get(),
-      net::NetLogSource());
-  rv = socket2->ConnectUsingNetwork(net::handles::kInvalidNetworkHandle,
-                                    server_address);
-  ASSERT_EQ(rv, net::ERR_NOT_IMPLEMENTED);
-  EXPECT_EQ(net::handles::kInvalidNetworkHandle, socket2->GetBoundNetwork());
-
-  auto socket3 = client_socket_factory_.CreateBrokeredUdpClientSocket(
-      net::DatagramSocket::DEFAULT_BIND, net::NetLog::Get(),
-      net::NetLogSource());
-  rv = socket3->ConnectUsingDefaultNetwork(server_address);
-  ASSERT_EQ(rv, net::ERR_NOT_IMPLEMENTED);
-  EXPECT_EQ(net::handles::kInvalidNetworkHandle, socket3->GetBoundNetwork());
-
-  // Clean up the broker helper for remaining tests.
-  client_socket_factory_.SetBrokerHelperDelegateForTesting(nullptr);
-#else
   rv = socket_->Connect(server_address);
   ASSERT_EQ(rv, net::ERR_NOT_IMPLEMENTED);
   EXPECT_EQ(net::handles::kInvalidNetworkHandle, socket_->GetBoundNetwork());
-#endif
 
   // ConnectUsingNetwork and ConnectUsingDefaultNetwork should also return
   // ERR_NOT_IMPLEMENTED on all platforms.
@@ -281,41 +230,11 @@ TEST_F(BrokeredUdpClientSocketTest, SetOptions) {
   EXPECT_EQ(rv, net::OK);
 
   EXPECT_EQ(socket_->get_multicast_interface_for_testing(), uint32_t(1));
-#if (!BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_WIN))
+#if !BUILDFLAG(IS_APPLE)
   EXPECT_TRUE(socket_->get_msg_confirm_for_testing());
 #endif
 #if BUILDFLAG(IS_POSIX)
   EXPECT_TRUE(socket_->get_recv_optimization_for_testing());
-#endif
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(socket_->get_use_non_blocking_io_for_testing());
-
-  // Set up a new socket to check that options are set correctly when sockets
-  // don't need to be brokered on win. Force the non-brokered path via the
-  // delegate, since `IPv4AllZeros()` is not publicly routable and would
-  // otherwise be brokered by `BrokerHelperWin::ShouldBroker` (see
-  // crbug.com/466139402).
-  client_socket_factory_.SetBrokerHelperDelegateForTesting(
-      std::make_unique<TestBrokerHelperDelegate>(false));
-  auto new_socket = client_socket_factory_.CreateBrokeredUdpClientSocket(
-      net::DatagramSocket::DEFAULT_BIND, net::NetLog::Get(),
-      net::NetLogSource());
-
-  net::TestCompletionCallback callback2;
-  net::IPEndPoint server_address2(net::IPAddress::IPv4AllZeros(),
-                                  /*port=*/8080);
-  EXPECT_THAT(new_socket->SetMulticastInterface(1), IsOk());
-  new_socket->UseNonBlockingIO();
-  rv = new_socket->ConnectAsync(server_address2, callback2.callback());
-
-  // `new_socket` shouldn't successfully connect since the address is invalid,
-  // but the options should still be set.
-  EXPECT_EQ(rv, net::ERR_ADDRESS_INVALID);
-  EXPECT_EQ(new_socket->get_multicast_interface_for_testing(), uint32_t(1));
-  EXPECT_TRUE(new_socket->get_use_non_blocking_io_for_testing());
-
-  // Clean up the broker helper for remaining tests.
-  client_socket_factory_.SetBrokerHelperDelegateForTesting(nullptr);
 #endif
 }
 

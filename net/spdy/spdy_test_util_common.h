@@ -215,11 +215,11 @@ struct SpdySessionDependencies {
   bool enable_early_data = false;
   bool key_auth_cache_server_entries_by_network_anonymization_key = false;
   bool enable_priority_update = false;
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
   bool go_away_on_ip_change = true;
 #else
   bool go_away_on_ip_change = false;
-#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
   bool ignore_ip_address_changes = false;
 };
 

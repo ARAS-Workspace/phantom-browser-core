@@ -731,8 +731,7 @@ TEST_F(AutofillWalletSyncBridgeTest,
 // Test that PaymentInstrumentCreationOption data is correctly returned from
 // GetAllLocalData(). This is separated from the overall tests due to the
 // buildflag dependencies.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 TEST_F(AutofillWalletSyncBridgeTest,
        GetAllDataForDebugging_ShouldReturnPaymentInstrumentCreationOptionData) {
   sync_pb::PaymentInstrumentCreationOption creation_option =
@@ -754,8 +753,7 @@ TEST_F(AutofillWalletSyncBridgeTest,
   EXPECT_THAT(GetAllLocalData(),
               UnorderedElementsAre(EqualsSpecifics(creation_option_specifics)));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 // Tests that when a new wallet card is sent by the server, the client only
 // keeps the new data.
@@ -986,8 +984,7 @@ TEST_F(AutofillWalletSyncBridgeTest, MergeFullSyncData_NewCloudTokenData) {
                            EqualsSpecifics(cloud_token_data_specifics2)));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Tests that when a new payment instrument creation options are sent by the
 // server, the client only keeps the new data.
 TEST_F(AutofillWalletSyncBridgeTest,
@@ -1016,8 +1013,7 @@ TEST_F(AutofillWalletSyncBridgeTest,
   EXPECT_THAT(GetAllLocalData(),
               UnorderedElementsAre(EqualsSpecifics(creation_option_specifics)));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 // Tests that when the server sends no cards, the client should delete all it's
 // existing data.
@@ -1076,8 +1072,7 @@ TEST_F(AutofillWalletSyncBridgeTest, MergeFullSyncData_NoCloudTokenData) {
   EXPECT_TRUE(GetAllLocalData().empty());
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Tests that when the server sends no payment instrument creation options, the
 // client should delete all it's existing data.
 TEST_F(AutofillWalletSyncBridgeTest,
@@ -1095,8 +1090,7 @@ TEST_F(AutofillWalletSyncBridgeTest,
   // The payment instrument creation options should be deleted.
   EXPECT_TRUE(GetAllLocalData().empty());
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 // Tests that when the server sends the same data as the client has, nothing
 // changes on the client.
@@ -1287,8 +1281,7 @@ TEST_F(AutofillWalletSyncBridgeTest, MergeFullSyncData_SetsNewMaskedIban) {
   EXPECT_THAT(iban_vector, UnorderedElementsAre(testing::Pointee(server_iban)));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Test that all field values for a payment instrument creation option sent from
 // the server are copied on the payment instrument creation option on the
 // client.
@@ -1308,8 +1301,7 @@ TEST_F(AutofillWalletSyncBridgeTest,
   EXPECT_THAT(GetAllLocalData(),
               UnorderedElementsAre(EqualsProto(creation_option_specifics)));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 // Tests that when there are existing IBANs, the data from the server is what
 // the client ends up with.
@@ -1423,8 +1415,7 @@ TEST_F(AutofillWalletSyncBridgeTest, ApplyDisableSyncChanges_Ibans) {
   EXPECT_TRUE(GetAllLocalData().empty());
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 TEST_F(AutofillWalletSyncBridgeTest,
        ApplyDisableSyncChanges_PaymentInstrumentCreationOptions) {
   // Create a payment instrument creation option on the client.
@@ -1450,8 +1441,7 @@ TEST_F(AutofillWalletSyncBridgeTest,
 
   EXPECT_TRUE(GetAllLocalData().empty());
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 // This test ensures that an int64 -> int conversion bug we encountered is
 // fixed.

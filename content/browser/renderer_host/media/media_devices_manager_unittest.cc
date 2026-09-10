@@ -506,7 +506,7 @@ class MediaDevicesManagerTest : public ::testing::Test {
     return media_devices_manager_->audio_device_origin_map_;
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   void InitVideoCaptureDevicesChangedObserver() {
     media_devices_manager_->video_capture_service_device_changed_observer_ =
         std::make_unique<
@@ -526,7 +526,7 @@ class MediaDevicesManagerTest : public ::testing::Test {
   }
 
   base::test::ScopedFeatureList scoped_feature_list_;
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
   // Must outlive MediaDevicesManager as ~MediaDevicesManager() verifies it's
   // running on the IO thread.
@@ -1305,89 +1305,12 @@ TEST_F(MediaDevicesManagerTest, EnumerateDevicesUnplugDefaultDevice) {
 TEST_F(MediaDevicesManagerTest, EnumerateDevicesUnplugCommunicationsDevice) {
   // This test has only significance on Windows devices, since communication
   // devices can only be found on windows.
-#if BUILDFLAG(IS_WIN)
-  std::string communications_device_id("fake_device_id_1");
-  std::string new_communications_device_id("fake_device_id_2");
-
-  EXPECT_EQ(removed_device_ids_.size(), 0u);
-
-  EXPECT_CALL(*audio_manager_, MockGetAudioInputDeviceNames(_)).Times(2);
-  EXPECT_CALL(*video_capture_device_factory_, MockGetDevicesInfo()).Times(0);
-  EXPECT_CALL(*audio_manager_, MockGetAudioOutputDeviceNames(_)).Times(0);
-  EXPECT_CALL(*this, MockCallback(_)).Times(2);
-  EXPECT_CALL(media_devices_manager_client_, InputDevicesChangedUI(_, _))
-      .Times(2);
-  // Since we will be removing the communications device, we expect that we will
-  // remove both the actual device as well as the old instance of the device
-  // with 'communications' ID.
-  blink::WebMediaDeviceInfo removed_devices;
-  EXPECT_CALL(media_devices_manager_client_, StopRemovedInputDevice(_, _))
-      .Times(2)
-      .WillRepeatedly(
-          Invoke(this, &MediaDevicesManagerTest::TrackRemovedDevice));
-
-  // Setup the configuration and run the devices.
-  audio_manager_->SetCommunicationsDeviceToId(communications_device_id);
-  RunEnumerateDevices();
-
-  // Unplug the default device and switch default to a different device.
-  audio_manager_->RemoveInputAudioDeviceById(communications_device_id);
-  audio_manager_->SetCommunicationsDeviceToId(new_communications_device_id);
-  RunEnumerateDevices();
-
-  EXPECT_EQ(removed_device_ids_.size(), 2u);
-  EXPECT_TRUE(removed_device_ids_.contains(communications_device_id));
-  EXPECT_TRUE(removed_device_ids_.contains(
-      media::AudioDeviceDescription::kCommunicationsDeviceId));
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 TEST_F(MediaDevicesManagerTest,
        EnumerateDevicesUnplugDefaultAndCommunicationsDevice) {
   // This test has only significance on Windows devices, since communication
   // devices can only be found on windows.
-#if BUILDFLAG(IS_WIN)
-  // The two device IDs that will be used as 'default' and 'communications'
-  // devices.
-  std::string target_device_id("fake_device_id_1");
-  std::string new_target_device_id("fake_device_id_2");
-
-  EXPECT_EQ(removed_device_ids_.size(), 0u);
-
-  EXPECT_CALL(*audio_manager_, MockGetAudioInputDeviceNames(_)).Times(2);
-  EXPECT_CALL(*video_capture_device_factory_, MockGetDevicesInfo()).Times(0);
-  EXPECT_CALL(*audio_manager_, MockGetAudioOutputDeviceNames(_)).Times(0);
-  EXPECT_CALL(*this, MockCallback(_)).Times(2);
-  EXPECT_CALL(media_devices_manager_client_, InputDevicesChangedUI(_, _))
-      .Times(2);
-  // Since we will be removing the device identified as 'default' and
-  // 'communications, we expect that we will
-  // remove the actual device as well as the old instances of the device
-  // with 'communications' and 'default' IDs.
-  blink::WebMediaDeviceInfo removed_devices;
-  EXPECT_CALL(media_devices_manager_client_, StopRemovedInputDevice(_, _))
-      .Times(3)
-      .WillRepeatedly(
-          Invoke(this, &MediaDevicesManagerTest::TrackRemovedDevice));
-
-  // Setup the configuration and run the devices.
-  audio_manager_->SetDefaultDeviceToId(target_device_id);
-  audio_manager_->SetCommunicationsDeviceToId(target_device_id);
-  RunEnumerateDevices();
-
-  // Unplug the default device and switch default to a different device.
-  audio_manager_->RemoveInputAudioDeviceById(target_device_id);
-  audio_manager_->SetDefaultDeviceToId(new_target_device_id);
-  audio_manager_->SetCommunicationsDeviceToId(new_target_device_id);
-  RunEnumerateDevices();
-
-  EXPECT_EQ(removed_device_ids_.size(), 3u);
-  EXPECT_TRUE(removed_device_ids_.contains(target_device_id));
-  EXPECT_TRUE(removed_device_ids_.contains(
-      media::AudioDeviceDescription::kDefaultDeviceId));
-  EXPECT_TRUE(removed_device_ids_.contains(
-      media::AudioDeviceDescription::kCommunicationsDeviceId));
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 TEST_F(MediaDevicesManagerTest, GuessVideoGroupID) {
@@ -1757,7 +1680,7 @@ TEST_F(MediaDevicesManagerTest, AddAudioDeviceToOriginMap) {
   EXPECT_EQ(it->second.begin()->device_id, "test_device_id");
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 TEST_F(MediaDevicesManagerTest, VideoSourceProviderTimer) {
   InitVideoCaptureDevicesChangedObserver();
 
@@ -1931,6 +1854,6 @@ TEST_F(MediaDevicesManagerTest, StopMonitoringReleaseVideoChangedObserver) {
   EXPECT_FALSE(IsVideoCaptureServiceDeviceChangedObserverInitialized());
   EXPECT_FALSE(IsDisconnectVideoSourceProviderTimerRunning());
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace content

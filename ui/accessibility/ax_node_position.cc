@@ -17,11 +17,11 @@ namespace ui {
 // i.e., it appears to be empty to assistive software, we need to treat it as a
 // character and a word boundary.
 AXEmbeddedObjectBehavior g_ax_embedded_object_behavior =
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#if BUILDFLAG(USE_ATK)
     AXEmbeddedObjectBehavior::kExposeCharacterForHypertext;
 #else
     AXEmbeddedObjectBehavior::kSuppressCharacter;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#endif  // BUILDFLAG(USE_ATK)
 
 ScopedAXEmbeddedObjectBehaviorSetter::ScopedAXEmbeddedObjectBehaviorSetter(
     AXEmbeddedObjectBehavior behavior) {

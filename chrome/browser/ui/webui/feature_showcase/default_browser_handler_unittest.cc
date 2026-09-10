@@ -33,20 +33,11 @@ class FeatureShowcaseDefaultBrowserHandlerTest : public testing::Test {
 
   void CreateHandlerForTesting(
       base::OnceClosure on_set_as_default
-#if BUILDFLAG(IS_WIN)
-      ,
-      DefaultBrowserHandler::PinToTaskbarCallbackForTesting on_pin =
-          base::NullCallback()
-#endif
   ) {
     handler_remote_.reset();
     handler_ = std::make_unique<DefaultBrowserHandler>(
         handler_remote_.BindNewPipeAndPassReceiver(),
         std::move(on_set_as_default)
-#if BUILDFLAG(IS_WIN)
-            ,
-        std::move(on_pin)
-#endif
     );
   }
 
@@ -102,22 +93,3 @@ TEST_F(FeatureShowcaseDefaultBrowserHandlerTest,
 
   histogram_tester.ExpectTotalCount("DefaultBrowser.SetDefaultResult2", 1);
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(FeatureShowcaseDefaultBrowserHandlerTest,
-       SetAsDefaultBrowserWithCanPin) {
-  base::HistogramTester histogram_tester;
-  shell_integration::DefaultBrowserWorker::DisableSetAsDefaultForTesting();
-
-  base::RunLoop run_loop;
-  CreateHandlerForTesting(base::NullCallback(),
-                          base::IgnoreArgs<bool>(run_loop.QuitClosure()));
-
-  handler_->SetCanPin(true);
-  handler_remote_->SetAsDefaultBrowser();
-  handler_remote_.FlushForTesting();
-  run_loop.Run();
-
-  histogram_tester.ExpectTotalCount("Windows.TaskbarPinResult", 1);
-}
-#endif

@@ -1094,10 +1094,8 @@ void PartitionAllocSupport::ReconfigureAfterZygoteFork(
 void PartitionAllocSupport::ReconfigureAfterFeatureListInit(
     std::string_view process_type,
     FeatureListConfiguration config) {
-#if !BUILDFLAG(IS_WIN)
   // TODO(mikt): Fix failure on `DelayloadsTest.ChromeElfDllLoadSanityTest`.
   CHECK(process_type == GetProcessType());
-#endif  // !BUILDFLAG(IS_WIN)
 
   // In Death Tests, `FeatureList` is never initialized. Even in these cases
   // we call this method to finalize the allocator configuration.
@@ -1370,15 +1368,6 @@ void PartitionAllocSupport::ReconfigureAfterFeatureListInit(
   }
 #endif  // PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
 
-#if BUILDFLAG(IS_WIN)
-  // Browser process only, since this is the one we want to prevent from
-  // crashing the most (as it takes down all the tabs).
-  if (process_type.empty() &&
-      base::FeatureList::IsEnabled(
-          base::features::kPageAllocatorRetryOnCommitFailure)) {
-    partition_alloc::SetRetryOnCommitFailure(true);
-  }
-#endif
 }
 
 void PartitionAllocSupport::ReconfigureAfterTaskRunnerInit(

@@ -3977,12 +3977,7 @@ TEST_F(MenuControllerTest, ContextMenuShownOnShiftF10Key) {
   // delegate.
   DispatchKeyWithFlags(ui::VKEY_F10, false, true, false, false);
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(1, menu_delegate()->show_context_menu_count());
-  EXPECT_EQ(pending_state_item(), menu_delegate()->show_context_menu_source());
-#else
   EXPECT_EQ(0, menu_delegate()->show_context_menu_count());
-#endif
 }
 
 // Test that the active descendant on the SubmenuView is updated to the

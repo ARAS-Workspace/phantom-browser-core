@@ -58,7 +58,8 @@
 #include "base/process/port_provider_mac.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(IS_APPLE)
 #define ENABLE_CPU_TESTS 1
 #else
 #define ENABLE_CPU_TESTS 0
@@ -730,14 +731,9 @@ TEST_F(SystemMetricsTest, MeasureChildCpuUsage) {
 
   ASSERT_TRUE(child_launcher.TerminateChildProcess());
 
-#if BUILDFLAG(IS_WIN)
-  // Windows and Fuchsia return final measurements of a process after it exits.
-  TestCumulativeCPU(metrics.get(), cpu_usage2);
-#else
   // All other platforms return an error.
   EXPECT_THAT(metrics->GetCumulativeCPUUsage(), ErrorIs(_));
   EXPECT_THAT(metrics->GetPlatformIndependentCPUUsage(), ErrorIs(_));
-#endif
 }
 
 #endif  // !BUILDFLAG(IS_APPLE)
@@ -776,9 +772,6 @@ TEST_F(SystemMetricsTest, TestValidMemoryInfo) {
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
         // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_GT(memory_info->private_bytes, 0U);
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 #if BUILDFLAG(IS_CHROMEOS)
@@ -818,19 +811,15 @@ TEST_F(SystemMetricsTest, ParseZramStat) {
 }
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
+    BUILDFLAG(IS_ANDROID)
 TEST(SystemMetrics2Test, GetSystemMemoryInfo) {
   SystemMemoryInfo info;
   EXPECT_TRUE(GetSystemMemoryInfo(&info));
 
   // Ensure each field received a value.
   EXPECT_GT(info.total, ByteSize(0));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_GT(info.avail_phys, ByteSize(0));
-#else
   EXPECT_GT(info.free, ByteSize(0));
-#endif
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   EXPECT_GT(info.buffers, ByteSize(0));
   EXPECT_GT(info.cached, ByteSize(0));
@@ -840,7 +829,7 @@ TEST(SystemMetrics2Test, GetSystemMemoryInfo) {
         // BUILDFLAG(IS_ANDROID)
 
   // All the values should be less than the total amount of memory.
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_IOS)
   // TODO(crbug.com/40515565): re-enable the following assertion on iOS.
   EXPECT_LT(info.free, info.total);
 #endif
@@ -864,8 +853,8 @@ TEST(SystemMetrics2Test, GetSystemMemoryInfo) {
   EXPECT_LT(info.shmem, info.total);
 #endif
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+        // || BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 TEST(ProcessMetricsTest, ParseProcStatCPU) {

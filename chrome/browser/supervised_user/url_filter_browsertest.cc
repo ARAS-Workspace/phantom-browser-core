@@ -48,12 +48,12 @@ class UrlFilterUiTest
       : InteractiveFamilyLiveTest(
             GetParam(),
             /*extra_enabled_hosts=*/{"example.com", "bestgore.com"}) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     scoped_feature_list_.InitWithFeatures(
         /*enabled_features=*/
         {supervised_user::kLocalWebApprovals},
         /*disabled_features=*/{});
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   }
 
  protected:
@@ -360,7 +360,7 @@ IN_PROC_BROWSER_TEST_P(UrlFilterUiTest,
       WaitForStateChange(kChildElementId, PageWithMatchingTitle("Best Gore")));
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_P(UrlFilterUiTest, DesktopLocalWebApprovalGranted) {
   DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kChildElementId);
   DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kPacpViewElementId);
@@ -552,7 +552,7 @@ IN_PROC_BROWSER_TEST_P(UrlFilterUiTest,
       EnsureNotPresent(kChildSignInElementId), Log("The sign-in tab is closed"),
       Log("Test sequence finished"));
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 INSTANTIATE_TEST_SUITE_P(
     ,

@@ -40,16 +40,12 @@ void WebTestTracingController::StartTracing() {
   // tracing session initializer for incremental writes. For windows, the
   // tracing session will buffer all data in memory and we write out the
   // complete trace file only when tracing stops.
-#if BUILDFLAG(IS_WIN)
-  tracing_session_->Setup(trace_config);
-#else
   {
     base::ScopedAllowBlockingForTesting allow_blocking;
     tracing_file_.Initialize(trace_file_path_, base::File::FLAG_CREATE_ALWAYS |
                                                    base::File::FLAG_WRITE);
   }
   tracing_session_->Setup(trace_config, tracing_file_.GetPlatformFile());
-#endif
   scoped_refptr<base::SequencedTaskRunner> task_runner(
       base::SingleThreadTaskRunner::GetCurrentDefault());
   // `this` can be bound because this object is freed only after a call to
@@ -97,31 +93,7 @@ void WebTestTracingController::StopTracing() {
 }
 
 void WebTestTracingController::OnTracingStopped() {
-#if BUILDFLAG(IS_WIN)
-  tracing_is_stopping_ = true;
-  {
-    base::ScopedAllowBlockingForTesting allow_blocking;
-    tracing_file_.Initialize(trace_file_path_, base::File::FLAG_CREATE_ALWAYS |
-                                                   base::File::FLAG_WRITE);
-  }
-  // `this` can be bound because this object is freed only after a call to
-  // this->StopTracing(), that method cannot return before TracingFinished()
-  // has run, and this binding can't run after TracingFinished().
-  tracing_session_->ReadTrace(
-      [this](perfetto::TracingSession::ReadTraceCallbackArgs args) {
-        CHECK(tracing_file_.IsValid());
-        if (args.size > 0) {
-          // SAFETY: Data and size are valid per perfetto's preconditions.
-          UNSAFE_BUFFERS(base::span<const char> data(args.data, args.size));
-          tracing_file_.WriteAtCurrentPos(base::as_bytes(data));
-        }
-        if (!args.has_more) {
-          TracingFinished();
-        }
-      });
-#else
   TracingFinished();
-#endif
 }
 
 void WebTestTracingController::TracingFinished() {

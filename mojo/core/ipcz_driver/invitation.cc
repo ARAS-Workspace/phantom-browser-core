@@ -22,12 +22,6 @@
 #include "mojo/public/cpp/platform/platform_channel_server_endpoint.h"
 #include "mojo/public/cpp/platform/platform_handle.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/process/process_info.h"
-#endif
-
 namespace mojo::core::ipcz_driver {
 
 namespace {
@@ -103,52 +97,6 @@ IpczDriverHandle CreateTransportForMojoEndpoint(
   transport->set_is_trusted_by_peer(options.is_trusted_by_peer);
   return ObjectBase::ReleaseAsHandle(std::move(transport));
 }
-
-#if BUILDFLAG(IS_WIN)
-// Helper function on Windows platform to open the remote server/client process
-// given a handle to a connected named pipe. It may return an invalid process
-// object if either the handle does not refer to a named pipe or the handle
-// refers to a named pipe that is not connected.
-base::Process OpenRemoteProcess(
-    const MojoInvitationTransportEndpoint& endpoint) {
-  // Extract the handle to the connected named pipe from mojo invitation
-  // transport endpoint.
-  HANDLE handle =
-      LongToHandle(static_cast<long>(endpoint.platform_handles[0].value));
-
-  base::ProcessId client_pid = 0;
-  base::ProcessId server_pid = 0;
-  base::ProcessId current_pid = base::GetCurrentProcId();
-
-  if (!GetNamedPipeClientProcessId(handle, &client_pid)) {
-    PLOG(ERROR) << "GetNamedPipeClientProcessId failed";
-    return base::Process();
-  }
-  if (!GetNamedPipeServerProcessId(handle, &server_pid)) {
-    PLOG(ERROR) << "GetNamedPipeServerProcessId failed";
-    return base::Process();
-  }
-
-  // The remote PID is whichever one isn't us.
-  base::ProcessId remote_pid =
-      (client_pid == current_pid) ? server_pid : client_pid;
-
-  if (remote_pid == 0 || remote_pid == current_pid) {
-    DLOG(ERROR) << "Could not identify remote process ID.";
-    return base::Process();
-  }
-
-  // Try to open the remote process.
-  base::Process remote_process =
-      base::Process::OpenWithAccess(remote_pid, PROCESS_DUP_HANDLE);
-  if (!remote_process.IsValid()) {
-    DVLOG(2) << "Remote process is invalid";
-    return base::Process();
-  }
-
-  return remote_process;
-}
-#endif
 
 }  // namespace
 
@@ -272,31 +220,11 @@ MojoResult Invitation::Send(
   // (e.g. a Chrome renderer) and should be subject to additional constraints
   // regarding what types of objects can be transferred to it.
   Transport::ProcessTrust remote_process_trust{};
-#if BUILDFLAG(IS_WIN)
-  if (options &&
-      (options->flags & MOJO_SEND_INVITATION_FLAG_UNTRUSTED_PROCESS) != 0) {
-    remote_process_trust = Transport::ProcessTrust::kUntrusted;
-  } else {
-    remote_process_trust = Transport::ProcessTrust::kTrusted;
-  }
-#endif
 
   const bool is_peer_elevated =
       options && (options->flags & MOJO_SEND_INVITATION_FLAG_ELEVATED);
-#if !BUILDFLAG(IS_WIN)
   // For now, the concept of an elevated process is only meaningful on Windows.
   CHECK(!is_peer_elevated);
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  // On Windows, if `remote_process` is invalid when sending invitation, that
-  // usually means the required remote process is not set in advance by sender,
-  // in such case, rely on the connected named pipe to get the remote process
-  // id, then open and set the remote process.
-  if (!remote_process.IsValid()) {
-    remote_process = OpenRemoteProcess(*transport_endpoint);
-  }
-#endif
 
   IpczDriverHandle transport = CreateTransportForMojoEndpoint(
       {.source = config.is_broker ? Transport::kBroker : Transport::kNonBroker,
@@ -390,10 +318,8 @@ MojoHandle Invitation::Accept(
 
   const bool is_elevated =
       options && (options->flags & MOJO_ACCEPT_INVITATION_FLAG_ELEVATED) != 0;
-#if !BUILDFLAG(IS_WIN)
   // For now, the concept of an elevated process is only meaningful on Windows.
   DCHECK(!is_elevated);
-#endif
 
   // When accepting an invitation, we ConnectNode() with the maximum possible
   // number of initial portals: unlike ipcz, Mojo APIs have no way for this end
@@ -426,11 +352,6 @@ MojoHandle Invitation::Accept(
   // own process. This is required to support transmission of arbitrary Windows
   // handles to and from the elevated process.
   base::Process remote_process;
-#if BUILDFLAG(IS_WIN)
-  if (is_elevated) {
-    remote_process = OpenRemoteProcess(*transport_endpoint);
-  }
-#endif
   if (remote_process.IsValid()) {
     Transport::FromHandle(transport)->set_remote_process(
         std::move(remote_process));

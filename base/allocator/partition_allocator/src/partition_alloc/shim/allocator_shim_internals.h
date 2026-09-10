@@ -47,11 +47,6 @@
 // impression that they can hook the allocator.
 #define SHIM_ALWAYS_EXPORT __attribute__((used, visibility("default"), noinline))
 
-#elif PA_BUILDFLAG(IS_WIN)  // __GNUC__
-
-#define __THROW
-#define SHIM_ALWAYS_EXPORT __declspec(noinline) __attribute__((used))
-
 #endif  // __GNUC__
 
 #endif  // PARTITION_ALLOC_SHIM_ALLOCATOR_SHIM_INTERNALS_H_

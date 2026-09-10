@@ -169,16 +169,6 @@
 #include "ash/webui/grit/ash_webui_common_resources.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <combaseapi.h>
-#include <wrl/client.h>
-
-#include "base/win/scoped_safearray.h"
-#include "base/win/scoped_variant.h"
-
-#include <uiautomation.h>
-#endif
-
 #if defined(USE_AURA)
 #include "content/browser/renderer_host/delegated_frame_host.h"
 #include "content/browser/renderer_host/render_widget_host_view_aura.h"
@@ -2550,63 +2540,6 @@ ui::AXPlatformNodeDelegate* FindAccessibilityNodeInSubtree(
   }
   return nullptr;
 }
-
-#if BUILDFLAG(IS_WIN)
-template <typename T>
-Microsoft::WRL::ComPtr<T> QueryInterfaceFromNode(
-    ui::AXPlatformNodeDelegate* node) {
-  Microsoft::WRL::ComPtr<T> result;
-  EXPECT_HRESULT_SUCCEEDED(
-      node->GetNativeViewAccessible()->QueryInterface(__uuidof(T), &result));
-  return result;
-}
-
-void UiaGetPropertyValueVtArrayVtUnknownValidate(
-    PROPERTYID property_id,
-    ui::AXPlatformNodeDelegate* target_node,
-    const std::vector<std::string>& expected_names) {
-  ASSERT_TRUE(target_node);
-
-  base::win::ScopedVariant result_variant;
-  Microsoft::WRL::ComPtr<IRawElementProviderSimple> node_provider =
-      QueryInterfaceFromNode<IRawElementProviderSimple>(target_node);
-
-  node_provider->GetPropertyValue(property_id, result_variant.Receive());
-  ASSERT_EQ(VT_ARRAY | VT_UNKNOWN, result_variant.type());
-  ASSERT_EQ(1u, SafeArrayGetDim(V_ARRAY(result_variant.ptr())));
-
-  LONG lower_bound, upper_bound, size;
-  ASSERT_HRESULT_SUCCEEDED(
-      SafeArrayGetLBound(V_ARRAY(result_variant.ptr()), 1, &lower_bound));
-  ASSERT_HRESULT_SUCCEEDED(
-      SafeArrayGetUBound(V_ARRAY(result_variant.ptr()), 1, &upper_bound));
-  size = upper_bound - lower_bound + 1;
-  ASSERT_EQ(static_cast<LONG>(expected_names.size()), size);
-
-  std::vector<std::string> names;
-  for (LONG i = 0; i < size; ++i) {
-    Microsoft::WRL::ComPtr<IUnknown> unknown_element;
-    ASSERT_HRESULT_SUCCEEDED(
-        SafeArrayGetElement(V_ARRAY(result_variant.ptr()), &i,
-                            static_cast<void**>(&unknown_element)));
-    ASSERT_NE(nullptr, unknown_element);
-
-    Microsoft::WRL::ComPtr<IRawElementProviderSimple>
-        raw_element_provider_simple;
-    ASSERT_HRESULT_SUCCEEDED(unknown_element.As(&raw_element_provider_simple));
-    ASSERT_NE(nullptr, raw_element_provider_simple);
-
-    base::win::ScopedVariant name;
-    ASSERT_HRESULT_SUCCEEDED(raw_element_provider_simple->GetPropertyValue(
-        UIA_NamePropertyId, name.Receive()));
-    ASSERT_EQ(VT_BSTR, name.type());
-    names.push_back(base::WideToUTF8(
-        std::wstring(V_BSTR(name.ptr()), SysStringLen(V_BSTR(name.ptr())))));
-  }
-
-  ASSERT_THAT(names, ::testing::UnorderedElementsAreArray(expected_names));
-}
-#endif
 
 RenderWidgetHost* GetKeyboardLockWidget(WebContents* web_contents) {
   return static_cast<WebContentsImpl*>(web_contents)->GetKeyboardLockWidget();

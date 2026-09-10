@@ -131,9 +131,9 @@
 #include "services/network/test/test_network_connection_tracker.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "components/device_signals/core/browser/mock_user_permission_service.h"  // nogncheck
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 using testing::_;
 using testing::AnyNumber;
@@ -263,13 +263,13 @@ class TestManagementUIHandler : public ManagementUIHandlerBase {
 
   base::ListValue GetReportingInfo(bool can_collect_signals = true,
                                    bool is_browser = true) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     EXPECT_CALL(mock_user_permission_service_, CanCollectSignals())
         .WillOnce(
             Return((can_collect_signals)
                        ? device_signals::UserPermission::kGranted
                        : device_signals::UserPermission::kMissingConsent));
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     base::ListValue report_sources;
     if (is_browser) {
       AddBrowserReportingInfo(&report_sources);
@@ -289,11 +289,11 @@ class TestManagementUIHandler : public ManagementUIHandlerBase {
 
   policy::PolicyService* GetPolicyService() override { return policy_service_; }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   device_signals::UserPermissionService* GetUserPermissionService() override {
     return &mock_user_permission_service_;
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_CHROMEOS)
   std::u16string GetFilesUploadToCloudInfo(Profile* profile) {
@@ -325,9 +325,9 @@ class TestManagementUIHandler : public ManagementUIHandlerBase {
   raw_ptr<policy::PolicyService> policy_service_ = nullptr;
   bool update_required_eol_ = false;
   std::string device_domain = "devicedomain.com";
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   device_signals::MockUserPermissionService mock_user_permission_service_;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #if BUILDFLAG(IS_CHROMEOS)
   std::unique_ptr<ash::SecureDnsManager> secure_dns_manager_;
 #endif  // BUILDFLAG(IS_CHROMEOS)
@@ -1717,9 +1717,9 @@ TEST_F(ManagementUIHandlerTests, CloudReportingPolicy) {
 #if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
   expected_messages.insert(kManagementExtensionReportVisitedUrl);
 #endif
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   expected_messages.insert(kManagementDeviceSignalsDisclosure);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   policy::SetDMTokenForTesting(policy::DMToken::CreateValidToken("fake-token"));
   ASSERT_PRED_FORMAT2(MessagesToBeEQ, handler_.GetReportingInfo(),
@@ -1751,7 +1751,7 @@ TEST_F(ManagementUIHandlerTests, CloudProfileReportingPolicy) {
                       expected_messages);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_F(ManagementUIHandlerTests,
        CloudReportingPolicyWithoutDeviceSignalsConsent) {
   ResetTestConfig();
@@ -1780,7 +1780,7 @@ TEST_F(ManagementUIHandlerTests,
                       handler_.GetReportingInfo(/*can_collect_signals=*/false),
                       expected_messages);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 TEST_F(ManagementUIHandlerTests, LegacyTechReport) {
   ResetTestConfig();
@@ -1796,9 +1796,9 @@ TEST_F(ManagementUIHandlerTests, LegacyTechReport) {
       std::make_unique<base::Value>(std::move(allowlist)));
 
   std::set<std::string> expected_messages = {kManagementLegacyTechReport};
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   expected_messages.insert(kManagementDeviceSignalsDisclosure);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   ASSERT_PRED_FORMAT2(MessagesToBeEQ, handler_.GetReportingInfo(),
                       expected_messages);
@@ -2071,7 +2071,7 @@ TEST_F(ManagementUIHandlerTests, GetFilesUploadToCloud) {
 }
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_F(ManagementUIHandlerTests, SaasReportingBrowserPolicyEnabled) {
   ResetTestConfig(false);
   GetTestConfig().saas_reporting_browser_enabled = true;
@@ -2093,4 +2093,4 @@ TEST_F(ManagementUIHandlerTests, SaasReportingProfilePolicyEnabled) {
   EXPECT_TRUE(MessagesToBeEQ("browser_reports", "expected", reports,
                              {kManagementExtensionReportVisitedUrl}));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

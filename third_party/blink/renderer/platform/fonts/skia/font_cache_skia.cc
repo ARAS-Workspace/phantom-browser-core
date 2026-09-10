@@ -95,7 +95,7 @@ const FontPlatformData* CreateFontPlatformDataForTypeface(
 }
 }  // namespace
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
 // static
 const FontPlatformData* FontCache::CreateFontPlatformDataForCharacter(
     SkFontMgr* fm,
@@ -170,63 +170,8 @@ const SimpleFontData* FontCache::GetLastResortFallbackFont(
                                              AlternateFontName::kLastResort);
     ++last_resort_fallback_attempt;
   }
-#if BUILDFLAG(IS_WIN)
-  // Try some more Windows-specific fallbacks.
-  if (!font_platform_data) {
-    DEFINE_THREAD_SAFE_STATIC_LOCAL(const FontFaceCreationParams,
-                                    msuigothic_creation_params,
-                                    (font_family_names::kMSUIGothic));
-    font_platform_data =
-        GetFontPlatformData(description, msuigothic_creation_params,
-                            AlternateFontName::kLastResort);
-    ++last_resort_fallback_attempt;
-  }
-  if (!font_platform_data) {
-    DEFINE_THREAD_SAFE_STATIC_LOCAL(const FontFaceCreationParams,
-                                    mssansserif_creation_params,
-                                    (font_family_names::kMicrosoftSansSerif));
-    font_platform_data =
-        GetFontPlatformData(description, mssansserif_creation_params,
-                            AlternateFontName::kLastResort);
-    ++last_resort_fallback_attempt;
-  }
-  if (!font_platform_data) {
-    DEFINE_THREAD_SAFE_STATIC_LOCAL(const FontFaceCreationParams,
-                                    segoeui_creation_params,
-                                    (font_family_names::kSegoeUI));
-    font_platform_data = GetFontPlatformData(
-        description, segoeui_creation_params, AlternateFontName::kLastResort);
-    ++last_resort_fallback_attempt;
-  }
-  if (!font_platform_data) {
-    DEFINE_THREAD_SAFE_STATIC_LOCAL(const FontFaceCreationParams,
-                                    calibri_creation_params,
-                                    (font_family_names::kCalibri));
-    font_platform_data = GetFontPlatformData(
-        description, calibri_creation_params, AlternateFontName::kLastResort);
-    ++last_resort_fallback_attempt;
-  }
-  if (!font_platform_data) {
-    DEFINE_THREAD_SAFE_STATIC_LOCAL(const FontFaceCreationParams,
-                                    timesnewroman_creation_params,
-                                    (font_family_names::kTimesNewRoman));
-    font_platform_data =
-        GetFontPlatformData(description, timesnewroman_creation_params,
-                            AlternateFontName::kLastResort);
-    ++last_resort_fallback_attempt;
-  }
-  if (!font_platform_data) {
-    DEFINE_THREAD_SAFE_STATIC_LOCAL(const FontFaceCreationParams,
-                                    couriernew_creation_params,
-                                    (font_family_names::kCourierNew));
-    font_platform_data =
-        GetFontPlatformData(description, couriernew_creation_params,
-                            AlternateFontName::kLastResort);
-    ++last_resort_fallback_attempt;
-  }
-#endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
   if (!font_platform_data) {
     // At least try to match locale.
     font_platform_data = FontCache::CreateFontPlatformDataForCharacter(
@@ -263,7 +208,7 @@ sk_sp<SkTypeface> FontCache::CreateTypeface(
     const FontDescription& font_description,
     const FontFaceCreationParams& creation_params,
     std::string& name) {
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   if (creation_params.CreationType() == kCreateFontByFciIdAndTtcIndex) {
     if (Platform::Current()->GetSandboxSupport()) {
       return SkTypeface_Factory::FromFontConfigInterfaceIdAndTtcIndex(
@@ -293,7 +238,6 @@ sk_sp<SkTypeface> FontCache::CreateTypeface(
   return typeface;
 }
 
-#if !BUILDFLAG(IS_WIN)
 const FontPlatformData* FontCache::CreateFontPlatformData(
     const FontDescription& font_description,
     const FontFaceCreationParams& creation_params,
@@ -352,7 +296,6 @@ const FontPlatformData* FontCache::CreateFontPlatformData(
 
   return font_platform_data;
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 sk_sp<SkTypeface> FontCache::MatchFamilyStyle(const char* family_name,
                                               const SkFontStyle& style) {

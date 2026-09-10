@@ -238,7 +238,6 @@ LiveTicks LiveTicks::Now() {
   return internal::g_live_ticks_now_function.load(std::memory_order_relaxed)();
 }
 
-#if !BUILDFLAG(IS_WIN)
 namespace subtle {
 LiveTicks LiveTicksNowIgnoringOverride() {
   // On non-windows platforms LiveTicks is equivalent to TimeTicks already.
@@ -247,8 +246,6 @@ LiveTicks LiveTicksNowIgnoringOverride() {
   return LiveTicks() + (TimeTicks::Now() - TimeTicks());
 }
 }  // namespace subtle
-
-#endif
 
 std::ostream& operator<<(std::ostream& os, LiveTicks live_ticks) {
   const TimeDelta as_time_delta = live_ticks - LiveTicks();

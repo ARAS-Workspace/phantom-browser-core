@@ -16,11 +16,6 @@
 #include "ui/gfx/platform_font.h"
 #include "ui/views/style/typography.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#include "ui/native_theme/native_theme_win.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include <optional>
 
@@ -130,8 +125,6 @@ ui::ResourceBundle::FontDetails ChromeTypographyProvider::GetFontDetailsImpl(
       style == views::style::STYLE_SECONDARY_MONOSPACED) {
 #if BUILDFLAG(IS_MAC)
     details.typeface = "Menlo";
-#elif BUILDFLAG(IS_WIN)
-    details.typeface = "Consolas";
 #else
     details.typeface = "DejaVu Sans Mono";
 #endif
@@ -207,10 +200,6 @@ int ChromeTypographyProvider::GetLineHeightImpl(int context, int style) const {
   constexpr int kTitlePlatformHeight = 19;
   constexpr int kBodyTextLargePlatformHeight = 16;
   constexpr int kBodyTextSmallPlatformHeight = 15;
-#elif BUILDFLAG(IS_WIN)
-  constexpr int kTitlePlatformHeight = 20;
-  constexpr int kBodyTextLargePlatformHeight = 18;
-  constexpr int kBodyTextSmallPlatformHeight = 16;
 #else
   constexpr int kTitlePlatformHeight = 18;
   constexpr int kBodyTextLargePlatformHeight = 17;

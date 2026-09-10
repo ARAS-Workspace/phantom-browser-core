@@ -155,11 +155,11 @@ PeerSessionImpl::PeerSessionImpl(
       connection_(std::move(connection)) {
   connection_->SetEventHandler(this);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
   // LocalMouseInputMonitorWin and LocalPointerInputMonitorChromeos filter out
   // an echo of the injected input before it reaches `remote_input_filter_`.
   input_pipeline_.remote_input_filter()->SetExpectLocalEcho(false);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void PeerSessionImpl::Start(
@@ -294,12 +294,7 @@ void PeerSessionImpl::NotifyClientResolution(
 
   // TODO(joedow): Determine if other platforms support desktop scaling.
   webrtc::DesktopVector dpi_vector{kDefaultDpi, kDefaultDpi};
-#if BUILDFLAG(IS_WIN)
-  // Matching the client DPI is only supported on Windows when curtained.
-  if (effective_policies_.curtain_required.value_or(false)) {
-    dpi_vector.set(resolution.x_dpi(), resolution.y_dpi());
-  }
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   dpi_vector.set(resolution.x_dpi(), resolution.y_dpi());
 #endif
 
@@ -1088,13 +1083,6 @@ void PeerSessionImpl::BindRemoteUrlOpener(
   }
   remote_open_url_message_handler_->AddReceiver(std::move(receiver));
 }
-
-#if BUILDFLAG(IS_WIN)
-void PeerSessionImpl::BindSecurityKeyForwarder(
-    mojo::PendingReceiver<mojom::SecurityKeyForwarder> receiver) {
-  OnSecurityKeyConnection(std::move(receiver));
-}
-#endif
 
 void PeerSessionImpl::RegisterCreateHandlerCallbackForTesting(
     const std::string& prefix,

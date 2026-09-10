@@ -374,12 +374,6 @@ class MockChromotingSessionServices : public mojom::ChromotingSessionServices {
               BindWebAuthnProxy,
               (mojo::PendingReceiver<mojom::WebAuthnProxy> receiver),
               (override));
-#if BUILDFLAG(IS_WIN)
-  MOCK_METHOD(void,
-              BindSecurityKeyForwarder,
-              (mojo::PendingReceiver<mojom::SecurityKeyForwarder> receiver),
-              (override));
-#endif
 };
 
 class MockChromotingHostServicesProvider

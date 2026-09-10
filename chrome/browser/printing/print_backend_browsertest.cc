@@ -49,11 +49,7 @@
 #include "testing/gmock/include/gmock/gmock-matchers.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "printing/emf_win.h"
-#else
 #include "printing/metafile_skia.h"
-#endif
 
 namespace printing {
 
@@ -249,36 +245,6 @@ class PrintBackendBrowserTest : public InProcessBrowserTest {
     return result;
   }
 
-#if BUILDFLAG(IS_WIN)
-  std::optional<mojom::ResultCode> RenderPageAndWait() {
-    // Load a sample EMF file for a single page for testing handling.
-    Emf metafile;
-    if (!LoadMetafileDataFromFile("test1.emf", metafile))
-      return std::nullopt;
-
-    base::MappedReadOnlyRegion region_mapping =
-        metafile.GetDataAsSharedMemoryRegion();
-    if (!region_mapping.IsValid())
-      return std::nullopt;
-
-    // Safe to use base::Unretained(this) since waiting locally on the callback
-    // forces a shorter lifetime than `this`.
-    mojom::ResultCode result;
-    GetPrintBackendService()->RenderPrintedPage(
-        kTestDocumentCookie,
-        /*page_index=*/0, metafile.GetDataType(),
-        std::move(region_mapping.region),
-        /*page_size=*/gfx::Size(200, 200),
-        /*page_content_rect=*/gfx::Rect(0, 0, 200, 200),
-        /*shrink_factor=*/1.0f,
-        base::BindOnce(&PrintBackendBrowserTest::CaptureResult,
-                       base::Unretained(this), std::ref(result)));
-    WaitUntilCallbackReceived();
-    return result;
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
-#if !BUILDFLAG(IS_WIN)
   std::optional<mojom::ResultCode> RenderDocumentAndWait() {
     // Load a sample PDF file for a single page for testing handling.
     MetafileSkia metafile;
@@ -301,7 +267,6 @@ class PrintBackendBrowserTest : public InProcessBrowserTest {
     WaitUntilCallbackReceived();
     return result;
   }
-#endif  // !BUILDFLAG(IS_WIN)
 
   mojom::ResultCode DocumentDoneAndWait() {
     mojom::ResultCode result;
@@ -360,14 +325,6 @@ class PrintBackendBrowserTest : public InProcessBrowserTest {
     capture_caps_and_info = std::move(caps_and_info);
     CheckForQuit();
   }
-
-#if BUILDFLAG(IS_WIN)
-  void OnDidGetPaperPrintableArea(gfx::Rect& capture_printable_area_um,
-                                  const gfx::Rect& printable_area_um) {
-    capture_printable_area_um = printable_area_um;
-    CheckForQuit();
-  }
-#endif
 
   void CapturePrintSettings(PrintSettingsResult& capture_print_settings,
                             PrintSettingsResult print_settings) {
@@ -589,55 +546,6 @@ IN_PROC_BROWSER_TEST_F(PrintBackendBrowserTest, FetchCapabilitiesAccessDenied) {
   EXPECT_EQ(caps_and_info.error(), mojom::ResultCode::kAccessDenied);
 }
 
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(PrintBackendBrowserTest, GetPaperPrintableArea) {
-  AddDefaultPrinter();
-
-  mojom::PrintBackendService::FetchCapabilitiesResult caps_and_info;
-
-  // Safe to use base::Unretained(this) since waiting locally on the callback
-  // forces a shorter lifetime than `this`.
-  GetPrintBackendService()->FetchCapabilities(
-      kDefaultPrinterName,
-      base::BindOnce(&PrintBackendBrowserTest::OnDidFetchCapabilities,
-                     base::Unretained(this), std::ref(caps_and_info)));
-  WaitUntilCallbackReceived();
-
-  // Fetching capabiliities only provides the paper printable area for the
-  // default paper size.  Find a paper which is not the default, which should
-  // have been given an incorrect printable area that matches the paper size.
-  ASSERT_TRUE(caps_and_info.has_value());
-  std::optional<PrinterSemanticCapsAndDefaults::Paper> non_default_paper;
-  const PrinterSemanticCapsAndDefaults::Paper& default_paper =
-      caps_and_info.value()->printer_caps.default_paper;
-  const PrinterSemanticCapsAndDefaults::Papers& papers =
-      caps_and_info.value()->printer_caps.papers;
-  for (const auto& paper : papers) {
-    if (paper != default_paper) {
-      non_default_paper = paper;
-      break;
-    }
-  }
-  ASSERT_TRUE(non_default_paper.has_value());
-  EXPECT_EQ(non_default_paper->printable_area_um(),
-            gfx::Rect(non_default_paper->size_um()));
-
-  // Request the printable area for this paper size, which should no longer
-  // match the physical size but have real printable area values.
-  gfx::Rect printable_area_um;
-  PrintSettings::RequestedMedia media(
-      /*.size_microns =*/non_default_paper->size_um(),
-      /*.vendor_id = */ non_default_paper->vendor_id());
-  GetPrintBackendService()->GetPaperPrintableArea(
-      kDefaultPrinterName, media,
-      base::BindOnce(&PrintBackendBrowserTest::OnDidGetPaperPrintableArea,
-                     base::Unretained(this), std::ref(printable_area_um)));
-  WaitUntilCallbackReceived();
-  ASSERT_TRUE(!printable_area_um.IsEmpty());
-  EXPECT_NE(printable_area_um, non_default_paper->printable_area_um());
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 IN_PROC_BROWSER_TEST_F(PrintBackendBrowserTest, UseDefaultSettings) {
   AddDefaultPrinter();
   SetPrinterNameForSubsequentContexts(kDefaultPrinterName);
@@ -739,27 +647,6 @@ IN_PROC_BROWSER_TEST_F(PrintBackendBrowserTest, StartPrinting) {
             mojom::ResultCode::kSuccess);
 }
 
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(PrintBackendBrowserTest, RenderPrintedPage) {
-  AddDefaultPrinter();
-  SetPrinterNameForSubsequentContexts(kDefaultPrinterName);
-
-  const uint32_t context_id = EstablishPrintingContextAndWait();
-
-  PrintSettings print_settings;
-  print_settings.set_device_name(kDefaultPrinterName16);
-  ASSERT_TRUE(
-      UpdatePrintSettingsAndWait(context_id, print_settings).has_value());
-
-  ASSERT_EQ(StartPrintingAndWait(context_id, print_settings),
-            mojom::ResultCode::kSuccess);
-
-  std::optional<mojom::ResultCode> result = RenderPageAndWait();
-  EXPECT_EQ(result, mojom::ResultCode::kSuccess);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
-#if !BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_F(PrintBackendBrowserTest, RenderPrintedDocument) {
   AddDefaultPrinter();
   SetPrinterNameForSubsequentContexts(kDefaultPrinterName);
@@ -777,7 +664,6 @@ IN_PROC_BROWSER_TEST_F(PrintBackendBrowserTest, RenderPrintedDocument) {
   std::optional<mojom::ResultCode> result = RenderDocumentAndWait();
   EXPECT_EQ(result, mojom::ResultCode::kSuccess);
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 IN_PROC_BROWSER_TEST_F(PrintBackendBrowserTest, DocumentDone) {
   AddDefaultPrinter();
@@ -793,11 +679,7 @@ IN_PROC_BROWSER_TEST_F(PrintBackendBrowserTest, DocumentDone) {
   ASSERT_EQ(StartPrintingAndWait(context_id, print_settings),
             mojom::ResultCode::kSuccess);
 
-#if BUILDFLAG(IS_WIN)
-  std::optional<mojom::ResultCode> result = RenderPageAndWait();
-#else
   std::optional<mojom::ResultCode> result = RenderDocumentAndWait();
-#endif
   EXPECT_EQ(result, mojom::ResultCode::kSuccess);
 
   EXPECT_EQ(DocumentDoneAndWait(), mojom::ResultCode::kSuccess);

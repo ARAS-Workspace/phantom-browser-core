@@ -84,8 +84,7 @@ class DefaultExternalConstants : public ExternalConstants {
 
   std::optional<EventLoggingPermissionProvider>
   GetEventLoggingPermissionProvider() const override {
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC))
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && BUILDFLAG(IS_MAC)
     return EventLoggingPermissionProvider{
         .app_id = BROWSER_APPID,
 #if BUILDFLAG(IS_MAC)

@@ -99,8 +99,7 @@ TEST(UrlUtilTest, ValidateUrlRejectsNestedSchemes) {
       ValidateLaunchUrlWebUnsafe(GURL("blob:https://example.com/guid-string")));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 TEST(UrlUtilTest, ValidateGoogleChromeSchemeUrls) {
   base::test::ScopedFeatureList feature_list{features::kGoogleChromeScheme};
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)

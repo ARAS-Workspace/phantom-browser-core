@@ -143,30 +143,6 @@ TEST(KeyConverter, WebDriverSpecialNonCharKey) {
   CheckEventsReleaseModifiers(keys, key_events);
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST(KeyConverter, NeedsCtrlAndAlt) {
-  KeyEventBuilder ctrl_builder;
-  ctrl_builder.SetKeyCode(ui::VKEY_CONTROL);
-
-  KeyEventBuilder alt_builder;
-  alt_builder.SetKeyCode(ui::VKEY_MENU);
-
-  KeyEventBuilder q_builder;
-  q_builder.SetModifiers(kControlKeyModifierMask | kAltKeyModifierMask)
-      ->SetKeyCode(ui::VKEY_Q)
-      ->SetText("q", "@");
-
-  std::vector<KeyEvent> key_events;
-  key_events.push_back(ctrl_builder.SetType(kRawKeyDownEventType)->Build());
-  key_events.push_back(alt_builder.SetType(kRawKeyDownEventType)->Build());
-  q_builder.Generate(&key_events);
-  key_events.push_back(alt_builder.SetType(kKeyUpEventType)->Build());
-  key_events.push_back(ctrl_builder.SetType(kKeyUpEventType)->Build());
-
-  ui::ScopedKeyboardLayout keyboard_layout(ui::KEYBOARD_LAYOUT_GERMAN);
-  CheckEventsReleaseModifiers("@", key_events);
-}
-#endif
 
 TEST(KeyConverter, UppercaseCharDoesShift) {
   ui::ScopedKeyboardLayout keyboard_layout(ui::KEYBOARD_LAYOUT_ENGLISH_US);

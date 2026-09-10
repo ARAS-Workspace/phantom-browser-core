@@ -72,11 +72,7 @@ IN_PROC_BROWSER_TEST_F(SocketApiTest, SocketUDPExtension) {
 }
 
 // Flaky on Windows. https://crbug.com/40836222.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SocketTCPExtension DISABLED_SocketTCPExtension
-#else
 #define MAYBE_SocketTCPExtension SocketTCPExtension
-#endif
 IN_PROC_BROWSER_TEST_F(SocketApiTest, MAYBE_SocketTCPExtension) {
   net::EmbeddedTestServer test_server(net::EmbeddedTestServer::TYPE_HTTP);
   test_server.AddDefaultHandlers();

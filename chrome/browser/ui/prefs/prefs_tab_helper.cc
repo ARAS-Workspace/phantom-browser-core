@@ -61,12 +61,8 @@
 #include "chrome/browser/themes/theme_service_factory.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_ANDROID) || BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID) || \
+    BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
 // If a font name in prefs default values starts with a comma, consider it's a
 // comma-separated font list and resolve it to the first available font.
 #define PREFS_FONT_LIST 1
@@ -121,20 +117,6 @@ ALL_FONT_SCRIPTS(WEBKIT_WEBPREFS_FONTS_STANDARD)
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-// On Windows with antialiasing we want to use an alternate fixed font like
-// Consolas, which looks much better than Courier New.
-bool ShouldUseAlternateDefaultFixedFont(const std::string& script) {
-  if (!base::StartsWith(script, "courier",
-                        base::CompareCase::INSENSITIVE_ASCII)) {
-    return false;
-  }
-  UINT smooth_type = 0;
-  SystemParametersInfo(SPI_GETFONTSMOOTHINGTYPE, 0, &smooth_type, 0);
-  return smooth_type == FE_FONTSMOOTHINGCLEARTYPE;
-}
-#endif
-
 struct FontDefault {
   const char* pref_name;
   int resource_id;
@@ -152,8 +134,8 @@ constexpr auto kFontDefaults = std::to_array<FontDefault>({
     {prefs::kWebKitCursiveFontFamily, IDS_CURSIVE_FONT_FAMILY},
     {prefs::kWebKitFantasyFontFamily, IDS_FANTASY_FONT_FAMILY},
     {prefs::kWebKitMathFontFamily, IDS_MATH_FONT_FAMILY},
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_LINUX) || BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
+    BUILDFLAG(ENABLE_DESKTOP_ANDROID_EXTENSIONS)
     {prefs::kWebKitStandardFontFamilyJapanese,
      IDS_STANDARD_FONT_FAMILY_JAPANESE},
     {prefs::kWebKitFixedFontFamilyJapanese, IDS_FIXED_FONT_FAMILY_JAPANESE},
@@ -183,7 +165,7 @@ constexpr auto kFontDefaults = std::to_array<FontDefault>({
     {prefs::kWebKitSansSerifFontFamilyDevanagari,
      IDS_SANS_SERIF_FONT_FAMILY_DEVANAGARI},
 #endif
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
     {prefs::kWebKitCursiveFontFamilySimplifiedHan,
      IDS_CURSIVE_FONT_FAMILY_SIMPLIFIED_HAN},
     {prefs::kWebKitCursiveFontFamilyTraditionalHan,
@@ -195,26 +177,6 @@ constexpr auto kFontDefaults = std::to_array<FontDefault>({
     {prefs::kWebKitSansSerifFontFamilyArabic,
      IDS_SANS_SERIF_FONT_FAMILY_ARABIC},
     {prefs::kWebKitFixedFontFamilyKorean, IDS_FIXED_FONT_FAMILY_KOREAN},
-    {prefs::kWebKitFixedFontFamilySimplifiedHan,
-     IDS_FIXED_FONT_FAMILY_SIMPLIFIED_HAN},
-    {prefs::kWebKitFixedFontFamilyTraditionalHan,
-     IDS_FIXED_FONT_FAMILY_TRADITIONAL_HAN},
-#elif BUILDFLAG(IS_WIN)
-    {prefs::kWebKitFixedFontFamilyArabic, IDS_FIXED_FONT_FAMILY_ARABIC},
-    {prefs::kWebKitSansSerifFontFamilyArabic,
-     IDS_SANS_SERIF_FONT_FAMILY_ARABIC},
-    {prefs::kWebKitStandardFontFamilyCyrillic,
-     IDS_STANDARD_FONT_FAMILY_CYRILLIC},
-    {prefs::kWebKitFixedFontFamilyCyrillic, IDS_FIXED_FONT_FAMILY_CYRILLIC},
-    {prefs::kWebKitSerifFontFamilyCyrillic, IDS_SERIF_FONT_FAMILY_CYRILLIC},
-    {prefs::kWebKitSansSerifFontFamilyCyrillic,
-     IDS_SANS_SERIF_FONT_FAMILY_CYRILLIC},
-    {prefs::kWebKitStandardFontFamilyGreek, IDS_STANDARD_FONT_FAMILY_GREEK},
-    {prefs::kWebKitFixedFontFamilyGreek, IDS_FIXED_FONT_FAMILY_GREEK},
-    {prefs::kWebKitSerifFontFamilyGreek, IDS_SERIF_FONT_FAMILY_GREEK},
-    {prefs::kWebKitSansSerifFontFamilyGreek, IDS_SANS_SERIF_FONT_FAMILY_GREEK},
-    {prefs::kWebKitFixedFontFamilyKorean, IDS_FIXED_FONT_FAMILY_KOREAN},
-    {prefs::kWebKitCursiveFontFamilyKorean, IDS_CURSIVE_FONT_FAMILY_KOREAN},
     {prefs::kWebKitFixedFontFamilySimplifiedHan,
      IDS_FIXED_FONT_FAMILY_SIMPLIFIED_HAN},
     {prefs::kWebKitFixedFontFamilyTraditionalHan,
@@ -419,14 +381,6 @@ void PrefsTabHelper::RegisterProfilePrefs(
   std::set<std::string> fonts_with_defaults;
   UScriptCode browser_script = GetScriptOfBrowserLocale(locale);
   for (FontDefault pref : kFontDefaults) {
-#if BUILDFLAG(IS_WIN)
-    if (pref.pref_name == prefs::kWebKitFixedFontFamily) {
-      if (ShouldUseAlternateDefaultFixedFont(
-              l10n_util::GetStringUTF8(pref.resource_id))) {
-        pref.resource_id = IDS_FIXED_FONT_FAMILY_ALT_WIN;
-      }
-    }
-#endif
 
     UScriptCode pref_script = GetScriptOfFontPref(pref.pref_name);
 

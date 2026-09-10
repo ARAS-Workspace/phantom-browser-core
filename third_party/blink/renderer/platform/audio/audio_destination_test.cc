@@ -341,8 +341,7 @@ TEST_P(AudioDestinationTest, GlitchAndDelay) {
       base::Milliseconds(80),
   });
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // Desktop platforms bypass the priming delay in the output buffer.
   constexpr int priming_frames = 0;
 #else

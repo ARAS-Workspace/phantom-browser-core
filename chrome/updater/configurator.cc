@@ -51,10 +51,6 @@
 #include "components/version_info/version_info.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#endif
-
 namespace updater {
 
 Configurator::Configurator(scoped_refptr<UpdaterPrefs> prefs,
@@ -88,11 +84,11 @@ Configurator::Configurator(scoped_refptr<UpdaterPrefs> prefs,
                     /*auto_flush=*/false)
               : nullptr),
       is_managed_device_([] {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
         return base::IsManagedOrEnterpriseDevice();
 #else
         return std::nullopt;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
       }()) {
 #if BUILDFLAG(IS_LINUX)
   // On Linux creating the NetworkFetcherFactory requires performing blocking IO

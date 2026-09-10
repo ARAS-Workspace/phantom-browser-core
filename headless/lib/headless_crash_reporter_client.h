@@ -30,11 +30,7 @@ class HeadlessCrashReporterClient : public crash_reporter::CrashReporterClient {
 
   void GetProductInfo(ProductInfo* product_info) override;
 
-#if BUILDFLAG(IS_WIN)
-  bool GetCrashDumpLocation(std::wstring* crash_dir) override;
-#else
   bool GetCrashDumpLocation(base::FilePath* crash_dir) override;
-#endif
 
   bool IsRunningUnattended() override;
 

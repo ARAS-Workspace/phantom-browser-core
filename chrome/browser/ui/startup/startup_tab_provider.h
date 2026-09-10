@@ -13,10 +13,6 @@
 #include "components/signin/public/base/signin_buildflags.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/ui/startup/startup_types.h"
-#endif
-
 class Profile;
 class StartupBrowserCreator;
 struct SessionStartupPref;

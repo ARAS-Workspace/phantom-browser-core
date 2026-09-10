@@ -276,18 +276,6 @@ inline constexpr char kLearnMoreEnterpriseURL[] =
 
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-// The URL for the Windows XP/Vista deprecation help center article.
-inline constexpr char kWindowsXPVistaDeprecationURL[] =
-    "https://chrome.blogspot.com/2015/11/"
-    "updates-to-chrome-platform-support.html";
-
-// The URL for the Windows 7/8.1 deprecation help center article.
-inline constexpr char kWindows78DeprecationURL[] =
-    "https://support.google.com/chrome?p=unsupported_windows";
-
-#endif
-
 // Please do not append entries here. See the comments at the top of the file.
 
 }  // namespace chrome

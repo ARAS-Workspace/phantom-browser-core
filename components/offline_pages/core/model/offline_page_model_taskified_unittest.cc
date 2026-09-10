@@ -814,12 +814,7 @@ TEST_F(OfflinePageModelTaskifiedTest, GetOfflineIdsForClientId) {
 
 // This test is affected by https://crbug.com/725685, which only affects windows
 // platform.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CheckTempPagesSavedInCorrectDir \
-  DISABLED_CheckTempPagesSavedInCorrectDir
-#else
 #define MAYBE_CheckTempPagesSavedInCorrectDir CheckTempPagesSavedInCorrectDir
-#endif
 TEST_F(OfflinePageModelTaskifiedTest, MAYBE_CheckTempPagesSavedInCorrectDir) {
   // Save a temporary page.
   const GURL kTestUrl("http://example.com");
@@ -837,13 +832,8 @@ TEST_F(OfflinePageModelTaskifiedTest, MAYBE_CheckTempPagesSavedInCorrectDir) {
 
 // This test is affected by https://crbug.com/725685, which only affects windows
 // platform.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CheckPersistenPagesSavedInCorrectDir \
-  DISABLED_CheckPersistenPagesSavedInCorrectDir
-#else
 #define MAYBE_CheckPersistenPagesSavedInCorrectDir \
   CheckPersistenPagesSavedInCorrectDir
-#endif
 TEST_F(OfflinePageModelTaskifiedTest,
        MAYBE_CheckPersistenPagesSavedInCorrectDir) {
   // Save a persistent page that will be published to the public folder.
@@ -862,11 +852,7 @@ TEST_F(OfflinePageModelTaskifiedTest,
 
 // This test is affected by https://crbug.com/725685, which only affects windows
 // platform.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PublishPageFailure DISABLED_PublishPageFailure
-#else
 #define MAYBE_PublishPageFailure PublishPageFailure
-#endif
 TEST_F(OfflinePageModelTaskifiedTest, MAYBE_PublishPageFailure) {
   // Save a persistent page that will report failure to be copied to a public
   // dir.
@@ -887,11 +873,7 @@ TEST_F(OfflinePageModelTaskifiedTest, MAYBE_PublishPageFailure) {
 
 // This test is affected by https://crbug.com/725685, which only affects windows
 // platform.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CheckPublishInternalArchive DISABLED_CheckPublishInternalArchive
-#else
 #define MAYBE_CheckPublishInternalArchive CheckPublishInternalArchive
-#endif
 TEST_F(OfflinePageModelTaskifiedTest, MAYBE_CheckPublishInternalArchive) {
   // Save a persistent page into our internal directory that will not be
   // published. We use a "browser actions" page for this purpose.
@@ -968,12 +950,7 @@ TEST_F(OfflinePageModelTaskifiedTest, GetAllPages) {
 
 // This test is affected by https://crbug.com/725685, which only affects windows
 // platform.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_StartupMaintenanceTaskExecuted \
-  DISABLED_StartupMaintenanceTaskExecuted
-#else
 #define MAYBE_StartupMaintenanceTaskExecuted StartupMaintenanceTaskExecuted
-#endif
 TEST_F(OfflinePageModelTaskifiedTest, MAYBE_StartupMaintenanceTaskExecuted) {
   // Insert temporary pages
   page_generator()->SetArchiveDirectory(temporary_dir_path());
@@ -1072,13 +1049,8 @@ TEST_F(OfflinePageModelTaskifiedTest, ClearStorage) {
 
 // This test is affected by https://crbug.com/725685, which only affects windows
 // platform.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PersistentPageConsistencyCheckExecuted \
-  DISABLED_PersistentPageConsistencyCheckExecuted
-#else
 #define MAYBE_PersistentPageConsistencyCheckExecuted \
   PersistentPageConsistencyCheckExecuted
-#endif
 TEST_F(OfflinePageModelTaskifiedTest,
        MAYBE_PersistentPageConsistencyCheckExecuted) {
   // The PersistentPageConsistencyCheckTask should not be executed based on time

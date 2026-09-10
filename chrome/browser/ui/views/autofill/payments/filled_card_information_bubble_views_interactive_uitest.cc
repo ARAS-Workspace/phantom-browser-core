@@ -208,7 +208,7 @@ IN_PROC_BROWSER_TEST_F(FilledCardInformationBubbleViewsInteractiveUiTest,
 
 // Invokes the bubble and verifies the bubble is dismissed upon page navigation.
 // Flaky on macOS, Linux, and Win. crbug.com/40794138
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_DismissBubbleUponNavigation DISABLED_DismissBubbleUponNavigation
 #else
 #define MAYBE_DismissBubbleUponNavigation DismissBubbleUponNavigation

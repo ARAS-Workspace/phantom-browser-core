@@ -25,13 +25,6 @@
 #include "base/values.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/threading/platform_thread.h"
-#include "base/win/scoped_handle.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace {
 
 // uint32_t is specified in the protocol as the type for the message header.
@@ -164,28 +157,6 @@ NativeMessagingReader::NativeMessagingReader(base::File file)
 NativeMessagingReader::~NativeMessagingReader() {
   read_task_runner_->DeleteSoon(FROM_HERE, core_.release());
 
-#if BUILDFLAG(IS_WIN)
-  // The ReadMessage() method uses a blocking read (on all platforms) which
-  // cause a deadlock if the owning thread attempts to destroy this object
-  // while there is a read operation pending.
-  // On POSIX platforms, closing the write end of the pipe causes the Chrome
-  // process to close the read end so that this class can be cleaned up.
-  // On Windows, closing the write end of the pipe does nothing as the parent
-  // process is cmd.exe which doesn't care.  Thus, the read end of the pipe
-  // remains open, the read operation is blocked, and we hang in the d'tor.
-  // Canceling the pending I/O here prevents the hang on Windows and isn't
-  // needed for POSIX since it works correctly.
-  base::PlatformThreadId thread_id = reader_thread_.GetThreadId();
-  base::win::ScopedHandle thread_handle(
-      OpenThread(THREAD_TERMINATE, /*bInheritHandle=*/false, thread_id.raw()));
-  if (!CancelSynchronousIo(thread_handle.Get())) {
-    // ERROR_NOT_FOUND means there were no pending IO requests so don't treat
-    // that result as an error.
-    if (GetLastError() != ERROR_NOT_FOUND) {
-      PLOG(ERROR) << "CancelSynchronousIo() failed";
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 void NativeMessagingReader::Start(const MessageCallback& message_callback,

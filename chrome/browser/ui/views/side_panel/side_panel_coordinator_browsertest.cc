@@ -2761,7 +2761,6 @@ IN_PROC_BROWSER_TEST_F(
 
 // TODO(crbug.com/467727720): Re-enable on Windows when the underlying jank is
 // resolved.
-#if !BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorTest,
                        ClosingMidShowFromAnimationReparentsContentView) {
   // Deregister and reregister kAboutThisSite side panel with kToolbar
@@ -2813,7 +2812,6 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorTest,
             nullptr);
   ASSERT_EQ(side_panel->GetContentParentView()->children().size(), 1);
 }
-#endif
 
 IN_PROC_BROWSER_TEST_F(
     SidePanelCoordinatorTest,

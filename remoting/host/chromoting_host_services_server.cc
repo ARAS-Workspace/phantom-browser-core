@@ -21,11 +21,6 @@
 #include <unistd.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/strcat_win.h"
-#include "base/win/win_util.h"
-#endif
-
 namespace remoting {
 
 // static
@@ -39,18 +34,7 @@ ChromotingHostServicesServer::CreateEndpointOptions(
   // process graph as the host's broker, so restrict their access to it.
   options.extra_send_invitation_flags =
       MOJO_SEND_INVITATION_FLAG_UNTRUSTED_PROCESS;
-#if BUILDFLAG(IS_WIN)
-  // Create a named pipe owned by the current user which is available to all
-  // authenticated users.
-  std::wstring user_sid;
-  if (!base::win::GetUserSidString(&user_sid)) {
-    LOG(ERROR) << "Failed to get user SID string.";
-    return {};
-  }
-  options.security_descriptor =
-      base::StrCat({L"O:", user_sid, L"G:", user_sid, L"D:(A;;GA;;;AU)"});
-  options.include_peer_process_info = true;
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   // Allow the endpoint to be connected by any users iff the server is run as
   // root.
   options.require_same_peer_user = (getuid() != 0);

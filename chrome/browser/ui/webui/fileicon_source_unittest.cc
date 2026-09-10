@@ -77,24 +77,6 @@ constexpr auto kBasicExpectations = std::to_array<FetchFileIconExpectation>({
      FILE_PATH_LITERAL("a?iconsize=small"), 1.0f, IconLoader::LARGE},
     {"?path=o%40%23%24%25%26*()%20%2B%3D%3F%2C%3A%3B%22.jpg",
      FILE_PATH_LITERAL("o@#$%&*() +=?,:;\".jpg"), 1.0f, IconLoader::NORMAL},
-#if BUILDFLAG(IS_WIN)
-    {"?path=c%3A%2Ffoo%2Fbar%2Fbaz", FILE_PATH_LITERAL("c:\\foo\\bar\\baz"),
-     1.0f, IconLoader::NORMAL},
-    {"?path=%2Ffoo&bar=asdf&asdf", FILE_PATH_LITERAL("\\foo"), 1.0f,
-     IconLoader::NORMAL},
-    {"?path=c%3A%2Fusers%2Ffoo%20user%2Fbar.txt",
-     FILE_PATH_LITERAL("c:\\users\\foo user\\bar.txt"), 1.0f,
-     IconLoader::NORMAL},
-    {"?path=c%3A%2Fusers%2F%C2%A9%202000.pdf",
-     FILE_PATH_LITERAL("c:\\users\\\u00a9 2000.pdf"), 1.0f, IconLoader::NORMAL},
-    {"?path=%E0%B6%9A%E0%B6%BB%E0%B7%9D%E0%B6%B8%E0%B7%8A",
-     FILE_PATH_LITERAL("\u0d9a\u0dbb\u0ddd\u0db8\u0dca"), 1.0f,
-     IconLoader::NORMAL},
-    {"?path=%2Ffoo%2Fbar", FILE_PATH_LITERAL("\\foo\\bar"), 1.0f,
-     IconLoader::NORMAL},
-    {"?path=%2Fbaz%20(1).txt&iconsize=small",
-     FILE_PATH_LITERAL("\\baz (1).txt"), 1.0f, IconLoader::SMALL},
-#else
     {"?path=%2Ffoo%2Fbar%2Fbaz", FILE_PATH_LITERAL("/foo/bar/baz"), 1.0f,
      IconLoader::NORMAL},
     {"?path=%2Ffoo&bar", FILE_PATH_LITERAL("/foo"), 1.0f, IconLoader::NORMAL},
@@ -106,7 +88,6 @@ constexpr auto kBasicExpectations = std::to_array<FetchFileIconExpectation>({
      IconLoader::NORMAL},
     {"?path=%2Fbaz%20(1).txt&iconsize=small", FILE_PATH_LITERAL("/baz (1).txt"),
      1.0f, IconLoader::SMALL},
-#endif
 });
 
 // Test that the callback is NULL.

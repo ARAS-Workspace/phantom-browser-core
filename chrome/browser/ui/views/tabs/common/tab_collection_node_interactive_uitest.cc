@@ -70,9 +70,8 @@ class TabCollectionNodeInteractiveUiTest
   }
 };
 
-#if BUILDFLAG(IS_WIN) || defined(MEMORY_SANITIZER) ||      \
-    defined(UNDEFINED_SANITIZER) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if defined(MEMORY_SANITIZER) || defined(UNDEFINED_SANITIZER) || \
+    BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_ValidateViewFocusOrder DISABLED_ValidateViewFocusOrder
 #else
 #define MAYBE_ValidateViewFocusOrder ValidateViewFocusOrder
@@ -184,12 +183,7 @@ IN_PROC_BROWSER_TEST_P(TabCollectionNodeInteractiveUiTest,
                   true));
 }
 
-#if BUILDFLAG(IS_WIN)
-// TODO(crbug.com/532713867): Re-enable this test on Windows.
-#define MAYBE_ClosingTabsUpdatesHoverState DISABLED_ClosingTabsUpdatesHoverState
-#else
 #define MAYBE_ClosingTabsUpdatesHoverState ClosingTabsUpdatesHoverState
-#endif
 IN_PROC_BROWSER_TEST_P(TabCollectionNodeInteractiveUiTest,
                        MAYBE_ClosingTabsUpdatesHoverState) {
   for (size_t i = 0; i < 2; ++i) {

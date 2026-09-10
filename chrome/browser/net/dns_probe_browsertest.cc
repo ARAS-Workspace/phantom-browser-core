@@ -55,10 +55,6 @@
 #include "services/network/public/mojom/clear_data_filter.mojom.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#endif
-
 using base::BindOnce;
 using base::BindRepeating;
 using base::FilePath;
@@ -407,13 +403,6 @@ class DnsProbeCurrentSecureConfigFailingProbesTest
   }
 
   void SetUpOnMainThread() override {
-#if BUILDFLAG(IS_WIN)
-    // Mark as not enterprise managed to prevent the secure DNS mode from
-    // being downgraded to off.
-    base::win::ScopedDomainStateForTesting scoped_domain(false);
-    // TODO(crbug.com/40229843): What is the correct function to use here?
-    EXPECT_FALSE(base::win::IsEnrolledToDomain());
-#endif
 
     // Set the mocked policy provider to act as if no policies are in use by
     // updating to an empty PolicyMap. Done to prevent potential unintended

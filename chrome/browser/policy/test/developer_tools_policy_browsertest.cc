@@ -426,13 +426,8 @@ IN_PROC_BROWSER_TEST_F(PolicyTest, DeveloperToolsDisabledExtensionsDevMode) {
 // blocked on extension schemes, regardless of the policy setting.
 // TODO(crbug.com/40064953): The loading of a force installed extension in this
 // test runs into an issue on branded Windows builders.
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && BUILDFLAG(IS_WIN)
-#define MAYBE_DebugURLsDisabledByDeveloperToolsAvailability \
-  DISABLED_DebugURLsDisabledByDeveloperToolsAvailability
-#else
 #define MAYBE_DebugURLsDisabledByDeveloperToolsAvailability \
   DebugURLsDisabledByDeveloperToolsAvailability
-#endif
 IN_PROC_BROWSER_TEST_F(PolicyTest,
                        MAYBE_DebugURLsDisabledByDeveloperToolsAvailability) {
   // TODO(https://crbug.com/40804030): Remove this when updated to use MV3.

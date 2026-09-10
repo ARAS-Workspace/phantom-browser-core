@@ -50,10 +50,6 @@
 #include "components/omnibox/browser/vector_icons.h"  // nogncheck
 #endif                                                // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/background/glic/glic_status_icon_win.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/background/glic/glic_status_icon_chromeos.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
@@ -81,9 +77,7 @@ namespace glic {
 std::unique_ptr<GlicStatusIcon> GlicStatusIcon::Create(
     GlicBackgroundDelegate* delegate,
     StatusTray* status_tray) {
-#if BUILDFLAG(IS_WIN)
-  return std::make_unique<GlicStatusIconWin>(delegate, status_tray);
-#elif BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
   return std::make_unique<GlicStatusIconChromeOS>(delegate, status_tray);
 #else
   return std::make_unique<GlicStatusIcon>(delegate, status_tray);
@@ -225,7 +219,7 @@ void GlicStatusIcon::UpdateHotkey(const ui::Accelerator& hotkey) {
 }
 
 void GlicStatusIcon::UpdateVisibilityOfExitInContextMenu() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   if (context_menu_) {
     const bool is_visible = GlobalBrowserCollection::GetInstance()->IsEmpty();
     const std::optional<size_t> index =
@@ -278,7 +272,7 @@ std::unique_ptr<StatusIconMenuModel> GlicStatusIcon::CreateStatusIconMenu() {
   menu->AddItem(IDC_GLIC_STATUS_ICON_MENU_SETTINGS,
                 l10n_util::GetStringUTF16(IDS_GLIC_STATUS_ICON_MENU_SETTINGS));
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   menu->AddSeparator(ui::NORMAL_SEPARATOR);
   menu->AddItem(IDC_GLIC_STATUS_ICON_MENU_EXIT,
                 l10n_util::GetStringUTF16(IDS_GLIC_STATUS_ICON_MENU_EXIT));

@@ -52,10 +52,6 @@
 #include "ui/gfx/native_ui_types.h"
 #include "ui/views/views_switches.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "services/webnn/webnn_switches.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/command_line_android.h"
 #include "base/android/jni_android.h"
@@ -92,9 +88,6 @@ const char* const kBadFlags[] = {
     sandbox::policy::switches::kDisableSetuidSandbox,
     sandbox::policy::switches::kDisableWebNNCompilerSandbox,
     sandbox::policy::switches::kNoSandbox,
-#if BUILDFLAG(IS_WIN)
-    sandbox::policy::switches::kAllowThirdPartyModules,
-#endif
     switches::kDisableWebSecurity,
     switches::kSingleProcess,
 
@@ -155,13 +148,6 @@ const char* const kBadFlags[] = {
     // GPU sanboxing isn't implemented for the Web GPU API yet meaning it would
     // be possible to read GPU data for other Chromium processes.
     switches::kEnableUnsafeWebGPU,
-
-#if BUILDFLAG(IS_WIN)
-    // These flags allow loading libraries from specified paths, which may
-    // compromise process integrity and security.
-    switches::kWebNNOrtLibraryPathForTesting,
-    switches::kWebNNOrtEpLibraryPathForTesting,
-#endif
 
 #if !BUILDFLAG(IS_ANDROID)
     // A flag to bypass the WebHID blocklist for testing purposes.

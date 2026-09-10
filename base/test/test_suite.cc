@@ -87,15 +87,6 @@
 #endif
 
 
-#if BUILDFLAG(IS_WIN)
-#if defined(_DEBUG)
-#include <crtdbg.h>
-#endif  // _DEBUG
-#include <windows.h>
-
-#include "base/debug/handle_hooks_win.h"
-#include "base/win/win_util.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 #if PA_BUILDFLAG(USE_PARTITION_ALLOC)
 #include "base/allocator/partition_alloc_support.h"
@@ -298,35 +289,6 @@ void InitializeLogging() {
 #endif  // !BUILDFLAG(IS_ANDROID)
 }
 
-#if BUILDFLAG(IS_WIN)
-// Handlers for invalid parameter, pure call, and abort. They generate a
-// breakpoint to ensure that we get a call stack on these failures.
-// These functions should be written to be unique in order to avoid confusing
-// call stacks from /OPT:ICF function folding. Printing a unique message or
-// returning a unique value will do this. Note that for best results they need
-// to be unique from *all* functions in Chrome.
-void InvalidParameter(const wchar_t* expression,
-                      const wchar_t* function,
-                      const wchar_t* file,
-                      unsigned int line,
-                      uintptr_t reserved) {
-  // CRT printed message is sufficient.
-  __debugbreak();
-  _exit(1);
-}
-
-void PureCall() {
-  fprintf(stderr, "Pure-virtual function call. Terminating.\n");
-  __debugbreak();
-  _exit(1);
-}
-
-void AbortHandler(int signal) {
-  // Print EOL after the CRT abort message.
-  fprintf(stderr, "\n");
-  __debugbreak();
-}
-#endif
 
 #if GTEST_HAS_DEATH_TEST
 // Returns a friendly message to tell developers how to see the stack traces for
@@ -343,11 +305,7 @@ std::string GetStackTraceMessage() {
       CommandLine::ForCurrentProcess()->GetSwitchValueNative("gtest_filter");
   return StrCat({"Stack trace suppressed; retry with `--",
                  switches::kWithDeathTestStackTraces, " --gtest_filter=",
-#if BUILDFLAG(IS_WIN)
-                 WideToUTF8(filter_switch)
-#else
                  filter_switch
-#endif
                      ,
                  "`."});
 }
@@ -365,22 +323,6 @@ TestSuite::TestSuite(int argc, char** argv) : argc_(argc), argv_(argv) {
   PreInitialize();
 }
 
-#if BUILDFLAG(IS_WIN)
-TestSuite::TestSuite(int argc, wchar_t** argv) : argc_(argc) {
-  argv_as_strings_.reserve(argc);
-  argv_as_pointers_.reserve(argc + 1);
-  std::for_each(argv, UNSAFE_TODO(argv + argc), [this](wchar_t* arg) {
-    argv_as_strings_.push_back(WideToUTF8(arg));
-    // Have to use .data() here to get a mutable pointer.
-    argv_as_pointers_.push_back(argv_as_strings_.back().data());
-  });
-  // `argv` is specified as containing `argc + 1` pointers, of which the last is
-  // null.
-  argv_as_pointers_.push_back(nullptr);
-  argv_ = argv_as_pointers_.data();
-  PreInitialize();
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 TestSuite::~TestSuite() {
   if (initialized_command_line_) {
@@ -485,30 +427,6 @@ void TestSuite::UnitTestAssertHandler(const char* file,
 }
 
 void TestSuite::SuppressErrorDialogs() {
-#if BUILDFLAG(IS_WIN)
-  UINT new_flags =
-      SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX;
-
-  // Preserve existing error mode, as discussed at
-  // http://blogs.msdn.com/oldnewthing/archive/2004/07/27/198410.aspx
-  UINT existing_flags = SetErrorMode(new_flags);
-  SetErrorMode(existing_flags | new_flags);
-
-#if defined(_DEBUG)
-  // Suppress the "Debug Assertion Failed" dialog.
-  // TODO(hbono): remove this code when gtest has it.
-  // http://groups.google.com/d/topic/googletestframework/OjuwNlXy5ac/discussion
-  _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
-  _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG);
-  _CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
-  _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE | _CRTDBG_MODE_DEBUG);
-#endif  // defined(_DEBUG)
-
-  // See crbug.com/783040 for test code to trigger all of these failures.
-  _set_invalid_parameter_handler(InvalidParameter);
-  _set_purecall_handler(PureCall);
-  signal(SIGABRT, AbortHandler);
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 void TestSuite::Initialize() {
@@ -593,17 +511,6 @@ void TestSuite::Initialize() {
 #endif  // else BUILDFLAG(IS_ANDROID)
 
   CHECK(debug::EnableInProcessStackDumping());
-#if BUILDFLAG(IS_WIN)
-  RouteStdioToConsole(true);
-  // Make sure we run with high resolution timer to minimize differences
-  // between production code and test code.
-  Time::EnableHighResolutionTimer(true);
-
-  if (!command_line->HasSwitch(
-          ::switches::kDisableStrictHandleCheckingForTesting)) {
-    PCHECK(win::EnableStrictHandleCheckingForCurrentProcess());
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   // In some cases, we do not want to see standard error dialogs.
   if (!debug::BeingDebugged() &&
@@ -681,9 +588,6 @@ void TestSuite::Shutdown() {
 void TestSuite::PreInitialize() {
   DCHECK(!is_initialized_);
 
-#if BUILDFLAG(IS_WIN)
-  base::debug::HandleHooks::PatchLoadedModules();
-#endif  // BUILDFLAG(IS_WIN)
 
   // The default death_test_style of "fast" is a frequent source of subtle test
   // flakiness. And on some platforms like macOS, use of system libraries after
@@ -699,9 +603,6 @@ void TestSuite::PreInitialize() {
   GTEST_FLAG_SET(death_test_style, "threadsafe");
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  GTEST_FLAG_SET(catch_exceptions, false);
-#endif
   EnableTerminationOnHeapCorruption();
 #if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_AURA)
   // When calling native char conversion functions (e.g wrctomb) we need to

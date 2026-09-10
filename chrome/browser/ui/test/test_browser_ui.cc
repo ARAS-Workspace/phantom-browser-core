@@ -21,7 +21,7 @@
 #include "ui/views/widget/widget.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "content/public/common/content_switches.h"
 #include "ui/base/test/skia_gold_matching_algorithm.h"
 #include "ui/compositor/compositor.h"
@@ -30,12 +30,8 @@
 #include "ui/views/widget/widget.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/events/platform/platform_event_source.h"
-#endif
-
 // TODO(crbug.com/40625383) support Mac for pixel tests.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define SUPPORTS_PIXEL_TEST
 #endif
 
@@ -55,22 +51,12 @@ class ScopedMouseDisabler {
     generator.MoveMouseTo({0, 0});
     cursor_client_->DisableMouseEvents();
     cursor_client_->LockCursor();
-#if BUILDFLAG(IS_WIN)
-    // On Windows, cursor client disable isn't consistently respected, and it's
-    // also used to handle touch -> mouse event translation, so use this
-    // instead. See crbug.com/333846475 for an example of the problem this
-    // solves.
-    ui::PlatformEventSource::SetIgnoreNativePlatformEvents(true);
-#endif
   }
 
   ScopedMouseDisabler(const ScopedMouseDisabler&) = delete;
   const ScopedMouseDisabler operator=(const ScopedMouseDisabler&) = delete;
 
   ~ScopedMouseDisabler() {
-#if BUILDFLAG(IS_WIN)
-    ui::PlatformEventSource::SetIgnoreNativePlatformEvents(false);
-#endif
     cursor_client_->UnlockCursor();
     cursor_client_->EnableMouseEvents();
   }
@@ -83,12 +69,7 @@ class ScopedMouseDisabler {
 }  // namespace
 
 TestBrowserUi::TestBrowserUi() {
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-  // TODO(crbug.com/40262522): Make these pass with x64 win magic numbers.
-  SetPixelMatchAlgorithm(
-      std::make_unique<ui::test::FuzzySkiaGoldMatchingAlgorithm>(
-          /*max_different_pixels=*/1000, /*pixel_delta_threshold=*/255 * 3));
-#elif defined(SUPPORTS_PIXEL_TEST)
+#if defined(SUPPORTS_PIXEL_TEST)
   // Default to fuzzy diff. The magic number is chosen based on
   // past experiments.
   SetPixelMatchAlgorithm(
@@ -188,17 +169,6 @@ void TestBrowserUi::SetPixelMatchAlgorithm(
 
 void TestBrowserUi::ShowAndVerifyUi() {
   PreShow();
-#if BUILDFLAG(IS_WIN)
-  // Gold files for pixel tests are for light mode, so if dark mode is not
-  // forced, and host is in dark mode, skip test.
-  if (!IsInteractiveUi() &&
-      !base::CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kForceDarkMode) &&
-      ui::NativeTheme::GetInstanceForNativeUi()->preferred_color_scheme() ==
-          ui::NativeTheme::PreferredColorScheme::kDark) {
-    GTEST_SKIP() << "Host is in dark mode; skipping test";
-  }
-#endif  // BUILDFLAG(IS_WIN)
   ShowUi(NameFromTestCase());
   ASSERT_TRUE(VerifyUi());
   if (IsInteractiveUi()) {

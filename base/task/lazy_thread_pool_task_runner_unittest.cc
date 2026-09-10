@@ -13,10 +13,6 @@
 #include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/com_init_util.h"
-#endif
-
 namespace base {
 
 namespace {
@@ -37,17 +33,6 @@ LazyThreadPoolSingleThreadTaskRunner g_single_thread_task_runner_user_blocking =
         TaskTraits(TaskPriority::USER_BLOCKING),
         SingleThreadTaskRunnerThreadMode::SHARED);
 
-#if BUILDFLAG(IS_WIN)
-LazyThreadPoolCOMSTATaskRunner g_com_sta_task_runner_user_visible =
-    LAZY_COM_STA_TASK_RUNNER_INITIALIZER(
-        TaskTraits(TaskPriority::USER_VISIBLE),
-        SingleThreadTaskRunnerThreadMode::SHARED);
-LazyThreadPoolCOMSTATaskRunner g_com_sta_task_runner_user_blocking =
-    LAZY_COM_STA_TASK_RUNNER_INITIALIZER(
-        TaskTraits(TaskPriority::USER_BLOCKING),
-        SingleThreadTaskRunnerThreadMode::SHARED);
-#endif  // BUILDFLAG(IS_WIN)
-
 void InitCheckers(SequenceCheckerImpl* sequence_checker,
                   ThreadCheckerImpl* thread_checker) {
   sequence_checker->DetachFromSequence();
@@ -67,20 +52,11 @@ void ExpectSequencedEnvironment(SequenceCheckerImpl* sequence_checker,
 void ExpectSingleThreadEnvironment(SequenceCheckerImpl* sequence_checker,
                                    ThreadCheckerImpl* thread_checker,
                                    TaskPriority expected_priority
-#if BUILDFLAG(IS_WIN)
-                                   ,
-                                   bool expect_com_sta = false
-#endif
 ) {
   EXPECT_TRUE(sequence_checker->CalledOnValidSequence());
   EXPECT_TRUE(thread_checker->CalledOnValidThread());
   EXPECT_EQ(expected_priority, internal::GetTaskPriorityForCurrentThread());
 
-#if BUILDFLAG(IS_WIN)
-  if (expect_com_sta) {
-    win::AssertComApartmentType(win::ComApartmentType::STA);
-  }
-#endif
 }
 
 class LazyThreadPoolTaskRunnerEnvironmentTest : public testing::Test {
@@ -96,10 +72,6 @@ class LazyThreadPoolTaskRunnerEnvironmentTest : public testing::Test {
   void TestTaskRunnerEnvironment(scoped_refptr<SequencedTaskRunner> task_runner,
                                  bool expect_single_thread,
                                  TaskPriority expected_priority
-#if BUILDFLAG(IS_WIN)
-                                 ,
-                                 bool expect_com_sta = false
-#endif
   ) {
     SequenceCheckerImpl sequence_checker;
     ThreadCheckerImpl thread_checker;
@@ -113,10 +85,6 @@ class LazyThreadPoolTaskRunnerEnvironmentTest : public testing::Test {
             ? BindOnce(&ExpectSingleThreadEnvironment,
                        Unretained(&sequence_checker),
                        Unretained(&thread_checker), expected_priority
-#if BUILDFLAG(IS_WIN)
-                       ,
-                       expect_com_sta
-#endif
                        )
             : BindOnce(&ExpectSequencedEnvironment,
                        Unretained(&sequence_checker),
@@ -154,20 +122,6 @@ TEST_F(LazyThreadPoolTaskRunnerEnvironmentTest,
                             true, TaskPriority::USER_BLOCKING);
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST_F(LazyThreadPoolTaskRunnerEnvironmentTest,
-       LazyThreadPoolCOMSTATaskRunnerUserVisible) {
-  TestTaskRunnerEnvironment(g_com_sta_task_runner_user_visible.Get(), true,
-                            TaskPriority::USER_VISIBLE, true);
-}
-
-TEST_F(LazyThreadPoolTaskRunnerEnvironmentTest,
-       LazyThreadPoolCOMSTATaskRunnerUserBlocking) {
-  TestTaskRunnerEnvironment(g_com_sta_task_runner_user_blocking.Get(), true,
-                            TaskPriority::USER_BLOCKING, true);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 TEST(LazyThreadPoolTaskRunnerTest, LazyThreadPoolSequencedTaskRunnerReset) {
   for (int i = 0; i < 2; ++i) {
     test::TaskEnvironment task_environment;
@@ -189,17 +143,5 @@ TEST(LazyThreadPoolTaskRunnerTest, LazyThreadPoolSingleThreadTaskRunnerReset) {
                                                              DoNothing());
   }
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST(LazyThreadPoolTaskRunnerTest, LazyThreadPoolCOMSTATaskRunnerReset) {
-  for (int i = 0; i < 2; ++i) {
-    test::TaskEnvironment task_environment;
-    // If the TaskRunner isn't released when the test::TaskEnvironment
-    // goes out of scope, the second invocation of the line below will access a
-    // deleted ThreadPoolInstance and crash.
-    g_com_sta_task_runner_user_visible.Get()->PostTask(FROM_HERE, DoNothing());
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace base

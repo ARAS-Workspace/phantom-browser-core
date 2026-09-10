@@ -56,8 +56,7 @@
 #endif
 
 // Other platforms have no-op implementations of WebRTC Diagnostic Logging.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 namespace {
 
 const char kTestUploadUrl[] = "https://upload.com/webrtc_upload";

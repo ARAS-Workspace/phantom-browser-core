@@ -73,50 +73,6 @@ TEST_F(DefaultBrowserStepEligibilityCheckerTest, DisabledByPolicy) {
   EXPECT_FALSE(future.Get());
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST_F(DefaultBrowserStepEligibilityCheckerTest, CheckFinishedIsDefault) {
-  SetDefaultBrowserDisabledByPolicy(false);
-
-  TestDefaultBrowserStepEligibilityChecker checker;
-  checker.SetStateForTesting(shell_integration::IS_DEFAULT);
-  base::test::TestFuture<bool> future;
-  checker.CheckEligibility(profile(), future.GetCallback());
-  EXPECT_FALSE(future.Get());
-}
-
-TEST_F(DefaultBrowserStepEligibilityCheckerTest, CheckFinishedNotDefault) {
-  SetDefaultBrowserDisabledByPolicy(false);
-
-  TestDefaultBrowserStepEligibilityChecker checker;
-  checker.SetStateForTesting(shell_integration::NOT_DEFAULT);
-  base::test::TestFuture<bool> future;
-  checker.CheckEligibility(profile(), future.GetCallback());
-  EXPECT_EQ(future.Get(), shell_integration::CanSetAsDefaultBrowser());
-}
-
-TEST_F(DefaultBrowserStepEligibilityCheckerTest,
-       CheckFinishedOtherModeIsDefault) {
-  SetDefaultBrowserDisabledByPolicy(false);
-
-  TestDefaultBrowserStepEligibilityChecker checker;
-  checker.SetStateForTesting(shell_integration::OTHER_MODE_IS_DEFAULT);
-  base::test::TestFuture<bool> future;
-  checker.CheckEligibility(profile(), future.GetCallback());
-  EXPECT_EQ(future.Get(), shell_integration::CanSetAsDefaultBrowser());
-}
-
-TEST_F(DefaultBrowserStepEligibilityCheckerTest, CheckFinishedUnknownDefault) {
-  SetDefaultBrowserDisabledByPolicy(false);
-
-  TestDefaultBrowserStepEligibilityChecker checker;
-  checker.SetStateForTesting(shell_integration::UNKNOWN_DEFAULT);
-  base::test::TestFuture<bool> future;
-  checker.CheckEligibility(profile(), future.GetCallback());
-  EXPECT_FALSE(future.Get());
-}
-#endif
-
-#if !BUILDFLAG(IS_WIN)
 TEST_F(DefaultBrowserStepEligibilityCheckerTest, NonWindowsReturnsFalse) {
   SetDefaultBrowserDisabledByPolicy(false);
 
@@ -125,4 +81,3 @@ TEST_F(DefaultBrowserStepEligibilityCheckerTest, NonWindowsReturnsFalse) {
   checker.CheckEligibility(profile(), future.GetCallback());
   EXPECT_FALSE(future.Get());
 }
-#endif

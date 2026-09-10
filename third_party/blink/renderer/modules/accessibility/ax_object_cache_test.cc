@@ -38,10 +38,6 @@
 #include "ui/accessibility/ax_action_data.h"
 #include "ui/gfx/geometry/rect.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "third_party/blink/public/web/win/web_font_rendering.h"
-#endif
-
 namespace blink {
 
 // TODO(nektar): Break test up into multiple tests.
@@ -747,10 +743,6 @@ TEST_F(AccessibilityTest, CanvasWithContentVisibilityAutoShouldNotCrash) {
 }
 
 TEST_F(AccessibilityTest, ValidationMessageIncludedInRootChildren) {
-#if BUILDFLAG(IS_WIN)
-  blink::WebFontRendering::SetMenuFontMetrics(
-      blink::WebString::FromAscii("Arial"), 12);
-#endif
   SetBodyInnerHTML(R"HTML(<input id="input">)HTML");
 
   AXObject* root = GetAXRootObject();

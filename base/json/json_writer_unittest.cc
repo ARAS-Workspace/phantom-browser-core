@@ -15,9 +15,6 @@
 #include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/string_util.h"
-#endif
 
 namespace base {
 
@@ -26,13 +23,7 @@ namespace {
 std::string FixNewlines(const std::string& json) {
   // The pretty-printer uses a different newline style on Windows than on
   // other platforms.
-#if BUILDFLAG(IS_WIN)
-  std::string result;
-  ReplaceChars(json, "\n", "\r\n", &result);
-  return result;
-#else
   return json;
-#endif
 }
 
 }  // namespace

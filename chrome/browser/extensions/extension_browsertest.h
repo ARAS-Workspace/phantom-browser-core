@@ -462,15 +462,6 @@ class ExtensionBrowserTest : public PlatformBrowserTest,
   // Disable external install UI.
   FeatureSwitch::ScopedOverride override_prompt_for_external_extensions_;
 
-#if BUILDFLAG(IS_WIN)
-  // Use mock shortcut directories to ensure app shortcuts are cleaned up.
-  base::ScopedPathOverride user_desktop_override_;
-  base::ScopedPathOverride common_desktop_override_;
-  base::ScopedPathOverride user_quick_launch_override_;
-  base::ScopedPathOverride start_menu_override_;
-  base::ScopedPathOverride common_start_menu_override_;
-#endif
-
   std::unique_ptr<ExtensionCache> test_extension_cache_;
 
   // Conditionally disable install verification.

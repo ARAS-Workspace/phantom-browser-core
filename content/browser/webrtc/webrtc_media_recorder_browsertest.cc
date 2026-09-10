@@ -167,9 +167,6 @@ IN_PROC_BROWSER_TEST_P(WebRtcMediaRecorderTest,
 #elif (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(THREAD_SANITIZER)
 // Flaky on Linux TSan, https://crbug.com/694373.
 #define MAYBE_PeerConnection DISABLED_PeerConnection
-#elif BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-// Fails on Win7 debug, https://crbug.com/703844.
-#define MAYBE_PeerConnection DISABLED_PeerConnection
 #elif BUILDFLAG(IS_MAC)
 // Fails on Mac, https://crbug.com/1222675
 #define MAYBE_PeerConnection DISABLED_PeerConnection

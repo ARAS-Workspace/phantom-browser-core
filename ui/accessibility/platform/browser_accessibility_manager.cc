@@ -506,13 +506,9 @@ bool BrowserAccessibilityManager::OnAccessibilityEvents(
   // remove this exclusion.
   base::ScopedSafetyChecksExclusion scoped_unsafe;
 
-#if BUILDFLAG(IS_WIN)
-  CHECK(!in_on_accessibility_events_)
-      << "Should not re-enter OnAccessiblityEvents()";
-#endif  // BUILDFLAG(IS_WIN)
-#if BUILDFLAG(IS_WIN) || DCHECK_IS_ON()
+#if DCHECK_IS_ON()
   base::AutoReset<bool> auto_reset(&in_on_accessibility_events_, true);
-#endif  // BUILDFLAG(IS_WIN) || DCHECK_IS_ON()
+#endif  // DCHECK_IS_ON()
 
   // Update the cached device scale factor.
   if (!use_custom_device_scale_factor_for_testing_)

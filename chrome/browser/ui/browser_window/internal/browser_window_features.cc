@@ -204,24 +204,20 @@
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/extensions/extension_browser_window_helper.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/extensions/settings_overridden_params_providers.h"
 #include "chrome/browser/ui/search_engines/default_search_extension_controlled_controller.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/pdf/infobar/pdf_infobar_controller.h"
 #include "chrome/browser/ui/startup/default_browser_prompt/pin_infobar/pin_infobar_controller.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/views/session_restore_infobar/session_restore_infobar_controller.h"
-#endif
-
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/ui/views/frame/windows_taskbar_icon_updater.h"
 #endif
 
 #if BUILDFLAG(IS_CHROMEOS)
@@ -474,7 +470,7 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
       browser->GetType() == BrowserWindowInterface::Type::TYPE_DEVTOOLS);
 #endif  // defined(USE_AURA)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (base::FeatureList::IsEnabled(features::kPdfInfoBar)) {
     pdf_infobar_controller_ =
         GetUserDataFactory().CreateInstance<pdf::infobar::PdfInfoBarController>(
@@ -484,9 +480,9 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
       GetUserDataFactory()
           .CreateInstance<default_browser::PinInfoBarController>(*browser,
                                                                  browser);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   profile_customization_bubble_sync_controller_ =
       std::make_unique<ProfileCustomizationBubbleSyncController>(browser,
                                                                  profile);
@@ -495,7 +491,7 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
           .CreateInstance<
               session_restore_infobar::SessionRestoreInfobarController>(
               *browser, browser);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   reading_list_side_panel_coordinator_ =
       GetUserDataFactory().CreateInstance<ReadingListSidePanelCoordinator>(
@@ -740,7 +736,7 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
     }
   }
 
-#if BUILDFLAG(ENABLE_EXTENSIONS) && (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC))
+#if BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(IS_MAC)
   if (browser_view) {
     if (!browser_->GetProfile()->IsOffTheRecord()) {
       base::UmaHistogramBoolean(
@@ -900,13 +896,6 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
   if (browser_view) {
     user_education_->Init(browser_view);
   }
-
-#if BUILDFLAG(IS_WIN)
-  if (browser_view) {
-    windows_taskbar_icon_updater_ =
-        std::make_unique<WindowsTaskbarIconUpdater>(*browser_view);
-  }
-#endif
 
   if (browser_view) {
     zoom_bubble_manager_ =
@@ -1112,9 +1101,6 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
   // Owned-by-all members.
   zoom_bubble_coordinator_.reset();
   zoom_bubble_manager_.reset();
-#if BUILDFLAG(IS_WIN)
-  windows_taskbar_icon_updater_.reset();
-#endif
   if (user_education_) {
     user_education_->TearDown();
   }
@@ -1157,7 +1143,7 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
     devtools_ui_controller_->TearDown();
   }
   desktop_browser_window_capabilities_.reset();
-#if BUILDFLAG(ENABLE_EXTENSIONS) && (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC))
+#if BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(IS_MAC)
   default_search_extension_controlled_controller_.reset();
 #endif
   data_protection_ui_controller_.reset();

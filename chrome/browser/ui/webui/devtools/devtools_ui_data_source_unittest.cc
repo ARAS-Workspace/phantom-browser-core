@@ -139,11 +139,7 @@ TEST_F(DevToolsUIDataSourceTest, TestDevToolsBundledURLWithQueryParam) {
 }
 
 TEST_F(DevToolsUIDataSourceTest, TestDevToolsBundledFileURLWithSwitch) {
-#if BUILDFLAG(IS_WIN)
-  const char* flag_value = "file://C:/tmp/";
-#else
   const char* flag_value = "file://tmp/";
-#endif
   base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
       switches::kCustomDevtoolsFrontend, flag_value);
   const GURL path =
@@ -212,11 +208,7 @@ TEST_F(DevToolsUIDataSourceTest, TestDevToolsRemoteURLWithSwitch) {
 }
 
 TEST_F(DevToolsUIDataSourceTest, TestDevToolsRemoteFileURLWithSwitch) {
-#if BUILDFLAG(IS_WIN)
-  const char* flag_value = "file://C:/tmp/";
-#else
   const char* flag_value = "file://tmp/";
-#endif
   base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
       switches::kCustomDevtoolsFrontend, flag_value);
   const GURL path =
@@ -228,11 +220,7 @@ TEST_F(DevToolsUIDataSourceTest, TestDevToolsRemoteFileURLWithSwitch) {
 
 TEST_F(DevToolsUIDataSourceTest,
        TestDevToolsRemoteFileURLWithSwitchAndServeRevParameters) {
-#if BUILDFLAG(IS_WIN)
-  const char* flag_value = "file://C:/tmp/";
-#else
   const char* flag_value = "file://tmp/";
-#endif
   base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
       switches::kCustomDevtoolsFrontend, flag_value);
   const GURL path = DevToolsUrl().Resolve(
@@ -245,11 +233,7 @@ TEST_F(DevToolsUIDataSourceTest,
 
 TEST_F(DevToolsUIDataSourceTest,
        TestDevToolsRemoteFileURLWithSwitchAndServeFileParameters) {
-#if BUILDFLAG(IS_WIN)
-  const char* flag_value = "file://C:/tmp/";
-#else
   const char* flag_value = "file://tmp/";
-#endif
   base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
       switches::kCustomDevtoolsFrontend, flag_value);
   const GURL path = DevToolsUrl().Resolve(DevToolsRemotePath(
@@ -262,11 +246,7 @@ TEST_F(DevToolsUIDataSourceTest,
 
 TEST_F(DevToolsUIDataSourceTest,
        TestDevToolsRemoteFileURLWithSwitchAndServeInternalFileParameters) {
-#if BUILDFLAG(IS_WIN)
-  const char* flag_value = "file://C:/tmp/";
-#else
   const char* flag_value = "file://tmp/";
-#endif
   base::CommandLine::ForCurrentProcess()->AppendSwitchASCII(
       switches::kCustomDevtoolsFrontend, flag_value);
   const GURL path = DevToolsUrl().Resolve(DevToolsRemotePath(

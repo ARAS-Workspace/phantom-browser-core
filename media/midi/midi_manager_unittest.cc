@@ -23,10 +23,6 @@
 #include "media/midi/task_service.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "media/midi/midi_manager_win.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/jni_android.h"
 #include "base/threading/simple_thread.h"
@@ -391,8 +387,8 @@ class PlatformMidiManagerTest : public ::testing::Test {
   // This #ifdef needs to be identical to the one in media/midi/midi_manager.cc.
   // Do not change the condition for disabling this test.
   bool IsSupported() {
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_WIN) && \
-    !(defined(USE_ALSA) && defined(USE_UDEV)) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_APPLE) && !(defined(USE_ALSA) && defined(USE_UDEV)) && \
+    !BUILDFLAG(IS_ANDROID)
     return false;
 #elif BUILDFLAG(IS_ANDROID)
     return HasSystemFeatureMidiForTesting();
@@ -427,9 +423,6 @@ TEST_F(PlatformMidiManagerTest, CreatePlatformMidiManager) {
 
 TEST_F(PlatformMidiManagerTest, InstanceIdOverflow) {
   service()->task_service()->OverflowInstanceIdForTesting();
-#if BUILDFLAG(IS_WIN)
-  MidiManagerWin::OverflowInstanceIdForTesting();
-#endif  // BUILDFLAG(IS_WIN)
 
   StartSession();
   ASSERT_TRUE(future()->Wait());

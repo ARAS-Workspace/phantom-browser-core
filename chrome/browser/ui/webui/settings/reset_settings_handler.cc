@@ -40,11 +40,6 @@
 #include "components/services/app_service/public/cpp/app_launch_util.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/profile_resetter/triggered_profile_resetter.h"
-#include "chrome/browser/profile_resetter/triggered_profile_resetter_factory.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace settings {
 
 #if BUILDFLAG(IS_CHROMEOS)
@@ -214,18 +209,6 @@ void ResetSettingsHandler::HandleGetTriggeredResetToolName(
   // Set up the localized strings for the triggered profile reset dialog.
   // Custom reset tool names are supported on Windows only.
   std::u16string reset_tool_name;
-#if BUILDFLAG(IS_WIN)
-  Profile* profile = Profile::FromWebUI(web_ui());
-  TriggeredProfileResetter* triggered_profile_resetter =
-      TriggeredProfileResetterFactory::GetForBrowserContext(profile);
-  // TriggeredProfileResetter instance will be nullptr for incognito profiles.
-  if (triggered_profile_resetter) {
-    reset_tool_name = triggered_profile_resetter->GetResetToolName();
-
-    // Now that a reset UI has been shown, don't trigger again for this profile.
-    triggered_profile_resetter->ClearResetTrigger();
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   if (reset_tool_name.empty()) {
     reset_tool_name = l10n_util::GetStringUTF16(

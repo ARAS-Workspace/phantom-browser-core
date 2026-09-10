@@ -169,7 +169,6 @@ TEST_F(CastMediaSinkServiceTest, DiscoveryDelayed) {
                                   nullptr);
 }
 
-#if !BUILDFLAG(IS_WIN)
 // TODO: crbug.com/345056325 - Remove this test after the
 // kDelayMediaSinkDiscovery feature is enabled by default.
 TEST_F(CastMediaSinkServiceTest, DiscoveryOnStartup) {
@@ -183,7 +182,6 @@ TEST_F(CastMediaSinkServiceTest, DiscoveryOnStartup) {
   media_sink_service_->Initialize(base::DoNothing(), base::DoNothing(),
                                   nullptr);
 }
-#endif
 
 TEST_F(CastMediaSinkServiceTest, DiscoveryPermissionRejected) {
   base::MockCallback<base::RepeatingClosure> cb;

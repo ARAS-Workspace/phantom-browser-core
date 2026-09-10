@@ -93,13 +93,6 @@ class SandboxedNQEBrowserTest : public ContentBrowserTest {
   }
 
   void SetUpOnMainThread() override {
-#if BUILDFLAG(IS_WIN)
-    if (!sandbox::policy::features::IsNetworkSandboxSupported()) {
-      // On *some* Windows, sandboxing cannot be enabled. We skip all the tests
-      // on such platforms.
-      GTEST_SKIP();
-    }
-#endif
 
     // These assertions need to precede ContentBrowserTest::SetUp to prevent the
     // test body from running when one of the assertions fails.
@@ -143,11 +136,7 @@ IN_PROC_BROWSER_TEST_F(SandboxedNQEBrowserTest, GetNetworkService) {
   EXPECT_TRUE(GetNetworkService());
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_NetworkQualityTracker DISABLED_NetworkQualityTracker
-#else
 #define MAYBE_NetworkQualityTracker NetworkQualityTracker
-#endif
 // Simulate EffectiveConnectionType change in NetworkQualityEstimator and
 // reports it to mojo client.
 IN_PROC_BROWSER_TEST_F(SandboxedNQEBrowserTest, MAYBE_NetworkQualityTracker) {

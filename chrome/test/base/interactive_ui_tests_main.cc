@@ -28,20 +28,12 @@
 
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ash/test/ui_controls_ash.h"
-#elif BUILDFLAG(IS_WIN)
-#include "ui/aura/test/ui_controls_aurawin.h"
 #endif
 
 #if defined(USE_AURA) && BUILDFLAG(IS_OZONE)
 #include "ui/ozone/public/ozone_platform.h"
 #include "ui/platform_window/common/platform_window_defaults.h"
 #endif  // defined(USE_AURA) && BUILDFLAG(IS_OZONE)
-
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#include "base/win/win_util.h"
-#include "chrome/test/base/always_on_top_window_killer_win.h"
-#endif
 
 class InteractiveUITestSuite : public ChromeTestSuite {
  public:
@@ -55,9 +47,6 @@ class InteractiveUITestSuite : public ChromeTestSuite {
 
 #if BUILDFLAG(IS_CHROMEOS)
     ash::test::EnableUIControlsAsh();
-#elif BUILDFLAG(IS_WIN)
-    com_initializer_ = std::make_unique<base::win::ScopedCOMInitializer>();
-    aura::test::EnableUIControlsAuraWin();
 #elif BUILDFLAG(IS_OZONE)
     // Notifies the platform that test config is needed. For Wayland, for
     // example, makes it possible to use emulated input.
@@ -92,15 +81,9 @@ class InteractiveUITestSuite : public ChromeTestSuite {
   }
 
   void Shutdown() override {
-#if BUILDFLAG(IS_WIN)
-    com_initializer_.reset();
-#endif
   }
 
  private:
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<base::win::ScopedCOMInitializer> com_initializer_;
-#endif
   base::TestDiscardableMemoryAllocator discardable_memory_allocator_;
 };
 
@@ -117,21 +100,9 @@ class InteractiveUITestLauncherDelegate : public ChromeTestLauncherDelegate {
   // content::TestLauncherDelegate:
   void PreSharding() override {
     ChromeTestLauncherDelegate::PreSharding();
-#if BUILDFLAG(IS_WIN)
-    // Check for any always-on-top windows present before any tests are run.
-    // Take a snapshot if any are found and attempt to close any that are system
-    // dialogs.
-    KillAlwaysOnTopWindows(RunType::BEFORE_SHARD);
-#endif
   }
 
   void OnTestTimedOut(const base::CommandLine& command_line) override {
-#if BUILDFLAG(IS_WIN)
-    // Take a snapshot of the screen and check for any always-on-top windows
-    // present before terminating the test. Attempt to close any that are system
-    // dialogs.
-    KillAlwaysOnTopWindows(RunType::AFTER_TEST_TIMEOUT, &command_line);
-#endif
     ChromeTestLauncherDelegate::OnTestTimedOut(command_line);
   }
 
@@ -181,10 +152,6 @@ int main(int argc, char** argv) {
   InProcessBrowserTest::set_global_browser_set_up_function(
       &ui_test_utils::BringBrowserWindowToFront);
 
-#if BUILDFLAG(IS_WIN)
-  base::win::EnableHighDPISupport();
-#endif  // BUILDFLAG(IS_WIN)
-
   // For ash chrome, it's using multiple X11 windows to host the browser.
   // Also, {emulating|injecting} keyboard and mouse events happen at ozone
   // level, not OS level. So it is fine to run tests in parallel.
@@ -204,13 +171,6 @@ int main(int argc, char** argv) {
     // Since the test is interactive, the invoker will want to have pixel output
     // to actually see the result.
     command_line->AppendSwitch(switches::kEnablePixelOutputInTests);
-#if BUILDFLAG(IS_WIN)
-    // Under Windows, dialogs (but not the browser window) created in the
-    // spawned browser_test process are invisible for some unknown reason.
-    // Pass in --disable-gpu to resolve this for now. See
-    // http://crbug.com/40504416.
-    command_line->AppendSwitch(switches::kDisableGpu);
-#endif  // BUILDFLAG(IS_WIN)
   }
 
   InteractiveUITestSuiteRunner runner;

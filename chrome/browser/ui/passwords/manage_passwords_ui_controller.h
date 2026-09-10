@@ -444,7 +444,7 @@ class ManagePasswordsUIController
   // is resolved).
   bool save_password_after_trusted_vault_error_resolution_ = false;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
   bool was_biometric_authentication_for_filling_promo_shown_ = false;
 #endif
 

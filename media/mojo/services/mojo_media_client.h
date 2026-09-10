@@ -103,14 +103,6 @@ class MEDIA_MOJO_EXPORT MojoMediaClient {
       const std::string& audio_device_id);
 
 
-#if BUILDFLAG(IS_WIN)
-  virtual std::unique_ptr<Renderer> CreateMediaFoundationRenderer(
-      scoped_refptr<base::SingleThreadTaskRunner> task_runner,
-      mojom::FrameInterfaceFactory* frame_interfaces,
-      mojo::PendingRemote<mojom::MediaLog> media_log_remote,
-      mojo::PendingReceiver<mojom::MediaFoundationRendererExtension>
-          renderer_extension_receiver);
-#endif  // BUILDFLAG(IS_WIN)
 
   // Returns the CdmFactory to be used by MojoCdmService. |frame_interfaces|
   // can be used to request interfaces provided remotely by the host. It may

@@ -55,10 +55,6 @@
 #include "base/posix/eintr_wrapper.h"
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/com_init_util.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace base::internal {
 
 namespace {
@@ -989,24 +985,6 @@ TEST_P(ThreadPoolImplTest, SingleThreadRunsTasksInCurrentSequence) {
   task_ran.Wait();
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST_P(ThreadPoolImplTest, COMSTATaskRunnersRunWithCOMSTA) {
-  StartThreadPool();
-  auto com_sta_task_runner = thread_pool_->CreateCOMSTATaskRunner(
-      {}, SingleThreadTaskRunnerThreadMode::SHARED);
-
-  TestWaitableEvent task_ran;
-  com_sta_task_runner->PostTask(
-      FROM_HERE, BindOnce(
-                     [](TestWaitableEvent* task_ran) {
-                       win::AssertComApartmentType(win::ComApartmentType::STA);
-                       task_ran->Signal();
-                     },
-                     Unretained(&task_ran)));
-  task_ran.Wait();
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 TEST_P(ThreadPoolImplTest, DelayedTasksNotRunAfterShutdown) {
   StartThreadPool();
   // As with delayed tasks in general, this is racy. If the task does happen to
@@ -1180,11 +1158,6 @@ void VerifyHasStringsOnStack(const std::string& pool_str,
 // Many POSIX bots flakily crash on |debug::StackTrace().ToString()|,
 // https://crbug.com/840429.
 #define MAYBE_IdentifiableStacks DISABLED_IdentifiableStacks
-#elif BUILDFLAG(IS_WIN) && \
-    (defined(ADDRESS_SANITIZER) || BUILDFLAG(CFI_CAST_CHECK))
-// Hangs on WinASan and WinCFI (grabbing StackTrace() too slow?),
-// https://crbug.com/845010#c7.
-#define MAYBE_IdentifiableStacks DISABLED_IdentifiableStacks
 #else
 #define MAYBE_IdentifiableStacks IdentifiableStacks
 #endif
@@ -1240,33 +1213,6 @@ TEST_P(ThreadPoolImplTest, MAYBE_IdentifiableStacks) {
                                        "RunBackgroundDedicatedWorker",
                                        shutdown_behavior.second));
 
-#if BUILDFLAG(IS_WIN)
-    thread_pool_
-        ->CreateCOMSTATaskRunner(traits,
-                                 SingleThreadTaskRunnerThreadMode::SHARED)
-        ->PostTask(FROM_HERE,
-                   BindOnce(&VerifyHasStringsOnStack, "RunSharedCOMWorker",
-                            shutdown_behavior.second));
-    thread_pool_
-        ->CreateCOMSTATaskRunner(best_effort_traits,
-                                 SingleThreadTaskRunnerThreadMode::SHARED)
-        ->PostTask(FROM_HERE, BindOnce(&VerifyHasStringsOnStack,
-                                       "RunBackgroundSharedCOMWorker",
-                                       shutdown_behavior.second));
-
-    thread_pool_
-        ->CreateCOMSTATaskRunner(traits,
-                                 SingleThreadTaskRunnerThreadMode::DEDICATED)
-        ->PostTask(FROM_HERE,
-                   BindOnce(&VerifyHasStringsOnStack, "RunDedicatedCOMWorker",
-                            shutdown_behavior.second));
-    thread_pool_
-        ->CreateCOMSTATaskRunner(best_effort_traits,
-                                 SingleThreadTaskRunnerThreadMode::DEDICATED)
-        ->PostTask(FROM_HERE, BindOnce(&VerifyHasStringsOnStack,
-                                       "RunBackgroundDedicatedCOMWorker",
-                                       shutdown_behavior.second));
-#endif  // BUILDFLAG(IS_WIN)
   }
 
   thread_pool_->FlushForTesting();
@@ -1308,17 +1254,9 @@ TEST_P(ThreadPoolImplTest, WorkerThreadObserver) {
   const int kExpectedNumDedicatedSingleThreadedWorkers = 6;
 
   const int kExpectedNumCOMSharedSingleThreadedWorkers =
-#if BUILDFLAG(IS_WIN)
-      kExpectedNumSharedSingleThreadedWorkers;
-#else
       0;
-#endif
   const int kExpectedNumCOMDedicatedSingleThreadedWorkers =
-#if BUILDFLAG(IS_WIN)
-      kExpectedNumDedicatedSingleThreadedWorkers;
-#else
       0;
-#endif
 
   EXPECT_CALL(*observer, OnWorkerThreadMainEntry())
       .Times(kExpectedNumPoolWorkers + kExpectedNumSharedSingleThreadedWorkers +
@@ -1367,43 +1305,6 @@ TEST_P(ThreadPoolImplTest, WorkerThreadObserver) {
   task_runners.push_back(thread_pool_->CreateSingleThreadTaskRunner(
       {TaskPriority::USER_BLOCKING, MayBlock()},
       SingleThreadTaskRunnerThreadMode::DEDICATED));
-
-#if BUILDFLAG(IS_WIN)
-  task_runners.push_back(thread_pool_->CreateCOMSTATaskRunner(
-      {TaskPriority::BEST_EFFORT}, SingleThreadTaskRunnerThreadMode::SHARED));
-  task_runners.push_back(thread_pool_->CreateCOMSTATaskRunner(
-      {TaskPriority::BEST_EFFORT, MayBlock()},
-      SingleThreadTaskRunnerThreadMode::SHARED));
-  task_runners.push_back(thread_pool_->CreateCOMSTATaskRunner(
-      {TaskPriority::USER_VISIBLE}, SingleThreadTaskRunnerThreadMode::SHARED));
-  task_runners.push_back(thread_pool_->CreateCOMSTATaskRunner(
-      {TaskPriority::USER_VISIBLE, MayBlock()},
-      SingleThreadTaskRunnerThreadMode::SHARED));
-  task_runners.push_back(thread_pool_->CreateCOMSTATaskRunner(
-      {TaskPriority::USER_BLOCKING}, SingleThreadTaskRunnerThreadMode::SHARED));
-  task_runners.push_back(thread_pool_->CreateCOMSTATaskRunner(
-      {TaskPriority::USER_BLOCKING, MayBlock()},
-      SingleThreadTaskRunnerThreadMode::SHARED));
-
-  task_runners.push_back(thread_pool_->CreateCOMSTATaskRunner(
-      {TaskPriority::BEST_EFFORT},
-      SingleThreadTaskRunnerThreadMode::DEDICATED));
-  task_runners.push_back(thread_pool_->CreateCOMSTATaskRunner(
-      {TaskPriority::BEST_EFFORT, MayBlock()},
-      SingleThreadTaskRunnerThreadMode::DEDICATED));
-  task_runners.push_back(thread_pool_->CreateCOMSTATaskRunner(
-      {TaskPriority::USER_VISIBLE},
-      SingleThreadTaskRunnerThreadMode::DEDICATED));
-  task_runners.push_back(thread_pool_->CreateCOMSTATaskRunner(
-      {TaskPriority::USER_VISIBLE, MayBlock()},
-      SingleThreadTaskRunnerThreadMode::DEDICATED));
-  task_runners.push_back(thread_pool_->CreateCOMSTATaskRunner(
-      {TaskPriority::USER_BLOCKING},
-      SingleThreadTaskRunnerThreadMode::DEDICATED));
-  task_runners.push_back(thread_pool_->CreateCOMSTATaskRunner(
-      {TaskPriority::USER_BLOCKING, MayBlock()},
-      SingleThreadTaskRunnerThreadMode::DEDICATED));
-#endif
 
   for (auto& task_runner : task_runners) {
     task_runner->PostTask(FROM_HERE, DoNothing());

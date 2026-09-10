@@ -38,7 +38,7 @@
 #include "google_apis/gaia/gaia_id.h"
 #include "services/network/test/test_url_loader_factory.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "base/files/file_path.h"
 #include "base/process/process.h"
 #include "base/strings/string_util.h"
@@ -46,18 +46,11 @@
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
 #include "components/device_signals/core/common/signals_features.h"
 #include "components/device_signals/core/system_signals/platform_utils.h"  // nogncheck
-#endif  //  BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "components/device_signals/test/test_constants.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/sys_string_conversions.h"
-#include "base/test/test_reg_util_win.h"
-#include "base/win/registry.h"
-#include "components/device_signals/test/win/scoped_executable_files.h"
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 #if !BUILDFLAG(IS_CHROMEOS)
 #include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
@@ -213,7 +206,7 @@ class EnterpriseReportingPrivateApiTest : public extensions::ExtensionApiTest {
 
     identity_test_env()->SetTestURLLoaderFactory(&test_url_loader_factory_);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     // Set device org's affiliated IDs.
     auto* browser_policy_manager =
         g_browser_process->browser_policy_connector()
@@ -223,7 +216,7 @@ class EnterpriseReportingPrivateApiTest : public extensions::ExtensionApiTest {
     browser_policy_data->add_device_affiliation_ids(kAffiliationId);
     browser_policy_manager->core()->store()->set_policy_data_for_testing(
         std::move(browser_policy_data));
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   }
 
   void TearDownOnMainThread() override {
@@ -261,7 +254,7 @@ IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest,
 
 IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest, GetDeviceId) {
   constexpr char kAssertions[] =
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       "chrome.test.assertNoLastError();"
       "chrome.test.assertEq(id, 'client_id');";
 #else
@@ -281,7 +274,7 @@ IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest, GetDeviceId) {
 
 IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest, GetPersistentSecret) {
   constexpr char kAssertions[] =
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
       "chrome.test.assertNoLastError();"
       "chrome.test.assertTrue(secret instanceof ArrayBuffer);";
 #else
@@ -303,7 +296,7 @@ IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest, GetPersistentSecret) {
 
 IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest, GetDeviceData) {
   constexpr char kAssertions[] =
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       "chrome.test.assertNoLastError();"
       "chrome.test.assertTrue(data instanceof ArrayBuffer);";
 #else
@@ -323,7 +316,7 @@ IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest, GetDeviceData) {
 
 IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest, SetDeviceData) {
   constexpr char kAssertions[] =
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       "chrome.test.assertNoLastError();"
       "chrome.enterprise.reportingPrivate.getDeviceData('id', (data) => {"
       "  let view = new Int8Array(data);"
@@ -353,56 +346,13 @@ IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest, SetDeviceData) {
 }
 
 IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest, GetDeviceInfo) {
-#if BUILDFLAG(IS_WIN)
-  constexpr char kOSName[] = "windows";
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   constexpr char kOSName[] = "macOS";
 #elif BUILDFLAG(IS_LINUX)
   constexpr char kOSName[] = "linux";
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  // The added conditions for windows are related to the fact that we don't know
-  // if the machine running the test is managed or not
-  constexpr char kTest[] = R"(
-    chrome.test.assertEq(
-      'function',
-      typeof chrome.enterprise.reportingPrivate.getDeviceInfo);
-
-    chrome.enterprise.reportingPrivate.getDeviceInfo((deviceInfo) => {
-      chrome.test.assertNoLastError();
-      let count = 10;
-      if(deviceInfo.windowsUserDomain){
-        count++;
-        chrome.test.assertEq(typeof deviceInfo.windowsUserDomain, "string");
-      } else {
-        chrome.test.assertEq(typeof deviceInfo.windowsUserDomain, "undefined");
-      }
-
-      if(deviceInfo.windowsMachineDomain){
-        count++;
-        chrome.test.assertEq(typeof deviceInfo.windowsMachineDomain, "string");
-      } else {
-        chrome.test.assertEq(
-          typeof deviceInfo.windowsMachineDomain,
-          "undefined");
-      }
-      chrome.test.assertEq(count, Object.keys(deviceInfo).length);
-      chrome.test.assertEq('%s', deviceInfo.osName);
-      chrome.test.assertEq(typeof deviceInfo.osVersion, 'string');
-      chrome.test.assertEq(typeof deviceInfo.securityPatchLevel, 'string');
-      chrome.test.assertEq(typeof deviceInfo.deviceHostName, 'string');
-      chrome.test.assertEq(typeof deviceInfo.deviceModel, 'string');
-      chrome.test.assertEq(typeof deviceInfo.serialNumber, 'string');
-      chrome.test.assertEq(typeof deviceInfo.screenLockSecured, 'string');
-      chrome.test.assertEq(typeof deviceInfo.diskEncrypted, 'string');
-      chrome.test.assertTrue(deviceInfo.macAddresses instanceof Array);
-      chrome.test.assertEq(typeof deviceInfo.secureBootEnabled, 'string');
-
-      chrome.test.notifyPass();
-    });)";
-  RunTest(base::StringPrintf(kTest, kOSName));
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   constexpr char kTest[] = R"(
     chrome.test.assertEq(
       'function',
@@ -495,159 +445,7 @@ IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest, GetCertificate) {
     });)");
 }
 
-#if BUILDFLAG(IS_WIN)
-
-IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest, GetAvInfo_Success) {
-  constexpr char kTest[] = R"(
-      chrome.test.assertEq(
-        'function',
-        typeof chrome.enterprise.reportingPrivate.getAvInfo);
-      const userContext = {userId: '%s'};
-
-   chrome.enterprise.reportingPrivate.getAvInfo(userContext, (avProducts) => {
-        chrome.test.assertNoLastError();
-        chrome.test.assertTrue(avProducts instanceof Array);
-        chrome.test.notifyPass();
-      });
-  )";
-
-  AccountInfo account_info = SignIn("some-email@example.com");
-  RunTest(base::StringPrintf(kTest, account_info.gaia.ToString().c_str()));
-}
-
-IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest, GetHotfixes_Success) {
-  constexpr char kTest[] = R"(
-      chrome.test.assertEq(
-        'function',
-        typeof chrome.enterprise.reportingPrivate.getHotfixes);
-      const userContext = {userId: '%s'};
-
-   chrome.enterprise.reportingPrivate.getHotfixes(userContext, (hotfixes) => {
-        chrome.test.assertNoLastError();
-        chrome.test.assertTrue(hotfixes instanceof Array);
-        chrome.test.notifyPass();
-      });
-  )";
-
-  AccountInfo account_info = SignIn("some-email@example.com");
-  RunTest(base::StringPrintf(kTest, account_info.gaia.ToString().c_str()));
-}
-
-IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest,
-                       GetRegistrySettings_Success) {
-  constexpr char kTest[] = R"(
-      chrome.test.assertEq(
-        'function',
-        typeof chrome.enterprise.reportingPrivate.getSettings);
-      const userContext = {userId: '%s'};
-      const options = [];
-
-      %s
-
-      const request = {userContext, options};
-
-   chrome.enterprise.reportingPrivate.getSettings(
-    request,
-    (settingsItems) => {
-        %s
-    });
-  )";
-
-  std::string kOptions = "";
-
-  std::string registry_path = "SOFTWARE\\\\Chromium\\\\DeviceTrust\\\\Test";
-  std::string valid_key = "test_key";
-
-  kOptions = base::StringPrintf(
-      R"(
-    const test_hive = 'HKEY_CURRENT_USER';
-    const registry_path = '%s';
-    const invalid_path = 'SOFTWARE\\Chromium\\DeviceTrust\\Invalid';
-    const valid_key = '%s';
-    const invalid_key = 'invalid_key';
-
-    options.push({
-      hive: test_hive,
-      path: registry_path,
-      key: valid_key,
-      getValue: false
-    });
-    options.push({
-      hive: test_hive,
-      path: registry_path,
-      key: valid_key,
-      getValue: true
-    });
-    options.push({
-      hive: test_hive,
-      path: registry_path,
-      key: invalid_key,
-      getValue: true
-    });
-    options.push({
-      hive: test_hive,
-      path: invalid_path,
-      key: valid_key,
-      getValue: true
-    });
-  )",
-      registry_path.c_str(), valid_key.c_str());
-
-  registry_util::RegistryOverrideManager registry_override_manager_;
-  registry_override_manager_.OverrideRegistry(HKEY_CURRENT_USER);
-
-  base::win::RegKey key(HKEY_CURRENT_USER,
-                        base::SysUTF8ToWide(registry_path).c_str(),
-                        KEY_ALL_ACCESS);
-  ASSERT_TRUE(key.WriteValue(base::SysUTF8ToWide(valid_key).c_str(), 37) ==
-              ERROR_SUCCESS);
-
-  constexpr char kAssertions[] = R"(
-      chrome.test.assertNoLastError();
-      chrome.test.assertTrue(settingsItems instanceof Array);
-      chrome.test.assertEq(4, settingsItems.length);
-
-      const expectedItems = [];
-
-      expectedItems.push({
-        hive: test_hive,
-        path: registry_path,
-        key: valid_key,
-        presence: 'FOUND',
-      });
-      expectedItems.push({
-        hive: test_hive,
-        path: registry_path,
-        key: valid_key,
-        presence: 'FOUND',
-        value: '37',
-      });
-      expectedItems.push({
-        hive: test_hive,
-        path: registry_path,
-        key: invalid_key,
-        presence: 'NOT_FOUND',
-      });
-      expectedItems.push({
-        hive: test_hive,
-        path: invalid_path,
-        key: valid_key,
-        presence: 'NOT_FOUND',
-      });
-      for (let i = 0; i < settingsItems.length; ++i) {
-        chrome.test.assertEq(settingsItems[i], expectedItems[i]);
-      }
-      chrome.test.notifyPass();
-  )";
-
-  AccountInfo account_info = SignIn("some-email@example.com");
-  RunTest(base::StringPrintf(kTest, account_info.gaia.ToString().c_str(),
-                             kOptions.c_str(), kAssertions));
-}
-
-#endif  // BUILDFLAG(IS_WIN)
-
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
 
 IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest,
                        GetRegistrySettings_UnsupportedPlatform) {
@@ -661,9 +459,9 @@ IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest,
   RunTest(base::StringPrintf("%s", kTest));
 }
 
-#endif  // !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#endif  // !BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // TODO(crbug.com/40888560): Failing consistently on Mac.
 // TODO(crbug.com/40863616): Flaky on Linux.
 #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
@@ -712,77 +510,7 @@ IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest,
   )";
 
   std::string extra_items = "";
-#if BUILDFLAG(IS_WIN)
-  device_signals::test::ScopedExecutableFiles scoped_executable_files;
-  std::string signed_exe_path =
-      scoped_executable_files.GetSignedExePath().AsUTF8Unsafe();
-  base::ReplaceSubstringsAfterOffset(&signed_exe_path, 0U, "\\", "\\\\");
-
-  std::string metadata_exe_path =
-      scoped_executable_files.GetMetadataExePath().AsUTF8Unsafe();
-  base::ReplaceSubstringsAfterOffset(&metadata_exe_path, 0U, "\\", "\\\\");
-
-  extra_items = base::StringPrintf(
-      R"(
-    const signedExePath = '%s';
-    options.push({
-      path: signedExePath,
-      computeSha256: true,
-      computeExecutableMetadata: true
-    });
-
-    const metadataExePath = '%s';
-    const metadataName = '%s';
-    const metadataVersion = '%s';
-    options.push({
-      path: metadataExePath,
-      computeSha256: true,
-      computeExecutableMetadata: true
-    });
-  )",
-      signed_exe_path.c_str(), metadata_exe_path.c_str(),
-      scoped_executable_files.GetMetadataProductName().c_str(),
-      scoped_executable_files.GetMetadataProductVersion().c_str());
-
-  constexpr char kAssertions[] = R"(
-        chrome.test.assertTrue(fileItems instanceof Array);
-        chrome.test.assertEq(3, fileItems.length);
-
-        let expectedFilesCounter = 0;
-        for (const response of fileItems) {
-          if (response.path === executablePath) {
-            chrome.test.assertEq('FOUND', response.presence);
-            chrome.test.assertTrue(!!response.sha256Hash);
-            chrome.test.assertTrue(response.isRunning);
-            chrome.test.assertEq([], response.publicKeysHashes);
-            ++expectedFilesCounter;
-          } else if (response.path === signedExePath) {
-            chrome.test.assertEq('FOUND', response.presence);
-            chrome.test.assertEq(
-              '4R_6DJ8lI0RTqe3RyyUdRhB_NLU2rXRkKoWErKjBqM4',
-              response.sha256Hash);
-            chrome.test.assertEq(
-              ['Rsw3wqh8gUxnMU8j2jGvvBMZqpe6OhIxn_WeEVg-pYQ'],
-              response.publicKeysHashes);
-            chrome.test.assertFalse(response.isRunning);
-            chrome.test.assertFalse(!!response.productName);
-            chrome.test.assertFalse(!!response.version);
-            ++expectedFilesCounter;
-          } else if (response.path === metadataExePath) {
-            chrome.test.assertEq('FOUND', response.presence);
-            chrome.test.assertEq(
-              'bLHEy9cl0WbDjNsdsSCGp1wRGT0tdp8ML56xyrh0W48',
-              response.sha256Hash);
-            chrome.test.assertEq(metadataName, response.productName);
-            chrome.test.assertEq(metadataVersion, response.version);
-            chrome.test.assertEq([], response.publicKeysHashes);
-            chrome.test.assertFalse(response.isRunning);
-            ++expectedFilesCounter;
-          }
-        }
-        chrome.test.assertEq(fileItems.length, expectedFilesCounter);
-  )";
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   std::string test_bundle_path =
       device_signals::test::GetTestBundlePath().AsUTF8Unsafe();
 
@@ -840,7 +568,7 @@ IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest,
         chrome.test.assertTrue(!!fileItemResponse.sha256Hash);
         chrome.test.assertTrue(fileItemResponse.isRunning);
   )";
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
   // Escape all backslashes.
   std::string escaped_file_path = test_runner_file_path->AsUTF8Unsafe();
@@ -852,7 +580,7 @@ IN_PROC_BROWSER_TEST_F(EnterpriseReportingPrivateApiTest,
                              kAssertions));
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_MAC)
 // TODO(http://crbug.com/40888560): Failing consistently on Mac.

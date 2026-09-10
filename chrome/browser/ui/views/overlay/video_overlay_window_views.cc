@@ -87,16 +87,6 @@
 #include "ui/aura/window.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/shell_integration_win.h"
-#include "content/public/browser/render_widget_host_view.h"
-#include "ui/aura/window.h"
-#include "ui/aura/window_tree_host.h"
-#include "ui/base/ime/text_input_client.h"
-#include "ui/base/ime/win/tsf_input_scope.h"
-#include "ui/base/win/shell.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/views/overlay/video_overlay_window_native_widget_mac.h"
 #endif  // BUILDFLAG(IS_MAC)
@@ -347,9 +337,7 @@ std::unique_ptr<VideoOverlayWindowViews> VideoOverlayWindowViews::Create(
 // Fade in animation is disabled for Document and Video Picture-in-Picture on
 // Windows. On Windows, resizable windows can not be translucent. See
 // crbug.com/425711450.
-#if !BUILDFLAG(IS_WIN)
   params.opacity = views::Widget::InitParams::WindowOpacity::kTranslucent;
-#endif
 
 #if BUILDFLAG(IS_MAC)
   // On Mac, we override the default native widget with our own subclass, which
@@ -368,48 +356,6 @@ std::unique_ptr<VideoOverlayWindowViews> VideoOverlayWindowViews::Create(
 
   overlay_window->Init(std::move(params));
   overlay_window->OnRootViewReady();
-
-#if BUILDFLAG(IS_WIN)
-  std::wstring app_user_model_id;
-  BrowserWindowInterface* browser =
-      GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
-          controller->GetWebContents());
-  if (browser) {
-    Browser* raw_browser = browser->GetBrowserForMigrationOnly();
-    const base::FilePath& profile_path = browser->GetProfile()->GetPath();
-    // Set the window app id to GetAppUserModelIdForApp if the original window
-    // is an app window, GetAppUserModelIdForBrowser if it's a browser window.
-    app_user_model_id =
-        browser->GetType() == BrowserWindowInterface::Type::TYPE_APP
-            ? shell_integration::win::GetAppUserModelIdForApp(
-                  base::UTF8ToWide(BrowserInitState::From(raw_browser)
-                                       ->create_params()
-                                       .app_name),
-                  profile_path)
-            : shell_integration::win::GetAppUserModelIdForBrowser(profile_path);
-    if (!app_user_model_id.empty()) {
-      ui::win::SetAppIdForWindow(
-          app_user_model_id,
-          overlay_window->GetNativeWindow()->GetHost()->GetAcceleratedWidget());
-    }
-  }
-
-  // Default to private input scope in the case where we don't have a
-  // TextInputClient, such as when this is running inside an InnerWebContents.
-  InputScope input_scope = IS_PRIVATE;
-  ui::TextInputClient* text_input_client = overlay_window->GetController()
-                                               ->GetWebContents()
-                                               ->GetRenderWidgetHostView()
-                                               ->GetTextInputClient();
-  if (text_input_client && text_input_client->ShouldDoLearning()) {
-    input_scope = IS_DEFAULT;
-  }
-
-  ui::tsf_inputscope::SetInputScope(
-      overlay_window->GetNativeWindow()->GetHost()->GetAcceleratedWidget(),
-      input_scope);
-
-#endif  // BUILDFLAG(IS_WIN)
 
   PictureInPictureOcclusionTracker* tracker =
       PictureInPictureWindowManager::GetInstance()->GetOcclusionTracker();
@@ -619,13 +565,6 @@ void VideoOverlayWindowViews::OnKeyEvent(ui::KeyEvent* event) {
 // On Windows, the Alt+F4 keyboard combination closes the window. Only handle
 // closure on key press so Close() is not called a second time when the key
 // is released.
-#if BUILDFLAG(IS_WIN)
-  if (event->type() == ui::EventType::kKeyPressed && event->IsAltDown() &&
-      event->key_code() == ui::VKEY_F4) {
-    CloseAndPauseIfAvailable();
-    event->SetHandled();
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   // If there's no focused control, then we handle certain keys as if they went
   // to the relevant control.
@@ -1731,15 +1670,11 @@ void VideoOverlayWindowViews::ShowInactive() {
 // Fade in animation is disabled for Document and Video Picture-in-Picture on
 // Windows. On Windows, resizable windows can not be translucent. See
 // crbug.com/425711450.
-#if BUILDFLAG(IS_WIN)
-  views::Widget::ShowInactive();
-#else
   if (!fade_animator_) {
     fade_animator_ = std::make_unique<PictureInPictureWidgetFadeAnimator>();
   }
   fade_animator_->AnimateShowWindow(
       this, PictureInPictureWidgetFadeAnimator::WidgetShowType::kShowInactive);
-#endif
 
   views::Widget::SetVisibleOnAllWorkspaces(true);
 #if BUILDFLAG(IS_CHROMEOS)

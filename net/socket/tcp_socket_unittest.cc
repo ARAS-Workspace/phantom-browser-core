@@ -47,13 +47,7 @@
 #endif  // BUILDFLAG(IS_ANDROID)
 
 // For getsockopt() call.
-#if BUILDFLAG(IS_WIN)
-#include <winsock2.h>
-
-#include "net/socket/tcp_socket_io_completion_port_win.h"
-#else  // !BUILDFLAG(IS_WIN)
 #include <sys/socket.h>
-#endif  //  !BUILDFLAG(IS_WIN)
 
 using net::test::IsError;
 using net::test::IsOk;
@@ -123,26 +117,18 @@ class TCPSocketTest
       public testing::WithParamInterface<std::tuple<bool, bool>> {
  protected:
   TCPSocketTest() {
-#if BUILDFLAG(IS_WIN)
-    scoped_feature_list_.InitWithFeatureState(
-        features::kTcpSocketIoCompletionPortWin,
-        IsTcpSocketIoCompletionPortWinEnabled());
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     scoped_feature_list_.InitWithFeatureState(
         features::kTcpPortRandomizationMac, IsTcpPortRandomizationMacEnabled());
 #else
     CHECK(!std::get<0>(GetParam()));
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
     socket_ = TCPSocket::Create(nullptr, nullptr, NetLogSource());
   }
 
-#if BUILDFLAG(IS_WIN)
-  bool IsTcpSocketIoCompletionPortWinEnabled() {
-    return std::get<0>(GetParam());
-  }
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   bool IsTcpPortRandomizationMacEnabled() { return std::get<0>(GetParam()); }
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
   bool ShouldUseReadIfReady() { return std::get<1>(GetParam()); }
 
@@ -560,25 +546,6 @@ TEST_P(TCPSocketTest, ReadWrite) {
   auto [socket1, socket2] = CreateIPv4SocketPair();
   TestReadWrite(std::move(socket1), std::move(socket2));
 }
-
-#if BUILDFLAG(IS_WIN)
-// Same test as above, but exercises the code used when
-// `FILE_SKIP_COMPLETION_PORT_ON_SUCCESS` is not supported.
-TEST_P(TCPSocketTest, ReadWriteNoSkipCompletionPortOnSuccess) {
-  if (!IsTcpSocketIoCompletionPortWinEnabled()) {
-    // FILE_SKIP_COMPLETION_PORT_ON_SUCCESS is only used by
-    // `TcpSocketIoCompletionPortWin`.
-    return;
-  }
-
-  TcpSocketIoCompletionPortWin::DisableSkipCompletionPortOnSuccessForTesting
-      disable_skip_completion_port_on_success;
-
-  ASSERT_NO_FATAL_FAILURE(SetUpListenIPv4());
-  auto [socket1, socket2] = CreateIPv4SocketPair();
-  TestReadWrite(std::move(socket1), std::move(socket2));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // Destroy a TCPSocket while there's a pending read, and make sure the read
 // IOBuffer that the socket was holding on to is destroyed.
@@ -1570,11 +1537,7 @@ TEST_P(TCPSocketTest, WriteError) {
   auto [socket1, socket2] = CreateIPv4SocketPair();
 
   // Disallow send operations to make the next `Write` fail.
-#if BUILDFLAG(IS_WIN)
-  shutdown(socket1->SocketDescriptorForTesting(), SD_SEND);
-#else
   shutdown(socket1->SocketDescriptorForTesting(), SHUT_WR);
-#endif
 
   // Attempt to write data. It should fail.
   TestCompletionCallback write_callback;
@@ -1592,36 +1555,21 @@ TEST_P(TCPSocketTest, ReadError) {
   auto [socket1, socket2] = CreateIPv4SocketPair();
 
   // Disallow receive operations to make the next `Read` fail.
-#if BUILDFLAG(IS_WIN)
-  shutdown(socket1->SocketDescriptorForTesting(), SD_RECEIVE);
-#else
   shutdown(socket1->SocketDescriptorForTesting(), SHUT_RD);
-#endif
 
   // Attempt to read data. It should fail.
   TestCompletionCallback read_callback;
   auto buffer = base::MakeRefCounted<IOBufferWithSize>(10);
   int read_result =
       socket1->Read(buffer.get(), buffer->size(), read_callback.callback());
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(read_result, net::ERR_FAILED);
-#else
   // Ideally, this test should make the read return a failure code.
   // Unfortunately, we haven't found a good way to do that.
   EXPECT_EQ(read_result, net::OK);
-#endif
   read_callback.GetResult(read_result);
 }
 
 // Tests error in a read that returns `net::ERR_IO_PENDING`.
 TEST_P(TCPSocketTest, PendingReadError) {
-#if BUILDFLAG(IS_WIN)
-  if (!IsTcpSocketIoCompletionPortWinEnabled()) {
-    // With the default implementation, the read callback is not invoked after
-    // `CloseSocketDescriptorForTesting()` is invoked.
-    return;
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   ASSERT_NO_FATAL_FAILURE(SetUpListenIPv4());
   auto [socket1, socket2] = CreateIPv4SocketPair();
@@ -1634,22 +1582,13 @@ TEST_P(TCPSocketTest, PendingReadError) {
       socket1->Read(buffer.get(), buffer->size(), read_callback.callback());
   EXPECT_EQ(read_result, net::ERR_IO_PENDING);
 
-#if BUILDFLAG(IS_WIN)
-  // Close the underlying socket to make the pending read fail.
-  socket1->CloseSocketDescriptorForTesting();
-#else
   // Disallow receive operations to make the pending read fail.
   shutdown(socket1->SocketDescriptorForTesting(), SHUT_RD);
-#endif
 
   // The read operation should fail.
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(read_callback.GetResult(read_result), net::ERR_FAILED);
-#else
   // Ideally, this test should make the read return a failure code.
   // Unfortunately, we haven't found a good way to do that.
   EXPECT_EQ(read_callback.GetResult(read_result), net::OK);
-#endif
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -1659,14 +1598,7 @@ INSTANTIATE_TEST_SUITE_P(
         // Base tests
         std::make_tuple(false, false),  // Base, Read
         std::make_tuple(false, true)    // Base, ReadIfReady
-#if BUILDFLAG(IS_WIN)
-        // TcpSocketIoCompletionPortWin tests
-        ,
-        std::make_tuple(true,
-                        false),      // TcpSocketIoCompletionPortWin, Read
-        std::make_tuple(true, true)  // TcpSocketIoCompletionPortWin,
-                                     // ReadIfReady
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
         // TcpPortRandomizationMac tests
         ,
         std::make_tuple(true,
@@ -1678,9 +1610,7 @@ INSTANTIATE_TEST_SUITE_P(
     [](::testing::TestParamInfo<std::tuple<bool, bool>> info) {
       std::string name;
       if (std::get<0>(info.param)) {
-#if BUILDFLAG(IS_WIN)
-        name = "TcpSocketIoCompletionPortWin";
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
         name = "TcpPortRandomizationMac";
 #endif
       } else {

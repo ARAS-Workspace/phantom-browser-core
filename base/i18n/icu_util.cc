@@ -6,9 +6,6 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
 
 #include <string.h>
 
@@ -78,13 +75,6 @@ int g_debug_icu_last_error;
 int g_debug_icu_load;
 int g_debug_icu_pf_error_details;
 int g_debug_icu_pf_last_error;
-#if BUILDFLAG(IS_WIN)
-wchar_t g_debug_icu_pf_filename[_MAX_PATH];
-#endif  // BUILDFLAG(IS_WIN)
-// Use an unversioned file name to simplify a icu version update down the road.
-// No need to change the filename in multiple places (gyp files, windows
-// build pkg configurations, etc). 'l' stands for Little Endian.
-// This variable is exported through the header file.
 const char kIcuDataFileName[] = "icudtl.dat";
 
 // Time zone data loading.
@@ -122,20 +112,8 @@ void LazyInitIcuDataFile() {
     LOG(ERROR) << "Can't find " << kIcuDataFileName;
     return;
   }
-#if BUILDFLAG(IS_WIN)
-  // TODO(brucedawson): http://crbug.com/445616
-  wchar_t tmp_buffer[_MAX_PATH] = {};
-  UNSAFE_TODO(wcscpy_s(tmp_buffer, data_path.value().c_str()));
-  debug::Alias(tmp_buffer);
-#endif
   data_path = data_path.AppendASCII(kIcuDataFileName);
 
-#if BUILDFLAG(IS_WIN)
-  // TODO(brucedawson): http://crbug.com/445616
-  wchar_t tmp_buffer2[_MAX_PATH] = {};
-  UNSAFE_TODO(wcscpy_s(tmp_buffer2, data_path.value().c_str()));
-  debug::Alias(tmp_buffer2);
-#endif
 
 #else  // !BUILDFLAG(IS_APPLE)
   // Assume it is in the framework bundle's Resources directory.
@@ -157,28 +135,10 @@ void LazyInitIcuDataFile() {
     // TODO(brucedawson): http://crbug.com/445616.
     g_debug_icu_pf_last_error = 0;
     g_debug_icu_pf_error_details = 0;
-#if BUILDFLAG(IS_WIN)
-    g_debug_icu_pf_filename[0] = 0;
-#endif  // BUILDFLAG(IS_WIN)
 
     g_icudtl_pf = file.TakePlatformFile();
     g_icudtl_region = MemoryMappedFile::Region::kWholeFile;
   }
-#if BUILDFLAG(IS_WIN)
-  else {
-    // TODO(brucedawson): http://crbug.com/445616.
-    g_debug_icu_pf_last_error = ::GetLastError();
-    g_debug_icu_pf_error_details = file.error_details();
-    UNSAFE_TODO(wcscpy_s(g_debug_icu_pf_filename, data_path.value().c_str()));
-    static auto* const path_crash_key = debug::AllocateCrashKeyString(
-        "icu-open-file-path", debug::CrashKeySize::Size256);
-    debug::SetCrashKeyString(path_crash_key, data_path.AsUTF8Unsafe());
-    static auto* const error_crash_key = debug::AllocateCrashKeyString(
-        "icu-open-file-error", debug::CrashKeySize::Size32);
-    debug::SetCrashKeyString(error_crash_key,
-                             NumberToString(g_debug_icu_pf_last_error));
-  }
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 // Configures ICU to load external time zone data, if appropriate.
@@ -252,16 +212,6 @@ bool InitializeICUFromDataFile() {
   debug::Alias(&debug_icu_load);
   int debug_icu_last_error = g_debug_icu_last_error;
   debug::Alias(&debug_icu_last_error);
-#if BUILDFLAG(IS_WIN)
-  int debug_icu_pf_last_error = g_debug_icu_pf_last_error;
-  debug::Alias(&debug_icu_pf_last_error);
-  int debug_icu_pf_error_details = g_debug_icu_pf_error_details;
-  debug::Alias(&debug_icu_pf_error_details);
-  wchar_t debug_icu_pf_filename[_MAX_PATH] = {};
-  UNSAFE_TODO(wcscpy_s(debug_icu_pf_filename, g_debug_icu_pf_filename));
-  debug::Alias(&debug_icu_pf_filename);
-#endif  // BUILDFLAG(IS_WIN)
-  // Excluding Chrome OS from this CHECK due to b/289684640.
 #if !BUILDFLAG(IS_CHROMEOS)
   // https://crbug.com/445616
   // https://crbug.com/1449816

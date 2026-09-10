@@ -65,10 +65,7 @@ class DumpAccessibilityEventsMenuTest
     // Scope this down to menu events, since that's what this test verifies.
     filters.emplace_back("*", ui::AXPropertyFilter::DENY);
 
-#if BUILDFLAG(IS_WIN)
-    filters.emplace_back("EVENT_SYSTEM_MENU*", ui::AXPropertyFilter::ALLOW);
-    filters.emplace_back("Menu*", ui::AXPropertyFilter::ALLOW);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     filters.emplace_back("AXMenuOpened*", ui::AXPropertyFilter::ALLOW);
     filters.emplace_back("AXMenuClosed*", ui::AXPropertyFilter::ALLOW);
 #elif BUILDFLAG(IS_LINUX)
@@ -111,13 +108,6 @@ class DumpAccessibilityEventsMenuTest
 
 // TODO(crbug.com/40672441): Re-enable.
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsMenuTest, DISABLED_MenuShowHide) {
-#if BUILDFLAG(IS_WIN)
-  if (GetApiType() == ui::AXApiType::kWinUIA) {
-    // TODO(crbug.com/40672441): Re-enable once UIA supports PID-based event
-    // capture.
-    GTEST_SKIP() << "UIA menu dump tests need PID-based event capture.";
-  }
-#endif
 
   BEGIN_RECORDING_EVENTS_OR_SKIP("menu-show-hide");
 
@@ -144,13 +134,6 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsMenuTest, DISABLED_MenuShowHide) {
 
 // TODO(crbug.com/40672441): Re-enable.
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsMenuTest, DISABLED_MenuNested) {
-#if BUILDFLAG(IS_WIN)
-  if (GetApiType() == ui::AXApiType::kWinUIA) {
-    // TODO(crbug.com/40672441): Re-enable once UIA supports PID-based event
-    // capture.
-    GTEST_SKIP() << "UIA menu dump tests need PID-based event capture.";
-  }
-#endif
 
   BEGIN_RECORDING_EVENTS_OR_SKIP("menu-nested");
 

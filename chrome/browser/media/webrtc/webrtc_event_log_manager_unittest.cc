@@ -78,11 +78,7 @@
 
 namespace webrtc_event_logging {
 
-#if BUILDFLAG(IS_WIN)
-#define NumberToStringType base::NumberToWString
-#else
 #define NumberToStringType base::NumberToString
-#endif
 
 using ::testing::_;
 using ::testing::NiceMock;

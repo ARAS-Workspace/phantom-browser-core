@@ -39,7 +39,7 @@ class TabResourceUsageCollectorBrowserTest : public InProcessBrowserTest {
 
 // TODO(crbug.com/368862390): This test fails on ChromeOS and Mac builds.
 // TODO(crbug.com/477852868): This test is also flaky on Win builds.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #define MAYBE_RefreshAllTabMemory DISABLED_RefreshAllTabMemory
 #else
 #define MAYBE_RefreshAllTabMemory RefreshAllTabMemory

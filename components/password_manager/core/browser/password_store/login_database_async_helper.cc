@@ -92,7 +92,7 @@ bool LoginDatabaseAsyncHelper::Initialize(
 // On Windows encryption capability is expected to be available by default.
 // On MacOS encrpytion is also expected to be available unless the user didn't
 // unlock the Keychain.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   // Check that the backend works.
   if (success && !is_encryption_available_) {
     success = false;

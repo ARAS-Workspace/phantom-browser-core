@@ -155,19 +155,9 @@ TEST_F(SandboxFileSystemBackendDelegateTest, IsAccessValid) {
   EXPECT_FALSE(IsAccessValid(CreateFileSystemURL(".")));
   EXPECT_FALSE(IsAccessValid(CreateFileSystemURL("..")));
 
-#if BUILDFLAG(IS_WIN)
-  // This is also disallowed due to Windows XP parent path handling.
-  EXPECT_FALSE(IsAccessValid(CreateFileSystemURL("...")));
-
-  // These are identified as unsafe cases due to weird path handling
-  // on Windows.
-  EXPECT_FALSE(IsAccessValid(CreateFileSystemURL(" ..")));
-  EXPECT_FALSE(IsAccessValid(CreateFileSystemURL(".. ")));
-#else
   EXPECT_TRUE(IsAccessValid(CreateFileSystemURL("...")));
   EXPECT_TRUE(IsAccessValid(CreateFileSystemURL(" ..")));
   EXPECT_TRUE(IsAccessValid(CreateFileSystemURL(".. ")));
-#endif
 
   // Similar but safe cases.
   EXPECT_TRUE(IsAccessValid(CreateFileSystemURL(" .")));

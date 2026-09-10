@@ -989,7 +989,7 @@ class ContextualTasksInteractiveUiTest : public InteractiveBrowserTest {
 
 // TODO(crbug.com/500717050): Parameterize this test suite on the feature flag.
 // TODO(crbug.com/524797987): Re-enable this test.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_AddAndRemovePdfChipFromComposebox \
   DISABLED_AddAndRemovePdfChipFromComposebox
 #else
@@ -1045,7 +1045,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksInteractiveUiTest,
 }
 
 // TODO(crbug.com/524797987): Re-enable this test.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_AddAndRemoveImageChipFromComposebox \
   DISABLED_AddAndRemoveImageChipFromComposebox
 #else
@@ -1091,8 +1091,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksInteractiveUiTest,
 }
 
 // TODO(crbug.com/524797987, crbug.com/529701663): Re-enable this test.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    (BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER))
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_AddAndRemoveTabFromComposebox \
   DISABLED_AddAndRemoveTabFromComposebox
 #else
@@ -1230,7 +1229,7 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksInteractiveUiTest,
 
 // TODO(crbug.com/516333831): Re-enable this test on Windows.
 // TODO(crbug.com/543925663): Re-enable this test on Linux TSAN.
-#if BUILDFLAG(IS_WIN) || (BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER))
+#if BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
 #define MAYBE_AddAndSubmitMultipleContextsFromComposebox \
   DISABLED_AddAndSubmitMultipleContextsFromComposebox
 #else
@@ -1352,13 +1351,8 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksInteractiveUiTest,
 }
 
 // TODO(crbug.com/516333831): Re-enable this test on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_AddAndSubmitMultipleContextsWithTextFromComposebox \
-  DISABLED_AddAndSubmitMultipleContextsWithTextFromComposebox
-#else
 #define MAYBE_AddAndSubmitMultipleContextsWithTextFromComposebox \
   AddAndSubmitMultipleContextsWithTextFromComposebox
-#endif
 IN_PROC_BROWSER_TEST_F(ContextualTasksInteractiveUiTest,
                        MAYBE_AddAndSubmitMultipleContextsWithTextFromComposebox) {
   const GURL kInterceptionUrl("https://www.google.com/search?udm=50");

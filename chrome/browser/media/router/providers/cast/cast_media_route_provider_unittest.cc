@@ -371,7 +371,7 @@ TEST_F(CastMediaRouteProviderTest, GetState) {
 }
 
 // MediaRemotingWithoutFullscreen is enabled on Win/Mac/Linux.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_F(CastMediaRouteProviderTest, GetRemotePlaybackCompatibleSinks) {
   MediaSinkInternal cc = CreateCastSinkWithModelName("Chromecast");
   MediaSinkInternal cc_ultra = CreateCastSinkWithModelName("Chromecast Ultra");

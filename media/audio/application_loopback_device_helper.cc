@@ -11,45 +11,7 @@
 
 namespace media {
 
-#if BUILDFLAG(IS_WIN)
-
-namespace {
-
-std::string BuildDeviceId(std::string_view base_id,
-                          const uint32_t application_id) {
-  return base::StrCat({base_id, ":", base::NumberToString(application_id)});
-}
-
-}  // namespace
-
-std::string MEDIA_EXPORT
-CreateApplicationLoopbackDeviceId(const uint32_t application_id) {
-  return BuildDeviceId(AudioDeviceDescription::kApplicationLoopbackDeviceId,
-                       application_id);
-}
-
-std::string MEDIA_EXPORT CreateRestrictOwnAudioBrowserLoopbackDeviceId() {
-  return BuildDeviceId(
-      AudioDeviceDescription::kRestrictOwnAudioBrowserLoopbackDeviceId,
-      base::GetCurrentProcId());
-}
-
-uint32_t MEDIA_EXPORT
-GetApplicationIdFromApplicationLoopbackDeviceId(std::string_view device_id) {
-  CHECK(AudioDeviceDescription::IsApplicationLoopbackDevice(device_id));
-
-  size_t colon_pos = device_id.find(':');
-  CHECK(colon_pos != std::string::npos);
-
-  uint32_t application_id;
-  bool valid =
-      base::StringToUint(device_id.substr(colon_pos + 1), &application_id);
-  CHECK(valid);
-
-  return application_id;
-}
-
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
 namespace {
 
@@ -108,7 +70,7 @@ ParseApplicationLoopbackDeviceId(std::string_view device_id) {
   return {bundle_id, application_id};
 }
 
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 bool MEDIA_EXPORT
 IsRestrictOwnAudioBrowserLoopbackDeviceId(std::string_view device_id) {

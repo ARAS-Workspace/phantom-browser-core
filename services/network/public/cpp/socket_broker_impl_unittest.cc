@@ -21,10 +21,6 @@
 #include "services/network/public/mojom/socket_broker.mojom.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace network {
 
 namespace {

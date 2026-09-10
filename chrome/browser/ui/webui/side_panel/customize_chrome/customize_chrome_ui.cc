@@ -276,7 +276,7 @@ CustomizeChromeUI::CustomizeChromeUI(content::WebUI* web_ui)
                              IdentityManagerFactory::GetForProfile(profile_)));
 
   source->AddBoolean("showDeviceThemeToggle",
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
                      true);
 #else
                      false);

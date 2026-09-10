@@ -21,10 +21,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/mojom/installedapp/related_application.mojom.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "content/browser/installedapp/native_win_app_fetcher.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace content {
 
 namespace {
@@ -57,9 +53,6 @@ class InstalledAppProviderImplTest : public RenderViewHostImplTestHarness {
       : content_browser_client_(kInstalledWebAppIds) {
     feature_list_.InitWithFeatures(
         {features::kInstalledAppProvider,
-#if BUILDFLAG(IS_WIN)
-         features::kFilterInstalledAppsWinMatching,
-#endif  // BUILDFLAG(IS_WIN)
          features::kFilterInstalledAppsWebAppMatching},
         {});
   }
@@ -74,11 +67,6 @@ class InstalledAppProviderImplTest : public RenderViewHostImplTestHarness {
     provider_ = InstalledAppProviderImpl::CreateForTesting(
         *(contents()->GetPrimaryMainFrame()),
         remote_.BindNewPipeAndPassReceiver());
-#if BUILDFLAG(IS_WIN)
-    provider_->SetNativeWinAppFetcherFactoryForTesting(
-        base::BindRepeating(&CreateFakeNativeWinAppFetcherForTesting,
-                            std::move(kInstalledWinAppIds)));
-#endif  // BUILDFLAG(IS_WIN)
     web_contents()->SetDelegate(&web_contents_delegate_);
   }
 
@@ -136,17 +124,11 @@ TEST_F(InstalledAppProviderImplTest, GetRelatedApps) {
   const std::vector<blink::mojom::RelatedApplicationPtr>& result = future.Get();
 
   std::size_t expected_number_of_matches = 0u;
-#if BUILDFLAG(IS_WIN)
-  expected_number_of_matches += 1u;
-#endif  // BUILDFLAG(IS_WIN)
 #if !BUILDFLAG(IS_ANDROID)
   expected_number_of_matches += 1u;
 #endif  // !BUILDFLAG(IS_ANDROID)
   EXPECT_EQ(result.size(), expected_number_of_matches);
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_THAT(result, Contains(RelatedAppById(kInstalledWinAppId)));
-#endif  // BUILDFLAG(IS_WIN)
 #if !BUILDFLAG(IS_ANDROID)
   EXPECT_THAT(result, Contains(RelatedAppById(kInstalledWebAppId)));
 #endif  // !BUILDFLAG(IS_ANDROID)
@@ -186,56 +168,5 @@ TEST_F(InstalledAppProviderImplTest,
   ASSERT_TRUE(future.Wait());
   EXPECT_THAT(future.Get(), IsEmpty());
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(InstalledAppProviderImplTest, LimitNumberOfMatchedApps) {
-  std::vector<blink::mojom::RelatedApplicationPtr> related_applications;
-
-  for (const std::string& id : kInstalledWebAppIds) {
-    related_applications.push_back(
-        CreateRelatedApplicationFromPlatformAndId("webapp", id));
-  }
-  for (const std::string& id : kInstalledWinAppIds) {
-    related_applications.push_back(
-        CreateRelatedApplicationFromPlatformAndId("windows", id));
-  }
-  EXPECT_EQ(related_applications.size(), 11u);
-
-  base::test::TestFuture<std::vector<blink::mojom::RelatedApplicationPtr>>
-      future;
-  remote()->FilterInstalledApps(
-      std::move(related_applications), GURL("http://foo.com/manifest.json"),
-      /*add_saved_related_applications=*/false, future.GetCallback());
-
-  ASSERT_TRUE(future.Wait());
-  const std::vector<blink::mojom::RelatedApplicationPtr>& result = future.Get();
-  EXPECT_EQ(result.size(), 10u);
-}
-
-TEST_F(InstalledAppProviderImplTest, UseSavedRelatedAppsIfManifestFetchFailed) {
-  std::vector<blink::mojom::RelatedApplicationPtr> related_applications;
-
-  std::vector<blink::mojom::RelatedApplicationPtr> saved_related_apps;
-  saved_related_apps.push_back(
-      CreateRelatedApplicationFromPlatformAndId("webapp", kInstalledWebAppId));
-
-  EXPECT_CALL(*web_contents_delegate(), GetSavedRelatedApplications(testing::_))
-      .WillOnce(
-          testing::Return(testing::ByMove(std::move(saved_related_apps))));
-
-  base::test::TestFuture<std::vector<blink::mojom::RelatedApplicationPtr>>
-      future;
-
-  remote()->FilterInstalledApps(
-      std::move(related_applications), GURL("http://foo.com/manifest.json"),
-      /*add_saved_related_applications=*/true, future.GetCallback());
-
-  ASSERT_TRUE(future.Wait());
-  const std::vector<blink::mojom::RelatedApplicationPtr>& result = future.Get();
-
-  EXPECT_EQ(result.size(), 1u);
-  EXPECT_THAT(result, Contains(RelatedAppById(kInstalledWebAppId)));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace content

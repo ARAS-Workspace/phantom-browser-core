@@ -1098,7 +1098,6 @@ class InputMethodObserverForShowIme : public InputMethodObserverBase {
 // or not. On Windows we have implemented TSF1 on Chromium that takes care of
 // IME compositions, handwriting panels, SIP visibility etc. Please see
 // (https://crbug.com/40649743) for more details.
-#if !BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_F(SitePerProcessTextInputManagerTest,
                        CorrectlyShowVirtualKeyboardIfEnabled) {
   // We only need the <iframe> page to create RWHV.
@@ -1145,7 +1144,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessTextInputManagerTest,
   sender.SetType(ui::TEXT_INPUT_TYPE_NONE);
   EXPECT_FALSE(send_and_check_show_ime());
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 #endif  // USE_AURA
 

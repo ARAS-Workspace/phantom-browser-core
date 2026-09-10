@@ -4,10 +4,6 @@
 
 #include "remoting/base/crash/crash_reporting_crashpad.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "remoting/base/crash/crashpad_win.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_LINUX)
 #include "remoting/base/crash/crashpad_linux.h"
 #endif  // BUILDFLAG(IS_LINUX)
@@ -23,9 +19,6 @@ void LogAndCleanupCrashDatabase() {
 // Not implemented for Mac, see https://crbug.com/714714
 void InitializeCrashpadReporting() {
   // Touch the object to make sure it is initialized.
-#if BUILDFLAG(IS_WIN)
-  CrashpadWin::GetInstance().Initialize();
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_LINUX)
   CrashpadLinux::GetInstance().Initialize();

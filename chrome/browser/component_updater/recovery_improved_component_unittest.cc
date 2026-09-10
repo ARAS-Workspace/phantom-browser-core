@@ -85,7 +85,7 @@ void TestActionHandler::Elevate(Callback callback) {
 
 }  // namespace
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 TEST_F(RecoveryImprovedActionHandlerTest, HandleError) {
   unzip::SetUnzipperLaunchOverrideForTesting(
       base::BindRepeating(&unzip::LaunchInProcessUnzipper));
@@ -106,43 +106,6 @@ TEST_F(RecoveryImprovedActionHandlerTest, HandleError) {
           runloop.QuitClosure()));
   runloop.Run();
 }
-#endif  //  BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(RecoveryImprovedActionHandlerTest, HandleSuccess) {
-  unzip::SetUnzipperLaunchOverrideForTesting(
-      base::BindRepeating(&unzip::LaunchInProcessUnzipper));
-
-  // Tests that the recovery program runs and it returns an expected value.
-  static constexpr char kActionRunFileName[] = "ChromeRecovery.crx3";
-  ASSERT_TRUE(temp_dir_.CreateUniqueTempDir());
-  const base::FilePath from_path =
-      update_client::GetTestFilePath(kActionRunFileName);
-  const base::FilePath to_path =
-      temp_dir_.GetPath().AppendASCII(kActionRunFileName);
-  ASSERT_TRUE(base::CopyFile(from_path, to_path));
-
-  base::RunLoop runloop;
-  base::MakeRefCounted<TestActionHandler>()->Handle(
-      to_path, "some-session-id",
-      base::BindOnce(
-          [](base::OnceClosure quit_closure, bool succeeded, int error_code,
-             int extra_code1) {
-            EXPECT_TRUE(succeeded);
-            EXPECT_EQ(1877345072, error_code);
-            EXPECT_EQ(0, extra_code1);
-            std::move(quit_closure).Run();
-          },
-          runloop.QuitClosure()));
-  {
-    // For some reason, the task which runs the wait for the recovery EXE
-    // execution is handled with some delay. This causes the run loop to
-    // fail with a timeout.
-    const base::test::ScopedRunLoopTimeout specific_timeout(FROM_HERE,
-                                                            base::Seconds(60));
-    runloop.Run();
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace component_updater

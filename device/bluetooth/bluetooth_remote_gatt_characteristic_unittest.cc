@@ -26,8 +26,6 @@
 #include "device/bluetooth/test/bluetooth_test_android.h"
 #elif BUILDFLAG(IS_APPLE)
 #include "device/bluetooth/test/bluetooth_test_mac.h"
-#elif BUILDFLAG(IS_WIN)
-#include "device/bluetooth/test/bluetooth_test_win.h"
 #elif defined(USE_CAST_BLUETOOTH_ADAPTER)
 #include "device/bluetooth/test/bluetooth_test_cast.h"
 #elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
@@ -40,18 +38,10 @@ using WriteType = device::BluetoothRemoteGattCharacteristic::WriteType;
 namespace device {
 
 class BluetoothRemoteGattCharacteristicTest :
-#if BUILDFLAG(IS_WIN)
-    public BluetoothTestWinrt {
-#else
     public BluetoothTest {
-#endif
  public:
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    BluetoothTestWinrt::SetUp();
-#else
     BluetoothTest::SetUp();
-#endif
   }
 
   // Creates adapter_, device_, service_, characteristic1_, & characteristic2_.
@@ -165,21 +155,13 @@ class BluetoothRemoteGattCharacteristicTest :
       characteristic2_ = nullptr;
 };
 
-#if BUILDFLAG(IS_WIN)
-using BluetoothRemoteGattCharacteristicTestWinrt =
-    BluetoothRemoteGattCharacteristicTest;
-#endif
 
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE)
 #define MAYBE_GetIdentifier GetIdentifier
 #else
 #define MAYBE_GetIdentifier DISABLED_GetIdentifier
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt, GetIdentifier) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_GetIdentifier) {
-#endif
   InitWithFakeAdapter();
 
   StartLowEnergyDiscoverySession();
@@ -249,11 +231,7 @@ TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_GetIdentifier) {
 #else
 #define MAYBE_GetUUID DISABLED_GetUUID
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt, GetUUID) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_GetUUID) {
-#endif
   InitWithFakeAdapter();
   StartLowEnergyDiscoverySession();
   BluetoothDevice* device = SimulateLowEnergyDevice(3);
@@ -294,11 +272,7 @@ TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_GetUUID) {
 #else
 #define MAYBE_GetProperties DISABLED_GetProperties
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt, GetProperties) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_GetProperties) {
-#endif
   InitWithFakeAdapter();
   StartLowEnergyDiscoverySession();
   BluetoothDevice* device = SimulateLowEnergyDevice(3);
@@ -331,11 +305,7 @@ TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_GetProperties) {
 #define MAYBE_GetService DISABLED_GetService
 #endif
 // Tests GetService.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt, GetService) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_GetService) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate());
 
   EXPECT_EQ(service_, characteristic1_->GetService());
@@ -349,13 +319,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_GetService) {
   DISABLED_ReadRemoteCharacteristic_Empty
 #endif
 // Tests ReadRemoteCharacteristic and GetValue with empty value buffer.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       ReadRemoteCharacteristic_Empty) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_ReadRemoteCharacteristic_Empty) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ));
 
@@ -381,13 +346,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_WriteRemoteCharacteristic_Empty
 #endif
 // Tests WriteRemoteCharacteristic with empty value buffer.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       WriteRemoteCharacteristic_Empty) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_WriteRemoteCharacteristic_Empty) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -421,13 +381,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_DeprecatedWriteRemoteCharacteristic_Empty
 #endif
 // Tests DeprecatedWriteRemoteCharacteristic with empty value buffer.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       DeprecatedWriteRemoteCharacteristic_Empty) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_DeprecatedWriteRemoteCharacteristic_Empty) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -453,13 +408,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_Retry_ReadRemoteCharacteristic_DuringDestruction_Fails \
   DISABLED_Retry_ReadRemoteCharacteristic_DuringDestruction_Fails
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       Retry_ReadRemoteCharacteristic_DuringDestruction_Fails) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_Retry_ReadRemoteCharacteristic_DuringDestruction_Fails) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ));
 
@@ -489,13 +439,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_Retry_WriteRemoteCharacteristic_DuringDestruction_Fails \
   DISABLED_Retry_WriteRemoteCharacteristic_DuringDestruction_Fails
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       Retry_WriteRemoteCharacteristic_DuringDestruction_Fails) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_Retry_WriteRemoteCharacteristic_DuringDestruction_Fails) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -536,14 +481,9 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_Retry_DeprecatedWriteRemoteCharacteristic_DuringDestruction_Fails \
   DISABLED_Retry_DeprecatedWriteRemoteCharacteristic_DuringDestruction_Fails
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       Retry_DeprecatedWriteRemoteCharacteristic_DuringDestruction_Fails) {
-#else
 TEST_F(
     BluetoothRemoteGattCharacteristicTest,
     MAYBE_Retry_DeprecatedWriteRemoteCharacteristic_DuringDestruction_Fails) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -608,13 +548,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_ReadRemoteCharacteristic_Disconnected \
   DISABLED_ReadRemoteCharacteristic_Disconnected
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       ReadRemoteCharacteristic_Disconnected) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_ReadRemoteCharacteristic_Disconnected) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ));
 
@@ -725,13 +660,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_WriteRemoteCharacteristic_Disconnected \
   DISABLED_WriteRemoteCharacteristic_Disconnected
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       WriteRemoteCharacteristic_Disconnected) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_WriteRemoteCharacteristic_Disconnected) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -777,13 +707,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_DeprecatedWriteRemoteCharacteristic_Disconnected \
   DISABLED_DeprecatedWriteRemoteCharacteristic_Disconnected
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       DeprecatedWriteRemoteCharacteristic_Disconnected) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_DeprecatedWriteRemoteCharacteristic_Disconnected) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -821,11 +746,7 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_ReadRemoteCharacteristic DISABLED_ReadRemoteCharacteristic
 #endif
 // Tests ReadRemoteCharacteristic and GetValue with non-empty value buffer.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt, ReadRemoteCharacteristic) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_ReadRemoteCharacteristic) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ));
 
@@ -866,13 +787,8 @@ static void TestCallback(
 #endif
 // Tests that ReadRemoteCharacteristic doesn't result in a
 // GattCharacteristicValueChanged call.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       ReadRemoteCharacteristic_GattCharacteristicValueChangedNotCalled) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_ReadRemoteCharacteristic_GattCharacteristicValueChangedNotCalled) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ));
 
@@ -898,11 +814,7 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_WriteRemoteCharacteristic DISABLED_WriteRemoteCharacteristic
 #endif
 // Tests WriteRemoteCharacteristic with non-empty value buffer.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt, WriteRemoteCharacteristic) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_WriteRemoteCharacteristic) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -940,13 +852,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_WriteRemoteCharacteristic) {
   DISABLED_DeprecatedWriteRemoteCharacteristic
 #endif
 // Tests DeprecatedWriteRemoteCharacteristic with non-empty value buffer.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       DeprecatedWriteRemoteCharacteristic) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_DeprecatedWriteRemoteCharacteristic) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -975,13 +882,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_ReadRemoteCharacteristic_Twice
 #endif
 // Tests ReadRemoteCharacteristic and GetValue multiple times.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       ReadRemoteCharacteristic_Twice) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_ReadRemoteCharacteristic_Twice) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ));
 
@@ -1021,13 +923,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_WriteRemoteCharacteristic_Twice
 #endif
 // Tests WriteRemoteCharacteristic multiple times.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       WriteRemoteCharacteristic_Twice) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_WriteRemoteCharacteristic_Twice) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -1079,13 +976,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_DeprecatedWriteRemoteCharacteristic_Twice
 #endif
 // Tests DeprecatedWriteRemoteCharacteristic multiple times.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       DeprecatedWriteRemoteCharacteristic_Twice) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_DeprecatedWriteRemoteCharacteristic_Twice) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -1127,13 +1019,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_ReadRemoteCharacteristic_MultipleCharacteristics
 #endif
 // Tests ReadRemoteCharacteristic on two characteristics.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       ReadRemoteCharacteristic_MultipleCharacteristics) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_ReadRemoteCharacteristic_MultipleCharacteristics) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ));
 
@@ -1171,13 +1058,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_WriteRemoteCharacteristic_MultipleCharacteristics
 #endif
 // Tests WriteRemoteCharacteristic on two characteristics.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       WriteRemoteCharacteristic_MultipleCharacteristics) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_WriteRemoteCharacteristic_MultipleCharacteristics) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -1220,13 +1102,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_DeprecatedWriteRemoteCharacteristic_MultipleCharacteristics
 #endif
 // Tests DeprecatedWriteRemoteCharacteristic on two characteristics.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       DeprecatedWriteRemoteCharacteristic_MultipleCharacteristics) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_DeprecatedWriteRemoteCharacteristic_MultipleCharacteristics) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -1267,13 +1144,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests a nested ReadRemoteCharacteristic from within another
 // ReadRemoteCharacteristic.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       RemoteCharacteristic_Nested_Read_Read) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_RemoteCharacteristic_Nested_Read_Read) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ));
 
@@ -1315,13 +1187,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests a nested WriteRemoteCharacteristic from within another
 // WriteRemoteCharacteristic.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       RemoteCharacteristic_Nested_Write_Write) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_RemoteCharacteristic_Nested_Write_Write) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -1370,13 +1237,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests a nested DeprecatedWriteRemoteCharacteristic from within another
 // DeprecatedWriteRemoteCharacteristic.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       RemoteCharacteristic_Nested_DeprecatedWrite_DeprecatedWrite) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_RemoteCharacteristic_Nested_DeprecatedWrite_DeprecatedWrite) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -1417,13 +1279,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests a nested WriteRemoteCharacteristic from within a
 // ReadRemoteCharacteristic.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       RemoteCharacteristic_Nested_Read_Write) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_RemoteCharacteristic_Nested_Read_Write) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ |
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
@@ -1473,13 +1330,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests a nested DeprecatedWriteRemoteCharacteristic from within a
 // ReadRemoteCharacteristic.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       RemoteCharacteristic_Nested_Read_DeprecatedWrite) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_RemoteCharacteristic_Nested_Read_DeprecatedWrite) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ |
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
@@ -1524,13 +1376,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests a nested ReadRemoteCharacteristic from within a
 // WriteRemoteCharacteristic.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       RemoteCharacteristic_Nested_Write_Read) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_RemoteCharacteristic_Nested_Write_Read) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ |
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
@@ -1577,13 +1424,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests a nested ReadRemoteCharacteristic from within a
 // DeprecatedWriteRemoteCharacteristic.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       RemoteCharacteristic_Nested_DeprecatedWrite_Read) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_RemoteCharacteristic_Nested_DeprecatedWrite_Read) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ |
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
@@ -1623,11 +1465,7 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_ReadError DISABLED_ReadError
 #endif
 // Tests ReadRemoteCharacteristic asynchronous error.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt, ReadError) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_ReadError) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ));
 
@@ -1653,11 +1491,7 @@ TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_ReadError) {
 #define MAYBE_WriteError DISABLED_WriteError
 #endif
 // Tests WriteRemoteCharacteristic asynchronous error.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt, WriteError) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_WriteError) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -1688,11 +1522,7 @@ TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_WriteError) {
 #define MAYBE_DeprecatedWriteError DISABLED_DeprecatedWriteError
 #endif
 // Tests DeprecatedWriteRemoteCharacteristic asynchronous error.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt, DeprecatedWriteError) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_DeprecatedWriteError) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -1832,13 +1662,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_ReadRemoteCharacteristic_ReadPending
 #endif
 // Tests ReadRemoteCharacteristic error with a pending read operation.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       ReadRemoteCharacteristic_ReadPending) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_ReadRemoteCharacteristic_ReadPending) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ));
 
@@ -1872,13 +1697,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests WriteRemoteCharacteristic error with a pending write
 // operation.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       WriteRemoteCharacteristic_WritePending) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_WriteRemoteCharacteristic_WritePending) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -1925,13 +1745,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests DeprecatedWriteRemoteCharacteristic error with a pending write
 // operation.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       DeprecatedWriteRemoteCharacteristic_WritePending) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_DeprecatedWriteRemoteCharacteristic_WritePending) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
 
@@ -1966,13 +1781,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_ReadRemoteCharacteristic_WritePending
 #endif
 // Tests ReadRemoteCharacteristic error with a pending write operation.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       ReadRemoteCharacteristic_WritePending) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_ReadRemoteCharacteristic_WritePending) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ |
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
@@ -2014,13 +1824,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_ReadRemoteCharacteristic_DeprecatedWritePending
 #endif
 // Tests ReadRemoteCharacteristic error with a pending write operation.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       ReadRemoteCharacteristic_DeprecatedWritePending) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_ReadRemoteCharacteristic_DeprecatedWritePending) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ |
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
@@ -2055,13 +1860,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_WriteRemoteCharacteristic_ReadPending
 #endif
 // Tests WriteRemoteCharacteristic error with a pending Read operation.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       WriteRemoteCharacteristic_ReadPending) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_WriteRemoteCharacteristic_ReadPending) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ |
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
@@ -2103,13 +1903,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests DeprecatedWriteRemoteCharacteristic error with a pending Read
 // operation.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       DeprecatedWriteRemoteCharacteristic_ReadPending) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_DeprecatedWriteRemoteCharacteristic_ReadPending) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_READ |
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE));
@@ -2146,13 +1941,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 // how other platforms set global variables.
 // Tests that a notification arriving during a pending read doesn't
 // cause a crash.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       Notification_During_ReadRemoteCharacteristic) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_Notification_During_ReadRemoteCharacteristic) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_NOTIFY |
           BluetoothRemoteGattCharacteristic::PROPERTY_READ,
@@ -2206,13 +1996,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests that a notification arriving during a pending write doesn't
 // cause a crash.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       Notification_During_WriteRemoteCharacteristic) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_Notification_During_WriteRemoteCharacteristic) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_NOTIFY |
           BluetoothRemoteGattCharacteristic::PROPERTY_WRITE,
@@ -2255,13 +2040,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests that a notification arriving during a pending write doesn't
 // cause a crash.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       Notification_During_DeprecatedWriteRemoteCharacteristic) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_Notification_During_DeprecatedWriteRemoteCharacteristic) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_NOTIFY |
           BluetoothRemoteGattCharacteristic::PROPERTY_WRITE,
@@ -2297,13 +2077,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // StartNotifySession fails if characteristic doesn't have Notify or Indicate
 // property.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StartNotifySession_NoNotifyOrIndicate) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StartNotifySession_NoNotifyOrIndicate) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY */ 0x10, NotifyValueState::NOTIFY,
       StartNotifySetupError::CHARACTERISTIC_PROPERTIES));
@@ -2327,13 +2102,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // StartNotifySession fails if the characteristic is missing the Client
 // Characteristic Configuration descriptor.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StartNotifySession_NoConfigDescriptor) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StartNotifySession_NoConfigDescriptor) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY */ 0x10, NotifyValueState::NOTIFY,
       StartNotifySetupError::CONFIG_DESCRIPTOR_MISSING));
@@ -2357,13 +2127,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // StartNotifySession fails if the characteristic has multiple Client
 // Characteristic Configuration descriptors.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StartNotifySession_MultipleConfigDescriptor) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StartNotifySession_MultipleConfigDescriptor) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY */ 0x10, NotifyValueState::NOTIFY,
       StartNotifySetupError::CONFIG_DESCRIPTOR_DUPLICATE));
@@ -2441,11 +2206,7 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_StartNotifySession DISABLED_StartNotifySession
 #endif
 // Tests StartNotifySession success on a characteristic that enabled Notify.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt, StartNotifySession) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_StartNotifySession) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY */ 0x10, NotifyValueState::NOTIFY));
 }
@@ -2457,13 +2218,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_StartNotifySession) {
   DISABLED_StartNotifySession_OnIndicate
 #endif
 // Tests StartNotifySession success on a characteristic that enabled Indicate.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StartNotifySession_OnIndicate) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StartNotifySession_OnIndicate) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: INDICATE */ 0x20, NotifyValueState::INDICATE));
 }
@@ -2477,13 +2233,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests StartNotifySession success on a characteristic that enabled Notify &
 // Indicate.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StartNotifySession_OnNotifyAndIndicate) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StartNotifySession_OnNotifyAndIndicate) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY and INDICATE bits set */ 0x30,
       NotifyValueState::NOTIFY));
@@ -2495,13 +2246,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_StartNotifySession_Multiple DISABLED_StartNotifySession_Multiple
 #endif
 // Tests multiple StartNotifySession success.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StartNotifySession_Multiple) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StartNotifySession_Multiple) {
-#endif
   ASSERT_NO_FATAL_FAILURE(
       FakeCharacteristicBoilerplate(/* properties: NOTIFY */ 0x10));
   SimulateGattDescriptor(
@@ -2542,13 +2288,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_StartNotifySessionError_Multiple
 #endif
 // Tests multiple StartNotifySessions pending and then an error.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StartNotifySessionError_Multiple) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StartNotifySessionError_Multiple) {
-#endif
   ASSERT_NO_FATAL_FAILURE(
       FakeCharacteristicBoilerplate(/* properties: NOTIFY */ 0x10));
   SimulateGattDescriptor(
@@ -2584,13 +2325,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Test that a GATT disconnect in a StartNotifications error callback will
 // behave correctly. Regression test for crbug.com/1107577.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StartNotifySessionDisconnectOnError) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StartNotifySessionDisconnectOnError) {
-#endif
   ASSERT_NO_FATAL_FAILURE(
       FakeCharacteristicBoilerplate(/* properties: NOTIFY */ 0x10));
 
@@ -2657,13 +2393,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_StartNotifySession_BeforeDeleted
 #endif
 // Tests StartNotifySession completing before chrome objects are deleted.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StartNotifySession_BeforeDeleted) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StartNotifySession_BeforeDeleted) {
-#endif
   ASSERT_NO_FATAL_FAILURE(
       FakeCharacteristicBoilerplate(/* properties: NOTIFY */ 0x10));
   SimulateGattDescriptor(
@@ -2711,13 +2442,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests StartNotifySession reentrant in start notify session success callback
 // and the reentrant start notify session success.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StartNotifySession_Reentrant_Success_Success) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StartNotifySession_Reentrant_Success_Success) {
-#endif
   ASSERT_NO_FATAL_FAILURE(
       FakeCharacteristicBoilerplate(/* properties: NOTIFY */ 0x10));
   SimulateGattDescriptor(
@@ -2760,11 +2486,7 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_StopNotifySession DISABLED_StopNotifySession
 #endif
 // Tests StopNotifySession success on a characteristic that enabled Notify.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt, StopNotifySession) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_StopNotifySession) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY */ 0x10, NotifyValueState::NOTIFY));
   ExpectedChangeNotifyValueAttempts(1);
@@ -2789,13 +2511,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_StopNotifySession) {
   DISABLED_StopNotifySession_SessionDeleted
 #endif
 // Tests that deleted sessions are stopped.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StopNotifySession_SessionDeleted) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StopNotifySession_SessionDeleted) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY */ 0x10, NotifyValueState::NOTIFY));
   ExpectedChangeNotifyValueAttempts(1);
@@ -2821,13 +2538,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests that deleting the sessions before the stop callbacks have been
 // invoked does not cause problems.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StopNotifySession_SessionDeleted2) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StopNotifySession_SessionDeleted2) {
-#endif
   ASSERT_NO_FATAL_FAILURE(
       FakeCharacteristicBoilerplate(/* properties: NOTIFY */ 0x10));
 
@@ -2884,13 +2596,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_StopNotifySession_Cancelled DISABLED_StopNotifySession_Cancelled
 #endif
 // Tests that cancelling StopNotifySession works.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StopNotifySession_Cancelled) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StopNotifySession_Cancelled) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY */ 0x10, NotifyValueState::NOTIFY));
 
@@ -2916,13 +2623,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   DISABLED_StopNotifySession_AfterDeleted
 #endif
 // Tests that deleted sessions are stopped.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StopNotifySession_AfterDeleted) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StopNotifySession_AfterDeleted) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY */ 0x10, NotifyValueState::NOTIFY));
 
@@ -2959,13 +2661,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_StopNotifySession_OnIndicate DISABLED_StopNotifySession_OnIndicate
 #endif
 // Tests StopNotifySession success on a characteristic that enabled Indicate.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StopNotifySession_OnIndicate) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StopNotifySession_OnIndicate) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: INDICATE */ 0x20, NotifyValueState::INDICATE));
   ExpectedChangeNotifyValueAttempts(1);
@@ -2992,13 +2689,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests StopNotifySession success on a characteristic that enabled Notify &
 // Indicate.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StopNotifySession_OnNotifyAndIndicate) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StopNotifySession_OnNotifyAndIndicate) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY and INDICATE bits set */ 0x30,
       NotifyValueState::NOTIFY));
@@ -3023,11 +2715,7 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_StopNotifySession_Error DISABLED_StopNotifySession_Error
 #endif
 // Tests StopNotifySession error
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt, StopNotifySession_Error) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_StopNotifySession_Error) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY */ 0x10, NotifyValueState::NOTIFY));
 
@@ -3054,13 +2742,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_StopNotifySession_Error) {
 #define MAYBE_StopNotifySession_Multiple1 DISABLED_StopNotifySession_Multiple1
 #endif
 // Tests multiple StopNotifySession calls for a single session.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StopNotifySession_Multiple1) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StopNotifySession_Multiple1) {
-#endif
   ASSERT_NO_FATAL_FAILURE(
       FakeCharacteristicBoilerplate(/* properties: NOTIFY */ 0x10));
 
@@ -3106,13 +2789,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_StopNotifySession_Multiple2 DISABLED_StopNotifySession_Multiple2
 #endif
 // Tests multiple StartNotifySession calls and multiple StopNotifySession calls.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StopNotifySession_Multiple2) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StopNotifySession_Multiple2) {
-#endif
   ASSERT_NO_FATAL_FAILURE(
       FakeCharacteristicBoilerplate(/* properties: NOTIFY */ 0x10));
 
@@ -3170,13 +2848,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests starting a new notify session before the previous stop request
 // resolves.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StopNotifySession_StopStart) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StopNotifySession_StopStart) {
-#endif
   ASSERT_NO_FATAL_FAILURE(
       FakeCharacteristicBoilerplate(/* properties: NOTIFY */ 0x10));
   SimulateGattDescriptor(
@@ -3225,13 +2898,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_StopNotifySession_StartStopStart \
   DISABLED_StopNotifySession_StartStopStart
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StopNotifySession_StartStopStart) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StopNotifySession_StartStopStart) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY */ 0x10, NotifyValueState::NOTIFY));
 
@@ -3287,13 +2955,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #endif
 // Tests starting a new notify session before the previous stop requests
 // resolve.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StopNotifySession_StopStopStart) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StopNotifySession_StopStopStart) {
-#endif
   ASSERT_NO_FATAL_FAILURE(
       FakeCharacteristicBoilerplate(/* properties: NOTIFY */ 0x10));
   SimulateGattDescriptor(
@@ -3357,13 +3020,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_StopNotifySession_Reentrant_Success_Stop \
   DISABLED_StopNotifySession_Reentrant_Success_Stop
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StopNotifySession_Reentrant_Success_Stop) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StopNotifySession_Reentrant_Success_Stop) {
-#endif
   ASSERT_NO_FATAL_FAILURE(
       FakeCharacteristicBoilerplate(/* properties: NOTIFY */ 0x10));
   SimulateGattDescriptor(
@@ -3408,13 +3066,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_StopNotifySession_Reentrant_Stop_StartSuccess \
   DISABLED_StopNotifySession_Reentrant_Stop_StartSuccess
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StopNotifySession_Reentrant_Stop_StartSuccess) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StopNotifySession_Reentrant_Stop_StartSuccess) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY */ 0x10, NotifyValueState::NOTIFY));
 
@@ -3460,13 +3113,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_StopNotifySession_Reentrant_Stop_StartError \
   DISABLED_StopNotifySession_Reentrant_Stop_StartError
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       StopNotifySession_Reentrant_Stop_StartError) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_StopNotifySession_Reentrant_Stop_StartError) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY */ 0x10, NotifyValueState::NOTIFY));
 
@@ -3503,18 +3151,14 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
   EXPECT_FALSE(characteristic1_->IsNotifying());
 }
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE)
 #define MAYBE_GattCharacteristicAdded GattCharacteristicAdded
 #else
 #define MAYBE_GattCharacteristicAdded DISABLED_GattCharacteristicAdded
 #endif
 // TODO(crbug.com/41356253) Android should report that services are discovered
 // when a characteristic is added, but currently does not.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt, GattCharacteristicAdded) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_GattCharacteristicAdded) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate());
   TestBluetoothAdapterObserver observer(adapter_);
 
@@ -3530,13 +3174,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_GattCharacteristicAdded) {
   DISABLED_GattCharacteristicValueChanged
 #endif
 // Tests Characteristic Value changes during a Notify Session.
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       GattCharacteristicValueChanged) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_GattCharacteristicValueChanged) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY */ 0x10, NotifyValueState::NOTIFY));
 
@@ -3627,13 +3266,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #define MAYBE_GattCharacteristicValueChanged_DisconnectDuring \
   DISABLED_GattCharacteristicValueChanged_DisconnectDuring
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       GattCharacteristicValueChanged_DisconnectDuring) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_GattCharacteristicValueChanged_DisconnectDuring) {
-#endif
   ASSERT_NO_FATAL_FAILURE(StartNotifyBoilerplate(
       /* properties: NOTIFY */ 0x10, NotifyValueState::NOTIFY));
   MockBluetoothAdapter::Observer observer1(adapter_);
@@ -3671,11 +3305,7 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #else
 #define MAYBE_GetDescriptors_FindNone DISABLED_GetDescriptors_FindNone
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt, GetDescriptors_FindNone) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_GetDescriptors_FindNone) {
-#endif
 
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate());
 
@@ -3688,13 +3318,8 @@ TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_GetDescriptors_FindNone) {
 #define MAYBE_GetDescriptors_and_GetDescriptor \
   DISABLED_GetDescriptors_and_GetDescriptor
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       GetDescriptors_and_GetDescriptor) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest,
        MAYBE_GetDescriptors_and_GetDescriptor) {
-#endif
 
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate());
 
@@ -3744,11 +3369,7 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 #else
 #define MAYBE_GetDescriptorsByUUID DISABLED_GetDescriptorsByUUID
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt, GetDescriptorsByUUID) {
-#else
 TEST_F(BluetoothRemoteGattCharacteristicTest, MAYBE_GetDescriptorsByUUID) {
-#endif
 
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate());
 
@@ -3869,15 +3490,9 @@ TEST_F(BluetoothRemoteGattCharacteristicTest,
 // Only applies to macOS and WinRT whose events arrive all on the UI thread. See
 // other *DuringDisconnect tests for Android and Windows whose events arrive on
 // a different thread.
-#if BUILDFLAG(IS_WIN)
-TEST_P(
-    BluetoothRemoteGattCharacteristicTestWinrt,
-    WriteWithoutResponseOnlyCharacteristic_WriteRemoteCharacteristicDuringDisconnect) {
-#else
 TEST_F(
     BluetoothRemoteGattCharacteristicTest,
     MAYBE_WriteWithoutResponseOnlyCharacteristic_WriteRemoteCharacteristicDuringDisconnect) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE_WITHOUT_RESPONSE));
 
@@ -3909,15 +3524,9 @@ TEST_F(
 // Only applies to macOS and WinRT whose events arrive all on the UI thread. See
 // other *DuringDisconnect tests for Android and Windows whose events arrive on
 // a different thread.
-#if BUILDFLAG(IS_WIN)
-TEST_P(
-    BluetoothRemoteGattCharacteristicTestWinrt,
-    WriteWithoutResponseOnlyCharacteristic_DeprecatedWriteRemoteCharacteristicDuringDisconnect) {
-#else
 TEST_F(
     BluetoothRemoteGattCharacteristicTest,
     MAYBE_WriteWithoutResponseOnlyCharacteristic_DeprecatedWriteRemoteCharacteristicDuringDisconnect) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE_WITHOUT_RESPONSE));
 
@@ -3940,14 +3549,9 @@ TEST_F(
 #define MAYBE_WriteWithoutResponseOnlyCharacteristic_CloseConnectionDuringDisconnect \
   DISABLED_WriteWithoutResponseOnlyCharacteristic_CloseConnectionDuringDisconnect
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattCharacteristicTestWinrt,
-       WriteWithoutResponseOnlyCharacteristic_CloseConnectionDuringDisconnect) {
-#else
 TEST_F(
     BluetoothRemoteGattCharacteristicTest,
     MAYBE_WriteWithoutResponseOnlyCharacteristic_CloseConnectionDuringDisconnect) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE_WITHOUT_RESPONSE));
 
@@ -3977,15 +3581,9 @@ TEST_F(
 #define MAYBE_DeprecatedWriteWithoutResponseOnlyCharacteristic_CloseConnectionDuringDisconnect \
   DISABLED_DeprecatedWriteWithoutResponseOnlyCharacteristic_CloseConnectionDuringDisconnect
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(
-    BluetoothRemoteGattCharacteristicTestWinrt,
-    DeprecatedWriteWithoutResponseOnlyCharacteristic_CloseConnectionDuringDisconnect) {
-#else
 TEST_F(
     BluetoothRemoteGattCharacteristicTest,
     MAYBE_DeprecatedWriteWithoutResponseOnlyCharacteristic_CloseConnectionDuringDisconnect) {
-#endif
   ASSERT_NO_FATAL_FAILURE(FakeCharacteristicBoilerplate(
       BluetoothRemoteGattCharacteristic::PROPERTY_WRITE_WITHOUT_RESPONSE));
 
@@ -4316,10 +3914,5 @@ TEST_F(BluetoothRemoteGattCharacteristicTest, ExtraDidDiscoverDescriptorsCall) {
 }
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_WIN)
-INSTANTIATE_TEST_SUITE_P(All,
-                         BluetoothRemoteGattCharacteristicTestWinrt,
-                         ::testing::ValuesIn(kBluetoothTestWinrtParam));
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace device

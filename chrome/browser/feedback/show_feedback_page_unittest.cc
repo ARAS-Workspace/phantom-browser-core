@@ -45,7 +45,7 @@ TEST_F(ShowFeedbackPageTest, CanShowFeedback_PolicyDisabled) {
   EXPECT_FALSE(CanShowFeedback(profile_.get()));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_F(ShowFeedbackPageTest, CanShowFeedback_FeatureDisabled) {
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndDisableFeature(

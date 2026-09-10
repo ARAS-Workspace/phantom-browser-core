@@ -145,7 +145,7 @@ IN_PROC_BROWSER_TEST_F(ActorMouseMoveToolBrowserTest,
 
 // Moving mouse to a coordinate not in the viewport should fail without
 // dispatching events.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_MouseMoveTool_MoveToCoordinateOffScreen \
   DISABLED_MouseMoveTool_MoveToCoordinateOffScreen
 #else

@@ -19,9 +19,7 @@ enum class FileType {
   kSuperJournal,  // A super-journal file.
   kWal,           // A WAL-mode journal.
   kWalIndex,      // A WAL-mode shared-memory index.
-#if !BUILDFLAG(IS_WIN)
   kWalIndexReadOnly,  // A read-only handle to the WAL-mode shared-memory index.
-#endif
 };
 
 }  // namespace sqlite_vfs

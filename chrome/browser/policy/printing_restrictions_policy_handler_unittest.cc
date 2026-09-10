@@ -167,7 +167,7 @@ class PrintPdfAsImageRestrictionsPolicyHandlerTest : public testing::Test {
   PrefValueMap prefs_;
 };
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 TEST_F(PrintPdfAsImageRestrictionsPolicyHandlerTest,
        DefaultWithAvailabilityEnabled) {
   // For platforms that require PrintPdfAsImageAvailability, demonstrate that
@@ -209,7 +209,7 @@ TEST_F(PrintPdfAsImageRestrictionsPolicyHandlerTest,
 
   CheckInvalidPolicy(key::kPrintPdfAsImageDefault, default_value.Clone());
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 TEST_F(PrintPdfAsImageRestrictionsPolicyHandlerTest,

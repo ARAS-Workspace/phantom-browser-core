@@ -26,15 +26,6 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/win_util.h"
-#include "base/win/windows_version.h"
-#include "ui/display/win/dpi.h"
-#include "ui/gfx/system_fonts_win.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ash/public/cpp/ash_typography.h"
 #endif
@@ -42,9 +33,6 @@
 namespace {
 
 // The default system font name.
-#if BUILDFLAG(IS_WIN)
-const char kDefaultFontName[] = "Segoe UI";
-#endif
 
 // Constant from the Harmony spec.
 constexpr int kHarmonyTitleSize = 15;
@@ -69,45 +57,6 @@ class LayoutProviderTest : public testing::Test {
 // if some system-wide settings are changed. Other tests rely on these default
 // settings and were the cause of many flaky tests.
 TEST_F(LayoutProviderTest, EnsuresDefaultSystemSettings) {
-#if BUILDFLAG(IS_WIN)
-  // Ensures anti-aliasing is activated.
-  BOOL antialiasing = TRUE;
-  BOOL result = SystemParametersInfo(SPI_GETFONTSMOOTHING, 0, &antialiasing, 0);
-  EXPECT_NE(result, FALSE);
-  EXPECT_NE(antialiasing, FALSE)
-      << "The test requires that fonts smoothing (anti-aliasing) is "
-         "activated. If this assert is failing you need to manually activate "
-         "the flag in your system fonts settings.";
-
-  double accessibility_font_scale = display::win::GetAccessibilityFontScale();
-  EXPECT_EQ(accessibility_font_scale, 1.0)
-      << "The test requires default display settings. The fonts are scaled "
-         "due to accessibility settings. font_scale="
-      << accessibility_font_scale;
-
-  // Ensures that the default UI fonts have the original settings.
-  gfx::Font caption_font =
-      gfx::win::GetSystemFont(gfx::win::SystemFont::kCaption);
-  gfx::Font small_caption_font =
-      gfx::win::GetSystemFont(gfx::win::SystemFont::kSmallCaption);
-  gfx::Font menu_font = gfx::win::GetSystemFont(gfx::win::SystemFont::kMenu);
-  gfx::Font status_font =
-      gfx::win::GetSystemFont(gfx::win::SystemFont::kStatus);
-  gfx::Font message_font =
-      gfx::win::GetSystemFont(gfx::win::SystemFont::kMessage);
-
-  EXPECT_EQ(caption_font.GetFontName(), kDefaultFontName);
-  EXPECT_EQ(small_caption_font.GetFontName(), kDefaultFontName);
-  EXPECT_EQ(menu_font.GetFontName(), kDefaultFontName);
-  EXPECT_EQ(status_font.GetFontName(), kDefaultFontName);
-  EXPECT_EQ(message_font.GetFontName(), kDefaultFontName);
-
-  EXPECT_EQ(caption_font.GetFontSize(), 12);
-  EXPECT_EQ(small_caption_font.GetFontSize(), 12);
-  EXPECT_EQ(menu_font.GetFontSize(), 12);
-  EXPECT_EQ(status_font.GetFontSize(), 12);
-  EXPECT_EQ(message_font.GetFontSize(), 12);
-#endif
 }
 
 // Check legacy font sizes. No new code should be using these constants, but if
@@ -123,13 +72,8 @@ TEST_F(LayoutProviderTest, MAYBE_LegacyFontSizeConstants) {
   ui::ResourceBundle& rb = ui::ResourceBundle::GetSharedInstance();
   gfx::FontList label_font = rb.GetFontListWithDelta(ui::kLabelFontSizeDelta);
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(16, label_font.GetHeight());
-  EXPECT_EQ(13, label_font.GetBaseline());
-#else
   EXPECT_EQ(15, label_font.GetHeight());
   EXPECT_EQ(12, label_font.GetBaseline());
-#endif
   EXPECT_EQ(12, label_font.GetFontSize());
   EXPECT_EQ(9, label_font.GetCapHeight());
 
@@ -141,12 +85,7 @@ TEST_F(LayoutProviderTest, MAYBE_LegacyFontSizeConstants) {
 
   gfx::FontList title_font = rb.GetFontListWithDelta(ui::kTitleFontSizeDelta);
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(15, title_font.GetFontSize());
-  EXPECT_EQ(20, title_font.GetHeight());
-  EXPECT_EQ(17, title_font.GetBaseline());
-  EXPECT_EQ(11, title_font.GetCapHeight());
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_EQ(14, title_font.GetFontSize());
   EXPECT_EQ(17, title_font.GetHeight());
   EXPECT_EQ(14, title_font.GetBaseline());
@@ -158,11 +97,7 @@ TEST_F(LayoutProviderTest, MAYBE_LegacyFontSizeConstants) {
   EXPECT_EQ(11, title_font.GetCapHeight());
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(7, title_font.GetExpectedTextWidth(1));
-#else
   EXPECT_EQ(8, title_font.GetExpectedTextWidth(1));
-#endif
 
   gfx::FontList small_font = rb.GetFontList(ui::ResourceBundle::SmallFont);
   gfx::FontList base_font = rb.GetFontList(ui::ResourceBundle::BaseFont);
@@ -209,11 +144,7 @@ TEST_F(LayoutProviderTest, RequestFontBySize) {
   constexpr int kBody2 = 12;                 // Leading 20.
   constexpr int kButton = 12;
 
-#if BUILDFLAG(IS_WIN)
-  constexpr gfx::Font::Weight kButtonWeight = gfx::Font::Weight::BOLD;
-#else
   constexpr gfx::Font::Weight kButtonWeight = gfx::Font::Weight::MEDIUM;
-#endif
 
   ui::ResourceBundle& rb = ui::ResourceBundle::GetSharedInstance();
 
@@ -236,8 +167,6 @@ TEST_F(LayoutProviderTest, RequestFontBySize) {
 // Headline leading not specified (multiline should be rare).
 #if BUILDFLAG(IS_MAC)
   EXPECT_EQ(25, headline_font.GetHeight());
-#elif BUILDFLAG(IS_WIN)
-  EXPECT_EQ(27, headline_font.GetHeight());
 #else
   EXPECT_EQ(24, headline_font.GetHeight());
 #endif
@@ -247,8 +176,6 @@ TEST_F(LayoutProviderTest, RequestFontBySize) {
 // Title font leading should be 22.
 #if BUILDFLAG(IS_MAC)
   EXPECT_EQ(19, title_font.GetHeight());  // i.e. Add 3 to obtain line height.
-#elif BUILDFLAG(IS_WIN)
-  EXPECT_EQ(20, title_font.GetHeight());  // Add 2.
 #else
   EXPECT_EQ(18, title_font.GetHeight());  // Add 4.
 #endif
@@ -258,8 +185,6 @@ TEST_F(LayoutProviderTest, RequestFontBySize) {
 // Body1 font leading should be 20.
 #if BUILDFLAG(IS_MAC)
   EXPECT_EQ(16, body1_font.GetHeight());  // Add 4.
-#elif BUILDFLAG(IS_WIN)
-  EXPECT_EQ(18, body1_font.GetHeight());
 #else  // Linux.
   EXPECT_EQ(17, body1_font.GetHeight());  // Add 3.
 #endif
@@ -267,20 +192,12 @@ TEST_F(LayoutProviderTest, RequestFontBySize) {
   EXPECT_EQ(kBody2, body2_font.GetFontSize());
 
 // Body2 font leading should be 20.
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(16, body2_font.GetHeight());
-#else
   EXPECT_EQ(15, body2_font.GetHeight());  // Other platforms: Add 5.
-#endif
 
   EXPECT_EQ(kButton, button_font.GetFontSize());
 
 // Button leading not specified (shouldn't be needed: no multiline buttons).
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(16, button_font.GetHeight());
-#else
   EXPECT_EQ(15, button_font.GetHeight());
-#endif
 }
 
 // Test that the default TypographyProvider correctly maps TextContexts relative

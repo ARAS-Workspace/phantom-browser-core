@@ -67,9 +67,7 @@ bool DevToolsStreamFile::InitOnFileSequenceIfNeeded() {
     had_errors_ = true;
     return false;
   }
-#if !BUILDFLAG(IS_WIN)
   base::DeleteFile(temp_path);
-#endif
   return true;
 }
 

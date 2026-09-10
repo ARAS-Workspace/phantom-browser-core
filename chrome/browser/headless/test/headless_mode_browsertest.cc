@@ -9,7 +9,7 @@
 // Native headless is currently available on Linux, Windows and Mac platforms.
 // More platforms will be added later, so avoid function level clutter by
 // providing a compile time condition over the entire file.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include <string>
 
 #include "base/check_deref.h"
@@ -466,7 +466,7 @@ Widget* ShowTestBubble(Browser* browser) {
 IN_PROC_BROWSER_TEST_F(HeadlessModeBrowserTest, HeadlessBubbleVisibility) {
   Widget* bubble_widget = ShowTestBubble(browser());
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // On Windows and Mac in headless mode we still have actual platform
   // windows which are always hidden, so verify that they are not visible.
   EXPECT_FALSE(test::IsPlatformWindowVisible(bubble_widget));
@@ -490,7 +490,6 @@ IN_PROC_BROWSER_TEST_F(HeadlessModeBrowserTest, HeadlessBubbleSize) {
 // On Windows user data dir is created before chrome.dll is loaded in
 // chrome_elf, see chrome/install_static/user_data_dir.h/cc, so the following
 // test does not apply.
-#if !BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_F(HeadlessModeBrowserTest, CreateUniqueUserDataDir) {
   base::ScopedAllowBlockingForTesting allow_blocking;
   base::test::ScopedCommandLine scoped_command_line;
@@ -510,9 +509,8 @@ IN_PROC_BROWSER_TEST_F(HeadlessModeBrowserTest, CreateUniqueUserDataDir) {
                                  FILE_PATH_LITERAL("-headless"));
   EXPECT_EQ(user_data_dir.DirName(), expected_parent);
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 }  // namespace
 
 }  // namespace headless
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

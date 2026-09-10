@@ -157,15 +157,7 @@ bool LowLatencyUsageSupportedForCanvas2D(RasterMode raster_mode) {
     return false;
   }
 
-#if BUILDFLAG(IS_WIN)
-  // Low-latency usages are supported on Windows if it's possible to back
-  // SharedImages by the D3D swapchain.
-  return SharedGpuContext::ContextProviderWrapper()
-      ->ContextProvider()
-      .SharedImageInterface()
-      ->GetCapabilities()
-      .shared_image_swap_chain;
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   return LowLatencyUsageSupportedForCanvas();
 #elif BUILDFLAG(IS_CHROMEOS)
   // Low-latency usage is always supported for Canvas2D on ChromeOS.
@@ -196,8 +188,6 @@ bool LowLatencyUsageSupportedForWebGL(gpu::SharedImageInterface* sii) {
   static const bool enabled = base::CommandLine::ForCurrentProcess()->HasSwitch(
       blink::switches::kEnableOverlaysAndLowLatencyUsageForWebGL);
   return enabled;
-#elif BUILDFLAG(IS_WIN)
-  return sii && sii->GetCapabilities().shared_image_swap_chain;
 #else
   // NOTE: crbug.com/41435781 would need to be resolved in order to support
   // low-latency usage on Mac (currently setting the desynchronized attribute

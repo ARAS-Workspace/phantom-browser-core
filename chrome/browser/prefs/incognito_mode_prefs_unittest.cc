@@ -59,7 +59,7 @@ TEST_F(IncognitoModePrefsTest, GetAvailability) {
 
 typedef IncognitoModePrefsTest IncognitoModePrefsDeathTest;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_GetAvailabilityBadValue DISABLED_GetAvailabilityBadValue
 #else
 #define MAYBE_GetAvailabilityBadValue GetAvailabilityBadValue

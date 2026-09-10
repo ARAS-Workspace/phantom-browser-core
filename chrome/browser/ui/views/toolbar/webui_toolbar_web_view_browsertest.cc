@@ -3680,11 +3680,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewSplitTabsBrowserTest,
 }
 
 // TODO(crbug.com/524808223): Re-enable this test.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_VerifySplitTabLocations DISABLED_VerifySplitTabLocations
-#else
 #define MAYBE_VerifySplitTabLocations VerifySplitTabLocations
-#endif
 IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewSplitTabsBrowserTest,
                        MAYBE_VerifySplitTabLocations) {
   WebUIToolbarWebView* webui_toolbar_view = GetWebUIToolbarWebView(browser());

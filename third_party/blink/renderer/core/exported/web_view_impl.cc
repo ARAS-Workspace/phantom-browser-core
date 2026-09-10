@@ -196,7 +196,7 @@
 #include "ui/base/ui_base_features.h"
 #include "ui/gfx/geometry/skia_conversions.h"
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 #include "ui/native_theme/native_theme.h"
 #endif
 
@@ -206,9 +206,6 @@
 #include "ui/gfx/font_render_params.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "third_party/blink/public/web/win/web_font_rendering.h"
-#endif
 
 // Get rid of WTF's pow define so we can use std::pow.
 #undef pow
@@ -399,7 +396,7 @@ void RecordPrerenderActivationSignalDelay(const String& metric_suffix) {
       queueing_time);
 }
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_MAC)
 SkFontHinting RendererPreferencesToSkiaHinting(
     const blink::RendererPreferences& prefs) {
 #if BUILDFLAG(IS_LINUX)
@@ -433,7 +430,7 @@ SkFontHinting RendererPreferencesToSkiaHinting(
       NOTREACHED();
   }
 }
-#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#endif  // !BUILDFLAG(IS_MAC)
 
 void ForEachFrameWidgetControlledByView(
     WebViewImpl& web_view,
@@ -461,7 +458,7 @@ void MaybePreloadSystemFonts(Page* page) {
       FROM_HERE, BindOnce([]() { FontCache::MaybePreloadSystemFonts(); }));
 }
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 void UpdateUseOverlayScrollbar(bool use_overlay_scrollbar) {
   ui::NativeTheme::GetInstanceForWeb()->set_use_overlay_scrollbar(
       use_overlay_scrollbar);
@@ -1920,14 +1917,11 @@ void WebView::ApplyWebPreferences(const web_pref::WebPreferences& prefs,
       prefs.default_maximum_page_scale_factor);
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  RuntimeEnabledFeatures::SetMiddleClickAutoscrollEnabled(true);
-#endif
 
   RuntimeEnabledFeatures::SetTranslateServiceEnabled(
       prefs.translate_service_available);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   if (web_view_impl->GetPage()) {
     if (auto* prewarmer = FontCache::GetFontPrewarmer()) {
       GenericFontFamilySettings& font_settings =
@@ -3648,24 +3642,6 @@ void WebViewImpl::UpdateFontRenderingFromRendererPrefs() {
       gfx::FontRenderParams::SubpixelRenderingToSkiaPixelGeometry(
           renderer_preferences_.subpixel_rendering),
       renderer_preferences_.text_contrast, renderer_preferences_.text_gamma);
-#if BUILDFLAG(IS_WIN)
-  // Cache the system font metrics in blink.
-  WebFontRendering::SetMenuFontMetrics(
-      WebString::FromUtf16(renderer_preferences_.menu_font_family_name),
-      renderer_preferences_.menu_font_height);
-  WebFontRendering::SetSmallCaptionFontMetrics(
-      WebString::FromUtf16(
-          renderer_preferences_.small_caption_font_family_name),
-      renderer_preferences_.small_caption_font_height);
-  WebFontRendering::SetStatusFontMetrics(
-      WebString::FromUtf16(renderer_preferences_.status_font_family_name),
-      renderer_preferences_.status_font_height);
-  WebFontRendering::SetAntialiasedTextEnabled(
-      renderer_preferences_.should_antialias_text);
-  WebFontRendering::SetLCDTextEnabled(
-      renderer_preferences_.subpixel_rendering !=
-      gfx::FontRenderParams::SUBPIXEL_RENDERING_NONE);
-#else
   WebFontRenderStyle::SetHinting(
       RendererPreferencesToSkiaHinting(renderer_preferences_));
   WebFontRenderStyle::SetAutoHint(renderer_preferences_.use_autohinter);
@@ -3682,7 +3658,6 @@ void WebViewImpl::UpdateFontRenderingFromRendererPrefs() {
         renderer_preferences_.system_font_family_name));
   }
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-#endif  // BUILDFLAG(IS_WIN)
 #endif  // !BUILDFLAG(IS_MAC)
 }
 
@@ -3828,7 +3803,7 @@ void WebViewImpl::UpdateRendererPreferences(
   SetExplicitlyAllowedPorts(
       renderer_preferences_.explicitly_allowed_network_ports);
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
   if (!ScrollbarTheme::MockScrollbarsEnabled()) {
     // DevTools emulation can update Blink's overlay scrollbar setting,
     // while OS theme updates can update NativeTheme before renderer preferences

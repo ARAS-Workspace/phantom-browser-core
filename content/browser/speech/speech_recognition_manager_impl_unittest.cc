@@ -72,11 +72,7 @@ class SpeechRecognitionManagerImplTest
 };
 
 // TODO(crbug.com/446260680): Disabled on Windows due to flakiness.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SodaNotInstalled DISABLED_SodaNotInstalled
-#else
 #define MAYBE_SodaNotInstalled SodaNotInstalled
-#endif
 TEST_F(SpeechRecognitionManagerImplTest, MAYBE_SodaNotInstalled) {
   if (!on_device_speech_recognition_supported_) {
     return;

@@ -52,8 +52,6 @@ namespace {
 static const int32_t kAlgorithmIdentifier = 1;
 static const int32_t kAnotherAlgorithmIdentifier = 2;
 
-constexpr bool is_win = !!BUILDFLAG(IS_WIN);
-
 #endif
 
 struct SecurePaymentConfirmationServiceDeleter {
@@ -520,10 +518,7 @@ TEST_P(SecurePaymentConfirmationServiceCredentialTest,
   fake_authenticator_response->info->raw_id = fake_credential_id_;
   fake_authenticator_response->info->client_data_json = fake_client_data_json_;
 
-  // Last used time is only set on Windows platform.
-  std::optional<base::Time> last_used =
-      is_win ? std::optional<base::Time>(base::Time::NowFromSystemTime())
-             : std::nullopt;
+  std::optional<base::Time> last_used = std::nullopt;
 
   EXPECT_CALL(
       *mock_web_data_service_,

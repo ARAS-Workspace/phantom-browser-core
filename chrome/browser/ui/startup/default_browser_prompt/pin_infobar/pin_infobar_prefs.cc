@@ -28,7 +28,7 @@ bool InfoBarShownRecentlyOrMaxTimes() {
   int reprompt_days = kPinInfoBarRepromptDays;
   int max_prompt_count = kPinInfoBarMaxPromptCount;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (base::FeatureList::IsEnabled(features::kSeparateDefaultAndPinPrompt)) {
     reprompt_days = features::kSeparateDefaultAndPinPromptPinCooldownDays.Get();
     max_prompt_count = features::kSeparateDefaultAndPinPromptPinMaxCount.Get();

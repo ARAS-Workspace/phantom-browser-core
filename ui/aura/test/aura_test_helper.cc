@@ -39,10 +39,6 @@
 #include "ui/platform_window/common/platform_window_defaults.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/task/sequenced_task_runner.h"
-#include "ui/aura/native_window_occlusion_tracker_win.h"
-#endif
 
 #if BUILDFLAG(IS_OZONE)
 #include "ui/events/ozone/events_ozone.h"
@@ -186,15 +182,6 @@ void AuraTestHelper::TearDown() {
   zero_duration_mode_.reset();
   wm_state_.reset();
 
-#if BUILDFLAG(IS_WIN)
-  // TODO(pkasting): This code doesn't really belong here.
-  // NativeWindowOcclusionTrackerWin is created on demand by various tests, must
-  // be torn down before the TaskEnvironment (which our owner is responsible
-  // for), and must be torn down after all Windows (so, after e.g. |host_|).
-  // Ideally, some specific class would create it and manage its lifetime,
-  // guaranteeing the above.
-  NativeWindowOcclusionTrackerWin::DeleteInstanceForTesting();
-#endif
 }
 
 void AuraTestHelper::RunAllPendingInMessageLoop() {

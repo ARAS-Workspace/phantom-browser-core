@@ -14,9 +14,7 @@
 #include "base/compiler_specific.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include <sys/ucontext.h>
 #elif BUILDFLAG(IS_APPLE)
 #include <mach/machine/thread_status.h>
@@ -38,82 +36,7 @@ uintptr_t& AsUintPtr(T* value) {
   return *reinterpret_cast<uintptr_t*>(value);
 }
 
-#if BUILDFLAG(IS_WIN)
-
-inline uintptr_t RegisterContextStackPointer(::CONTEXT* context) {
-#if defined(ARCH_CPU_X86_64)
-  return context->Rsp;
-#elif defined(ARCH_CPU_ARM64)
-  return context->Sp;
-#elif defined(ARCH_CPU_X86)
-  return context->Esp;
-#else
-#error "Unknown architecture"
-#endif
-}
-
-inline void SetRegisterContextStackPointer(::CONTEXT* context, uintptr_t val) {
-#if defined(ARCH_CPU_X86_64)
-  context->Rsp = val;
-#elif defined(ARCH_CPU_ARM64)
-  context->Sp = val;
-#elif defined(ARCH_CPU_X86)
-  context->Esp = val;
-#else
-#error "Unknown architecture"
-#endif
-}
-
-inline uintptr_t RegisterContextFramePointer(::CONTEXT* context) {
-#if defined(ARCH_CPU_X86_64)
-  return context->Rbp;
-#elif defined(ARCH_CPU_ARM64)
-  return context->Fp;
-#elif defined(ARCH_CPU_X86)
-  return context->Ebp;
-#else
-#error "Unknown architecture"
-#endif
-}
-
-inline void SetRegisterContextFramePointer(::CONTEXT* context, uintptr_t val) {
-#if defined(ARCH_CPU_X86_64)
-  context->Rbp = val;
-#elif defined(ARCH_CPU_ARM64)
-  context->Fp = val;
-#elif defined(ARCH_CPU_X86)
-  context->Ebp = val;
-#else
-#error "Unknown architecture"
-#endif
-}
-
-inline uintptr_t RegisterContextInstructionPointer(::CONTEXT* context) {
-#if defined(ARCH_CPU_X86_64)
-  return context->Rip;
-#elif defined(ARCH_CPU_ARM64)
-  return context->Pc;
-#elif defined(ARCH_CPU_X86)
-  return context->Eip;
-#else
-#error "Unknown architecture"
-#endif
-}
-
-inline void SetRegisterContextInstructionPointer(::CONTEXT* context,
-                                                 uintptr_t val) {
-#if defined(ARCH_CPU_X86_64)
-  context->Rip = val;
-#elif defined(ARCH_CPU_ARM64)
-  context->Pc = val;
-#elif defined(ARCH_CPU_X86)
-  context->Eip = val;
-#else
-#error "Unknown architecture"
-#endif
-}
-
-#elif BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 inline uintptr_t RegisterContextStackPointer(mcontext_t* context) {
 #if defined(ARCH_CPU_ARMEL)

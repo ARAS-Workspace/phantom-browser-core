@@ -31,11 +31,6 @@
 #include "printing/buildflags/buildflags.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/aura/window.h"
-#include "ui/aura/window_tree_host.h"
-#endif
-
 using task_manager::browsertest_util::MatchAboutBlankTab;
 using task_manager::browsertest_util::MatchAnyPrint;
 using task_manager::browsertest_util::MatchAnyTab;
@@ -126,30 +121,6 @@ IN_PROC_BROWSER_TEST_F(PrintPreviewBrowserTest,
   ASSERT_NO_FATAL_FAILURE(
       WaitForTaskManagerRows(1, MatchPrint(url::kAboutBlankURL)));
 }
-
-#if BUILDFLAG(IS_WIN)
-// http://crbug.com/40375875
-IN_PROC_BROWSER_TEST_F(PrintPreviewBrowserTest,
-                       DISABLED_NoCrashOnCloseWithOtherTabs) {
-  // Now print preview.
-  Print();
-
-  ui_test_utils::NavigateToURLWithDisposition(
-      browser(), GURL("about:blank"), WindowOpenDisposition::NEW_FOREGROUND_TAB,
-      ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
-
-  browser()->tab_strip_model()->ActivateTabAt(
-      0, TabStripUserGestureDetails(
-             TabStripUserGestureDetails::GestureType::kOther));
-
-  // Navigate main tab to hide print preview.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GURL("about:blank")));
-
-  browser()->tab_strip_model()->ActivateTabAt(
-      1, TabStripUserGestureDetails(
-             TabStripUserGestureDetails::GestureType::kOther));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 IN_PROC_BROWSER_TEST_F(PrintPreviewBrowserTest, PreviewStartedMetric) {
   base::HistogramTester histogram_tester;

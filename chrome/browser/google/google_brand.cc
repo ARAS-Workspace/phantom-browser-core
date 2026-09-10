@@ -26,42 +26,7 @@ const char* g_brand_for_testing = nullptr;
 
 // Global functions -----------------------------------------------------------
 
-#if BUILDFLAG(IS_WIN)
-
-bool GetBrand(std::string* brand) {
-  if (g_brand_for_testing) {
-    brand->assign(g_brand_for_testing);
-    return true;
-  }
-
-  // Cache brand code value, since it is queried a lot and registry queries are
-  // slow enough to actually affect top-level metrics like
-  // Omnibox.CharTypedToRepaintLatency.
-  static const base::NoDestructor<std::optional<std::string>> brand_code(
-      []() -> std::optional<std::string> {
-        std::wstring brandw;
-        if (!GoogleUpdateSettings::GetBrand(&brandw)) {
-          return std::nullopt;
-        }
-        return base::WideToASCII(brandw);
-      }());
-  if (!brand_code->has_value()) {
-    return false;
-  }
-  brand->assign(**brand_code);
-  return true;
-}
-
-bool GetReactivationBrand(std::string* brand) {
-  std::wstring brandw;
-  bool ret = GoogleUpdateSettings::GetReactivationBrand(&brandw);
-  if (ret) {
-    brand->assign(base::WideToASCII(brandw));
-  }
-  return ret;
-}
-
-#elif !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
 
 bool GetBrand(std::string* brand) {
   if (g_brand_for_testing) {

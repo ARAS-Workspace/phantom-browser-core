@@ -17,9 +17,6 @@
 #include "headless/lib/headless_content_main_delegate.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include <sys/resource.h>
 #endif
@@ -72,11 +69,6 @@ int main(int argc, char** argv) {
     PLOG(WARNING) << "Failed to set core dump limit";
   }
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-#if BUILDFLAG(IS_WIN)
-  // Load and pin user32.dll to avoid having to load it once tests start while
-  // on the main thread loop where blocking calls are disallowed.
-  base::win::PinUser32();
-#endif  // BUILDFLAG(IS_WIN)
 
   // Setup a working test environment for the network service in case it's used.
   // Only create this object in the utility process, so that its members don't

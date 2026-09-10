@@ -25,12 +25,6 @@
 #include "ui/events/test/events_test_utils.h"
 #include "ui/gfx/geometry/vector2d_conversions.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "ui/events/keycodes/keyboard_code_conversion.h"
-#endif
-
 #if BUILDFLAG(IS_OZONE)
 #include "ui/events/ozone/events_ozone.h"
 #endif
@@ -788,29 +782,6 @@ void EventGenerator::DispatchKeyEvent(bool is_press,
                                       ui::KeyboardCode key_code,
                                       int flags,
                                       int source_device_id) {
-#if BUILDFLAG(IS_WIN)
-  UINT key_press = WM_KEYDOWN;
-  uint16_t character = ui::DomCodeToUsLayoutCharacter(
-      ui::UsLayoutKeyboardCodeToDomCode(key_code), flags);
-  if (is_press && character) {
-    CHROME_MSG native_event = {NULL, WM_KEYDOWN, static_cast<UINT>(key_code),
-                               0};
-    native_event.time =
-        (ui::EventTimeForNow() - base::TimeTicks()).InMilliseconds() &
-        UINT32_MAX;
-    ui::KeyEvent keyev(native_event, flags);
-    Dispatch(&keyev);
-    // On Windows, WM_KEYDOWN event is followed by WM_CHAR with a character
-    // if the key event corresponds to a real character.
-    key_press = WM_CHAR;
-    key_code = static_cast<ui::KeyboardCode>(character);
-  }
-  CHROME_MSG native_event = {NULL, (is_press ? key_press : WM_KEYUP),
-                             static_cast<UINT>(key_code), 0};
-  native_event.time =
-      (ui::EventTimeForNow() - base::TimeTicks()).InMilliseconds() & UINT32_MAX;
-  ui::KeyEvent keyev(native_event, flags);
-#else
   ui::EventType type =
       is_press ? ui::EventType::kKeyPressed : ui::EventType::kKeyReleased;
   ui::KeyEvent keyev(type, key_code, flags);
@@ -822,7 +793,6 @@ void EventGenerator::DispatchKeyEvent(bool is_press,
     SetKeyboardImeFlags(&keyev, kPropertyKeyboardImeIgnoredFlag);
   }
 #endif  // BUILDFLAG(IS_OZONE)
-#endif  // BUILDFLAG(IS_WIN)
   keyev.set_source_device_id(source_device_id);
   Dispatch(&keyev);
 }

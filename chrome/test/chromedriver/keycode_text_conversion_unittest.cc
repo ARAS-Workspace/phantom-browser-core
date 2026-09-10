@@ -35,14 +35,6 @@ void CheckCharToKeyCode(char character, ui::KeyboardCode key_code,
                        key_code, modifiers);
 }
 
-#if BUILDFLAG(IS_WIN)
-void CheckCharToKeyCode(wchar_t character, ui::KeyboardCode key_code,
-                        int modifiers) {
-  CheckCharToKeyCode16(base::WideToUTF16(std::wstring(1, character))[0],
-                       key_code, modifiers);
-}
-#endif
-
 void CheckCantConvertChar(wchar_t character) {
   std::wstring character_string;
   character_string.push_back(character);
@@ -122,34 +114,3 @@ TEST(KeycodeTextConversionTest, MAYBE_CharToKeyCode) {
   CheckCantConvertChar(L'\u00E9');
   CheckCantConvertChar(L'\u2159');
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST(KeycodeTextConversionTest, NonShiftModifiers) {
-  ui::ScopedKeyboardLayout keyboard_layout(ui::KEYBOARD_LAYOUT_GERMAN);
-  int ctrl_and_alt = kControlKeyModifierMask | kAltKeyModifierMask;
-  CheckCharToKeyCode('@', ui::VKEY_Q, ctrl_and_alt);
-  EXPECT_EQ("@", ConvertKeyCodeToTextNoError(ui::VKEY_Q, ctrl_and_alt));
-}
-
-TEST(KeycodeTextConversionTest, NonEnglish) {
-  // For Greek and Russian keyboard layouts, which are very different from
-  // QWERTY, Windows just uses virtual key codes that match the QWERTY layout,
-  // and translates them to other characters.  If we wanted to test something
-  // like German, whose layout is very similar to QWERTY, we'd need to be
-  // careful, as in this case Windows maps the keyboard scan codes to the
-  // appropriate (different) VKEYs instead of mapping the VKEYs to different
-  // characters.
-  {
-    ui::ScopedKeyboardLayout greek_layout(ui::KEYBOARD_LAYOUT_GREEK);
-    CheckCharToKeyCode(';', ui::VKEY_Q, 0);
-    EXPECT_EQ(";", ConvertKeyCodeToTextNoError(ui::VKEY_Q, 0));
-  }
-  {
-    // Regression test for chromedriver bug #405.
-    ui::ScopedKeyboardLayout russian_layout(ui::KEYBOARD_LAYOUT_RUSSIAN);
-    CheckCharToKeyCode(L'\u0438', ui::VKEY_B, 0);
-    EXPECT_EQ(base::WideToUTF8(L"\u0438"),
-              ConvertKeyCodeToTextNoError(ui::VKEY_B, 0));
-  }
-}
-#endif

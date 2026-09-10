@@ -58,22 +58,10 @@ bool ScreenAILibraryWrapperImpl::LoadFunction(T& function_variable,
 bool ScreenAILibraryWrapperImpl::Load(const base::FilePath& library_path) {
   library_ = base::ScopedNativeLibrary(library_path);
 
-#if BUILDFLAG(IS_WIN)
-  DWORD error = library_.GetError()->code;
-  base::UmaHistogramSparse(
-      "Accessibility.ScreenAI.LibraryLoadDetailedResultOnWindows",
-      static_cast<int>(error));
-  if (error != ERROR_SUCCESS) {
-    VLOG(0) << "Library load error: " << library_.GetError()->code;
-    return false;
-  }
-#else
-
   if (!library_.GetError()->message.empty()) {
     VLOG(0) << "Library load error: " << library_.GetError()->message;
     return false;
   }
-#endif
 
 #if BUILDFLAG(IS_CHROMEOS)
   if (!LoadFunction(set_logger_, "SetLogger")) {

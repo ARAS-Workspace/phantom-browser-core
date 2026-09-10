@@ -52,7 +52,7 @@
 #include "chromeos/dbus/constants/dbus_switches.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "components/device_signals/core/common/signals_features.h"
 #endif
 
@@ -290,7 +290,7 @@ class EnterpriseReportingPrivateGetContextInfoChromeOSFirewallTest
 
   bool BuiltInDnsClientPlatformDefault() {
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+    BUILDFLAG(IS_LINUX)
     return true;
 #else
     return false;
@@ -587,7 +587,7 @@ class EnterpriseReportingPrivateGetCertificateTest
       public testing::WithParamInterface<bool> {
  public:
   EnterpriseReportingPrivateGetCertificateTest() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     feature_list_.InitWithFeatureState(
         enterprise_signals::features::kAllowClientCertificateReportingForUsers,
         GetParam());
@@ -797,7 +797,7 @@ IN_PROC_BROWSER_TEST_P(EnterpriseReportingPrivateGetCertificateTest,
 
 INSTANTIATE_TEST_SUITE_P(,
                          EnterpriseReportingPrivateGetCertificateTest,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
                          testing::Bool());
 #else
                          testing::Values(false));

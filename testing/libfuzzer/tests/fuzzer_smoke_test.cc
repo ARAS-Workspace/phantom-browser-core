@@ -89,7 +89,7 @@ TEST(FuzzerSmokeTest, MAYBE_LpmEmptyFuzzerDoesNotCrashOnStartup) {
 // This test is limited to POSIX the process leak bug only affects POSIX
 // platforms where ClusterFuzz runs with terminate_before_kill=True
 // (which uses SIGTERM first).
-#if !BUILDFLAG(IS_WIN) && defined(USING_FUZZTEST_WRAPPER)
+#if defined(USING_FUZZTEST_WRAPPER)
 // TODO(https://crbug.com/536875721): Re-enable when MSAN builds are fixed.
 #if defined(MEMORY_SANITIZER)
 #define MAYBE_WrapperDoesNotLeakChildOnSIGTERM \
@@ -143,7 +143,7 @@ TEST(FuzzerSmokeTest, MAYBE_WrapperDoesNotLeakChildOnSIGTERM) {
       ::TestTimeouts::action_timeout(),
       kill(-wrapper_pid, 0) != 0 && errno == ESRCH);
 }
-#endif  // !BUILDFLAG(IS_WIN)
+#endif  // defined(USING_FUZZTEST_WRAPPER)
 
 }  // namespace
 }  // namespace fuzzing

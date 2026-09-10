@@ -386,17 +386,6 @@ class HeadlessModeScreenshotCommandBrowserTest
  public:
   HeadlessModeScreenshotCommandBrowserTest() = default;
 
-#if BUILDFLAG(IS_WIN)
-  void SetUp() override {
-    // Use software compositing instead of GL which causes blank screenshots on
-    // Windows, especially under ASAN. See https://crbug.com/40267033 and
-    // https://crbug.com/328195816.
-    UseSoftwareCompositing();
-
-    HeadlessModeCommandBrowserTestWithTempDir::SetUp();
-  }
-#endif
-
   void SetUpCommandLine(base::CommandLine* command_line) override {
     HeadlessModeCommandBrowserTestWithTempDir::SetUpCommandLine(command_line);
 

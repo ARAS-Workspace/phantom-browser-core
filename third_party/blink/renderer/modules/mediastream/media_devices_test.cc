@@ -645,11 +645,6 @@ class MockMediaPermission : public media::MediaPermission {
 
   bool IsEncryptedMediaEnabled() override { return false; }
 
-#if BUILDFLAG(IS_WIN)
-  void IsHardwareSecureDecryptionAllowed(
-      IsHardwareSecureDecryptionAllowedCB cb) override {}
-#endif  // BUILDFLAG(IS_WIN)
-
   void SetCameraPermission(bool has_permission) {
     has_camera_permission_ = has_permission;
   }

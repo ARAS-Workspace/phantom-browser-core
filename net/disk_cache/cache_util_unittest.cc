@@ -181,11 +181,7 @@ TEST_F(CacheUtilTest, PreferredCacheSize) {
 
   // The size of the HTTP cache is multiplied by 4 by default on non-Windows.
   constexpr bool kHTTPCacheSizeIsIncreased =
-#if BUILDFLAG(IS_WIN)
-      false;
-#else
       true;
-#endif
 
   const struct TestCase {
     int64_t available;

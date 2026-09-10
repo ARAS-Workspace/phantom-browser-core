@@ -353,21 +353,7 @@ void Discovery::DeviceChanged(BluetoothAdapter* adapter,
 }
 
 void Discovery::AdapterPoweredChanged(BluetoothAdapter* adapter, bool powered) {
-#if BUILDFLAG(IS_WIN)
-  // On Windows, the power-on event appears to race against initialization of
-  // the adapter, such that one of the WinRT API calls inside
-  // BluetoothAdapter::StartDiscoverySessionWithFilter() can fail with "Device
-  // not ready for use". So wait for things to actually be ready.
-  // TODO(crbug.com/40670639): Remove this delay once the Bluetooth layer
-  // handles the spurious failure.
-  base::SequencedTaskRunner::GetCurrentDefault()->PostDelayedTask(
-      FROM_HERE,
-      base::BindOnce(&Discovery::StartCableDiscovery,
-                     weak_factory_.GetWeakPtr()),
-      base::Milliseconds(500));
-#else
   StartCableDiscovery();
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 #if BUILDFLAG(IS_CHROMEOS)

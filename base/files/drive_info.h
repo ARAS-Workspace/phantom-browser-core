@@ -47,8 +47,7 @@ struct BASE_EXPORT DriveInfo {
   // Whether the drive has a seek penalty (i.e. is or is not a spinning disk).
   std::optional<bool> has_seek_penalty;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   // Whether the drive is a "removable" drive.
   //
   // In macOS's IOKit API, a drive is "removable" if "the media is removable
@@ -71,7 +70,7 @@ struct BASE_EXPORT DriveInfo {
   // The size of the media, in bytes.
   std::optional<int64_t> size_bytes;
 #endif
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // Whether the drive is connected over USB.
   std::optional<bool> is_usb;
 #endif
@@ -90,10 +89,6 @@ struct BASE_EXPORT DriveInfo {
   std::optional<std::string> bsd_name;
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  // The size, in bytes, of a physical sector on the disk.
-  std::optional<uint32_t> bytes_per_sector;
-#endif
 };
 
 // Given a path to a file (following symlinks), returns information about the

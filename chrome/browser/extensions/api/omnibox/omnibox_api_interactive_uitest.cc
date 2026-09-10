@@ -505,11 +505,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxApiTest, IncognitoSplitMode) {
 }
 
 // The test is flaky on Win10. crbug.com/40670412.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PopupStaysClosed DISABLED_PopupStaysClosed
-#else
 #define MAYBE_PopupStaysClosed PopupStaysClosed
-#endif
 // Tests that the autocomplete popup doesn't reopen after accepting input for
 // a given query.
 // http://crbug.com/40594300
@@ -551,7 +547,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxApiTest, MAYBE_PopupStaysClosed) {
 
 // Tests deleting a deletable omnibox extension suggestion result.
 // Flaky on Windows and Linux TSan. https://crbug.com/40816589
-#if BUILDFLAG(IS_WIN) || (BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER))
+#if BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
 #define MAYBE_DeleteOmniboxSuggestionResult \
   DISABLED_DeleteOmniboxSuggestionResult
 #else

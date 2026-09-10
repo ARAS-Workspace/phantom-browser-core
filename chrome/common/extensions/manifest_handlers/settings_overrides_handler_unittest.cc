@@ -153,7 +153,7 @@ TEST(OverrideSettingsTest, ParseManifest) {
   std::u16string error;
   scoped_refptr<Extension> extension = CreateExtension(kManifest, &error);
   ASSERT_TRUE(extension.get());
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   ASSERT_TRUE(
       extension->manifest()->FindPath(manifest_keys::kSettingsOverride));
 
@@ -187,7 +187,7 @@ TEST(OverrideSettingsTest, ParsePrepopulatedId) {
   scoped_refptr<Extension> extension =
       CreateExtension(kPrepopulatedManifest, &error);
   ASSERT_TRUE(extension.get());
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   ASSERT_TRUE(
       extension->manifest()->FindPath(manifest_keys::kSettingsOverride));
 
@@ -211,7 +211,7 @@ TEST(OverrideSettingsTest, ParseManifestBrokenHomepageButCorrectStartupPages) {
   scoped_refptr<Extension> extension =
       CreateExtension(kManifestBrokenHomepageButCorrectStartupPages, &error);
   ASSERT_TRUE(extension.get());
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   ASSERT_TRUE(
       extension->manifest()->FindPath(manifest_keys::kSettingsOverride));
 
@@ -231,7 +231,7 @@ TEST(OverrideSettingsTest, ParseManifestBrokenStartupPagesButCorrectHomepage) {
   scoped_refptr<Extension> extension =
       CreateExtension(kManifestBrokenStartupPagesButCorrectHomepage, &error);
   ASSERT_TRUE(extension.get());
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   ASSERT_TRUE(
       extension->manifest()->FindPath(manifest_keys::kSettingsOverride));
   const SettingsOverrides* settings_override =
@@ -249,7 +249,7 @@ TEST(OverrideSettingsTest, ParseBrokenManifestEmptySettingsOverride) {
   std::u16string error;
   scoped_refptr<Extension> extension =
       CreateExtension(kBrokenManifestEmpty, &error);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_FALSE(extension.get());
   EXPECT_EQ(extensions::ErrorUtils::FormatErrorMessageUTF16(
                 extensions::manifest_errors::kInvalidEmptyDictionary,
@@ -266,7 +266,7 @@ TEST(OverrideSettingsTest, ParseBrokenManifestHomepage) {
   std::u16string error;
   scoped_refptr<Extension> extension =
       CreateExtension(kBrokenManifestHomepage, &error);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_FALSE(extension.get());
   EXPECT_EQ(extensions::ErrorUtils::FormatErrorMessageUTF16(
                 extensions::manifest_errors::kInvalidHomepageOverrideURL,
@@ -283,7 +283,7 @@ TEST(OverrideSettingsTest, ParseBrokenManifestStartupPages) {
   std::u16string error;
   scoped_refptr<Extension> extension =
       CreateExtension(kBrokenManifestStartupPages, &error);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_FALSE(extension.get());
   EXPECT_EQ(
       extensions::ErrorUtils::FormatErrorMessageUTF16(
@@ -328,7 +328,7 @@ TEST(OverrideSettingsTest, SearchProviderMissingKeys) {
     std::u16string error;
     scoped_refptr<Extension> extension = CreateExtensionWithSearchProvider(
         std::move(provider_with_missing_key), &error);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     EXPECT_FALSE(extension.get());
     EXPECT_EQ(extensions::ErrorUtils::FormatErrorMessageUTF16(
                   extensions::manifest_errors::kInvalidSearchEngineMissingKeys,

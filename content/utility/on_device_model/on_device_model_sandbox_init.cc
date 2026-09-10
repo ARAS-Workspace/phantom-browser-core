@@ -66,7 +66,7 @@ void UpdateSandboxOptionsForGpu(
 // adapter. This makes sure any relevant drivers or other libs are loaded before
 // enabling the sandbox.
 BASE_FEATURE(kOnDeviceModelWarmDrivers,
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -96,15 +96,6 @@ bool PreSandboxInit() {
   }
 #endif
 
-#if defined(DAWN_USE_BUILT_DXC) && BUILDFLAG(IS_WIN)
-  base::FilePath module_path;
-  if (base::PathService::Get(base::DIR_MODULE, &module_path)) {
-    // Preload DXC requirements if enabled.
-    base::LoadNativeLibrary(module_path.Append(L"dxil.dll"), nullptr);
-    base::LoadNativeLibrary(module_path.Append(L"dxcompiler.dll"), nullptr);
-  }
-#endif
-
   if (ShouldWarmDrivers()) {
     // Warm any relevant drivers before attempting to bring up the sandbox. For
     // good measure we initialize a device instance for any adapter with an
@@ -112,9 +103,7 @@ bool PreSandboxInit() {
     dawnProcSetProcs(&dawn::native::GetProcs());
     auto instance = std::make_unique<dawn::native::Instance>();
     const wgpu::RequestAdapterOptions adapter_options{
-#if BUILDFLAG(IS_WIN)
-        .backendType = wgpu::BackendType::D3D12,
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
         .backendType = wgpu::BackendType::Metal,
 #else
         .backendType = wgpu::BackendType::Vulkan,

@@ -24,12 +24,6 @@ extern char** environ;
 #endif
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/check_op.h"
-#endif
-
 namespace base::internal {
 
 namespace {
@@ -133,80 +127,6 @@ UNSAFE_BUFFER_USAGE base::HeapArray<char*> AlterEnvironment(
   }
   result[result_indices.size()] = 0;  // Null terminator.
 
-  return result;
-}
-
-#elif BUILDFLAG(IS_WIN)
-
-// static
-base::HeapArray<wchar_t> GetEnvironment() {
-  wchar_t* env_ptr = GetEnvironmentStrings();
-  if (!env_ptr) {
-    return {};
-  }
-
-  const wchar_t* p = env_ptr;
-  while (*p) {
-    // SAFETY: env_ptr points to a memory block provided by the OS. The loop
-    // follows the Win32 API contract where strings are NUL-terminated and the
-    // entire block ends with an extra NUL.
-    const size_t length = UNSAFE_BUFFERS(wcslen(p));
-    p = UNSAFE_BUFFERS(p + length + 1);
-  }
-  // Include the final terminating NUL.
-  const size_t total_len = static_cast<size_t>(p - env_ptr) + 1;
-  auto result = base::HeapArray<wchar_t>::WithSize(total_len);
-
-  // SAFETY: env_ptr points to a block of memory provided by the OS, and
-  // total_len has been calculated by scanning that same block until the
-  // double-NUL terminator.
-  base::span<const wchar_t> env_span =
-      UNSAFE_BUFFERS(base::span(env_ptr, total_len));
-  result.copy_from(env_span);
-
-  FreeEnvironmentStrings(env_ptr);
-  return result;
-}
-
-NativeEnvironmentString AlterEnvironment(base::span<const wchar_t> env,
-                                         const EnvironmentMap& changes) {
-  NativeEnvironmentString result;
-
-  // First build up all of the unchanged environment strings.
-  base::span<const wchar_t> remaining = env;
-  while (!remaining.empty() && remaining[0] != L'\0') {
-    // Find the next NUL terminator.
-    auto it = std::ranges::find(remaining, L'\0');
-    CHECK(it != remaining.end());  // Malformed block.
-    // SAFETY: We verified `remaining` contains L'\0' at `it`.
-    const wchar_t* env_var_ptr = remaining.data();
-    NativeEnvironmentCStringView env_var =
-        UNSAFE_BUFFERS(NativeEnvironmentCStringView(env_var_ptr));
-    NativeEnvironmentStringView key;
-    size_t line_length = ParseEnvLine(env_var, &key);
-
-    // Keep only values not specified in the change vector.
-    if (changes.find(key) == changes.end()) {
-      result.append(remaining.data(), line_length);
-    }
-    remaining = remaining.subspan(line_length);
-  }
-
-  // Now append all modified and new values.
-  for (const auto& i : changes) {
-    // Windows environment blocks cannot handle keys or values with NULs.
-    CHECK_EQ(std::wstring::npos, i.first.find(L'\0'));
-    CHECK_EQ(std::wstring::npos, i.second.find(L'\0'));
-    if (!i.second.empty()) {
-      result += i.first;
-      result.push_back(L'=');
-      result += i.second;
-      result.push_back(L'\0');
-    }
-  }
-
-  // Add the terminating NUL.
-  result.push_back(L'\0');
   return result;
 }
 

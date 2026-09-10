@@ -61,10 +61,6 @@
 #include "chrome/browser/ui/profiles/profile_picker.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(ENABLE_SESSION_SERVICE)
 #include "chrome/browser/sessions/session_data_service.h"
 #include "chrome/browser/sessions/session_data_service_factory.h"
@@ -424,10 +420,6 @@ void SessionEnding() {
   // Emit the shutdown metric for the end-session case. The process will exit
   // after this point.
   browser_shutdown::RecordShutdownMetrics();
-
-#if BUILDFLAG(IS_WIN)
-  base::win::SetShouldCrashOnProcessDetach(false);
-#endif  // BUILDFLAG(IS_WIN)
 
   // On Windows 7 and later, the system will consider the process ripe for
   // termination as soon as it hides or destroys its windows. Since any

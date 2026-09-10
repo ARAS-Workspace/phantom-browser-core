@@ -64,9 +64,9 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/url_util.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/enterprise/util/managed_browser_utils.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS©_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 using actor::ActorKeyedService;
 using actor::ActorTask;
@@ -121,11 +121,11 @@ class GlicActorPolicyCheckerBrowserTestBase : public GlicBrowserTest {
     identity_test_env_->SetTestURLLoaderFactory(&test_url_loader_factory_);
     identity_manager_ = IdentityManagerFactory::GetForProfile(GetProfile());
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     disclaimer_service_resetter_ =
         enterprise_util::DisableAutomaticManagementDisclaimerUntilReset(
             GetProfile());
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   }
 
   void TearDownOnMainThread() override {

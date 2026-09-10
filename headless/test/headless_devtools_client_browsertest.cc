@@ -93,12 +93,7 @@ class HeadlessCrashObserverTest : public HeadlessDevTooledBrowserTest {
   // Make sure we don't fail because the renderer crashed!
   void PrimaryMainFrameRenderProcessGone(
       base::TerminationStatus status) override {
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-    // TODO(crbug.com/40577245): Make ASan not interfere and expect a crash.
-    // ASan's normal error exit code is 1, which base categorizes as the process
-    // being killed.
-    EXPECT_EQ(base::TERMINATION_STATUS_PROCESS_WAS_KILLED, status);
-#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     EXPECT_EQ(base::TERMINATION_STATUS_PROCESS_CRASHED, status);
 #else
     EXPECT_EQ(base::TERMINATION_STATUS_ABNORMAL_TERMINATION, status);
@@ -111,11 +106,7 @@ class HeadlessCrashObserverTest : public HeadlessDevTooledBrowserTest {
 
 // TODO(crbug.com/40206073): HeadlessCrashObserverTest.RunAsyncTest is flaky on
 // Win debug.
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-DISABLED_HEADLESS_DEVTOOLED_TEST_F(HeadlessCrashObserverTest);
-#else
 HEADLESS_DEVTOOLED_TEST_F(HeadlessCrashObserverTest);
-#endif
 
 class HeadlessDevToolsNetworkBlockedUrlTest
     : public HeadlessDevTooledBrowserTest {
@@ -450,9 +441,6 @@ class DomTreeExtractionBrowserTest : public HeadlessDevTooledBrowserTest {
       actual_entries += entry_json;
     }
 
-#if BUILDFLAG(IS_WIN)
-    ASSERT_TRUE(base::RemoveChars(actual_entries, "\r", &actual_entries));
-#endif
 
     EXPECT_EQ(expected_entries, actual_entries);
   }

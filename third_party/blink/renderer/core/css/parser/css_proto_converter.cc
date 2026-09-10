@@ -16,9 +16,6 @@
 // TODO(bikineev): "IN" comes as a macro from <windows.h>. It conflicts with
 // Length::IN from the generated proto file. Change the name in css.proto rather
 // than hacking with directives here.
-#if BUILDFLAG(IS_WIN) && defined(IN)
-#undef IN
-#endif
 
 namespace css_proto_converter {
 

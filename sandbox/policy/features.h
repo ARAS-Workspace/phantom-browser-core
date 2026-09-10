@@ -24,24 +24,6 @@ SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kNetworkServiceFileAllowlist);
 
 #endif
 
-#if BUILDFLAG(IS_WIN)
-SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kSpeechRecognitionSandboxHardening);
-SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kWinSboxDisableExtensionPoints);
-SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kPrintCompositorLPAC);
-SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kRendererAppContainer);
-SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kWinSboxNetworkServiceSandboxIsLPAC);
-SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kWinSboxZeroAppShim);
-SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kNetworkServiceCodeIntegrity);
-SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kWinSboxNoFakeGdiInit);
-SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(
-    kWinSboxRestrictCoreSharingOnRenderer);
-SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kEnableCsrssLockdown);
-SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kWinSboxStrictHandleChecks);
-SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kWinSboxHighGPUJobMemoryLimits);
-SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(
-    kWinSboxModuleTamperingProtection);
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_CHROMEOS)
 SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kSpectreVariant2Mitigation);
 #endif  // BUILDFLAG(IS_CHROMEOS)
@@ -60,13 +42,6 @@ SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kUseRendererProcessPolicy);
 SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kRestrictRendererPoliciesInBaseline);
 SANDBOX_POLICY_EXPORT BASE_DECLARE_FEATURE(kRestrictCloneParameters);
 #endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_WIN)
-// Returns whether the network sandbox is supported. This is different from
-// IsAppContainerSandboxSupported as the Network Service uses some newer APIs to
-// correctly function when sandboxed.
-SANDBOX_POLICY_EXPORT bool IsNetworkSandboxSupported();
-#endif  // BUILDFLAG(IS_WIN)
 
 // Returns whether the network sandbox is enabled for the current platform
 // configuration. This might be overridden by the content embedder so prefer

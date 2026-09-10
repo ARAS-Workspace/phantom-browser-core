@@ -13,10 +13,6 @@
 #include "base/memory/shared_memory_mapping.h"
 #include "third_party/webrtc/modules/desktop_capture/shared_memory.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_handle.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 // Helper classes to implement sharing of captured video frames over an IPC
 // channel.
 namespace remoting {
@@ -47,11 +43,6 @@ class SharedVideoMemory : public webrtc::SharedMemory {
   base::OnceClosure on_deleted_callback_;
   base::ReadOnlySharedMemoryRegion region_;
   base::WritableSharedMemoryMapping mapping_;
-#if BUILDFLAG(IS_WIN)
-  // Owns the handle passed to the base class which is used by
-  // webrtc::ScreenCapturer.
-  base::win::ScopedHandle writable_handle_;
-#endif
 };
 
 // A webrtc::SharedMemoryFactory implementation which creates

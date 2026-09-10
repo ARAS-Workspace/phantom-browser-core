@@ -6,13 +6,6 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <mlang.h>
-#include <objidl.h>
-#endif
-
 #include <stddef.h>
 
 #include <algorithm>
@@ -44,10 +37,6 @@
 #include "third_party/blink/public/web/blink.h"
 #include "third_party/blink/public/web/web_frame.h"
 #include "v8/include/v8-initialization.h"
-
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#endif
 
 namespace {
 

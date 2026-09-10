@@ -419,13 +419,7 @@ bool InfoBarUiTest::VerifyUi() {
                         test_info->name()) != ui::test::ActionResult::kFailed);
 }
 
-#if BUILDFLAG(IS_WIN)
-// TODO(crbug.com/40261456): This test case has been frequently failing on
-// "Win10 Tests x64" since 2024-05-08.
-#define MAYBE_InvokeUi_dev_tools DISABLED_InvokeUi_dev_tools
-#else
 #define MAYBE_InvokeUi_dev_tools InvokeUi_dev_tools
-#endif
 IN_PROC_BROWSER_TEST_P(InfoBarUiTest, MAYBE_InvokeUi_dev_tools) {
   ShowAndVerifyUi();
 }
@@ -492,33 +486,19 @@ IN_PROC_BROWSER_TEST_P(InfoBarUiTest, InvokeUi_page_info) {
   ShowAndVerifyUi();
 }
 
-#if BUILDFLAG(IS_WIN)
-// TODO(crbug.com/40261456): This test case has been frequently failing on
-// "Win10 Tests x64" since 2024-05-08.
-#define MAYBE_InvokeUi_automation DISABLED_InvokeUi_automation
-#else
 #define MAYBE_InvokeUi_automation InvokeUi_automation
-#endif
 IN_PROC_BROWSER_TEST_P(InfoBarUiTest, MAYBE_InvokeUi_automation) {
   ShowAndVerifyUi();
 }
 
 // Consistently failing on Windows https://crbug.com/40921752.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_InvokeUi_tab_sharing DISABLED_InvokeUi_tab_sharing
-#else
 #define MAYBE_InvokeUi_tab_sharing InvokeUi_tab_sharing
-#endif
 IN_PROC_BROWSER_TEST_P(InfoBarUiTest, MAYBE_InvokeUi_tab_sharing) {
   ShowAndVerifyUi();
 }
 
 // Consistently failing on Windows https://crbug.com/40921752.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_InvokeUi_multiple_infobars DISABLED_InvokeUi_multiple_infobars
-#else
 #define MAYBE_InvokeUi_multiple_infobars InvokeUi_multiple_infobars
-#endif
 IN_PROC_BROWSER_TEST_P(InfoBarUiTest, MAYBE_InvokeUi_multiple_infobars) {
   ShowAndVerifyUi();
 }

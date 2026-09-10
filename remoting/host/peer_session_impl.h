@@ -198,10 +198,6 @@ class PeerSessionImpl : public PeerSession,
       mojo::PendingReceiver<mojom::WebAuthnProxy> receiver) override;
   void BindRemoteUrlOpener(
       mojo::PendingReceiver<mojom::RemoteUrlOpener> receiver) override;
-#if BUILDFLAG(IS_WIN)
-  void BindSecurityKeyForwarder(
-      mojo::PendingReceiver<mojom::SecurityKeyForwarder> receiver) override;
-#endif
 
   protocol::Transport* transport() override;
 

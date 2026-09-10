@@ -2090,7 +2090,7 @@ void AvatarToolbarButtonStateManager::MaybeShowProfileSwitchIPH() {
   }
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 void AvatarToolbarButtonStateManager::MaybeShowSupervisedUserSignInIPH() {
   if (!base::FeatureList::IsEnabled(
           feature_engagement::kIPHSupervisedUserProfileSigninFeature)) {
@@ -2211,7 +2211,7 @@ void AvatarToolbarButtonStateManager::MaybeShowSignInBenefitsIPH() {
   BrowserUserEducationInterface::From(browser_)->MaybeShowStartupFeaturePromo(
       feature_to_show);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 void AvatarToolbarButtonStateManager::
     MaybeShowExplicitBrowserSigninPreferenceRememberedIPH(

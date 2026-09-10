@@ -18,9 +18,6 @@
 #include "ui/display/display_switches.h"
 
 // TODO(crbug.com/40269208): enable this test on all supported platforms.
-#if BUILDFLAG(IS_WIN)
-#include "components/eye_dropper/eye_dropper_view.h"
-#endif
 
 class EyeDropperBrowserTest : public UiBrowserTest,
                               public ::testing::WithParamInterface<float> {
@@ -34,33 +31,10 @@ class EyeDropperBrowserTest : public UiBrowserTest,
 
   // UiBrowserTest:
   void ShowUi(const std::string& name) override {
-#if BUILDFLAG(IS_WIN)
-    content::RenderFrameHost* parent_frame = browser()
-                                                 ->tab_strip_model()
-                                                 ->GetActiveWebContents()
-                                                 ->GetPrimaryMainFrame();
-    parent_frame->GetView()->Focus();
-    eye_dropper_ = ShowEyeDropper(parent_frame, /*listener=*/nullptr);
-#endif
   }
 
   bool VerifyUi() override {
-#if BUILDFLAG(IS_WIN)
-    if (!eye_dropper_) {
-      return false;
-    }
-
-    views::Widget* widget =
-        static_cast<eye_dropper::EyeDropperView*>(eye_dropper_.get())
-            ->GetWidget();
-    auto* test_info = testing::UnitTest::GetInstance()->current_test_info();
-    const std::string screenshot_name =
-        base::StrCat({test_info->test_suite_name(), "_", test_info->name()});
-    return VerifyPixelUi(widget, "EyeDropperBrowserTest", screenshot_name) !=
-           ui::test::ActionResult::kFailed;
-#else
     return true;
-#endif
   }
 
   void WaitForUserDismissal() override {

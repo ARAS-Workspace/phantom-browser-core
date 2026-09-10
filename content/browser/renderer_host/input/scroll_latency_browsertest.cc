@@ -248,11 +248,7 @@ IN_PROC_BROWSER_TEST_F(ScrollLatencyBrowserTest,
 }
 
 // TODO(crbug.com/370658912) heap-use-after-free on Win ASAN.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_ScrollingEventLatencyTrace DISABLED_ScrollingEventLatencyTrace
-#else
 #define MAYBE_ScrollingEventLatencyTrace ScrollingEventLatencyTrace
-#endif  // BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
 
 // A basic smoke test verifying that key scroll-related events are recorded
 // during scrolling. This test performs a simple scroll and expects to see three

@@ -787,13 +787,7 @@ IN_PROC_BROWSER_TEST_F(OnDeviceTranslationBrowserTest,
   NavigateToEmptyPage();
 
   auto console_observer =
-#if BUILDFLAG(IS_WIN)
-      // On Windows, the service crashes when failed to preload the library
-      // in PreLockdownSandboxHook().
-      CreateConsoleObserver("The translation service crashed.");
-#else
       CreateConsoleObserver("Failed to load the translation library.");
-#endif  // BUILDFLAG(IS_WIN)
 
   EXPECT_EQ(EvalJsCatchingError(R"(
             const translator = await Translator.create({

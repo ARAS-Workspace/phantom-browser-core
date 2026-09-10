@@ -40,10 +40,6 @@
 #include "ui/views/view.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/views/win/hwnd_util.h"
-#endif
-
 namespace views::test {
 
 namespace {
@@ -975,14 +971,6 @@ TEST_P(AXVirtualViewTest, HitTesting) {
 }
 
 // Test for GetTargetForNativeAccessibilityEvent().
-#if BUILDFLAG(IS_WIN)
-TEST_P(AXVirtualViewTest, GetTargetForEvents) {
-  EXPECT_EQ(button_, virtual_label_->GetOwnerView());
-  EXPECT_NE(nullptr, HWNDForView(virtual_label_->GetOwnerView()));
-  EXPECT_EQ(HWNDForView(button_),
-            virtual_label_->GetTargetForNativeAccessibilityEvent());
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_P(AXVirtualViewTest, ContainerLiveStatusPropagatedToVirtualChildren) {
   button_->GetViewAccessibility().SetLiveRegionContainer(

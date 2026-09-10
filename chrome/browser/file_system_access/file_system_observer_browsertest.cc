@@ -71,10 +71,7 @@ class FileSystemObserverTest : public InProcessBrowserTest {
 
   void SetUpOnMainThread() override {
     ASSERT_TRUE(temp_dir_.CreateUniqueTempDir());
-#if BUILDFLAG(IS_WIN)
-    // Convert path to long format to avoid mixing long and 8.3 formats in test.
-    ASSERT_TRUE(temp_dir_.Set(base::MakeLongFilePath(temp_dir_.Take())));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     // Temporary files in Mac are created under /var/, which is a symlink that
     // resolves to /private/var/. Set `temp_dir_` directly to the resolved file
     // path, given that the expected FSEvents event paths are reported as
@@ -147,13 +144,11 @@ class FileSystemObserverTest : public InProcessBrowserTest {
   }
 
   bool SupportsReportingModifiedPath() const {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
     return true;
 #else
     return false;
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) ||
-        // BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
   }
 
   bool SupportsChangeInfo() const { return SupportsReportingModifiedPath(); }

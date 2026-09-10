@@ -19,9 +19,6 @@
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/device_info.h"
 #endif
-#if BUILDFLAG(IS_WIN)
-#include "components/metrics/system_session_analyzer/system_session_analyzer_win.h"
-#endif
 
 namespace metrics {
 
@@ -67,9 +64,6 @@ void StabilityMetricsProvider::RegisterPrefs(PrefRegistrySimple* registry) {
   registry->RegisterIntegerPref(prefs::kStabilityCrashCountDueToGmsCoreUpdate,
                                 0);
 #endif
-#if BUILDFLAG(IS_WIN)
-  registry->RegisterIntegerPref(prefs::kStabilitySystemCrashCount, 0);
-#endif
 }
 
 void StabilityMetricsProvider::Init() {
@@ -88,9 +82,6 @@ void StabilityMetricsProvider::ClearSavedStabilityMetrics() {
 
 #if BUILDFLAG(IS_ANDROID)
   local_state_->SetInteger(prefs::kStabilityLaunchCount, 0);
-#endif
-#if BUILDFLAG(IS_WIN)
-  local_state_->SetInteger(prefs::kStabilitySystemCrashCount, 0);
 #endif
 }
 
@@ -129,13 +120,6 @@ void StabilityMetricsProvider::ProvideStabilityMetrics(
     local_state_->ClearPref(prefs::kStabilityFileMetricsUnsentSamplesCount);
   }
 
-#if BUILDFLAG(IS_WIN)
-  int pref_value = 0;
-  if (GetAndClearPrefValue(prefs::kStabilitySystemCrashCount, &pref_value)) {
-    UMA_STABILITY_HISTOGRAM_COUNTS_100("Stability.Internals.SystemCrashCount",
-                                       pref_value);
-  }
-#endif
 }
 
 void StabilityMetricsProvider::LogCrash(base::Time last_live_timestamp) {
@@ -152,9 +136,6 @@ void StabilityMetricsProvider::LogCrash(base::Time last_live_timestamp) {
   StabilityMetricsHelper::RecordStabilityEvent(
       StabilityEventType::kBrowserCrash);
 
-#if BUILDFLAG(IS_WIN)
-  MaybeLogSystemCrash(last_live_timestamp);
-#endif
 }
 
 void StabilityMetricsProvider::LogLaunch() {
@@ -163,34 +144,6 @@ void StabilityMetricsProvider::LogLaunch() {
 #endif
   StabilityMetricsHelper::RecordStabilityEvent(StabilityEventType::kLaunch);
 }
-
-#if BUILDFLAG(IS_WIN)
-bool StabilityMetricsProvider::IsUncleanSystemSession(
-    base::Time last_live_timestamp) {
-  DCHECK_NE(base::Time(), last_live_timestamp);
-  // There's a non-null last live timestamp, see if this occurred in
-  // a Windows system session that ended uncleanly. The expectation is that
-  // |last_live_timestamp| will have occurred in the immediately previous system
-  // session, but if the system has been restarted many times since Chrome last
-  // ran, that's not necessarily true. Log traversal can be expensive, so we
-  // limit the analyzer to reaching back three previous system sessions to bound
-  // the cost of the traversal.
-  SystemSessionAnalyzer analyzer(3);
-
-  SystemSessionAnalyzer::Status status =
-      analyzer.IsSessionUnclean(last_live_timestamp);
-
-  return status == SystemSessionAnalyzer::UNCLEAN;
-}
-
-void StabilityMetricsProvider::MaybeLogSystemCrash(
-    base::Time last_live_timestamp) {
-  if (last_live_timestamp != base::Time() &&
-      IsUncleanSystemSession(last_live_timestamp)) {
-    IncrementPrefValue(prefs::kStabilitySystemCrashCount);
-  }
-}
-#endif
 
 void StabilityMetricsProvider::IncrementPrefValue(const char* path) {
   int value = local_state_->GetInteger(path);

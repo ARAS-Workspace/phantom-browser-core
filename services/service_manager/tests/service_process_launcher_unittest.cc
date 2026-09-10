@@ -24,13 +24,8 @@ namespace {
 
 const char kTestServiceName[] = "service_process_launcher_test_service";
 
-#if BUILDFLAG(IS_WIN)
-const base::FilePath::CharType kServiceExtension[] =
-    FILE_PATH_LITERAL(".service.exe");
-#else
 const base::FilePath::CharType kServiceExtension[] =
     FILE_PATH_LITERAL(".service");
-#endif
 
 void ProcessReadyCallbackAdapter(bool expect_process_id_valid,
                                  base::OnceClosure callback,

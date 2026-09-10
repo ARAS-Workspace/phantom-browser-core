@@ -24,10 +24,6 @@
 #include "third_party/skia/include/core/SkAlphaType.h"
 #include "third_party/skia/include/core/SkColorSpace.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/gfx/win/d3d_shared_fence.h"
-#endif
-
 namespace gpu {
 namespace {
 
@@ -298,13 +294,6 @@ std::unique_ptr<LegacyOverlayImageRepresentation>
 SharedImageBacking::ProduceLegacyOverlay(SharedImageManager* manager,
                                          MemoryTypeTracker* tracker) {
   return nullptr;
-}
-#endif
-
-#if BUILDFLAG(IS_WIN)
-void SharedImageBacking::UpdateExternalFence(
-    scoped_refptr<gfx::D3DSharedFence> external_fence) {
-  NOTIMPLEMENTED_LOG_ONCE();
 }
 #endif
 

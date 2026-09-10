@@ -66,16 +66,6 @@ class ChromeTracingDelegate : public content::TracingDelegate,
   tracing::MetadataDataSource::ChromeMetadataRecorder
   CreateChromeMetadataPacketRecorder() const override;
 
-#if BUILDFLAG(IS_WIN)
-  void GetSystemTracingState(
-      base::OnceCallback<void(bool service_supported, bool service_enabled)>
-          on_tracing_state) override;
-  void EnableSystemTracing(
-      base::OnceCallback<void(bool success)> on_complete) override;
-  void DisableSystemTracing(
-      base::OnceCallback<void(bool success)> on_complete) override;
-#endif  // BUILDFLAG(IS_WIN)
-
  private:
 #if BUILDFLAG(IS_ANDROID)
   // TabModelListObserver implementation.

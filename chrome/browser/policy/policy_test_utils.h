@@ -13,7 +13,7 @@
 #include "components/security_interstitials/core/controller_client.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
 #endif
@@ -88,7 +88,7 @@ class [[maybe_unused, nodiscard]] ScopedDomainEnterpriseManagement {
  private:
 // Indicate a machine is domain-joined by enterprise policy for mac and
 // windows only.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   policy::ScopedManagementServiceOverrideForTesting browser_management{
       policy::ManagementServiceFactory::GetForPlatform(),
       policy::EnterpriseManagementAuthority::CLOUD_DOMAIN};

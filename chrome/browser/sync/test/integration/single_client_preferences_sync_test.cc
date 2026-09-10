@@ -1558,11 +1558,11 @@ class SingleClientTrackedPreferencesSyncTest
 
   bool IsProtectionEnforced() const {
 // Only windows and mac have the strongest enforcement setting.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     return true;
 #else
     return false;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
   }
 };
 

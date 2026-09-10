@@ -946,16 +946,9 @@ std::optional<WebURL> ApplyFilePathAlias(const WebURL& target) {
     return std::nullopt;
   }
 
-#if BUILDFLAG(IS_WIN)
-  std::wstring path = base::UTF16ToWide(target.GetString().Utf16());
-  const std::wstring file_prefix =
-      base::ASCIIToWide(url::kFileScheme) +
-      base::ASCIIToWide(url::kStandardSchemeSeparator);
-#else
   std::string path = target.GetString().Utf8();
   const std::string file_prefix =
       std::string(url::kFileScheme) + url::kStandardSchemeSeparator;
-#endif
   if (!base::StartsWith(path, file_prefix + alias_mapping[0],
                         base::CompareCase::SENSITIVE)) {
     return std::nullopt;
@@ -963,11 +956,7 @@ std::optional<WebURL> ApplyFilePathAlias(const WebURL& target) {
 
   base::ReplaceFirstSubstringAfterOffset(&path, 0, alias_mapping[0],
                                          alias_mapping[1]);
-#if BUILDFLAG(IS_WIN)
-  return blink::WebURL(GURL(base::WideToUTF8(path)));
-#else
   return blink::WebURL(GURL(path));
-#endif
 }
 
 // Packs all navigation timings sent by the browser to a blink understandable

@@ -42,17 +42,6 @@
 #include "ui/ozone/public/ozone_platform.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/installer/util/install_util.h"
-#include "chrome/installer/util/shell_util.h"
-#include "ui/aura/window.h"
-#include "ui/aura/window_tree_host.h"
-#include "ui/base/win/hwnd_metrics.h"
-#include "ui/base/win/shell.h"
-#include "ui/display/win/screen_win.h"
-#include "ui/views/win/hwnd_util.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "chrome/browser/shell_integration_linux.h"
 #include "chrome/browser/ui/views/frame/opaque_browser_frame_view_layout.h"
@@ -76,16 +65,6 @@ constexpr int kInitialPositionBuffer = 4;
 // should be applied in order to calculate the correct widget bounds.
 gfx::Outsets GetTargetOutsets(const gfx::Rect& bounds) {
   gfx::Outsets outsets;
-#if BUILDFLAG(IS_WIN)
-  RECT bounds_rect = bounds.ToRECT();
-  int frame_thickness = ui::GetResizableFrameThicknessFromMonitorInDIP(
-      MonitorFromRect(&bounds_rect, MONITOR_DEFAULTTONEAREST),
-      /*has_caption=*/false);
-  // On Windows, the presence of a frame means that we need to adjust the left,
-  // right and bottom by frame thickness.
-  outsets.set_left_right(frame_thickness, frame_thickness);
-  outsets.set_bottom(frame_thickness);
-#endif
   return outsets;
 }
 
@@ -108,7 +87,7 @@ class GlicClientView : public views::ClientView {
   GlicView* glic_view() { return static_cast<GlicView*>(contents_view()); }
 };
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 class GlicFrameView : public views::NativeFrameView {
  public:
   explicit GlicFrameView(views::Widget* widget)
@@ -124,10 +103,7 @@ class GlicFrameView : public views::NativeFrameView {
       return HTNOWHERE;
     }
 
-#if BUILDFLAG(IS_WIN)
-    int resize_border = resize_border =
-        display::win::GetScreenWin()->GetSystemMetricsInDIP(SM_CXSIZEFRAME);
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     int resize_border = OpaqueBrowserFrameViewLayout::kFrameBorderThickness;
 #endif
     const bool can_resize = GetWidget()->widget_delegate() &&
@@ -148,7 +124,7 @@ class GlicFrameView : public views::NativeFrameView {
   }
 };
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 class GlicWidgetDelegate : public views::WidgetDelegate {
  public:
@@ -359,12 +335,12 @@ std::unique_ptr<views::WidgetDelegate> GlicWidget::CreateWidgetDelegate(
         return std::make_unique<GlicClientView>(widget, contents_view);
       }));
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   delegate->SetFrameViewFactory(base::BindRepeating(
       [](views::Widget* widget) -> std::unique_ptr<views::FrameView> {
         return std::make_unique<GlicFrameView>(widget);
       }));
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_CHROMEOS)
   // TODO(b:458115863): Move ChromeOS specific code to platform specific
@@ -429,13 +405,6 @@ std::unique_ptr<GlicWidget> GlicWidget::Create(views::WidgetDelegate* delegate,
     params.bounds.set_origin({});
   }
 #endif  // BUILDFLAG(IS_OZONE)
-#if BUILDFLAG(IS_WIN)
-  // If floaty won't be always on top, it should appear in the taskbar and
-  // alt tab list.
-  if (!base::FeatureList::IsEnabled(features::kGlicZOrderChanges)) {
-    params.dont_show_in_taskbar = true;
-  }
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_MAC)
   params.animation_enabled = true;
 #endif  // BUILDFLAG(IS_MAC)
@@ -464,16 +433,6 @@ std::unique_ptr<GlicWidget> GlicWidget::Create(views::WidgetDelegate* delegate,
                                   kGlicWidgetIdentifier);
 
   //  -------------- Platform-Specific Post-Init Properties.
-#if BUILDFLAG(IS_WIN)
-  HWND hwnd = widget->GetNativeWindow()->GetHost()->GetAcceleratedWidget();
-  if (hwnd != nullptr) {
-    ui::win::PreventWindowFromPinning(hwnd);
-    if (base::FeatureList::IsEnabled(features::kGlicZOrderChanges)) {
-      ui::win::SetAppIdForWindow(
-          ShellUtil::GetBrowserModelId(InstallUtil::IsPerUserInstall()), hwnd);
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
   return widget;
 }
 

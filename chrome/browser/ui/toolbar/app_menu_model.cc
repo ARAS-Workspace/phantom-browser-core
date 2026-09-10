@@ -167,12 +167,6 @@
 #include "chrome/browser/ui/webui/signin/signin_utils_desktop.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/time/time.h"
-#include "base/win/shortcut.h"
-#include "base/win/windows_version.h"
-#include "content/public/browser/gpu_data_manager.h"
-#endif
 
 using base::UserMetricsAction;
 using content::WebContents;
@@ -247,7 +241,7 @@ std::u16string GetUpgradeDialogTitleText() {
     return l10n_util::GetStringUTF16(IDS_UPGRADE_BUBBLE_MENU_ITEM);
   }
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
+    (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
   return l10n_util::GetStringUTF16(IDS_RELAUNCH_TO_UPDATE_ALT);
 #else
   return l10n_util::GetStringUTF16(IDS_RELAUNCH_TO_UPDATE);

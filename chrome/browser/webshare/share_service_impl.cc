@@ -26,11 +26,6 @@
 #include "chrome/browser/webshare/mac/sharing_service_operation.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/webshare/win/share_operation.h"
-#include "ui/display/display.h"
-#endif
-
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #include "chrome/browser/safe_browsing/v5_get_hash_protocol_manager_factory.h"
@@ -54,7 +49,7 @@ ShareServiceImpl::ShareServiceImpl(
           content::WebContents::FromRenderFrameHost(&render_frame_host))
 #endif
 {
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_MAC)
   NOTREACHED();
 #endif
 }
@@ -312,28 +307,6 @@ void ShareServiceImpl::RunShareOperation(
          ShareCallback callback,
          blink::mojom::ShareError result) { std::move(callback).Run(result); },
       std::move(sharing_service_operation), std::move(callback)));
-#elif BUILDFLAG(IS_WIN)
-  auto blocker = web_contents->ForSecurityDropFullscreen(
-      /*display_id=*/display::kInvalidDisplayId);
-  if (!blocker) {
-    std::move(callback).Run(blink::mojom::ShareError::PERMISSION_DENIED);
-    return;
-  }
-
-  auto share_operation = std::make_unique<webshare::ShareOperation>(
-      title, text, share_url, web_contents);
-  auto* const share_operation_ptr = share_operation.get();
-  share_operation_ptr->Run(
-      std::move(files),
-      base::BindOnce(
-          [](std::unique_ptr<webshare::ShareOperation> share_operation,
-             base::ScopedClosureRunner fullscreen_block, ShareCallback callback,
-             blink::mojom::ShareError result) {
-            fullscreen_block.RunAndReset();
-            std::move(callback).Run(result);
-          },
-          std::move(share_operation), std::move(*blocker),
-          std::move(callback)));
 #else
   NOTREACHED();
 #endif

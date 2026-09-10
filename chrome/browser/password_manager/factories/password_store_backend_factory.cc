@@ -24,21 +24,21 @@
 #include "components/password_manager/core/browser/password_store/password_store_built_in_backend.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/policy/policy_path_parser.h"  // nogncheck
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif                                                 // BUILDFLAG(IS_MAC)
 
 namespace {
 
 #if !BUILDFLAG(IS_ANDROID)
 void SetIsUserDataDirPolicySet(
     password_manager::LoginDatabase* login_database) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   base::FilePath user_data_dir;
   policy::path_parser::CheckUserDataDirPolicy(&user_data_dir);
   // If `user_data_dir` is empty it means that policy did not set it.
   login_database->SetIsUserDataDirPolicySet(!user_data_dir.empty());
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 

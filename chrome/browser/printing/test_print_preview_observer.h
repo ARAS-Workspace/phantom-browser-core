@@ -13,10 +13,6 @@
 #include "chrome/browser/ui/webui/print_preview/print_preview_ui.h"
 #include "content/public/test/browser_test_utils.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "printing/printing_utils.h"
-#endif
-
 namespace content {
 class WebContents;
 }
@@ -42,12 +38,6 @@ class TestPrintPreviewObserver : PrintPreviewUI::TestDelegate {
 
   uint32_t rendered_page_count() const { return rendered_page_count_; }
 
-#if BUILDFLAG(IS_WIN)
-  bool did_composite_pdf_document() const {
-    return did_composite_pdf_document_;
-  }
-#endif
-
  private:
   void EnsureWaitForLoaded();
 
@@ -65,10 +55,6 @@ class TestPrintPreviewObserver : PrintPreviewUI::TestDelegate {
   const int pages_per_sheet_;
   uint32_t expected_rendered_page_count_ = 1;
   uint32_t rendered_page_count_ = 0;
-
-#if BUILDFLAG(IS_WIN)
-  bool did_composite_pdf_document_ = false;
-#endif
 
   const bool wait_for_loaded_;
   raw_ptr<content::WebContents, FlakyDanglingUntriaged> preview_dialog_ =

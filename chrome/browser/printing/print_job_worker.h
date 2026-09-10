@@ -109,12 +109,6 @@ class PrintJobWorker {
     return document_.get();
   }
 
-#if BUILDFLAG(IS_WIN)
-  // Renders a page in the printer.  Returns false if any errors occur.
-  // This is applicable when using the Windows GDI print API.
-  virtual bool SpoolPage(PrintedPage* page);
-#endif
-
   // Renders the document to the printer.  Returns false if any errors occur.
   virtual bool SpoolDocument();
 
@@ -144,11 +138,6 @@ class PrintJobWorker {
   // Posts a task to call OnNewPage(). Used to wait for pages/document to be
   // available.
   void PostWaitForPage();
-
-#if BUILDFLAG(IS_WIN)
-  // Windows print GDI-specific handling for OnNewPage().
-  bool OnNewPageHelperGdi();
-#endif  // BUILDFLAG(IS_WIN)
 
   // Printing context delegate.
   const std::unique_ptr<PrintingContext::Delegate> printing_context_delegate_;

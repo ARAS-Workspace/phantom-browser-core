@@ -120,54 +120,6 @@ TEST_F(HanKerningTest, FontDataVertical) {
   EXPECT_TRUE(zht_data.is_quote_fullwidth);
 }
 
-#if BUILDFLAG(IS_WIN)
-// A test case of CJK fullwidth punctuation has slightly different widths from
-// the `IdeographicInlineSize` (the width of U+0x6C34). crbug.com/1519775
-// https://collabo-cafe.com/events/collabo/shingeki-anime-completed-hajime-isayama-illust2023/
-TEST_F(HanKerningTest, FontDataSizeError) {
-  class EnableAntialiasedText {
-   public:
-    EnableAntialiasedText()
-        : is_antialiased_text_enabled_(
-              FontCache::Get().AntialiasedTextEnabled()) {
-      FontCache::Get().SetAntialiasedTextEnabled(true);
-    }
-    ~EnableAntialiasedText() {
-      FontCache::Get().SetAntialiasedTextEnabled(is_antialiased_text_enabled_);
-    }
-
-   private:
-    bool is_antialiased_text_enabled_;
-  } enable_antialias_text;
-
-  FontDescription font_description;
-  font_description.SetFamily(
-      FontFamily(AtomicString("Yu Gothic"), FontFamily::Type::kFamilyName));
-  const float specified_size = 16.f * 1.03f;
-  font_description.SetSpecifiedSize(specified_size);
-  const float computed_size = specified_size * 1.25f;
-  font_description.SetComputedSize(computed_size);
-  font_description.SetFontSmoothing(FontSmoothingMode::kAntialiased);
-  Font* font = MakeGarbageCollected<Font>(font_description);
-  const SimpleFontData* primary_font = font->PrimaryFont();
-
-  SkString name;
-  primary_font->PlatformData().Typeface()->getPostScriptName(&name);
-  if (!name.equals("YuGothic-Regular")) {
-    return;
-  }
-
-  scoped_refptr<LayoutLocale> locale =
-      LayoutLocale::CreateForTesting(AtomicString("ja"));
-  HanKerning::FontData data(*font->PrimaryFont(), *locale, true);
-  EXPECT_TRUE(data.has_alternate_spacing);
-  EXPECT_EQ(data.type_for_dot, HanKerning::CharType::kClose);
-  EXPECT_EQ(data.type_for_colon, HanKerning::CharType::kMiddle);
-  EXPECT_EQ(data.type_for_semicolon, HanKerning::CharType::kMiddle);
-  EXPECT_FALSE(data.is_quote_fullwidth);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 TEST_F(HanKerningTest, ResetFeatures) {
   Font* noto_cjk = CreateNotoCjk();
   const FontDescription& font_description = noto_cjk->GetFontDescription();
@@ -188,24 +140,5 @@ TEST_F(HanKerningTest, ResetFeatures) {
   }
   EXPECT_EQ(features.size(), 1u);
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(HanKerningTest, YuGothicUI) {
-  const FontFamily family(AtomicString("Yu Gothic UI"),
-                          FontFamily::Type::kFamilyName);
-  const scoped_refptr<LayoutLocale> locale =
-      LayoutLocale::CreateForTesting(AtomicString("ja"));
-  for (int weight = 100; weight <= 900; weight += 100) {
-    FontDescription font_description;
-    font_description.SetFamily(family);
-    font_description.SetWeight(FontSelectionValue(weight));
-    Font* font = MakeGarbageCollected<Font>(font_description);
-    const SimpleFontData* primary_font = font->PrimaryFont();
-    HanKerning::FontData han_kerning_data(*primary_font, *locale,
-                                          /*is_horizontal*/ true);
-    EXPECT_FALSE(han_kerning_data.has_alternate_spacing);
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace blink

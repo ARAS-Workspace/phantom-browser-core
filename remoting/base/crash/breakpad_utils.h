@@ -15,10 +15,6 @@
 #include "base/time/time.h"
 #include "base/values.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_handle.h"
-#endif
-
 namespace remoting {
 
 // base::Value keys used in multiple crash components.
@@ -37,14 +33,6 @@ extern bool CreateMinidumpDirectoryIfNeeded(
 
 extern bool WriteMetadataForMinidump(const base::FilePath& minidump_file_path,
                                      base::DictValue custom_client_info);
-
-#if BUILDFLAG(IS_WIN)
-
-// The name of the pipe to use for OOP crash reporting.
-extern const wchar_t kCrashServerPipeName[];
-
-base::win::ScopedHandle GetClientHandleForCrashServerPipe();
-#endif  // BUILDFLAG(IS_WIN)
 
 // Helper for generating and uploading minidumps.
 class BreakpadHelper {

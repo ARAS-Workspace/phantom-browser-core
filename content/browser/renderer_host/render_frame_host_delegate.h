@@ -53,10 +53,6 @@
 #include "ui/base/clipboard/clipboard_metadata.h"
 #include "ui/base/window_open_disposition.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/gfx/native_ui_types.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/scoped_java_ref.h"
 #endif

@@ -109,7 +109,7 @@ TEST_F(ManagedBrowserUtilsTest, HasMachineLevelPolicies) {
 }
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 TEST_F(ManagedBrowserUtilsTest, WorkProfileDefaultLabel) {
   // Ensure enterprise badging can be shown.
   std::u16string work_label = u"Work";

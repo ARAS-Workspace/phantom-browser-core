@@ -16,19 +16,11 @@
 #include "media/capture/video/apple/gpu_memory_buffer_tracker_apple.h"
 #elif BUILDFLAG(IS_LINUX)
 #include "media/capture/video/linux/v4l2_gpu_memory_buffer_tracker.h"
-#elif BUILDFLAG(IS_WIN)
-#include "media/capture/video/win/gpu_memory_buffer_tracker_win.h"
 #endif
 
 namespace media {
 
 VideoCaptureBufferTrackerFactoryImpl::VideoCaptureBufferTrackerFactoryImpl() {}
-
-#if BUILDFLAG(IS_WIN)
-VideoCaptureBufferTrackerFactoryImpl::VideoCaptureBufferTrackerFactoryImpl(
-    scoped_refptr<DXGIDeviceManager> dxgi_device_manager)
-    : dxgi_device_manager_(std::move(dxgi_device_manager)) {}
-#endif
 
 VideoCaptureBufferTrackerFactoryImpl::~VideoCaptureBufferTrackerFactoryImpl() =
     default;
@@ -44,18 +36,13 @@ VideoCaptureBufferTrackerFactoryImpl::CreateTracker(
       return std::make_unique<GpuMemoryBufferTrackerApple>();
 #elif BUILDFLAG(IS_LINUX)
       return std::make_unique<V4L2GpuMemoryBufferTracker>();
-#elif BUILDFLAG(IS_WIN)
-      if (!dxgi_device_manager_) {
-        return nullptr;
-      }
-      return std::make_unique<GpuMemoryBufferTrackerWin>(dxgi_device_manager_);
 #else
       return nullptr;
 #endif
     case VideoCaptureBufferType::kSharedImage:
       return nullptr;
     default:
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
       // Since Windows and macOS capturer outputs NV12 only for GMBs and I420
       // for software frames, the pixel format is used to choose between shmem
       // and gmb trackers. Therefore I420 shmem trackers must not be reusable
@@ -78,12 +65,6 @@ VideoCaptureBufferTrackerFactoryImpl::CreateTrackerForExternalBuffer(
   gfx::GpuMemoryBufferHandle handle = std::move(buffer.handle);
 #if BUILDFLAG(IS_APPLE)
   return std::make_unique<GpuMemoryBufferTrackerApple>(handle.io_surface());
-#elif BUILDFLAG(IS_WIN)
-  if (handle.type != gfx::DXGI_SHARED_HANDLE) {
-    return nullptr;
-  }
-  return std::make_unique<GpuMemoryBufferTrackerWin>(std::move(handle),
-                                                     dxgi_device_manager_);
 #else
   return nullptr;
 #endif

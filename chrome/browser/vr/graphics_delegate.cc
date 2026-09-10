@@ -19,9 +19,7 @@
 #include "ui/gfx/geometry/size.h"
 #include "ui/gfx/geometry/transform.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/vr/graphics_delegate_win.h"
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/vr/graphics_delegate_android.h"
 #endif
 
@@ -64,9 +62,7 @@ CameraModel CameraModelViewProjFromXRView(
 }  // namespace
 
 std::unique_ptr<GraphicsDelegate> GraphicsDelegate::Create() {
-#if BUILDFLAG(IS_WIN)
-  return std::make_unique<GraphicsDelegateWin>();
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   return std::make_unique<GraphicsDelegateAndroid>();
 #else
   NOTIMPLEMENTED();

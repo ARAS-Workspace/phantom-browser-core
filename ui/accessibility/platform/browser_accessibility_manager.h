@@ -60,9 +60,7 @@ namespace ui {
 // Required by the several platform specific
 // `BrowserAccessibilityManager::ToBrowserAccessibilityManager...()` methods
 // declared below.
-#if BUILDFLAG(IS_WIN)
-class BrowserAccessibilityManagerWin;
-#elif BUILDFLAG(USE_ATK)
+#if BUILDFLAG(USE_ATK)
 class BrowserAccessibilityManagerAuraLinux;
 #elif BUILDFLAG(IS_MAC)
 class BrowserAccessibilityManagerMac;
@@ -318,10 +316,6 @@ class COMPONENT_EXPORT(AX_PLATFORM) BrowserAccessibilityManager
   // This is called when the user finishes a find in page query and all
   // highlighted matches are deactivated.
   virtual void OnFindInPageTermination() {}
-
-#if BUILDFLAG(IS_WIN)
-  BrowserAccessibilityManagerWin* ToBrowserAccessibilityManagerWin();
-#endif
 
 #if BUILDFLAG(USE_ATK)
   BrowserAccessibilityManagerAuraLinux*
@@ -637,7 +631,7 @@ class COMPONENT_EXPORT(AX_PLATFORM) BrowserAccessibilityManager
   static bool never_suppress_or_delay_events_for_testing_;
 
   // For debug only: True when handling OnAccessibilityEvents.
-#if BUILDFLAG(IS_WIN) || DCHECK_IS_ON()
+#if DCHECK_IS_ON()
   bool in_on_accessibility_events_ = false;
 #endif  // DCHECK_IS_ON()
 

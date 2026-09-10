@@ -266,20 +266,6 @@ void WebNNContextImpl::ReportBadMessageAndDisconnect(std::string_view message) {
   OnDisconnect();
 }
 
-#if BUILDFLAG(IS_WIN)
-void WebNNContextImpl::DestroyAllContextsAndKillGpuProcess() {
-  if (!main_task_runner_->RunsTasksInCurrentSequence()) {
-    main_task_runner_->PostTask(
-        FROM_HERE,
-        base::BindOnce(
-            &WebNNContextProviderImpl::DestroyAllContextsAndKillGpuProcess,
-            context_provider_));
-    return;
-  }
-
-  context_provider_->DestroyAllContextsAndKillGpuProcess();
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 void WebNNContextImpl::AddGraphImpl(scoped_refptr<WebNNGraphImpl> graph_impl) {
   graph_impls_.emplace(std::move(graph_impl));

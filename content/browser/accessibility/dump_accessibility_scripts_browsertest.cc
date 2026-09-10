@@ -43,16 +43,6 @@ constexpr const char kMacTextOperation[]{"mac/text-operation"};
 
 #endif
 
-#if BUILDFLAG(IS_WIN)
-
-constexpr const char kIAccessible[]{"win/ia2/iaccessible"};
-constexpr const char kIAccessible2[]{"win/ia2/iaccessible2"};
-constexpr const char kIAccessibleTable[]{"win/ia2/iaccessibletable"};
-constexpr const char kIAccessibleTextSelectionContainer[]{
-    "win/ia2/iaccessibletextselectioncontainer"};
-
-#endif
-
 // See content/test/data/accessibility/readme.md for an overview.
 //
 // This test loads an HTML file, invokes a script, and then
@@ -772,54 +762,6 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityScriptTest, AXTextOperationReplace) {
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityScriptTest,
                        AXTextOperationReplacePreserveCase) {
   AXTextOperation_RunTest("ax-text-operation-replace-preserve-case.html");
-}
-
-#endif
-
-#if BUILDFLAG(IS_WIN)
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         DumpAccessibilityScriptTest,
-                         ::testing::Values(ui::AXApiType::kWinIA2),
-                         TestPassToString());
-
-// IAccessible
-
-IN_PROC_BROWSER_TEST_P(DumpAccessibilityScriptTest, IAccessibleRole) {
-  RunTypedTest<kIAccessible>(L"iaccessible-role.html");
-}
-
-// IAccessible2
-
-IN_PROC_BROWSER_TEST_P(DumpAccessibilityScriptTest, IAccessible2Role) {
-  RunTypedTest<kIAccessible2>(L"iaccessible2-role.html");
-}
-
-// IAccessibleTable
-
-IN_PROC_BROWSER_TEST_P(DumpAccessibilityScriptTest,
-                       IAccessibleTableSelectedColumns) {
-  RunTypedTest<kIAccessibleTable>(L"iaccessibletable-selected-columns.html");
-}
-
-// IAccessibleTextSelectionContainer
-
-IN_PROC_BROWSER_TEST_P(DumpAccessibilityScriptTest,
-                       IAccessibleTextSelectionContainerSelections) {
-  RunTypedTest<kIAccessibleTextSelectionContainer>(
-      L"iaccessibletextselectioncontainer-selections.html");
-}
-
-IN_PROC_BROWSER_TEST_P(DumpAccessibilityScriptTest,
-                       IAccessibleTextSelectionContainerSetSelections) {
-  RunTypedTest<kIAccessibleTextSelectionContainer>(
-      L"iaccessibletextselectioncontainer-set-selections.html");
-}
-
-IN_PROC_BROWSER_TEST_P(DumpAccessibilityScriptTest,
-                       IAccessibleTextSelectionContainerClearSelections) {
-  RunTypedTest<kIAccessibleTextSelectionContainer>(
-      L"iaccessibletextselectioncontainer-clear-selections.html");
 }
 
 #endif

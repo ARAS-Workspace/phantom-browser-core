@@ -24,16 +24,7 @@
 #include "net/base/ip_address_util.h"
 #include "net/base/sys_addrinfo.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <winsock2.h>
-#include <winternl.h>
-
-#include <netioapi.h>
-#include <ntstatus.h>
-#include <ws2bth.h>
-
-#include "net/base/winsock_util.h"  // For kBluetoothAddressSize
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include <net/if.h>
 #endif
 
@@ -152,16 +143,10 @@ IPEndPoint::IPEndPoint(const IPAddress& address,
 IPEndPoint::IPEndPoint(const IPEndPoint& endpoint) = default;
 
 uint16_t IPEndPoint::port() const {
-#if BUILDFLAG(IS_WIN)
-  DCHECK_NE(address_.size(), kBluetoothAddressSize);
-#endif
   return port_;
 }
 
 IPEndPoint IPEndPoint::CopyWithPort(uint16_t port) const {
-#if BUILDFLAG(IS_WIN)
-  DCHECK_NE(address_.size(), kBluetoothAddressSize);
-#endif
   return IPEndPoint(address_, port, scope_id_);
 }
 
@@ -175,10 +160,6 @@ int IPEndPoint::GetSockAddrFamily() const {
       return AF_INET;
     case IPAddress::kIPv6AddressSize:
       return AF_INET6;
-#if BUILDFLAG(IS_WIN)
-    case kBluetoothAddressSize:
-      return AF_BTH;
-#endif
     default:
       NOTREACHED() << "Bad IP address";
   }
@@ -194,9 +175,6 @@ bool IPEndPoint::ToSockAddr(struct sockaddr* address,
 
   DCHECK(address);
   DCHECK(address_length);
-#if BUILDFLAG(IS_WIN)
-  DCHECK_NE(address_.size(), kBluetoothAddressSize);
-#endif
   switch (address_.size()) {
     case IPAddress::kIPv4AddressSize: {
       if (*address_length < kSockaddrInSize)
@@ -259,37 +237,15 @@ bool IPEndPoint::FromSockAddr(const struct sockaddr* sock_addr,
       }
       return true;
     }
-#if BUILDFLAG(IS_WIN)
-    case AF_BTH: {
-      if (sock_addr_len < static_cast<socklen_t>(sizeof(SOCKADDR_BTH)))
-        return false;
-      const SOCKADDR_BTH* addr =
-          reinterpret_cast<const SOCKADDR_BTH*>(sock_addr);
-      *this = IPEndPoint();
-      // A bluetooth address is 6 bytes, but btAddr is a ULONGLONG, so we take a
-      // prefix of it.
-      address_ = IPAddress(base::as_bytes(base::span_from_ref(addr->btAddr))
-                               .first(kBluetoothAddressSize));
-      // Intentionally ignoring Bluetooth port. It is a ULONG, but
-      // `IPEndPoint::port_` is a uint16_t. See https://crbug.com/1231273.
-      return true;
-    }
-#endif
   }
   return false;  // Unrecognized |sa_family|.
 }
 
 std::string IPEndPoint::ToString() const {
-#if BUILDFLAG(IS_WIN)
-  DCHECK_NE(address_.size(), kBluetoothAddressSize);
-#endif
   return IPAddressToStringWithPort(address_, port_);
 }
 
 std::string IPEndPoint::ToStringWithoutPort() const {
-#if BUILDFLAG(IS_WIN)
-  DCHECK_NE(address_.size(), kBluetoothAddressSize);
-#endif
   return address_.ToString();
 }
 

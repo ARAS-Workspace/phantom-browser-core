@@ -145,27 +145,6 @@ base::ScopedFD VulkanMemory::GetMemoryFd(
 }
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-base::win::ScopedHandle VulkanMemory::GetMemoryHandle(
-    VkExternalMemoryHandleTypeFlagBits handle_type) {
-  VkMemoryGetWin32HandleInfoKHR get_handle_info = {
-      .sType = VK_STRUCTURE_TYPE_MEMORY_GET_WIN32_HANDLE_INFO_KHR,
-      .memory = device_memory(),
-      .handleType = handle_type,
-  };
-
-  VkDevice device = device_queue_->GetVulkanDevice();
-
-  HANDLE handle = nullptr;
-  vkGetMemoryWin32HandleKHR(device, &get_handle_info, &handle);
-  if (handle == nullptr) {
-    DLOG(ERROR) << "Unable to extract file handle out of external VkImage";
-    return base::win::ScopedHandle();
-  }
-
-  return base::win::ScopedHandle(handle);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 
 }  // namespace gpu

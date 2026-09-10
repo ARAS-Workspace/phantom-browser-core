@@ -2420,11 +2420,7 @@ IN_PROC_BROWSER_TEST_P(RenderFrameHostManagerTest, DontSelectInvalidFiles) {
   EXPECT_EQ(url1, prev_entry->GetURL());
   const std::vector<base::FilePath>& files =
       prev_entry->GetPageState().GetReferencedFiles();
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(1U, files.size());
-#else
   EXPECT_EQ(0U, files.size());
-#endif
 }
 
 // Test for http://crbug.com/262948.

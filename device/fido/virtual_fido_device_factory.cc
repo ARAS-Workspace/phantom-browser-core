@@ -78,15 +78,4 @@ void VirtualFidoDeviceFactory::DisconnectDevice() {
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-std::unique_ptr<device::FidoDiscoveryBase>
-VirtualFidoDeviceFactory::MaybeCreateWinWebAuthnApiDiscovery() {
-  if (!discover_win_webauthn_api_authenticator_) {
-    return nullptr;
-  }
-
-  return FidoDiscoveryFactory::MaybeCreateWinWebAuthnApiDiscovery();
-}
-#endif
-
 }  // namespace device::test

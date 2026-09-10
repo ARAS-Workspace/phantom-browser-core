@@ -181,7 +181,7 @@ class StoreMetricsReporterTest : public SyncUsernameTestBase {
         prefs::kProfileStoreMigratedToOSCryptAsync, false);
     prefs_.registry()->RegisterBooleanPref(
         prefs::kAccountStoreMigratedToOSCryptAsync, false);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
     prefs_.registry()->RegisterBooleanPref(
         prefs::kBiometricAuthenticationBeforeFilling, false);
 #endif
@@ -293,7 +293,7 @@ INSTANTIATE_TEST_SUITE_P(
         EnableStateParam(false, EnableSettingManageState::kPolicy, 8),
         EnableStateParam(false, EnableSettingManageState::kRecommended, 9)));
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 
 // The test fixture is used to test StoreIndependentMetrics. Depending on the
 // test, the parameter defines whether password manager or

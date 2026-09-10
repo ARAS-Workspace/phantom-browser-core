@@ -93,11 +93,6 @@ TEST_F(BrowserSwitcherPrefsTest, ListensForPrefChanges) {
                                   base::Value("notepad.exe"));
   prefs_backend()->SetManagedPref(prefs::kAlternativeBrowserParameters,
                                   StringArrayToValue({"a", "b", "c"}));
-#if BUILDFLAG(IS_WIN)
-  prefs_backend()->SetManagedPref(prefs::kChromePath, base::Value("cmd.exe"));
-  prefs_backend()->SetManagedPref(prefs::kChromeParameters,
-                                  StringArrayToValue({"d", "e", "f"}));
-#endif
   prefs_backend()->SetManagedPref(prefs::kUrlList,
                                   StringArrayToValue({"example.com"}));
   prefs_backend()->SetManagedPref(prefs::kUrlGreylist,
@@ -111,15 +106,6 @@ TEST_F(BrowserSwitcherPrefsTest, ListensForPrefChanges) {
   EXPECT_EQ("a", prefs()->GetAlternativeBrowserParameters()[0]);
   EXPECT_EQ("b", prefs()->GetAlternativeBrowserParameters()[1]);
   EXPECT_EQ("c", prefs()->GetAlternativeBrowserParameters()[2]);
-
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ("cmd.exe", prefs()->GetChromePath().MaybeAsASCII());
-
-  EXPECT_EQ(3u, prefs()->GetChromeParameters().size());
-  EXPECT_EQ("d", prefs()->GetChromeParameters()[0]);
-  EXPECT_EQ("e", prefs()->GetChromeParameters()[1]);
-  EXPECT_EQ("f", prefs()->GetChromeParameters()[2]);
-#endif
 
   EXPECT_EQ(1u, prefs()->GetRules().sitelist.size());
   EXPECT_EQ("example.com", prefs()->GetRules().sitelist[0]->ToString());

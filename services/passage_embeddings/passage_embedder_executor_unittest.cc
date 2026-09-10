@@ -65,11 +65,7 @@ class PassageEmbedderExecutorTest : public testing::Test {
     if (!file.IsValid()) {
       return nullptr;
     }
-#if BUILDFLAG(IS_WIN)
-    auto status = engine->BuildModelFromFileHandle(file.GetPlatformFile());
-#else
     auto status = engine->BuildModelFromFileDescriptor(file.GetPlatformFile());
-#endif
     if (!status.ok()) {
       return nullptr;
     }

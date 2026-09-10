@@ -251,11 +251,6 @@ static void CheckCodeUnitPairs(const std::u16string& text,
 // Test that both both UTF-16 surrogate pairs and combining character sequences
 // do not get split by ElideText.
 TEST(TextEliderTest, ElideTextAtomicSequences) {
-#if BUILDFLAG(IS_WIN)
-  // Needed to bypass DCHECK in GetFallbackFont.
-  base::test::SingleThreadTaskEnvironment task_environment(
-      base::test::SingleThreadTaskEnvironment::MainThreadType::UI);
-#endif
   const FontList font_list;
   std::vector<std::u16string> pairs;
   // The below is 'MUSICAL SYMBOL G CLEF' (U+1D11E), which is represented in

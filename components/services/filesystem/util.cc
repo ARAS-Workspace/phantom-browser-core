@@ -15,10 +15,6 @@
 #include "base/strings/string_util.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#endif
-
 // module filesystem has various constants which must line up with enum values
 // in base::File::Flags.
 static_assert(filesystem::mojom::kFlagOpen ==
@@ -97,9 +93,7 @@ base::File::Error ValidatePath(const std::string& raw_path,
   if (!base::IsStringUTF8(raw_path))
     return base::File::Error::FILE_ERROR_INVALID_OPERATION;
 
-#if BUILDFLAG(IS_WIN)
-  base::FilePath::StringType path = base::UTF8ToWide(raw_path);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   base::FilePath::StringType path = raw_path;
 #endif
 

@@ -55,9 +55,6 @@ SqlSharedCacheIndexDatabase::SqlSharedCacheIndexDatabase(
           storage_directory.Append(kSqlBackendSharedCacheIndexFileName)),
       db_(sql::DatabaseOptions()
               .set_exclusive_locking(true)
-#if BUILDFLAG(IS_WIN)
-              .set_exclusive_database_file_lock(true)
-#endif  // IS_WIN
               .set_wal_mode(true),
           sql::Database::Tag("SharedCacheIndex")) {
 }

@@ -13,9 +13,6 @@
 #endif
 
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
 
 namespace gpu {
 
@@ -36,9 +33,6 @@ SemaphoreHandle::SemaphoreHandle(gfx::GpuFenceHandle fence_handle) {
 #elif BUILDFLAG(IS_POSIX)
   Init(VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR,
        fence_handle.Release());
-#elif BUILDFLAG(IS_WIN)
-  Init(VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT,
-       fence_handle.Release());
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 }
 
@@ -58,8 +52,6 @@ gfx::GpuFenceHandle SemaphoreHandle::ToGpuFenceHandle() && {
   }
 #elif BUILDFLAG(IS_POSIX)
   fence_handle.Adopt(TakeHandle());
-#elif BUILDFLAG(IS_WIN)
-  fence_handle.Adopt(TakeHandle());
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   return fence_handle;
 }
@@ -71,14 +63,6 @@ SemaphoreHandle SemaphoreHandle::Duplicate() const {
 #if BUILDFLAG(IS_POSIX)
   return SemaphoreHandle(type_,
                          base::ScopedFD(HANDLE_EINTR(dup(handle_.get()))));
-#elif BUILDFLAG(IS_WIN)
-  HANDLE handle_dup;
-  if (!::DuplicateHandle(::GetCurrentProcess(), handle_.Get(),
-                         ::GetCurrentProcess(), &handle_dup, 0, FALSE,
-                         DUPLICATE_SAME_ACCESS)) {
-    return SemaphoreHandle();
-  }
-  return SemaphoreHandle(type_, base::win::ScopedHandle(handle_dup));
 #else
 #error Unsupported OS
 #endif

@@ -18,10 +18,6 @@
 #include "ui/views/layout/fill_layout.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/views/widget/desktop_aura/desktop_native_widget_aura.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ui/aura/window.h"
 #include "ui/aura/window_targeter.h"
@@ -177,14 +173,6 @@ std::unique_ptr<views::Widget> MessagePopupView::Show() {
   popup_collection_->ConfigureWidgetInitParamsForContainer(widget.get(),
                                                            &params);
   widget->set_focus_on_creation(false);
-
-#if BUILDFLAG(IS_WIN)
-  // We want to ensure that this toast always goes to the native desktop,
-  // not the Ash desktop (since there is already another toast contents view
-  // there.
-  if (!params.parent)
-    params.native_widget = new views::DesktopNativeWidgetAura(widget.get());
-#endif
 
   widget->Init(std::move(params));
 

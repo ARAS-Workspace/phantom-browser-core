@@ -362,11 +362,7 @@
 //   }
 // ```
 #if !defined(DISABLE_CFI_ICALL)
-#if BUILDFLAG(IS_WIN)
-#define DISABLE_CFI_ICALL NO_SANITIZE("cfi-icall") __declspec(guard(nocf))
-#else
 #define DISABLE_CFI_ICALL NO_SANITIZE("cfi-icall")
-#endif
 #endif
 
 // Annotates a function disabling Control Flow Integrity indirect call checks if
@@ -384,11 +380,7 @@
 //   }
 // ```
 #if !defined(DISABLE_CFI_DLSYM)
-#if BUILDFLAG(IS_WIN)
-#define DISABLE_CFI_DLSYM
-#else
 #define DISABLE_CFI_DLSYM DISABLE_CFI_ICALL
-#endif
 #endif
 
 // Evaluates to a string constant containing the function signature.
@@ -732,8 +724,7 @@ inline constexpr bool AnalyzerAssumeTrue(bool arg) {
 // TODO(crbug.com/42204008): Investigate, fix, and re-enable.
 #if __has_cpp_attribute(clang::preserve_most) &&             \
     (defined(ARCH_CPU_ARM64) || defined(ARCH_CPU_X86_64)) && \
-    !defined(COMPONENT_BUILD) &&                             \
-    !(BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64))
+    !defined(COMPONENT_BUILD)
 #define PRESERVE_MOST [[clang::preserve_most]]
 #else
 #define PRESERVE_MOST

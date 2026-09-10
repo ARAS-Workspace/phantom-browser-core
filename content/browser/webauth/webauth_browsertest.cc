@@ -88,12 +88,6 @@
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/mojom/webauthn/authenticator.mojom.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "device/fido/win/fake_webauthn_api.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -123,13 +117,6 @@ constexpr char kNotAllowedErrorMessage[] =
     "NotAllowedError: The operation either timed out or was not "
     "allowed. See: "
     "https://www.w3.org/TR/webauthn-2/#sctn-privacy-considerations-client.";
-
-#if BUILDFLAG(IS_WIN)
-constexpr char kInvalidStateErrorMessage[] =
-    "InvalidStateError: The user attempted to register an "
-    "authenticator that contains one of the credentials already registered "
-    "with the relying party.";
-#endif  // BUILDFLAG(IS_WIN)
 
 constexpr char kResidentCredentialsErrorMessage[] =
     "NotSupportedError: Resident credentials or empty "
@@ -1605,129 +1592,6 @@ IN_PROC_BROWSER_TEST_F(WebAuthJavascriptClientBrowserTest,
             EvalJs(shell()->web_contents()->GetPrimaryMainFrame(),
                    BuildGetCallWithParameters(parameters)));
 }
-
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(WebAuthJavascriptClientBrowserTest, WinMakeCredential) {
-  EXPECT_TRUE(
-      NavigateToURL(shell(), GetHttpsURL("www.acme.com", "/title1.html")));
-
-  device::FakeWinWebAuthnApi fake_api;
-  fake_api.set_is_uvpaa(true);
-  device::WinWebAuthnApi::ScopedOverride win_webauthn_api_override(&fake_api);
-
-  ASSERT_EQ(kOkMessage,
-            EvalJs(shell()->web_contents(),
-                   BuildCreateCallWithParameters(CreateParameters())));
-}
-
-IN_PROC_BROWSER_TEST_F(WebAuthJavascriptClientBrowserTest,
-                       WinMakeCredentialTransports) {
-  EXPECT_TRUE(
-      NavigateToURL(shell(), GetHttpsURL("www.acme.com", "/title1.html")));
-
-  device::FakeWinWebAuthnApi fake_api;
-  fake_api.set_is_uvpaa(true);
-  fake_api.set_version(WEBAUTHN_API_VERSION_9);
-  device::WinWebAuthnApi::ScopedOverride win_webauthn_api_override(&fake_api);
-
-  ASSERT_EQ("hybrid,internal",
-            EvalJs(shell()->web_contents(),
-                   "navigator.credentials.create({ publicKey: {"
-                   "  challenge: new TextEncoder().encode('climb a mountain'),"
-                   "  rp: { id: 'acme.com', name: 'Acme' },"
-                   "  user: { "
-                   "    id: new TextEncoder().encode('1098237235409872'),"
-                   "    name: 'avery.a.jones@example.com',"
-                   "    displayName: 'Avery A. Jones' },"
-                   "  pubKeyCredParams: [{ type: 'public-key', alg: -257 }],"
-                   "  timeout: 10000,"
-                   "  authenticatorSelection: {"
-                   "     userVerification: 'preferred',"
-                   "     authenticatorAttachment: 'platform',"
-                   "  },"
-                   "}}).then(c => c.response.getTransports().sort().join(','),"
-                   "         e => e.toString())"));
-}
-
-IN_PROC_BROWSER_TEST_F(WebAuthJavascriptClientBrowserTest,
-                       WinMakeCredentialReturnCodeFailure) {
-  EXPECT_TRUE(
-      NavigateToURL(shell(), GetHttpsURL("www.acme.com", "/title1.html")));
-  device::FakeWinWebAuthnApi fake_api;
-  device::WinWebAuthnApi::ScopedOverride win_webauthn_api_override(&fake_api);
-
-  // Errors documented for WebAuthNGetErrorName() in <webauthn.h>.
-  const std::map<HRESULT, std::string> errors{
-      // NTE_EXISTS is the error for using an authenticator that matches the
-      // exclude list, which should result in "InvalidStateError".
-      {NTE_EXISTS, kInvalidStateErrorMessage},
-      // All other errors should yield "NotAllowedError".
-      {HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED), kNotAllowedErrorMessage},
-      {NTE_TOKEN_KEYSET_STORAGE_FULL, kNotAllowedErrorMessage},
-      {NTE_TOKEN_KEYSET_STORAGE_FULL, kNotAllowedErrorMessage},
-      {NTE_INVALID_PARAMETER, kNotAllowedErrorMessage},
-      {NTE_DEVICE_NOT_FOUND, kNotAllowedErrorMessage},
-      {NTE_NOT_FOUND, kNotAllowedErrorMessage},
-      {HRESULT_FROM_WIN32(ERROR_CANCELLED), kNotAllowedErrorMessage},
-      {NTE_USER_CANCELLED, kNotAllowedErrorMessage},
-      {HRESULT_FROM_WIN32(ERROR_TIMEOUT), kNotAllowedErrorMessage},
-      // Undocumented errors should default to NOT_ALLOWED_ERROR.
-      {ERROR_FILE_NOT_FOUND, kNotAllowedErrorMessage},
-  };
-
-  for (const auto& error : errors) {
-    fake_api.set_hresult(error.first);
-
-    EXPECT_EQ(error.second,
-              EvalJs(shell()->web_contents(),
-                     BuildCreateCallWithParameters(CreateParameters())));
-  }
-}
-
-IN_PROC_BROWSER_TEST_F(WebAuthJavascriptClientBrowserTest, WinGetAssertion) {
-  EXPECT_TRUE(
-      NavigateToURL(shell(), GetHttpsURL("www.acme.com", "/title1.html")));
-
-  constexpr uint8_t credential_id[] = {'A', 'A', 'A'};
-
-  device::FakeWinWebAuthnApi fake_api;
-  fake_api.InjectNonDiscoverableCredential(credential_id, "acme.com");
-  device::WinWebAuthnApi::ScopedOverride win_webauthn_api_override(&fake_api);
-
-  GetParameters get_parameters;
-  get_parameters.allow_credentials =
-      "[{ type: 'public-key', id: new TextEncoder().encode('AAA')}]";
-
-  ASSERT_EQ(kOkMessage, EvalJs(shell()->web_contents(),
-                               BuildGetCallWithParameters(get_parameters)));
-}
-
-IN_PROC_BROWSER_TEST_F(WebAuthJavascriptClientBrowserTest,
-                       WinGetAssertionReturnCodeFailure) {
-  EXPECT_TRUE(
-      NavigateToURL(shell(), GetHttpsURL("www.acme.com", "/title1.html")));
-  device::FakeWinWebAuthnApi fake_api;
-  device::WinWebAuthnApi::ScopedOverride win_webauthn_api_override(&fake_api);
-
-  // Errors documented for WebAuthNGetErrorName() in <webauthn.h>.
-  const std::set<HRESULT> errors{
-      // NTE_EXISTS -- should not be returned for WebAuthNGetAssertion().
-      HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED), NTE_TOKEN_KEYSET_STORAGE_FULL,
-      NTE_TOKEN_KEYSET_STORAGE_FULL, NTE_INVALID_PARAMETER,
-      NTE_DEVICE_NOT_FOUND, NTE_NOT_FOUND, HRESULT_FROM_WIN32(ERROR_CANCELLED),
-      NTE_USER_CANCELLED, HRESULT_FROM_WIN32(ERROR_TIMEOUT),
-      // Other errors should also result in NOT_ALLOWED_ERROR.
-      ERROR_FILE_NOT_FOUND};
-
-  for (const auto& error : errors) {
-    fake_api.set_hresult(error);
-
-    ASSERT_EQ(kNotAllowedErrorMessage,
-              EvalJs(shell()->web_contents(),
-                     BuildGetCallWithParameters(GetParameters())));
-  }
-}
-#endif
 
 IN_PROC_BROWSER_TEST_F(WebAuthJavascriptClientBrowserTest,
                        GetAssertionOversizedAllowList) {

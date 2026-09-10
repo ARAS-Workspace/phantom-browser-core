@@ -16,7 +16,7 @@
 #include "chrome/browser/extensions/api/enterprise_reporting_private/chrome_desktop_report_request_helper.h"
 #include "chrome/common/extensions/api/enterprise_reporting_private.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "base/time/time.h"
 #include "components/device_signals/core/browser/signals_types.h"
 #endif
@@ -211,7 +211,7 @@ class EnterpriseReportingPrivateGetCertificateFunction
       client_cert_fetcher_;
 };
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 class EnterpriseReportingPrivateGetFileSystemInfoFunction
     : public ExtensionFunction {
@@ -240,9 +240,9 @@ class EnterpriseReportingPrivateGetFileSystemInfoFunction
   }
 };
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 class EnterpriseReportingPrivateGetSettingsFunction : public ExtensionFunction {
  public:
   DECLARE_EXTENSION_FUNCTION("enterprise.reportingPrivate.getSettings",
@@ -269,61 +269,7 @@ class EnterpriseReportingPrivateGetSettingsFunction : public ExtensionFunction {
   }
 };
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_WIN)
-
-class EnterpriseReportingPrivateGetAvInfoFunction : public ExtensionFunction {
- public:
-  DECLARE_EXTENSION_FUNCTION("enterprise.reportingPrivate.getAvInfo",
-                             ENTERPRISEREPORTINGPRIVATE_GETAVINFO)
-
-  EnterpriseReportingPrivateGetAvInfoFunction();
-  EnterpriseReportingPrivateGetAvInfoFunction(
-      const EnterpriseReportingPrivateGetAvInfoFunction&) = delete;
-  EnterpriseReportingPrivateGetAvInfoFunction& operator=(
-      const EnterpriseReportingPrivateGetAvInfoFunction&) = delete;
-
- private:
-  ~EnterpriseReportingPrivateGetAvInfoFunction() override;
-
-  // ExtensionFunction
-  ExtensionFunction::ResponseAction Run() override;
-
-  void OnSignalRetrieved(base::TimeTicks start_time,
-                         device_signals::SignalsAggregationResponse response);
-
-  device_signals::SignalName signal_name() {
-    return device_signals::SignalName::kAntiVirus;
-  }
-};
-
-class EnterpriseReportingPrivateGetHotfixesFunction : public ExtensionFunction {
- public:
-  DECLARE_EXTENSION_FUNCTION("enterprise.reportingPrivate.getHotfixes",
-                             ENTERPRISEREPORTINGPRIVATE_GETHOTFIXES)
-
-  EnterpriseReportingPrivateGetHotfixesFunction();
-  EnterpriseReportingPrivateGetHotfixesFunction(
-      const EnterpriseReportingPrivateGetHotfixesFunction&) = delete;
-  EnterpriseReportingPrivateGetHotfixesFunction& operator=(
-      const EnterpriseReportingPrivateGetHotfixesFunction&) = delete;
-
- private:
-  ~EnterpriseReportingPrivateGetHotfixesFunction() override;
-
-  // ExtensionFunction
-  ExtensionFunction::ResponseAction Run() override;
-
-  void OnSignalRetrieved(base::TimeTicks start_time,
-                         device_signals::SignalsAggregationResponse response);
-
-  device_signals::SignalName signal_name() {
-    return device_signals::SignalName::kHotfixes;
-  }
-};
-
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 class EnterpriseReportingPrivateReportDataMaskingEventFunction
     : public ExtensionFunction {

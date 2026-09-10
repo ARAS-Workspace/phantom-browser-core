@@ -89,10 +89,6 @@ blink::UserAgentBrandVersion GetGreasedUserAgentBrandVersion(
     int seed,
     blink::UserAgentBrandVersionType output_version_type);
 
-#if BUILDFLAG(IS_WIN)
-int GetHighestKnownUniversalApiContractVersionForTesting();
-#endif  // BUILDFLAG(IS_WIN)
-
 // Returns the CPU architecture in Windows/Mac/POSIX/Fuchsia and the empty
 // string on Android or if unknown.
 std::string GetCpuArchitecture();

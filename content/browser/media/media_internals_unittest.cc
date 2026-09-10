@@ -170,8 +170,6 @@ TEST_F(MediaInternalsVideoCaptureDeviceTest,
   descriptor.set_display_name("dummy");
 #if BUILDFLAG(IS_MAC)
   descriptor.capture_api = media::VideoCaptureApi::MACOSX_AVFOUNDATION;
-#elif BUILDFLAG(IS_WIN)
-  descriptor.capture_api = media::VideoCaptureApi::WIN_DIRECT_SHOW;
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   descriptor.device_id = "/dev/dummy";
   descriptor.capture_api = media::VideoCaptureApi::LINUX_V4L2_SINGLE_PLANE;
@@ -201,8 +199,6 @@ TEST_F(MediaInternalsVideoCaptureDeviceTest,
   ExpectListOfStrings("formats", expected_list);
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   ExpectString("captureApi", "V4L2 SPLANE");
-#elif BUILDFLAG(IS_WIN)
-  ExpectString("captureApi", "Direct Show");
 #elif BUILDFLAG(IS_MAC)
   ExpectString("captureApi", "AV Foundation");
 #elif BUILDFLAG(IS_ANDROID)

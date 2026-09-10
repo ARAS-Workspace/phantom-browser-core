@@ -111,11 +111,6 @@ class BookmarkBrowsertest : public InProcessBrowserTest {
     feature_list_.InitWithFeatures(
         /*enabled_features=*/{switches::kSyncEnableBookmarksInTransportMode},
         /*disabled_features=*/{
-#if BUILDFLAG(IS_WIN)
-            // This needs to be disabled so that animations are guaranteed to
-            // work.
-            features::kApplyNativeOcclusionToCompositor
-#endif
         });
   }
 
@@ -186,12 +181,7 @@ IN_PROC_BROWSER_TEST_F(BookmarkBrowsertest, PRE_Persist) {
                                      /*just_opened=*/true);
 }
 
-#if BUILDFLAG(IS_WIN)
-// TODO(crbug.com/41443454): The test fails on Windows.
-#define MAYBE_Persist DISABLED_Persist
-#else
 #define MAYBE_Persist Persist
-#endif
 
 IN_PROC_BROWSER_TEST_F(BookmarkBrowsertest, MAYBE_Persist) {
   BookmarkModel* bookmark_model = WaitForBookmarkModel(browser()->GetProfile());
@@ -535,12 +525,10 @@ IN_PROC_BROWSER_TEST_F(BookmarkBrowsertest, DragSingleBookmark) {
         ASSERT_FALSE(url_infos.empty());
         EXPECT_EQ(page_url, url_infos.front().url);
         EXPECT_EQ(page_title, url_infos.front().title);
-#if !BUILDFLAG(IS_WIN)
         // On Windows, GetDragImage() is a NOTREACHED() as the Windows
         // implementation of OSExchangeData just sets the drag image on the OS
         // API. https://crbug.com/41419592
         EXPECT_FALSE(drag_data->provider().GetDragImage().isNull());
-#endif
         EXPECT_EQ(expected_point, point);
         run_loop->Quit();
       });
@@ -622,12 +610,10 @@ IN_PROC_BROWSER_TEST_F(BookmarkBrowsertest, DragMultipleBookmarks) {
         // TODO(http://crbug.com/41011768): test the bookmark folder.
         EXPECT_EQ(page_title, url_infos.front().title);
         EXPECT_EQ(page_url, url_infos.front().url);
-#if !BUILDFLAG(IS_WIN)
         // On Windows, GetDragImage() is a NOTREACHED() as the Windows
         // implementation of OSExchangeData just sets the drag image on the OS
         // API. https://crbug.com/41419592
         EXPECT_FALSE(drag_data->provider().GetDragImage().isNull());
-#endif
         EXPECT_EQ(expected_point, point);
         run_loop->Quit();
       });

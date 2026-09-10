@@ -35,13 +35,6 @@ bool IsVideoCaptureUseGpuMemoryBufferEnabled() {
              switches::kVideoCaptureUseGpuMemoryBuffer);
 }
 
-#if BUILDFLAG(IS_WIN)
-bool IsMediaFoundationCameraUsageMonitoringEnabled() {
-  return base::FeatureList::IsEnabled(
-      features::kMediaFoundationCameraUsageMonitoring);
-}
-#endif
-
 }  // namespace switches
 
 namespace features {
@@ -53,11 +46,5 @@ BASE_FEATURE(kExcludePipFromScreenCapture, base::FEATURE_DISABLED_BY_DEFAULT);
 // Wayland display server.
 BASE_FEATURE(kWebRtcPipeWireCamera, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // defined(WEBRTC_USE_PIPEWIRE)
-
-#if BUILDFLAG(IS_WIN)
-// Controls monitoring for camera usage by other applications.
-BASE_FEATURE(kMediaFoundationCameraUsageMonitoring,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace features

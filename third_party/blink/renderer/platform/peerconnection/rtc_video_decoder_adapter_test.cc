@@ -323,9 +323,6 @@ class RTCVideoDecoderAdapterTest : public ::testing::Test {
             });
     EXPECT_CALL(gpu_factories_, CreateVideoDecoder(_, _)).Times(AtLeast(0));
     std::vector<base::test::FeatureRef> enable_features;
-#if BUILDFLAG(IS_WIN)
-    enable_features.emplace_back(::media::kD3D11Vp9kSVCHWDecoding);
-#endif
     if (!enable_features.empty())
       feature_list_.InitWithFeatures(enable_features, {});
   }
@@ -818,22 +815,7 @@ TEST_F(RTCVideoDecoderAdapterTest, DecodesImageWithSingleSpatialLayer) {
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST_F(RTCVideoDecoderAdapterTest, UseD3D11ToDecodeVP9kSVCStream) {
-  video_decoder_->SetDecoderType(media::VideoDecoderType::kD3D11);
-  ASSERT_TRUE(BasicSetup());
-  SetSpatialIndex(2);
-  EXPECT_CALL(*video_decoder_, Decode_(_, _))
-      .WillOnce(
-          base::test::RunOnceCallback<1>(media::DecoderStatus::Codes::kOk));
-
-  ASSERT_EQ(Decode(0), WEBRTC_VIDEO_CODEC_OK);
-
-  EXPECT_CALL(decoded_cb_, Run(_));
-  FinishDecode(0);
-  media_thread_.FlushForTesting();
-}
-#elif !(defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS))
+#if !(defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS))
 // ChromeOS has the ability to decode VP9 kSVC Stream. Other cases should
 // fallback to sw decoder.
 TEST_F(RTCVideoDecoderAdapterTest,
@@ -847,7 +829,7 @@ TEST_F(RTCVideoDecoderAdapterTest,
 
   media_thread_.FlushForTesting();
 }
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // !(defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS))
 
 TEST_F(RTCVideoDecoderAdapterTest, FallbackToSWInAV1SVC) {
   SetSdpFormat(webrtc::SdpVideoFormat(

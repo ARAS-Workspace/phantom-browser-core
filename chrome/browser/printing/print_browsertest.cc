@@ -102,12 +102,6 @@
 #include "chrome/services/printing/public/mojom/print_backend_service.mojom.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "printing/printing_utils.h"
-#include "sandbox/policy/features.h"
-#include "sandbox/policy/switches.h"
-#endif
-
 namespace printing {
 
 using testing::_;
@@ -534,15 +528,6 @@ void PrintBrowserTest::SetPrinterNameForSubsequentContexts(
   test_printing_context_factory_.SetPrinterNameForSubsequentContexts(
       printer_name);
 }
-
-#if BUILDFLAG(IS_WIN)
-void PrintBrowserTest::SetPrinterLanguageTypeForSubsequentContexts(
-    mojom::PrinterLanguageType printer_language_type) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  test_printing_context_factory_.SetPrinterLanguageTypeForSubsequentContexts(
-      printer_language_type);
-}
-#endif
 
 void PrintBrowserTest::SetUserSettingsPageRangesForSubsequentContext(
     const PageRanges& page_ranges) {
@@ -2170,40 +2155,5 @@ IN_PROC_BROWSER_TEST_F(PrintFencedFrameBrowserTest, DocumentExecCommand) {
 IN_PROC_BROWSER_TEST_F(PrintFencedFrameBrowserTest, BrowserPrint) {
   RunPrintTest();
 }
-
-#if BUILDFLAG(IS_WIN)
-// Demonstrate that the Print Compositor still works using the legacy sandbox
-// method, should the `kPrintCompositorLPAC` flag be disabled.
-// TODO(crbug.com/40283514):  Remove once LPAC sandboxing has been proven to
-// work even for GDI.
-class PrintCompositorLegacySandboxBrowserTest : public PrintBrowserTest {
-  void SetUp() override {
-    std::vector<base::test::FeatureRef> disabled_features;
-
-    disabled_features.push_back(
-        sandbox::policy::features::kPrintCompositorLPAC);
-
-    scoped_feature_list_.InitWithFeatures(/*enabled_features=*/{},
-                                          disabled_features);
-    PrintBrowserTest::SetUp();
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(PrintCompositorLegacySandboxBrowserTest,
-                       WindowDotPrint) {
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  TestPrintPreviewObserver print_preview_observer(/*wait_for_loaded=*/true);
-  content::ExecuteScriptAsync(web_contents->GetPrimaryMainFrame(),
-                              "window.print();");
-  print_preview_observer.WaitUntilPreviewIsReady();
-
-  EXPECT_TRUE(print_preview_observer.did_composite_pdf_document());
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace printing

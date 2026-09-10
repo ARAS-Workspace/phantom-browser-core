@@ -352,7 +352,7 @@ IN_PROC_BROWSER_TEST_P(SingleClientContactInfoPassphraseSyncTest,
 }
 
 // Transport Mode is only supported on these platforms.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // CONTACT_INFO should be able to run in transport mode and the availability of
 // account profiles should depend on the signed-in state.
 IN_PROC_BROWSER_TEST_P(SingleClientContactInfoSyncTest, TransportMode) {
@@ -460,7 +460,7 @@ IN_PROC_BROWSER_TEST_P(SingleClientContactInfoSyncTest, AuthErrorState) {
                   ->address_data_manager()
                   .IsEligibleForAddressAccountStorage());
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_P(SingleClientContactInfoSyncTest,

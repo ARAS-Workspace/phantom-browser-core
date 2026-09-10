@@ -2708,7 +2708,6 @@ TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
   run_loop.Run();
 }
 
-#if !BUILDFLAG(IS_WIN)
 TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
        TrustedSourcesPolicyTrusted) {
   base::CommandLine* command_line(base::CommandLine::ForCurrentProcess());
@@ -2771,7 +2770,6 @@ TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,
   policy::SetDMTokenForTesting(policy::DMToken::CreateEmptyToken());
 }
 #endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
-#endif  // !BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeDownloadManagerDelegateTestWithSafeBrowsing,

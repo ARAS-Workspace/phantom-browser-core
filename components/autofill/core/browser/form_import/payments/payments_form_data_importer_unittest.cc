@@ -1771,7 +1771,7 @@ TEST_F(PaymentsFormDataImporterTest,
 }
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 // Test that in the case where the MandatoryReauthManager denotes we should not
 // offer re-auth opt-in, we do not start the opt-in flow.
 TEST_F(PaymentsFormDataImporterTest,
@@ -1916,7 +1916,7 @@ TEST_F(PaymentsFormDataImporterTest,
           .payment_method_type_if_non_interactive_authentication_flow_completed()
           .has_value());
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 
 // Test that ProceedWithSavingIfApplicable gets called for server cards with the
 // correct pre-requisites set.

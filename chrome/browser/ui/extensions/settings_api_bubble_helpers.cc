@@ -36,8 +36,7 @@ namespace {
 // Whether the NTP post-install UI is enabled. By default, this is limited to
 // Windows, Mac, ChromeOS, and Desktop Android but can be overridden for
 // testing.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 bool g_ntp_post_install_ui_enabled = true;
 #else
 bool g_ntp_post_install_ui_enabled = false;
@@ -108,7 +107,7 @@ void RegisterSettingsOverriddenUiPrefs(PrefRegistrySimple* registry) {
 void MaybeShowExtensionControlledHomeNotification(
     BrowserWindowInterface* browser,
     content::WebContents* web_contents) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   auto* profile = browser->GetProfile();
   auto bubble_delegate =
       std::make_unique<ControlledHomeDialogController>(profile, web_contents);
@@ -125,7 +124,7 @@ void MaybeShowExtensionControlledHomeNotification(
 void MaybeShowExtensionControlledSearchNotification(
     content::WebContents* web_contents,
     AutocompleteMatch::Type match_type) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (!AutocompleteMatch::IsSearchType(match_type) ||
       match_type == AutocompleteMatchType::SEARCH_OTHER_ENGINE) {
     return;

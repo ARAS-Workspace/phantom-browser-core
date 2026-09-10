@@ -65,10 +65,7 @@ static const char kCustomThemeName[] = "name";
 static const char kCustomThemeUrl[] = "http://update.url/foo";
 constexpr char kTestUrl[] = "https://www.foo.com";
 
-#if BUILDFLAG(IS_WIN)
-const base::FilePath::CharType kExtensionFilePath[] =
-    FILE_PATH_LITERAL("c:\\foo");
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 const base::FilePath::CharType kExtensionFilePath[] = FILE_PATH_LITERAL("/oo");
 #else
 #error "Unknown platform"

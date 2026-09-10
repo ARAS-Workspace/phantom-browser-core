@@ -68,10 +68,6 @@ void InitializeTimeout(const char* switch_name,
 #endif
 #elif BUILDFLAG(CFI_DIAG)
   constexpr int kTimeoutMultiplier = 3;
-#elif defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_WIN)
-  // ASan/Win has not been optimized yet, give it a higher
-  // timeout multiplier. See http://crbug.com/412471
-  constexpr int kTimeoutMultiplier = 3;
 #elif defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_CHROMEOS)
   // Typical slowdown for memory sanitizer is 2x.
   constexpr int kTimeoutMultiplier = 2 * kAshBaseMultiplier;

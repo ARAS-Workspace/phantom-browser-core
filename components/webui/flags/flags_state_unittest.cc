@@ -543,11 +543,7 @@ TEST_F(FlagsStateTest, RegisterAllFeatureVariationParametersWithDefaultTrials) {
 }
 
 base::CommandLine::StringType CreateSwitch(const std::string& value) {
-#if BUILDFLAG(IS_WIN)
-  return base::ASCIIToWide(value);
-#else
   return value;
-#endif
 }
 
 TEST_F(FlagsStateTest, RemoveFlagSwitches) {
@@ -711,24 +707,14 @@ TEST_F(FlagsStateTest, CheckValues) {
   // Confirm that there is no '=' in the command line for simple switches.
   std::string switch1_with_equals =
       std::string("--") + std::string(kSwitch1) + std::string("=");
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(std::wstring::npos, command_line.GetCommandLineString().find(
-                                    base::ASCIIToWide(switch1_with_equals)));
-#else
   EXPECT_EQ(std::string::npos,
             command_line.GetCommandLineString().find(switch1_with_equals));
-#endif
 
   // And confirm there is a '=' for switches with values.
   std::string switch2_with_equals =
       std::string("--") + std::string(kSwitch2) + std::string("=");
-#if BUILDFLAG(IS_WIN)
-  EXPECT_NE(std::wstring::npos, command_line.GetCommandLineString().find(
-                                    base::ASCIIToWide(switch2_with_equals)));
-#else
   EXPECT_NE(std::string::npos,
             command_line.GetCommandLineString().find(switch2_with_equals));
-#endif
 
   // And it should persist.
   const base::ListValue& entries_list =

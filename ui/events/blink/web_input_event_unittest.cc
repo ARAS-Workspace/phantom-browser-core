@@ -88,12 +88,6 @@ TEST(WebInputEventTest, TestMakeWebKeyboardEventWindowsKeyCode) {
     blink::WebKeyboardEvent webkit_event = MakeWebKeyboardEvent(event);
     EXPECT_EQ(VKEY_CONTROL, webkit_event.windows_key_code);
   }
-#if BUILDFLAG(IS_WIN)
-// TODO(yusukes): Add tests for win_aura once keyboardEvent() in
-// third_party/WebKit/Source/web/win/WebInputEventFactory.cpp is modified
-// to return VKEY_[LR]XXX instead of VKEY_XXX.
-// https://bugs.webkit.org/show_bug.cgi?id=86694
-#endif
 }
 
 // Checks that MakeWebKeyboardEvent fills a correct keypad modifier.
@@ -618,24 +612,6 @@ TEST(WebInputEventTest, MousePointerEvent) {
     ASSERT_EQ(tests[i].screen_location.y(), web_event.PositionInScreen().y());
   }
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST(WebInputEventTest, MouseLeaveScreenCoordinate) {
-  CHROME_MSG msg_event = {nullptr, WM_MOUSELEAVE, 0, MAKELPARAM(300, 200)};
-  ::SetCursorPos(250, 350);
-  ui::MouseEvent ui_event(msg_event);
-
-  blink::WebMouseEvent web_event = MakeWebMouseEvent(ui_event);
-  ASSERT_EQ(blink::WebInputEvent::Type::kMouseLeave, web_event.GetType());
-
-  // WM_MOUSELEAVE events take coordinates from cursor position instead of
-  // LPARAM.
-  ASSERT_EQ(250, web_event.PositionInWidget().x());
-  ASSERT_EQ(350, web_event.PositionInWidget().y());
-  ASSERT_EQ(250, web_event.PositionInScreen().x());
-  ASSERT_EQ(350, web_event.PositionInScreen().y());
-}
-#endif
 
 TEST(WebInputEventTest, MouseMoveUnadjustedMovement) {
   gfx::PointF cursor_pos(123, 456);

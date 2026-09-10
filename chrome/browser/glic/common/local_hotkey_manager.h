@@ -50,10 +50,6 @@ class LocalHotkeyManager : public ui::AcceleratorTarget {
     kZoomReset,
     // Capture a region of the screen.
     kCaptureRegion,
-#if BUILDFLAG(IS_WIN)
-    // Show the title bar context menu
-    kTitleBarContextMenu,
-#endif
     // Toggle the Glic panel.
     kPanelToggle,
   };
@@ -90,10 +86,6 @@ class LocalHotkeyManager : public ui::AcceleratorTarget {
         return "kZoomReset";
       case Command::kCaptureRegion:
         return "kCaptureRegion";
-#if BUILDFLAG(IS_WIN)
-      case Command::kTitleBarContextMenu:
-        return "kTitleBarContextMenu";
-#endif
       case Command::kPanelToggle:
         return "kPanelToggle";
     }

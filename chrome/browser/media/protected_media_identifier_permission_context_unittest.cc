@@ -88,7 +88,7 @@ TEST_F(ProtectedMediaIdentifierPermissionContextTest,
   ASSERT_TRUE(IsOriginAllowed(requesting_sub_domain_origin_));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 TEST_F(ProtectedMediaIdentifierPermissionContextTest,
        ProtectedMediaIdentifierOnDifferentProfiles) {
   ASSERT_FALSE(IsProtectedMediaIdentifierEnabled(
@@ -100,7 +100,7 @@ TEST_F(ProtectedMediaIdentifierPermissionContextTest,
   ASSERT_TRUE(IsProtectedMediaIdentifierEnabled(
       profile_testing_helper_.regular_profile()));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_CHROMEOS)
 TEST_F(ProtectedMediaIdentifierPermissionContextTest,

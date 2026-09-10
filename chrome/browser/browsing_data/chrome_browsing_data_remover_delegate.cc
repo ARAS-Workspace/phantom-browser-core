@@ -227,10 +227,6 @@
 #include "device/fido/cros/credential_store.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/media/cdm_document_service_impl.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 #include "chrome/browser/safe_browsing/safe_browsing_service.h"
 #endif
@@ -1246,11 +1242,6 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
         CreateTaskCompletionClosure(TracingDataType::kCdmLicenses));
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-    CdmDocumentServiceImpl::ClearCdmData(
-        profile_, delete_begin, delete_end, nullable_filter,
-        CreateTaskCompletionClosure(TracingDataType::kCdmLicenses));
-#endif  // BUILDFLAG(IS_WIN)
   }
 
   //////////////////////////////////////////////////////////////////////////////

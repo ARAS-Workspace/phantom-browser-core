@@ -51,18 +51,6 @@ void GpuHostImplTestApi::HookDelegateBase::DidUpdateGPUInfo(
   original_delegate_->DidUpdateGPUInfo(gpu_info);
 }
 
-#if BUILDFLAG(IS_WIN)
-void GpuHostImplTestApi::HookDelegateBase::DidUpdateOverlayInfo(
-    const gpu::OverlayInfo& overlay_info) {
-  original_delegate_->DidUpdateOverlayInfo(overlay_info);
-}
-
-void GpuHostImplTestApi::HookDelegateBase::DidUpdateDXGIInfo(
-    gfx::mojom::DXGIInfoPtr dxgi_info) {
-  original_delegate_->DidUpdateDXGIInfo(std::move(dxgi_info));
-}
-#endif
-
 void GpuHostImplTestApi::HookDelegateBase::BlockDomainsFrom3DAPIs(
     const std::set<GURL>& urls,
     gpu::DomainGuilt guilt) {

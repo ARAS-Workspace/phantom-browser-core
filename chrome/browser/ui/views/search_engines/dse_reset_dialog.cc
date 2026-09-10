@@ -33,7 +33,7 @@
 
 namespace search_engines {
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 namespace {
 
 const char kDefaultSearchEngineResetNotificationShown[] =
@@ -133,12 +133,12 @@ void ShowSearchEngineResetNotification(
 }
 
 }  // namespace
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 void MaybeShowSearchEngineResetNotification(
     Browser* browser,
     AutocompleteMatch::Type match_type) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // Ensure it is a non-navigation search query.
   if (!AutocompleteMatch::IsSearchType(match_type)) {
     return;
@@ -171,7 +171,7 @@ void MaybeShowSearchEngineResetNotification(
   }
 
   ShowSearchEngineResetNotification(browser, default_search_engine);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 }
 
 }  // namespace search_engines

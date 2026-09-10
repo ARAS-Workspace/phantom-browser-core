@@ -16,10 +16,6 @@ COMPONENT_EXPORT(PRINT_BACKEND) extern const char kValueTrue[];
 COMPONENT_EXPORT(PRINT_BACKEND) extern const char kPrinterStatus[];
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-COMPONENT_EXPORT(PRINT_BACKEND) extern const char kLocationTagName[];
-#endif
-
 #if BUILDFLAG(USE_CUPS)
 COMPONENT_EXPORT(PRINT_BACKEND) extern const char kDriverInfoTagName[];
 COMPONENT_EXPORT(PRINT_BACKEND) extern const char kDriverNameTagName[];

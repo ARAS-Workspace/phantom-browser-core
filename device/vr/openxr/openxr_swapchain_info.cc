@@ -11,10 +11,7 @@
 
 namespace device {
 
-#if BUILDFLAG(IS_WIN)
-OpenXrSwapchainInfo::OpenXrSwapchainInfo(ID3D11Texture2D* d3d11_texture)
-    : d3d11_texture(d3d11_texture) {}
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 OpenXrSwapchainInfo::OpenXrSwapchainInfo(uint32_t texture)
     : openxr_texture(texture) {}
 #endif

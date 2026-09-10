@@ -547,50 +547,29 @@ class ExtensionUninstallDialogImplInteractiveBrowserTest
   ExtensionOrigin extension_origin_;
 };
 
-#if BUILDFLAG(IS_WIN)
-// TODO(crbug.com/40069124): Enable the test again.
-#define MAYBE_InvokeUi_ManualUninstall DISABLED_InvokeUi_ManualUninstall
-#else
 #define MAYBE_InvokeUi_ManualUninstall InvokeUi_ManualUninstall
-#endif
 IN_PROC_BROWSER_TEST_F(ExtensionUninstallDialogImplInteractiveBrowserTest,
                        MAYBE_InvokeUi_ManualUninstall) {
   RunTest(MANUAL_UNINSTALL, EXTENSION_LOCAL_SOURCE);
 }
 
 // TODO(crbug.com/40926539): Re-enable this test
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_InvokeUi_ManualUninstallShowReportAbuse \
-  DISABLED_InvokeUi_ManualUninstallShowReportAbuse
-#else
 #define MAYBE_InvokeUi_ManualUninstallShowReportAbuse \
   InvokeUi_ManualUninstallShowReportAbuse
-#endif
 IN_PROC_BROWSER_TEST_F(ExtensionUninstallDialogImplInteractiveBrowserTest,
                        MAYBE_InvokeUi_ManualUninstallShowReportAbuse) {
   RunTest(MANUAL_UNINSTALL, EXTENSION_FROM_WEBSTORE);
 }
 
-#if BUILDFLAG(IS_WIN)
-// TODO(crbug.com/40069124): Enable the test again.
-#define MAYBE_InvokeUi_UninstallByExtension \
-  DISABLED_InvokeUi_UninstallByExtension
-#else
 #define MAYBE_InvokeUi_UninstallByExtension InvokeUi_UninstallByExtension
-#endif
 IN_PROC_BROWSER_TEST_F(ExtensionUninstallDialogImplInteractiveBrowserTest,
                        MAYBE_InvokeUi_UninstallByExtension) {
   RunTest(UNINSTALL_BY_EXTENSION, EXTENSION_LOCAL_SOURCE);
 }
 
 // TODO(crbug.com/40926539): Fix flakiness and re-enable this test.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_InvokeUi_UninstallByExtensionShowReportAbuse \
-  DISABLED_InvokeUi_UninstallByExtensionShowReportAbuse
-#else
 #define MAYBE_InvokeUi_UninstallByExtensionShowReportAbuse \
   InvokeUi_UninstallByExtensionShowReportAbuse
-#endif
 IN_PROC_BROWSER_TEST_F(ExtensionUninstallDialogImplInteractiveBrowserTest,
                        MAYBE_InvokeUi_UninstallByExtensionShowReportAbuse) {
   RunTest(UNINSTALL_BY_EXTENSION, EXTENSION_FROM_WEBSTORE);

@@ -33,8 +33,7 @@ constexpr XrView kDefaultView{
     /*pose=*/{{0, 0, 0, 1}, {0, 0, 0}},
     /*fov=*/{kDefaultFov, kDefaultFov, kDefaultFov, kDefaultFov}};
 
-// TODO(crbug.com/529457611): Windows does not support framebuffer scaling.
-constexpr bool kSupportsViewportScaling = !BUILDFLAG(IS_WIN);
+constexpr bool kSupportsViewportScaling = true;
 
 constexpr base::ByteSize kLowMemoryThreshold = base::GiBU(8);
 constexpr double kLowMemoryDefaultMaxScaleFactor = 1.5f;

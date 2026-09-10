@@ -743,11 +743,7 @@ TEST_F(AudioOutputResamplerTest, HighLatencyFallbackFailed) {
 
 // Only Windows has a high latency output driver that is not the same as the low
 // latency path.
-#if BUILDFLAG(IS_WIN)
-  static const int kFallbackCount = 2;
-#else
   static const int kFallbackCount = 1;
-#endif
   EXPECT_CALL(manager(), MakeAudioOutputStream(_, _, _))
       .Times(kFallbackCount)
       .WillRepeatedly(Return(static_cast<AudioOutputStream*>(NULL)));
@@ -779,11 +775,7 @@ TEST_F(AudioOutputResamplerTest, HighLatencyFallbackFailed) {
 TEST_F(AudioOutputResamplerTest, AllFallbackFailed) {
 // Only Windows has a high latency output driver that is not the same as the low
 // latency path.
-#if BUILDFLAG(IS_WIN)
-  static const int kFallbackCount = 3;
-#else
   static const int kFallbackCount = 2;
-#endif
   EXPECT_CALL(manager(), MakeAudioOutputStream(_, _, _))
       .Times(kFallbackCount)
       .WillRepeatedly(Return(static_cast<AudioOutputStream*>(NULL)));
@@ -857,11 +849,7 @@ TEST_F(AudioOutputResamplerTest, FallbackRecovery) {
   MockAudioOutputStream fake_stream(&manager_, params_);
 
   // Trigger the fallback mechanism until a fake output stream is created.
-#if BUILDFLAG(IS_WIN)
-  static const int kFallbackCount = 2;
-#else
   static const int kFallbackCount = 1;
-#endif
   EXPECT_CALL(manager(), MakeAudioOutputStream(_, _, _))
       .Times(kFallbackCount)
       .WillRepeatedly(Return(static_cast<AudioOutputStream*>(NULL)));

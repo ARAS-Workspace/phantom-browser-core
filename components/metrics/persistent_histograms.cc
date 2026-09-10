@@ -50,48 +50,6 @@ bool IsSpareFileRequired() {
 #endif
 }
 
-#if BUILDFLAG(IS_WIN)
-
-// Windows sometimes creates files of the form MyFile.pma~RF71cb1793.TMP
-// when trying to rename a file to something that exists but is in-use, and
-// then fails to remove them. See https://crbug.com/934164
-void DeleteOldWindowsTempFiles(const base::FilePath& dir) {
-  // Look for any temp files older than one day and remove them. The time check
-  // ensures that nothing in active transition gets deleted; these names only
-  // exists on the order of milliseconds when working properly so "one day" is
-  // generous but still ensures no big build up of these files. This is an
-  // I/O intensive task so do it in the background (enforced by "file" calls).
-  base::Time one_day_ago = base::Time::Now() - base::Days(1);
-  base::FileEnumerator file_iter(dir, /*recursive=*/false,
-                                 base::FileEnumerator::FILES);
-  for (base::FilePath path = file_iter.Next(); !path.empty();
-       path = file_iter.Next()) {
-    if (base::ToUpperASCII(path.FinalExtension()) !=
-            FILE_PATH_LITERAL(".TMP") ||
-        base::ToUpperASCII(path.BaseName().value())
-                .find(FILE_PATH_LITERAL(".PMA~RF")) < 0) {
-      continue;
-    }
-
-    const auto& info = file_iter.GetInfo();
-    if (info.IsDirectory()) {
-      continue;
-    }
-    if (info.GetLastModifiedTime() > one_day_ago) {
-      continue;
-    }
-
-    base::DeleteFile(path);
-  }
-}
-
-// How much time after startup to run the above function. Two minutes is
-// enough for the system to stabilize and get the user what they want before
-// spending time on clean-up efforts.
-constexpr base::TimeDelta kDeleteOldWindowsTempFilesDelay = base::Minutes(2);
-
-#endif  // BUILDFLAG(IS_WIN)
-
 // Create persistent/shared memory and allow histograms to be stored in
 // it. Memory that is not actually used won't be physically mapped by the
 // system. BrowserMetrics usage, as reported in UMA, has the 99.99
@@ -284,19 +242,6 @@ void PersistentHistogramsCleanup(const base::FilePath& metrics_dir) {
           std::move(spare_file), kAllocSize),
       base::Seconds(kSpareFileCreateDelaySeconds));
 
-#if BUILDFLAG(IS_WIN)
-  // Post a best effort task that will delete files. Unlike SKIP_ON_SHUTDOWN,
-  // which will block on the deletion if the task already started,
-  // CONTINUE_ON_SHUTDOWN will not block shutdown on the task completing. It's
-  // not a *necessity* to delete the files the same session they are "detected".
-  // On shutdown, the deletion will be interrupted.
-  base::ThreadPool::PostDelayedTask(
-      FROM_HERE,
-      {base::MayBlock(), base::TaskPriority::BEST_EFFORT,
-       base::TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN},
-      base::BindOnce(&DeleteOldWindowsTempFiles, metrics_dir),
-      kDeleteOldWindowsTempFilesDelay);
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 void InstantiatePersistentHistogramsWithFeaturesAndCleanup(

@@ -65,10 +65,6 @@ namespace embedder_support {
 class OriginTrialsSettingsStorage;
 }  // namespace embedder_support
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/win/isolated_browser_support.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace extensions {
 class ExtensionsBrowserClient;
 }
@@ -217,7 +213,7 @@ class BrowserProcessImpl : public BrowserProcess,
 
   StartupData* startup_data() override;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   void StartAutoupdateTimer() override;
 #endif
 
@@ -288,12 +284,6 @@ class BrowserProcessImpl : public BrowserProcess,
 
   // ApplicationLocaleStorage callback
   void OnLocaleChanged(const std::string& new_locale);
-
-#if BUILDFLAG(IS_WIN)
-  void UpdateProcessIsolationState();
-  void OnProcessIsolationStateSet(
-      base::expected<chrome::IsolationState, HRESULT> result);
-#endif  // BUILDFLAG(IS_WIN)
 
   // Methods called to control our lifetime. The browser process can be "pinned"
   // to make sure it keeps running.
@@ -435,7 +425,7 @@ class BrowserProcessImpl : public BrowserProcess,
 
   std::unique_ptr<BatteryMetrics> battery_metrics_;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   base::RepeatingTimer autoupdate_timer_;
 
   // Gets called by autoupdate timer to see if browser needs restart and can be
@@ -444,7 +434,7 @@ class BrowserProcessImpl : public BrowserProcess,
   bool IsRunningInBackground() const;
   void OnPendingRestartResult(bool is_update_pending_restart);
   void RestartBackgroundInstance();
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
   std::unique_ptr<activity_reporter::ActivityReporter> activity_reporter_;
 

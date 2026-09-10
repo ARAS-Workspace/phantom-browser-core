@@ -28,10 +28,6 @@ namespace {
 bool IsComponentSupported() {
 #if BUILDFLAG(IS_CHROMEOS)
   return true;
-#elif BUILDFLAG(IS_WIN)
-  // Key Distribution component is necessary for full IWAs support as it
-  // involves the IWA allowlist necessary to install IWAs in prod...
-  return base::FeatureList::IsEnabled(features::kIsolatedWebApps);
 #elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // ...however, on Mac/Linux, the component logic is not fully supported. A
   // separate flag enables developing and testing both: IWAs and the component

@@ -164,7 +164,7 @@ INSTANTIATE_TEST_SUITE_P(
                             version_info::Channel::DEV,
                             /*is_extended_stable=*/false,
                             /*posix_data_dir_suffix=*/"-unstable")));
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 INSTANTIATE_TEST_SUITE_P(
     Canary,
     ChannelInfoTest,
@@ -184,8 +184,7 @@ INSTANTIATE_TEST_SUITE_P(
                             version_info::Channel::CANARY,
                             /*is_extended_stable=*/false,
                             /*posix_data_dir_suffix=*/"-canary")));
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)  ||
-        // BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC)
 #else   // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 INSTANTIATE_TEST_SUITE_P(
     Chromium,

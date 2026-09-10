@@ -142,14 +142,6 @@
 #include "device/fido/mac/scoped_touch_id_test_environment.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "content/public/test/test_browser_context.h"
-#include "device/fido/fido_test_data.h"
-#include "device/fido/win/fake_webauthn_api.h"
-#include "device/fido/win/util.h"
-#include "third_party/microsoft_webauthn/src/webauthn.h"  // nogncheck
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chromeos/dbus/tpm_manager/tpm_manager_client.h"
 #include "chromeos/dbus/u2f/u2f_client.h"
@@ -1111,31 +1103,6 @@ TEST_F(AuthenticatorImplTest, GetAssertionResponseWithAttestedCredentialData) {
       AuthenticatorGetAssertionAndWaitForTimeout(std::move(options)).status,
       AuthenticatorStatus::NOT_ALLOWED_ERROR);
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(AuthenticatorImplTest, Win_IsUVPAA) {
-  virtual_device_factory_->set_discover_win_webauthn_api_authenticator(true);
-  NavigateAndCommit(GURL(kTestOrigin1));
-  mojo::Remote<blink::mojom::Authenticator> authenticator =
-      ConnectToAuthenticator();
-
-  for (const bool enable_win_webauthn_api : {false, true}) {
-    SCOPED_TRACE(enable_win_webauthn_api ? "enable_win_webauthn_api"
-                                         : "!enable_win_webauthn_api");
-    for (const bool is_uvpaa : {false, true}) {
-      SCOPED_TRACE(is_uvpaa ? "is_uvpaa" : "!is_uvpaa");
-      for (bool is_off_the_record : {true, false}) {
-        SCOPED_TRACE(is_off_the_record ? "off the record" : "on the record");
-        static_cast<TestBrowserContext*>(GetBrowserContext())
-            ->set_is_off_the_record(is_off_the_record);
-        fake_win_webauthn_api_.set_available(enable_win_webauthn_api);
-        fake_win_webauthn_api_.set_is_uvpaa(is_uvpaa);
-        EXPECT_EQ(AuthenticatorIsUvpaa(), enable_win_webauthn_api && is_uvpaa);
-      }
-    }
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_CHROMEOS)
 TEST_F(AuthenticatorImplTest, IsUVPAA) {

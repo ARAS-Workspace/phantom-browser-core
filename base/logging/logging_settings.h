@@ -14,10 +14,6 @@
 #include "base/memory/raw_ptr.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#endif
-
 namespace logging {
 
 // A bitmask of potential logging destinations.
@@ -39,9 +35,7 @@ enum : uint32_t {
 // On POSIX platforms, where it may not even be possible to locate the
 // executable on disk, use stderr.
 // On Fuchsia, use the Fuchsia logging service.
-#if BUILDFLAG(IS_WIN)
-  LOG_DEFAULT = LOG_TO_FILE,
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   LOG_DEFAULT = LOG_TO_SYSTEM_DEBUG_LOG | LOG_TO_STDERR,
 #endif
 };
@@ -84,13 +78,6 @@ struct BASE_EXPORT LoggingSettings {
   raw_ptr<FILE> log_file = nullptr;
   // ChromeOS uses the syslog log format by default.
   LogFormat log_format = LogFormat::LOG_FORMAT_SYSLOG;
-#endif
-#if BUILDFLAG(IS_WIN)
-  // Contains an optional file that logs should be written to. If present,
-  // `log_file_path` will be ignored, and the logging system will take ownership
-  // of the HANDLE. If there's an error writing to this file, no fallback paths
-  // will be opened.
-  HANDLE log_file = nullptr;
 #endif
 };
 

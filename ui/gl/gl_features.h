@@ -26,13 +26,9 @@ GL_EXPORT bool UseCompositorClockVSyncInterval();
 GL_EXPORT BASE_DECLARE_FEATURE(kDefaultPassthroughCommandDecoder);
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 GL_EXPORT BASE_DECLARE_FEATURE(kFallbackToSWIfGLES3NotSupported);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_WIN)
-GL_EXPORT BASE_DECLARE_FEATURE(kUseCompositorClockVSyncInterval);
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
 // Controls whether 2-pixel even boundary alignment is enforced for YUV 4:2:0
@@ -76,12 +72,6 @@ GL_EXPORT bool IsSwiftShaderAllowed(const base::CommandLine* command_line);
 // --use-angle=swiftshader-webgl.
 GL_EXPORT bool IsSwiftShaderUsedForWebGLByCommandLine(
     const base::CommandLine* command_line);
-
-#if BUILDFLAG(IS_WIN)
-GL_EXPORT BASE_DECLARE_FEATURE(kAllowD3D11WarpFallback);
-
-GL_EXPORT BASE_DECLARE_FEATURE(kDCompOnD3D12);
-#endif
 
 GL_EXPORT bool IsWARPAllowed(const base::CommandLine* command_line);
 

@@ -31,10 +31,6 @@
 #include "components/bookmarks/common/bookmark_constants.h"
 #include "components/version_info/version_info.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/installer/util/install_util.h"
-#endif
-
 // Reconnaissance diagnostics. These are the first and most critical
 // diagnostic tests. Here we check for the existence of critical files.
 // TODO(cpu): Define if it makes sense to localize strings.
@@ -91,13 +87,7 @@ class InstallTypeTest : public DiagnosticsTest {
   InstallTypeTest& operator=(const InstallTypeTest&) = delete;
 
   bool ExecuteImpl(DiagnosticsModel::Observer* observer) override {
-#if BUILDFLAG(IS_WIN)
-    user_level_ = InstallUtil::IsPerUserInstall();
-    const char* type = user_level_ ? "User Level" : "System Level";
-    std::string install_type(type);
-#else
     std::string install_type("System Level");
-#endif  // BUILDFLAG(IS_WIN)
     RecordSuccess(install_type);
     g_install_type = this;
     return true;

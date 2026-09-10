@@ -540,14 +540,8 @@ TEST_F(MappableSharedImageVideoFramePoolTest, YV12Frame) {
   EXPECT_NE(software_frame.get(), frame.get());
   EXPECT_EQ(PIXEL_FORMAT_YV12, frame->format());
   EXPECT_TRUE(frame->HasSharedImage());
-#if BUILDFLAG(IS_WIN)
-  // Windows Direct Composition path only supports NV12 overlays.
-  EXPECT_FALSE(
-      frame->shared_image()->usage().Has(gpu::SHARED_IMAGE_USAGE_SCANOUT));
-#else
   EXPECT_TRUE(
       frame->shared_image()->usage().Has(gpu::SHARED_IMAGE_USAGE_SCANOUT));
-#endif
 }
 
 TEST_F(MappableSharedImageVideoFramePoolTest,

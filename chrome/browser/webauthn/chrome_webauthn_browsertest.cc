@@ -88,14 +88,6 @@
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/compiler_specific.h"
-#include "device/fido/win/authenticator.h"
-#include "device/fido/win/fake_webauthn_api.h"
-#include "device/fido/win/util.h"
-#include "device/fido/win/webauthn_api.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace {
 
 using ShadowedCredentials = ::webauthn::PasskeyModel::ShadowedCredentials;
@@ -143,22 +135,6 @@ static constexpr char kMakeCredentialWithHints[] = R"((() => {
   }}).then(c => 'webauthn: OK',
            e => 'error ' + e);
 })())";
-
-#if BUILDFLAG(IS_WIN)
-
-static constexpr char kGetAssertionWithHints[] = R"((() => {
-  let cred_id = new Uint8Array([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]);
-  return navigator.credentials.get({ publicKey: {
-    challenge: cred_id,
-    timeout: 10000,
-    hints: ["nonsense", "hybrid", "security-key", "hybrid", "nonsense"],
-    userVerification: 'discouraged',
-    allowCredentials: [{type: 'public-key', id: cred_id}],
-  }}).then(c => 'webauthn: OK',
-           e => 'error ' + e);
-})())";
-
-#endif  // BUILDFLAG(IS_WIN)
 
 std::string GetSignalUnknownCredentialScript(
     base::span<const uint8_t> credential_id) {
@@ -390,289 +366,6 @@ IN_PROC_BROWSER_TEST_F(WebAuthnBrowserTest, ChromeExtensions) {
           .ExtractString(),
       testing::HasSubstr("Public-key credentials are only available to"));
 }
-
-#if BUILDFLAG(IS_WIN)
-
-class WinWebAuthnBrowserTest
-    : public WebAuthnBrowserTest,
-      device::WinWebAuthnApiAuthenticator::TestObserver {
- public:
-  static constexpr char kMakeDiscoverableCredential[] = R"((() => {
-    return navigator.credentials.create({ publicKey: {
-      rp: { name: "" },
-      user: { id: new Uint8Array([0]), name: "foo", displayName: "" },
-      pubKeyCredParams: [{type: "public-key", alg: -7}],
-      challenge: new Uint8Array([0]),
-      timeout: 10000,
-      userVerification: 'discouraged',
-      authenticatorSelection: {
-        requireResidentKey: true,
-      },
-    }}).then(c => 'webauthn: OK',
-            e => 'error ' + e);
-  })())";
-
-  WinWebAuthnBrowserTest() {
-    scoped_feature_list_.InitWithFeatures({device::kWebAuthnHelloSignal},
-                                          /*disabled_features=*/{});
-  }
-
-  void SetUpOnMainThread() override {
-    WebAuthnBrowserTest::SetUpOnMainThread();
-    signal_unknown_credential_run_loop_ = std::make_unique<base::RunLoop>();
-    signal_all_accepted_credentials_run_loop_ =
-        std::make_unique<base::RunLoop>();
-    auto virtual_device_factory =
-        std::make_unique<device::test::VirtualFidoDeviceFactory>();
-    virtual_device_factory->set_discover_win_webauthn_api_authenticator(true);
-    auth_env_ =
-        std::make_unique<content::ScopedAuthenticatorEnvironmentForTesting>(
-            std::move(virtual_device_factory));
-    device::WinWebAuthnApiAuthenticator::SetGlobalObserverForTesting(this);
-  }
-
-  void TearDownOnMainThread() override {
-    device::WinWebAuthnApiAuthenticator::SetGlobalObserverForTesting(nullptr);
-    WebAuthnBrowserTest::TearDownOnMainThread();
-  }
-
-  void WaitForSignalUnknownCredential() {
-    signal_unknown_credential_run_loop_->Run();
-    signal_unknown_credential_run_loop_ = std::make_unique<base::RunLoop>();
-  }
-
-  void WaitForSignalAllAcceptedCredentials() {
-    signal_all_accepted_credentials_run_loop_->Run();
-    signal_all_accepted_credentials_run_loop_ =
-        std::make_unique<base::RunLoop>();
-  }
-
-  // device::WinWebAuthnApiAuthenticator::TestObserver:
-  void OnSignalUnknownCredential() override {
-    signal_unknown_credential_run_loop_->Quit();
-  }
-
-  void OnSignalAllAcceptedCredentials() override {
-    signal_all_accepted_credentials_run_loop_->Quit();
-  }
-
- protected:
-  std::unique_ptr<base::RunLoop> signal_unknown_credential_run_loop_;
-  std::unique_ptr<base::RunLoop> signal_all_accepted_credentials_run_loop_;
-  device::FakeWinWebAuthnApi win_api_;
-  device::WinWebAuthnApi::ScopedOverride win_webauthn_api_override_{&win_api_};
-  std::unique_ptr<content::ScopedAuthenticatorEnvironmentForTesting> auth_env_;
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-// Integration test for Large Blob on Windows.
-IN_PROC_BROWSER_TEST_F(WinWebAuthnBrowserTest, WinLargeBlob) {
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server_.GetURL("www.example.com", "/title1.html")));
-  win_api_.set_version(WEBAUTHN_API_VERSION_3);
-
-  constexpr char kMakeCredentialLargeBlob[] = R"(
-    let cred_id;
-    const blob = "blobby volley";
-    navigator.credentials.create({ publicKey: {
-      challenge: new TextEncoder().encode('climb a mountain'),
-      rp: { name: 'Acme' },
-      user: {
-        id: new TextEncoder().encode('1098237235409872'),
-        name: 'avery.a.jones@example.com',
-        displayName: 'Avery A. Jones'},
-      pubKeyCredParams: [{ type: 'public-key', alg: '-257'}],
-      authenticatorSelection: {
-         requireResidentKey: true,
-      },
-      extensions: { largeBlob: { support: 'required' } },
-    }}).then(cred => {
-      cred_id = cred.rawId;
-      if (!cred.getClientExtensionResults().largeBlob ||
-          !cred.getClientExtensionResults().largeBlob.supported) {
-        throw new Error('large blob not supported');
-      }
-      return navigator.credentials.get({ publicKey: {
-        challenge: new TextEncoder().encode('run a marathon'),
-        allowCredentials: [{type: 'public-key', id: cred_id}],
-        extensions: {
-          largeBlob: {
-            write: new TextEncoder().encode(blob),
-          },
-        },
-      }});
-    }).then(assertion => {
-      if (!assertion.getClientExtensionResults().largeBlob.written) {
-        throw new Error('large blob not written to');
-      }
-      return navigator.credentials.get({ publicKey: {
-        challenge: new TextEncoder().encode('solve p=np'),
-        allowCredentials: [{type: 'public-key', id: cred_id}],
-        extensions: {
-          largeBlob: {
-            read: true,
-          },
-        },
-      }});
-    }).then(assertion => {
-      if (new TextDecoder().decode(
-          assertion.getClientExtensionResults().largeBlob.blob) != blob) {
-        throw new Error('blob does not match');
-      }
-      return 'webauthn: OK';
-    }).catch(error => 'webauthn: ' + error.toString());)";
-
-  EXPECT_EQ(
-      "webauthn: OK",
-      content::EvalJs(browser()->tab_strip_model()->GetActiveWebContents(),
-                      kMakeCredentialLargeBlob));
-}
-
-// Integration test for signalUnknownCredentialId on Windows.
-IN_PROC_BROWSER_TEST_F(WinWebAuthnBrowserTest, WinSignalUnknownCredential) {
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server_.GetURL("www.example.com", "/title1.html")));
-  win_api_.set_version(WEBAUTHN_API_VERSION_4);
-  win_api_.set_supports_silent_discovery(true);
-
-  // Set up a Windows Hello passkey.
-  EXPECT_EQ(
-      "webauthn: OK",
-      content::EvalJs(browser()->tab_strip_model()->GetActiveWebContents(),
-                      kMakeDiscoverableCredential));
-  ASSERT_EQ(win_api_.registrations().size(), 1u);
-  const std::vector<uint8_t> credential_id =
-      win_api_.registrations().begin()->first;
-
-  // Signal the passkey as unknown, which should delete it.
-  EXPECT_EQ(
-      "webauthn: OK",
-      content::EvalJs(browser()->tab_strip_model()->GetActiveWebContents(),
-                      GetSignalUnknownCredentialScript(credential_id)));
-
-  WaitForSignalUnknownCredential();
-  EXPECT_TRUE(win_api_.registrations().empty());
-}
-
-// Integration test for signalAllAcceptedCredentials on Windows.
-IN_PROC_BROWSER_TEST_F(WinWebAuthnBrowserTest,
-                       WinSignalAllAcceptedCredentials) {
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server_.GetURL("www.example.com", "/title1.html")));
-  win_api_.set_version(WEBAUTHN_API_VERSION_4);
-  win_api_.set_supports_silent_discovery(true);
-
-  // Set up a Windows Hello passkey.
-  EXPECT_EQ(
-      "webauthn: OK",
-      content::EvalJs(browser()->tab_strip_model()->GetActiveWebContents(),
-                      kMakeDiscoverableCredential));
-  ASSERT_EQ(win_api_.registrations().size(), 1u);
-  const std::vector<uint8_t>& credential_id =
-      win_api_.registrations().begin()->first;
-  const std::vector<uint8_t>& user_id =
-      win_api_.registrations().begin()->second.user->id;
-
-  // Signal the passkey as known, which should keep it.
-  EXPECT_EQ(
-      "webauthn: OK",
-      content::EvalJs(browser()->tab_strip_model()->GetActiveWebContents(),
-                      GetSignalAllAcceptedCredentials(credential_id, user_id)));
-  WaitForSignalAllAcceptedCredentials();
-  EXPECT_EQ(win_api_.registrations().size(), 1u);
-
-  // Signal a different passkey as known, which should delete the existing one.
-  EXPECT_EQ("webauthn: OK",
-            content::EvalJs(
-                browser()->tab_strip_model()->GetActiveWebContents(),
-                GetSignalAllAcceptedCredentials(kCredentialID2, user_id)));
-  WaitForSignalAllAcceptedCredentials();
-  EXPECT_TRUE(win_api_.registrations().empty());
-}
-
-// Tests getting an assertion with an allow-list containing internal credentials
-// under simulated RDP on Windows 11.
-// Regression test for crbug.com/443001325.
-IN_PROC_BROWSER_TEST_F(WinWebAuthnBrowserTest, WinGetAssertionRdp) {
-  constexpr char kGetAssertionInternalCredID1234[] = R"((() => {
-    let cred_id = new Uint8Array([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]);
-    return navigator.credentials.get({ publicKey: {
-      challenge: cred_id,
-      timeout: 10000,
-      userVerification: 'discouraged',
-      allowCredentials: [{
-        type: 'public-key',
-        id: cred_id,
-        transports: ['internal']
-      }],
-    }}).then(c => 'webauthn: OK',
-            e => 'error ' + e);
-  })())";
-
-  device::fido::win::ScopedIsRdpSessionOverride rdp_override(true);
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server_.GetURL("www.example.com", "/title1.html")));
-  win_api_.set_version(WEBAUTHN_API_VERSION_4);
-  win_api_.set_is_uvpaa(true);
-  win_api_.set_supports_silent_discovery(true);
-  win_api_.set_simulate_rdp(true);
-  win_api_.InjectNonDiscoverableCredential(kCredentialID, "www.example.com");
-  EXPECT_EQ(
-      "webauthn: OK",
-      content::EvalJs(browser()->tab_strip_model()->GetActiveWebContents(),
-                      kGetAssertionInternalCredID1234));
-}
-
-IN_PROC_BROWSER_TEST_F(WinWebAuthnBrowserTest, MakeCredentialHints) {
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server_.GetURL("www.example.com", "/title1.html")));
-
-  for (int version :
-       std::vector{WEBAUTHN_API_VERSION_7, WEBAUTHN_API_VERSION_8}) {
-    SCOPED_TRACE(version);
-    win_api_.set_version(version);
-    EXPECT_EQ(
-        "webauthn: OK",
-        content::EvalJs(browser()->tab_strip_model()->GetActiveWebContents(),
-                        kMakeCredentialWithHints));
-    if (version == WEBAUTHN_API_VERSION_7) {
-      EXPECT_THAT(win_api_.last_hints(), testing::IsEmpty());
-    } else {
-      EXPECT_THAT(win_api_.last_hints(),
-                  testing::ElementsAre(
-                      testing::StrEq(WEBAUTHN_CREDENTIAL_HINT_HYBRID),
-                      testing::StrEq(WEBAUTHN_CREDENTIAL_HINT_SECURITY_KEY),
-                      testing::StrEq(WEBAUTHN_CREDENTIAL_HINT_HYBRID)));
-    }
-  }
-}
-
-IN_PROC_BROWSER_TEST_F(WinWebAuthnBrowserTest, GetAssertionHints) {
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), https_server_.GetURL("www.example.com", "/title1.html")));
-  win_api_.InjectNonDiscoverableCredential(kCredentialID, "www.example.com");
-
-  for (int version :
-       std::vector{WEBAUTHN_API_VERSION_7, WEBAUTHN_API_VERSION_8}) {
-    SCOPED_TRACE(version);
-    win_api_.set_version(version);
-    EXPECT_EQ(
-        "webauthn: OK",
-        content::EvalJs(browser()->tab_strip_model()->GetActiveWebContents(),
-                        kGetAssertionWithHints));
-    if (version == WEBAUTHN_API_VERSION_7) {
-      EXPECT_THAT(win_api_.last_hints(), testing::IsEmpty());
-    } else {
-      EXPECT_THAT(win_api_.last_hints(),
-                  testing::ElementsAre(
-                      testing::StrEq(WEBAUTHN_CREDENTIAL_HINT_HYBRID),
-                      testing::StrEq(WEBAUTHN_CREDENTIAL_HINT_SECURITY_KEY),
-                      testing::StrEq(WEBAUTHN_CREDENTIAL_HINT_HYBRID)));
-    }
-  }
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 IN_PROC_BROWSER_TEST_F(WebAuthnBrowserTest,
                        SignalUnknownCredentialGPMPasskeys) {
@@ -1860,9 +1553,6 @@ class WebAuthnUAFReproductionTest
       public AuthenticatorRequestDialogModel::Observer {
  public:
   WebAuthnUAFReproductionTest() {
-#if BUILDFLAG(IS_WIN)
-    win_api_.set_available(false);
-#endif
   }
   ~WebAuthnUAFReproductionTest() override = default;
 
@@ -1929,10 +1619,6 @@ class WebAuthnUAFReproductionTest
       raw_ptr<ChromeAuthenticatorRequestDelegate, DisableDanglingPtrDetection>>
       delegate_shown_future_;
   bool web_contents_deleted_ = false;
-#if BUILDFLAG(IS_WIN)
-  device::FakeWinWebAuthnApi win_api_;
-  device::WinWebAuthnApi::ScopedOverride win_webauthn_api_override_{&win_api_};
-#endif
 };
 
 IN_PROC_BROWSER_TEST_F(WebAuthnUAFReproductionTest, CancelUAF) {

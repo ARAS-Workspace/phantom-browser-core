@@ -453,11 +453,7 @@ class GcpInstallOverOldInstallTest : public GcpSetupTest,
 };
 
 // TODO: crbug.com/347201817 - Fix ODR violation.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_DoInstallOverOldInstall DISABLED_DoInstallOverOldInstall
-#else
 #define MAYBE_DoInstallOverOldInstall DoInstallOverOldInstall
-#endif
 TEST_P(GcpInstallOverOldInstallTest, MAYBE_DoInstallOverOldInstall) {
   logging::ResetEventSourceForTesting();
 
@@ -518,12 +514,7 @@ INSTANTIATE_TEST_SUITE_P(All,
                          ::testing::Values(0, 1));
 
 // TODO: crbug.com/347201817 - Fix ODR violation.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_DoInstallOverOldLockedInstall \
-  DISABLED_DoInstallOverOldLockedInstall
-#else
 #define MAYBE_DoInstallOverOldLockedInstall DoInstallOverOldLockedInstall
-#endif
 TEST_F(GcpSetupTest, MAYBE_DoInstallOverOldLockedInstall) {
   logging::ResetEventSourceForTesting();
 
@@ -558,11 +549,7 @@ TEST_F(GcpSetupTest, MAYBE_DoInstallOverOldLockedInstall) {
 }
 
 // TODO: crbug.com/347201817 - Fix ODR violation.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_LaunchGcpAfterInstall DISABLED_LaunchGcpAfterInstall
-#else
 #define MAYBE_LaunchGcpAfterInstall LaunchGcpAfterInstall
-#endif
 TEST_F(GcpSetupTest, MAYBE_LaunchGcpAfterInstall) {
   logging::ResetEventSourceForTesting();
 
@@ -616,11 +603,7 @@ class GcpInstallerTest : public GcpSetupTest,
                          public ::testing::WithParamInterface<int> {};
 
 // TODO: crbug.com/347201817 - Fix ODR violation.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_DoUninstall DISABLED_DoUninstall
-#else
 #define MAYBE_DoUninstall DoUninstall
-#endif
 TEST_P(GcpInstallerTest, MAYBE_DoUninstall) {
   int standalone_installer = GetParam();
 
@@ -673,11 +656,7 @@ TEST_P(GcpInstallerTest, MAYBE_DoUninstall) {
 INSTANTIATE_TEST_SUITE_P(All, GcpInstallerTest, ::testing::Values(0, 1));
 
 // TODO: crbug.com/347201817 - Fix ODR violation.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_DoUninstallWithExtension DISABLED_DoUninstallWithExtension
-#else
 #define MAYBE_DoUninstallWithExtension DoUninstallWithExtension
-#endif
 TEST_F(GcpSetupTest, MAYBE_DoUninstallWithExtension) {
   logging::ResetEventSourceForTesting();
 

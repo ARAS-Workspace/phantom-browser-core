@@ -213,7 +213,7 @@ class ReadAnythingOmniboxControllerBrowserTest
     std::vector<base::test::FeatureRef> enabled_features = {
         features::kReadAnythingOmniboxChip,
         feature_engagement::kIPHReadingModePageActionLabelFeature,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
         features::kWasmTtsEngineAutoInstallDisabled
 #endif
     };

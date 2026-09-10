@@ -325,7 +325,6 @@ TEST_F(MetricsStateManagerTest,
   EXPECT_EQ(client_info_load_count_, 1);
 }
 
-#if !BUILDFLAG(IS_WIN)
 TEST_F(MetricsStateManagerTest, ProvisionalClientId_PromotedToClientId) {
   // Force enable the creation of a provisional client ID on first run for
   // consistency between Chromium and Chrome builds.
@@ -418,7 +417,6 @@ TEST_F(MetricsStateManagerTest, ProvisionalClientId_PersistedAcrossFirstRuns) {
               provisional_client_id);
   }
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 TEST_F(MetricsStateManagerTest, LoadPrefs) {
   ClientInfo client_info;

@@ -12,7 +12,7 @@
 #include "components/ukm/ukm_recorder_impl.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 TEST(ChromeBrowserFieldTrialsTest, SamplingTrials) {
   TestingPrefServiceSimple local_state;
   ChromeBrowserFieldTrials chrome_browser_field_trials(&local_state);
@@ -57,4 +57,4 @@ TEST(ChromeBrowserFieldTrialsTest, SamplingTrials) {
   metrics::CreateFallbackUkmSamplingTrialIfNeeded(
       entropy_providers.default_entropy(), feature_list.get());
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)

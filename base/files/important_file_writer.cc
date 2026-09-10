@@ -45,19 +45,6 @@ namespace {
 
 constexpr auto kDefaultCommitInterval = Seconds(10);
 
-#if BUILDFLAG(IS_WIN)
-// This is how many times we will retry ReplaceFile on Windows.
-constexpr int kReplaceRetries = 5;
-
-// This is the result code recorded to ImportantFile.FileReplaceRetryCount if
-// ReplaceFile still fails. It should stay constant even if we change
-// kReplaceRetries.
-constexpr int kReplaceRetryFailure = 10;
-static_assert(kReplaceRetryFailure > kReplaceRetries, "No overlap allowed");
-
-constexpr auto kReplacePauseInterval = Milliseconds(100);
-#endif
-
 // Alternate representation of ReplaceFile results, recorded to
 // ImportantFile.FileReplaceResult.
 // These values are persisted to logs. Entries should not be renumbered and
@@ -99,35 +86,6 @@ void UmaHistogramReplaceResultWithSuffix(std::string_view histogram_suffix,
                           result);
 }
 
-#if BUILDFLAG(IS_WIN)
-void UmaHistogramRetryCountWithSuffix(std::string_view histogram_suffix,
-                                      int retry_count,
-                                      bool success) {
-  CHECK_LE(retry_count, kReplaceRetries);
-  auto result = success
-                    ? (retry_count > 0 ? ReplaceResult::kSuccessWithRetry
-                                       : ReplaceResult::kSuccessWithoutRetry)
-                    : ReplaceResult::kFailure;
-  UmaHistogramReplaceResultWithSuffix(histogram_suffix, result);
-
-  // We only retry on Windows
-  if (retry_count > 0) {
-    constexpr char kCountHistogramName[] =
-        "ImportantFile.FileReplaceRetryCount2";
-    if (histogram_suffix.empty()) {
-      UmaHistogramExactLinear(kCountHistogramName, retry_count,
-                              kReplaceRetries + 1);
-    } else {
-      UmaHistogramExactLinear(
-          base::JoinString({kCountHistogramName, histogram_suffix}, "."),
-          retry_count, kReplaceRetries + 1);
-    }
-    UmaHistogramExactLinear(base::JoinString({kCountHistogramName, "All"}, "."),
-                            retry_count, kReplaceRetries + 1);
-  }
-}
-#endif
-
 void UmaHistogramTimesWithSuffix(std::string_view histogram_name,
                                  std::string_view histogram_suffix,
                                  base::TimeDelta sample) {
@@ -163,19 +121,6 @@ void UmaHistogramCounts10MWithSuffix(std::string_view histogram_name,
 void DeleteTmpFileWithRetry(File tmp_file,
                             const FilePath& tmp_file_path,
                             int attempt = 0) {
-#if BUILDFLAG(IS_WIN)
-  // Mark the file for deletion when it is closed and then close it implicitly.
-  if (tmp_file.IsValid()) {
-    if (tmp_file.DeleteOnClose(true)) {
-      return;
-    }
-    // The file was opened with exclusive r/w access, so failures are primarily
-    // due to I/O errors or other phenomena out of the process's control. Go
-    // ahead and close the file. The call to DeleteFile below will basically
-    // repeat the above, but maybe it will somehow succeed.
-    tmp_file.Close();
-  }
-#endif
 
   // Retry every 250ms for up to two seconds. Metrics indicate that this is a
   // reasonable number of retries -- the failures after all attempts generally
@@ -280,15 +225,6 @@ bool ImportantFileWriter::WriteFileAtomicallyImpl(
     ImportantFileWriterCleaner::AddDirectory(path.DirName());
   }
 
-#if BUILDFLAG(IS_WIN) && DCHECK_IS_ON()
-  // In https://crbug.com/920174, we have cases where CreateTemporaryFileInDir
-  // hits a DCHECK because creation fails with no indication why. Pull the path
-  // onto the stack so that we can see if it is malformed in some odd way.
-  wchar_t path_copy[MAX_PATH];
-  base::wcslcpy(path_copy, path.value().c_str(), std::size(path_copy));
-  base::debug::Alias(path_copy);
-#endif  // BUILDFLAG(IS_WIN) && DCHECK_IS_ON()
-
 #if BUILDFLAG(IS_CHROMEOS)
   // On Chrome OS, chrome gets killed when it cannot finish shutdown quickly,
   // and this function seems to be one of the slowest shutdown steps.
@@ -349,40 +285,6 @@ bool ImportantFileWriter::WriteFileAtomicallyImpl(
   // doing its job without oplocks). Boost a background thread's priority on
   // Windows and close as late as possible to improve the chances that the other
   // software will lose the race.
-#if BUILDFLAG(IS_WIN)
-  DWORD last_error;
-  int retry_count = 0;
-  {
-    ScopedBoostPriority scoped_boost_priority(ThreadType::kPresentation);
-    tmp_file.Close();
-    result =
-        replace_file_callback.Run(tmp_file_path, path, &replace_file_error);
-    // Save and restore the last error code so that it's not polluted by the
-    // thread priority change.
-    last_error = ::GetLastError();
-    for (/**/; !result && retry_count < kReplaceRetries; ++retry_count) {
-      // The race condition between closing the temporary file and moving it
-      // gets hit on a regular basis on some systems
-      // (https://crbug.com/1099284), so we retry a few times before giving up.
-      PlatformThread::Sleep(kReplacePauseInterval);
-      result =
-          replace_file_callback.Run(tmp_file_path, path, &replace_file_error);
-      last_error = ::GetLastError();
-    }
-  }
-
-  // Log how many times we had to retry the ReplaceFile operation before it
-  // succeeded.
-  UmaHistogramRetryCountWithSuffix(histogram_suffix, retry_count, result);
-
-  // Log to an unsuffixed histogram as well. If we never succeeded then return a
-  // special value.
-  if (!result) {
-    retry_count = kReplaceRetryFailure;
-  }
-  UmaHistogramExactLinear("ImportantFile.FileReplaceRetryCount", retry_count,
-                          kReplaceRetryFailure);
-#else
   tmp_file.Close();
   result = replace_file_callback.Run(tmp_file_path, path, &replace_file_error);
   // Log the result of the ReplaceFile operation. In contrast with Windows,
@@ -390,15 +292,8 @@ bool ImportantFileWriter::WriteFileAtomicallyImpl(
   UmaHistogramReplaceResultWithSuffix(
       histogram_suffix,
       result ? ReplaceResult::kSuccessWithoutRetry : ReplaceResult::kFailure);
-#endif  // BUILDFLAG(IS_WIN)
 
   if (!result) {
-#if BUILDFLAG(IS_WIN)
-    // Restore the error code from ReplaceFile so that it will be available for
-    // the log message, otherwise failures in SetCurrentThreadType may be
-    // reported instead.
-    ::SetLastError(last_error);
-#endif
     DPLOG(WARNING) << "Failed to replace " << path << " with " << tmp_file_path;
     DeleteTmpFileWithRetry(File(), tmp_file_path);
   }

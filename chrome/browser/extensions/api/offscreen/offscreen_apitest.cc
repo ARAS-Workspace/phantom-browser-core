@@ -607,11 +607,7 @@ IN_PROC_BROWSER_TEST_F(OffscreenApiTest, LongLoadOffscreenDocument) {
 // when chrome.action is supported on desktop Android.
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 // TODO(crbug.com/40272130): Failing on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TabCaptureStreams DISABLED_TabCaptureStreams
-#else
 #define MAYBE_TabCaptureStreams TabCaptureStreams
-#endif
 IN_PROC_BROWSER_TEST_F(OffscreenApiTest, MAYBE_TabCaptureStreams) {
   const Extension* extension = LoadExtension(
       test_data_dir_.AppendASCII("offscreen/tab_capture_streams"));

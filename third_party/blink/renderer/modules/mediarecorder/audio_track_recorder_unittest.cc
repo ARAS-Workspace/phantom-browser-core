@@ -56,13 +56,6 @@
 #include "third_party/blink/renderer/platform/wtf/functional.h"
 #include "third_party/opus/src/include/opus.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <objbase.h>
-
-#include "media/gpu/windows/mf_audio_encoder.h"
-#define HAS_AAC_ENCODER 1
-#endif  //  BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_MAC) && BUILDFLAG(USE_PROPRIETARY_CODECS)
 #include "media/filters/mac/audio_toolbox_audio_encoder.h"
 #define HAS_AAC_ENCODER 1
@@ -106,9 +99,6 @@ class TestInterfaceFactory : public media::mojom::InterfaceFactory {
  public:
   TestInterfaceFactory() = default;
   ~TestInterfaceFactory() override {
-#if BUILDFLAG(IS_WIN)
-    ::CoUninitialize();
-#endif  // BUILDFLAG(IS_WIN)
   }
 
   void BindRequest(mojo::ScopedMessagePipeHandle handle) {
@@ -131,12 +121,6 @@ class TestInterfaceFactory : public media::mojom::InterfaceFactory {
 #if BUILDFLAG(IS_MAC)
     auto platform_audio_encoder =
         std::make_unique<media::AudioToolboxAudioEncoder>();
-#elif BUILDFLAG(IS_WIN)
-    HRESULT hr = ::CoInitializeEx(
-        nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-    DCHECK(SUCCEEDED(hr));
-    auto platform_audio_encoder = std::make_unique<media::MFAudioEncoder>(
-        blink::scheduler::GetSequencedTaskRunnerForTesting());
 #else
 #error "Unknown platform encoder."
 #endif
@@ -169,13 +153,6 @@ class TestInterfaceFactory : public media::mojom::InterfaceFactory {
                             media::CreateCdmStatus::kCdmNotSupported);
   }
 
-#if BUILDFLAG(IS_WIN)
-  void CreateMediaFoundationRenderer(
-      mojo::PendingRemote<media::mojom::MediaLog> media_log_remote,
-      mojo::PendingReceiver<media::mojom::Renderer> receiver,
-      mojo::PendingReceiver<media::mojom::MediaFoundationRendererExtension>
-          renderer_extension_receiver) override {}
-#endif  // BUILDFLAG(IS_WIN)
  private:
   mojo::Receiver<media::mojom::InterfaceFactory> receiver_{this};
   mojo::UniqueReceiverSet<media::mojom::AudioEncoder> audio_encoder_receivers_;
@@ -499,15 +476,6 @@ class AudioTrackRecorderTest : public testing::TestWithParam<ATRTestParams> {
     if (codec_ == media::AudioCodec::kPCM) {
       return desired_num_outputs;
     }
-
-#if HAS_AAC_ENCODER && BUILDFLAG(IS_WIN)
-    // The AAC encoder on Windows buffers two output frames. So, we need
-    // enough input to fill these buffers before we will receive output, if we
-    // haven't provided any other input.
-    if (first_input_ && codec_ == media::AudioCodec::kAAC) {
-      desired_num_outputs += 2;
-    }
-#endif  // HAS_AAC_ENCODER
 
     int inputs_per_output;
     if (codec_ == media::AudioCodec::kOpus) {

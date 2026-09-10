@@ -487,7 +487,7 @@ IN_PROC_BROWSER_TEST_P(MultiContentsViewUiTest, ActiveContentsViewHasFocus) {
 // is used to simulate tab switching scenarios using Tab Search
 // TODO(https://crbug.com/422941990): Flaky (times out) on Linux and Windows
 // debug bots.
-#if !defined(NDEBUG) && (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX))
+#if !defined(NDEBUG) && BUILDFLAG(IS_LINUX)
 #define MAYBE_TabChangeInSplitViewWithInactiveBrowserWindow \
   DISABLED_TabChangeInSplitViewWithInactiveBrowserWindow
 #else
@@ -520,8 +520,7 @@ IN_PROC_BROWSER_TEST_P(MultiContentsViewUiTest,
 // scenarios using Tab Search
 // TODO(https://crbug.com/422941990): Flaky (times out) on Linux and Windows
 // debug bots.
-#if (!defined(NDEBUG) && (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX))) || \
-    defined(THREAD_SANITIZER)
+#if (!defined(NDEBUG) && BUILDFLAG(IS_LINUX)) || defined(THREAD_SANITIZER)
 #define MAYBE_SwitchToSplitViewWithInactiveBrowserWindow \
   DISABLED_SwitchToSplitViewWithInactiveBrowserWindow
 #else
@@ -1124,7 +1123,7 @@ IN_PROC_BROWSER_TEST_P(MultiContentsViewOutlineHighlightUiTest,
 
 // TODO(crbug.com/414590951): There's limited support for testing drag and drop
 // on various platforms. These should be re-enabled as support is added.
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
 
 gfx::Point PointForDropTargetFromView(views::View* view) {
   return view->GetBoundsInScreen().right_center() - gfx::Vector2d(10, 0);
@@ -1357,4 +1356,4 @@ IN_PROC_BROWSER_TEST_P(MultiContentsViewBookmarkDragEntrypointsUiTest,
       DragMouseToWithoutWait(kMultiContentsViewElementId, PointForDropTarget()),
       WaitForDropTargetVisible());
 }
-#endif  // !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)

@@ -50,11 +50,7 @@ std::string MakeLabel(const char* test_name, const std::string& video_codec) {
 }  // namespace
 
 static const base::FilePath::CharType kFrameAnalyzerExecutable[] =
-#if BUILDFLAG(IS_WIN)
-    FILE_PATH_LITERAL("frame_analyzer.exe");
-#else
     FILE_PATH_LITERAL("frame_analyzer");
-#endif
 
 static const base::FilePath::CharType kCapturedYuvFileName[] =
     FILE_PATH_LITERAL("captured_video.yuv");
@@ -347,7 +343,7 @@ IN_PROC_BROWSER_TEST_P(WebRtcVideoQualityBrowserTest,
 // component build.
 // TODO(crbug.com/40100787): re-enable when flakiness is investigated, diagnosed
 // and resolved.
-#if BUILDFLAG(IS_WIN) || defined(COMPONENT_BUILD)
+#if defined(COMPONENT_BUILD)
 #define MAYBE_MANUAL_TestVideoQualityVp9 DISABLED_MANUAL_TestVideoQualityVp9
 #else
 #define MAYBE_MANUAL_TestVideoQualityVp9 MANUAL_TestVideoQualityVp9

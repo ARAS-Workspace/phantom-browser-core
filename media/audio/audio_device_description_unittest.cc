@@ -131,34 +131,6 @@ TEST(AudioDeviceDescriptionTest, GetDefaultDeviceName) {
       default_name + " - " + std::string(non_null_terminated_name));
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST(AudioDeviceDescriptionTest, GetCommunicationsDeviceName) {
-  auto communication_name =
-      AudioDeviceDescription::GetCommunicationsDeviceName();
-
-  // Passing an empty string should return `communication_name`.
-  EXPECT_EQ(AudioDeviceDescription::GetCommunicationsDeviceName(std::string()),
-            communication_name);
-  EXPECT_EQ(AudioDeviceDescription::GetCommunicationsDeviceName(""),
-            communication_name);
-
-  std::string real_device_name = "Real Device Name";
-
-  // `real_device_name` should be appended.
-  EXPECT_EQ(
-      AudioDeviceDescription::GetCommunicationsDeviceName(real_device_name),
-      communication_name + " - " + real_device_name);
-
-  std::string_view non_null_terminated_name =
-      std::string_view(real_device_name).substr(0, 11);
-
-  // Verify we properly handle a non-null terminated string_view.
-  EXPECT_EQ(AudioDeviceDescription::GetCommunicationsDeviceName(
-                non_null_terminated_name),
-            communication_name + " - " + std::string(non_null_terminated_name));
-}
-#endif
-
 TEST(AudioDeviceDescriptionTest, IsLoopbackDevice) {
   EXPECT_TRUE(AudioDeviceDescription::IsLoopbackDevice(
       AudioDeviceDescription::kLoopbackInputDeviceId));
@@ -177,12 +149,7 @@ TEST(AudioDeviceDescriptionTest, IsLoopbackDevice) {
 TEST(AudioDeviceDescriptionTest, IsApplicationLoopbackDevice) {
   EXPECT_TRUE(AudioDeviceDescription::IsApplicationLoopbackDevice(
       AudioDeviceDescription::kApplicationLoopbackDeviceId));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(AudioDeviceDescription::IsApplicationLoopbackDevice(
-      CreateApplicationLoopbackDeviceId(12345)));
-  EXPECT_TRUE(AudioDeviceDescription::IsApplicationLoopbackDevice(
-      CreateRestrictOwnAudioBrowserLoopbackDeviceId()));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_TRUE(AudioDeviceDescription::IsApplicationLoopbackDevice(
       CreateApplicationLoopbackDeviceId("org.chromium.Chromium",
                                         std::nullopt)));

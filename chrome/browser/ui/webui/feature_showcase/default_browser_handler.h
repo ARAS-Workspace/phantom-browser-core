@@ -18,19 +18,11 @@ class DefaultBrowserHandler
       mojo::PendingReceiver<feature_showcase::mojom::DefaultBrowserPageHandler>
           receiver);
 
-#if BUILDFLAG(IS_WIN)
-  using PinToTaskbarCallbackForTesting = base::OnceCallback<void(bool)>;
-#endif
-
   // Constructor for testing.
   DefaultBrowserHandler(
       mojo::PendingReceiver<feature_showcase::mojom::DefaultBrowserPageHandler>
           receiver,
       base::OnceClosure on_set_as_default_completed_callback
-#if BUILDFLAG(IS_WIN)
-      ,
-      PinToTaskbarCallbackForTesting on_pin_to_taskbar_callback
-#endif
   );
 
   DefaultBrowserHandler(const DefaultBrowserHandler&) = delete;
@@ -48,9 +40,6 @@ class DefaultBrowserHandler
   bool can_pin_ = false;
 
   base::OnceClosure on_set_as_default_completed_callback_for_testing_;
-#if BUILDFLAG(IS_WIN)
-  PinToTaskbarCallbackForTesting on_pin_to_taskbar_callback_for_testing_;
-#endif
 };
 
 #endif  // CHROME_BROWSER_UI_WEBUI_FEATURE_SHOWCASE_DEFAULT_BROWSER_HANDLER_H_

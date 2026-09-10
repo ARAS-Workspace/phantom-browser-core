@@ -20,10 +20,6 @@
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "mojo/public/cpp/system/message_pipe.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace IPC {
 
 scoped_refptr<base::SingleThreadTaskRunner> GetIOThreadTaskRunner();
@@ -44,9 +40,7 @@ class LockThreadAffinity {
 
  private:
   bool affinity_set_ok_;
-#if BUILDFLAG(IS_WIN)
-  DWORD_PTR old_affinity_;
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   cpu_set_t old_cpuset_;
 #endif
 };

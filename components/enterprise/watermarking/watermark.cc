@@ -30,9 +30,7 @@ constexpr double kMaxWatermarkBlockWidthToFontSizeRatio = 700.0 / 24.0;
 
 gfx::Font WatermarkFont(int font_size) {
   return gfx::Font(
-#if BUILDFLAG(IS_WIN)
-      "Segoe UI",
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
       "SF Pro Text",
 #elif BUILDFLAG(IS_LINUX)
       "Ubuntu",
@@ -45,7 +43,7 @@ gfx::Font WatermarkFont(int font_size) {
 }
 
 gfx::Font::Weight WatermarkFontWeight() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   return gfx::Font::Weight::SEMIBOLD;
 #else
   return gfx::Font::Weight::MEDIUM;

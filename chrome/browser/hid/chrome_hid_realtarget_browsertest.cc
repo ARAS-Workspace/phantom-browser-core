@@ -22,13 +22,11 @@ namespace {
 
 constexpr int kMicroBitVendorId = 0x0d28;
 constexpr int kMicroBitProductId = 0x0204;
-#if BUILDFLAG(IS_WIN)
-constexpr char16_t kMicroBit[] = u"CMSIS-DAP";
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 constexpr char16_t kMicroBit[] = u"BBC micro:bit CMSIS-DAP";
 #else
 constexpr char16_t kMicroBit[] = u"ARM BBC micro:bit CMSIS-DAP";
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 class RealTargetTestChooserView : public permissions::ChooserController::View {
  public:

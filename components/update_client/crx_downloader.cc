@@ -20,9 +20,6 @@
 #include "base/task/thread_pool.h"
 #include "base/trace_event/trace_event.h"
 #include "build/build_config.h"
-#if BUILDFLAG(IS_WIN)
-#include "components/update_client/background_downloader_win.h"
-#endif
 #include "base/containers/span.h"
 #include "base/containers/to_vector.h"
 #include "components/update_client/network.h"

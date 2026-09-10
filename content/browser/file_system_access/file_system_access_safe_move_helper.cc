@@ -364,18 +364,8 @@ void FileSystemAccessSafeMoveHelper::DidFileDoQuarantine(
                            std::move(quarantine_remote)),
             quarantine::mojom::QuarantineFileResult::ANNOTATION_FAILED));
   } else {
-#if BUILDFLAG(IS_WIN)
-    base::ThreadPool::PostTaskAndReplyWithResult(
-        FROM_HERE, {base::MayBlock()},
-        base::BindOnce(&quarantine::SetInternetZoneIdentifierDirectly,
-                       target_url.path(), authority_url, referrer_url),
-        base::BindOnce(&FileSystemAccessSafeMoveHelper::DidAnnotateFile,
-                       weak_factory_.GetWeakPtr(),
-                       std::move(quarantine_remote)));
-#else
     DidAnnotateFile(std::move(quarantine_remote),
                     quarantine::mojom::QuarantineFileResult::ANNOTATION_FAILED);
-#endif
   }
 }
 

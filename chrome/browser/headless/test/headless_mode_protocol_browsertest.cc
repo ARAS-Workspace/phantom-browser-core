@@ -262,11 +262,6 @@ class HeadlessModeScreencastTest : public HeadlessModeProtocolBrowserTest {
   void SetUpCommandLine(base::CommandLine* command_line) override {
     HeadlessModeProtocolBrowserTest::SetUpCommandLine(command_line);
 
-#if BUILDFLAG(IS_WIN)
-    // Screencast tests fail on Windows unless GPU compositing is disabled,
-    // see https://crbug.com/40255057 and https://crbug.com/40943029.
-    UseSoftwareCompositing();
-#endif
   }
 };
 

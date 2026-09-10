@@ -171,7 +171,7 @@ class TestingBrowserProcess
   DownloadRequestLimiter* download_request_limiter() override;
   StartupData* startup_data() override;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   void StartAutoupdateTimer() override {}
 #endif
 

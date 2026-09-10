@@ -35,12 +35,6 @@ std::optional<bool> IsUsingDefaultDataDirectory();
 // value for testing. Set to `std::nullopt` to restore the default behavior.
 void SetUsingDefaultUserDataDirectoryForTesting(std::optional<bool> is_default);
 
-#if BUILDFLAG(IS_WIN)
-// Get the path to the roaming user's data directory, regardless of whether
-// DIR_ROAMING_USER_DATA has been overridden by a command-line option.
-bool GetDefaultRoamingUserDataDirectory(base::FilePath* result);
-#endif
-
 // Get the path to the user's cache directory.  This is normally the
 // same as the profile directory, but on Linux it can also be
 // $XDG_CACHE_HOME and on Mac it can be under ~/Library/Caches.
@@ -53,7 +47,7 @@ void GetUserCacheDirectory(const base::FilePath& profile_dir, base::FilePath* re
 // Get the path to the user's documents directory.
 bool GetUserDocumentsDirectory(base::FilePath* result);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Gets the path to a safe default download directory for a user.
 bool GetUserDownloadsDirectorySafe(base::FilePath* result);
 #endif

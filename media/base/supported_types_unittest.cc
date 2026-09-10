@@ -12,9 +12,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
 
 namespace media {
 
@@ -193,8 +190,7 @@ TEST(SupportedTypesTest, IsDecoderSupportedVideoType_VP9Profiles) {
 // on ARM64. See third_party/libvpx/BUILD.gn.
 #if defined(ARCH_CPU_X86_FAMILY) ||                             \
     (defined(ARCH_CPU_ARM_FAMILY) && BUILDFLAG(IS_CHROMEOS)) || \
-    (defined(ARCH_CPU_ARM64) &&                                 \
-     (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)))
+    (defined(ARCH_CPU_ARM64) && (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)))
 
   EXPECT_TRUE(IsDecoderSupportedVideoType(
       {VideoCodec::kVP9, VP9PROFILE_PROFILE2, kUnspecifiedLevel, kColorSpace}));
@@ -302,12 +298,12 @@ TEST(SupportedTypesTest, XHE_AACSupported) {
 
   EXPECT_EQ(
 #if BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) && \
-    (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN))
+    (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC))
       kPropCodecsEnabled,
 #else
       false,
 #endif  // BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) && (BUILDFLAG(IS_ANDROID) ||
-        // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN))
+        // BUILDFLAG(IS_MAC))
       IsDecoderSupportedAudioType(aac));
 }
 
@@ -422,8 +418,7 @@ TEST(SupportedTypesTest, IsEncoderSupportedVideoType_VP9Profiles) {
 // on ARM64. See third_party/libvpx/BUILD.gn.
 #if defined(ARCH_CPU_X86_FAMILY) ||                             \
     (defined(ARCH_CPU_ARM_FAMILY) && BUILDFLAG(IS_CHROMEOS)) || \
-    (defined(ARCH_CPU_ARM64) &&                                 \
-     (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)))
+    (defined(ARCH_CPU_ARM64) && (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)))
 
   EXPECT_TRUE(
       IsEncoderSupportedVideoType({VideoCodec::kVP9, VP9PROFILE_PROFILE2}));
@@ -875,7 +870,7 @@ TEST(SupportedTypesTest, ProfileColorSpace_VP9Profile0WithBT2020) {
 
 #if defined(ARCH_CPU_X86_FAMILY) ||                             \
     (defined(ARCH_CPU_ARM_FAMILY) && BUILDFLAG(IS_CHROMEOS)) || \
-    (defined(ARCH_CPU_ARM64) && (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)))
+    (defined(ARCH_CPU_ARM64) && BUILDFLAG(IS_MAC))
 TEST(SupportedTypesTest, ProfileColorSpace_VP9Profile2WithHDR) {
   // VP9 Profile 2 support depends on high bit depth support in libvpx.
   // On architectures where Profile 2 is supported, HDR color spaces

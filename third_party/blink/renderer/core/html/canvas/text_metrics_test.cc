@@ -107,22 +107,14 @@ struct CaretPositionForOffsetBidiTestData {
     {u"0fi1fi23fif456fifi",
      TextDirection::kLtr,
      {0, 0, 0, 1, 10, 11, 16, 17, 18, 18},
-#if BUILDFLAG(IS_WIN)
-     {-5, 0, 2, 5, 49, 53, 81, 85, 88, 90},
-#else
      {-5, 0, 2, 5, 46, 50, 77, 80, 83, 85},
-#endif
      TextMetricsTest::kLatinFont},
 
     // 3
     {u"0fi1fi23fif456fifi",
      TextDirection::kRtl,
      {0, 0, 0, 1, 10, 11, 16, 17, 18, 18},
-#if BUILDFLAG(IS_WIN)
-     {-5, 0, 2, 5, 49, 53, 81, 85, 88, 90},
-#else
      {-5, 0, 2, 5, 46, 50, 77, 80, 83, 85},
-#endif
      TextMetricsTest::kLatinFont},
 
     // 4
@@ -132,8 +124,6 @@ struct CaretPositionForOffsetBidiTestData {
 #if BUILDFLAG(IS_APPLE)
      {-5, 0, 3, 20, 23, 40, 45, 57, 61, 71, 74, 82, 86, 90, 93, 96, 97.306,
       105},
-#elif BUILDFLAG(IS_WIN)
-     {-5, 0, 3, 20, 22, 40, 44, 56, 60, 70, 74, 81, 85, 89, 91, 94, 96, 105},
 #else
      {-5, 0, 3, 21, 25, 41, 47, 60, 64, 74, 78, 87, 91, 94, 96, 100, 102, 105},
 #endif
@@ -146,8 +136,6 @@ struct CaretPositionForOffsetBidiTestData {
 #if BUILDFLAG(IS_APPLE)
      {-5, 0, 3, 20, 23, 40, 45, 57, 61, 71, 74, 82, 86, 90, 93, 96, 97.306,
       105},
-#elif BUILDFLAG(IS_WIN)
-     {-5, 0, 3, 20, 22, 40, 44, 56, 60, 70, 74, 81, 85, 89, 91, 94, 96, 105},
 #else
      {-5, 0, 3, 21, 25, 41, 47, 60, 64, 74, 78, 87, 91, 94, 96, 100, 102, 105},
 #endif

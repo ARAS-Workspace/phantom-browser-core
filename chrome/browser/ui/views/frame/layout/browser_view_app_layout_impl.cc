@@ -397,9 +397,6 @@ void BrowserViewAppLayoutImpl::DoPostLayoutVisualAdjustments(
     // DCHECK in Label. As such, disable the DCHECK.
     label.SetSkipSubpixelRenderingOpacityCheck(
         delegate().GetImmersiveModeController()->IsEnabled());
-#elif BUILDFLAG(IS_WIN)
-    label.SetSubpixelRenderingEnabled(false);
-    label.SetAutoColorReadabilityEnabled(false);
 #elif BUILDFLAG(IS_LINUX)
     label.SetSubpixelRenderingEnabled(false);
 #endif

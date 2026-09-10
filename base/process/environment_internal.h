@@ -50,29 +50,6 @@ BASE_EXPORT base::span<const char* const> GetEnvironment();
 // Sets the current process' environment.
 // On POSIX, this updates the system's 'environ' array.
 BASE_EXPORT void SetEnvironment(base::span<char*> env);
-#elif BUILDFLAG(IS_WIN)
-// Returns a modified environment vector constructed from the given environment
-// and the list of changes given in |changes|. Each key in the environment is
-// matched against the first element of the pairs. In the event of a match, the
-// value is replaced by the second of the pair, unless the second is empty, in
-// which case the key-value is removed.
-//
-// This Windows version takes a span over a Windows-style environment block and
-// returns a new Windows-style environment block, which is a string containing
-// several NUL-terminated strings followed by an extra terminating NUL
-// character. So, e.g., the environment A=1 B=2 is represented as
-// L"A=1\0B=2\0\0". The input span `env` can be empty.
-BASE_EXPORT NativeEnvironmentString
-AlterEnvironment(base::span<const wchar_t> env, const EnvironmentMap& changes);
-
-// Returns a double-NUL-terminated copy of the current process' environment
-// block. Windows requires returning an owned copy of the environment block.
-// `GetEnvironmentStrings` allocates memory that the caller must release by
-// calling `FreeEnvironmentStrings` (see
-// https://learn.microsoft.com/en-us/windows/win32/api/processenv/nf-processenv-getenvironmentstrings).
-// To manage this safely, we copy the block to a `HeapArray` and free the
-// OS-allocated block immediately.
-BASE_EXPORT base::HeapArray<wchar_t> GetEnvironment();
 #endif  // OS_*
 
 }  // namespace internal

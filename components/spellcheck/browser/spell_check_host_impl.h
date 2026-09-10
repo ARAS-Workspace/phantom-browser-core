@@ -48,9 +48,6 @@ class SpellCheckHostImpl : public spellcheck::mojom::SpellCheckHost {
       const std::vector<spellcheck::SpellingMarker>& spelling_markers,
       RequestTextCheckCallback callback) override;
 
-#if BUILDFLAG(IS_WIN)
-  void InitializeDictionaries(InitializeDictionariesCallback callback) override;
-#endif  // BUILDFLAG(IS_WIN)
 #endif  // BUILDFLAG(USE_BROWSER_SPELLCHECKER) &&
         // !BUILDFLAG(ENABLE_SPELLING_SERVICE)
 

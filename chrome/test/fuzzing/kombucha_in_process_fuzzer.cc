@@ -30,9 +30,6 @@
 #endif
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ash/test/ui_controls_ash.h"
-#elif BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#include "ui/aura/test/ui_controls_aurawin.h"
 #endif
 #if defined(USE_AURA) && BUILDFLAG(IS_OZONE)
 #include "ui/ozone/public/ozone_platform.h"
@@ -76,13 +73,6 @@ KombuchaInProcessFuzzer::KombuchaInProcessFuzzer()
 
 KombuchaInProcessFuzzer::~KombuchaInProcessFuzzer() = default;
 
-#if BUILDFLAG(IS_WIN)
-void KombuchaInProcessFuzzer::TearDown() {
-  InteractiveBrowserTestMixin::TearDown();
-  com_initializer_.reset();
-}
-#endif
-
 void KombuchaInProcessFuzzer::SetUp() {
   // Mouse movements require enabling ui_controls manually for tests
   // that live outside the ui_interaction_test directory.
@@ -90,9 +80,6 @@ void KombuchaInProcessFuzzer::SetUp() {
   // chrome/test/base/interactive_ui_tests_main.cc
 #if BUILDFLAG(IS_CHROMEOS)
   ash::test::EnableUIControlsAsh();
-#elif BUILDFLAG(IS_WIN)
-  com_initializer_ = std::make_unique<base::win::ScopedCOMInitializer>();
-  aura::test::EnableUIControlsAuraWin();
 #elif BUILDFLAG(IS_OZONE)
   // Notifies the platform that test config is needed. For Wayland, for
   // example, makes its possible to use emulated input.

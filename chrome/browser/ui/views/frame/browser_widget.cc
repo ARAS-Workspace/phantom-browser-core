@@ -54,13 +54,6 @@
 #include "ui/linux/linux_ui.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/feature_list.h"
-#include "content/public/browser/desktop_capture_pip_utils.h"
-#include "media/base/media_switches.h"
-#include "media/capture/capture_switches.h"
-#include "ui/wm/core/window_properties.h"
-#endif
 namespace {
 
 // Helper to track whether a ThemeChange event has been received by the widget.
@@ -143,7 +136,6 @@ void BrowserWidget::InitBrowserWidget() {
       BrowserWindowInterface::Type::TYPE_PICTURE_IN_PICTURE) {
     params.z_order = ui::ZOrderLevel::kFloatingWindow;
     params.visible_on_all_workspaces = true;
-#if !BUILDFLAG(IS_WIN)
     // This has the side-effect of keeping the pip window in the tab order.
     //
     // On all platforms, except for Windows, this doesn't change anything
@@ -151,18 +143,6 @@ void BrowserWidget::InitBrowserWidget() {
     // affected. Specifically, the title bar will not render correctly, see
     // https://crbug.com/40273014 for more details.
     params.remove_standard_frame = true;
-#endif  // !BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN)
-    // Apply screen capture exclusion at initialization. Note that while this
-    // uses Aura window properties, the underlying behavior is currently
-    // Windows-only.
-    if (base::FeatureList::IsEnabled(features::kExcludePipFromScreenCapture) &&
-        content::desktop_capture::IsPipExcludedFromScreenCapture()) {
-      params.init_properties_container.SetProperty(
-          wm::kExcludeFromScreenCaptureKey, true);
-    }
-#endif
   }
 
 #if BUILDFLAG(IS_LINUX)
@@ -509,11 +489,6 @@ ui::ColorProviderKey BrowserWidget::GetColorProviderKey() const {
       browser_native_widget_ && browser_native_widget_->UseCustomFrame();
   key.frame_type = use_custom_frame ? ui::ColorProviderKey::FrameType::kChromium
                                     : ui::ColorProviderKey::FrameType::kNative;
-#if BUILDFLAG(IS_WIN)
-  if (theme_service->UsingDeviceTheme() && use_custom_frame) {
-    key.frame_style = ui::ColorProviderKey::FrameStyle::kSystem;
-  }
-#endif
 
   return key;
 }
@@ -568,10 +543,6 @@ bool BrowserWidget::RegenerateFrameOnThemeChange(
   // System and user theme changes can both change frame buttons, so the frame
   // always needs to be regenerated on Linux.
   need_regenerate = true;
-#elif BUILDFLAG(IS_WIN)
-  need_regenerate |=
-      (theme_change_type == BrowserThemeChangeType::kBrowserTheme) &&
-      !IsFullscreen();
 #else
   need_regenerate |= theme_change_type == BrowserThemeChangeType::kBrowserTheme;
 #endif

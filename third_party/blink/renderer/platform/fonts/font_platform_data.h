@@ -132,7 +132,7 @@ class PLATFORM_EXPORT FontPlatformData
   bool FontContainsCharacter(UChar32 character) const;
 #endif
 
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
   const WebFontRenderStyle& GetFontRenderStyle() const { return style_; }
 #endif
 
@@ -142,20 +142,15 @@ class PLATFORM_EXPORT FontPlatformData
   String GetPostScriptName() const;
 
  private:
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
   WebFontRenderStyle QuerySystemRenderStyle(const std::string& family,
                                             float text_size,
                                             SkFontStyle,
                                             TextRenderingMode text_rendering);
 #endif
-#if BUILDFLAG(IS_WIN)
-  // TODO(https://crbug.com/808221): Remove and use QuerySystemRenderStyle()
-  // instead.
-  WebFontRenderStyle QuerySystemForRenderStyle();
-#endif
 
   const sk_sp<SkTypeface> typeface_;
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
   std::string family_;
 #endif
 

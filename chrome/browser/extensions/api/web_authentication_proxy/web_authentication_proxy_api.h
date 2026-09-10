@@ -14,8 +14,8 @@
 #include "extensions/browser/extension_function.h"
 #include "extensions/browser/extension_function_histogram_value.h"
 
-// This API is limited to Win/Mac/Linux.
-static_assert(BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX));
+// This API is limited to Mac/Linux.
+static_assert(BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX));
 
 namespace extensions {
 

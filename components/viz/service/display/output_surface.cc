@@ -84,22 +84,4 @@ void OutputSurface::ReadbackForTesting(
   NOTIMPLEMENTED();
 }
 
-#if BUILDFLAG(IS_WIN)
-bool IsDelegatedCompositingSupportedAndEnabled(
-    OutputSurface::DCSupportLevel support_level) {
-  if (support_level < OutputSurface::DCSupportLevel::kDCompTexture) {
-    return false;
-  }
-
-  // Ensure we check the feature flag iff the feature is supported.
-  return features::IsDelegatedCompositingEnabled();
-}
-
-bool IsBufferQueueSupportedAndEnabled(
-    OutputSurface::DCSupportLevel support_level) {
-  return support_level >= OutputSurface::DCSupportLevel::kDCompDynamicTexture &&
-         base::FeatureList::IsEnabled(features::kBufferQueue);
-}
-#endif
-
 }  // namespace viz

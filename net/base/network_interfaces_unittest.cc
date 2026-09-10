@@ -15,15 +15,6 @@
 
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
 #include <net/if.h>
-#elif BUILDFLAG(IS_WIN)
-#include <objbase.h>
-
-#include <windows.h>
-
-#include <iphlpapi.h>
-
-#include "base/strings/string_util.h"
-#include "base/win/win_util.h"
 #endif
 
 namespace net {
@@ -46,17 +37,7 @@ TEST(NetworkInterfacesTest, GetNetworkList) {
     EXPECT_GT(it->prefix_length, 1u);
     EXPECT_LE(it->prefix_length, it->address.size() * 8);
 
-#if BUILDFLAG(IS_WIN)
-    // On Windows |name| is NET_LUID.
-    NET_LUID luid;
-    EXPECT_EQ(static_cast<DWORD>(NO_ERROR),
-              ConvertInterfaceIndexToLuid(it->interface_index, &luid));
-    GUID guid;
-    EXPECT_EQ(static_cast<DWORD>(NO_ERROR),
-              ConvertInterfaceLuidToGuid(&luid, &guid));
-    auto name = base::win::WStringFromGUID(guid);
-    EXPECT_EQ(base::UTF8ToWide(it->name), name);
-#elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
     char name[IF_NAMESIZE];
     EXPECT_TRUE(if_indextoname(it->interface_index, name));
     EXPECT_STREQ(it->name.c_str(), name);

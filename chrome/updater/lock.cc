@@ -16,9 +16,6 @@
 
 #include "base/strings/strcat.h"
 #include "chrome/updater/updater_branding.h"
-#elif BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#include "chrome/updater/util/win_util.h"
 #endif
 
 namespace updater {
@@ -36,11 +33,6 @@ std::unique_ptr<ScopedLock> CreateScopedLock(const std::string& name,
       base::StrCat({MAC_BUNDLE_IDENTIFIER_STRING, name,
                     UpdaterScopeToString(scope), ".lock"}),
       timeout);
-#elif BUILDFLAG(IS_WIN)
-  NamedObjectAttributes lock_attr =
-      GetNamedObjectAttributes(base::UTF8ToWide(name).c_str(), scope);
-  return named_system_lock::ScopedLock::Create(lock_attr.name, &lock_attr.sa,
-                                               timeout);
 #endif
 }
 

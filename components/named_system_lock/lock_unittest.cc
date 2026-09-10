@@ -26,10 +26,6 @@
 #include "base/strings/strcat.h"
 #elif BUILDFLAG(IS_MAC)
 #include "base/strings/strcat.h"
-#elif BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/strings/utf_string_conversions.h"
 #endif
 
 namespace named_system_lock {
@@ -60,11 +56,7 @@ TEST_F(NamedSystemLockTest, LockThenLockSameThread) {
 
   std::unique_ptr<ScopedLock> lock_again = CreateLock();
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(lock_again);
-#else   // BUILDFLAG(IS_WIN)
   EXPECT_FALSE(lock_again);
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 TEST_F(NamedSystemLockTest, LockThenTryLockInThreadFail) {

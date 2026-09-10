@@ -46,10 +46,6 @@
 #include "ui/gfx/geometry/size.h"
 #include "ui/gfx/gpu_memory_buffer_handle.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/gfx/win/d3d_shared_fence.h"
-#endif
-
 namespace gpu {
 namespace {
 
@@ -68,14 +64,7 @@ base::trace_event::MemoryAllocatorDumpGuid GetSubBackingGUIDForTracing(
 enum class ContentSyncReason { kRead = 0, kWrite = 1, kMaxValue = kWrite };
 // LINT.ThenChange(//tools/metrics/histograms/metadata/gpu/enums.xml:ContentSyncReason)
 
-#if BUILDFLAG(IS_WIN)
-// Only allow shmem overlays for NV12 on Windows.
-// This moves the SCANOUT flag from the GPU backing to the shmem backing in the
-// CompoundImageBacking.
-constexpr bool kAllowShmOverlays = true;
-#else
 constexpr bool kAllowShmOverlays = false;
-#endif
 
 gpu::SharedImageUsageSet GetShmSharedImageUsage(SharedImageUsageSet usage) {
   gpu::SharedImageUsageSet new_usage = SHARED_IMAGE_USAGE_CPU_WRITE_ONLY;
@@ -599,10 +588,6 @@ class WrappedOverlayCompoundImageRepresentation
   GetAHardwareBufferFenceSync() final {
     return wrapped_->GetAHardwareBufferFenceSync();
   }
-#elif BUILDFLAG(IS_WIN)
-  std::optional<gl::DCLayerOverlayImage> GetDCLayerOverlayImage() final {
-    return wrapped_->GetDCLayerOverlayImage();
-  }
 #elif BUILDFLAG(IS_APPLE)
   gfx::ScopedIOSurface GetIOSurface() const final {
     return wrapped_->GetIOSurface();
@@ -646,25 +631,6 @@ class WrappedWebNNTensorCompoundImageRepresentation
         wrapped_(std::move(wrapped)) {
     DCHECK(wrapped_);
   }
-
-#if BUILDFLAG(IS_WIN)
-  scoped_refptr<gfx::D3DSharedFence> GetAcquireFence() const final {
-    return wrapped_->GetAcquireFence();
-  }
-
-  void SetReleaseFence(scoped_refptr<gfx::D3DSharedFence> release_fence) final {
-    wrapped_->SetReleaseFence(std::move(release_fence));
-  }
-
-  Microsoft::WRL::ComPtr<ID3D12Resource> GetD3D12Buffer() const final {
-    return wrapped_->GetD3D12Buffer();
-  }
-
-  base::win::ScopedHandle GetD3D12HeapHandle() const final {
-    return wrapped_->GetD3D12HeapHandle();
-  }
-
-#endif
 
 #if BUILDFLAG(IS_APPLE)
   IOSurfaceRef GetIOSurface() const final { return wrapped_->GetIOSurface(); }
@@ -795,11 +761,6 @@ class WrappedVideoCompoundImageRepresentation
     wrapped_->EndReadAccess();
     compound_backing()->NotifyEndAccess(wrapped_->backing(), AccessMode::kRead);
   }
-#if BUILDFLAG(IS_WIN)
-  D3D11TextureAndArrayIndex GetD3D11Texture() const override {
-    return wrapped_->GetD3D11Texture();
-  }
-#endif
 #if BUILDFLAG(IS_ANDROID)
   AHardwareBuffer* GetAHardwareBuffer() const override {
     return wrapped_->GetAHardwareBuffer();

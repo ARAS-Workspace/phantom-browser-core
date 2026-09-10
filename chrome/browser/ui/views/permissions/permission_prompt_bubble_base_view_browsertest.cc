@@ -256,13 +256,8 @@ IN_PROC_BROWSER_TEST_F(PermissionPromptBubbleBaseViewBrowserTest,
 }
 
 // crbug.com/41474037
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ActiveTabClosedAfterRendererCrashesWithPendingPermissionRequest \
-  DISABLED_ActiveTabClosedAfterRendererCrashesWithPendingPermissionRequest
-#else
 #define MAYBE_ActiveTabClosedAfterRendererCrashesWithPendingPermissionRequest \
   ActiveTabClosedAfterRendererCrashesWithPendingPermissionRequest
-#endif
 // Regression test for https://crbug.com/40614480.
 IN_PROC_BROWSER_TEST_F(
     PermissionPromptBubbleBaseViewBrowserTest,

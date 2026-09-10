@@ -43,13 +43,6 @@
 #include <sys/wait.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "sandbox/policy/mojom/sandbox.mojom.h"
-#include "sandbox/win/src/sandbox_types.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(USE_ZYGOTE)
 #include "content/common/zygote/zygote_handle_impl_linux.h"
 #include "content/public/common/zygote/zygote_handle.h"
@@ -101,11 +94,6 @@ class UtilityProcessHostBrowserTest : public BrowserChildProcessObserver,
   void AddFailedLaunchOptions(UtilityProcessHost::Options& options) {
     expect_failed_launch_ = true;
 
-#if BUILDFLAG(IS_WIN)
-    // The Windows sandbox does not like the child process being a different
-    // process, so launch unsandboxed for the purpose of this test.
-    options.WithSandboxType(sandbox::mojom::Sandbox::kNoSandbox);
-#endif
     // Simulate a catastrophic launch failure for all child processes by
     // making the path to the process non-existent.
     base::CommandLine::ForCurrentProcess()->AppendSwitchPath(
@@ -114,12 +102,7 @@ class UtilityProcessHostBrowserTest : public BrowserChildProcessObserver,
   }
 
   void AddElevatedOptions(UtilityProcessHost::Options& options) {
-#if BUILDFLAG(IS_WIN)
-    options.WithSandboxType(
-        sandbox::mojom::Sandbox::kNoSandboxAndElevatedPrivileges);
-#else
     NOTREACHED();
-#endif
   }
 
   // After `service_` is bound, `run_test` is invoked, and then the RunLoop will
@@ -277,9 +260,7 @@ class UtilityProcessHostBrowserTest : public BrowserChildProcessObserver,
       const ChildProcessTerminationInfo& info) override {
     DCHECK_CURRENTLY_ON(BrowserThread::UI);
 
-#if BUILDFLAG(IS_WIN)
-    EXPECT_EQ(EXCEPTION_BREAKPOINT, static_cast<DWORD>(info.exit_code));
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
     EXPECT_TRUE(WIFSIGNALED(info.exit_code));
 #if defined(OFFICIAL_BUILD) || (defined(ARCH_CPU_ARM64) && BUILDFLAG(IS_LINUX))
     EXPECT_EQ(SIGTRAP, WTERMSIG(info.exit_code));
@@ -301,16 +282,7 @@ class UtilityProcessHostBrowserTest : public BrowserChildProcessObserver,
       const ChildProcessTerminationInfo& info) override {
     DCHECK_CURRENTLY_ON(BrowserThread::UI);
     EXPECT_EQ(info.status, base::TERMINATION_STATUS_LAUNCH_FAILED);
-#if BUILDFLAG(IS_WIN)
-    // On Windows, the sandbox code handles all non-elevated process launches.
-    EXPECT_EQ(sandbox::SBOX_ERROR_CANNOT_LAUNCH_UNSANDBOXED_PROCESS,
-              info.exit_code);
-    // File not found because subprocess called 'non_existent_path.exe' does not
-    // exist.
-    EXPECT_EQ(DWORD{ERROR_FILE_NOT_FOUND}, info.last_error);
-#else
     EXPECT_EQ(LAUNCH_RESULT_FAILURE, info.exit_code);
-#endif
     EXPECT_EQ(kTestProcessName, data.metrics_name);
     has_failed_launch_ = true;
     ResetService();
@@ -468,51 +440,6 @@ IN_PROC_BROWSER_TEST_F(UtilityProcessHostBrowserTest, FailToLaunchProcess) {
   ASSERT_FALSE(crash_was_pre_ipc_.has_value());
 }
 #endif  // !BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_WIN)
-
-IN_PROC_BROWSER_TEST_F(UtilityProcessHostBrowserTest,
-                       FailToStartNetworkProcess) {
-  expect_crashed_ = true;
-  RunUtilityProcess(
-      DefaultOptions()
-          .WithSandboxType(sandbox::mojom::Sandbox::kNetwork)
-          .WithExtraCommandLineSwitches(
-              {switches::kUtilityImmediateCrashForTesting})
-          .Pass(),
-      base::BindOnce(&UtilityProcessHostBrowserTest::RunBasicPingPongTest,
-                     base::Unretained(this)));
-  EXPECT_TRUE(*crash_was_pre_ipc_);
-}
-
-IN_PROC_BROWSER_TEST_F(UtilityProcessHostBrowserTest, LaunchElevatedProcess) {
-  RunUtilityProcess(
-      DefaultOptions()
-          .WithSandboxType(
-              sandbox::mojom::Sandbox::kNoSandboxAndElevatedPrivileges)
-          .Pass(),
-      mojo::core::IsMojoIpczEnabled()
-          ? base::BindOnce(
-                &UtilityProcessHostBrowserTest::RunSharedMemoryHandleTest,
-                base::Unretained(this))
-          : base::BindOnce(&UtilityProcessHostBrowserTest::RunBasicPingPongTest,
-                           base::Unretained(this)));
-}
-
-// Disabled because currently this causes a WER dialog to appear.
-IN_PROC_BROWSER_TEST_F(UtilityProcessHostBrowserTest,
-                       DISABLED_LaunchElevatedProcessAndCrash) {
-  RunUtilityProcess(
-      DefaultOptions()
-          .WithSandboxType(
-              sandbox::mojom::Sandbox::kNoSandboxAndElevatedPrivileges)
-          .Pass(),
-      base::BindOnce(&UtilityProcessHostBrowserTest::RunCrashImmediatelyTest,
-                     base::Unretained(this)));
-  EXPECT_TRUE(crash_was_pre_ipc_.has_value());
-  EXPECT_FALSE(crash_was_pre_ipc_.value());
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
 // Ensure that the network service launches and can establish Mojo IPC

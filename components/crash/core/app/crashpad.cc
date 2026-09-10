@@ -40,10 +40,6 @@
 #include <unistd.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "components/crash/core/app/crash_export_thunks.h"
-#endif
-
 namespace crash_reporter {
 
 #if BUILDFLAG(IS_IOS)
@@ -86,17 +82,6 @@ bool InitializeCrashpadImpl(bool initial_client,
     // sanitization.
     DCHECK(browser_process || process_type == "relauncher" ||
            process_type == "app_shim");
-#elif BUILDFLAG(IS_WIN)
-    // "Chrome Installer" is the name historically used for installer binaries
-    // as processed by the backend.
-    DCHECK(browser_process || process_type == "Chrome Installer" ||
-           process_type == "notification-helper" ||
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-           process_type == "os-update-handler" ||
-           process_type == "platform-experience-helper" ||
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-           process_type == "GCPW Installer" || process_type == "GCPW DLL" ||
-           process_type == "elevated-tracing-service");
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
     DCHECK(browser_process);
 #else
@@ -143,8 +128,6 @@ bool InitializeCrashpadImpl(bool initial_client,
   static crashpad::StringAnnotation<12> pid_key("pid");
 #if BUILDFLAG(IS_POSIX)
   pid_key.Set(base::NumberToString(getpid()));
-#elif BUILDFLAG(IS_WIN)
-  pid_key.Set(base::NumberToString(::GetCurrentProcessId()));
 #endif
 
   static crashpad::StringAnnotation<24> osarch_key("osarch");
@@ -165,11 +148,6 @@ bool InitializeCrashpadImpl(bool initial_client,
   // On Mac, we only want the browser to initialize the database, but not the
   // relauncher.
   const bool should_initialize_database_and_set_upload_policy = browser_process;
-#elif BUILDFLAG(IS_WIN)
-  // On Windows, we want both the browser process and the installer and any
-  // other "main, first process" to initialize things. There is no "relauncher"
-  // on Windows, so this is synonymous with initial_client.
-  const bool should_initialize_database_and_set_upload_policy = initial_client;
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   const bool should_initialize_database_and_set_upload_policy = browser_process;
 #endif
@@ -197,31 +175,6 @@ bool InitializeCrashpad(bool initial_client, const std::string& process_type) {
                                 base::FilePath(), std::vector<std::string>(),
                                 /*embedded_handler=*/false, /*attachments=*/{});
 }
-
-#if BUILDFLAG(IS_WIN)
-bool InitializeCrashpadWithEmbeddedHandler(
-    bool initial_client,
-    const std::string& process_type,
-    const std::string& user_data_dir,
-    const base::FilePath& exe_path,
-    const std::vector<base::FilePath>& attachments) {
-  return InitializeCrashpadImpl(initial_client, process_type, user_data_dir,
-                                exe_path, std::vector<std::string>(),
-                                /*embedded_handler=*/true, attachments);
-}
-
-bool InitializeCrashpadWithDllEmbeddedHandler(
-    bool initial_client,
-    const std::string& process_type,
-    const std::string& user_data_dir,
-    const base::FilePath& exe_path,
-    const std::vector<std::string>& initial_arguments,
-    const std::vector<base::FilePath>& attachments) {
-  return InitializeCrashpadImpl(initial_client, process_type, user_data_dir,
-                                exe_path, initial_arguments,
-                                /*embedded_handler=*/true, attachments);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 namespace {
 crashpad::CrashpadClient* crashpad_client = nullptr;
@@ -314,53 +267,16 @@ void CrashWithoutDumping(const std::string& message) {
         // BUILDFLAG(IS_ANDROID)
 
 void GetReports(std::vector<Report>* reports) {
-#if BUILDFLAG(IS_WIN)
-  // On Windows, the crash client may be linked into another module, which
-  // does the client registration. That means the global that holds the crash
-  // report database lives across a module boundary, where the other module
-  // implements the GetCrashReportsImpl function. Since the other module has
-  // a separate allocation domain, this awkward copying is necessary.
-
-  // Start with an arbitrary copy size.
-  reports->resize(25);
-  while (true) {
-    size_t available_reports =
-        GetCrashReports_ExportThunk(&reports->at(0), reports->size());
-    if (available_reports <= reports->size()) {
-      // The input size was large enough to capture all available crashes.
-      // Trim the vector to the actual number of reports returned and return.
-      reports->resize(available_reports);
-      return;
-    }
-
-    // Resize to the number of available reports, plus some slop to all but
-    // eliminate the possibility of running around the loop again due to a
-    // newly arrived crash report.
-    reports->resize(available_reports + 5);
-  }
-#else
   GetReportsImpl(reports);
-#endif
 }
 
 void RequestSingleCrashUpload(const std::string& local_id) {
-#if BUILDFLAG(IS_WIN)
-  // On Windows, crash reporting may be implemented in another module, which is
-  // why this can't call crash_reporter::RequestSingleCrashUpload directly.
-  RequestSingleCrashUpload_ExportThunk(local_id.c_str());
-#else
   crash_reporter::RequestSingleCrashUploadImpl(local_id);
-#endif
 }
 
 std::optional<base::FilePath> GetCrashpadDatabasePath() {
-#if BUILDFLAG(IS_WIN)
-  base::FilePath::StringType::const_pointer path =
-      GetCrashpadDatabasePath_ExportThunk();
-#else
   base::FilePath::StringType::const_pointer path =
       GetCrashpadDatabasePathImpl();
-#endif
   if (!path) {
     return std::nullopt;
   }
@@ -368,11 +284,7 @@ std::optional<base::FilePath> GetCrashpadDatabasePath() {
 }
 
 void ClearReportsBetween(const base::Time& begin, const base::Time& end) {
-#if BUILDFLAG(IS_WIN)
-  ClearReportsBetween_ExportThunk(begin.ToTimeT(), end.ToTimeT());
-#else
   ClearReportsBetweenImpl(begin.ToTimeT(), end.ToTimeT());
-#endif
 }
 
 void GetReportsImpl(std::vector<Report>* reports) {

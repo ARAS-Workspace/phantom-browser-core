@@ -66,8 +66,7 @@ enum class VerifyStatus {
 };
 
 VerifyStatus GetExperimentStatus() {
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC))
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && BUILDFLAG(IS_MAC)
   return VerifyStatus::ENFORCE;
 #else
   return VerifyStatus::NONE;

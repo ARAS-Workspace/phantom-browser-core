@@ -17,9 +17,7 @@
 #include "base/thread_annotations.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include <errno.h>
 #include <pthread.h>
 #include <string.h>
@@ -59,9 +57,7 @@ class BASE_EXPORT LockImpl {
   friend class base::win::internal::AutoNativeLock;
   friend class base::win::internal::ScopedHandleVerifier;
 
-#if BUILDFLAG(IS_WIN)
-  using NativeHandle = CHROME_SRWLOCK;
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   using NativeHandle = pthread_mutex_t;
 #endif
 
@@ -114,17 +110,7 @@ void LockImpl::Lock() {
   LockInternal();
 }
 
-#if BUILDFLAG(IS_WIN)
-bool LockImpl::Try() {
-  return !!::TryAcquireSRWLockExclusive(
-      reinterpret_cast<PSRWLOCK>(&native_handle_));
-}
-
-void LockImpl::Unlock() {
-  ::ReleaseSRWLockExclusive(reinterpret_cast<PSRWLOCK>(&native_handle_));
-}
-
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 
 #if DCHECK_IS_ON()
 BASE_EXPORT void dcheck_trylock_result(int rv);

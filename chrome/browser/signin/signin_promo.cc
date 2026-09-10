@@ -35,10 +35,6 @@
 #include "net/base/url_util.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 namespace signin {
 
 const char kSignInPromoQueryKeyAccessPoint[] = "access_point";

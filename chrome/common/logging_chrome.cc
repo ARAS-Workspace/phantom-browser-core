@@ -6,10 +6,6 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 #include <fstream>
 #include <memory>
 #include <string>
@@ -43,19 +39,6 @@
 #include "base/time/time.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <initguid.h>
-
-#include "base/logging_win.h"
-#include "base/process/process_info.h"
-#include "base/syslog_logging.h"
-#include "base/win/scoped_handle.h"
-#include "base/win/windows_handle_util.h"
-#include "chrome/common/win/eventlog_messages.h"
-#include "chrome/install_static/install_details.h"
-#include "sandbox/policy/switches.h"
-#endif
-
 namespace logging {
 namespace {
 
@@ -81,15 +64,6 @@ bool chrome_logging_redirected_ = false;
 constexpr char kChronosHomeDir[] = "/home/chronos/user/";
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-// {7FE69228-633E-4f06-80C1-527FEA23E3A7}
-const GUID kChromeTraceProviderName = {
-    0x7fe69228,
-    0x633e,
-    0x4f06,
-    {0x80, 0xc1, 0x52, 0x7f, 0xea, 0x23, 0xe3, 0xa7}};
-#endif
-
 // Assertion handler for logging errors that occur when dialogs are
 // silenced.  To record a new error, pass the log string associated
 // with that error in the str parameter.
@@ -109,39 +83,8 @@ void SuppressDialogs() {
   assert_handler_ = new ScopedLogAssertHandler(
       base::BindRepeating(SilentRuntimeAssertHandler));
 
-#if BUILDFLAG(IS_WIN)
-  UINT new_flags =
-      SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX;
-  // Preserve existing error mode, as discussed at http://t/dmea
-  UINT existing_flags = SetErrorMode(new_flags);
-  SetErrorMode(existing_flags | new_flags);
-#endif
-
   dialogs_are_suppressed_ = true;
 }
-
-#if BUILDFLAG(IS_WIN)
-base::win::ScopedHandle GetLogInheritedHandle(
-    const base::CommandLine& command_line) {
-  auto handle_str = command_line.GetSwitchValueNative(switches::kLogFile);
-  uint32_t handle_value = 0;
-  if (!base::StringToUint(handle_str, &handle_value)) {
-    return base::win::ScopedHandle();
-  }
-  // Duplicate the handle from the command line so that different things can
-  // init logging. This means the handle from the parent is never closed, but
-  // there will only be one of these in the process.
-  HANDLE log_handle = nullptr;
-  if (!::DuplicateHandle(GetCurrentProcess(),
-                         base::win::Uint32ToHandle(handle_value),
-                         GetCurrentProcess(), &log_handle, 0,
-                         /*bInheritHandle=*/FALSE, DUPLICATE_SAME_ACCESS)) {
-    return base::win::ScopedHandle();
-  }
-  // Transfer ownership to the caller.
-  return base::win::ScopedHandle(log_handle);
-}
-#endif
 
 // `filename_is_handle`, will be set to `true` if the log-file switch contains
 // an inherited handle value rather than a filepath, and `false` otherwise.
@@ -183,28 +126,11 @@ LoggingDestination LoggingDestFromCommandLine(
     if (logging_destination == "system") {
       return LOG_TO_SYSTEM_DEBUG_LOG;
     }
-#if BUILDFLAG(IS_WIN)
-    if (logging_destination == "handle" &&
-        command_line.HasSwitch(switches::kProcessType) &&
-        command_line.HasSwitch(switches::kLogFile)) {
-      // Child processes can log to a handle duplicated from the parent, and
-      // provided in the log-file switch value.
-      filename_is_handle = true;
-      return kDefaultLoggingMode | LOG_TO_FILE;
-    }
-#endif  // BUILDFLAG(IS_WIN)
     if (logging_destination != "") {
       // The browser process should not be called with --enable-logging=handle.
       LOG(ERROR) << "Invalid logging destination: " << logging_destination;
       return kDefaultLoggingMode;
     }
-#if BUILDFLAG(IS_WIN)
-    if (command_line.HasSwitch(switches::kProcessType) &&
-        !command_line.HasSwitch(sandbox::policy::switches::kNoSandbox)) {
-      // Sandboxed processes cannot open log files so skip if provided.
-      return kDefaultLoggingMode & ~LOG_TO_FILE;
-    }
-#endif
   }
   return kDefaultLoggingMode;
 }
@@ -397,22 +323,9 @@ void InitChromeLogging(const base::CommandLine& command_line,
 #if BUILDFLAG(IS_CHROMEOS)
   base::FilePath target_path;
 #endif
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedHandle log_handle;
-#endif
 
   if (logging_dest & LOG_TO_FILE) {
     if (filename_is_handle) {
-#if BUILDFLAG(IS_WIN)
-      // Child processes on Windows are provided a file handle if logging is
-      // enabled as sandboxed processes cannot open files.
-      log_handle = GetLogInheritedHandle(command_line);
-      if (!log_handle.is_valid()) {
-        DLOG(ERROR) << "Unable to initialize logging from handle.";
-        chrome_logging_failed_ = true;
-        return;
-      }
-#endif
     } else {
       log_path = GetLogFileName(command_line);
 
@@ -445,13 +358,6 @@ void InitChromeLogging(const base::CommandLine& command_line,
   if (!log_path.empty()) {
     settings.log_file_path = log_path.value().c_str();
   }
-#if BUILDFLAG(IS_WIN)
-  // Avoid initializing with INVALID_HANDLE_VALUE.
-  // This handle is owned by the logging framework and is closed when the
-  // process exits.
-  // TODO(crbug.com/328285906) Use a ScopedHandle in logging settings.
-  settings.log_file = log_handle.is_valid() ? log_handle.release() : nullptr;
-#endif
   settings.lock_log = log_locking_state;
   settings.delete_old = delete_old_log_file;
   bool success = InitLogging(settings);
@@ -513,16 +419,6 @@ void InitChromeLogging(const base::CommandLine& command_line,
     }
   }
 
-#if BUILDFLAG(IS_WIN)
-  // Enable trace control and transport through event tracing for Windows.
-  LogEventProvider::Initialize(kChromeTraceProviderName);
-
-  // Enable logging to the Windows Event Log.
-  SetEventSource(base::WideToASCII(
-                     install_static::InstallDetails::Get().install_full_name()),
-                 BROWSER_CATEGORY, MSG_LOG_MESSAGE);
-#endif
-
   base::StatisticsRecorder::InitLogOnShutdown();
 
   chrome_logging_initialized_ = true;
@@ -552,28 +448,12 @@ base::FilePath GetLogFileName(const base::CommandLine& command_line) {
   if (filename.empty()) {
     std::optional<std::string> env_filename =
         base::Environment::Create()->GetVar(env_vars::kLogFileName);
-#if BUILDFLAG(IS_WIN)
-    filename = base::UTF8ToWide(env_filename.value_or(""));
-#else
     filename = env_filename.value_or("");
-#endif  // BUILDFLAG(IS_WIN)
   }
 
   if (!filename.empty()) {
     base::FilePath candidate_path(filename);
-#if BUILDFLAG(IS_WIN)
-    // Windows requires an absolute path for the --log-file switch. Windows
-    // cannot log to the current directory as it cds() to the exe's directory
-    // earlier than this function runs.
-    candidate_path = candidate_path.NormalizePathSeparators();
-    if (candidate_path.IsAbsolute()) {
-      return candidate_path;
-    } else {
-      PLOG(ERROR) << "Invalid logging destination: " << filename;
-    }
-#else
     return candidate_path;
-#endif  // BUILDFLAG(IS_WIN)
   }
 
   // If command line and environment do not provide a log file we can use,
@@ -585,13 +465,8 @@ base::FilePath GetLogFileName(const base::CommandLine& command_line) {
     log_path = log_path.Append(log_filename);
     return log_path;
   } else {
-#if BUILDFLAG(IS_WIN)
-    // On Windows we cannot use a non-absolute path so we cannot provide a file.
-    return base::FilePath();
-#else
     // Error with path service, just use the default in our current directory.
     return log_filename;
-#endif  // BUILDFLAG(IS_WIN)
   }
 }
 

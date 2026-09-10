@@ -44,7 +44,7 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "base/enterprise_util.h"
 #elif BUILDFLAG(IS_CHROMEOS)
 #include "chromeos/ash/components/install_attributes/install_attributes.h"
@@ -87,7 +87,7 @@ bool IsBrowserUnderAnyEnterpriseManagement(Profile* profile) {
   // joined, MDM enrolled, or enterprise cloud managed.
   // Note: All Linux machine management (via /etc/opt/chrome/policies/ or Chrome
   // Browser Cloud Management) is fully captured by Step 1 above.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (base::IsManagedOrEnterpriseDevice()) {
     return true;
   }

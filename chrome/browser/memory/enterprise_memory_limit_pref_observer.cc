@@ -48,7 +48,7 @@ EnterpriseMemoryLimitPrefObserver::~EnterpriseMemoryLimitPrefObserver() {
 }
 
 bool EnterpriseMemoryLimitPrefObserver::PlatformIsSupported() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return true;
 #else
   return false;

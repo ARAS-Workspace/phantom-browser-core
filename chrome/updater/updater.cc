@@ -57,16 +57,7 @@
 #include "third_party/crashpad/crashpad/client/crash_report_database.h"
 #include "third_party/crashpad/crashpad/client/settings.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/debug/alias.h"
-#include "base/strings/sys_string_conversions.h"
-#include "base/win/process_startup_helper.h"
-#include "base/win/scoped_com_initializer.h"
-#include "base/win/windows_version.h"
-#include "chrome/updater/app/server/win/updater_service_delegate.h"
-#include "chrome/updater/util/win_util.h"
-#include "partition_alloc/page_allocator.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "base/apple/foundation_util.h"
 #endif
 
@@ -140,20 +131,7 @@ int HandleUpdaterCommands(UpdaterScope updater_scope,
     base::ThreadPoolInstance::Set(nullptr);
   }));
 
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedCOMInitializer com_initializer(
-      base::win::ScopedCOMInitializer::kMTA);
-  if (!com_initializer.Succeeded()) {
-    PLOG(ERROR) << "Failed to initialize COM";
-    return kErrorComInitializationFailed;
-  }
-
-  // Failing to disable COM exception handling is a critical error.
-  CHECK(SUCCEEDED(DisableCOMExceptionHandling()))
-      << "Failed to disable COM exception handling.";
-  base::win::RegisterInvalidParamHandler();
-  VLOG(1) << GetUACState();
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   base::apple::SetBaseBundleIDOverride(MAC_BUNDLE_IDENTIFIER_STRING);
 #endif
 
@@ -196,15 +174,6 @@ int HandleUpdaterCommands(UpdaterScope updater_scope,
     return MakeAppUpdateApps()->Run();
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (command_line->HasSwitch(kWindowsServiceSwitch)) {
-    return UpdaterServiceDelegate::RunWindowsService();
-  }
-
-  if (command_line->HasSwitch(kHealthCheckSwitch)) {
-    return kErrorOk;
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   if (command_line->HasSwitch(kUninstallSwitch) ||
       command_line->HasSwitch(kUninstallIfUnusedSwitch)) {
@@ -290,25 +259,12 @@ constexpr const char* BuildFlavor() {
 }
 
 std::string OperatingSystemVersion() {
-#if BUILDFLAG(IS_WIN)
-  const base::win::OSInfo::VersionNumber v =
-      base::win::OSInfo::GetInstance()->version_number();
-  return absl::StrFormat("%u.%u.%u.%u", v.major, v.minor, v.build, v.patch);
-#else
   return base::SysInfo().OperatingSystemVersion();
-#endif
 }
 
 
 base::CommandLine::StringType GetCommandLineString() {
-#if BUILDFLAG(IS_WIN)
-  // Gets the raw command line on Windows, because
-  // `base::CommandLine::GetCommandLineString()` could return an invalid string
-  // after the class re-arranges the legacy command line arguments.
-  return ::GetCommandLine();
-#else
   return base::CommandLine::ForCurrentProcess()->GetCommandLineString();
-#endif
 }
 
 void EnableLoggingByDefault() {
@@ -325,15 +281,8 @@ void EnableLoggingByDefault() {
 }  // namespace
 
 int UpdaterMain(int argc, const char* const* argv) {
-#if BUILDFLAG(IS_WIN)
-  CHECK(EnableSecureDllLoading());
-#endif
 
   // Make the process more resilient to memory allocation issues.
-#if BUILDFLAG(IS_WIN)
-  EnableProcessHeapMetadataProtection();
-  partition_alloc::SetRetryOnCommitFailure(true);
-#endif
   base::EnableTerminationOnHeapCorruption();
   base::EnableTerminationOnOutOfMemory();
   logging::RegisterAbslAbortHook();
@@ -343,9 +292,6 @@ int UpdaterMain(int argc, const char* const* argv) {
 
   base::CommandLine::Init(argc, argv);
   base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
-#if BUILDFLAG(IS_WIN)
-  *command_line = GetCommandLineLegacyCompatible();
-#endif
   EnableLoggingByDefault();
   const UpdaterScope updater_scope = GetUpdaterScope();
   InitLogging(updater_scope);
@@ -375,22 +321,9 @@ int UpdaterMain(int argc, const char* const* argv) {
       << "Available disk space in temporary directory (" << temp_dir
       << "): " << temp_dir_space->available << " / " << temp_dir_space->total;
 
-#if BUILDFLAG(IS_WIN)
-  const HResultOr<std::wstring> cmd_line = GetCommandLineForPid(parent_pid);
-  if (cmd_line.has_value()) {
-    VLOG(1) << "Parent process command line: " << *cmd_line;
-  }
-  EnsureEnoughMemory();
-  RecordCpuFeaturesForCrash();  // TODO(crbug.com/441591130): remove when fixed.
-#endif                          // IS_WIN
 
   const std::string event_id = GenerateEventId();
-#if BUILDFLAG(IS_WIN)
-  const std::string command_line_string =
-      base::SysWideToUTF8(GetCommandLineString());
-#else
   const std::string command_line_string = GetCommandLineString();
-#endif
   UpdaterProcessStartEvent()
       .SetEventId(event_id)
       .SetCommandLine(command_line_string)
@@ -407,25 +340,6 @@ int UpdaterMain(int argc, const char* const* argv) {
   VLOG(1) << __func__ << " (--" << GetUpdaterCommand(command_line) << ")"
           << " returned " << exit_code << ".";
 
-#if BUILDFLAG(IS_WIN)
-  base::AtExitManager::ProcessCallbacksNow();
-
-  ::SetLastError(ERROR_SUCCESS);
-  const bool terminate_result =
-      ::TerminateProcess(::GetCurrentProcess(), static_cast<UINT>(exit_code));
-
-  // Capture error information in case TerminateProcess fails so that it may be
-  // found in a post-return crash dump if the process crashes on exit.
-  const DWORD terminate_error_code = ::GetLastError();
-  DWORD exit_codes[] = {
-      0xDEADBECF,
-      static_cast<DWORD>(exit_code),
-      static_cast<DWORD>(terminate_result),
-      terminate_error_code,
-      0xDEADBEDF,
-  };
-  base::debug::Alias(exit_codes);
-#endif  // BUILDFLAG(IS_WIN)
 
   return exit_code;
 }

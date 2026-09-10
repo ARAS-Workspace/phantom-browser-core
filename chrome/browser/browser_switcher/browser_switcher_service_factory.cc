@@ -12,10 +12,6 @@
 #include "components/prefs/pref_service.h"
 #include "content/public/browser/browser_context.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/browser_switcher/browser_switcher_service_win.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #error BrowserSwitcher is not supported on ChromeOS. Neither Ash nor LaCrOS.
 #endif
@@ -24,11 +20,7 @@ namespace browser_switcher {
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-using BrowserSwitcherServiceImpl = BrowserSwitcherServiceWin;
-#else
 using BrowserSwitcherServiceImpl = BrowserSwitcherService;
-#endif
 
 }  // namespace
 

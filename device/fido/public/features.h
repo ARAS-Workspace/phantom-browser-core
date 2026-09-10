@@ -13,8 +13,7 @@
 
 namespace device {
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Allows the passkey unlock error UI to be shown.
 COMPONENT_EXPORT(FIDO_PUBLIC)
 BASE_DECLARE_FEATURE(kPasskeyUnlockErrorUi);
@@ -28,12 +27,6 @@ COMPONENT_EXPORT(FIDO_PUBLIC)
 extern const base::FeatureParam<PasskeyUnlockErrorUiExperimentArm>
     kPasskeyUnlockErrorUiExperimentArm;
 #endif
-
-#if BUILDFLAG(IS_WIN)
-// Controls whether on Windows, U2F/CTAP2 requests are forwarded to the
-// native WebAuthentication API, where available.
-COMPONENT_EXPORT(FIDO_PUBLIC) BASE_DECLARE_FEATURE(kWebAuthUseNativeWinApi);
-#endif  // BUILDFLAG(IS_WIN)
 
 COMPONENT_EXPORT(FIDO_PUBLIC)
 BASE_DECLARE_FEATURE(kWebAuthnActorCheck);
@@ -134,12 +127,6 @@ BASE_DECLARE_FEATURE_PARAM(
 // fulfill a GPM passkey operation but no system UV or GPM PIN is available.
 COMPONENT_EXPORT(FIDO_PUBLIC)
 BASE_DECLARE_FEATURE(kWebAuthnCreatePinWhenSystemUvDisabled);
-
-#if BUILDFLAG(IS_WIN)
-// Enables support for PRF on create on Windows.
-COMPONENT_EXPORT(FIDO_PUBLIC)
-BASE_DECLARE_FEATURE(kWebAuthnWinPrfOnCreate);
-#endif  // BUILDFLAG(IS_WIN)
 
 // Enable max priority mode in WebAuthn websocket connections to cloud services.
 COMPONENT_EXPORT(FIDO_PUBLIC)

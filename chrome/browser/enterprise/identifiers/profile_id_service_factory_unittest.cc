@@ -28,12 +28,7 @@
 #include "chromeos/ash/components/system/fake_statistics_provider.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/wmi.h"
-#endif
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 #include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
 #else
 #include "components/policy/core/common/cloud/mock_cloud_policy_store.h"
@@ -83,10 +78,6 @@ class ProfileIdServiceFactoryTest : public testing::Test,
   std::string GetTestProfileId(const Profile* profile) {
     std::string encoded_string;
     std::string device_id = kFakeDeviceID;
-#if BUILDFLAG(IS_WIN)
-    device_id += base::WideToUTF8(
-        base::win::WmiComputerSystemInfo::Get().serial_number());
-#endif  // (BUILDFLAG(IS_WIN)
     base::Base64UrlEncode(
         base::SHA1HashString(profile->GetPrefs()->GetString(kProfileGUIDPref) +
                              device_id),
@@ -139,8 +130,7 @@ class ProfileIdServiceFactoryTest : public testing::Test,
   base::ScopedObservation<ProfileManager, ProfileManagerObserver>
       profile_manager_observer_{this};
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
   policy::FakeBrowserDMTokenStorage storage_;
 #else
   policy::MockCloudPolicyStore store_{
@@ -148,8 +138,7 @@ class ProfileIdServiceFactoryTest : public testing::Test,
 #if BUILDFLAG(IS_CHROMEOS)
   ash::system::ScopedFakeStatisticsProvider fake_statistics_provider_;
 #endif
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_ANDROID)
 };
 
 // Tests multiple calls to get the profile identifier for the same profile has
@@ -200,10 +189,6 @@ TEST_F(ProfileIdServiceFactoryTest, GetProfileId_Incognito_Profile) {
 TEST_F(ProfileIdServiceFactoryTest, GetProfileIdWithPresetGuid) {
   std::string random_guid = base::Uuid::GenerateRandomV4().AsLowercaseString();
   std::string device_id = kFakeDeviceID;
-#if BUILDFLAG(IS_WIN)
-  device_id +=
-      base::WideToUTF8(base::win::WmiComputerSystemInfo::Get().serial_number());
-#endif  // (BUILDFLAG(IS_WIN)
   std::string expected_profile_id =
       service_->GetProfileIdWithGuidAndDeviceId(random_guid, device_id).value();
 

@@ -297,9 +297,6 @@ void SecurePaymentConfirmationService::OnAuthenticatorMakeCredential(
     // Last used time is needed on platforms where the credentials cannot be
     // listed by platform APIs.
     std::optional<base::Time> last_used;
-#if BUILDFLAG(IS_WIN)
-      last_used = base::Time::NowFromSystemTime();
-#endif
 
       passkey_browser_binder_->BindKey(
           std::move(*browser_bound_key), response->info->raw_id,

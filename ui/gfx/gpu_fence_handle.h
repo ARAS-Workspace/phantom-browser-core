@@ -14,9 +14,6 @@
 #endif
 
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_handle.h"
-#endif
 
 namespace gfx {
 
@@ -24,8 +21,6 @@ namespace gfx {
 struct COMPONENT_EXPORT(GFX) GpuFenceHandle {
 #if BUILDFLAG(IS_POSIX)
   using ScopedPlatformFence = base::ScopedFD;
-#elif BUILDFLAG(IS_WIN)
-  using ScopedPlatformFence = base::win::ScopedHandle;
 #endif
 
   GpuFenceHandle(const GpuFenceHandle&) = delete;
@@ -59,9 +54,6 @@ struct COMPONENT_EXPORT(GFX) GpuFenceHandle {
 #if BUILDFLAG(IS_POSIX)
   // Returns fd but the returned fd is not owned.
   int Peek() const;
-#elif BUILDFLAG(IS_WIN)
-  // Returns HANDLE but the returned HANDLE is not owned.
-  HANDLE Peek() const;
 #endif
 
   // Returns global total number of clones since last call.

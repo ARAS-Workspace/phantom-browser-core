@@ -37,10 +37,6 @@
 #include "chrome/browser/printing/printer_query_oop.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 // Must come after all headers that specialize FromJniType() / ToJniType().
 #include "chrome/android/chrome_jni_headers/TabPrinter_jni.h"  // nogncheck
@@ -261,39 +257,6 @@ void PrinterQuery::SetSettingsFromPOD(
 }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-void PrinterQuery::UpdatePrintableArea(
-    PrintSettings* print_settings,
-    OnDidUpdatePrintableAreaCallback callback) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  scoped_refptr<PrintBackend> print_backend =
-      PrintBackend::CreateInstance(g_browser_process->GetApplicationLocale());
-
-  // Blocking is needed here because Windows printer drivers are oftentimes
-  // not thread-safe and have to be accessed on the UI thread.
-  base::ScopedAllowBlocking allow_blocking;
-  std::string printer_name = base::UTF16ToUTF8(print_settings->device_name());
-  crash_keys::ScopedPrinterInfo crash_key(
-      printer_name, print_backend->GetPrinterDriverInfo(printer_name));
-
-  PRINTER_LOG(EVENT) << "Updating paper printable area in-process for "
-                     << printer_name;
-
-  const PrintSettings::RequestedMedia& media =
-      print_settings->requested_media();
-  std::optional<gfx::Rect> printable_area_um =
-      print_backend->GetPaperPrintableArea(printer_name, media.vendor_id,
-                                           media.size_microns);
-  if (!printable_area_um.has_value()) {
-    std::move(callback).Run(/*success=*/false);
-    return;
-  }
-
-  print_settings->UpdatePrinterPrintableArea(printable_area_um.value());
-  std::move(callback).Run(/*success=*/true);
-}
-#endif
-
 // static
 void PrinterQuery::ApplyDefaultPrintableAreaToVirtualPrinterPrintSettings(
     PrintSettings& print_settings) {
@@ -335,11 +298,6 @@ void PrinterQuery::UpdatePrintSettings(base::DictValue new_settings,
   mojom::PrinterType type = static_cast<mojom::PrinterType>(
       new_settings.FindInt(kSettingPrinterType).value());
   if (type == mojom::PrinterType::kLocal) {
-#if BUILDFLAG(IS_WIN)
-    // Blocking is needed here because Windows printer drivers are oftentimes
-    // not thread-safe and have to be accessed on the UI thread.
-    base::ScopedAllowBlocking allow_blocking;
-#endif
     scoped_refptr<PrintBackend> print_backend =
         PrintBackend::CreateInstance(g_browser_process->GetApplicationLocale());
     std::string printer_name = *new_settings.FindString(kSettingDeviceName);
@@ -362,11 +320,6 @@ void PrinterQuery::UpdatePrintSettings(base::DictValue new_settings,
 
   mojom::ResultCode result;
   {
-#if BUILDFLAG(IS_WIN)
-    // Blocking is needed here because Windows printer drivers are oftentimes
-    // not thread-safe and have to be accessed on the UI thread.
-    base::ScopedAllowBlocking allow_blocking;
-#endif
     result = printing_context_->UpdatePrintSettings(std::move(new_settings));
   }
 
@@ -445,11 +398,6 @@ void PrinterQuery::UseDefaultSettings(SettingsCallback callback) {
   PRINTER_LOG(EVENT) << "Using printer default settings in-process";
   mojom::ResultCode result;
   {
-#if BUILDFLAG(IS_WIN)
-    // Blocking is needed here because Windows printer drivers are oftentimes
-    // not thread-safe and have to be accessed on the UI thread.
-    base::ScopedAllowBlocking allow_blocking;
-#endif
     result = printing_context_->UseDefaultSettings();
   }
   InvokeSettingsCallback(std::move(callback), result);

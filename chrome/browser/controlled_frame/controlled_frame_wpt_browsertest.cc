@@ -34,7 +34,7 @@ namespace {
 const auto kTestFiles = testing::Values("add_content_scripts.window.js",
                                         "camera.window.js",
                                         "client_hints_user_agent.window.js",
-#if !(BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)) && !IS_LINUX_OR_CROS
+#if !IS_LINUX_OR_CROS
                                         "frame_event_handlers_part_1.window.js",
 #endif
                                         "frame_event_handlers_part_2.window.js",
@@ -44,7 +44,7 @@ const auto kTestFiles = testing::Values("add_content_scripts.window.js",
                                         "no_callback.window.js",
                                         "scheme.window.js",
                                         "user_agent_override.window.js",
-#if !(BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)) && !IS_LINUX_OR_CROS
+#if !IS_LINUX_OR_CROS
                                         "webrequest_auth.window.js",
 #endif
                                         "webrequest_core.window.js",

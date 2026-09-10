@@ -28,16 +28,7 @@ bool IsHostAllowedInIncognito(const GURL& url) {
   }
 
   if (host == chrome::kChromeUIChromeSigninHost) {
-#if BUILDFLAG(IS_WIN)
-    // Allow incognito mode for the chrome-signin url if we only want to
-    // retrieve the login scope token without touching any profiles. This
-    // option is only available on Windows for use with Google Credential
-    // Provider for Windows.
-    return signin::GetSigninReasonForEmbeddedPromoURL(url) ==
-           signin_metrics::Reason::kFetchLstOnly;
-#else
     return false;
-#endif  // BUILDFLAG(IS_WIN)
   }
 
   // Most URLs are allowed in incognito; the following are exceptions.

@@ -49,12 +49,7 @@
 #include "content/public/browser/network_service_instance.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#include "base/base_paths_win.h"
-#include "chrome/install_static/install_modes.h"
-#else
 #include "chrome/common/chrome_switches.h"
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/app_controller_mac.h"
@@ -65,12 +60,7 @@
 #include "chrome/browser/policy/browser_dm_token_storage_linux.h"
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/policy/browser_dm_token_storage_win.h"
-#include "chrome/install_static/install_util.h"
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "chrome/browser/enterprise/client_certificates/browser_context_delegate.h"
 #include "chrome/browser/enterprise/client_certificates/cert_utils.h"
 #include "chrome/browser/enterprise/connectors/device_trust/key_management/browser/device_trust_key_manager_impl.h"
@@ -80,16 +70,11 @@
 #include "components/enterprise/client_certificates/core/certificate_provisioning_service.h"
 #include "components/enterprise/client_certificates/core/dm_server_client.h"
 #include "components/enterprise/client_certificates/core/key_upload_client.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 namespace policy {
 
 namespace {
-
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-constexpr base::FilePath::StringViewType kCachedPolicyDirname =
-    FILE_PATH_LITERAL("Policies");
-#endif
 
 constexpr char kInvalidationListenerLogPrefix[] =
     "ChromeBrowserCloudManagementControllerDesktop";
@@ -118,8 +103,6 @@ void ChromeBrowserCloudManagementControllerDesktop::
   storage_delegate = std::make_unique<BrowserDMTokenStorageMac>();
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   storage_delegate = std::make_unique<BrowserDMTokenStorageLinux>();
-#elif BUILDFLAG(IS_WIN)
-  storage_delegate = std::make_unique<BrowserDMTokenStorageWin>();
 #else
   NOTREACHED();
 #endif
@@ -134,13 +117,6 @@ int ChromeBrowserCloudManagementControllerDesktop::GetUserDataDirKey() {
 base::FilePath
 ChromeBrowserCloudManagementControllerDesktop::GetExternalPolicyDir() {
   base::FilePath external_policy_path;
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  base::PathService::Get(base::DIR_PROGRAM_FILESX86, &external_policy_path);
-
-  external_policy_path =
-      external_policy_path.Append(install_static::kCompanyPathName)
-          .Append(kCachedPolicyDirname);
-#endif
 
   return external_policy_path;
 }
@@ -295,7 +271,7 @@ ChromeBrowserCloudManagementControllerDesktop::CreateClientDataDelegate() {
 
 std::unique_ptr<enterprise_connectors::DeviceTrustKeyManager>
 ChromeBrowserCloudManagementControllerDesktop::CreateDeviceTrustKeyManager() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   auto* browser_dm_token_storage = BrowserDMTokenStorage::Get();
   auto* device_management_service = GetDeviceManagementService();
   auto shared_url_loader_factory = GetSharedURLLoaderFactory();
@@ -311,13 +287,13 @@ ChromeBrowserCloudManagementControllerDesktop::CreateDeviceTrustKeyManager() {
       std::move(key_rotation_launcher), std::move(key_loader));
 #else
   return nullptr;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 }
 
 std::unique_ptr<client_certificates::CertificateProvisioningService>
 ChromeBrowserCloudManagementControllerDesktop::
     CreateCertificateProvisioningService() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   if (!certificate_store_) {
     certificate_store_ =
         std::make_unique<client_certificates::PrefsCertificateStore>(
@@ -330,7 +306,7 @@ ChromeBrowserCloudManagementControllerDesktop::
       GetDeviceManagementService(), GetSharedURLLoaderFactory());
 #else
   return nullptr;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 }
 
 void ChromeBrowserCloudManagementControllerDesktop::StartInvalidations() {

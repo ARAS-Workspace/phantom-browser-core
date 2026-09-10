@@ -10,9 +10,6 @@
 #include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "net/dns/dns_test_util.h"
-#endif
 
 namespace net {
 

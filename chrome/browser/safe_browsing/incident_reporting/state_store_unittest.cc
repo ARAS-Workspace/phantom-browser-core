@@ -31,34 +31,9 @@
 #include "extensions/browser/quota_service.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/test/test_reg_util_win.h"
-#endif
-
 namespace safe_browsing {
 
-#if BUILDFLAG(IS_WIN)
-
-// A base test fixture that redirects HKCU for testing the platform state store
-// backed by the Windows registry to prevent interference with existing Chrome
-// installs or other tests.
-class PlatformStateStoreTestBase : public ::testing::Test {
- protected:
-  void SetUp() override {
-    ::testing::Test::SetUp();
-    ASSERT_NO_FATAL_FAILURE(
-        registry_override_manager_.OverrideRegistry(HKEY_CURRENT_USER));
-  }
-
- private:
-  registry_util::RegistryOverrideManager registry_override_manager_;
-};
-
-#else  // BUILDFLAG(IS_WIN)
-
 using PlatformStateStoreTestBase = ::testing::Test;
-
-#endif  // BUILDFLAG(IS_WIN)
 
 // A test fixture with a testing profile that writes its user prefs to a json
 // file.

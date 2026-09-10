@@ -66,10 +66,7 @@ AddressInfo::AddressInfoAndResult AddressInfo::Get(
 
     // If the call to getaddrinfo() failed because of a system error, report
     // it separately from ERR_NAME_NOT_RESOLVED.
-#if BUILDFLAG(IS_WIN)
-    if (os_error != WSAHOST_NOT_FOUND && os_error != WSANO_DATA)
-      err = ERR_NAME_RESOLUTION_FAILED;
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
     // Workaround for Android's getaddrinfo leaving ai==nullptr without an
     // error.
     // http://crbug.com/134142
@@ -189,9 +186,6 @@ std::unique_ptr<addrinfo, FreeAddrInfoFunc> AddrInfoGetter::getaddrinfo(
 #if BUILDFLAG(IS_ANDROID)
     *out_os_error = android::GetAddrInfoForNetwork(network, host.c_str(),
                                                    nullptr, hints, &ai);
-#elif BUILDFLAG(IS_WIN)
-    *out_os_error = WSAEOPNOTSUPP;
-    return rv;
 #else
     errno = ENOSYS;
     *out_os_error = EAI_SYSTEM;
@@ -202,9 +196,6 @@ std::unique_ptr<addrinfo, FreeAddrInfoFunc> AddrInfoGetter::getaddrinfo(
   }
 
   if (*out_os_error) {
-#if BUILDFLAG(IS_WIN)
-    *out_os_error = WSAGetLastError();
-#endif
     return rv;
   }
 

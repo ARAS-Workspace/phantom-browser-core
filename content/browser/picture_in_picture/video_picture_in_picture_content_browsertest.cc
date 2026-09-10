@@ -587,13 +587,8 @@ IN_PROC_BROWSER_TEST_F(MediaSessionPictureInPictureContentBrowserTest,
 // verifying that the "nexttrack" action can be invoked after playing through
 // to the end of media.
 // TODO(https://crbug.com/422414020): This is failing on Windows arm64.
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-#define MAYBE_ActionAvailableAfterEndOfStreamAndSrcUpdate \
-  DISABLED_ActionAvailableAfterEndOfStreamAndSrcUpdate
-#else
 #define MAYBE_ActionAvailableAfterEndOfStreamAndSrcUpdate \
   ActionAvailableAfterEndOfStreamAndSrcUpdate
-#endif
 IN_PROC_BROWSER_TEST_F(MediaSessionPictureInPictureContentBrowserTest,
                        MAYBE_ActionAvailableAfterEndOfStreamAndSrcUpdate) {
   ASSERT_TRUE(NavigateToURL(

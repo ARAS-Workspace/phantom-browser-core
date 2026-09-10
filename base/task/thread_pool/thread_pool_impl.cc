@@ -230,11 +230,6 @@ void ThreadPoolImpl::Start(const ThreadPoolInstance::InitParams& init_params,
     case InitParams::CommonThreadPoolEnvironment::DEFAULT:
       worker_environment = ThreadGroup::WorkerEnvironment::NONE;
       break;
-#if BUILDFLAG(IS_WIN)
-    case InitParams::CommonThreadPoolEnvironment::COM_MTA:
-      worker_environment = ThreadGroup::WorkerEnvironment::COM_MTA;
-      break;
-#endif
   }
 
   size_t foreground_threads = init_params.max_num_foreground_threads;
@@ -363,15 +358,6 @@ ThreadPoolImpl::CreateSingleThreadTaskRunner(
   return single_thread_task_runner_manager_.CreateSingleThreadTaskRunner(
       traits, thread_mode);
 }
-
-#if BUILDFLAG(IS_WIN)
-scoped_refptr<SingleThreadTaskRunner> ThreadPoolImpl::CreateCOMSTATaskRunner(
-    const TaskTraits& traits,
-    SingleThreadTaskRunnerThreadMode thread_mode) {
-  return single_thread_task_runner_manager_.CreateCOMSTATaskRunner(traits,
-                                                                   thread_mode);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 scoped_refptr<UpdateableSequencedTaskRunner>
 ThreadPoolImpl::CreateUpdateableSequencedTaskRunner(const TaskTraits& traits) {

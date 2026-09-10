@@ -39,8 +39,6 @@
 
 #if BUILDFLAG(IS_ANDROID)
 #include "net/android/dummy_spnego_authenticator.h"
-#elif BUILDFLAG(IS_WIN)
-#include "net/http/mock_sspi_library_win.h"
 #elif BUILDFLAG(USE_EXTERNAL_GSSAPI)
 #include "net/http/mock_gssapi_library_posix.h"
 #else
@@ -61,12 +59,7 @@ class HttpAuthHandlerNegotiateTest : public PlatformTest,
     scoped_feature_list_.InitAndEnableFeature(
         features::kPartitionConnectionsByNetworkIsolationKey);
     network_anoymization_key_ = NetworkAnonymizationKey::CreateTransient();
-#if BUILDFLAG(IS_WIN)
-    auto auth_library =
-        std::make_unique<MockAuthLibrary>(const_cast<wchar_t*>(NEGOSSP_NAME));
-#else
     auto auth_library = std::make_unique<MockAuthLibrary>();
-#endif
     auth_library_ = auth_library.get();
     resolver_ = std::make_unique<MockCachingHostResolver>(
         /*cache_invalidation_num=*/0,
@@ -94,13 +87,6 @@ class HttpAuthHandlerNegotiateTest : public PlatformTest,
 #endif
 
   void SetupMocks(MockAuthLibrary* mock_library) {
-#if BUILDFLAG(IS_WIN)
-    security_package_ = std::make_unique<SecPkgInfoW>();
-    UNSAFE_TODO(memset(security_package_.get(), 0x0, sizeof(SecPkgInfoW)));
-    security_package_->cbMaxToken = 1337;
-    mock_library->ExpectQuerySecurityPackageInfo(SEC_E_OK,
-                                                 security_package_.get());
-#else
     // Copied from an actual transaction!
     static const char kAuthResponse[] =
         "\x60\x82\x02\xCA\x06\x09\x2A\x86\x48\x86\xF7\x12\x01\x02\x02\x01"
@@ -187,7 +173,6 @@ class HttpAuthHandlerNegotiateTest : public PlatformTest,
           query.minor_response_code, query.context_info,
           query.expected_input_token, query.output_token);
     }
-#endif  // BUILDFLAG(IS_WIN)
   }
 
 #if BUILDFLAG(IS_POSIX)
@@ -265,9 +250,7 @@ class HttpAuthHandlerNegotiateTest : public PlatformTest,
 
   NetworkAnonymizationKey network_anoymization_key_;
 
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<SecPkgInfoW> security_package_;
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   std::unique_ptr<MockAuthLibrary> auth_library_for_android_;
 #endif
   std::unique_ptr<MockCachingHostResolver> resolver_;
@@ -292,11 +275,7 @@ TEST_F(HttpAuthHandlerNegotiateTest, DisableCname) {
   std::string token;
   EXPECT_EQ(OK, callback.GetResult(auth_handler->GenerateAuthToken(
                     nullptr, &request_info, callback.callback(), &token)));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ("HTTP/alias", auth_handler->spn_for_testing());
-#else
   EXPECT_EQ("HTTP@alias", auth_handler->spn_for_testing());
-#endif
 }
 
 TEST_F(HttpAuthHandlerNegotiateTest, DisableCnameStandardPort) {
@@ -310,11 +289,7 @@ TEST_F(HttpAuthHandlerNegotiateTest, DisableCnameStandardPort) {
   std::string token;
   EXPECT_EQ(OK, callback.GetResult(auth_handler->GenerateAuthToken(
                     nullptr, &request_info, callback.callback(), &token)));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ("HTTP/alias", auth_handler->spn_for_testing());
-#else
   EXPECT_EQ("HTTP@alias", auth_handler->spn_for_testing());
-#endif
 }
 
 TEST_F(HttpAuthHandlerNegotiateTest, DisableCnameNonstandardPort) {
@@ -328,11 +303,7 @@ TEST_F(HttpAuthHandlerNegotiateTest, DisableCnameNonstandardPort) {
   std::string token;
   EXPECT_EQ(OK, callback.GetResult(auth_handler->GenerateAuthToken(
                     nullptr, &request_info, callback.callback(), &token)));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ("HTTP/alias:500", auth_handler->spn_for_testing());
-#else
   EXPECT_EQ("HTTP@alias:500", auth_handler->spn_for_testing());
-#endif
 }
 
 TEST_F(HttpAuthHandlerNegotiateTest, CnameSync) {
@@ -346,11 +317,7 @@ TEST_F(HttpAuthHandlerNegotiateTest, CnameSync) {
   std::string token;
   EXPECT_EQ(OK, callback.GetResult(auth_handler->GenerateAuthToken(
                     nullptr, &request_info, callback.callback(), &token)));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ("HTTP/canonical.example.com", auth_handler->spn_for_testing());
-#else
   EXPECT_EQ("HTTP@canonical.example.com", auth_handler->spn_for_testing());
-#endif
 
   // Make sure a cache-only lookup with the wrong NetworkAnonymizationKey (an
   // empty one) fails, to make sure the right NetworkAnonymizationKey was used.
@@ -390,11 +357,7 @@ TEST_F(HttpAuthHandlerNegotiateTest, CnameAsync) {
             auth_handler->GenerateAuthToken(nullptr, &request_info,
                                             callback.callback(), &token));
   EXPECT_THAT(callback.WaitForResult(), IsOk());
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ("HTTP/canonical.example.com", auth_handler->spn_for_testing());
-#else
   EXPECT_EQ("HTTP@canonical.example.com", auth_handler->spn_for_testing());
-#endif
 
   // Make sure a cache-only lookup with the wrong NetworkAnonymizationKey (an
   // empty one) fails, to make sure the right NetworkAnonymizationKey was used.
@@ -532,10 +495,7 @@ TEST_F(HttpAuthHandlerNegotiateTest, OverrideAuthSystem) {
             return std::make_unique<TestAuthSystem>();
           }));
   negotiate_factory->set_http_auth_preferences(http_auth_preferences());
-#if BUILDFLAG(IS_WIN)
-  negotiate_factory->set_library(
-      std::make_unique<MockAuthLibrary>(NEGOSSP_NAME));
-#elif !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   negotiate_factory->set_library(std::make_unique<MockAuthLibrary>());
 #endif
 

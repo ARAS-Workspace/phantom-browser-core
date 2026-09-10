@@ -24,11 +24,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#include "base/win/wmi.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 using enterprise::ProfileIdServiceFactory;
 using testing::_;
 
@@ -124,10 +119,6 @@ TEST_F(ManagedProfileCreatorTest, CreatesNewProfile) {
   EXPECT_EQ(u"local_profile_name", entry->GetName());
 
   std::string device_id = kFakeDeviceID;
-#if BUILDFLAG(IS_WIN)
-  device_id +=
-      base::WideToUTF8(base::win::WmiComputerSystemInfo::Get().serial_number());
-#endif  // (BUILDFLAG(IS_WIN)
 
   EXPECT_EQ(ProfileIdServiceFactory::GetForProfile(profile_)
                 ->GetProfileIdWithGuidAndDeviceId(kExampleGuid, device_id)

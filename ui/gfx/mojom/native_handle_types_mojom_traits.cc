@@ -18,10 +18,6 @@
 #include "ui/gfx/native_pixmap_handle.h"
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
 
-#if BUILDFLAG(IS_WIN)
-#include "base/memory/unsafe_shared_memory_region.h"
-#include "ui/gfx/gpu_memory_buffer_handle.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/scoped_hardware_buffer_handle.h"
@@ -123,34 +119,6 @@ bool StructTraits<
 }
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
 
-#if BUILDFLAG(IS_WIN)
-bool StructTraits<gfx::mojom::DXGIHandleDataView, gfx::DXGIHandle>::Read(
-    gfx::mojom::DXGIHandleDataView data,
-    gfx::DXGIHandle* handle) {
-  base::win::ScopedHandle buffer_handle = data.TakeBufferHandle().TakeHandle();
-  gfx::DXGIHandleToken token;
-  if (!data.ReadToken(&token)) {
-    return false;
-  }
-  base::UnsafeSharedMemoryRegion region;
-  if (!data.ReadSharedMemoryHandle(&region)) {
-    return false;
-  }
-  *handle = gfx::DXGIHandle(std::move(buffer_handle), token, std::move(region));
-  DCHECK(handle->IsValid());
-  return true;
-}
-
-bool StructTraits<gfx::mojom::DXGIHandleTokenDataView, gfx::DXGIHandleToken>::
-    Read(gfx::mojom::DXGIHandleTokenDataView& input,
-         gfx::DXGIHandleToken* output) {
-  base::UnguessableToken token;
-  if (!input.ReadValue(&token))
-    return false;
-  *output = gfx::DXGIHandleToken(token);
-  return true;
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_APPLE)
 IOSurfaceHandle::IOSurfaceHandle() = default;
@@ -193,10 +161,6 @@ gfx::mojom::GpuMemoryBufferPlatformHandleDataView::Tag UnionTraits<
     case gfx::NATIVE_PIXMAP:
       return Tag::kNativePixmapHandle;
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
-#if BUILDFLAG(IS_WIN)
-    case gfx::DXGI_SHARED_HANDLE:
-      return Tag::kDxgiHandle;
-#endif
 #if BUILDFLAG(IS_ANDROID)
     case gfx::ANDROID_HARDWARE_BUFFER:
       return Tag::kAndroidHardwareBufferHandle;
@@ -275,11 +239,6 @@ bool UnionTraits<gfx::mojom::GpuMemoryBufferPlatformHandleDataView,
       gmb_handle->type = gfx::NATIVE_PIXMAP;
       return data.ReadNativePixmapHandle(&gmb_handle->native_pixmap_handle_);
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_OZONE)
-#if BUILDFLAG(IS_WIN)
-    case Tag::kDxgiHandle:
-      gmb_handle->type = gfx::DXGI_SHARED_HANDLE;
-      return data.ReadDxgiHandle(&gmb_handle->dxgi_handle_);
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_ANDROID)
     case Tag::kAndroidHardwareBufferHandle:
       gmb_handle->type = gfx::ANDROID_HARDWARE_BUFFER;

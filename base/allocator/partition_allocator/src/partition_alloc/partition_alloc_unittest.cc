@@ -88,9 +88,7 @@
 #endif
 
 // Headers for the AmountOfPhysicalMemory() function.
-#if PA_BUILDFLAG(IS_WIN)
-#include <windows.h>
-#elif PA_BUILDFLAG(IS_APPLE)
+#if PA_BUILDFLAG(IS_APPLE)
 #include <sys/sysctl.h>
 #elif PA_BUILDFLAG(IS_POSIX)
 #include <unistd.h>
@@ -115,13 +113,7 @@ namespace {
 // Best effort to get the amount of physical memory available to the system.
 // Returns 0 on failure.
 uint64_t AmountOfPhysicalMemory() {
-#if PA_BUILDFLAG(IS_WIN)
-  MEMORYSTATUSEX mem_status = {.dwLength = sizeof(mem_status)};
-  if (GlobalMemoryStatusEx(&mem_status)) {
-    return mem_status.ullTotalPhys;
-  }
-  return 0;
-#elif PA_BUILDFLAG(IS_APPLE)
+#if PA_BUILDFLAG(IS_APPLE)
   uint64_t physical_memory;
   size_t size = sizeof(physical_memory);
   int rv = sysctlbyname("hw.memsize", &physical_memory, &size, nullptr, 0);
@@ -2717,7 +2709,9 @@ TEST_P(PartitionAllocTest, CheckMetadataIntegrityPass) {
 //
 // Disable these test on Windows, since they run slower, so tend to timeout and
 // cause flake.
-#if !PA_BUILDFLAG(IS_WIN) && (!PA_BUILDFLAG(PA_ARCH_CPU_64_BITS) || (PA_BUILDFLAG(IS_POSIX) && !(PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID))))
+#if (!PA_BUILDFLAG(PA_ARCH_CPU_64_BITS) || \
+     (PA_BUILDFLAG(IS_POSIX) &&            \
+      !(PA_BUILDFLAG(IS_APPLE) || PA_BUILDFLAG(IS_ANDROID))))
 #define MAYBE_RepeatedAllocReturnNullDirect RepeatedAllocReturnNullDirect
 #define MAYBE_RepeatedReallocReturnNullDirect RepeatedReallocReturnNullDirect
 #else
@@ -3535,11 +3529,7 @@ TEST_P(PartitionAllocTest, PurgeDiscardableFirstPage) {
     EXPECT_TRUE(stats);
     EXPECT_TRUE(stats->is_valid);
     EXPECT_EQ(0u, stats->decommittable_bytes);
-#if PA_BUILDFLAG(IS_WIN)
-    EXPECT_EQ(0u, stats->discardable_bytes);
-#else
     EXPECT_EQ(SystemPageSize(), stats->discardable_bytes);
-#endif
     EXPECT_EQ(SystemPageSize(), stats->active_bytes);
     EXPECT_EQ(2 * SystemPageSize(), stats->resident_bytes);
   }
@@ -3575,11 +3565,7 @@ TEST_P(PartitionAllocTest, PurgeDiscardableNonPageSizedAlloc) {
     EXPECT_TRUE(stats);
     EXPECT_TRUE(stats->is_valid);
     EXPECT_EQ(0u, stats->decommittable_bytes);
-#if PA_BUILDFLAG(IS_WIN)
-    EXPECT_EQ(3 * SystemPageSize(), stats->discardable_bytes);
-#else
     EXPECT_EQ(4 * SystemPageSize(), stats->discardable_bytes);
-#endif
     EXPECT_EQ(requested_size * 2, stats->active_bytes);
     EXPECT_EQ(10 * SystemPageSize(), stats->resident_bytes);
   }
@@ -3635,11 +3621,7 @@ TEST_P(PartitionAllocTest, PurgeDiscardableNonPageSizedAllocOnSlotBoundary) {
     EXPECT_TRUE(stats);
     EXPECT_TRUE(stats->is_valid);
     EXPECT_EQ(0u, stats->decommittable_bytes);
-#if PA_BUILDFLAG(IS_WIN)
-    EXPECT_EQ(3 * SystemPageSize(), stats->discardable_bytes);
-#else
     EXPECT_EQ(4 * SystemPageSize(), stats->discardable_bytes);
-#endif
     EXPECT_EQ(requested_size * 2, stats->active_bytes);
     EXPECT_EQ(10 * SystemPageSize(), stats->resident_bytes);
   }
@@ -3753,11 +3735,7 @@ TEST_P(PartitionAllocTest, PurgeDiscardableWithFreeListStraightening) {
     EXPECT_TRUE(stats);
     EXPECT_TRUE(stats->is_valid);
     EXPECT_EQ(0u, stats->decommittable_bytes);
-#if PA_BUILDFLAG(IS_WIN)
-    EXPECT_EQ(SystemPageSize(), stats->discardable_bytes);
-#else
     EXPECT_EQ(2 * SystemPageSize(), stats->discardable_bytes);
-#endif
     EXPECT_EQ(SystemPageSize(), stats->active_bytes);
     EXPECT_EQ(4 * SystemPageSize(), stats->resident_bytes);
   }

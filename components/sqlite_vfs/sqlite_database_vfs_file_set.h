@@ -69,11 +69,9 @@ class COMPONENT_EXPORT(SQLITE_VFS) SqliteVfsFileSet {
   const base::File& GetWalIndexFile() const {
     return db_file_->GetWalIndexFile();
   }
-#if !BUILDFLAG(IS_WIN)
   const base::File& GetWalIndexFileReadOnly() const {
     return wal_index_file_read_only_;
   }
-#endif
   const base::UnsafeSharedMemoryRegion& GetSharedLock() const {
     return shared_lock_;
   }
@@ -99,9 +97,7 @@ class COMPONENT_EXPORT(SQLITE_VFS) SqliteVfsFileSet {
   SqliteVfsFileSet(std::unique_ptr<SandboxedFile> db_file,
                    std::unique_ptr<SandboxedFile> journal_file,
                    std::unique_ptr<SandboxedFile> wal_journal_file,
-#if !BUILDFLAG(IS_WIN)
                    base::File wal_index_file_read_only,
-#endif
                    base::UnsafeSharedMemoryRegion shared_lock,
                    bool wal_mode);
 
@@ -114,11 +110,9 @@ class COMPONENT_EXPORT(SQLITE_VFS) SqliteVfsFileSet {
   // The write-ahead journal file is only present if
   std::unique_ptr<SandboxedFile> wal_journal_file_;
 
-#if !BUILDFLAG(IS_WIN)
   // Read-only handle to the database's WAL-index file ("-shm") on POSIX systems
   // for a read-write database open for multiple connections.
   base::File wal_index_file_read_only_;
-#endif
 
   // SQLite databases use standard naming for their files. Since the vfs might
   // register files for many databases at once it needs some way to

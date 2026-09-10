@@ -190,13 +190,8 @@ const SandboxedRarAnalyzerTest::BinaryData
         "signed.exe",
         CDRDT(WIN_EXECUTABLE),
         kSignedExeSignature,
-#if BUILDFLAG(IS_WIN)
-        true,
-        true,
-#else
         false,
         false,
-#endif
         37768,
 };
 
@@ -442,14 +437,8 @@ TEST_F(SandboxedRarAnalyzerTest,
   ASSERT_TRUE(binary.has_length());
   EXPECT_EQ(kSignedExe.length, binary.length());
 
-#if BUILDFLAG(IS_WIN)
-  // On windows, we should also have a signature and image header
-  ASSERT_TRUE(binary.has_signature());
-  ASSERT_TRUE(binary.has_image_headers());
-#else
   ASSERT_FALSE(binary.has_signature());
   ASSERT_FALSE(binary.has_image_headers());
-#endif
 }
 
 TEST_F(SandboxedRarAnalyzerTest, AnalyzeMultipartRarContainingExecutable) {

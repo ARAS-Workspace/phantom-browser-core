@@ -42,7 +42,6 @@ class SystemDisplayExtensionApiTest : public ExtensionApiTest {
 };
 
 // TODO(crbug.com/40779611): Revisit this after screen creation refactoring.
-#if !BUILDFLAG(IS_WIN)
 
 IN_PROC_BROWSER_TEST_F(SystemDisplayExtensionApiTest, GetDisplayInfo) {
   ASSERT_TRUE(RunExtensionTest("system_display/info")) << message_;
@@ -65,8 +64,6 @@ IN_PROC_BROWSER_TEST_F(SystemDisplayExtensionApiTest, OnDisplayChangedEvent) {
   EXPECT_TRUE(base::test::RunUntil(
       [&]() { return !provider_->is_observing_for_testing(); }));
 }
-
-#endif  // BUILDFLAG(IS_WIN)
 
 #if !BUILDFLAG(IS_CHROMEOS)
 

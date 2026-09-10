@@ -23,11 +23,7 @@
 namespace {
 
 const base::CommandLine::StringType FAKE_DEVICE_FLAG =
-#if BUILDFLAG(IS_WIN)
-    base::ASCIIToWide(switches::kUseFakeDeviceForMediaStream);
-#else
     switches::kUseFakeDeviceForMediaStream;
-#endif
 
 bool IsUseFakeDeviceForMediaStream(const base::CommandLine::StringType& arg) {
   return arg.find(FAKE_DEVICE_FLAG) != std::string::npos;

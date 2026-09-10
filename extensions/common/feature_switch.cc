@@ -20,7 +20,7 @@ class CommonSwitches {
       :  // Intentionally no flag since turning this off outside of tests
          // is a security risk.
         prompt_for_external_extensions(nullptr,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
                                        FeatureSwitch::DEFAULT_ENABLED),
 #else
                                        FeatureSwitch::DEFAULT_DISABLED),

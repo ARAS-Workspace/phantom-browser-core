@@ -439,20 +439,6 @@ TEST_P(SecurePaymentConfirmationAppBrowserBindingTest,
 
   if (GetParam().expect_browser_bound_key) {
     // Last used time should only be set/updated on Windows platform.
-#if BUILDFLAG(IS_WIN)
-    if (GetParam().is_new_bbk) {
-      EXPECT_CALL(
-          *mock_service,
-          SetBrowserBoundKey(
-              _, _, _,
-              /*last_used=*/testing::Optional(base::Time::NowFromSystemTime()),
-              _));
-    } else {
-      EXPECT_CALL(*mock_service,
-                  UpdateBrowserBoundKeyLastUsed(
-                      _, _, /*last_used=*/base::Time::NowFromSystemTime(), _));
-    }
-#else
     if (GetParam().is_new_bbk) {
       EXPECT_CALL(
           *mock_service,
@@ -460,7 +446,6 @@ TEST_P(SecurePaymentConfirmationAppBrowserBindingTest,
     } else {
       EXPECT_CALL(*mock_service, UpdateBrowserBoundKeyLastUsed).Times(0);
     }
-#endif
   }
 
   // Simulate the retrieval of an existing browser bound key.

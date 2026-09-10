@@ -61,10 +61,6 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/base/clipboard/clipboard_util_win.h"
-#endif
-
 using base::ASCIIToUTF16;
 using base::UTF16ToUTF8;
 
@@ -154,12 +150,6 @@ TYPED_TEST(ClipboardTest, ClearTest) {
       &this->clipboard(), ClipboardFormatType::PlainTextType(),
       ClipboardBuffer::kCopyPaste,
       /* data_dst = */ nullptr));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_FALSE(ui::clipboard_test_util::IsFormatAvailable(
-      &this->clipboard(), ClipboardFormatType::PlainTextAType(),
-      ClipboardBuffer::kCopyPaste,
-      /* data_dst = */ nullptr));
-#endif
 }
 
 TYPED_TEST(ClipboardTest, TextTest) {
@@ -177,12 +167,6 @@ TYPED_TEST(ClipboardTest, TextTest) {
       &this->clipboard(), ClipboardFormatType::PlainTextType(),
       ClipboardBuffer::kCopyPaste,
       /* data_dst = */ nullptr));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(ui::clipboard_test_util::IsFormatAvailable(
-      &this->clipboard(), ClipboardFormatType::PlainTextAType(),
-      ClipboardBuffer::kCopyPaste,
-      /* data_dst = */ nullptr));
-#endif
 
   text_result = clipboard_test_util::ReadText(&this->clipboard(),
                                               ClipboardBuffer::kCopyPaste,
@@ -220,11 +204,6 @@ TYPED_TEST(ClipboardTest, HTMLTest) {
   EXPECT_LE(markup.size(), fragment_end - fragment_start);
   EXPECT_EQ(markup,
             markup_result.substr(fragment_end - markup.size(), markup.size()));
-#if BUILDFLAG(IS_WIN)
-  // TODO(playmobil): It's not clear that non windows clipboards need to support
-  // this.
-  EXPECT_EQ(url, url_result);
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 TYPED_TEST(ClipboardTest, SvgTest) {
@@ -248,17 +227,6 @@ TYPED_TEST(ClipboardTest, SvgTest) {
 
   EXPECT_EQ(markup, markup_result);
   // On Windows, the SVG data is written as UTF-8.
-#if BUILDFLAG(IS_WIN)
-  if (base::FeatureList::IsEnabled(features::kUseUtf8EncodingForSvgImage)) {
-    std::string result = clipboard_test_util::ReadData(
-        &this->clipboard(), ClipboardFormatType::SvgType(),
-        /*data_dst=*/nullptr);
-    // On Windows, after calling `GetClipboardData`, some extra null characters
-    // are added at the end. Use the C-string for comparison that ignores the
-    // null characters after the first one.
-    EXPECT_EQ(base::UTF16ToUTF8(markup), result.c_str());
-  }
-#endif
 }
 
 #if !BUILDFLAG(IS_ANDROID)
@@ -376,11 +344,6 @@ TYPED_TEST(ClipboardTest, TrickyHTMLTest) {
   EXPECT_LE(markup.size(), fragment_end - fragment_start);
   EXPECT_EQ(markup,
             markup_result.substr(fragment_end - markup.size(), markup.size()));
-#if BUILDFLAG(IS_WIN)
-  // TODO(playmobil): It's not clear that non windows clipboards need to support
-  // this.
-  EXPECT_EQ(url, url_result);
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 // Some platforms store HTML as UTF-8 internally. Make sure fragment indices are
@@ -412,13 +375,10 @@ TYPED_TEST(ClipboardTest, UnicodeHTMLTest) {
   EXPECT_LE(markup.size(), fragment_end - fragment_start);
   EXPECT_EQ(markup,
             markup_result.substr(fragment_end - markup.size(), markup.size()));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(url, url_result);
-#endif
 }
 
 // TODO(estade): Port the following test (decide what target we use for urls)
-#if !BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_APPLE)
 TYPED_TEST(ClipboardTest, BookmarkTest) {
   std::u16string title(u"The Example Company"), title_result;
   std::string url("http://www.example.com/"), url_result;
@@ -436,12 +396,7 @@ TYPED_TEST(ClipboardTest, BookmarkTest) {
   clipboard_test_util::ReadBookmark(&this->clipboard(),
                                     /* data_dst = */ nullptr, &title_result,
                                     &url_result);
-#if !BUILDFLAG(IS_WIN)
   EXPECT_EQ(title, title_result);
-#else
-  // On Windows the title should be empty when CFSTR_INETURLW is queried.
-  EXPECT_EQ(std::string(), UTF16ToUTF8(title_result));
-#endif
   EXPECT_EQ(url, url_result);
 }
 #endif  // !BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_APPLE)
@@ -501,12 +456,6 @@ TYPED_TEST(ClipboardTest, MultiFormatTest) {
       &this->clipboard(), ClipboardFormatType::PlainTextType(),
       ClipboardBuffer::kCopyPaste,
       /* data_dst = */ nullptr));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(ui::clipboard_test_util::IsFormatAvailable(
-      &this->clipboard(), ClipboardFormatType::PlainTextAType(),
-      ClipboardBuffer::kCopyPaste,
-      /* data_dst = */ nullptr));
-#endif
   uint32_t fragment_start;
   uint32_t fragment_end;
   clipboard_test_util::ReadHTML(&this->clipboard(), ClipboardBuffer::kCopyPaste,
@@ -515,11 +464,6 @@ TYPED_TEST(ClipboardTest, MultiFormatTest) {
   EXPECT_LE(markup.size(), fragment_end - fragment_start);
   EXPECT_EQ(markup,
             markup_result.substr(fragment_end - markup.size(), markup.size()));
-#if BUILDFLAG(IS_WIN)
-  // TODO(playmobil): It's not clear that non windows clipboards need to support
-  // this.
-  EXPECT_EQ(url, url_result);
-#endif  // BUILDFLAG(IS_WIN)
   text_result = clipboard_test_util::ReadText(&this->clipboard(),
                                               ClipboardBuffer::kCopyPaste,
                                               /* data_dst = */ nullptr);
@@ -544,12 +488,6 @@ TYPED_TEST(ClipboardTest, URLTest) {
       &this->clipboard(), ClipboardFormatType::PlainTextType(),
       ClipboardBuffer::kCopyPaste,
       /* data_dst = */ nullptr));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(ui::clipboard_test_util::IsFormatAvailable(
-      &this->clipboard(), ClipboardFormatType::PlainTextAType(),
-      ClipboardBuffer::kCopyPaste,
-      /* data_dst = */ nullptr));
-#endif
   std::u16string text_result = clipboard_test_util::ReadText(
       &this->clipboard(), ClipboardBuffer::kCopyPaste,
       /* data_dst = */ nullptr);
@@ -571,37 +509,6 @@ TYPED_TEST(ClipboardTest, URLTest) {
   EXPECT_EQ(UTF16ToUTF8(url), ascii_text);
 #endif
 }
-
-#if BUILDFLAG(IS_WIN)
-// See crbug.com/1477344 for more details on the issue.
-TYPED_TEST(ClipboardTest, ChromiumCustomFormatTest) {
-  std::u16string markup(u"<strong>Hi!</string>"), markup_result;
-  std::string url("http://www.example.com/"), url_result;
-
-  {
-    ScopedClipboardWriter clipboard_writer(ClipboardBuffer::kCopyPaste);
-    clipboard_writer.WriteHTML(markup, url);
-  }
-
-  EXPECT_THAT(this->GetAvailableTypes(ClipboardBuffer::kCopyPaste),
-              Contains(kMimeTypeHtml16));
-  EXPECT_THAT(this->GetAvailableTypes(ClipboardBuffer::kCopyPaste),
-              testing::Not(Contains(kMimeTypeDataTransferCustomData16)));
-  {
-    ScopedClipboardWriter clipboard_writer(ClipboardBuffer::kCopyPaste);
-    base::flat_map<std::u16string, std::u16string> custom_data;
-    custom_data[kMimeTypeDataTransferCustomData16] = u"data";
-    base::Pickle pickle;
-    WriteCustomDataToPickle(custom_data, &pickle);
-    clipboard_writer.WritePickledData(
-        pickle, ClipboardFormatType::DataTransferCustomType());
-  }
-  EXPECT_THAT(this->GetAvailableTypes(ClipboardBuffer::kCopyPaste),
-              testing::Not(Contains(kMimeTypeHtml16)));
-  EXPECT_THAT(this->GetAvailableTypes(ClipboardBuffer::kCopyPaste),
-              Contains(kMimeTypeDataTransferCustomData16));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 namespace {
 
@@ -965,12 +872,7 @@ TYPED_TEST(ClipboardTest, PlatformSpecificDataTest) {
   const std::string text = "test string";
   const std::string kFormatString = "web text/plain";
   const std::u16string kFormatString16 = u"text/plain";
-#if BUILDFLAG(IS_WIN)
-  // Windows requires an extra '\0' at the end for a raw write.
-  const std::string kPlatformSpecificText = text + '\0';
-#else
   const std::string kPlatformSpecificText = text;
-#endif
   base::span<const uint8_t> text_span = UNSAFE_TODO(base::span<const uint8_t>(
       reinterpret_cast<const uint8_t*>(kPlatformSpecificText.data()),
       kPlatformSpecificText.size()));
@@ -1000,7 +902,7 @@ TYPED_TEST(ClipboardTest, PlatformSpecificDataTest) {
 }
 #endif
 
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_APPLE)
 TYPED_TEST(ClipboardTest, NonAsciiFormatTest) {
   ClipboardFormatType non_ascii_format =
       ClipboardFormatType::Deserialize("non-ascii-\xff");
@@ -1061,87 +963,6 @@ TYPED_TEST(ClipboardTest, WebSmartPasteTest) {
       ClipboardBuffer::kCopyPaste,
       /* data_dst = */ nullptr));
 }
-
-#if BUILDFLAG(IS_WIN)  // Windows only tests.
-void HtmlTestHelper(const std::string& cf_html,
-                    const std::string& expected_html) {
-  std::string html;
-  clipboard_util::CFHtmlToHtml(cf_html, &html, nullptr);
-  EXPECT_EQ(html, expected_html);
-}
-
-TYPED_TEST(ClipboardTest, HtmlTest) {
-  // Test converting from CF_HTML format data with <!--StartFragment--> and
-  // <!--EndFragment--> comments, like from MS Word.
-  HtmlTestHelper(
-      "Version:1.0\r\n"
-      "StartHTML:0000000105\r\n"
-      "EndHTML:0000000199\r\n"
-      "StartFragment:0000000123\r\n"
-      "EndFragment:0000000161\r\n"
-      "\r\n"
-      "<html>\r\n"
-      "<body>\r\n"
-      "<!--StartFragment-->\r\n"
-      "\r\n"
-      "<p>Foo</p>\r\n"
-      "\r\n"
-      "<!--EndFragment-->\r\n"
-      "</body>\r\n"
-      "</html>\r\n\r\n",
-      "<p>Foo</p>");
-
-  // Test converting from CF_HTML format data without <!--StartFragment--> and
-  // <!--EndFragment--> comments, like from OpenOffice Writer.
-  HtmlTestHelper(
-      "Version:1.0\r\n"
-      "StartHTML:0000000105\r\n"
-      "EndHTML:0000000151\r\n"
-      "StartFragment:0000000121\r\n"
-      "EndFragment:0000000131\r\n"
-      "<html>\r\n"
-      "<body>\r\n"
-      "<p>Foo</p>\r\n"
-      "</body>\r\n"
-      "</html>\r\n\r\n",
-      "<p>Foo</p>");
-}
-
-TYPED_TEST(ClipboardTest, PrivacyMetadataTest) {
-  // We're testing platform-specific behavior, so use PlatformClipboardTest.
-  std::string test_suite_name = ::testing::UnitTest::GetInstance()
-                                    ->current_test_info()
-                                    ->test_suite_name();
-  if (test_suite_name != std::string("ClipboardTest/PlatformClipboardTest")) {
-    return;
-  }
-
-  {
-    ScopedClipboardWriter clipboard_writer(ClipboardBuffer::kCopyPaste);
-    clipboard_writer.WriteText(u"foo");
-    clipboard_writer.MarkAsOffTheRecord();
-  }
-
-  EXPECT_TRUE(ui::clipboard_test_util::IsFormatAvailable(
-      &this->clipboard(), ClipboardFormatType::ClipboardHistoryType(),
-      ClipboardBuffer::kCopyPaste,
-      /* data_dst = */ nullptr));
-  EXPECT_TRUE(ui::clipboard_test_util::IsFormatAvailable(
-      &this->clipboard(), ClipboardFormatType::UploadCloudClipboardType(),
-      ClipboardBuffer::kCopyPaste,
-      /* data_dst = */ nullptr));
-  std::string result = clipboard_test_util::ReadData(
-      &this->clipboard(), ClipboardFormatType::ClipboardHistoryType(),
-      /* data_dst = */ nullptr);
-  DWORD history_data = UNSAFE_TODO(std::strtoul(result.c_str(), nullptr, 16));
-  EXPECT_EQ(0ul, history_data);
-  result = clipboard_test_util::ReadData(
-      &this->clipboard(), ClipboardFormatType::UploadCloudClipboardType(),
-      /* data_dst = */ nullptr);
-  DWORD cloud_data = UNSAFE_TODO(std::strtoul(result.c_str(), nullptr, 16));
-  EXPECT_EQ(0ul, cloud_data);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
 TYPED_TEST(ClipboardTest, PasswordTest) {
@@ -1248,7 +1069,7 @@ TYPED_TEST(ClipboardTest, WriteImageEmptyParams) {
   scw.WriteImage(SkBitmap());
 }
 
-#if (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID))
+#if BUILDFLAG(IS_ANDROID)
 TYPED_TEST(ClipboardTest, BookmarkTestWithoutTitle) {
   // We're testing platform-specific behavior, so use PlatformClipboardTest.
   std::string test_suite_name = ::testing::UnitTest::GetInstance()
@@ -1277,7 +1098,7 @@ TYPED_TEST(ClipboardTest, BookmarkTestWithoutTitle) {
                                     &url_result);
   EXPECT_EQ(url, url_result);
 }
-#endif  //(BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID))
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // Policy controller is only intended to be used in Chrome OS, so the following
 // policy related tests are only run on Chrome OS.

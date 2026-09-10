@@ -243,13 +243,6 @@
 #include "chrome/browser/web_applications/extensions/launch.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "ui/aura/window.h"
-#include "ui/aura/window_tree_host.h"
-#endif
-
 #if BUILDFLAG(ENABLE_LENS_DESKTOP_GOOGLE_BRANDED_FEATURES)
 #include "chrome/browser/lens/region_search/lens_region_search_controller.h"
 #include "chrome/browser/lens/region_search/lens_region_search_helper.h"
@@ -1306,28 +1299,6 @@ void CloseWindow(BrowserWindowInterface* browser) {
   base::RecordAction(UserMetricsAction("CloseWindow"));
   browser->GetWindow()->Close();
 }
-
-#if BUILDFLAG(IS_WIN)
-void OpenMoveWindow(BrowserWindowInterface* browser) {
-  HWND hwnd = BrowserView::GetBrowserViewForBrowser(
-                  browser->GetBrowserForMigrationOnly())
-                  ->GetWidget()
-                  ->GetNativeWindow()
-                  ->GetHost()
-                  ->GetAcceleratedWidget();
-  PostMessage(hwnd, WM_SYSCOMMAND, SC_MOVE, 0);
-}
-
-void OpenSizeWindow(BrowserWindowInterface* browser) {
-  HWND hwnd = BrowserView::GetBrowserViewForBrowser(
-                  browser->GetBrowserForMigrationOnly())
-                  ->GetWidget()
-                  ->GetNativeWindow()
-                  ->GetHost()
-                  ->GetAcceleratedWidget();
-  PostMessage(hwnd, WM_SYSCOMMAND, SC_SIZE, 0);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 content::WebContents& NewTab(BrowserWindowInterface* browser,
                              NewTabTypes context) {
@@ -2710,7 +2681,7 @@ void OpenUpdateChromeDialog(BrowserWindowInterface* browser) {
     ShowOutdatedUpgradeBubble(browser, browser,
                               /*auto_update_enabled=*/false);
   } else {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     if (base::FeatureList::IsEnabled(features::kFewerUpdateConfirmations)) {
       chrome::AttemptRelaunch();
       return;

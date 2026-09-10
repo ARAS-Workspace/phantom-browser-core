@@ -15,10 +15,6 @@
 #include "components/metrics_services_manager/metrics_services_manager.h"
 #include "content/public/test/browser_test.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/test/test_reg_util_win.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace {
 
 // Callback from changing whether reporting is enabled.
@@ -57,16 +53,6 @@ class SampledOutClientIdSavedBrowserTest : public PlatformBrowserTest {
   ~SampledOutClientIdSavedBrowserTest() override = default;
 
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    // Override HKCU to prevent writing to real keys. On Windows, the metrics
-    // reporting consent is stored in the registry, and it is used to determine
-    // the metrics reporting state when it is unset (e.g. during tests, which
-    // start with fresh user data dirs). Otherwise, this may cause flakiness
-    // since tests will sometimes start with metrics reporting enabled and
-    // sometimes disabled.
-    ASSERT_NO_FATAL_FAILURE(
-        override_manager_.OverrideRegistry(HKEY_CURRENT_USER));
-#endif  // BUILDFLAG(IS_WIN)
 
     // Because metrics reporting is disabled in non-Chrome-branded builds,
     // IsMetricsReportingEnabled() always returns false. Enable it here for
@@ -98,9 +84,6 @@ class SampledOutClientIdSavedBrowserTest : public PlatformBrowserTest {
   PrefService* local_state() { return g_browser_process->local_state(); }
 
  private:
-#if BUILDFLAG(IS_WIN)
-  registry_util::RegistryOverrideManager override_manager_;
-#endif  // BUILDFLAG(IS_WIN)
 
   base::test::ScopedFeatureList feature_list_;
 };

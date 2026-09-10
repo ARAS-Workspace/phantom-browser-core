@@ -170,8 +170,7 @@ TEST_P(HangWatcherEnabledTest, HangWatcherEnabled) {
 
 TEST(HangWatcherGpuEnabledTest, HangWatcherEnabledOnGpuProcessByDefault) {
   ManualHangWatcher hang_watcher(HangWatcher::ProcessType::kGPUProcess);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
   EXPECT_TRUE(hang_watcher.IsEnabled());
 #else
   EXPECT_FALSE(hang_watcher.IsEnabled());
@@ -897,8 +896,7 @@ TEST_F(HangWatcherTest, Hang) {
   EXPECT_EQ(hang_watcher.GetHangCount(), 1);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 // Tests that hangs get recorded for the GPU process by default.
 TEST_F(HangWatcherTest, GpuProcessHangReportingEnabledByDefault) {
   ManualHangWatcher hang_watcher(HangWatcher::ProcessType::kGPUProcess);

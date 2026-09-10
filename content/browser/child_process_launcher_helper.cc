@@ -297,9 +297,6 @@ void ChildProcessLauncherHelper::LaunchOnLauncherThread() {
   if (IsUsingLaunchOptions()) {
     options.emplace();
     options_ptr = &*options;
-#if BUILDFLAG(IS_WIN)
-    options_ptr->elevated = delegate_->ShouldLaunchElevated();
-#endif
   }
 
   // Propagate the kWaitForDebugger switch to child process if the
@@ -359,24 +356,14 @@ void ChildProcessLauncherHelper::LaunchOnLauncherThread() {
     // The LastError is set on the launcher thread, but needs to be transferred
     // to the Client thread.
     PostLaunchOnLauncherThread(std::move(process),
-#if BUILDFLAG(IS_WIN)
-                               ::GetLastError(),
-#endif
                                launch_result);
   }
 }
 
 void ChildProcessLauncherHelper::PostLaunchOnLauncherThread(
     ChildProcessLauncherHelper::Process process,
-#if BUILDFLAG(IS_WIN)
-    DWORD last_error,
-#endif
     int launch_result) {
-#if BUILDFLAG(IS_WIN)
-  const bool launch_elevated = delegate_->ShouldLaunchElevated();
-#else
   const bool launch_elevated = false;
-#endif
   if (mojo_channel_)
     mojo_channel_->RemoteProcessLaunchAttempted();
 
@@ -391,12 +378,6 @@ void ChildProcessLauncherHelper::PostLaunchOnLauncherThread(
   if (launch_elevated) {
     invitation.set_extra_flags(MOJO_SEND_INVITATION_FLAG_ELEVATED);
   }
-
-#if BUILDFLAG(IS_WIN)
-  if (delegate_->ShouldUseUntrustedMojoInvitation()) {
-    invitation.set_extra_flags(MOJO_SEND_INVITATION_FLAG_UNTRUSTED_PROCESS);
-  }
-#endif
 
   if (!mojo::core::GetConfiguration().is_broker_process) {
     invitation.set_extra_flags(MOJO_SEND_INVITATION_FLAG_SHARE_BROKER);
@@ -423,17 +404,11 @@ void ChildProcessLauncherHelper::PostLaunchOnLauncherThread(
       FROM_HERE,
       base::BindOnce(&ChildProcessLauncherHelper::PostLaunchOnClientThread,
                      this, std::move(process),
-#if BUILDFLAG(IS_WIN)
-                     last_error,
-#endif
                      launch_result));
 }
 
 void ChildProcessLauncherHelper::PostLaunchOnClientThread(
     ChildProcessLauncherHelper::Process process,
-#if BUILDFLAG(IS_WIN)
-    DWORD last_error,
-#endif
     int error_code) {
   if (child_process_launcher_) {
     // Record the total launch duration.
@@ -441,9 +416,6 @@ void ChildProcessLauncherHelper::PostLaunchOnClientThread(
                         base::TimeTicks::Now() - init_start_time_);
 
     child_process_launcher_->Notify(std::move(process),
-#if BUILDFLAG(IS_WIN)
-                                    last_error,
-#endif
                                     error_code);
   } else if (process.process.IsValid() && terminate_on_shutdown_) {
     // Client is gone, terminate the process.
@@ -471,7 +443,6 @@ void ChildProcessLauncherHelper::ForceNormalProcessTerminationAsync(
           std::move(process)));
 }
 
-#if !BUILDFLAG(IS_WIN)
 void ChildProcessLauncherHelper::PassLoggingSwitches(
     base::LaunchOptions* launch_options,
     base::CommandLine* cmd_line) {
@@ -487,7 +458,6 @@ void ChildProcessLauncherHelper::PassLoggingSwitches(
   };
   cmd_line->CopySwitchesFrom(browser_command_line, kForwardSwitches);
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 }  // namespace internal
 

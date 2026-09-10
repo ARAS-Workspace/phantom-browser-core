@@ -72,7 +72,7 @@ BASE_FEATURE(kDbusSecretPortal, base::FEATURE_ENABLED_BY_DEFAULT);
 // Destroy profiles when their last browser window is closed, instead of when
 // the browser exits.
 BASE_FEATURE(kDestroyProfileOnBrowserClose,
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
              base::FEATURE_ENABLED_BY_DEFAULT);
 #else
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -115,16 +115,6 @@ BASE_FEATURE(kNotificationOneTapUnsubscribeOnDesktop,
              base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-// When this feature is enabled, Chrome will register os_update_handler with
-// Omaha, to be run on OS upgrade.
-BASE_FEATURE(kRegisterOsUpdateHandlerWin, base::FEATURE_ENABLED_BY_DEFAULT);
-// When this feature is enabled, Chrome will install the
-// platform_experience_helper.
-BASE_FEATURE(kInstallPlatformExperienceHelperWin,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-
 // When this feature is enabled, the network service will restart unsandboxed if
 // a previous attempt to launch it sandboxed failed.
 BASE_FEATURE(kRestartNetworkServiceUnsandboxedForFailedLaunch,
@@ -164,67 +154,12 @@ BASE_FEATURE(kSecretPortalKeyProviderUseForEncryption,
 // Enables migration of the network context data from `unsandboxed_data_path` to
 // `data_path`. See the explanation in network_context.mojom.
 BASE_FEATURE(kTriggerNetworkDataMigration,
-#if BUILDFLAG(IS_WIN)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 // Enables runtime detection of USB devices which provide a WebUSB landing page
 // descriptor.
 BASE_FEATURE(kWebUsbDeviceDetection, base::FEATURE_ENABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_WIN)
-// Disable dynamic code using ACG. Prevents the browser process from generating
-// dynamic code or modifying executable code. See comments in
-// sandbox/win/src/security_level.h. Only available on Windows 10 RS1 (1607,
-// Build 14393) onwards.
-BASE_FEATURE(kBrowserDynamicCodeDisabled, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// When enabled, the browser will run with isolation enabled on the next
-// restart.
-BASE_FEATURE(kIsolatedProcess, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// The Chrome DLL can be pre-read with ::PrefetchVirtualMemory() from the
-// browser or a child process. Pre-reading is supposed to bring the whole DLL in
-// physical memory more efficiently than a series of hard faults. However,
-// pre-reading consumes a non-trivial amount of CPU even when the DLL is already
-// in physical memory and it may not be necessary to have the full DLL in
-// physical memory (space taken by unused parts of the DLL could potentially be
-// used for more important stuff). This file has multiple features to experiment
-// with policies for pre-reading the Chrome DLL in child processes. The
-// `kPrefetchVirtualMemoryPolicy` feature defined elsewhere controls pre-reading
-// the Chrome DLL from the browser process.
-
-// When enabled, child processes never pre-read the Chrome DLL.
-BASE_FEATURE(kNoPreReadMainDll, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// When enabled, child processes don't pre-read the Chrome DLL if we believe the
-// Chrome DLL is on an SSD (i.e. pre-read only on spinning disk).
-BASE_FEATURE(kNoPreReadMainDllIfSsd, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// When enabled, the browser process suppresses pre-read in child processes
-// shortly after browser startup, where "shortly after" is dictated by the
-// feature param below. This is thought to be a productive strategy since the
-// browser process will have recently pre-read the DLL during browser
-// startup. In that case, the browser process has recently pre-read the DLL so
-// pre-reading again is thought to be counter-productive (CPU consumption for no
-// gains).
-BASE_FEATURE(kNoPreReadMainDllStartup, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Time after browser startup during which child processes don't pre-read the
-// Chrome DLL when `kNoPreReadMainDllStartup` is enabled.
-const base::FeatureParam<base::TimeDelta>
-    kNoPreReadMainDllStartup_StartupDuration{&kNoPreReadMainDllStartup,
-                                             "no-preread-dll-startup-time",
-                                             base::Minutes(2)};
-
-// When enabled, the browser process will re-launch itself when launched with
-// an elevated linked token. The re-launched browser will use the token from
-// the Windows Shell (explorer.exe), which is typically non-elevated.
-BASE_FEATURE(kAutoDeElevate, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN)
 
 // This flag enables the removal of IWAs surface captures from Chrome Tabs
 // category in getDisplayMedia() API. When disabled, IWAs surface captures

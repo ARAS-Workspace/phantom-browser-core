@@ -82,11 +82,6 @@ class IconLoader : public base::SelfDeleting {
   void ReadGroup();
   void ReadIcon();
 #endif
-#if BUILDFLAG(IS_WIN)
-  // Reads an icon in a sandboxed service. Use this when the file itself must
-  // be parsed.
-  void ReadIconInSandbox();
-#endif
 
   // The traits of the tasks posted to base::ThreadPool by this class. These
   // operations may block, because they are fetching icons from the disk, yet

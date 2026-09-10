@@ -2283,7 +2283,7 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .SetActionId(kActionExit)
           .Build());
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
           base::BindRepeating(
@@ -2316,33 +2316,7 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               bwi))
           .SetActionId(kActionMaximizeWindow)
           .Build());
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN)
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::OpenMoveWindow(bwi);
-              },
-              bwi))
-          .SetActionId(kActionMoveWindow)
-          .SetText(l10n_util::GetStringUTF16(IDS_MOVE_WINDOW_MENU_WIN))
-          .Build());
-
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                chrome::OpenSizeWindow(bwi);
-              },
-              bwi))
-          .SetActionId(kActionSizeWindow)
-          .SetText(l10n_util::GetStringUTF16(IDS_SIZE_WINDOW_MENU_WIN))
-          .Build());
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX)
 
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
@@ -3164,7 +3138,7 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               [](BrowserWindowInterface* bwi, actions::ActionItem* item,
                  actions::ActionInvocationContext context) {
                 base::RecordAction(base::UserMetricsAction("CreateShortcut"));
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
                 chrome::CreateDesktopShortcutForActiveWebContents(
                     bwi->GetBrowserForMigrationOnly());
 #else
@@ -3821,7 +3795,7 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
 #endif
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
+    (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
           base::BindRepeating(

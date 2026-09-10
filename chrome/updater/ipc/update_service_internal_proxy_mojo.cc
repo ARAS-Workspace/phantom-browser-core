@@ -38,10 +38,6 @@
 #include "mojo/public/cpp/platform/platform_channel_endpoint.h"
 #include "mojo/public/cpp/system/isolated_connection.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <wrl/client.h>
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace updater {
 namespace {
 
@@ -104,16 +100,9 @@ void UpdateServiceInternalProxyMojoImpl::OnDisconnected() {
   remote_.reset();
 }
 
-#if BUILDFLAG(IS_WIN)
-void UpdateServiceInternalProxyMojoImpl::OnConnected(
-    mojo::PendingReceiver<mojom::UpdateServiceInternal> pending_receiver,
-    std::optional<mojo::PlatformChannelEndpoint> endpoint,
-    Microsoft::WRL::ComPtr<IUnknown> server) {
-#else   // BUILDFLAG(IS_WIN)
 void UpdateServiceInternalProxyMojoImpl::OnConnected(
     mojo::PendingReceiver<mojom::UpdateServiceInternal> pending_receiver,
     std::optional<mojo::PlatformChannelEndpoint> endpoint) {
-#endif  // BUILDFLAG(IS_WIN)
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   if (!endpoint) {
     VLOG(2) << "No endpoint received.";
@@ -135,10 +124,6 @@ void UpdateServiceInternalProxyMojoImpl::OnConnected(
 
   connection_ = std::move(connection);
 
-#if BUILDFLAG(IS_WIN)
-  server_ = server;
-#endif  // BUILDFLAG(IS_WIN)
-
   // A weak pointer is used here to prevent remote_ from forming a reference
   // cycle with this object.
   remote_.set_disconnect_handler(
@@ -146,13 +131,8 @@ void UpdateServiceInternalProxyMojoImpl::OnConnected(
                      weak_factory_.GetWeakPtr()));
 }
 
-#if BUILDFLAG(IS_WIN)
-scoped_refptr<UpdateServiceInternal> CreateUpdateServiceInternalProxyMojo(
-    UpdaterScope scope) {
-#else   // BUILDFLAG(IS_WIN)
 scoped_refptr<UpdateServiceInternal> CreateUpdateServiceInternalProxy(
     UpdaterScope scope) {
-#endif  // BUILDFLAG(IS_WIN)
   return base::MakeRefCounted<UpdateServiceInternalProxy>(
       base::MakeRefCounted<UpdateServiceInternalProxyMojoImpl>(scope));
 }

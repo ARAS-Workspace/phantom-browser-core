@@ -151,7 +151,7 @@ void FlagsUIHandler::SendExperimentalFeatures(bool deprecated_features_only) {
   results.Set("importExportEnabled",
               base::FeatureList::IsEnabled(features::kImportExportFlags));
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
   version_info::Channel channel = chrome::GetChannel();
   results.Set(
       flags_ui::kShowBetaChannelPromotion,

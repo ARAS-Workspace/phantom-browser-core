@@ -57,8 +57,6 @@ std::optional<HardwareCodecParameters> GetHardwareCodecParameters(
           switches::kCastStreamingForceDisableHardwareH264,
 #if BUILDFLAG(IS_MAC)
           &kCastStreamingMacHardwareH264
-#elif BUILDFLAG(IS_WIN)
-          &kCastStreamingWinHardwareH264
 #else
           nullptr
 #endif

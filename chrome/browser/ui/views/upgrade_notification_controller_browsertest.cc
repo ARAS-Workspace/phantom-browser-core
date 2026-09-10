@@ -47,24 +47,3 @@ IN_PROC_BROWSER_TEST_F(OutdatedUpgradeBubbleTest, InvokeUi_NoAutoUpdate) {
 }
 
 // The critical upgrade dialog is intentionally only shown on Windows.
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(OutdatedUpgradeBubbleTest, InvokeUi_Critical) {
-  // Omit seconds so as to have a consistent string for pixel tests.
-  CriticalNotificationBubbleView::ScopedSetTimeFormatterForTesting scoper(
-      &base::TimeDurationFormat);
-  ShowAndVerifyUi();
-}
-
-IN_PROC_BROWSER_TEST_F(OutdatedUpgradeBubbleTest,
-                       CriticalNotificationBubbleViewAccessibleProperties) {
-  auto* const upgrade_notification_controller =
-      UpgradeNotificationController::From(browser());
-  auto bubble_view = upgrade_notification_controller
-                         ->GetCriticalNotificationBubbleViewForTest();
-  ASSERT_TRUE(bubble_view);
-
-  ui::AXNodeData data;
-  bubble_view->GetViewAccessibility().GetAccessibleNodeData(&data);
-  EXPECT_EQ(data.role, ax::mojom::Role::kAlertDialog);
-}
-#endif

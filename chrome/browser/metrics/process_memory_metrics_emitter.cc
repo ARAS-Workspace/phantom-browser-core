@@ -65,10 +65,6 @@
 #include "base/android/meminfo_dump_provider.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "media/mojo/mojom/media_foundation_service.mojom.h"
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/process_map.h"
@@ -1652,11 +1648,6 @@ void ProcessMemoryMetricsEmitter::ReceivedMemoryDump(
         } else if (pmd.service_name() ==
                    media::mojom::CdmServiceBroker::Name_) {
           ptype = HistogramProcessType::kCdmService;
-#if BUILDFLAG(IS_WIN)
-        } else if (pmd.service_name() ==
-                   media::mojom::MediaFoundationServiceBroker::Name_) {
-          ptype = HistogramProcessType::kMediaFoundationService;
-#endif
         } else if (pmd.service_name() ==
                    network::mojom::NetworkService::Name_) {
           ptype = HistogramProcessType::kNetworkService;

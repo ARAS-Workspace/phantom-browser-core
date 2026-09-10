@@ -34,17 +34,6 @@
 #include "components/update_client/persisted_data.h"
 #include "components/update_client/update_client_errors.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/containers/span.h"
-#include "base/containers/span_reader.h"
-#include "base/numerics/byte_conversions.h"
-#include "base/win/registry.h"
-#include "chrome/updater/util/win_util.h"
-#include "chrome/updater/win/win_constants.h"
-#endif
-
 namespace {
 
 // PersistedData keys.
@@ -117,14 +106,6 @@ void PersistedData::SetProductVersion(const std::string& id,
   CHECK(pv.IsValid());
   delegate_->SetProductVersion(id, pv);
 
-#if BUILDFLAG(IS_WIN)
-  // For backwards compatibility, we record the PV in ClientState as well.
-  // (Some applications read it from there.) This has the side effect of
-  // creating the ClientState key, which is read to sense for application
-  // uninstallation.
-  SetRegistryKey(UpdaterScopeToHKeyRoot(scope_), GetAppClientStateKey(id),
-                 kRegValuePV, base::UTF8ToWide(pv.GetString()));
-#endif
 }
 
 base::Version PersistedData::GetMaxPreviousProductVersion(
@@ -192,33 +173,10 @@ std::string PersistedData::GetBrandCode(const std::string& id) {
 
   const std::string bc = GetString(id, kBC);
 
-#if BUILDFLAG(IS_WIN)
-  // For backwards compatibility, if there is a brand code in the registry
-  // ClientState, that brand code is considered authoritative, and overrides any
-  // brand code that is already in `prefs`.
-  std::wstring registry_bc;
-  if (base::win::RegKey(UpdaterScopeToHKeyRoot(scope_),
-                        GetAppClientStateKey(id).c_str(),
-                        Wow6432(KEY_QUERY_VALUE))
-          .ReadValue(kRegValueBrandCode, &registry_bc) == ERROR_SUCCESS) {
-    const std::string registry_brand_code = base::WideToUTF8(registry_bc);
-    if (!registry_brand_code.empty() && registry_brand_code != bc) {
-      SetString(id, kBC, registry_brand_code);
-      return registry_brand_code;
-    }
-  }
-#endif
-
   if (bc.empty()) {
     return {};
   }
 
-#if BUILDFLAG(IS_WIN)
-  // For backwards compatibility, record the brand code in ClientState, since
-  // some applications read it from there.
-  SetRegistryKey(UpdaterScopeToHKeyRoot(scope_), GetAppClientStateKey(id),
-                 kRegValueBrandCode, base::UTF8ToWide(bc));
-#endif
   return bc;
 }
 
@@ -232,12 +190,6 @@ void PersistedData::SetBrandCode(const std::string& id, const std::string& bc) {
 
   SetString(id, kBC, bc);
 
-#if BUILDFLAG(IS_WIN)
-  // For backwards compatibility, record the brand code in ClientState, since
-  // some applications read it from there.
-  SetRegistryKey(UpdaterScopeToHKeyRoot(scope_), GetAppClientStateKey(id),
-                 kRegValueBrandCode, base::UTF8ToWide(bc));
-#endif
 }
 
 base::FilePath PersistedData::GetBrandPath(const std::string& id) const {
@@ -254,15 +206,6 @@ void PersistedData::SetBrandPath(const std::string& id,
 std::string PersistedData::GetAP(const std::string& id) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
-#if BUILDFLAG(IS_WIN)
-  // For backwards compatibility, we read AP from ClientState first, since some
-  // applications write to it there.
-  if (const std::string ap(GetAppAPValue(scope_, id)); !ap.empty()) {
-    SetAP(id, ap);
-    return ap;
-  }
-#endif
-
   return GetString(id, kAP);
 }
 
@@ -270,20 +213,6 @@ void PersistedData::SetAP(const std::string& id, const std::string& ap) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   SetString(id, kAP, ap);
 
-#if BUILDFLAG(IS_WIN)
-  // For backwards compatibility, we record the AP in ClientState as well.
-  // (Some applications read it from there.)
-
-  // Chromium Updater has both local and global pref stores. In practice, if
-  // this `PersistedData` is using a local pref store, `id` will be the
-  // qualification app and the ClientState value is not important, so it is
-  // acceptable for each instance of the updater to overwrite it with various
-  // values. Else, this is the global pref store and reflecting the value in
-  // registry is correct. Clients should transition to requesting the
-  // registration info for their application via RPC.
-  SetRegistryKey(UpdaterScopeToHKeyRoot(scope_), GetAppClientStateKey(id),
-                 kRegValueAP, base::UTF8ToWide(ap));
-#endif
 }
 
 base::FilePath PersistedData::GetAPPath(const std::string& id) const {
@@ -312,24 +241,6 @@ std::string PersistedData::GetLang(const std::string& id) {
 
   const std::string lang = GetString(id, kLang);
 
-#if BUILDFLAG(IS_WIN)
-  // For backwards compatibility, if there is a lang in the registry Clients or
-  // ClientState, that lang is considered authoritative, and overrides any lang
-  // that is already in `prefs`.
-  for (const auto& subkey : {GetAppClientsKey(id), GetAppClientStateKey(id)}) {
-    std::wstring registry_lang_w;
-    if (base::win::RegKey(UpdaterScopeToHKeyRoot(scope_), subkey.c_str(),
-                          Wow6432(KEY_QUERY_VALUE))
-            .ReadValue(kRegValueLang, &registry_lang_w) == ERROR_SUCCESS) {
-      const std::string registry_lang = base::WideToUTF8(registry_lang_w);
-      if (!registry_lang.empty() && registry_lang != lang) {
-        SetString(id, kLang, registry_lang);
-        return registry_lang;
-      }
-    }
-  }
-#endif
-
   return lang;
 }
 
@@ -338,12 +249,6 @@ void PersistedData::SetLang(const std::string& id, const std::string& lang) {
 
   SetString(id, kLang, lang);
 
-#if BUILDFLAG(IS_WIN)
-  // For backwards compatibility, record the lang in ClientState, since some
-  // applications read it from there.
-  SetRegistryKey(UpdaterScopeToHKeyRoot(scope_), GetAppClientStateKey(id),
-                 kRegValueLang, base::UTF8ToWide(lang));
-#endif
 }
 
 int PersistedData::GetDateLastActive(const std::string& id) const {
@@ -386,12 +291,6 @@ void PersistedData::SetCohort(const std::string& id,
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   delegate_->SetCohort(id, cohort);
 
-#if BUILDFLAG(IS_WIN)
-  // For backwards compatibility, we record the Cohort in ClientState as well.
-  // (Some applications read it from there.)
-  SetRegistryKey(UpdaterScopeToHKeyRoot(scope_), GetAppCohortKey(id), L"",
-                 base::UTF8ToWide(cohort));
-#endif
 }
 
 std::string PersistedData::GetCohortName(const std::string& id) const {
@@ -404,12 +303,6 @@ void PersistedData::SetCohortName(const std::string& id,
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   delegate_->SetCohortName(id, cohort_name);
 
-#if BUILDFLAG(IS_WIN)
-  // For backwards compatibility, we record the Cohort in ClientState as well.
-  // (Some applications read it from there.)
-  SetRegistryKey(UpdaterScopeToHKeyRoot(scope_), GetAppCohortKey(id),
-                 kRegValueCohortName, base::UTF8ToWide(cohort_name));
-#endif
 }
 
 std::string PersistedData::GetCohortHint(const std::string& id) const {
@@ -550,21 +443,6 @@ bool PersistedData::HasApp(const std::string& id) {
 
 bool PersistedData::RemoveApp(const std::string& id) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-#if BUILDFLAG(IS_WIN)
-  // For backwards compatibility, the `ClientState` and (for system installs)
-  // `ClientStateMedium` entries for the app are also removed.
-  for (const auto& subkey : [&] {
-         std::vector<std::wstring> subkeys = {GetAppClientStateKey(id)};
-         if (IsSystemInstall(scope_)) {
-           subkeys.push_back(GetAppClientStateMediumKey(id));
-         }
-         return subkeys;
-       }()) {
-    base::win::RegKey(UpdaterScopeToHKeyRoot(scope_), L"", Wow6432(DELETE))
-        .DeleteKey(subkey.c_str());
-  }
-#endif
 
   if (!pref_service_) {
     return false;
@@ -756,11 +634,6 @@ void PersistedData::SetEulaRequired(bool eula_required) {
   if (pref_service_) {
     pref_service_->SetBoolean(kEulaRequired, eula_required);
   }
-#if BUILDFLAG(IS_WIN)
-  // For backwards compatibility, `eulaaccepted` is recorded in the registry,
-  // since some applications read it from there.
-  SetEulaAccepted(scope_, !eula_required);
-#endif
 }
 
 base::Time PersistedData::GetLastChecked() const {
@@ -786,75 +659,6 @@ void PersistedData::SetLastStarted(base::Time time) {
     pref_service_->SetTime(kLastStarted, time);
   }
 }
-
-#if BUILDFLAG(IS_WIN)
-std::optional<OSVERSIONINFOEX> PersistedData::GetLastOSVersion() const {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-  // Unpacks the os version from a base-64-encoded string internally.
-  const std::string encoded_os_version =
-      pref_service_->GetString(kLastOSVersion);
-
-  if (encoded_os_version.empty()) {
-    return std::nullopt;
-  }
-
-  return base::Base64Decode(encoded_os_version)
-      .and_then([](const std::vector<uint8_t>& decoded)
-                    -> std::optional<OSVERSIONINFOEX> {
-        if (decoded.size() != sizeof(OSVERSIONINFOEX)) {
-          return std::nullopt;
-        }
-        auto reader = base::SpanReader(base::span(decoded));
-        OSVERSIONINFOEX info;
-        info.dwOSVersionInfoSize =
-            base::U32FromNativeEndian(*reader.Read<sizeof(DWORD)>());
-        info.dwMajorVersion =
-            base::U32FromNativeEndian(*reader.Read<sizeof(DWORD)>());
-        info.dwMinorVersion =
-            base::U32FromNativeEndian(*reader.Read<sizeof(DWORD)>());
-        info.dwBuildNumber =
-            base::U32FromNativeEndian(*reader.Read<sizeof(DWORD)>());
-        info.dwPlatformId =
-            base::U32FromNativeEndian(*reader.Read<sizeof(DWORD)>());
-        base::as_writable_byte_span(info.szCSDVersion)
-            .copy_from(
-                *reader.Read<sizeof((OSVERSIONINFOEX){}.szCSDVersion)>());
-        info.wServicePackMajor =
-            base::U16FromNativeEndian(*reader.Read<sizeof(WORD)>());
-        info.wServicePackMinor =
-            base::U16FromNativeEndian(*reader.Read<sizeof(WORD)>());
-        info.wSuiteMask =
-            base::U16FromNativeEndian(*reader.Read<sizeof(WORD)>());
-        info.wProductType =
-            base::U8FromNativeEndian(*reader.Read<sizeof(BYTE)>());
-        info.wReserved = base::U8FromNativeEndian(*reader.Read<sizeof(BYTE)>());
-
-        CHECK_EQ(reader.remaining(), 0u);
-        return info;
-      });
-}
-
-void PersistedData::SetLastOSVersion() {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-  if (!pref_service_) {
-    return;
-  }
-
-  // Get and set the current OS version.
-  std::optional<OSVERSIONINFOEX> os_version = GetOSVersion();
-  if (!os_version) {
-    return;
-  }
-
-  // The os version is internally stored as a base-64-encoded string.
-  std::string encoded_os_version =
-      base::Base64Encode(base::byte_span_from_ref(os_version.value()));
-
-  return pref_service_->SetString(kLastOSVersion, encoded_os_version);
-}
-#endif
 
 // Register persisted data prefs, except for kPersistedDataPreference.
 // kPersistedDataPreference is registered by update_client::RegisterPrefs.

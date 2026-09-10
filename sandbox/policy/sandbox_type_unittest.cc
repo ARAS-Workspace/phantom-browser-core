@@ -78,26 +78,7 @@ TEST(SandboxTypeTest, Utility) {
   EXPECT_EQ(Sandbox::kSpeechRecognition,
             SandboxTypeFromCommandLine(command_line9));
 
-#if BUILDFLAG(IS_WIN)
-  base::CommandLine command_line10(command_line);
-  SetCommandLineFlagsForSandboxType(&command_line10, Sandbox::kXrCompositing);
-  EXPECT_EQ(Sandbox::kXrCompositing,
-            SandboxTypeFromCommandLine(command_line10));
-
-  base::CommandLine command_line11(command_line);
-  SetCommandLineFlagsForSandboxType(&command_line11,
-                                    Sandbox::kNoSandboxAndElevatedPrivileges);
-  EXPECT_EQ(Sandbox::kNoSandboxAndElevatedPrivileges,
-            SandboxTypeFromCommandLine(command_line11));
-
-  base::CommandLine command_line12(command_line);
-  SetCommandLineFlagsForSandboxType(&command_line12, Sandbox::kPdfConversion);
-  EXPECT_EQ(Sandbox::kPdfConversion,
-            SandboxTypeFromCommandLine(command_line12));
-#endif
-
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   base::CommandLine command_line13(command_line);
   SetCommandLineFlagsForSandboxType(&command_line13, Sandbox::kPrintBackend);
   EXPECT_EQ(Sandbox::kPrintBackend, SandboxTypeFromCommandLine(command_line13));
@@ -163,13 +144,6 @@ TEST(SandboxTypeTest, Nonesuch) {
 
 // This flag is impossible on non-Windows platforms where it crashes in
 // a NOTREACHED(), but validate that it does exist on Windows.
-#if BUILDFLAG(IS_WIN)
-TEST(SandboxTypeTest, ElevatedPrivileges) {
-  Sandbox elevated_type = UtilitySandboxTypeFromString(
-      StringFromUtilitySandboxType(Sandbox::kNoSandboxAndElevatedPrivileges));
-  EXPECT_EQ(Sandbox::kNoSandboxAndElevatedPrivileges, elevated_type);
-}
-#endif
 
 }  // namespace policy
 }  // namespace sandbox

@@ -76,7 +76,7 @@ TEST(WebAppUrlConfigTest, DataUrlIsNotEligible) {
 
 TEST(WebAppUrlConfigTest, ChromeExtensionUrlPlatformDependent) {
   bool expected = true;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   expected = false;
 #endif
   EXPECT_EQ(expected,

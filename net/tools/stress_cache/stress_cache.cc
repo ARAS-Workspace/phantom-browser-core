@@ -55,10 +55,6 @@
 #include "net/disk_cache/disk_cache.h"
 #include "net/disk_cache/disk_cache_test_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/logging_win.h"
-#endif
-
 using base::Time;
 
 const int kError = -1;
@@ -406,13 +402,6 @@ void CrashHandler(const char* file,
 
 // -----------------------------------------------------------------------
 
-#if BUILDFLAG(IS_WIN)
-// {B9A153D4-31C3-48e4-9ABF-D54383F14A0D}
-const GUID kStressCacheTraceProviderName = {
-    0xb9a153d4, 0x31c3, 0x48e4,
-        { 0x9a, 0xbf, 0xd5, 0x43, 0x83, 0xf1, 0x4a, 0xd } };
-#endif
-
 int main(int argc, const char* argv[]) {
   // Setup an AtExitManager so Singleton objects will be destructed.
   base::AtExitManager at_exit_manager;
@@ -423,15 +412,11 @@ int main(int argc, const char* argv[]) {
   logging::ScopedLogAssertHandler scoped_assert_handler(
       base::BindRepeating(CrashHandler));
 
-#if BUILDFLAG(IS_WIN)
-  logging::LogEventProvider::Initialize(kStressCacheTraceProviderName);
-#else
   base::CommandLine::Init(argc, argv);
   logging::LoggingSettings settings;
   settings.logging_dest =
       logging::LOG_TO_SYSTEM_DEBUG_LOG | logging::LOG_TO_STDERR;
   logging::InitLogging(settings);
-#endif
 
   // Some time for the memory manager to flush stuff.
   base::PlatformThread::Sleep(base::Seconds(3));

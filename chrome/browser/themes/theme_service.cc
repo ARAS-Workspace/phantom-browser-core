@@ -478,7 +478,7 @@ void ThemeService::UseSystemTheme() {
 }
 
 void ThemeService::UseDeviceTheme(bool follow) {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
   // This toggle is currently supported on ChromeOS and Windows and we only want
   // platforms to set the value if they have a visible toggle.
   profile_->GetPrefs()->SetBoolean(prefs::kBrowserFollowsSystemThemeColors,
@@ -497,13 +497,6 @@ bool ThemeService::UsingDeviceTheme() const {
     return GetIsBaseline() && !UsingExtensionTheme();
   }
   return pref->GetValue()->GetBool();
-#elif BUILDFLAG(IS_WIN)
-  // Always respect the profile preference on Windows. In the default case the
-  // preference starts disabled.
-  return profile_->GetPrefs()
-      ->FindPreference(prefs::kBrowserFollowsSystemThemeColors)
-      ->GetValue()
-      ->GetBool();
 #else
   // Only ChromeOS and Windows have this toggle.
   return false;
@@ -916,7 +909,7 @@ void ThemeService::ClearThemeData(bool reset_all_settings) {
   SwapThemeSupplier(nullptr);
   ClearThemePrefs();
   if (reset_all_settings) {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
     // This toggle is currently supported on ChromeOS and Windows and we only
     // want platforms to set the value if they have a visible toggle.
     profile_->GetPrefs()->ClearPref(prefs::kBrowserFollowsSystemThemeColors);

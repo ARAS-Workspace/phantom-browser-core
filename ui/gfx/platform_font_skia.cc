@@ -25,10 +25,6 @@
 #include "ui/gfx/font_render_params.h"
 #include "ui/gfx/text_utils.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/gfx/system_fonts_win.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "ui/linux/linux_ui.h"
 #endif
@@ -158,18 +154,6 @@ void PlatformFontSkia::EnsuresDefaultFontIsInitialized() {
   Font::Weight weight = Font::Weight::NORMAL;
   FontRenderParams params;
 
-#if BUILDFLAG(IS_WIN)
-  // On windows, the system default font is retrieved by using the GDI API
-  // SystemParametersInfo(...) (see struct NONCLIENTMETRICS). The font
-  // properties need to be converted as close as possible to a skia font.
-  // The style must be kept (see http://crbug/989476).
-  gfx::Font system_font = win::GetDefaultSystemFont();
-  family = system_font.GetFontName();
-  size_pixels = system_font.GetFontSize();
-  style = system_font.GetStyle();
-  weight = system_font.GetWeight();
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_LINUX)
   // On Linux, LinuxUi is used to query the native toolkit (e.g.
   // GTK) for the default UI font.
@@ -239,11 +223,7 @@ void PlatformFontSkia::SetDefaultFontDescription(
 Font PlatformFontSkia::DeriveFont(int size_delta,
                                   int style,
                                   Font::Weight weight) const {
-#if BUILDFLAG(IS_WIN)
-  const int new_size = win::AdjustFontSize(font_size_pixels_, size_delta);
-#else
   const int new_size = font_size_pixels_ + size_delta;
-#endif
 
   DCHECK_GT(new_size, 0);
 
@@ -462,11 +442,7 @@ void PlatformFontSkia::ComputeMetricsIfNecessary() {
     //     Linux Skia implements   : ceil(-ascent) + ceil(descent)
     // TODO(etienneb): Make both implementation consistent and fix the broken
     // unittests.
-#if BUILDFLAG(IS_WIN)
-    height_pixels_ = SkScalarCeilToInt(metrics.fDescent - metrics.fAscent);
-#else
     height_pixels_ = ascent_pixels_ + SkScalarCeilToInt(metrics.fDescent);
-#endif
 
     if (metrics.fAvgCharWidth) {
       average_width_pixels_ = SkScalarToDouble(metrics.fAvgCharWidth);

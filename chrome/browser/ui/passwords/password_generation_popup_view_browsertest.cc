@@ -252,7 +252,7 @@ IN_PROC_BROWSER_TEST_F(PasswordGenerationPopupViewTest,
   EXPECT_FALSE(node_data.HasState(ax::mojom::State::kInvisible));
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 IN_PROC_BROWSER_TEST_F(PasswordGenerationPopupViewTest, PopupInAxTree) {
   content::ScopedAccessibilityModeOverride mode_override(ui::kAXModeComplete);
 
@@ -274,7 +274,7 @@ IN_PROC_BROWSER_TEST_F(PasswordGenerationPopupViewTest, PopupInAxTree) {
                ->GetLastActiveBrowser()
                ->GetWindow()
                ->GetNativeWindow();
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#elif BUILDFLAG(IS_LINUX)
   views::Widget* dialog_widget = waiter.WaitIfNeededAndGet();
   window = dialog_widget->GetNativeWindow();
 #endif
@@ -296,6 +296,6 @@ IN_PROC_BROWSER_TEST_F(PasswordGenerationPopupViewTest, PopupInAxTree) {
   EXPECT_TRUE(
       node_delegate->GetBoolAttribute(ax::mojom::BoolAttribute::kSelected));
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 }  // namespace autofill

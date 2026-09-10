@@ -95,9 +95,7 @@ class ElementTrackerViewsMinimizeRestoreUiTest : public InteractiveBrowserTest,
 IN_PROC_BROWSER_TEST_F(ElementTrackerViewsMinimizeRestoreUiTest,
                        TestAssumptions) {
   // Note: on Windows, visibility does not change on minimization.
-#if !BUILDFLAG(IS_WIN)
   bool shown = false;
-#endif
 
   RunTestSequence(
       Check([this]() { return GetWidget()->IsVisible(); }),
@@ -105,17 +103,11 @@ IN_PROC_BROWSER_TEST_F(ElementTrackerViewsMinimizeRestoreUiTest,
       WithoutDelay(
           AfterEvent(ui::test::internal::kInteractiveTestPivotElementId,
                      kWindowMinimized, []() { LOG(INFO) << "GOT MINIMIZED"; })
-#if !BUILDFLAG(IS_WIN)
               ,
           AfterEvent(ui::test::internal::kInteractiveTestPivotElementId,
                      kWindowHidden, []() { LOG(INFO) << "GOT HIDDEN"; })
-#endif
               ),
       Do([this]() { GetWidget()->Restore(); }),
-#if BUILDFLAG(IS_WIN)
-      AfterEvent(ui::test::internal::kInteractiveTestPivotElementId,
-                 kWindowRestored, []() { LOG(INFO) << "GOT RESTORED"; })
-#else
       InParallel(
           RunSubsequence(WithoutDelay(AfterEvent(
               ui::test::internal::kInteractiveTestPivotElementId, kWindowShown,
@@ -128,7 +120,6 @@ IN_PROC_BROWSER_TEST_F(ElementTrackerViewsMinimizeRestoreUiTest,
                          kWindowRestored,
                          []() { LOG(INFO) << "GOT RESTORED"; }),
               CheckVariable(shown, true))))
-#endif
 
   );
 }

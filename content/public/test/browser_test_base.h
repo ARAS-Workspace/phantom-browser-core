@@ -321,10 +321,6 @@ class BrowserTestBase : public ::testing::Test {
   // CreatedBrowserMainParts().
   void CreatedBrowserMainPartsImpl(BrowserMainParts* browser_main_parts);
 
-#if BUILDFLAG(IS_WIN)
-  std::optional<base::ScopedPathOverride> system_temp_override_;
-#endif
-
   // Embedded HTTP test server, cheap to create, started on demand.
   std::unique_ptr<net::EmbeddedTestServer> embedded_test_server_;
 

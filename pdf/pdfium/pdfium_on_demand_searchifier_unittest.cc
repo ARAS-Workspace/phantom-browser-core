@@ -709,11 +709,7 @@ TEST_P(PDFiumOnDemandSearchifierTest, SelectPageBeforeSearchify) {
   engine->SelectAll();
 
   // The page has 2 images, so the text contains 2 fake OCR results.
-#if BUILDFLAG(IS_WIN)
-  const char kExpectedSelection[] = "OCR Text 0\r\nOCR Text 1";
-#else
   const char kExpectedSelection[] = "OCR Text 0\nOCR Text 1";
-#endif
   ASSERT_EQ(engine->GetSelectedText(), kExpectedSelection);
 }
 

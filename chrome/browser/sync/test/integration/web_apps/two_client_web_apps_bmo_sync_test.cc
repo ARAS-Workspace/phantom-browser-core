@@ -313,12 +313,7 @@ IN_PROC_BROWSER_TEST_P(TwoClientWebAppsBMOSyncTest, DisplayMode) {
 
 // Although the logic is allowed to be racy, the profiles should still end up
 // with the same web app ids.
-#if BUILDFLAG(IS_WIN)
-// Flaky on windows, https://crbug.com/40142626
-#define MAYBE_DoubleInstallWithUninstall DISABLED_DoubleInstallWithUninstall
-#else
 #define MAYBE_DoubleInstallWithUninstall DoubleInstallWithUninstall
-#endif
 IN_PROC_BROWSER_TEST_P(TwoClientWebAppsBMOSyncTest,
                        MAYBE_DoubleInstallWithUninstall) {
   ASSERT_TRUE(SetupClients());

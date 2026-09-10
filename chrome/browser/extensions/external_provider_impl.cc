@@ -85,10 +85,6 @@
 #include "chromeos/ash/components/policy/device_local_account/device_local_account_type.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/extensions/external_registry_loader_win.h"
-#endif
-
 static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 using content::BrowserThread;
@@ -808,7 +804,6 @@ void ExternalProviderImpl::CreateExternalProviders(
     return;
   }
 
-#if !BUILDFLAG(IS_WIN)
   // On Mac OS, items in /Library/... should be written by the superuser.
   // Check that all components of the path are writable by root only.
   ExternalPrefLoader::Options check_admin_permissions_on_mac;
@@ -819,7 +814,6 @@ void ExternalProviderImpl::CreateExternalProviders(
   check_admin_permissions_on_mac = ExternalPrefLoader::NONE;
 #endif
   int bundled_extension_creation_flags = Extension::NO_FLAGS;
-#endif
 #if BUILDFLAG(IS_CHROMEOS)
   bundled_extension_creation_flags = Extension::FROM_WEBSTORE |
       Extension::WAS_INSTALLED_BY_DEFAULT;
@@ -862,14 +856,6 @@ void ExternalProviderImpl::CreateExternalProviders(
         ManifestLocation::kExternalPrefDownload,
         bundled_extension_creation_flags));
 #endif
-#if BUILDFLAG(IS_WIN)
-    auto registry_provider = std::make_unique<ExternalProviderImpl>(
-        service, new ExternalRegistryLoader, profile,
-        ManifestLocation::kExternalRegistry,
-        ManifestLocation::kExternalPrefDownload, Extension::NO_FLAGS);
-    registry_provider->set_allow_updates(true);
-    provider_list->push_back(std::move(registry_provider));
-#else
     provider_list->push_back(std::make_unique<ExternalProviderImpl>(
         service,
         base::MakeRefCounted<ExternalPrefLoader>(
@@ -889,7 +875,6 @@ void ExternalProviderImpl::CreateExternalProviders(
             nullptr),
         profile, ManifestLocation::kExternalPref,
         ManifestLocation::kExternalPrefDownload, Extension::NO_FLAGS));
-#endif
 #endif
   }
 

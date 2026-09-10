@@ -729,13 +729,6 @@ IN_PROC_BROWSER_TEST_F(ECHPolicyTest, ECHEnabledPolicy) {
   EXPECT_EQ(base::ASCIIToUTF16(kECHFailureTitle), result.title);
 }
 
-// https://crbug.com/475587477 means that requests shortly after the network
-// service starts can fail or crash the browser process on DCHECK-enabled
-// builds. Skip tests that restart the network service on Windows for now.
-// TODO(https://crbug.com/475587477): Remove this and enable the tests on
-// Windows.
-constexpr bool kSuffersFromBug475587477 = BUILDFLAG(IS_WIN);
-
 // TLS13EarlyDataPolicyTest relies on the fact that EmbeddedTestServer
 // uses HTTP/1.1 without connection reuse (unless the protocol is explicitly
 // specified). If EmbeddedTestServer ever gains connection reuse by default,
@@ -807,10 +800,6 @@ class TLS13EarlyDataPolicyTestBase
   }
 
   static void RestartNetworkServiceAndWaitUntilReady() {
-    // This is a DCHECK() just because a CHECK() would lead to an unreachable
-    // code compiler error on Windows.
-    DCHECK(!kSuffersFromBug475587477);
-
     content::RestartNetworkService();
     content::FlushNetworkServiceInstanceForTesting();
   }
@@ -856,7 +845,7 @@ IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyTest,
 }
 
 // TODO(crbug.com/418717917, crbug.com/419211957): Flaky on Windows and Android.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_TLS13EarlyDataPolicyEnable DISABLED_TLS13EarlyDataPolicyEnable
 #else
 #define MAYBE_TLS13EarlyDataPolicyEnable TLS13EarlyDataPolicyEnable
@@ -886,7 +875,7 @@ IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyTest, TLS13EarlyDataPolicyDisable) {
 }
 
 // TODO(crbug.com/475587477, crbug.com/477510552): Flaky on Windows and Android.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_EnableWithRestart DISABLED_EnableWithRestart
 #else
 #define MAYBE_EnableWithRestart EnableWithRestart
@@ -931,10 +920,6 @@ IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyEnabledByDefaultTest, Disable) {
 
 IN_PROC_BROWSER_TEST_P(TLS13EarlyDataPolicyEnabledByDefaultTest,
                        DisableWithRestart) {
-  if (kSuffersFromBug475587477) {
-    GTEST_SKIP()
-        << "Test is flaky on this platform due to https://crbug.com/475587477";
-  }
   PolicyMap policies;
   SetPolicy(&policies, key::kTLS13EarlyDataEnabled, base::Value(false));
   UpdateProviderPolicy(policies);

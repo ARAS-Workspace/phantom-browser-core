@@ -321,10 +321,6 @@ void OpenFeedbackDialog(BrowserWindowInterface* browser,
                         feedback::FeedbackSource source,
                         const std::string& description_template = std::string(),
                         const std::string& category_tag = std::string());
-#if BUILDFLAG(IS_WIN)
-void OpenMoveWindow(BrowserWindowInterface* browser);
-void OpenSizeWindow(BrowserWindowInterface* browser);
-#endif  // BUILDFLAG(IS_WIN)
 void ToggleBookmarkBar(BrowserWindowInterface* browser);
 void SetBookmarkBarVisibilityState(BrowserWindowInterface* browser,
                                    bookmarks::BookmarkBarVisibilityState state);

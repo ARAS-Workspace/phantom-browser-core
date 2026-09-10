@@ -674,12 +674,6 @@ void DesktopSessionAgent::OnDesktopEnvironmentCreated(
       base::BindRepeating(&protocol::InputEventTracker::ReleaseAll,
                           base::Unretained(input_tracker_.get())));
 
-#if BUILDFLAG(IS_WIN)
-  // LocalInputMonitorWin filters out an echo of the injected input before it
-  // reaches |remote_input_filter_|.
-  remote_input_filter_->SetExpectLocalEcho(false);
-#endif  // BUILDFLAG(IS_WIN)
-
   // Start the input injector.
   std::unique_ptr<protocol::ClipboardStub> clipboard_stub(
       new DesktopSessionClipboardStub(this));

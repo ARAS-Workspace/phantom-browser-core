@@ -20,10 +20,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/install_static/install_modes.h"
-#include "chrome/install_static/test/scoped_install_details.h"
-#endif
 
 namespace {
 
@@ -103,11 +99,7 @@ class AppMenuIconControllerTest : public ::testing::TestWithParam<int> {
 
  protected:
   AppMenuIconControllerTest()
-#if BUILDFLAG(IS_WIN)
-      : install_details_(false, GetParam()){}
-#else
       = default;
-#endif
 
   UpgradeDetector* upgrade_detector() { return &upgrade_detector_; }
   Profile* profile() { return &profile_; }
@@ -117,9 +109,6 @@ class AppMenuIconControllerTest : public ::testing::TestWithParam<int> {
 #if !BUILDFLAG(GOOGLE_CHROME_BRANDING)
     // Dev and canary channels are specific to Google Chrome branding.
     return false;
-#elif BUILDFLAG(IS_WIN)
-    // Windows supports specifying the channel via ScopedInstallDetails.
-    return GetParam() >= install_static::DEV_INDEX;
 #else
     // Non-Windows platforms don't have a way to specify the channel; see
     // https://crbug.com/40601741.
@@ -134,9 +123,6 @@ class AppMenuIconControllerTest : public ::testing::TestWithParam<int> {
   }
 
  private:
-#if BUILDFLAG(IS_WIN)
-  install_static::ScopedInstallDetails install_details_;
-#endif
 
   FakeUpgradeDetector upgrade_detector_;
   content::BrowserTaskEnvironment task_environment_;
@@ -206,14 +192,7 @@ TEST_P(AppMenuIconControllerTest, UpgradeNotification) {
   BroadcastLevel(UpgradeDetector::UPGRADE_ANNOYANCE_NONE);
 }
 
-#if BUILDFLAG(IS_WIN)
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    AppMenuIconControllerTest,
-    ::testing::Range(0, static_cast<int>(install_static::NUM_INSTALL_MODES)));
-#else
 INSTANTIATE_TEST_SUITE_P(All, AppMenuIconControllerTest, ::testing::Values(0));
-#endif
 
 #if !BUILDFLAG(IS_CHROMEOS)
 TEST_P(AppMenuIconControllerTest, GlobalErrorLowSeverityShowsActionRequired) {

@@ -182,11 +182,7 @@ void PasswordManagerExporter::Export() {
 
 void PasswordManagerExporter::OnPasswordsExported(bool success) {
   if (success) {
-#if !BUILDFLAG(IS_WIN)
     std::string file_path = destination_.value();
-#else
-    std::string file_path = base::WideToUTF8(destination_.value());
-#endif
     OnProgress(
         {.status = ExportProgressStatus::kSucceeded, .file_path = file_path});
 

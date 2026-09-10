@@ -821,13 +821,8 @@ IN_PROC_BROWSER_TEST_P(GlicApiTestWithOneTab,
 }
 
 // Note: Win-ASAN is flaky.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_testGetContextFromFocusedTabWithAllRequestedData \
-  DISABLED_testGetContextFromFocusedTabWithAllRequestedData
-#else
 #define MAYBE_testGetContextFromFocusedTabWithAllRequestedData \
   testGetContextFromFocusedTabWithAllRequestedData
-#endif
 IN_PROC_BROWSER_TEST_P(GlicApiTestWithOneTab,
                        MAYBE_testGetContextFromFocusedTabWithAllRequestedData) {
   ExecuteJsTest();
@@ -1197,7 +1192,7 @@ IN_PROC_BROWSER_TEST_F(GlicApiTestWithOneTab,
 
 // TODO(crbug.com/460826488): Enable on ChromeOS.
 // Win-asan is flaky.
-#if (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER))
+#if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_testFetchInactiveTabScreenshotWhileMinimized \
   DISABLED_testFetchInactiveTabScreenshotWhileMinimized
 #else
@@ -1208,7 +1203,7 @@ IN_PROC_BROWSER_TEST_P(GlicApiTestWithOneTab,
                        MAYBE_testFetchInactiveTabScreenshotWhileMinimized) {
   TODO_SKIP_BROKEN_MULTI_INSTANCE_TEST();
   RunTestSequence(AddInstrumentedTabAndOpenSidePanel(kSecondTab, page_url()));
-  bool can_fetch_screenshot = BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC);
+  bool can_fetch_screenshot = BUILDFLAG(IS_MAC);
 
   ExecuteJsTest({.params = base::Value(can_fetch_screenshot)});
 

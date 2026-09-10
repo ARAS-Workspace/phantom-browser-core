@@ -24,13 +24,6 @@ struct GPU_IPC_COMMON_EXPORT StructTraits<
     return input.supports_scanout_shared_images;
   }
 
-#if BUILDFLAG(IS_WIN)
-  static bool supports_scanout_shared_images_for_software_video_frames(
-      const gpu::SharedImageCapabilities& input) {
-    return input.supports_scanout_shared_images_for_software_video_frames;
-  }
-#endif
-
   static bool supports_r16_shared_images(
       const gpu::SharedImageCapabilities& input) {
     return input.supports_r16_shared_images;
@@ -63,13 +56,6 @@ struct GPU_IPC_COMMON_EXPORT StructTraits<
   static bool shared_image_d3d(const gpu::SharedImageCapabilities& input) {
     return input.shared_image_d3d;
   }
-
-#if BUILDFLAG(IS_WIN)
-  static bool shared_image_swap_chain(
-      const gpu::SharedImageCapabilities& input) {
-    return input.shared_image_swap_chain;
-  }
-#endif
 
 #if BUILDFLAG(IS_MAC)
   static uint32_t texture_target_for_io_surfaces(

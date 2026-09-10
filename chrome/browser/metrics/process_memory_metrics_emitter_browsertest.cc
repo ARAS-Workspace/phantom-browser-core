@@ -53,13 +53,6 @@
 #include "extensions/test/test_extension_dir.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <wrl/client.h>
-
-#include "chrome/browser/ui/views/frame/browser_view.h"
-#include "third_party/iaccessible2/ia2_api_all.h"
-#endif
-
 namespace {
 
 using base::trace_event::MemoryDumpDeterminism;
@@ -173,12 +166,10 @@ void CheckExperimentalMemoryMetricsForProcessType(
     int count,
     const char* process_type,
     int number_of_processes) {
-#if !BUILDFLAG(IS_WIN)
   CheckMemoryMetric(
       std::string("Memory.Experimental.") + process_type + "2.Malloc",
       histogram_tester, count, ValueRestriction::ABOVE_ZERO,
       number_of_processes);
-#endif
   CheckMemoryMetric(
       std::string("Memory.Experimental.") + process_type + "2.BlinkGC",
       histogram_tester, count, ValueRestriction::NONE, number_of_processes);
@@ -226,10 +217,8 @@ void CheckExperimentalMemoryMetrics(
     int count,
     int number_of_renderer_processes,
     int number_of_extension_processes) {
-#if !BUILDFLAG(IS_WIN)
   CheckMemoryMetric("Memory.Experimental.Browser2.Malloc", histogram_tester,
                     count, ValueRestriction::ABOVE_ZERO);
-#endif
   CheckMemoryMetric("Memory.Experimental.Browser2.Custom.AXPlatformNodeCount",
                     histogram_tester, count, ValueRestriction::ABOVE_ZERO);
   if (number_of_renderer_processes) {
@@ -434,10 +423,8 @@ class ProcessMemoryMetricsEmitterTest
   }
 
   void CheckUkmRendererEntry(const ukm::mojom::UkmEntry* entry) {
-#if !BUILDFLAG(IS_WIN)
     CheckMemoryMetricWithName(entry, UkmEntry::kMallocName,
                               ValueRestriction::ABOVE_ZERO);
-#endif
 #if !BUILDFLAG(IS_MAC)
     CheckMemoryMetricWithName(entry, UkmEntry::kResidentName,
                               ValueRestriction::ABOVE_ZERO);
@@ -464,10 +451,8 @@ class ProcessMemoryMetricsEmitterTest
   }
 
   void CheckUkmBrowserEntry(const ukm::mojom::UkmEntry* entry) {
-#if !BUILDFLAG(IS_WIN)
     CheckMemoryMetricWithName(entry, UkmEntry::kMallocName,
                               ValueRestriction::ABOVE_ZERO);
-#endif
 #if !BUILDFLAG(IS_MAC)
     CheckMemoryMetricWithName(entry, UkmEntry::kResidentName,
                               ValueRestriction::ABOVE_ZERO);
@@ -597,9 +582,8 @@ IN_PROC_BROWSER_TEST_F(ProcessMemoryMetricsEmitterTest,
 // TODO(crbug.com/41474189): Re-enable on Win, Linux, and Mac once not
 // flaky.
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-#if defined(ADDRESS_SANITIZER) || defined(MEMORY_SANITIZER) ||            \
-    BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_MAC)
+#if defined(ADDRESS_SANITIZER) || defined(MEMORY_SANITIZER) || \
+    BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #define MAYBE_FetchAndEmitMetricsWithExtensions \
   DISABLED_FetchAndEmitMetricsWithExtensions
 #else
@@ -789,9 +773,8 @@ IN_PROC_BROWSER_TEST_F(ProcessMemoryMetricsEmitterTest,
 
 // Test is flaky on chromeos and linux. https://crbug.com/41444813.
 // Test is flaky on mac and win: https://crbug.com/40621250.
-#if defined(ADDRESS_SANITIZER) || defined(MEMORY_SANITIZER) ||            \
-    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#if defined(ADDRESS_SANITIZER) || defined(MEMORY_SANITIZER) || \
+    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_ForegroundAndBackgroundPages DISABLED_ForegroundAndBackgroundPages
 #else
 #define MAYBE_ForegroundAndBackgroundPages ForegroundAndBackgroundPages
@@ -873,49 +856,3 @@ IN_PROC_BROWSER_TEST_F(ProcessMemoryMetricsEmitterTest, MAYBE_RendererBuildId) {
     EXPECT_TRUE(found);
   }
 }
-
-#if BUILDFLAG(IS_WIN)
-// Tests the reporting of dormant, ghost, and live node counts.
-// Disabled due to flakes; see https://crbug.com/41324945.
-IN_PROC_BROWSER_TEST_F(ProcessMemoryMetricsEmitterTest,
-                       DISABLED_AXPlatformNodeWinTest) {
-  // A lambda to collect and check a memory metric.
-  auto check_metric = [this](const std::string& metric_name) {
-    base::HistogramTester histogram_tester;
-    base::RunLoop run_loop;
-    {
-      auto emitter = base::MakeRefCounted<ProcessMemoryMetricsEmitterFake>(
-          run_loop.QuitClosure(), test_ukm_recorder_.get());
-      emitter->FetchAndEmitProcessMemoryMetrics();
-    }
-
-    run_loop.Run();
-
-    CheckMemoryMetric(metric_name, histogram_tester, 1,
-                      ValueRestriction::ABOVE_ZERO);
-  };
-
-  // Enable basic accessibility to ensure that nodes are created.
-  content::ScopedAccessibilityModeOverride basic_ax(ui::kAXModeBasic);
-
-  // Check that there are a number of dormant nodes for the browser's UX.
-  check_metric(
-      "Memory.Experimental.Browser2.Custom.AXPlatformWinDormantNodeCount");
-
-  // Hold a reference to an accessibility node so that there's one live node.
-  Microsoft::WRL::ComPtr<IAccessible> root(
-      BrowserView::GetBrowserViewForBrowser(browser())
-          ->GetNativeViewAccessible());
-  ASSERT_TRUE(root);
-
-  // Check for a live node.
-  check_metric(
-      "Memory.Experimental.Browser2.Custom.AXPlatformWinLiveNodeCount");
-
-  // Close the browser so that the live node becomes a ghost.
-  CloseBrowserSynchronously(browser());
-
-  check_metric(
-      "Memory.Experimental.Browser2.Custom.AXPlatformWinGhostNodeCount");
-}
-#endif  // BUILDFLAG(IS_WIN)

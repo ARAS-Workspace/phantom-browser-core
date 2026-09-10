@@ -34,7 +34,7 @@
 #include "content/public/test/browser_test_utils.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "base/command_line.h"
 #include "ui/views/test/view_skia_gold_pixel_diff.h"
 #endif
@@ -187,7 +187,7 @@ class NewTabPageTest : public InProcessBrowserTest,
   // verification is skipped.
   bool VerifyUi(const std::string& screenshot_prefix,
                 const std::string& screenshot_name) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     if (base::CommandLine::ForCurrentProcess()->HasSwitch(
             switches::kVerifyPixels)) {
       views::ViewSkiaGoldPixelDiff pixel_diff(screenshot_prefix);

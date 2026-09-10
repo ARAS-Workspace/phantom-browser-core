@@ -89,10 +89,6 @@ bool mojo::StructTraits<remoting::mojom::DesktopCaptureOptionsDataView,
       data_view.use_update_notifications());
   out_options->set_detect_updated_region(data_view.detect_updated_region());
 
-#if BUILDFLAG(IS_WIN)
-  out_options->set_allow_directx_capturer(data_view.allow_directx_capturer());
-#endif  // BUILDFLAG(IS_WIN)
-
   return true;
 }
 
@@ -143,37 +139,6 @@ bool mojo::StructTraits<remoting::mojom::DesktopVectorDataView,
   out_vector->set(data_view.x(), data_view.y());
   return true;
 }
-
-#if BUILDFLAG(IS_WIN)
-// static
-bool mojo::UnionTraits<
-    remoting::mojom::FileChooserResultDataView,
-    ::remoting::Result<base::FilePath,
-                       ::remoting::protocol::FileTransfer_Error>>::
-    Read(remoting::mojom::FileChooserResultDataView data_view,
-         ::remoting::Result<base::FilePath,
-                            ::remoting::protocol::FileTransfer_Error>*
-             out_result) {
-  switch (data_view.tag()) {
-    case remoting::mojom::FileChooserResultDataView::Tag::kFilepath: {
-      base::FilePath filepath;
-      if (!data_view.ReadFilepath(&filepath)) {
-        return false;
-      }
-      out_result->EmplaceSuccess(std::move(filepath));
-      return true;
-    }
-    case remoting::mojom::FileChooserResultDataView::Tag::kError: {
-      ::remoting::protocol::FileTransfer_Error error;
-      if (!data_view.ReadError(&error)) {
-        return false;
-      }
-      out_result->EmplaceError(std::move(error));
-      return true;
-    }
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // static
 bool mojo::UnionTraits<
@@ -653,9 +618,6 @@ bool mojo::StructTraits<remoting::mojom::SessionOptionsDataView,
 #if BUILDFLAG(IS_MAC)
   out_options->enable_sck_capturer = data_view.enable_sck_capturer();
 #endif  // BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_WIN)
-  out_options->allow_dxgi_capturer = data_view.allow_dxgi_capturer();
-#endif  // BUILDFLAG(IS_WIN)
   out_options->disable_udp = data_view.disable_udp();
   out_options->vp9_encoder_speed = data_view.vp9_encoder_speed();
   out_options->av1_active_map = data_view.av1_active_map();

@@ -44,14 +44,6 @@ void WebXrVrBrowserTestBase::EnterSessionWithUserGestureOrFail(
       "sessionInfos[sessionTypes.IMMERSIVE].currentSession != null",
       kPollTimeoutLong, web_contents);
 
-#if BUILDFLAG(IS_WIN)
-  // Creating a session may take foreground from us, and Windows may not return
-  // it when the session terminates. This means subsequent requests to enter an
-  // immersive session may fail. The fix for testing is to call
-  // SetForegroundWindow manually. In real code, we'll have foreground if there
-  // was a user gesture to enter VR.
-  SetForegroundWindow(hwnd_);
-#endif
 }
 
 void WebXrVrBrowserTestBase::EndSession(content::WebContents* web_contents) {
@@ -142,9 +134,6 @@ XrBrowserTestBase::RuntimeType WebXrVrOpenXrBrowserTestBase::GetRuntimeType()
 }
 
 WebXrVrOpenXrBrowserTest::WebXrVrOpenXrBrowserTest() {
-#if BUILDFLAG(IS_WIN)
-  runtime_requirements_.push_back(XrTestRequirement::DIRECTX_11_1);
-#endif
 }
 
 WebXrVrOpenXrBrowserTestWebXrDisabled::WebXrVrOpenXrBrowserTestWebXrDisabled() {

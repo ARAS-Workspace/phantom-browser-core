@@ -100,7 +100,6 @@ TEST_F(InputFileTest, TestRead_Valid) {
 }
 
 // TODO(crbug.com/40148372): Fix these tests from crashing on Windows.
-#if !BUILDFLAG(IS_WIN)
 TEST_F(InputFileTest, TestRead_Valid_ChunkLargerThanFileSize) {
   VerifyRead(kTestDataSize * 2);
 }
@@ -110,7 +109,6 @@ TEST_F(InputFileTest, TestRead_Valid_LargeFileSize) {
   CreateValidInputFile(kTestDataSize * 100);
   VerifyRead(kChunkSize);
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 TEST_F(InputFileTest, TestRead_Invalid) {
   CreateInvalidInputFile();

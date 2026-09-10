@@ -211,7 +211,7 @@ IN_PROC_BROWSER_TEST_P(WebRtcVideoCaptureServiceEnumerationBrowserTest,
 
 // TODO(https://crbug.com/352672009): Flaky on Mac.
 // TODO(https://crbug.com/352092989): Flaky on Windows.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_RemoveVirtualDeviceAfterItHasBeenEnumerated \
   DISABLED_RemoveVirtualDeviceAfterItHasBeenEnumerated
 #else

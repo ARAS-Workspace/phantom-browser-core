@@ -189,13 +189,8 @@ IN_PROC_BROWSER_TEST_F(AppBrowserDocumentPictureInPictureBrowserTest,
 }
 
 // TODO(https://crbug.com/422947648): This times out on win11-arm64 builders.
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-#define MAYBE_ResizeToRespectsMaximumWindowSize \
-  DISABLED_ResizeToRespectsMaximumWindowSize
-#else
 #define MAYBE_ResizeToRespectsMaximumWindowSize \
   ResizeToRespectsMaximumWindowSize
-#endif
 IN_PROC_BROWSER_TEST_F(AppBrowserDocumentPictureInPictureBrowserTest,
                        MAYBE_ResizeToRespectsMaximumWindowSize) {
   const webapps::AppId app_id =

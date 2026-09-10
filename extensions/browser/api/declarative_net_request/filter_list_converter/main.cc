@@ -60,11 +60,7 @@ int main(int argc, char* argv[]) {
   base::CommandLine::StringType comma_separated_paths =
       command_line.GetSwitchValueNative(kSwitchInputFilterlistFiles);
 
-#if BUILDFLAG(IS_WIN)
-  base::CommandLine::StringType separator = L",";
-#else
   base::CommandLine::StringType separator(",");
-#endif
 
   for (const auto& piece : base::SplitStringPiece(
            comma_separated_paths, separator, base::TRIM_WHITESPACE,

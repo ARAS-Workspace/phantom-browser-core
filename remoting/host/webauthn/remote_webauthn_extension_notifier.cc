@@ -31,15 +31,6 @@
 #include "base/environment.h"
 #include "base/nix/xdg_util.h"
 #include "base/strings/string_util.h"
-#elif BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <knownfolders.h>
-#include <shlobj.h>
-#include <wtsapi32.h>
-
-#include "base/win/scoped_co_mem.h"
-#include "base/win/scoped_handle.h"
 #endif
 
 namespace remoting {
@@ -48,37 +39,6 @@ namespace {
 // Content of file doesn't matter so we just write an empty string.
 static constexpr char kExtensionWakeupFileContent[] = "";
 
-#if BUILDFLAG(IS_WIN)
-// Helper class to impersonate a user and revert back when it goes out of scope.
-// Note that Windows impersonation is bound to the current thread, so it is
-// thread-safe.
-class ScopedImpersonation {
- public:
-  ScopedImpersonation(const ScopedImpersonation&) = delete;
-  ScopedImpersonation& operator=(const ScopedImpersonation&) = delete;
-
-  explicit ScopedImpersonation(HANDLE user_token) {
-    if (user_token != nullptr && user_token != INVALID_HANDLE_VALUE) {
-      if (ImpersonateLoggedOnUser(user_token)) {
-        is_impersonating_ = true;
-      } else {
-        PLOG(ERROR) << "ImpersonateLoggedOnUser failed";
-      }
-    }
-  }
-
-  ~ScopedImpersonation() {
-    if (is_impersonating_) {
-      RevertToSelf();
-    }
-  }
-
-  bool is_impersonating() const { return is_impersonating_; }
-
- private:
-  bool is_impersonating_ = false;
-};
-#endif
 
 }  // namespace
 
@@ -114,14 +74,14 @@ RemoteWebAuthnExtensionNotifier::RemoteStateChangeContext::
 // directory only exists if the corresponding Chrome version is installed.
 RemoteWebAuthnExtensionNotifier::RemoteStateChangeContext
 RemoteWebAuthnExtensionNotifier::GetRemoteStateChangeContext() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   constexpr base::FilePath::CharType kStateChangeDirName[] =
       FILE_PATH_LITERAL("WebAuthenticationProxyRemoteSessionStateChange");
 #endif
 
   RemoteWebAuthnExtensionNotifier::RemoteStateChangeContext context;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   std::vector<base::FilePath>& dirs = context.dirs;
 #endif
 
@@ -146,45 +106,6 @@ RemoteWebAuthnExtensionNotifier::GetRemoteStateChangeContext() {
   dirs.push_back(
       base_path.Append("google-chrome-unstable").Append(kStateChangeDirName));
   dirs.push_back(base_path.Append("chromium").Append(kStateChangeDirName));
-#elif BUILDFLAG(IS_WIN)
-  // See: chrome/common/chrome_paths_win.cc
-  constexpr base::FilePath::CharType kUserDataDirName[] =
-      FILE_PATH_LITERAL("User Data");
-
-  // Get the LocalAppData path for the current logged in user. We can't just use
-  // base::PathService since it returns LocalAppData for administrator on the
-  // desktop process.
-  HANDLE user_token = nullptr;
-  if (!WTSQueryUserToken(WTS_CURRENT_SESSION, &user_token)) {
-    PLOG(ERROR) << "Failed to get current user token";
-    return context;
-  }
-  context.user_token.Set(user_token);
-  base::win::ScopedCoMem<wchar_t> local_app_data_path_buf;
-  if (!SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, /* dwFlags= */ 0,
-                                      context.user_token.get(),
-                                      &local_app_data_path_buf))) {
-    PLOG(ERROR) << "SHGetKnownFolderPath failed";
-    return context;
-  }
-
-  base::FilePath base_path = base::FilePath(local_app_data_path_buf.get());
-  base::FilePath base_path_google = base_path.Append(L"Google");
-  dirs.push_back(base_path_google.Append(L"Chrome")
-                     .Append(kUserDataDirName)
-                     .Append(kStateChangeDirName));
-  dirs.push_back(base_path_google.Append(L"Chrome Beta")
-                     .Append(kUserDataDirName)
-                     .Append(kStateChangeDirName));
-  dirs.push_back(base_path_google.Append(L"Chrome Dev")
-                     .Append(kUserDataDirName)
-                     .Append(kStateChangeDirName));
-  dirs.push_back(base_path_google.Append(L"Chrome SxS")
-                     .Append(kUserDataDirName)
-                     .Append(kStateChangeDirName));
-  dirs.push_back(base_path.Append(L"Chromium")
-                     .Append(kUserDataDirName)
-                     .Append(kStateChangeDirName));
 #elif BUILDFLAG(IS_MAC)
   // See: chrome/common/chrome_paths_mac.mm
   base::FilePath base_path;
@@ -231,13 +152,6 @@ RemoteWebAuthnExtensionNotifier::Core::~Core() {
 void RemoteWebAuthnExtensionNotifier::Core::WakeUpExtension() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
-#if BUILDFLAG(IS_WIN)
-  ScopedImpersonation impersonation(context_.user_token.get());
-  if (context_.user_token.is_valid() && !impersonation.is_impersonating()) {
-    PLOG(ERROR) << "Aborting file writes due to impersonation failure.";
-    return;
-  }
-#endif
 
   for (const base::FilePath& dir : context_.dirs) {
     // Note: We check DirectoryExists as the user. If they've swapped the

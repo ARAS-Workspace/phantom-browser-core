@@ -229,17 +229,9 @@ bool FrameResources::Initialize(VideoPixelFormat format,
       gpu::SHARED_IMAGE_USAGE_DISPLAY_WRITE;
 
   auto si_caps = context->GetCapabilities();
-#if BUILDFLAG(IS_WIN)
-  // On Windows, overlays are in general not supported. However, in some
-  // cases they are supported for the software video frame use case in
-  // particular. This cap details whether that support is present.
-  const bool add_scanout_usage =
-      si_caps.supports_scanout_shared_images_for_software_video_frames;
-#else
   // On all other platforms, whether scanout for SharedImages is supported
   // for this particular use case is no different than the general case.
   const bool add_scanout_usage = si_caps.supports_scanout_shared_images;
-#endif
   if (add_scanout_usage) {
     usage |= gpu::SHARED_IMAGE_USAGE_SCANOUT;
   }

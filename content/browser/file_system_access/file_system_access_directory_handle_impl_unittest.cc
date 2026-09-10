@@ -306,14 +306,10 @@ TEST_F(FileSystemAccessDirectoryHandleImplTest, GetEntries) {
   for (const char* name : kUnsafeNames) {
     base::FilePath file_path = dir_.GetPath().AppendASCII(name);
     bool success = base::WriteFile(file_path, "data");
-#if !BUILDFLAG(IS_WIN)
     // Some of the unsafe names are not legal file names on Windows. This is
     // okay, and doesn't materially effect the outcome of the test, so just
     // ignore any failures writing these files to disk.
     EXPECT_TRUE(success) << "Failed to create file " << file_path;
-#else
-    std::ignore = success;
-#endif
   }
   if (base::FeatureList::IsEnabled(
           features::kFileSystemAccessDirectoryIterationBlocklistCheck)) {

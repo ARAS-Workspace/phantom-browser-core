@@ -12,7 +12,7 @@
 
 namespace updater {
 
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
 scoped_refptr<PolicyManagerInterface> CreatePlatformPolicyManager(
     std::optional<bool> override_is_managed_device) {
   return nullptr;

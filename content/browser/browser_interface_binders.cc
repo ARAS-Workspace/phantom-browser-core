@@ -1196,7 +1196,7 @@ void PopulateBinderMapWithContext(
       &BindRenderFrameHostImpl<
           &RenderFrameHostImpl::BindMediaInterfaceFactoryReceiver>);
 
-#if BUILDFLAG(ENABLE_LIBRARY_CDMS) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(ENABLE_LIBRARY_CDMS) || BUILDFLAG(IS_ANDROID)
   map->Add<media::mojom::KeySystemSupport>(
       &BindRenderFrameHostImpl<
           &RenderFrameHostImpl::BindKeySystemSupportReceiver>);

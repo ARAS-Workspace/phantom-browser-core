@@ -56,11 +56,6 @@
 #include <glib.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/logging.h"
-#include "ui/base/l10n/l10n_util_win.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace l10n_util {
 namespace {
 
@@ -150,27 +145,7 @@ std::string GetApplicationLocaleInternalNonMac(std::string_view pref_locale) {
   // to renderer and plugin processes is common, so they know what language the
   // parent process decided to use.
 
-#if BUILDFLAG(IS_WIN)
-  // First, try the preference value.
-  if (!pref_locale.empty()) {
-    prefered_tag = GetLanguageTagFromString(pref_locale);
-  }
-
-  // Next, try the overridden locale.
-  const std::vector<std::string>& languages = l10n_util::GetLocaleOverrides();
-  if (!languages.empty()) {
-    candidates.reserve(candidates.size() + languages.size());
-    std::ranges::transform(languages, std::back_inserter(candidates),
-                           [](const std::string& language) {
-                             return GetLanguageTagFromString(language);
-                           });
-  } else {
-    // If no override was set, defer to ICU
-    candidates.push_back(
-        base::i18n::LanguageTagConverter::GetInstance().FromIcuLocale(
-            icu::Locale::getDefault()));
-  }
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // Try pref_locale first.
   if (!pref_locale.empty()) {
     prefered_tag = GetLanguageTagFromString(pref_locale);
@@ -201,7 +176,7 @@ std::string GetApplicationLocaleInternalNonMac(std::string_view pref_locale) {
   if (!pref_locale.empty()) {
     prefered_tag = GetLanguageTagFromString(pref_locale);
   }
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_ANDROID)
 
   // If `prefered_tag`, it is attempt to get a match for it, even if it is not
   // exact.

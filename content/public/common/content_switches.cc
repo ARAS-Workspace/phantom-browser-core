@@ -943,36 +943,6 @@ const char kPreventResizingContentsForTesting[] =
 const char kEnableSpeechDispatcher[] = "enable-speech-dispatcher";
 #endif
 
-#if BUILDFLAG(IS_WIN)
-// Device scale factor passed to certain processes like renderers, etc.
-const char kDeviceScaleFactor[]     = "device-scale-factor";
-
-// Disable the Legacy Window which corresponds to the size of the WebContents.
-const char kDisableLegacyIntermediateWindow[] = "disable-legacy-window";
-
-// DirectWrite FontCache is shared by browser to renderers using shared memory.
-// This switch allows us to pass the shared memory handle to the renderer.
-const char kFontCacheSharedHandle[] = "font-cache-shared-handle";
-
-// Raise the timer interrupt frequency in all Chrome processes, for experimental
-// purposes. This feature is needed because as of Windows 10 2004 the scheduling
-// effects of changing the timer interrupt frequency are not global, and this
-// lets us prove/disprove whether this matters. See https://crbug.com/1128917
-const char kRaiseTimerFrequency[] = "raise-timer-frequency";
-
-// Causes the second GPU process used for gpu info collection to display a
-// dialog on launch.
-const char kGpu2StartupDialog[] = "gpu2-startup-dialog";
-
-// Use high priority for the audio process.
-const char kAudioProcessHighPriority[] = "audio-process-high-priority";
-
-// Specifies pipe names for the incoming and outbound messages on the Windows
-// platform. This is a comma separated list of two pipe handles serialized as
-// unsigned integers, e.g. "--remote-debugging-io-pipes=3,4".
-const char kRemoteDebuggingIoPipes[] = "remote-debugging-io-pipes";
-#endif
-
 #if defined(ENABLE_IPC_FUZZER)
 // Dumps IPC messages sent from renderer processes to the browser process to
 // the given directory. Used primarily to gather samples for IPC fuzzing.

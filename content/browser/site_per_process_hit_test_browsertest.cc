@@ -2080,15 +2080,6 @@ class SitePerProcessEmulatedTouchBrowserTest
         ASSERT_TRUE(false);
     }
 
-#if BUILDFLAG(IS_WIN)
-    {
-      gfx::Rect view_bounds = root_rwhv->GetViewBounds();
-      LOG(ERROR) << "Root view bounds = (" << view_bounds.x() << ","
-                 << view_bounds.y() << ") " << view_bounds.width() << " x "
-                 << view_bounds.height();
-    }
-#endif
-
     gfx::Point position_in_child(5, 5);
     InputEventAckWaiter child_gesture_event_observer(
         child_rwhv->GetRenderWidgetHost(),
@@ -4690,13 +4681,8 @@ class SitePerProcessMouseWheelHitTestBrowserTest
 };
 
 // Fails on Windows official build, see // https://crbug.com/800822
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_MultipleSubframeWheelEventsOnMainThread \
-  DISABLED_MultipleSubframeWheelEventsOnMainThread
-#else
 #define MAYBE_MultipleSubframeWheelEventsOnMainThread \
   MultipleSubframeWheelEventsOnMainThread
-#endif
 IN_PROC_BROWSER_TEST_F(SitePerProcessMouseWheelHitTestBrowserTest,
                        MAYBE_MultipleSubframeWheelEventsOnMainThread) {
   GURL main_url(embedded_test_server()->GetURL(
@@ -4737,12 +4723,7 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessMouseWheelHitTestBrowserTest,
 // Verifies that test in SubframeWheelEventsOnMainThread also makes sense for
 // the same page loaded in the mainframe.
 // Fails on Windows official build, see // https://crbug.com/800822
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_MainframeWheelEventsOnMainThread \
-  DISABLED_MainframeWheelEventsOnMainThread
-#else
 #define MAYBE_MainframeWheelEventsOnMainThread MainframeWheelEventsOnMainThread
-#endif
 IN_PROC_BROWSER_TEST_F(SitePerProcessMouseWheelHitTestBrowserTest,
                        MAYBE_MainframeWheelEventsOnMainThread) {
   GURL main_url(
@@ -4928,7 +4909,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessMouseWheelHitTestBrowserTest,
     thread_observer.Wait();
   }
 
-#if !BUILDFLAG(IS_WIN)
   {
     ui::ScrollEvent fling_start(ui::EventType::kScrollFlingStart,
                                 child_point_in_root, ui::EventTimeForNow(), 0,
@@ -4945,7 +4925,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessMouseWheelHitTestBrowserTest,
     await_fling_start_in_child.Wait();
     thread_observer.Wait();
   }
-#endif
 }
 
 // Ensure that a cross-process subframe with a touch-handler can receive touch
@@ -5309,7 +5288,6 @@ void SendTouchpadPinchSequenceWithExpectedTarget(
   EXPECT_EQ(nullptr, router_touchpad_gesture_target);
 }
 
-#if !BUILDFLAG(IS_WIN)
 // Sending touchpad fling events is not supported on Windows.
 void SendTouchpadFlingSequenceWithExpectedTarget(
     RenderWidgetHostViewBase* root_view,
@@ -5358,7 +5336,6 @@ void SendTouchpadFlingSequenceWithExpectedTarget(
   gestrue_scroll_end_waiter.GetAckStateWaitIfNecessary();
   fling_cancel_waiter.Wait();
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 }  // anonymous namespace
 
@@ -5440,13 +5417,8 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 }
 
 // TODO: Flaking test crbug.com/802827
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_InputEventRouterGesturePreventDefaultTargetMapTest \
-  DISABLED_InputEventRouterGesturePreventDefaultTargetMapTest
-#else
 #define MAYBE_InputEventRouterGesturePreventDefaultTargetMapTest \
   InputEventRouterGesturePreventDefaultTargetMapTest
-#endif
 #if defined(USE_AURA) || BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(
     SitePerProcessHitTestBrowserTest,
@@ -5596,7 +5568,6 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
                                               router->touchpad_gesture_target_,
                                               rwhv_parent);
 
-#if !BUILDFLAG(IS_WIN)
   // Sending touchpad fling events is not supported on Windows.
 
   // Send touchpad fling sequence to main-frame.
@@ -5610,13 +5581,12 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
   // Send another touchpad fling sequence to main frame.
   SendTouchpadFlingSequenceWithExpectedTarget(
       rwhv_parent, main_frame_point, router->wheel_target_, rwhv_parent);
-#endif
 }
 
 // Test that performing a touchpad pinch over an OOPIF offers the synthetic
 // wheel events to the child and causes the page scale factor to change for
 // the main frame (given that the child did not consume the wheel).
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // TODO(crbug.com/41449850): Flaky on multiple platforms.
 #define MAYBE_TouchpadPinchOverOOPIF DISABLED_TouchpadPinchOverOOPIF
 #else
@@ -5725,7 +5695,8 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessHitTestBrowserTest,
 
 // Tests that performing a touchpad double-tap zoom over an OOPIF offers the
 // synthetic wheel event to the child.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
+    BUILDFLAG(IS_ANDROID)
 // TODO(crbug.com/41449850): Flaky on multiple platforms.
 #define MAYBE_TouchpadDoubleTapZoomOverOOPIF \
   DISABLED_TouchpadDoubleTapZoomOverOOPIF
@@ -7350,7 +7321,7 @@ using SitePerProcessDelegatedInkBrowserTest = SitePerProcessHitTestBrowserTest;
 // TODO(crbug.com/40835227): Fix and enable the test on Fuchsia.
 // TODO(crbug.com/40935254): flaky on ChromeOS
 // TODO(http://b/331190208): Test failing on Linux
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 #define MAYBE_MetadataAndPointGoThroughOOPIF \
   DISABLED_MetadataAndPointGoThroughOOPIF
 #else

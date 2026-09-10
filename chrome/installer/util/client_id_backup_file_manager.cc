@@ -19,15 +19,10 @@
 namespace {
 
 // File name used in the user data dir to store a backup of the client ID.
-#if BUILDFLAG(IS_WIN)
-constexpr base::FilePath::CharType kClientIdBackupFileName[] =
-    FILE_PATH_LITERAL("ClientIdBackup");
-#else
 // TODO(crbug.com/510249717): Migrate to the same file name that is used on the
 // Windows platform.
 constexpr base::FilePath::CharType kClientIdBackupFileName[] =
     FILE_PATH_LITERAL("Consent To Send Stats");
-#endif
 
 base::FilePath GetBackupFileDir() {
   return base::PathService::CheckedGet(chrome::DIR_USER_DATA);

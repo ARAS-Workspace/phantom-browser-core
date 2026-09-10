@@ -56,7 +56,7 @@ static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 namespace extensions {
 
 namespace {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // Prepopulated id hardcoded in test_extension. We select it to be a
 // prepopulated ID unlikely to match an engine that is part of the TopEngines
 // tier for the environments where the test run, but still matches some
@@ -362,7 +362,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionSettingsOverrideTest,
                         "is not allowed for specified platform."),
             extension->install_warnings().front().message);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace
 }  // namespace extensions

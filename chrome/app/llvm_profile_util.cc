@@ -41,11 +41,7 @@ std::string GetLLVMProfileFilename(std::string_view current,
   //   encoding corruption that could occur when round-tripping through UTF-16.
   // * Minimal bootstrap targets (such as Mac helper executables) can use this
   //   utility without taking a dependency on //base.
-#if BUILDFLAG(IS_WIN)
-  constexpr std::string_view kPathSeparators = "/\\";
-#else
   constexpr std::string_view kPathSeparators = "/";
-#endif
   size_t filename_start = current.find_last_of(kPathSeparators);
   filename_start =
       (filename_start == std::string_view::npos) ? 0 : filename_start + 1;

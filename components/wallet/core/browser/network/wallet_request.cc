@@ -13,9 +13,7 @@ namespace wallet {
 namespace {
 
 ClientInfo::ChromeClientInfo::Platform GetPlatform() {
-#if BUILDFLAG(IS_WIN)
-  return ClientInfo::ChromeClientInfo::PLATFORM_WINDOWS;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return ClientInfo::ChromeClientInfo::PLATFORM_MACOS;
 #elif BUILDFLAG(IS_CHROMEOS)
   return ClientInfo::ChromeClientInfo::PLATFORM_CHROMEOS;

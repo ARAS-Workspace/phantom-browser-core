@@ -95,20 +95,6 @@ class BrowserFocusBasicTest : public InProcessBrowserTest {
     // the setup function, which interferes with what the test wants to test so
     // unset it.
     set_global_browser_set_up_function(nullptr);
-#if BUILDFLAG(IS_WIN)
-    // For CHROME_HEADLESS, which is currently used for browser tests, native
-    // window occlusion is turned off. Turn it on to match the production
-    // environment.
-    base::FieldTrialParams field_trial_params{
-        { features::kApplyNativeOcclusionToCompositorType.name,
-          features::kApplyNativeOcclusionToCompositorTypeRelease }};
-    scoped_feature_list_.InitWithFeaturesAndParameters(
-        /*enabled_features=*/
-        {{features::kApplyNativeOcclusionToCompositor, field_trial_params},
-         { features::kAlwaysTrackNativeWindowOcclusionForTest,
-           {} }},
-        /*disabled_features=*/{});
-#endif
   }
 
   views::Widget* GetWidgetForBrowser(BrowserWindowInterface* browser) {
@@ -132,9 +118,6 @@ class BrowserFocusBasicTest : public InProcessBrowserTest {
   }
 
  private:
-#if BUILDFLAG(IS_WIN)
-  base::test::ScopedFeatureList scoped_feature_list_;
-#endif
 };
 
 // A basic test to check that a newly opened browser window has focus and the

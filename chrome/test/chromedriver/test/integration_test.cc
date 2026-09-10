@@ -6,12 +6,6 @@
 
 #include "base/compiler_specific.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <fcntl.h>
-#endif
-
 #include "base/command_line.h"
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
@@ -65,14 +59,6 @@ void IntegrationTest::SetUp() {
 #if BUILDFLAG(IS_POSIX)
   options.fds_to_remap.emplace_back(1, 1);
   options.fds_to_remap.emplace_back(2, 2);
-#elif BUILDFLAG(IS_WIN)
-  options.stdin_handle = INVALID_HANDLE_VALUE;
-  options.stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-  options.stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
-  options.handles_to_inherit.push_back(options.stdout_handle);
-  if (options.stderr_handle != options.stdout_handle) {
-    options.handles_to_inherit.push_back(options.stderr_handle);
-  }
 #endif
   process_ = base::LaunchProcess(command, options);
   ASSERT_TRUE(process_.IsValid());

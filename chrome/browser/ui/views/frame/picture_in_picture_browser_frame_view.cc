@@ -61,11 +61,6 @@
 #include "ui/views/window/frame_background.h"
 #include "ui/views/window/window_shape.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/base/win/hwnd_metrics.h"
-#include "ui/views/win/hwnd_util.h"
-#endif
-
 #if !BUILDFLAG(IS_MAC)
 // Mac does not use Aura
 #include "ui/aura/window.h"
@@ -374,12 +369,7 @@ void PictureInPictureBrowserFrameView::ShowOverlayIfNeeded() {
 void PictureInPictureBrowserFrameView::OnBrowserViewInitViewsComplete() {
   BrowserFrameView::OnBrowserViewInitViewsComplete();
 
-#if BUILDFLAG(IS_WIN)
-  const gfx::Insets insets = GetClientAreaInsets(
-      MonitorFromWindow(HWNDForView(this), MONITOR_DEFAULTTONEAREST));
-#else
   const gfx::Insets insets;
-#endif
 
   const std::optional<blink::mojom::PictureInPictureWindowOptions> pip_options =
       GetBrowserView()->GetDocumentPictureInPictureOptions();
@@ -557,13 +547,11 @@ void PictureInPictureBrowserFrameView::AddedToWidget() {
 // Fade in animation is disabled for Document and Video Picture-in-Picture on
 // Windows. On Windows, resizable windows can not be translucent. See
 // crbug.com/425711450.
-#if !BUILDFLAG(IS_WIN)
   if (!fade_animator_) {
     fade_animator_ = std::make_unique<PictureInPictureWidgetFadeAnimator>();
   }
   fade_animator_->AnimateShowWindow(
       GetWidget(), PictureInPictureWidgetFadeAnimator::WidgetShowType::kNone);
-#endif
 
   // If the AutoPiP setting overlay is set, then post a task to show it.  Don't
   // do this here, since not all observers might have found out about the new
@@ -1013,16 +1001,6 @@ gfx::Size PictureInPictureBrowserFrameView::GetNonClientViewAreaSize() const {
   return gfx::Size(border_thickness.width(),
                    top_height + border_thickness.bottom());
 }
-
-#if BUILDFLAG(IS_WIN)
-gfx::Insets PictureInPictureBrowserFrameView::GetClientAreaInsets(
-    HMONITOR monitor) const {
-  const int frame_thickness = ui::GetResizableFrameThicknessFromMonitorInPixels(
-      monitor, /*has_caption=*/true);
-  return gfx::Insets::TLBR(0, frame_thickness, frame_thickness,
-                           frame_thickness);
-}
-#endif
 
 bool PictureInPictureBrowserFrameView::HasAnyVisibleContentSettingViews()
     const {

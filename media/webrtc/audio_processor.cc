@@ -520,7 +520,7 @@ std::optional<double> AudioProcessor::ProcessData(
 
   // Upscale the volume to the range expected by the WebRTC automatic gain
   // controller.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   DCHECK_LE(volume, 1.0);
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OPENBSD)
   // We have a special situation on Linux where the microphone volume can be

@@ -2,25 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// Needed for BUILDFLAG(IS_WIN)
-#include "build/build_config.h"
-
-// Windows headers must come first.
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
-// Proceed with header includes in usual order.
 #include "content/browser/scheduler/responsiveness/native_event_observer.h"
 
+#include "build/build_config.h"
 #include "ui/events/platform/platform_event_source.h"
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include "ui/events/platform/platform_event_source.h"
-#endif
-
-#if BUILDFLAG(IS_WIN)
-#include "base/task/current_thread.h"
 #endif
 
 namespace content {
@@ -71,24 +59,6 @@ void BrowserUINativeEventObserver::PlatformEventSourceDestroying() {
 }
 
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_WIN)
-void BrowserUINativeEventObserver::RegisterObserver() {
-  base::CurrentUIThread::Get()->RegisterNativeEventObserver(this);
-}
-
-void BrowserUINativeEventObserver::UnregisterObserver() {
-  base::CurrentUIThread::Get()->UnregisterNativeEventObserver(this);
-}
-
-void BrowserUINativeEventObserver::WillRunNativeEvent(uintptr_t identifier) {
-  will_run_event_callback_.Run(identifier);
-}
-
-void BrowserUINativeEventObserver::DidRunNativeEvent(uintptr_t identifier) {
-  did_run_event_callback_.Run(identifier);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
 void BrowserUINativeEventObserver::RegisterObserver() {}

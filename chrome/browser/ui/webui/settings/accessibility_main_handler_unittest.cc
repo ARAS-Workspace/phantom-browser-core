@@ -4,7 +4,7 @@
 
 #include "chrome/browser/ui/webui/settings/accessibility_main_handler.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include <memory>
 
 #include "base/memory/raw_ptr.h"
@@ -16,13 +16,13 @@
 #include "content/public/test/test_web_ui.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/accessibility/accessibility_features.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 namespace settings {
 
 namespace {
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 const char kWebUIListenerCall[] = "cr.webUIListenerCallback";
 const char kScreenAIDownloadingProgressChangedEventName[] =
     "screen-ai-downloading-progress-changed";
@@ -60,11 +60,11 @@ class TestAccessibilityMainHandler : public AccessibilityMainHandler {
                           screen_ai::ScreenAIInstallState::Observer>
       component_ready_observer_{this};
 };
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 }  // namespace
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 class AccessibilityMainHandlerScreenAITest : public testing::Test {
  public:
   AccessibilityMainHandlerScreenAITest()
@@ -215,6 +215,6 @@ TEST_F(AccessibilityMainHandlerScreenAITest,
                     /*expected_arg=*/static_cast<int>(state),
                     /*call_count=*/call_data_count_before_call + 1u);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 }  // namespace settings

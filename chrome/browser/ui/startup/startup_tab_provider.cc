@@ -50,13 +50,6 @@
 #include "net/base/filename_util.h"
 #include "net/base/url_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/string_util_win.h"
-#include "base/win/windows_version.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/shell_integration.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
@@ -66,7 +59,7 @@
 #include "extensions/common/manifest_handlers/chrome_url_overrides_handler.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "chrome/browser/headless/headless_mode_util.h"
 #endif
 
@@ -89,15 +82,9 @@ bool ProfileHasOtherTabbedBrowser(Profile* profile) {
 
 bool IsWelcomePageUrl(const GURL& url) {
   static constexpr std::string_view kChromeUIWelcomeHost = "welcome";
-#if BUILDFLAG(IS_WIN)
-  static constexpr std::string_view kChromeUIWelcomeWin10Host = "welcome-win10";
-#endif
 
   return url.SchemeIs(content::kChromeUIScheme) &&
          (url.host() == kChromeUIWelcomeHost
-#if BUILDFLAG(IS_WIN)
-          || url.host() == kChromeUIWelcomeWin10Host
-#endif
          );
 }
 

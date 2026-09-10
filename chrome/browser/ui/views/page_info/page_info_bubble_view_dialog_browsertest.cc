@@ -803,13 +803,8 @@ class PageInfoBubbleViewIsolatedWebAppBrowserTest : public DialogBrowserTest {
 // expectation for tests run on windows.
 // crbug.com/40251389
 // Flaky on Win10 Tests x64 (crbug.com/40261456)
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_InvokeUi_AppNameIsDisplayedInsteadOfOriginForIsolatedWebApps_REV2 \
-  DISABLED_InvokeUi_AppNameIsDisplayedInsteadOfOriginForIsolatedWebApps_REV2
-#else
 #define MAYBE_InvokeUi_AppNameIsDisplayedInsteadOfOriginForIsolatedWebApps_REV2 \
   InvokeUi_AppNameIsDisplayedInsteadOfOriginForIsolatedWebApps_REV2
-#endif
 IN_PROC_BROWSER_TEST_F(
     PageInfoBubbleViewIsolatedWebAppBrowserTest,
     MAYBE_InvokeUi_AppNameIsDisplayedInsteadOfOriginForIsolatedWebApps_REV2) {

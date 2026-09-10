@@ -173,10 +173,6 @@ OpenXrExtensionHelper::OpenXrExtensionHelper(
   // Visibility Mask
   OPENXR_LOAD_FN(xrGetVisibilityMaskKHR);
 
-#if BUILDFLAG(IS_WIN)
-  OPENXR_LOAD_FN(xrConvertWin32PerformanceCounterToTimeKHR);
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
   OPENXR_LOAD_FN(xrCreateTrackableTrackerANDROID);
   OPENXR_LOAD_FN(xrDestroyTrackableTrackerANDROID);

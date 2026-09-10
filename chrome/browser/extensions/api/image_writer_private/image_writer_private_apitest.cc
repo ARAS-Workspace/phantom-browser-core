@@ -42,22 +42,14 @@ class ImageWriterPrivateApiTest : public ExtensionApiTest {
     expected1.model = "Model 1";
     expected1.capacity = image_writer::kTestFileSize;
     expected1.removable = true;
-#if BUILDFLAG(IS_WIN)
-    expected1.storage_unit_id = test_utils_.GetDevicePath().AsUTF8Unsafe();
-#else
     expected1.storage_unit_id = test_utils_.GetDevicePath().value();
-#endif
 
     RemovableStorageDevice expected2;
     expected2.vendor = "Vendor 2";
     expected2.model = "Model 2";
     expected2.capacity = image_writer::kTestFileSize << 2;
     expected2.removable = false;
-#if BUILDFLAG(IS_WIN)
-    expected2.storage_unit_id = test_utils_.GetDevicePath().AsUTF8Unsafe();
-#else
     expected2.storage_unit_id = test_utils_.GetDevicePath().value();
-#endif
 
     device_list->data.push_back(std::move(expected1));
     device_list->data.push_back(std::move(expected2));

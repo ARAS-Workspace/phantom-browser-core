@@ -28,17 +28,6 @@
 #include "services/network/public/cpp/mutable_network_traffic_annotation_tag_mojom_traits.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/sys_string_conversions.h"
-#include "base/win/registry.h"
-#include "base/win/shlwapi.h"
-#include "base/win/windows_types.h"
-#include "chrome/enterprise_companion/enterprise_companion_branding.h"
-#include "chrome/enterprise_companion/icu_util.h"
-#define UPDATER_POLICIES_KEY \
-  L"Software\\Policies\\" COMPANY_SHORTNAME_STRING L"\\Update\\"
-#endif
-
 namespace enterprise_companion {
 
 namespace {
@@ -147,48 +136,8 @@ std::optional<ProxyConfigAndOverridePrecedence> GetProxyConfigFromCloudPolicy(
 
 std::optional<ProxyConfigAndOverridePrecedence>
 GetProxyConfigFromSystemPolicy() {
-#if BUILDFLAG(IS_WIN)
-  std::string proxy_mode;
-  std::string pac_url;
-  std::string proxy_server;
-  std::optional<bool> cloud_policy_overrides_platform_policy;
-  for (base::win::RegistryValueIterator it(HKEY_LOCAL_MACHINE,
-                                           UPDATER_POLICIES_KEY);
-       it.Valid(); ++it) {
-    const std::string key_name =
-        base::ToLowerASCII(base::SysWideToUTF8(it.Name()));
-    if (it.Type() == REG_DWORD &&
-        key_name == "cloudpolicyoverridesplatformpolicy") {
-      cloud_policy_overrides_platform_policy =
-          *reinterpret_cast<const int*>(it.Value());
-      continue;
-    } else if (it.Type() != REG_SZ) {
-      continue;
-    }
-
-    const std::string value = base::SysWideToUTF8(it.Value());
-
-    if (key_name == "proxymode") {
-      proxy_mode = value;
-    } else if (key_name == "proxypacurl") {
-      pac_url = value;
-    } else if (key_name == "proxyserver") {
-      proxy_server = value;
-    }
-  }
-
-  std::optional<net::ProxyConfig> config =
-      GetProxyConfigFromPolicyValues(proxy_mode, pac_url, proxy_server);
-  return config ? std::make_optional(ProxyConfigAndOverridePrecedence{
-                      .config = *config,
-                      .cloud_policy_overrides_platform_policy =
-                          cloud_policy_overrides_platform_policy})
-                : std::nullopt;
-
-#else
   // Proxy configuration is not supported via system policy on Mac or Linux.
   return std::nullopt;
-#endif
 }
 
 std::optional<net::ProxyConfig> GetProxyConfigFromPolicy(
@@ -256,18 +205,6 @@ class ProxyConfigService final : public net::ProxyConfigService,
     DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
     fallback_->OnLazyPoll();
     std::optional<net::ProxyConfig> new_config = GetEffectiveConfig();
-
-#if BUILDFLAG(IS_WIN)
-    // ICU data may be needed to canonicalize hostnames sourced from PAC scripts
-    // in cases where the URL contains non-ASCII Unicode code points. However,
-    // ICU initialization is a known contributor to instability. Lazy
-    // initialization is used to optimistically avoid crashy code paths when PAC
-    // proxies are not used. See: https://crbug.com/420737997,
-    // https://crbug.com/422974907, and https://crbug.com/428983277.
-    if (new_config && new_config->has_pac_url()) {
-      InitializeICU();
-    }
-#endif
 
     if ((last_config_.has_value() != new_config.has_value()) ||
         (last_config_ && new_config &&

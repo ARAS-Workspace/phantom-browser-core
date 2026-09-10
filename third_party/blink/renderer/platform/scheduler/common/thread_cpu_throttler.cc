@@ -17,8 +17,6 @@
 #if BUILDFLAG(IS_POSIX)
 #include <signal.h>
 #define USE_SIGNALS 1
-#elif BUILDFLAG(IS_WIN)
-#include <windows.h>
 #endif
 
 namespace blink {
@@ -154,24 +152,12 @@ void ThreadCPUThrottler::ThrottlingThread::Throttle() {
 #ifdef USE_SIGNALS
   pthread_kill(throttled_thread_handle_.platform_handle(), SIGUSR2);
   Sleep(base::Microseconds(quant_time_us));
-#elif BUILDFLAG(IS_WIN)
-  double rate = throttling_rate_percent_.load(std::memory_order_acquire) / 100.;
-  base::TimeDelta run_duration =
-      base::Microseconds(static_cast<int>(quant_time_us / rate));
-  base::TimeDelta sleep_duration =
-      base::Microseconds(quant_time_us) - run_duration;
-  Sleep(run_duration);
-  ::SuspendThread(throttled_thread_handle_.platform_handle());
-  Sleep(sleep_duration);
-  ::ResumeThread(throttled_thread_handle_.platform_handle());
 #endif
 }
 
 void ThreadCPUThrottler::ThrottlingThread::Start() {
-#if defined(USE_SIGNALS) || BUILDFLAG(IS_WIN)
 #if defined(USE_SIGNALS)
   InstallSignalHandler();
-#endif
   if (!base::PlatformThread::Create(0, this, &throttling_thread_handle_)) {
     LOG(ERROR) << "Failed to create throttling thread.";
   }
@@ -181,15 +167,7 @@ void ThreadCPUThrottler::ThrottlingThread::Start() {
 }
 
 void ThreadCPUThrottler::ThrottlingThread::Sleep(base::TimeDelta duration) {
-#if BUILDFLAG(IS_WIN)
-  // We cannot rely on ::Sleep function as it's precision is not enough for
-  // the purpose. Could be up to 16ms jitter.
-  base::TimeTicks wakeup_time = base::TimeTicks::Now() + duration;
-  while (base::TimeTicks::Now() < wakeup_time) {
-  }
-#else
   base::PlatformThread::Sleep(duration);
-#endif
 }
 
 void ThreadCPUThrottler::ThrottlingThread::Stop() {

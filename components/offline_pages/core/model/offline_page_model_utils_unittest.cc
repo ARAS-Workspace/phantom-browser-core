@@ -74,11 +74,7 @@ const std::vector<GenerateUniqueFilenameTestCase>& UniqueFilenameCases() {
 }
 
 // Crashing on Windows, see http://crbug.com/79365
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TestGenerateUniqueFilename DISABLED_TestGenerateUniqueFilename
-#else
 #define MAYBE_TestGenerateUniqueFilename TestGenerateUniqueFilename
-#endif
 TEST(OfflinePageModelUtilsTest, MAYBE_TestGenerateUniqueFilename) {
   base::ScopedTempDir temp_dir;
   ASSERT_TRUE(temp_dir.CreateUniqueTempDir());

@@ -36,29 +36,13 @@
 #include "chrome/common/mac/detect_inappropriate_exit.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include "base/base_switches.h"
 #endif
 
 #if BUILDFLAG(IS_LINUX)
 #include "chrome/app/chrome_main_linux.h"
 #endif
-
-#if BUILDFLAG(IS_WIN)
-#include <timeapi.h>
-
-#include "base/dcheck_is_on.h"
-#include "base/debug/dump_without_crashing.h"
-#include "base/debug/handle_hooks_win.h"
-#include "base/win/current_module.h"
-#include "base/win/win_util.h"
-#include "chrome/chrome_elf/chrome_elf_main.h"
-#include "chrome/common/chrome_constants.h"
-#include "chrome/install_static/initialize_from_primary_module.h"
-#include "chrome/install_static/install_details.h"
-
-#define DLLEXPORT __declspec(dllexport)
-#endif  // BUILDFLAG(IS_WIN)
 
 namespace {
 
@@ -77,16 +61,7 @@ const base::CommandLine& GetInitialBrowserCommandLine() {
   return GetInitialCommandLineStorage().value();
 }
 
-#if BUILDFLAG(IS_WIN)
-// We use extern C for the prototype DLLEXPORT to avoid C++ name mangling.
-extern "C" {
-DLLEXPORT int __cdecl ChromeMain(HINSTANCE instance,
-                                 sandbox::SandboxInterfaceInfo* sandbox_info,
-                                 int64_t exe_main_entry_point_ticks,
-                                 int64_t preread_begin_ticks,
-                                 int64_t preread_end_ticks);
-}
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 extern "C" {
 // This function must be marked with NO_STACK_PROTECTOR or it may crash on
 // return, see the --change-stack-guard-on-fork command line flag.
@@ -98,13 +73,7 @@ NO_STACK_PROTECTOR __attribute__((visibility("default"))) int ChromeMain(
 #error Unknown platform.
 #endif
 
-#if BUILDFLAG(IS_WIN)
-DLLEXPORT int __cdecl ChromeMain(HINSTANCE instance,
-                                 sandbox::SandboxInterfaceInfo* sandbox_info,
-                                 int64_t exe_entry_point_ticks,
-                                 int64_t preread_begin_ticks,
-                                 int64_t preread_end_ticks) {
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 int ChromeMain(int argc, const char** argv) {
 #else
 #error Unknown platform.
@@ -114,53 +83,13 @@ int ChromeMain(int argc, const char** argv) {
   PossiblyDetermineFallbackChromeChannel(argv[0]);
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  install_static::InitializeFromPrimaryModule();
-#if !defined(COMPONENT_BUILD) && DCHECK_IS_ON()
-  // Patch the main EXE on non-component builds when DCHECKs are enabled.
-  // This allows detection of third party code that might attempt to meddle with
-  // Chrome's handles. This must be done when single-threaded to avoid other
-  // threads attempting to make calls through the hooks while they are being
-  // emplaced.
-  // Note: The EXE is patched separately, in chrome/app/chrome_exe_main_win.cc.
-  base::debug::HandleHooks::AddIATPatch(CURRENT_MODULE());
-#endif  // !defined(COMPONENT_BUILD) && DCHECK_IS_ON()
-  StartupTimestamps timestamps{
-      base::TimeTicks::FromInternalValue(exe_entry_point_ticks),
-      base::TimeTicks::FromInternalValue(preread_begin_ticks),
-      base::TimeTicks::FromInternalValue(preread_end_ticks)};
-  ChromeMainDelegate chrome_main_delegate(timestamps);
-#else  // BUILDFLAG(IS_WIN)
   ChromeMainDelegate chrome_main_delegate(
       {.exe_entry_point_ticks = base::TimeTicks::Now()});
-#endif
   content::ContentMainParams params(&chrome_main_delegate);
 
-#if BUILDFLAG(IS_WIN)
-  // The process should crash when going through abnormal termination, but we
-  // must be sure to reset this setting when ChromeMain returns normally.
-  auto crash_on_detach_resetter = base::ScopedClosureRunner(
-      base::BindOnce(&base::win::SetShouldCrashOnProcessDetach,
-                     base::win::ShouldCrashOnProcessDetach()));
-  base::win::SetShouldCrashOnProcessDetach(true);
-  base::win::SetAbortBehaviorForCrashReporting();
-  params.instance = instance;
-  params.sandbox_info = sandbox_info;
-
-  // Pass chrome_elf's copy of DumpProcessWithoutCrash resolved via load-time
-  // dynamic linking.
-  base::debug::SetDumpWithoutCrashingFunction(&DumpProcessWithoutCrash);
-
-  // Verify that chrome_elf and this module (chrome.dll) have the same version.
-  if (install_static::InstallDetails::Get().VersionMismatch()) {
-    base::debug::DumpWithoutCrashing();
-  }
-  base::CommandLine::Init(0, nullptr);
-#else
   params.argc = argc;
   params.argv = argv;
   base::CommandLine::Init(params.argc, params.argv);
-#endif  // BUILDFLAG(IS_WIN)
 
   base::CommandLine* command_line(base::CommandLine::ForCurrentProcess());
 
@@ -170,13 +99,6 @@ int ChromeMain(int argc, const char** argv) {
   if (!command_line->HasSwitch(switches::kProcessType)) {
     GetInitialCommandLineStorage() = *command_line;
   }
-
-#if BUILDFLAG(IS_WIN)
-  if (command_line->HasSwitch(::switches::kRaiseTimerFrequency)) {
-    // Raise the timer interrupt frequency and leave it raised.
-    timeBeginPeriod(1);
-  }
-#endif
 
 #if BUILDFLAG(IS_MAC)
   chrome::InitializeExitSixtyNineDetector();

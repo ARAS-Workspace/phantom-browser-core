@@ -13,9 +13,7 @@
 #include "build/build_config.h"
 #include "net/proxy_resolution/proxy_config_with_annotation.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "net/proxy_resolution/win/proxy_config_service_win.h"
-#elif BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
 #include "net/proxy_resolution/proxy_config_service_ios.h"
 #elif BUILDFLAG(IS_MAC)
 #include "net/proxy_resolution/proxy_config_service_mac.h"
@@ -25,14 +23,14 @@
 #include "net/proxy_resolution/proxy_config_service_android.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 #include "net/traffic_annotation/network_traffic_annotation.h"
 #endif
 
 namespace net {
 
 namespace {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 constexpr net::NetworkTrafficAnnotationTag kSystemProxyConfigTrafficAnnotation =
     net::DefineNetworkTrafficAnnotation("proxy_config_system", R"(
       semantics {
@@ -94,10 +92,7 @@ class ProxyConfigServiceDirect : public ProxyConfigService {
 std::unique_ptr<ProxyConfigService>
 ProxyConfigService::CreateSystemProxyConfigService(
     scoped_refptr<base::SequencedTaskRunner> main_task_runner) {
-#if BUILDFLAG(IS_WIN)
-  return std::make_unique<ProxyConfigServiceWin>(
-      kSystemProxyConfigTrafficAnnotation);
-#elif BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
   return std::make_unique<ProxyConfigServiceIOS>(
       kSystemProxyConfigTrafficAnnotation);
 #elif BUILDFLAG(IS_MAC)

@@ -18,10 +18,6 @@
 #include "mojo/public/cpp/platform/platform_channel.h"
 #include "testing/libfuzzer/libfuzzer_base_wrappers.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 DEFINE_LLVM_FUZZER_TEST_ONE_INPUT_SPAN(base::span<const uint8_t> payload) {
   static base::NoDestructor<mojo::core::Environment> environment;
   mojo::PlatformChannel channel;

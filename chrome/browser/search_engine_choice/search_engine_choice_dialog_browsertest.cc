@@ -583,13 +583,8 @@ IN_PROC_BROWSER_TEST_F(SearchEngineChoiceDialogBrowserTest,
 
 // TODO(crbug.com/429600559): Re-implement this test and cover windows once a
 // non-flaky implementation is found.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DialogDoesNotShowWithExtensionEnabledThatOverridesDSE \
-  DISABLED_DialogDoesNotShowWithExtensionEnabledThatOverridesDSE
-#else
 #define MAYBE_DialogDoesNotShowWithExtensionEnabledThatOverridesDSE \
   DialogDoesNotShowWithExtensionEnabledThatOverridesDSE
-#endif
 IN_PROC_BROWSER_TEST_F(
     SearchEngineChoiceDialogBrowserTest,
     MAYBE_DialogDoesNotShowWithExtensionEnabledThatOverridesDSE) {

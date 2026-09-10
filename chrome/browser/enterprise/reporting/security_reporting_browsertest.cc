@@ -80,7 +80,7 @@ namespace {
 const char* kCookieHeaderName = "Cookie";
 const char* kSetCookiePath = "/set-cookie";
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 constexpr net::BackoffEntry::Policy kTestBackoffPolicy = {
     0,   // Number of initial errors to ignore before applying exponential
          // back-off rules.
@@ -179,7 +179,7 @@ class SecurityReportingBrowserTest
     net::test_server::RegisterDefaultHandlers(&embedded_https_test_server());
 
     CHECK(embedded_https_test_server().InitializeAndListen());
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     ReportUploader::SetBackoffPolicyForTesting(&kTestBackoffPolicy);
     create_services_subscription_ =
         BrowserContextDependencyManager::GetInstance()
@@ -198,7 +198,7 @@ class SecurityReportingBrowserTest
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     ReportUploader::SetBackoffPolicyForTesting(nullptr);
 #endif
     MixinBasedPlatformBrowserTest::TearDown();
@@ -226,7 +226,7 @@ class SecurityReportingBrowserTest
 
     MixinBasedPlatformBrowserTest::SetUpOnMainThread();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     ProfileNetworkContextServiceFactory::GetForContext(GetProfile())
         ->set_client_cert_store_factory_for_testing(
             base::BindRepeating([]() -> std::unique_ptr<net::ClientCertStore> {
@@ -419,7 +419,7 @@ class SecurityReportingBrowserTest
   base::test::ScopedFeatureList scoped_feature_list_;
   base::HistogramTester histogram_tester_;
   std::unique_ptr<ManagementContextMixin> management_mixin_;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   base::CallbackListSubscription create_services_subscription_;
 #endif
 };
@@ -459,7 +459,7 @@ IN_PROC_BROWSER_TEST_P(SecurityReportingBrowserTest, SecurityReportOnly) {
   EXPECT_EQ(user_profile_info.certificates_size(), 0);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Tests that when SecuritySignalsClientCertificatesSelectors policy and
 // certificate collection feature flag are set, security report is successfully
 // generated.
@@ -573,7 +573,7 @@ IN_PROC_BROWSER_TEST_P(SecurityReportingBrowserTest,
     EXPECT_EQ(0, user_profile_info.certificates_size());
   }
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // Tests that a combined Profile report is sent when all user
 // policies are enabled, with cookies.

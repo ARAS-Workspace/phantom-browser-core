@@ -240,7 +240,7 @@ IN_PROC_BROWSER_TEST_F(PrintPreviewPolicyTest, MediaSizePolicy) {
   RunTestCase("MediaSizePolicy");
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(PrintPreviewPolicyTest, PrintPdfAsImageAvailability) {
   RunTestCase("PrintPdfAsImageAvailability");
 }
@@ -454,7 +454,7 @@ IN_PROC_BROWSER_TEST_F(PrintPreviewPreviewGenerationTest,
   RunTestCase("ScalingPdfAlignPdfDefaultPrintSettingsWithHTML");
 }
 
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(PrintPreviewPreviewGenerationTest, Rasterize) {
   RunTestCase("Rasterize");
 }
@@ -511,7 +511,7 @@ IN_PROC_BROWSER_TEST_F(PrintPreviewLinkContainerTest, OpenInPreviewLinkClick) {
 }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 class PrintPreviewSystemDialogTest : public PrintPreviewBrowserTest {
  protected:
   void RunTestCase(const std::string& testCase) {
@@ -530,7 +530,7 @@ IN_PROC_BROWSER_TEST_F(PrintPreviewSystemDialogTest,
                        InvalidSettingsDisableLink) {
   RunTestCase("InvalidSettingsDisableLink");
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 class PrintPreviewDestinationStoreTest : public PrintPreviewBrowserTest {
  protected:

@@ -100,11 +100,9 @@
 #include "chrome/browser/net/network_annotation_monitor.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/net/chrome_mojo_proxy_resolver_win.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/net/chrome_mojo_proxy_resolver_mac.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(ENABLE_REQUEST_HEADER_INTEGRITY)
 #include "chrome/common/request_header_integrity/request_header_integrity_url_loader_throttle.h"  // nogncheck crbug.com/40147906
@@ -266,7 +264,7 @@ NetworkSandboxState IsNetworkSandboxEnabledInternal() {
     // it is not always initialized.
     CHECK_IS_TEST();
   }
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
   auto* local_state = g_browser_process->local_state();
 #endif
 
@@ -280,20 +278,14 @@ NetworkSandboxState IsNetworkSandboxEnabledInternal() {
   }
 #endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN)
-  if (!sandbox::policy::features::IsNetworkSandboxSupported()) {
-    return NetworkSandboxState::kDisabledByPlatform;
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   if (local_state &&
       local_state->HasPrefPath(prefs::kNetworkServiceSandboxEnabled)) {
     return local_state->GetBoolean(prefs::kNetworkServiceSandboxEnabled)
                ? NetworkSandboxState::kEnabledByPolicy
                : NetworkSandboxState::kDisabledByPolicy;
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
   // If no policy is specified, then delegate to global sandbox configuration.
   return sandbox::policy::features::IsNetworkSandboxEnabled()
@@ -416,15 +408,6 @@ class SystemNetworkContextManager::NetworkProcessLaunchWatcher
           "Chrome.SystemNetworkContextManager.NetworkSandboxLaunchFailed."
           "ErrorCode",
           info.exit_code);
-#if BUILDFLAG(IS_WIN)
-      // This histogram duplicates data recorded in
-      // ChildProcess.LaunchFailed.WinLastError but is specific to the network
-      // service to make analysis easier.
-      base::UmaHistogramSparse(
-          "Chrome.SystemNetworkContextManager.NetworkSandboxLaunchFailed."
-          "WinLastError",
-          info.last_error);
-#endif  // BUILDFLAG(IS_WIN)
       RecordLaunchFailure();
     }
   }
@@ -764,9 +747,9 @@ void SystemNetworkContextManager::RegisterPrefs(PrefRegistrySimple* registry) {
 
   registry->RegisterListPref(prefs::kExplicitlyAllowedNetworkPorts);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   registry->RegisterBooleanPref(prefs::kNetworkServiceSandboxEnabled, true);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_LINUX)
   registry->RegisterBooleanPref(prefs::kReceivedHttpAuthNegotiateHeader, false);
@@ -987,17 +970,14 @@ void SystemNetworkContextManager::ConfigureDefaultNetworkContextParams(
     }
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (command_line.HasSwitch(switches::kUseSystemProxyResolver)) {
-#if BUILDFLAG(IS_WIN)
-    network_context_params->system_proxy_resolver =
-        ChromeMojoProxyResolverWin::CreateWithSelfOwnedReceiver();
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     network_context_params->system_proxy_resolver =
         ChromeMojoProxyResolverMac::CreateWithSelfOwnedReceiver();
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
   network_context_params->pac_quick_check_enabled =
       local_state_->GetBoolean(prefs::kQuickCheckEnabled);

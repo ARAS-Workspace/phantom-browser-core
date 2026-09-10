@@ -707,11 +707,7 @@ TEST_F(ConnectTest, ConnectToClientProcess_Blocked) {
   base::Process process;
   mojom::ConnectResult result =
       service_manager::test::LaunchAndConnectToProcess(
-#if BUILDFLAG(IS_WIN)
-          base::StrCat({kTestExeName, ".exe"}),
-#else
           kTestExeName,
-#endif
           service_manager::Identity(kTestExeName, kSystemInstanceGroup,
                                     base::Token{}, base::Token::CreateRandom()),
           connector(), &process);

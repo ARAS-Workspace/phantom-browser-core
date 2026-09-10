@@ -532,68 +532,11 @@ TEST_F(ImportantFileWriterTest, ReplaceFileSuccess) {
   EXPECT_EQ(CALLED_WITH_SUCCESS,
             write_callback_observer_.GetAndResetObservationState());
 
-#if BUILDFLAG(IS_WIN)
-  // 0 means no retries were needed.
-  histogram_tester.ExpectUniqueSample("ImportantFile.FileReplaceRetryCount", 0,
-                                      1);
-
-  // FileReplaceRetryCount2 is only recorded if retries were needed.
-  histogram_tester.ExpectTotalCount("ImportantFile.FileReplaceRetryCount2", 0);
-  histogram_tester.ExpectTotalCount("ImportantFile.FileReplaceRetryCount2.All",
-                                    0);
-#endif
-
   // 0 means no retries were needed.
   histogram_tester.ExpectUniqueSample("ImportantFile.FileReplaceResult", 0, 1);
   histogram_tester.ExpectUniqueSample("ImportantFile.FileReplaceResult.All", 0,
                                       1);
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(ImportantFileWriterTest, ReplaceFileRetry) {
-  base::HistogramTester histogram_tester;
-  ImportantFileWriter writer(file_,
-                             SingleThreadTaskRunner::GetCurrentDefault());
-
-  // Fake a failure on the first two calls to ReplaceFile.
-  size_t retry_count = 0;
-  writer.SetReplaceFileCallbackForTesting(base::BindLambdaForTesting(
-      [&retry_count](const FilePath&, const FilePath&, File::Error* error) {
-        if (retry_count < 2) {
-          retry_count += 1;
-          *error = File::FILE_ERROR_IN_USE;
-          return false;
-        }
-        *error = File::FILE_OK;
-        return true;
-      }));
-
-  DataSerializer serializer("foo");
-  EXPECT_EQ(NOT_CALLED, write_callback_observer_.GetAndResetObservationState());
-  base::RunLoop run_loop;
-  write_callback_observer_.ObserveNextWriteCallbacks(&writer,
-                                                     run_loop.QuitClosure());
-  writer.WriteNow("foo");
-  run_loop.Run();
-
-  EXPECT_EQ(CALLED_WITH_SUCCESS,
-            write_callback_observer_.GetAndResetObservationState());
-  EXPECT_EQ(retry_count, 2u);
-
-  histogram_tester.ExpectUniqueSample("ImportantFile.FileReplaceRetryCount", 2,
-                                      1);
-
-  histogram_tester.ExpectUniqueSample("ImportantFile.FileReplaceRetryCount2", 2,
-                                      1);
-  histogram_tester.ExpectUniqueSample(
-      "ImportantFile.FileReplaceRetryCount2.All", 2, 1);
-
-  // 1 means succeeded with retries.
-  histogram_tester.ExpectUniqueSample("ImportantFile.FileReplaceResult", 1, 1);
-  histogram_tester.ExpectUniqueSample("ImportantFile.FileReplaceResult.All", 1,
-                                      1);
-}
-#endif
 
 TEST_F(ImportantFileWriterTest, ReplaceFileFails) {
   base::HistogramTester histogram_tester;
@@ -617,16 +560,6 @@ TEST_F(ImportantFileWriterTest, ReplaceFileFails) {
 
   EXPECT_EQ(CALLED_WITH_ERROR,
             write_callback_observer_.GetAndResetObservationState());
-#if BUILDFLAG(IS_WIN)
-  // 10 means ReplaceFile never succeeded.
-  histogram_tester.ExpectUniqueSample("ImportantFile.FileReplaceRetryCount", 10,
-                                      1);
-
-  histogram_tester.ExpectUniqueSample("ImportantFile.FileReplaceRetryCount2", 5,
-                                      1);
-  histogram_tester.ExpectUniqueSample(
-      "ImportantFile.FileReplaceRetryCount2.All", 5, 1);
-#endif
 
   // 2 means ReplaceFile never succeeded.
   histogram_tester.ExpectUniqueSample("ImportantFile.FileReplaceResult", 2, 1);
@@ -656,17 +589,6 @@ TEST_F(ImportantFileWriterTest, ReplaceFileFailsWithSuffix) {
 
   EXPECT_EQ(CALLED_WITH_ERROR,
             write_callback_observer_.GetAndResetObservationState());
-
-#if BUILDFLAG(IS_WIN)
-  // 10 means ReplaceFile never succeeded.
-  histogram_tester.ExpectUniqueSample("ImportantFile.FileReplaceRetryCount", 10,
-                                      1);
-
-  histogram_tester.ExpectUniqueSample(
-      "ImportantFile.FileReplaceRetryCount2.Foo", 5, 1);
-  histogram_tester.ExpectUniqueSample(
-      "ImportantFile.FileReplaceRetryCount2.All", 5, 1);
-#endif
 
   // 2 means ReplaceFile never succeeded.
   histogram_tester.ExpectUniqueSample("ImportantFile.FileReplaceResult.Foo", 2,

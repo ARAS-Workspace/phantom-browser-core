@@ -17,12 +17,6 @@
 #include "chrome/common/pref_names.h"
 #include "components/prefs/pref_service.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/win/taskbar_manager.h"
-#include "chrome/installer/util/install_util.h"
-#include "chrome/installer/util/shell_util.h"
-#endif
-
 namespace {
 
 bool IsDefaultBrowserDisabledByPolicy() {
@@ -55,19 +49,10 @@ DefaultBrowserHandler::DefaultBrowserHandler(
     mojo::PendingReceiver<feature_showcase::mojom::DefaultBrowserPageHandler>
         receiver,
     base::OnceClosure on_set_as_default_completed_callback
-#if BUILDFLAG(IS_WIN)
-    ,
-    PinToTaskbarCallbackForTesting on_pin_to_taskbar_callback
-#endif
     )
     : receiver_(this, std::move(receiver)),
       on_set_as_default_completed_callback_for_testing_(
           std::move(on_set_as_default_completed_callback))
-#if BUILDFLAG(IS_WIN)
-      ,
-      on_pin_to_taskbar_callback_for_testing_(
-          std::move(on_pin_to_taskbar_callback))
-#endif
 {
 }
 
@@ -93,18 +78,6 @@ void DefaultBrowserHandler::SetAsDefaultBrowser() {
           },
           std::move(on_set_as_default_completed_callback_for_testing_)));
 
-#if BUILDFLAG(IS_WIN)
-  if (can_pin_) {
-    browser_util::PinResultCallback pin_callback = base::DoNothing();
-    if (on_pin_to_taskbar_callback_for_testing_) {
-      pin_callback = std::move(on_pin_to_taskbar_callback_for_testing_);
-    }
-    browser_util::PinAppToTaskbar(
-        ShellUtil::GetBrowserModelId(InstallUtil::IsPerUserInstall()),
-        browser_util::PinAppToTaskbarChannel::kFirstRunExperience,
-        std::move(pin_callback));
-  }
-#endif
 }
 
 void DefaultBrowserHandler::SkipSetAsDefaultBrowser() {

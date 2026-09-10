@@ -22,12 +22,9 @@
 #include "components/device_signals/core/common/signals_features.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/string_number_conversions.h"
-#include "base/test/test_reg_util_win.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "base/command_line.h"
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 namespace device_signals {
 
@@ -60,82 +57,11 @@ constexpr char kValidFakeJwtZtaContent[] =
 constexpr char kExpectedAgentId[] = "beefbeefbeefbeefbeefbeefbeef1111";
 constexpr char kExpectedCustomerId[] = "abcdef123456789";
 
-#if BUILDFLAG(IS_WIN)
-constexpr wchar_t kCSAgentRegPath[] =
-    L"SYSTEM\\CurrentControlSet\\services\\CSAgent\\Sim";
-
-constexpr char kFakeHexCSCustomerId[] = "CABCDEF1234ABCD1234D";
-constexpr char kFakeHexCSAgentId[] = "ADEBCA432156ABDC";
-
-// CU is the registry value containing the customer ID.
-constexpr wchar_t kCSCURegKey[] = L"CU";
-
-// AG is the registry value containing the agent ID.
-constexpr wchar_t kCSAGRegKey[] = L"AG";
-
-void CreateRegistryKey() {
-  base::win::RegKey key;
-  LONG res = key.Create(HKEY_LOCAL_MACHINE, kCSAgentRegPath, KEY_WRITE);
-  ASSERT_EQ(res, ERROR_SUCCESS);
-}
-
-// Overwrite the registry values for both agent and customer ID with empty
-// strings, instead of simply removing the key itself since the mocked registry
-// doesn't work well with local machine environments.
-void DeleteRegistryValues() {
-  base::win::RegKey key;
-  LONG res = key.Open(HKEY_LOCAL_MACHINE, kCSAgentRegPath, KEY_WRITE);
-  ASSERT_EQ(res, ERROR_SUCCESS);
-
-  std::string empty_string = std::string();
-  res = key.WriteValue(kCSCURegKey, empty_string.data(), empty_string.size(),
-                       REG_BINARY);
-  ASSERT_EQ(res, ERROR_SUCCESS);
-
-  res = key.WriteValue(kCSAGRegKey, empty_string.data(), empty_string.size(),
-                       REG_BINARY);
-  ASSERT_EQ(res, ERROR_SUCCESS);
-}
-
-void SetUpCrowdStrikeInfo(const std::optional<std::string>& customer_id,
-                          const std::optional<std::string>& agent_id) {
-  CreateRegistryKey();
-
-  base::win::RegKey key;
-  LONG res = key.Open(HKEY_LOCAL_MACHINE, kCSAgentRegPath, KEY_WRITE);
-  ASSERT_EQ(res, ERROR_SUCCESS);
-
-  if (customer_id) {
-    // Have to Hex-decode the values before storing them.
-    std::string decoded_customer_id;
-    ASSERT_TRUE(base::HexStringToString(customer_id.value().c_str(),
-                                        &decoded_customer_id));
-    res = key.WriteValue(kCSCURegKey, decoded_customer_id.data(),
-                         decoded_customer_id.size(), REG_BINARY);
-    ASSERT_EQ(res, ERROR_SUCCESS);
-  }
-
-  if (agent_id) {
-    // Have to Hex-decode the values before storing them.
-    std::string decoded_agent_id;
-    ASSERT_TRUE(
-        base::HexStringToString(agent_id.value().c_str(), &decoded_agent_id));
-    res = key.WriteValue(kCSAGRegKey, decoded_agent_id.data(),
-                         decoded_agent_id.size(), REG_BINARY);
-    ASSERT_EQ(res, ERROR_SUCCESS);
-  }
-}
-
-#endif  // BUILDFLAG(IS_WIN)
-
 }  // namespace
 
 class CrowdStrikeClientTest : public testing::Test {
  protected:
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    registry_override_manager_.OverrideRegistry(HKEY_LOCAL_MACHINE);
-#endif
 
     ASSERT_TRUE(scoped_temp_dir_.CreateUniqueTempDir());
     scoped_feature_list_.InitAndEnableFeature(
@@ -203,10 +129,6 @@ class CrowdStrikeClientTest : public testing::Test {
   base::ScopedTempDir scoped_temp_dir_;
   base::test::ScopedFeatureList scoped_feature_list_;
   base::HistogramTester histogram_tester_;
-
-#if BUILDFLAG(IS_WIN)
-  registry_util::RegistryOverrideManager registry_override_manager_;
-#endif
 
   std::unique_ptr<CrowdStrikeClient> client_;
 };
@@ -358,69 +280,7 @@ TEST_F(CrowdStrikeClientTest, Identifiers_Success_CachedValue) {
   EXPECT_FALSE(GetSignals());
 }
 
-#if BUILDFLAG(IS_WIN)
-
-// Tests that only having the customer ID in the registry is treated
-// as insufficient, and no value is returned.
-TEST_F(CrowdStrikeClientTest, Identifiers_NoFile_RegistryNoAgentId) {
-  InitializeClient();
-  SetUpCrowdStrikeInfo(kFakeHexCSCustomerId, std::nullopt);
-
-  auto signals = GetSignals();
-
-  ASSERT_TRUE(signals);
-  EXPECT_EQ(signals->customer_id, base::ToLowerASCII(kFakeHexCSCustomerId));
-  EXPECT_TRUE(signals->agent_id.empty());
-}
-
-TEST_F(CrowdStrikeClientTest, Identifiers_NoFile_RegistryNoCustomerId) {
-  InitializeClient();
-  SetUpCrowdStrikeInfo(std::nullopt, kFakeHexCSAgentId);
-
-  auto signals = GetSignals();
-
-  ASSERT_TRUE(signals);
-  EXPECT_EQ(signals->agent_id, base::ToLowerASCII(kFakeHexCSAgentId));
-  EXPECT_TRUE(signals->customer_id.empty());
-
-  DeleteRegistryValues();
-
-  // Expect the value to still be cached.
-  signals = GetSignals();
-
-  ASSERT_TRUE(signals);
-  EXPECT_EQ(signals->agent_id, base::ToLowerASCII(kFakeHexCSAgentId));
-  EXPECT_TRUE(signals->customer_id.empty());
-}
-
-TEST_F(CrowdStrikeClientTest, Identifiers_FileHasPrecendence) {
-  InitializeClient();
-  SetUpCrowdStrikeInfo(kFakeHexCSCustomerId, kFakeHexCSAgentId);
-
-  CreateFakeFileWithContent(kValidFakeJwtZtaContent);
-
-  auto signals = GetSignals();
-
-  ASSERT_TRUE(signals);
-  EXPECT_EQ(signals->agent_id, kExpectedAgentId);
-  EXPECT_EQ(signals->customer_id, kExpectedCustomerId);
-}
-
-TEST_F(CrowdStrikeClientTest, Identifiers_DecodingFailed_RegistryFallback) {
-  InitializeClient();
-  CreateFakeFileWithContent("some.random%%.content");
-  SetUpCrowdStrikeInfo(kFakeHexCSCustomerId, kFakeHexCSAgentId);
-
-  auto signals =
-      GetSignals(/*expected_error=*/SignalCollectionError::kParsingFailed);
-
-  ASSERT_TRUE(signals);
-  EXPECT_EQ(signals->customer_id, base::ToLowerASCII(kFakeHexCSCustomerId));
-  EXPECT_EQ(signals->agent_id, base::ToLowerASCII(kFakeHexCSAgentId));
-  ValidateHistogram(SignalsParsingError::kBase64DecodingFailed);
-}
-
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
 namespace {
 

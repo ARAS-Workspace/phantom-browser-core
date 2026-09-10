@@ -635,7 +635,7 @@ TEST_F(SupervisedUserExtensionTest,
   // the existing extensions remain enabled on Desktop.
   CreateExtensionManager();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // On Desktop, before the release of parental controls the extensions would be
   // installed and enabled by default.
   CheckEnabled(good_crx);
@@ -673,7 +673,7 @@ TEST_F(SupervisedUserExtensionTest,
   // the existing extensions remain enabled on Desktop.
   CreateExtensionManager();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // On Desktop, before the release of parental controls the extensions would be
   // installed and enabled by default.
   CheckEnabled(extension_id);
@@ -689,7 +689,7 @@ TEST_F(SupervisedUserExtensionTest,
 
   // Grant the upgraded permissions.
   registrar()->GrantPermissionsAndEnableExtension(*extension2);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // The parental approval granted at SU Extension manager still applies.
   CheckEnabled(extension_id);
 #else

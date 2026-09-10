@@ -52,10 +52,6 @@
 #include "base/files/file_descriptor_watcher_posix.h"
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#endif
-
 namespace base::test {
 
 namespace {
@@ -919,18 +915,6 @@ TEST_F(TaskEnvironmentTest, MultiThreadedMockTimeAndThreadPoolQueuedMode) {
   EXPECT_EQ(expected_value, count);
 }
 
-#if BUILDFLAG(IS_WIN)
-// Regression test to ensure that TaskEnvironment enables the MTA in the
-// thread pool (so that the test environment matches that of the browser process
-// and com_init_util.h's assertions are happy in unit tests).
-TEST_F(TaskEnvironmentTest, ThreadPoolPoolAllowsMTA) {
-  TaskEnvironment task_environment;
-  ThreadPool::PostTask(FROM_HERE, BindOnce(&win::AssertComApartmentType,
-                                           win::ComApartmentType::MTA));
-  task_environment.RunUntilIdle();
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 TEST_F(TaskEnvironmentTest, SetsDefaultRunTimeout) {
   const RunLoop::RunLoopTimeout* old_run_timeout =
       ScopedRunLoopTimeout::GetTimeoutForCurrentThread();
@@ -1441,59 +1425,6 @@ TEST_F(TaskEnvironmentTest, SingleThreadMockTime) {
   EXPECT_EQ(expected_value, counter);
   EXPECT_EQ(TimeTicks::Now(), start_time + kDelay);
 }
-
-#if BUILDFLAG(IS_WIN)
-namespace {
-
-enum class ApartmentType {
-  kSTA,
-  kMTA,
-};
-
-void InitializeSTAApartment() {
-  base::win::ScopedCOMInitializer initializer;
-  EXPECT_TRUE(initializer.Succeeded());
-}
-
-void InitializeMTAApartment() {
-  base::win::ScopedCOMInitializer initializer(
-      base::win::ScopedCOMInitializer::kMTA);
-  EXPECT_TRUE(initializer.Succeeded());
-}
-
-void InitializeCOMOnWorker(
-    TaskEnvironment::ThreadPoolCOMEnvironment com_environment,
-    ApartmentType apartment_type) {
-  TaskEnvironment task_environment(com_environment);
-  ThreadPool::PostTask(FROM_HERE, BindOnce(apartment_type == ApartmentType::kSTA
-                                               ? &InitializeSTAApartment
-                                               : &InitializeMTAApartment));
-  task_environment.RunUntilIdle();
-}
-
-}  // namespace
-
-TEST_F(TaskEnvironmentTest, DefaultCOMEnvironment) {
-  // Attempt to initialize an MTA COM apartment. Expect this to succeed since
-  // the thread is already in an MTA apartment.
-  InitializeCOMOnWorker(TaskEnvironment::ThreadPoolCOMEnvironment::DEFAULT,
-                        ApartmentType::kMTA);
-
-  // Attempt to initialize an STA COM apartment. Expect this to fail since the
-  // thread is already in an MTA apartment.
-  EXPECT_DCHECK_DEATH(InitializeCOMOnWorker(
-      TaskEnvironment::ThreadPoolCOMEnvironment::DEFAULT, ApartmentType::kSTA));
-}
-
-TEST_F(TaskEnvironmentTest, NoCOMEnvironment) {
-  // Attempt to initialize both MTA and STA COM apartments. Both should succeed
-  // when the thread is not already in an apartment.
-  InitializeCOMOnWorker(TaskEnvironment::ThreadPoolCOMEnvironment::NONE,
-                        ApartmentType::kMTA);
-  InitializeCOMOnWorker(TaskEnvironment::ThreadPoolCOMEnvironment::NONE,
-                        ApartmentType::kSTA);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // TODO(crbug.com/40835641): Re-enable this test
 // TODO(crbug.com/475624916): This test is flaky on Fuchsia when host

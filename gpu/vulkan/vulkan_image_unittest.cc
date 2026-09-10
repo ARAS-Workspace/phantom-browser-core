@@ -89,26 +89,6 @@ TEST_F(VulkanImageTest, CreateWithExternalMemory) {
           << std::hex << " handle_types = 0x" << image->handle_types()
           << " handle_type = 0x" << handle_type;
     }
-#elif BUILDFLAG(IS_WIN)
-    EXPECT_TRUE(image->handle_types() &
-                VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT)
-        << std::hex << "handle_types = 0x" << image->handle_types();
-    const VkExternalMemoryHandleTypeFlagBits kHandleTypes[] = {
-        VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT,
-        VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_BIT,
-        VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D12_HEAP_BIT,
-        VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D12_RESOURCE_BIT,
-    };
-    // Get fd for all supported types.
-    for (auto handle_type : kHandleTypes) {
-      if ((image->handle_types() & handle_type) == 0)
-        continue;
-      base::win::ScopedHandle scoped_handle = image->GetMemoryHandle(
-          static_cast<VkExternalMemoryHandleTypeFlagBits>(handle_type));
-      EXPECT_TRUE(scoped_handle.is_valid())
-          << std::hex << " handle_types = 0x" << image->handle_types()
-          << " handle_type = 0x" << handle_type;
-    }
 #endif
 
     image->Destroy();

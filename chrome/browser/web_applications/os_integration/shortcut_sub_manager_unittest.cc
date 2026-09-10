@@ -190,7 +190,7 @@ class ShortcutSubManagerExecuteTest : public ShortcutSubManagerTestBase {
   ShortcutSubManagerExecuteTest() = default;
 
   bool HasShortcutsOsIntegration() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     return true;
 #else
     return false;
@@ -198,11 +198,7 @@ class ShortcutSubManagerExecuteTest : public ShortcutSubManagerTestBase {
   }
 
   bool HasShortcutsPinnedToTaskBar() {
-#if BUILDFLAG(IS_WIN)
-    return true;
-#else
     return false;
-#endif  // BUILDFLAG(IS_WIN)
   }
 
   SkColor GetShortcutColor(const webapps::AppId& app_id,
@@ -211,17 +207,7 @@ class ShortcutSubManagerExecuteTest : public ShortcutSubManagerTestBase {
       return SK_ColorTRANSPARENT;
     }
 
-#if BUILDFLAG(IS_WIN)
-    std::optional<SkColor> application_menu_icon_color =
-        fake_os_integration().GetShortcutIconTopLeftColor(
-            profile(), fake_os_integration().application_menu(), app_id,
-            app_name);
-    if (!application_menu_icon_color) {
-      ADD_FAILURE() << "Could not get shortcut icon color";
-      return SK_ColorTRANSPARENT;
-    }
-    return application_menu_icon_color.value();
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     std::optional<SkColor> icon_color =
         fake_os_integration().GetShortcutIconTopLeftColor(
             profile(), fake_os_integration().chrome_apps_folder(), app_id,
@@ -464,13 +450,11 @@ TEST_F(ShortcutSubManagerExecuteTest,
     EXPECT_TRUE(os_integration_state->has_shortcut());
 // TODO(crbug.com/339024222): The color doesn't correctly update to yellow on
 // windows.
-#if !BUILDFLAG(IS_WIN)
     EXPECT_TRUE(fake_os_integration().IsShortcutCreated(
         profile(), expected_app_id,
         fake_provider().registrar_unsafe().GetAppShortName(expected_app_id)));
     EXPECT_THAT(GetShortcutColor(expected_app_id, app_name),
                 testing::Eq(SK_ColorYELLOW));
-#endif
   }
 }
 

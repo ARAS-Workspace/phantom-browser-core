@@ -36,7 +36,6 @@
 // These tests are disabled because WebUsbDetector::Initialize is a noop on
 // Windows due to jank and hangs caused by enumerating devices.
 // https://crbug.com/41281414
-#if !BUILDFLAG(IS_WIN)
 namespace {
 
 // USB device product name.
@@ -563,4 +562,3 @@ IN_PROC_BROWSER_TEST_F(
       ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
   AddDeviceWithNotificationExpectation(device_2, true);
 }
-#endif  // !BUILDFLAG(IS_WIN)

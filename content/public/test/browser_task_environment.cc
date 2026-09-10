@@ -31,10 +31,6 @@
 #include "base/android/task_scheduler/post_task_android.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#endif
-
 namespace content {
 
 class TestBrowserThread {
@@ -156,9 +152,6 @@ BrowserTaskEnvironment::~BrowserTaskEnvironment() {
   // BrowserThread::CurrentlyOn() returns the results expected by the observers.
   DestroyTaskEnvironment();
 
-#if BUILDFLAG(IS_WIN)
-  com_initializer_.reset();
-#endif
 }
 
 BrowserTaskEnvironment::BrowserTaskEnvironment(
@@ -175,14 +168,6 @@ void BrowserTaskEnvironment::Init() {
   CHECK(!BrowserThread::IsThreadInitialized(BrowserThread::UI));
 
   CHECK(!real_io_thread_ || !HasIOMainLoop()) << "Can't have two IO threads";
-
-#if BUILDFLAG(IS_WIN)
-  // Similar to Chrome's UI thread, we need to initialize COM separately for
-  // this thread as we don't call Start() for the UI TestBrowserThread; it's
-  // already started!
-  com_initializer_ = std::make_unique<base::win::ScopedCOMInitializer>();
-  CHECK(com_initializer_->Succeeded());
-#endif
 
   auto browser_ui_thread_scheduler =
       BrowserUIThreadScheduler::CreateForTesting(sequence_manager());

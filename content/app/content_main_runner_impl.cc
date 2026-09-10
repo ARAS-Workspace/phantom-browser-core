@@ -129,16 +129,10 @@
 #include "ui/display/display_switches.h"
 #include "ui/gfx/switches.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <malloc.h>
-#include <cstring>
-
-#include "ui/base/l10n/l10n_util_win.h"
-#include "ui/display/win/dpi.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "sandbox/mac/seatbelt.h"
 #include "sandbox/mac/seatbelt_exec.h"
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_IOS)
 #include "base/threading/thread_restrictions.h"
@@ -289,11 +283,7 @@ void AsanProcessInfoCB(const char* reason,
                        bool* should_exit_cleanly,
                        bool* should_abort) {
   auto* cmd_line = base::CommandLine::ForCurrentProcess();
-#if BUILDFLAG(IS_WIN)
-  std::string cmd_string = base::WideToUTF8(cmd_line->GetCommandLineString());
-#else
   std::string cmd_string = cmd_line->GetCommandLineString();
-#endif
   base::debug::AsanService::GetInstance()->Log("\nCommand line: `%s`\n",
                                                cmd_string.c_str());
 }
@@ -434,49 +424,6 @@ mojo::ScopedMessagePipeHandle MaybeAcceptMojoInvitation() {
   return invitation.ExtractMessagePipe(0);
 }
 
-#if BUILDFLAG(IS_WIN)
-void HandleConsoleControlEventOnBrowserUiThread(DWORD control_type) {
-  GetContentClient()->browser()->SessionEnding(control_type);
-}
-
-// A console control event handler for browser processes that initiates end
-// session handling on the main thread and hangs the control thread.
-BOOL WINAPI BrowserConsoleControlHandler(DWORD control_type) {
-  BrowserTaskExecutor::GetUIThreadTaskRunner(
-      {base::TaskPriority::USER_BLOCKING})
-      ->PostTask(FROM_HERE,
-                 base::BindOnce(&HandleConsoleControlEventOnBrowserUiThread,
-                                control_type));
-
-  // Block the control thread while waiting for SessionEnding to be handled.
-  base::PlatformThread::Sleep(base::Hours(1));
-
-  // This should never be hit. The process will be terminated either by
-  // ContentBrowserClient::SessionEnding or by Windows, if the former takes too
-  // long.
-  return TRUE;  // Handled.
-}
-
-// A console control event handler for non-browser processes that hangs the
-// control thread. The event will be handled by the browser process.
-BOOL WINAPI OtherConsoleControlHandler(DWORD control_type) {
-  // Block the control thread while waiting for the browser process.
-  base::PlatformThread::Sleep(base::Hours(1));
-
-  // This should never be hit. The process will be terminated by the browser
-  // process or by Windows, if the former takes too long.
-  return TRUE;  // Handled.
-}
-
-void InstallConsoleControlHandler(bool is_browser_process) {
-  if (!::SetConsoleCtrlHandler(is_browser_process
-                                   ? &BrowserConsoleControlHandler
-                                   : &OtherConsoleControlHandler,
-                               /*Add=*/TRUE)) {
-    DPLOG(ERROR) << "Failed to set console hook function";
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 bool ShouldAllowSystemTracingConsumer() {
 // System tracing consumer support is currently only supported on ChromeOS.
@@ -693,10 +640,6 @@ static void RegisterMainThreadFactories() {
 // Returns the exit code for this process.
 int RunBrowserProcessMain(MainFunctionParams main_function_params,
                           ContentMainDelegate* delegate) {
-#if BUILDFLAG(IS_WIN)
-  if (delegate->ShouldHandleConsoleControlEvents())
-    InstallConsoleControlHandler(/*is_browser_process=*/true);
-#endif
   auto exit_code = delegate->RunProcess("", std::move(main_function_params));
   if (std::holds_alternative<int>(exit_code)) {
     DCHECK_GE(std::get<int>(exit_code), 0);
@@ -715,10 +658,6 @@ NO_STACK_PROTECTOR int RunOtherNamedProcessTypeMain(
     ContentMainDelegate* delegate) {
 #if BUILDFLAG(IS_MAC)
   base::Process::SetCurrentTaskDefaultRole();
-#endif
-#if BUILDFLAG(IS_WIN)
-  if (delegate->ShouldHandleConsoleControlEvents())
-    InstallConsoleControlHandler(/*is_browser_process=*/false);
 #endif
   static const auto kMainFunctions = std::to_array<MainFunction>({
       {switches::kUtilityProcess, UtilityMain},
@@ -835,7 +774,6 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
     DCHECK_NE(base::ThreadPoolInstance::Get(), nullptr);
   }
 
-#if !BUILDFLAG(IS_WIN)
 
   [[maybe_unused]] base::GlobalDescriptors* g_fds =
       base::GlobalDescriptors::GetInstance();
@@ -868,7 +806,6 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
         // BUILDFLAG(IS_OPENBSD)
 
-#endif  // !BUILDFLAG(IS_WIN)
 
   is_initialized_ = true;
   TRACE_EVENT0("startup,benchmark,rail", "ContentMainRunnerImpl::Initialize");
@@ -899,15 +836,6 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
         process_type);
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (command_line.HasSwitch(switches::kDeviceScaleFactor)) {
-    std::string scale_factor_string =
-        command_line.GetSwitchValueASCII(switches::kDeviceScaleFactor);
-    double scale_factor = 0;
-    if (base::StringToDouble(scale_factor_string, &scale_factor))
-      display::win::SetDefaultDeviceScaleFactor(scale_factor);
-  }
-#endif
 
   RegisterContentSchemes(delegate_->ShouldLockSchemeRegistry());
   ContentClientInitializer::Set(process_type, delegate_);
@@ -970,11 +898,7 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
       }));
 
 #if !defined(OFFICIAL_BUILD) || BUILDFLAG(CHROME_FOR_TESTING)
-#if BUILDFLAG(IS_WIN)
-  bool should_enable_stack_dump = !process_type.empty();
-#else
   bool should_enable_stack_dump = true;
-#endif
   // Print stack traces to stderr when crashes occur. This opens up security
   // holes so it should never be enabled for official builds. This needs to
   // happen before crash reporting is initialized (which for chrome happens in
@@ -1013,13 +937,7 @@ int ContentMainRunnerImpl::Initialize(ContentMainParams params) {
   base::CheckPThreadStackMinIsSafe();
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-  if (!sandbox::policy::Sandbox::Initialize(
-          SandboxTypeFromCommandLine(command_line),
-          content_main_params_->sandbox_info)) {
-    return TerminateForFatalInitializationError();
-  }
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (!IsUnsandboxedSandboxType(SandboxTypeFromCommandLine(command_line))) {
     // Verify that the sandbox was initialized prior to ContentMain using the
     // SeatbeltExecServer.
@@ -1140,9 +1058,7 @@ NO_STACK_PROTECTOR int ContentMainRunnerImpl::Run() {
       std::move(content_main_params_->created_main_parts_closure);
   main_params.needs_startup_tracing_after_sandbox_init =
       needs_startup_tracing_after_sandbox_init;
-#if BUILDFLAG(IS_WIN)
-  main_params.sandbox_info = content_main_params_->sandbox_info;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   main_params.autorelease_pool = content_main_params_->autorelease_pool;
 #endif
 
@@ -1198,14 +1114,6 @@ int ContentMainRunnerImpl::RunBrowser(MainFunctionParams main_params,
     if (pre_browser_main_exit_code.has_value())
       return pre_browser_main_exit_code.value();
 
-#if BUILDFLAG(IS_WIN)
-    if (l10n_util::GetLocaleOverrides().empty()) {
-      // Override the configured locale with the user's preferred UI language.
-      // Don't do this if the locale is already set, which is done by
-      // integration tests to ensure tests always run with the same locale.
-      l10n_util::OverrideLocaleWithUILanguageList();
-    }
-#endif
 
     // When this is enabled, these things will have already been initialized.
     if (!delegate_->IsInitFeatureListEarly()) {
@@ -1365,11 +1273,6 @@ void ContentMainRunnerImpl::Shutdown() {
   // The BrowserTaskExecutor needs to be destroyed before |exit_manager_|.
   BrowserTaskExecutor::Shutdown();
 
-#if BUILDFLAG(IS_WIN)
-#ifdef _CRTDBG_MAP_ALLOC
-  _CrtDumpMemoryLeaks();
-#endif  // _CRTDBG_MAP_ALLOC
-#endif  // BUILDFLAG(IS_WIN)
 
   exit_manager_.reset(nullptr);
 

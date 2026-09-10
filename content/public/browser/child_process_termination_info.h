@@ -18,10 +18,6 @@
 #include "content/public/browser/user_level_memory_pressure_metrics.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#endif
-
 namespace content {
 
 struct CONTENT_EXPORT ChildProcessTerminationInfo {
@@ -75,11 +71,6 @@ struct CONTENT_EXPORT ChildProcessTerminationInfo {
   // Information about memory pressure metrics collected
   // by the user-level memory pressure generator.
   std::optional<UserLevelMemoryPressureMetrics> memory_pressure_metrics;
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  // The LastError if there was a failure to launch the process.
-  DWORD last_error;
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)

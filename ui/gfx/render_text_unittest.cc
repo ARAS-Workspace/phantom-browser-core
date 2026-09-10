@@ -67,9 +67,6 @@
 #include "ui/gfx/text_elider.h"
 #include "ui/gfx/text_utils.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
 
 #if BUILDFLAG(IS_APPLE)
 #include "base/mac/mac_util.h"
@@ -101,16 +98,7 @@ enum {
 using FontSpan = std::pair<Font, Range>;
 
 bool IsFontsSmoothingEnabled() {
-#if BUILDFLAG(IS_WIN)
-  BOOL antialiasing = TRUE;
-  BOOL result = SystemParametersInfo(SPI_GETFONTSMOOTHING, 0, &antialiasing, 0);
-  if (result == FALSE) {
-    ADD_FAILURE() << "Failed to retrieve font aliasing configuration.";
-  }
-  return antialiasing;
-#else
   return true;
-#endif
 }
 
 // Checks whether |range| contains |index|. This is not the same as calling
@@ -3041,13 +3029,8 @@ TEST_F(RenderTextTest, MoveCursor_Word) {
                                         SELECTION_NONE, &expected);
 
   // Move right twice.
-#if BUILDFLAG(IS_WIN)  // Move word right includes space/punctuation.
-  expected.push_back(Range(4));
-  expected.push_back(Range(8));
-#else  // Non-Windows: move word right does NOT include space/punctuation.
   expected.push_back(Range(3));
   expected.push_back(Range(7));
-#endif
   RunMoveCursorTestAndClearExpectations(render_text, WORD_BREAK, CURSOR_RIGHT,
                                         SELECTION_NONE, &expected);
 
@@ -3061,11 +3044,7 @@ TEST_F(RenderTextTest, MoveCursor_Word) {
 
   // Move right twice.
   expected.push_back(Range(6));
-#if BUILDFLAG(IS_WIN)  // Select word right includes space/punctuation.
-  expected.push_back(Range(6, 8));
-#else  // Non-Windows: select word right does NOT include space/punctuation.
   expected.push_back(Range(6, 7));
-#endif
   RunMoveCursorTestAndClearExpectations(render_text, WORD_BREAK, CURSOR_RIGHT,
                                         SELECTION_CARET, &expected);
 
@@ -3083,11 +3062,7 @@ TEST_F(RenderTextTest, MoveCursor_Word) {
                                         SELECTION_RETAIN, &expected);
 
   // Move right twice.
-#if BUILDFLAG(IS_WIN)  // Select word right includes space/punctuation.
-  expected.push_back(Range(6, 8));
-#else  // Non-Windows: select word right does NOT include space/punctuation.
   expected.push_back(Range(6, 7));
-#endif
   expected.push_back(Range(6, 11));
   RunMoveCursorTestAndClearExpectations(render_text, WORD_BREAK, CURSOR_RIGHT,
                                         SELECTION_RETAIN, &expected);
@@ -3106,11 +3081,7 @@ TEST_F(RenderTextTest, MoveCursor_Word) {
                                         SELECTION_EXTEND, &expected);
 
   // Move right twice.
-#if BUILDFLAG(IS_WIN)  // Select word right includes space/punctuation.
-  expected.push_back(Range(4, 8));
-#else  // Non-Windows: select word right does NOT include space/punctuation.
   expected.push_back(Range(4, 7));
-#endif
   expected.push_back(Range(4, 11));
   RunMoveCursorTestAndClearExpectations(render_text, WORD_BREAK, CURSOR_RIGHT,
                                         SELECTION_EXTEND, &expected);
@@ -3136,13 +3107,8 @@ TEST_F(RenderTextTest, MoveCursor_Word_RTL) {
                                         SELECTION_NONE, &expected);
 
   // Move left twice.
-#if BUILDFLAG(IS_WIN)  // Move word left includes space/punctuation.
-  expected.push_back(Range(4));
-  expected.push_back(Range(8));
-#else  // Non-Windows: move word left does NOT include space/punctuation.
   expected.push_back(Range(3));
   expected.push_back(Range(7));
-#endif
   RunMoveCursorTestAndClearExpectations(render_text, WORD_BREAK, CURSOR_LEFT,
                                         SELECTION_NONE, &expected);
 
@@ -3156,11 +3122,7 @@ TEST_F(RenderTextTest, MoveCursor_Word_RTL) {
 
   // Move left twice.
   expected.push_back(Range(6));
-#if BUILDFLAG(IS_WIN)  // Select word left includes space/punctuation.
-  expected.push_back(Range(6, 8));
-#else  // Non-Windows: select word left does NOT include space/punctuation.
   expected.push_back(Range(6, 7));
-#endif
   RunMoveCursorTestAndClearExpectations(render_text, WORD_BREAK, CURSOR_LEFT,
                                         SELECTION_CARET, &expected);
 
@@ -3178,11 +3140,7 @@ TEST_F(RenderTextTest, MoveCursor_Word_RTL) {
                                         SELECTION_RETAIN, &expected);
 
   // Move left twice.
-#if BUILDFLAG(IS_WIN)  // Select word left includes space/punctuation.
-  expected.push_back(Range(6, 8));
-#else  // Non-Windows: select word left does NOT include space/punctuation.
   expected.push_back(Range(6, 7));
-#endif
   expected.push_back(Range(6, 11));
   RunMoveCursorTestAndClearExpectations(render_text, WORD_BREAK, CURSOR_LEFT,
                                         SELECTION_RETAIN, &expected);
@@ -3201,11 +3159,7 @@ TEST_F(RenderTextTest, MoveCursor_Word_RTL) {
                                         SELECTION_EXTEND, &expected);
 
   // Move left twice.
-#if BUILDFLAG(IS_WIN)  // Select word left includes space/punctuation.
-  expected.push_back(Range(4, 8));
-#else  // Non-Windows: select word left does NOT include space/punctuation.
   expected.push_back(Range(4, 7));
-#endif
   expected.push_back(Range(4, 11));
   RunMoveCursorTestAndClearExpectations(render_text, WORD_BREAK, CURSOR_LEFT,
                                         SELECTION_EXTEND, &expected);
@@ -4590,20 +4544,11 @@ TEST_F(RenderTextTest, MoveCursorLeftRightWithSelection_Multiline) {
 
   // Move cursor right with WORD_BREAK.
   render_text->MoveCursor(WORD_BREAK, CURSOR_RIGHT, SELECTION_NONE);
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(Range(4), render_text->selection());
-#else
   EXPECT_EQ(Range(3), render_text->selection());
-#endif
   EXPECT_EQ(0U, GetLineContainingCaret());
   render_text->MoveCursor(WORD_BREAK, CURSOR_RIGHT, SELECTION_NONE);
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(Range(9), render_text->selection());
-  EXPECT_EQ(3U, GetLineContainingCaret());
-#else
   EXPECT_EQ(Range(7), render_text->selection());
   EXPECT_EQ(1U, GetLineContainingCaret());
-#endif
   render_text->MoveCursor(WORD_BREAK, CURSOR_RIGHT, SELECTION_NONE);
   EXPECT_EQ(Range(11), render_text->selection());
   EXPECT_EQ(3U, GetLineContainingCaret());
@@ -4682,14 +4627,7 @@ void MoveLeftRightByWordVerifier(RenderText* render_text, const char16_t* str) {
     const SelectionModel end = render_text->selection_model();
 
     // For testing simplicity, each word is a 3-character word.
-#if BUILDFLAG(IS_WIN)
-    // Windows moves from "|abc def" to "abc |def" instead of "abc| def", so
-    // traverse 4 characters on all but the last word instead of all but the
-    // first.
-    const int num_character_moves = (i == num_words - 1) ? 3 : 4;
-#else
     const int num_character_moves = (i == 0) ? 3 : 4;
-#endif
     render_text->SetSelection(start);
     for (int j = 0; j < num_character_moves; ++j)
       render_text->MoveCursor(CHARACTER_BREAK, CURSOR_RIGHT, SELECTION_NONE);
@@ -4729,14 +4667,7 @@ void MoveLeftRightByWordVerifier(RenderText* render_text, const char16_t* str) {
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-// TODO(aleventhal): https://crbug.com/906308 Fix bugs, update verifier code
-// above, and enable for Windows.
-#define MAYBE_MoveLeftRightByWordInBidiText \
-  DISABLED_MoveLeftRightByWordInBidiText
-#else
 #define MAYBE_MoveLeftRightByWordInBidiText MoveLeftRightByWordInBidiText
-#endif
 TEST_F(RenderTextTest, MAYBE_MoveLeftRightByWordInBidiText) {
   RenderText* render_text = GetRenderText();
   // For testing simplicity, each word is a 3-character word.
@@ -4815,11 +4746,7 @@ TEST_F(RenderTextTest, MoveLeftRightByWordInTextWithMultiSpaces) {
   render_text->SetText(u"abc     def");
   render_text->SetCursorPosition(5);
   render_text->MoveCursor(WORD_BREAK, CURSOR_RIGHT, SELECTION_NONE);
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(8U, render_text->cursor_position());
-#else
   EXPECT_EQ(11U, render_text->cursor_position());
-#endif
 
   render_text->SetCursorPosition(5);
   render_text->MoveCursor(WORD_BREAK, CURSOR_LEFT, SELECTION_NONE);
@@ -5208,13 +5135,8 @@ TEST_F(RenderTextTest, DefaultLineHeights) {
   const FontList headline_font = body2_font.DeriveWithSizeDelta(8);
   const FontList title_font = body2_font.DeriveWithSizeDelta(3);
   const FontList body1_font = body2_font.DeriveWithSizeDelta(1);
-#if BUILDFLAG(IS_WIN)
-  const FontList button_font =
-      body2_font.DeriveWithWeight(gfx::Font::Weight::BOLD);
-#else
   const FontList button_font =
       body2_font.DeriveWithWeight(gfx::Font::Weight::MEDIUM);
-#endif
 
   EXPECT_EQ(12, body2_font.GetFontSize());
   EXPECT_EQ(20, headline_font.GetFontSize());
@@ -5405,11 +5327,6 @@ TEST_F(RenderTextTest, StringSizeBoldWidth) {
   const int bold_width = render_text->GetStringSize().width();
   EXPECT_GT(bold_width, plain_width);
 
-#if BUILDFLAG(IS_WIN)
-  render_text->SetWeight(Font::Weight::SEMIBOLD);
-  const int semibold_width = render_text->GetStringSize().width();
-  EXPECT_GT(bold_width, semibold_width);
-#endif
 
   // Now, apply a plain style over the first word only.
   render_text->ApplyWeight(Font::Weight::NORMAL, Range(0, 5));
@@ -6699,11 +6616,7 @@ TEST_F(RenderTextTest, MicrosoftSpecificPrivateUseCharacterReplacement) {
   for (auto* codepoint : allowed_codepoints) {
     RenderText* render_text = GetRenderText();
     render_text->SetText(codepoint);
-#if BUILDFLAG(IS_WIN)
-    EXPECT_EQ(codepoint, render_text->GetDisplayText());
-#else
     EXPECT_EQ(u"\uFFFD", render_text->GetDisplayText());
-#endif
   }
 }
 
@@ -7130,7 +7043,7 @@ TEST_F(RenderTextTest, HarfBuzz_DefaultEmojiCodepointProducesGlyphs) {
       total_glyphs += run->shape.glyph_count;
       // Fuchsia does not bundle a suitable font to resolve all glyphs.
       EXPECT_EQ(0U, run->CountMissingGlyphs());
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
       // The pre-pass must have routed the run through the platform color
       // emoji typeface. On Linux/CrOS we can't reliably assert this in tests
       // because the bot image may not have Noto Color Emoji installed.
@@ -7194,9 +7107,6 @@ TEST_F(RenderTextTest, HarfBuzz_EmojiDefaultVS15PrefersTextPresentation) {
     const internal::TextRunList* run_list = GetHarfBuzzRunList();
     ASSERT_GE(run_list->size(), 1U);
     for (const auto& run : run_list->runs()) {
-#if BUILDFLAG(IS_WIN)
-      EXPECT_EQ(0U, run->CountMissingGlyphs()) << "VS-15 run rendered as tofu";
-#endif
       EXPECT_FALSE(
           TypefaceMayRenderColorEmojiForTest(run->font_params.skia_face.get()))
           << "VS-15 run was shaped with a color-emoji typeface";
@@ -7261,15 +7171,8 @@ TEST_F(RenderTextTest, HarfBuzz_SplitRunsWithMissingGlyphCJK) {
   RenderTextHarfBuzz* render_text = GetRenderText();
   render_text->SetText(u"㐇𠁠㐇𠁠");
 
-#if BUILDFLAG(IS_WIN)
-  // "㐇" and "𠁠" are in separate fonts on Windows.
-  EXPECT_EQ(std::vector<std::u16string>({u"㐇", u"𠁠", u"㐇", u"𠁠"}),
-            GetRunListStrings());
-  EXPECT_EQ("[0][1->2][3][4->5]", GetRunListStructureString());
-#else
   EXPECT_EQ(std::vector<std::u16string>({u"㐇𠁠㐇𠁠"}), GetRunListStrings());
   EXPECT_EQ("[0->5]", GetRunListStructureString());
-#endif  // BUILDFLAG(IS_WIN)
   CheckBoundsForCursorPositions();
 }
 
@@ -7342,16 +7245,9 @@ TEST_F(RenderTextTest, HarfBuzz_SplitRunsInFontCJKAndLatin) {
   RenderTextHarfBuzz* render_text = GetRenderText();
   render_text->SetText(u"㐇𠁠abc㐇𠁠");
 
-#if BUILDFLAG(IS_WIN)
-  // "㐇" and "𠁠" are in separate fonts on Windows.
-  EXPECT_EQ(std::vector<std::u16string>({u"㐇", u"𠁠", u"abc", u"㐇", u"𠁠"}),
-            GetRunListStrings());
-  EXPECT_EQ("[0][1->2][3->5][6][7->8]", GetRunListStructureString());
-#else
   EXPECT_EQ(std::vector<std::u16string>({u"㐇𠁠", u"abc", u"㐇𠁠"}),
             GetRunListStrings());
   EXPECT_EQ("[0->2][3->5][6->8]", GetRunListStructureString());
-#endif  // BUILDFLAG(IS_WIN)
 
   CheckBoundsForCursorPositions();
 }
@@ -7360,23 +7256,13 @@ TEST_F(RenderTextTest, HarfBuzz_SplitRunsInFontCJKAndLatinWithEliding) {
   RenderTextHarfBuzz* render_text = GetRenderText();
   render_text->SetText(u"aaaaaaaaaaaaaaaaaaaa㐇𠁠ꟺ");
 
-#if BUILDFLAG(IS_WIN)
-  // "㐇", "𠁠", and "ꟺ" are in separate fonts on Windows.
-  EXPECT_EQ("[0->19][20][21->22][23]", GetRunListStructureString());
-#else
   EXPECT_EQ("[0->19][20->22][23]", GetRunListStructureString());
-#endif  // BUILDFLAG(IS_WIN)
   EXPECT_EQ(u"aaaaaaaaaaaaaaaaaaaa㐇𠁠ꟺ", test_api()->GetLayoutText());
 
   // This is equivalent to "a...aaaa㐇𠁠ꟺ".
   render_text->ApplyEliding(true, gfx::Range(1, 15));
 
-#if BUILDFLAG(IS_WIN)
-  // "㐇", "𠁠", and "ꟺ" are in separate fonts on Windows.
-  EXPECT_EQ("[0][1][2->6][7][8->9][10]", GetRunListStructureString());
-#else
   EXPECT_EQ("[0][1][2->6][7->9][10]", GetRunListStructureString());
-#endif  // BUILDFLAG(IS_WIN)
   EXPECT_EQ(u"a…aaaaa㐇𠁠ꟺ", test_api()->GetLayoutText());
 
   // Now clear the previous eliding and set a new eliding at the end.
@@ -7473,15 +7359,6 @@ TEST_F(RenderTextTest, HarfBuzz_ShapeRunsWithMultipleFonts) {
   EXPECT_EQ(expected, GetRunListStrings());
   EXPECT_EQ("[0->2][3][4->6]", GetRunListStructureString());
 
-#if BUILDFLAG(IS_WIN)
-  const std::vector<std::string> expected_fonts = {"Segoe UI Emoji", "Segoe UI",
-                                                   "Segoe UI Symbol"};
-
-  std::vector<std::string> mapped_fonts;
-  for (const auto& font_span : GetFontSpans())
-    mapped_fonts.push_back(font_span.first.GetFontName());
-  EXPECT_EQ(expected_fonts, mapped_fonts);
-#endif
 }
 
 TEST_F(RenderTextTest, GlyphBounds) {
@@ -7726,56 +7603,6 @@ const FallbackFontCase kComplexTextCases[] = {
     {"mixed1", u"www.اختبار.com"},
     {"mixed2", u"(اختبار)"},
     {"mixed3", u"/ זה (מבחן) /"},
-#if BUILDFLAG(IS_WIN)
-    {"asc_arb", u"abcښڛڜdef"},
-    {"devanagari", u"ञटठडढणतथ"},
-    {"ethiopic", u"መጩጪᎅⶹⶼ"},
-    {"greek", u"ξοπρς"},
-    {"kannada", u"ಠಡಢಣತಥ"},
-    {"lao", u"ປຝພຟມ"},
-    {"oriya", u"ଔକଖଗଘଙ"},
-    {"telugu_lat", u"aaఉయ!"},
-    {"common_math", u"ℳ: ¬ƒ(x)=½×¾"},
-    {"picto_title", u"☞☛test☚☜"},
-    {"common_numbers", u"𝟭𝟐⒓¹²"},
-    {"common_puncts", u",.!"},
-    {"common_space_math1", u" 𝓐"},
-    {"common_space_math2", u" 𝓉"},
-    {"common_split_spaces", u"♬  𝓐"},
-    {"common_mixed", u"\U0001d4c9\u24d4\U0001d42c"},
-    {"arrows", u"↰↱↲↳↴↵⇚⇛⇜⇝⇞⇟"},
-    {"arrows_space", u"↰ ↱ ↲ ↳ ↴ ↵ ⇚ ⇛ ⇜ ⇝ ⇞ ⇟"},
-    {"emoji_title", u"▶Feel goods"},
-    {"enclosed_alpha", u"ⒶⒷⒸⒹⒺⒻⒼ"},
-    {"shapes", u" ▶▷▸▹►▻◀◁◂◃◄◅"},
-    {"symbols", u"☂☎☏☝☫☬☭☮☯"},
-    {"symbols_space", u"☂ ☎ ☏ ☝ ☫ ☬ ☭ ☮ ☯"},
-    {"dingbats", u"✂✃✄✆✇✈"},
-    {"cjk_compatibility_ideographs", u"賈滑串句龜"},
-    {"lat_dev_ZWNJ", u"a\u200Cक"},
-    {"paren_picto", u"(☾☹☽)"},
-    {"emoji1", u"This is 💩!"},
-    {"emoji2", u"Look [🔝]"},
-    {"strange1", u"💔♬  𝓐 𝓉ⓔ𝐬т ＦỖ𝕣 ｃ卄尺𝕆ᵐ€  ♘👹"},
-    {"strange2", u"˜”*°•.˜”*°• A test for chrome •°*”˜.•°*”˜"},
-    {"strange3", u"𝐭єⓢт ｆσ𝐑 𝔠ʰ𝕣ό𝐌𝔢"},
-    {"strange4", u"тẸⓈ𝔱 𝔽𝕠ᖇ 𝕔𝐡ŕ𝔬ⓜẸ"},
-    {"url1", u"http://www.google.com"},
-    {"url2", u"http://www.nowhere.com/Lörick.html"},
-    {"url3", u"http://www.nowhere.com/تسجيل الدخول"},
-    {"url4", u"https://xyz.com:8080/تس(1)جيل الدخول"},
-    {"url5", u"http://www.script.com/test.php?abc=42&cde=12&f=%20%20"},
-    {"punct1", u"This‐is‑a‒test–for—punctuations"},
-    {"punct2", u"⁅All ‷magic‴ comes with a ‶price″⁆"},
-    {"punct3", u"⍟ Complete my sentence… †"},
-    {"parens", u"❝This❞ 「test」 has ((a)) 【lot】 [{of}] 〚parentheses〛"},
-    {"games", u"Let play: ♗♘⚀⚁♠♣"},
-    {"braille", u"⠞⠑⠎⠞ ⠋⠕⠗ ⠉⠓⠗⠕⠍⠑"},
-    {"emoticon1", u"¯\\_(ツ)_/¯"},
-    {"emoticon2", u"٩(⁎❛ᴗ❛⁎)۶"},
-    {"emoticon3", u"(͡° ͜ʖ ͡°)"},
-    {"emoticon4", u"[̲̅$̲̅(̲̅5̲̅)̲̅$̲̅]"},
-#endif
 };
 
 INSTANTIATE_TEST_SUITE_P(FallbackFontComplexTextCases,
@@ -7787,41 +7614,7 @@ INSTANTIATE_TEST_SUITE_P(FallbackFontComplexTextCases,
 // block. These tests work on Windows and Mac default fonts installation.
 // On other platforms, the fonts are mock (see test_fonts).
 const FallbackFontCase kCommonScriptCases[] = {
-#if BUILDFLAG(IS_WIN)
-    // The following tests are made to work on win7 and win10.
-    {"common00", u"\u237b\u2ac1\u24f5\u259f\u2a87\u23ea\u25d4\u2220"},
-    {"common01", u"\u2303\u2074\u2988\u32b6\u26a2\u24e5\u2a53\u2219"},
-    {"common02", u"\u29b2\u25fc\u2366\u24ae\u2647\u258e\u2654\u25fe"},
-    {"common03", u"\u21ea\u22b4\u29b0\u2a84\u0008\u2657\u2731\u2697"},
-    {"common04", u"\u2b3c\u2932\u21c8\u23cf\u20a1\u2aa2\u2344\u0011"},
-    {"common05", u"\u22c3\u2a56\u2340\u21b7\u26ba\u2798\u220f\u2404"},
-    {"common06", u"\u21f9\u25fd\u008e\u21e6\u2686\u21e4\u259f\u29ee"},
-    {"common07", u"\u231e\ufe39\u0008\u2349\u2262\u2270\uff09\u2b3b"},
-    {"common08", u"\u24a3\u236e\u29b2\u2259\u26ea\u2705\u00ae\u2a23"},
-    {"common09", u"\u33bd\u235e\u2018\u32ba\u2973\u02c1\u20b9\u25b4"},
-    {"common10", u"\u2245\u2a4d\uff19\u2042\u2aa9\u2658\u276e\uff40"},
-    {"common11", u"\u0007\u21b4\u23c9\u2593\u21ba\u00a0\u258f\u23b3"},
-    {"common12", u"\u2938\u250c\u2240\u2676\u2297\u2b07\u237e\u2a04"},
-    {"common13", u"\u2520\u233a\u20a5\u2744\u2445\u268a\u2716\ufe62"},
-    {"common14", u"\ufe4d\u25d5\u2ae1\u2a35\u2323\u273c\u26be\u2a3b"},
-    {"common15", u"\u2aa2\u0000\ufe65\u2962\u2573\u21f8\u2651\u02d2"},
-    {"common16", u"\u225c\u2283\u2960\u4de7\uff12\uffe1\u0016\u2905"},
-    {"common17", u"\uff07\u25aa\u2076\u259e\u226c\u2568\u0026\u2691"},
-    {"common18", u"\u2388\u21c2\u208d\u2a7f\u22d0\u2583\u2ad5\u240f"},
-    {"common19", u"\u230a\u27ac\u001e\u261e\u259d\u25c3\u33a5\u0011"},
-    {"common20", u"\ufe54\u29c7\u2477\u21ed\u2069\u4dfc\u2ae2\u21e8"},
-    {"common21", u"\u2131\u2ab7\u23b9\u2660\u2083\u24c7\u228d\u2a01"},
-    {"common22", u"\u2587\u2572\u21df\uff3c\u02cd\ufffd\u2404\u22b3"},
-    {"common23", u"\u4dc3\u02fe\uff09\u25a3\ufe14\u255c\u2128\u2698"},
-    {"common24", u"\u2b36\u3382\u02f6\u2752\uff16\u22cf\u00b0\u21d6"},
-    {"common25", u"\u2561\u23db\u2958\u2782\u22af\u2621\u24a3\u29ae"},
-    {"common26", u"\u2693\u22e2\u2988\u2987\u33ba\u2a94\u298e\u2328"},
-    {"common27", u"\u266c\u2aa5\u2405\uffeb\uff5c\u2902\u291e\u02e6"},
-    {"common28", u"\u2634\u32b2\u3385\u2032\u33be\u2366\u2ac7\u23cf"},
-    {"common29", u"\u2981\ua721\u25a9\u2320\u21cf\u295a\u2273\u2ac2"},
-    {"common30", u"\u22d9\u2465\u2347\u2a94\u4dca\u2389\u23b0\u208d"},
-    {"common31", u"\u21cc\u2af8\u2912\u23a4\u2271\u2303\u241e\u33a1"},
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
     {"common00", u"\u2497\uff04\u277c\u21b6\u2076\u21e4\u2068\u21b3"},
     {"common01", u"\u2663\u2466\u338e\u226b\u2734\u21be\u3389\u00ab"},
     {"common02", u"\u2062\u2197\u3392\u2681\u33be\u206d\ufe10\ufe34"},
@@ -7901,30 +7694,6 @@ INSTANTIATE_TEST_SUITE_P(FallbackFontCommonScript,
                          ::testing::ValuesIn(kCommonScriptCases),
                          RenderTextTestWithFallbackFontCase::ParamInfoToString);
 
-#if BUILDFLAG(IS_WIN)
-// Ensures that locale is used for fonts selection.
-TEST_F(RenderTextTest, CJKFontWithLocale) {
-  const char16_t kCJKTest[] = u"\u8AA4\u904E\u9AA8";
-  static const char* kLocaleTests[] = {"zh-CN", "ja-JP", "ko-KR"};
-
-  std::set<std::string> tested_font_names;
-  for (const auto* locale : kLocaleTests) {
-    base::i18n::SetICUDefaultLocale(locale);
-    ResetRenderTextInstance();
-
-    RenderTextHarfBuzz* render_text = GetRenderText();
-    render_text->SetText(kCJKTest);
-
-    const std::vector<FontSpan> font_spans = GetFontSpans();
-    ASSERT_EQ(font_spans.size(), 1U);
-
-    // Expect the font name to be different for each locale.
-    bool unique_font_name =
-        tested_font_names.insert(font_spans[0].first.GetFontName()).second;
-    EXPECT_TRUE(unique_font_name);
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_F(RenderTextTest, SameFontAccrossIgnorableCodepoints) {
   RenderText* render_text = GetRenderText();

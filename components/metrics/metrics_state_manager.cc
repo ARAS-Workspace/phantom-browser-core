@@ -618,19 +618,6 @@ void MetricsStateManager::ResetMetricsIDsIfNecessary() {
 }
 
 bool MetricsStateManager::ShouldGenerateProvisionalClientId(bool is_first_run) {
-#if BUILDFLAG(IS_WIN)
-  // We do not want to generate a provisional client ID on Windows because
-  // there's no UMA checkbox on first run. Instead it comes from the install
-  // page. So if UMA is not enabled at this point, it's unlikely it will be
-  // enabled in the same session since that requires the user to manually do
-  // that via settings page after they unchecked it on the download page.
-  //
-  // Note: Windows first run is covered by browser tests
-  // FirstRunMasterPrefsVariationsSeedTest.PRE_SecondRun and
-  // FirstRunMasterPrefsVariationsSeedTest.SecondRun. If the platform ifdef
-  // for this logic changes, the tests should be updated as well.
-  return false;
-#else
   // We should only generate a provisional client ID on the first run. If for
   // some reason there is already a client ID, we do not generate one either.
   // This can happen if metrics reporting is managed by a policy.
@@ -665,7 +652,6 @@ bool MetricsStateManager::ShouldGenerateProvisionalClientId(bool is_first_run) {
   }
 
   return true;
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 }  // namespace metrics

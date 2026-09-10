@@ -239,21 +239,7 @@ uint32_t GpuChannelHost::EnqueueDeferredMessage(
   return enqueued_deferred_message_id_;
 }
 
-#if BUILDFLAG(IS_WIN)
-void GpuChannelHost::CopyToGpuMemoryBufferAsync(
-    const Mailbox& mailbox,
-    std::vector<SyncToken> sync_token_dependencies,
-    uint64_t release_count,
-    base::OnceCallback<void(bool)> callback) {
-  AutoLock lock(deferred_message_lock_);
-  InternalFlush(UINT32_MAX);
-  GetGpuChannel().CopyToGpuMemoryBufferAsync(
-      mailbox, std::move(sync_token_dependencies), release_count,
-      std::move(callback));
-}
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 void GpuChannelHost::CopyNativeGmbToSharedMemoryAsync(
     gfx::GpuMemoryBufferHandle buffer_handle,
     base::UnsafeSharedMemoryRegion memory_region,
@@ -267,7 +253,7 @@ void GpuChannelHost::CopyNativeGmbToSharedMemoryAsync(
   GetGpuChannel().CopyNativeGmbToSharedMemoryAsync(
       std::move(buffer_handle), std::move(memory_region), std::move(callback));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 void GpuChannelHost::DelayedEnsureFlush(uint32_t deferred_message_id) {
   AutoLock lock(deferred_message_lock_);

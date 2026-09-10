@@ -49,11 +49,9 @@ using ::testing::Test;
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-static const char kDownloadPath[] = "c:\\\\path\\to\\download";
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 static const char kDownloadPath[] = "/path/to/download";
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 
 class MockDelegate : public DevToolsFileHelper::Delegate {
  public:
@@ -351,9 +349,6 @@ TEST_F(DevToolsFileHelperTest, ConnectAutomaticFileSystemWithRelativePath) {
 
 TEST_F(DevToolsFileHelperTest, ConnectAutomaticFileSystemWithNetworkPath) {
   std::vector<std::string> network_paths = {"//attacker.com/share"};
-#if BUILDFLAG(IS_WIN)
-  network_paths.push_back("\\\\attacker.com\\share");
-#endif
 
   for (const std::string& path_str : network_paths) {
     base::MockCallback<DevToolsFileHelper::ConnectCallback> connect_cb;
@@ -370,11 +365,7 @@ TEST_F(DevToolsFileHelperTest, ConnectAutomaticFileSystemWithNetworkPath) {
 }
 
 TEST_F(DevToolsFileHelperTest, ConnectAutomaticFileSystemWithParentReferences) {
-#if BUILDFLAG(IS_WIN)
-  std::string traversal_path = "c:\\foo\\bar\\..\\baz";
-#else
   std::string traversal_path = "/foo/bar/../baz";
-#endif
 
   base::MockCallback<DevToolsFileHelper::ConnectCallback> connect_cb;
   EXPECT_CALL(connect_cb, Run(false));

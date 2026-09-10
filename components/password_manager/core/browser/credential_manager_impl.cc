@@ -261,7 +261,7 @@ void CredentialManagerImpl::SendPasswordForm(
         client_->IsReauthBeforeFillingRequired(authenticator.get())) {
       authenticator_ = std::move(authenticator);
       std::u16string message;
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
       const std::u16string origin = base::UTF8ToUTF16(
           password_manager::GetShownOrigin(client_->GetLastCommittedOrigin()));
       message = l10n_util::GetStringFUTF16(IDS_PASSWORD_MANAGER_FILLING_REAUTH,

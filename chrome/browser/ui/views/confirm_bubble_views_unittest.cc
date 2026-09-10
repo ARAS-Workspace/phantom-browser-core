@@ -20,11 +20,7 @@ using views::Widget;
 typedef ChromeViewsTestBase ConfirmBubbleViewsTest;
 
 // TODO(crbug.com/40099109) Disabled on windows due to flake
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CreateAndClose DISABLED_CreateAndClose
-#else
 #define MAYBE_CreateAndClose CreateAndClose
-#endif
 TEST_F(ConfirmBubbleViewsTest, MAYBE_CreateAndClose) {
   SetConstrainedWindowViewsClient(CreateChromeConstrainedWindowViewsClient());
 

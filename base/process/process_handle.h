@@ -14,9 +14,6 @@
 #include "base/base_export.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#endif
 
 
 namespace base {
@@ -26,28 +23,18 @@ class FilePath;
 // ProcessHandle is a platform specific type which represents the underlying OS
 // handle to a process.
 // ProcessId is a number which identifies the process in the OS.
-#if BUILDFLAG(IS_WIN)
-typedef HANDLE ProcessHandle;
-typedef DWORD ProcessId;
-typedef HANDLE UserTokenHandle;
-const ProcessHandle kNullProcessHandle = NULL;
-const ProcessId kNullProcessId = 0;
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 // On POSIX, our ProcessHandle will just be the PID.
 typedef pid_t ProcessHandle;
 typedef pid_t ProcessId;
 const ProcessHandle kNullProcessHandle = 0;
 const ProcessId kNullProcessId = 0;
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 
 // To print ProcessIds portably use CrPRIdPid (based on PRIuS and friends from
 // C99 and format_macros.h) like this:
 // base::StringPrintf("PID is %" CrPRIdPid ".\n", pid);
-#if BUILDFLAG(IS_WIN)
-#define CrPRIdPid "ld"
-#else
 #define CrPRIdPid "d"
-#endif
 
 class UniqueProcId {
  public:

@@ -11,13 +11,4 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-int WINAPI wWinMain(HINSTANCE /*instance*/,
-                    HINSTANCE /*previous_instance*/,
-                    LPWSTR /*command_line*/,
-                    int /*command_show*/) {}
-#else
 int main() {}
-#endif

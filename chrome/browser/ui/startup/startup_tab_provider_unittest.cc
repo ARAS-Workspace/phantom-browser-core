@@ -27,12 +27,7 @@
 #include "extensions/common/extension_builder.h"
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/sys_string_conversions.h"
-#define CMD_ARG(x) L##x
-#else
 #define CMD_ARG(x) x
-#endif  // !BUILDFLAG(IS_WIN)
 
 TEST(StartupTabProviderTest, GetInitialPrefsTabsForState) {
   std::vector<GURL> input = {GURL(u"https://new_tab_page"),
@@ -83,18 +78,10 @@ TEST(StartupTabProviderTest, GetResetTriggerTabsForState_WelcomeSkipped) {
   StartupTabs output =
       StartupTabProviderImpl::GetInitialPrefsTabsForState(true, input);
 
-#if BUILDFLAG(IS_WIN)
-  // chrome://welcome-win10 existed only on Windows, so we check and skip it
-  // only there.
-  ASSERT_EQ(1U, output.size());
-  EXPECT_EQ(input[2], output[0].url);
-  tester.ExpectBucketCount("Startup.StartupTabs.IsWelcomePageSkipped", true, 2);
-#else
   ASSERT_EQ(2U, output.size());
   EXPECT_EQ(input[1], output[0].url);
   EXPECT_EQ(input[2], output[1].url);
   tester.ExpectBucketCount("Startup.StartupTabs.IsWelcomePageSkipped", true, 1);
-#endif
 }
 
 TEST(StartupTabProviderTest, GetPinnedTabsForState) {
@@ -344,11 +331,7 @@ namespace {
 // Helper to create a CommandLine object from a single argument, handling
 // platform differences for string types.
 static base::CommandLine MakeCommandLine(std::string_view argument) {
-#if BUILDFLAG(IS_WIN)
-  return base::CommandLine({L"", base::ASCIIToWide(argument)});
-#else
   return base::CommandLine({"", std::string(argument)});
-#endif
 }
 
 }  // namespace
@@ -486,11 +469,7 @@ TEST(StartupTabProviderTest, GetCommandLineTabsCustomScheme) {
 
 // This test fails on Windows. TODO(crbug.com/40265634): Investigate and
 // fix this test on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_GetCommandLineTabsFileUrl DISABLED_GetCommandLineTabsFileUrl
-#else
 #define MAYBE_GetCommandLineTabsFileUrl GetCommandLineTabsFileUrl
-#endif
 TEST(StartupTabProviderTest, MAYBE_GetCommandLineTabsFileUrl) {
   content::BrowserTaskEnvironment task_environment;
   TestingProfile profile;

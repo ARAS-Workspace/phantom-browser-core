@@ -68,11 +68,7 @@ void DownloadDirPolicyHandler::ApplyPolicySettingsWithParameters(
   }
   std::string str_value = value->GetString();
   base::FilePath::StringType string_value =
-#if BUILDFLAG(IS_WIN)
-      base::UTF8ToWide(str_value);
-#else
       str_value;
-#endif
 
   // Make sure the path isn't empty, since that will point to an undefined
   // location; the default location is used instead in that case.
@@ -84,13 +80,8 @@ void DownloadDirPolicyHandler::ApplyPolicySettingsWithParameters(
     expanded_value = policy::path_parser::ExpandPathVariables(
         DownloadPrefs::GetDefaultDownloadDirectory().value());
   }
-#if BUILDFLAG(IS_WIN)
-  prefs->SetValue(prefs::kDownloadDefaultDirectory,
-                  base::Value(base::WideToUTF8(expanded_value)));
-#else
   prefs->SetValue(prefs::kDownloadDefaultDirectory,
                   base::Value(expanded_value));
-#endif
 
   const bool is_mandatory =
       policies.Get(policy_name())->level == policy::POLICY_LEVEL_MANDATORY;

@@ -9,12 +9,6 @@
 #include "base/compiler_specific.h"
 #include "base/strings/string_number_conversions.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <fcntl.h>
-#endif
-
 #include "base/command_line.h"
 #include "base/files/platform_file.h"
 #include "base/logging.h"
@@ -31,13 +25,11 @@
 
 #if BUILDFLAG(IS_POSIX)
 #include "base/posix/eintr_wrapper.h"
-#elif BUILDFLAG(IS_WIN)
-#include "base/win/windows_handle_util.h"
 #endif
 
 namespace {
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_POSIX)
 testing::AssertionResult StatusOk(const Status& status) {
   if (status.IsOk()) {
     return testing::AssertionSuccess();
@@ -62,10 +54,6 @@ class PipeBuilderTest : public testing::Test {
   const base::TimeDelta long_timeout_;
 };
 
-#if BUILDFLAG(IS_WIN)
-const char kIoPipesParamName[] = "remote-debugging-io-pipes";
-#endif
-
 enum {
   kSuccess = 0,
   kReadError = 1,
@@ -82,16 +70,6 @@ int ReadFromPipeNoBestEffort(base::PlatformFile file_in,
                              int size) {
   return HANDLE_EINTR(read(file_in, buffer, size));
 }
-#elif BUILDFLAG(IS_WIN)
-int ReadFromPipeNoBestEffort(base::PlatformFile file_in,
-                             char* buffer,
-                             int size) {
-  unsigned long received = 0;
-  if (!::ReadFile(file_in, buffer, size, &received, nullptr)) {
-    return (GetLastError() == ERROR_BROKEN_PIPE) ? 0 : -1;
-  }
-  return static_cast<int>(received);
-}
 #endif
 
 #if BUILDFLAG(IS_POSIX)
@@ -99,18 +77,9 @@ int WriteToPipeNoBestEffort(base::PlatformFile file_out,
                             base::span<const char> buffer) {
   return HANDLE_EINTR(write(file_out, buffer.data(), buffer.size()));
 }
-#elif BUILDFLAG(IS_WIN)
-int WriteToPipeNoBestEffort(base::PlatformFile file_out,
-                            base::span<const char> buffer) {
-  unsigned long written = 0;
-  if (!::WriteFile(file_out, buffer.data(), buffer.size(), &written, nullptr)) {
-    return -1;
-  }
-  return static_cast<int>(written);
-}
 #endif
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_POSIX)
 int WriteToPipe(base::PlatformFile file_out, base::span<const char> buffer) {
   size_t offset = 0;
   int rv = 0;
@@ -124,20 +93,6 @@ int WriteToPipe(base::PlatformFile file_out, base::span<const char> buffer) {
 }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-HANDLE ParseHandle(const std::string& serialized_handle) {
-  uint32_t handle_as_uin32;
-  if (!base::StringToUint(serialized_handle, &handle_as_uin32)) {
-    return INVALID_HANDLE_VALUE;
-  }
-  HANDLE handle = base::win::Uint32ToHandle(handle_as_uin32);
-  if (GetFileType(handle) != FILE_TYPE_PIPE) {
-    return INVALID_HANDLE_VALUE;
-  }
-  return handle;
-}
-#endif
-
 MULTIPROCESS_TEST_MAIN(PipeEchoProcess) {
   const int capacity = 1024;
   base::ScopedPlatformFile file_in;
@@ -145,29 +100,6 @@ MULTIPROCESS_TEST_MAIN(PipeEchoProcess) {
 #if BUILDFLAG(IS_POSIX)
   file_in = base::ScopedPlatformFile(3);
   file_out = base::ScopedPlatformFile(4);
-#elif BUILDFLAG(IS_WIN)
-  base::CommandLine* cmd_line = base::CommandLine::ForCurrentProcess();
-  if (!cmd_line->HasSwitch(kIoPipesParamName)) {
-    return kIoPipesNotFound;
-  }
-  std::string io_pipes = cmd_line->GetSwitchValueASCII(kIoPipesParamName);
-  std::vector<std::string> pipe_names = base::SplitString(
-      io_pipes, ",", base::TRIM_WHITESPACE, base::SPLIT_WANT_ALL);
-  if (pipe_names.size() != 2) {
-    return kIoPipesAreMalformed;
-  }
-  std::string in_pipe = pipe_names[0];
-  std::string out_pipe = pipe_names[1];
-  base::win::ScopedHandle read_handle(ParseHandle(in_pipe));
-  if (!read_handle.is_valid()) {
-    return kInvalidInPipe;
-  }
-  base::win::ScopedHandle write_handle(ParseHandle(out_pipe));
-  if (!write_handle.is_valid()) {
-    return kInvalidOutPipe;
-  }
-  file_in = std::move(read_handle);
-  file_out = std::move(write_handle);
 #endif
   std::vector<char> buffer(capacity);
   while (true) {
@@ -220,7 +152,7 @@ TEST_F(PipeBuilderTest, CborIsUnsupported) {
   EXPECT_EQ(nullptr, pipe_builder.TakeSocket().get());
 }
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_POSIX)
 
 TEST_F(PipeBuilderTest, PlatfformIsSupported) {
   EXPECT_TRUE(PipeBuilder::PlatformIsSupported());
@@ -253,14 +185,6 @@ TEST_F(PipeBuilderTest, SendAndReceive) {
 #if BUILDFLAG(IS_POSIX)
   options.fds_to_remap.emplace_back(1, 1);
   options.fds_to_remap.emplace_back(2, 2);
-#elif BUILDFLAG(IS_WIN)
-  options.stdin_handle = INVALID_HANDLE_VALUE;
-  options.stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-  options.stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
-  options.handles_to_inherit.push_back(options.stdout_handle);
-  if (options.stderr_handle != options.stdout_handle) {
-    options.handles_to_inherit.push_back(options.stderr_handle);
-  }
 #endif
   base::Process process =
       base::SpawnMultiProcessTestChild("PipeEchoProcess", command, options);

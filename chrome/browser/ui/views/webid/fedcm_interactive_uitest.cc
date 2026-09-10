@@ -117,11 +117,7 @@ IN_PROC_BROWSER_TEST_F(FedCmCUJTest, BubbleHidesWhenModalUIShown) {
 }
 
 // TODO(https://crbug.com/387473078): Fix this on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_OneClickOutsideBubble DISABLED_OneClickOutsideBubble
-#else
 #define MAYBE_OneClickOutsideBubble OneClickOutsideBubble
-#endif
 // When the bubble view is showing, a single click outside the bubble should be
 // received by the website.
 IN_PROC_BROWSER_TEST_F(FedCmCUJTest, MAYBE_OneClickOutsideBubble) {

@@ -150,7 +150,7 @@ class SpeechRecognitionServiceTest
 
   // Disable the sandbox on Windows and MacOS as the sandboxes on those
   // platforms have not been configured yet.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   void SetUpCommandLine(base::CommandLine* command_line) override {
     // Required for the utility process to access the directory containing the
     // test files.
@@ -273,7 +273,7 @@ void SpeechRecognitionServiceTest::OnLanguageIdentificationEvent(
 
 void SpeechRecognitionServiceTest::SetUpPrefs() {
   base::FilePath soda_binary_path;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   soda_binary_path =
       test_data_dir_.Append(base::FilePath(::soda::kSodaResourcePath))
           .Append(::soda::kSodaTestBinaryRelativePath);

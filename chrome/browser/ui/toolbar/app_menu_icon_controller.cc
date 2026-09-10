@@ -166,7 +166,7 @@ std::u16string AppMenuIconController::GetIconLabel(IconType type,
     return std::u16string();
   } else if (type == IconType::kUpgradeNotification) {
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
+    (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
     int message_id = IDS_APP_MENU_BUTTON_UPDATE;
     // Select an update text option randomly. Show this text in all browser
     // windows.

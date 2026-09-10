@@ -18,10 +18,10 @@
 #include "components/version_info/version_info.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if (BUILDFLAG(IS_WIN) && defined(ARCH_CPU_X86_64)) || BUILDFLAG(IS_MAC) || \
-    (BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_ARM_CFI_TABLE)) ||           \
-    (BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_ARM64)) ||                   \
-    (BUILDFLAG(IS_CHROMEOS) &&                                              \
+#if BUILDFLAG(IS_MAC) ||                                          \
+    (BUILDFLAG(IS_ANDROID) && BUILDFLAG(ENABLE_ARM_CFI_TABLE)) || \
+    (BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_ARM64)) ||         \
+    (BUILDFLAG(IS_CHROMEOS) &&                                    \
      (defined(ARCH_CPU_X86_64) || defined(ARCH_CPU_ARM64)))
 constexpr bool kThreadProfilerSupportedOnPlatform = true;
 #else

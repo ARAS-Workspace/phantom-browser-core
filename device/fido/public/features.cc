@@ -33,8 +33,7 @@ namespace device {
 // default-enabled for long enough, based on the removal milestone in their
 // comment.
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Not yet enabled by default.
 BASE_FEATURE(kPasskeyUnlockErrorUi, base::FEATURE_DISABLED_BY_DEFAULT);
 
@@ -53,12 +52,6 @@ constexpr base::FeatureParam<PasskeyUnlockErrorUiExperimentArm>
         &kPasskeyUnlockErrorUiExperimentArms};
 #endif
 
-#if BUILDFLAG(IS_WIN)
-// Permanent flag
-BASE_FEATURE(kWebAuthUseNativeWinApi,
-             "WebAuthenticationUseNativeWinApi",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN)
 
 // This is used to enable an experiment to reject WebAuthn requests
 // when actor mode is on.
@@ -170,10 +163,6 @@ COMPONENT_EXPORT(FIDO_PUBLIC)
 BASE_FEATURE(kWebAuthnGpmPinResetUsesAccountIndex,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_WIN)
-// Enabled by default in M147. Remove in or after M150.
-BASE_FEATURE(kWebAuthnWinPrfOnCreate, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN)
 
 // Enabled by default in M150. Remove in or after M153.
 COMPONENT_EXPORT(FIDO_PUBLIC)

@@ -16,10 +16,6 @@ const char kValueTrue[] = "true";
 const char kPrinterStatus[] = "printerStatus";
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-const char kLocationTagName[] = "printer-location";
-#endif
-
 #if BUILDFLAG(USE_CUPS)
 const char kDriverInfoTagName[] = "system_driverinfo";
 const char kDriverNameTagName[] = "printer-make-and-model";

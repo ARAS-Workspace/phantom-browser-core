@@ -297,7 +297,7 @@ TEST_F(BrowsingDataCounterUtilsTest, TabsCounterResult) {
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 class CookieBrowsingDataCounterUtilsTest : public BrowsingDataCounterUtilsTest {
  public:
@@ -483,6 +483,6 @@ TEST_F(CookieBrowsingDataCounterUtilsTest, CookieCounterResult) {
   }
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 }  // namespace browsing_data_counter_utils

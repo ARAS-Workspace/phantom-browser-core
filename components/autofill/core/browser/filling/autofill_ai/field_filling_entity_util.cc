@@ -389,8 +389,7 @@ url::Origin GetTargetFieldOrigin(const url::Origin& origin,
 std::u16string GetAuthenticationMessage(const url::Origin& origin) {
   // Android is excluded here because the system biometric prompt does not
   // support a custom message.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_IOS)
   // TODO(crbug.com/492978632): Evaluate if the host should be accessed based
   // on the field origin instead of using the last committed main frame origin
   // and what should happen when `host` is empty.
@@ -398,8 +397,7 @@ std::u16string GetAuthenticationMessage(const url::Origin& origin) {
                                     base::UTF8ToUTF16(origin.host()));
 #else
   return std::u16string();
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) ||
-        // BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_IOS)
 }
 
 }  // namespace autofill

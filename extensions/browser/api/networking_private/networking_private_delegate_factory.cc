@@ -14,7 +14,7 @@
 #include "extensions/browser/api/networking_private/networking_private_chromeos.h"
 #elif BUILDFLAG(IS_LINUX)
 #include "extensions/browser/api/networking_private/networking_private_linux.h"
-#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#elif BUILDFLAG(IS_MAC)
 #include "components/wifi/wifi_service.h"
 #include "extensions/browser/api/networking_private/networking_private_service_client.h"
 #endif
@@ -66,7 +66,7 @@ NetworkingPrivateDelegateFactory::BuildServiceInstanceForBrowserContext(
   delegate = std::make_unique<NetworkingPrivateChromeOS>(browser_context);
 #elif BUILDFLAG(IS_LINUX)
   delegate = std::make_unique<NetworkingPrivateLinux>();
-#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#elif BUILDFLAG(IS_MAC)
   std::unique_ptr<wifi::WiFiService> wifi_service(wifi::WiFiService::Create());
   delegate =
       std::make_unique<NetworkingPrivateServiceClient>(std::move(wifi_service));
@@ -74,8 +74,7 @@ NetworkingPrivateDelegateFactory::BuildServiceInstanceForBrowserContext(
   NOTREACHED();
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   if (ui_factory_) {
     delegate->set_ui_delegate(ui_factory_->CreateDelegate());
   }

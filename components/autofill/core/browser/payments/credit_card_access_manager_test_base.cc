@@ -30,7 +30,7 @@
 #include "components/sync/test/test_sync_service.h"
 #include "testing/gmock/include/gmock/gmock.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 #include "components/autofill/core/browser/payments/test_credit_card_fido_authenticator.h"
 #include "components/autofill/core/browser/payments/test_internal_authenticator.h"
 #include "components/autofill/core/browser/strike_databases/payments/fido_authentication_strike_database.h"
@@ -105,7 +105,7 @@ void CreditCardAccessManagerTestBase::SetUp() {
 
   CreateAutofillDriver();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
   autofill_driver().SetAuthenticator(new TestInternalAuthenticator());
   test_api(credit_card_access_manager())
       .set_fido_authenticator(std::make_unique<TestCreditCardFidoAuthenticator>(
@@ -213,7 +213,7 @@ bool CreditCardAccessManagerTestBase::GetRealPanForCVCAuth(
                                  TestFidoRequestOptionsType::kNotPresent);
 
   payments::UnmaskResponseDetails response;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
   response.card_authorization_token = "dummy_card_authorization_token";
   if (test_fido_request_options_type == TestFidoRequestOptionsType::kValid) {
     response.fido_request_options = GetTestRequestOptions();
@@ -228,7 +228,7 @@ bool CreditCardAccessManagerTestBase::GetRealPanForCVCAuth(
   return true;
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 void CreditCardAccessManagerTestBase::AddMaxStrikes() {
   auto* strike_database =
       GetFIDOAuthenticator()->GetOrCreateFidoAuthenticationStrikeDatabase();
@@ -318,7 +318,7 @@ CreditCardAccessManagerTestBase::GetFIDOAuthenticator() {
 }
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 void CreditCardAccessManagerTestBase::AcceptWebauthnOfferDialog(
     bool did_accept) {
   GetFIDOAuthenticator()->OnWebauthnOfferDialogUserResponse(did_accept);
@@ -368,7 +368,7 @@ void CreditCardAccessManagerTestBase::
   const CreditCard* card =
       personal_data().payments_data_manager().GetCreditCardByGUID(kTestGUID);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
   fido_authenticator().set_is_user_opted_in(
       fido_authenticator_is_user_opted_in);
 #endif
@@ -391,7 +391,7 @@ void CreditCardAccessManagerTestBase::
       RiskBasedAuthenticationResponse::Result::kAuthenticationRequired;
   response.context_token = "fake_context_token";
   response.card_unmask_challenge_options = challenge_options;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
   if (fido_authenticator_is_user_opted_in) {
     response.fido_request_options = GetTestRequestOptions();
   }
@@ -399,7 +399,7 @@ void CreditCardAccessManagerTestBase::
   credit_card_access_manager().OnRiskBasedAuthenticationResponseReceived(
       response);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
   // This if-statement ensures that fido-related flows run correctly.
   if (fido_authenticator_is_user_opted_in) {
     // Expect the CreditCardAccessManager invokes the FIDO authenticator
@@ -499,7 +499,7 @@ void CreditCardAccessManagerTestBase::VerifyOnSelectChallengeOptionInvoked() {
   EXPECT_EQ(otp_authenticator().context_token(), "fake_context_token");
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 TestCreditCardFidoAuthenticator&
 CreditCardAccessManagerTestBase::fido_authenticator() {
   return static_cast<TestCreditCardFidoAuthenticator&>(
@@ -517,7 +517,7 @@ TestPersonalDataManager& CreditCardAccessManagerTestBase::personal_data() {
   return autofill_client().GetPersonalDataManager();
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 void CreditCardAccessManagerTestBase::OptUserInToFido() {
   std::string other_server_id = "00000000-0000-0000-0000-000000000034";
   // Add a random FIDO eligible card, it will return RequestOptions in unmask

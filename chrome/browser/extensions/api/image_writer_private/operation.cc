@@ -63,11 +63,7 @@ Operation::Operation(base::WeakPtr<OperationManager> manager,
                      const base::FilePath& download_folder)
     : manager_(manager),
       extension_id_(extension_id),
-#if BUILDFLAG(IS_WIN)
-      device_path_(base::FilePath::FromUTF8Unsafe(device_path)),
-#else
       device_path_(device_path),
-#endif
       temp_dir_(std::make_unique<base::ScopedTempDir>()),
       stage_(image_writer_api::Stage::kUnknown),
       progress_(0),

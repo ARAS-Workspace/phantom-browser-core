@@ -129,17 +129,11 @@ class LayoutTextTest : public RenderingTest {
       if (const auto* shape_result = item.TextShapeResult()) {
         stream << ", ShapeResult=" << shape_result->StartIndex() << "+"
                << shape_result->NumCharacters();
-#if BUILDFLAG(IS_WIN)
-        if (shape_result->NumCharacters() != shape_result->NumGlyphs()) {
-          stream << " #glyphs=" << shape_result->NumGlyphs();
-        }
-#else
         // Note: |num_glyphs| depends on installed font, we check only for
         // Windows because most of failures are reported on Windows.
         if (num_glyphs) {
           stream << " #glyphs=" << num_glyphs;
         }
-#endif
         if (flags & kIncludeSnappedWidth) {
           stream << " width=" << shape_result->SnappedWidth();
         }
@@ -159,72 +153,6 @@ class LayoutTextTest : public RenderingTest {
 };
 
 }  // namespace
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(LayoutTextTest, PrewarmFamily) {
-  test::ScopedTestFontPrewarmer prewarmer;
-  SetBodyInnerHTML(R"HTML(
-    <style>
-    #container { font-family: testfont; }
-    </style>
-    <div id="container">text</div>
-  )HTML");
-  EXPECT_THAT(prewarmer.PrewarmedFamilyNames(), ElementsAre("testfont"));
-  LayoutObject* container = GetLayoutObjectByElementId("container");
-  EXPECT_TRUE(container->StyleRef()
-                  .GetFont()
-                  ->GetFontDescription()
-                  .Family()
-                  .IsPrewarmed());
-}
-
-// Test `@font-face` fonts are NOT prewarmed.
-TEST_F(LayoutTextTest, PrewarmFontFace) {
-  test::ScopedTestFontPrewarmer prewarmer;
-  SetBodyInnerHTML(R"HTML(
-    <!--
-      This font was produced by subsetting <roboto regular> to include only the
-      .notdef glyph (GID 0) and 'A' (GID 1, U+0041). The following command was
-      used on the source font:
-      pyftsubset <roboto regular> --unicodes="U+0041" --no-hinting --layout-features='' \
-        --name-IDs='' --drop-tables+=GPOS,GSUB,gasp,GDEF,name,post
-    -->
-    <style>
-    @font-face {
-      font-family: testfont;
-      src: url(data:font/ttf;base64,AAEAAAAIAIAAAwAAT1MvMnKqYewAAAFQAAAAYGNtYXAADACUAAABsAAAADRnbHlm9aiJLAAAAIwAAAA4aGVhZPxq0noAAADsAAAANmhoZWEKugWiAAABLAAAACRobXR4CMQAgAAAASQAAAAIbG9jYQAcAAAAAADkAAAABm1heHAAJADlAAAAxAAAACAAAgAcAAAFHQWwAAcACgAAASEDIwEzASMBIQMDzf2eicYCLKgCLcX9TQHv+AF8/oQFsPpQAhoCqQABAAAAAgCPABYAVAAFAAEAAAAAAAAAAAAAAAAABgABAAAAAAAcAAAAAQAAAAIjEpNb+gZfDzz1ABkIAAAAAADE8BEuAAAAANUBUvT6G/3VCTAIcwAAAAkAAgAAAAAAAAOMAGQFOAAcAAEAAAds/gwAAAlJ+hv+SgkwAAEAAAAAAAAAAAAAAAAAAAACAAMEhgGQAAUAAAWaBTMAAAEfBZoFMwAAA9EAZgIAAAACAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAEdPT0cAQABBAEEGAP4AAGYHmgIAAAAAAQAAAAAEOgWwACAAIAADAAAAAgAAAAMAAAAUAAMAAQAAABQABAAgAAAABAAEAAEAAABB//8AAABB////wAABAAAAAA==);
-    }
-    #container { font-family: testfont; }
-    </style>
-    <div id="container">text</div>
-  )HTML");
-  EXPECT_THAT(prewarmer.PrewarmedFamilyNames(), ElementsAre());
-  LayoutObject* container = GetLayoutObjectByElementId("container");
-  EXPECT_FALSE(container->StyleRef()
-                   .GetFont()
-                   ->GetFontDescription()
-                   .Family()
-                   .IsPrewarmed());
-}
-
-TEST_F(LayoutTextTest, PrewarmGenericFamily) {
-  test::ScopedTestFontPrewarmer prewarmer;
-  SetBodyInnerHTML(R"HTML(
-    <style>
-    #container { font-family: serif; }
-    </style>
-    <div id="container">text</div>
-  )HTML");
-  // No prewarms because |GenericFontFamilySettings| is empty.
-  EXPECT_THAT(prewarmer.PrewarmedFamilyNames(), ElementsAre());
-  LayoutObject* container = GetLayoutObjectByElementId("container");
-  EXPECT_TRUE(container->StyleRef()
-                  .GetFont()
-                  ->GetFontDescription()
-                  .Family()
-                  .IsPrewarmed());
-}
-#endif
 
 struct OffsetMappingTestData {
   const char* text;

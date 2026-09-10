@@ -50,10 +50,6 @@
 #include "base/apple/mach_port_rendezvous.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace mojo_legacy {
 namespace core {
 namespace {
@@ -330,9 +326,6 @@ base::Process MAYBE_InvitationTest::LaunchChildTestClient(
   base::LaunchOptions default_launch_options;
   base::LaunchOptions& launch_options =
       custom_launch_options ? *custom_launch_options : default_launch_options;
-#if BUILDFLAG(IS_WIN)
-  launch_options.start_hidden = true;
-#endif
 
   PlatformChannel channel;
   PlatformHandle local_endpoint_handle;
@@ -386,12 +379,7 @@ void MAYBE_InvitationTest::SendInvitationToClient(
 
   MojoPlatformProcessHandle process_handle;
   process_handle.struct_size = sizeof(process_handle);
-#if BUILDFLAG(IS_WIN)
-  process_handle.value =
-      static_cast<uint64_t>(reinterpret_cast<uintptr_t>(process));
-#else
   process_handle.value = static_cast<uint64_t>(process);
-#endif
 
   MojoInvitationTransportEndpoint transport_endpoint;
   transport_endpoint.struct_size = sizeof(transport_endpoint);

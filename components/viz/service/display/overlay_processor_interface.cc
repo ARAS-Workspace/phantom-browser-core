@@ -19,8 +19,6 @@
 
 #if BUILDFLAG(IS_APPLE)
 #include "components/viz/service/display/overlay_processor_mac.h"
-#elif BUILDFLAG(IS_WIN)
-#include "components/viz/service/display/overlay_processor_win.h"
 #elif BUILDFLAG(IS_ANDROID)
 #include "components/viz/service/display/overlay_processor_android.h"
 #include "components/viz/service/display/overlay_processor_surface_control.h"
@@ -114,25 +112,6 @@ OverlayProcessorInterface::CreateOverlayProcessor(
 #if BUILDFLAG(IS_APPLE)
   DCHECK(capabilities.supports_surfaceless);
   return std::make_unique<OverlayProcessorMac>();
-#elif BUILDFLAG(IS_WIN)
-  if (capabilities.dc_support_level == OutputSurface::DCSupportLevel::kNone) {
-    return std::make_unique<OverlayProcessorStub>();
-  }
-
-  DCHECK(display_controller);
-  DCHECK(display_controller->skia_dependency());
-  return std::make_unique<OverlayProcessorWin>(
-      capabilities.dc_support_level,
-      display_controller->skia_dependency()
-          ->GetGpuDriverBugWorkarounds()
-          .disable_direct_composition_letterbox_video_optimization,
-      debug_settings,
-      std::make_unique<DCLayerOverlayProcessor>(
-          capabilities.allowed_yuv_overlay_count,
-          display_controller->skia_dependency()
-              ->GetGpuDriverBugWorkarounds()
-              .disable_video_overlay_if_moving));
-
 #elif BUILDFLAG(IS_OZONE)
   // In tests and Ozone/X11, we do not expect surfaceless surface support.
   if (!capabilities.supports_surfaceless)
@@ -187,7 +166,7 @@ OverlayCandidate OverlayProcessorInterface::CreatePrimaryPlane(
     const PrimaryPlaneParams& params) {
   OverlayCandidate overlay_plane;
   overlay_plane.is_root_render_pass = true;
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE)
   overlay_plane.transform = gfx::Transform();
 #else
   overlay_plane.transform = gfx::OverlayTransform::OVERLAY_TRANSFORM_NONE;

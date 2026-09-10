@@ -205,12 +205,7 @@ void ChromeProfileRequestGenerator::OnBaseReportsReady(
         device_signals::AgentSignalCollectionType::kDetectedAgents);
   }
 
-#if BUILDFLAG(IS_WIN)
-  signals_request.signal_names.emplace(device_signals::SignalName::kAntiVirus);
-  signals_request.signal_names.emplace(device_signals::SignalName::kHotfixes);
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (enterprise_signals::features::IsCertificateCollectionEnabled() &&
       generation_config.challenge.has_value() &&
       !generation_config.challenge.value().empty()) {
@@ -242,7 +237,7 @@ void ChromeProfileRequestGenerator::OnBaseReportsReady(
       }
     }
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   signals_request.trigger = device_signals::Trigger::kSignalsReport;
 
@@ -305,25 +300,6 @@ void ChromeProfileRequestGenerator::OnAggregatedSignalsReceived(
     }
 
     os_report->set_version(os_signals.os_version);
-#if BUILDFLAG(IS_WIN)
-    if (os_signals.machine_guid) {
-      os_report->set_machine_guid(os_signals.machine_guid.value());
-    }
-    if (os_signals.secure_boot_mode) {
-      os_report->set_secure_boot_mode(
-          (os_signals.secure_boot_mode)
-              ? TranslateSettingValue(os_signals.secure_boot_mode.value())
-              : em::SettingValue::UNKNOWN);
-    }
-    if (os_signals.windows_machine_domain) {
-      os_report->set_windows_machine_domain(
-          os_signals.windows_machine_domain.value());
-    }
-    if (os_signals.windows_user_domain) {
-      os_report->set_windows_user_domain(
-          os_signals.windows_user_domain.value());
-    }
-#endif  // BUILDFLAG(IS_WIN)
 
     if (os_signals.distribution_version) {
       os_report->set_distribution_version(
@@ -405,23 +381,6 @@ void ChromeProfileRequestGenerator::OnAggregatedSignalsReceived(
       }
     }
   }
-
-#if BUILDFLAG(IS_WIN)
-  if (response.av_signal_response) {
-    const auto& antivirus_signals = response.av_signal_response.value();
-    for (auto av_product : antivirus_signals.av_products) {
-      os_report->add_antivirus_info()->Swap(
-          TranslateAvProduct(av_product).get());
-    }
-  }
-
-  if (response.hotfix_signal_response) {
-    const auto& hotfix_signals = response.hotfix_signal_response.value();
-    for (auto hotfix : hotfix_signals.hotfixes) {
-      os_report->add_hotfixes(hotfix.hotfix_id);
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   if (response.certificate_signals_response) {
     const auto& cert_signals = response.certificate_signals_response.value();

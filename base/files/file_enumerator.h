@@ -18,9 +18,7 @@
 #include "base/time/time.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -85,14 +83,7 @@ class BASE_EXPORT FileEnumerator {
     // On POSIX systems, this is rounded down to the second.
     Time GetLastModifiedTime() const;
 
-#if BUILDFLAG(IS_WIN)
-    // Note that the cAlternateFileName (used to hold the "short" 8.3 name)
-    // of the WIN32_FIND_DATA will be empty. Since we don't use short file
-    // names, we tell Windows to omit it which speeds up the query slightly.
-    const WIN32_FIND_DATA& find_data() const {
-      return *ChromeToWindowsType(&find_data_);
-    }
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
     const stat_wrapper_t& stat() const { return stat_; }
 #endif
 
@@ -103,9 +94,7 @@ class BASE_EXPORT FileEnumerator {
     FilePath content_uri_;
     std::vector<std::string> subdirs_;
 #endif
-#if BUILDFLAG(IS_WIN)
-    CHROME_WIN32_FIND_DATA find_data_ = {};
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
     stat_wrapper_t stat_;
     FilePath filename_;
 #endif
@@ -238,17 +227,7 @@ class BASE_EXPORT FileEnumerator {
 
   bool IsPatternMatched(const FilePath& src) const;
 
-#if BUILDFLAG(IS_WIN)
-  const WIN32_FIND_DATA& find_data() const {
-    return *ChromeToWindowsType(&find_data_);
-  }
-
-  // True when find_data_ is valid.
-  bool has_find_data_ = false;
-  CHROME_WIN32_FIND_DATA find_data_ = {};
-  HANDLE find_handle_ = INVALID_HANDLE_VALUE;
-
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   // Marks the given inode as visited. Returns true if it is the first time that
   // it got marked as visited.
   bool MarkVisited(const stat_wrapper_t& st) {

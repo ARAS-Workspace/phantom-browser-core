@@ -85,7 +85,7 @@ bool GoogleIsDefaultSearchProvider(Profile* profile) {
   return IsGoogleSearch(*default_search, *template_url_service);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // Helper to determine if a search provider is known (prepopulated).
 bool IsPrepopulatedOrStarterPack(const TemplateURL* template_url,
                                  TemplateURLService* template_url_service) {
@@ -394,7 +394,7 @@ void LogMissingParams(const ExtensionSettingsOverriddenDialog::Params& params) {
                                 param);
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace
 
@@ -476,7 +476,7 @@ std::optional<ExtensionSettingsOverriddenDialog::Params> GetNtpOverriddenParams(
       std::move(show_params));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 bool ExtensionSearchOverrideMatchesExistingEngine(Profile* profile) {
   if (!profile) {
     return false;
@@ -734,6 +734,6 @@ void GetSearchOverriddenParamsThenRun(
   // so trigger the callback immediately.
   std::move(done_callback).Run(std::move(params));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace settings_overridden_params

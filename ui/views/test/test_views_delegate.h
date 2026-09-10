@@ -56,9 +56,6 @@ class TestViewsDelegate : public ViewsDelegate {
   }
 
   // ViewsDelegate:
-#if BUILDFLAG(IS_WIN)
-  HICON GetSmallWindowIcon() const override;
-#endif
   void OnBeforeWidgetInit(Widget::InitParams* params,
                           internal::NativeWidgetDelegate* delegate) override;
 #if BUILDFLAG(IS_MAC)

@@ -283,7 +283,7 @@ class ParentApprovalRequestTest
   bool parent_permission_dialog_appeared_ = false;
 };
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Tests that installation fails when the custodian info is missing and the
 // right histograms are recorded. Regression test for crbug.com/35071637.
 IN_PROC_BROWSER_TEST_P(ParentApprovalRequestTest,
@@ -322,7 +322,7 @@ IN_PROC_BROWSER_TEST_P(ParentApprovalRequestTest,
           kNoParentError,
       1);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // Tests that the method to request extension approval can be triggered
 // without errors for new (uninstalled) extensions that already have been

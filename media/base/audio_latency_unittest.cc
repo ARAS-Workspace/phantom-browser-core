@@ -35,11 +35,7 @@ class AudioLatencyTest : public testing::TestWithParam<AudioLatencyTestData> {
 // Windows 10 may allow exactly the minimum buffer size using the IAudioClient3
 // API but any other buffer size must be a multiple of the hardware_buffer_size
 // and not the min_buffer_size.
-#if BUILDFLAG(IS_WIN)
-    const int multiplier = hardware_buffer_size;
-#else
     const int multiplier = platform_min_buffer_size;
-#endif
 
     const int platform_max_buffer_size =
         (max_buffer_size && max_buffer_size < limits::kMaxWebAudioBufferSize)
@@ -84,16 +80,7 @@ class AudioLatencyTest : public testing::TestWithParam<AudioLatencyTestData> {
                     max_buffer_size, limits::kMaxWebAudioBufferSize));
     }
 
-#if BUILDFLAG(IS_WIN)
-    if (min_buffer_size && min_buffer_size < hardware_buffer_size) {
-      EXPECT_EQ(hardware_buffer_size,
-                media::AudioLatency::GetExactBufferSize(
-                    base::Seconds((min_buffer_size * 1.1) /
-                                  static_cast<double>(hardware_sample_rate)),
-                    hardware_sample_rate, hardware_buffer_size, min_buffer_size,
-                    max_buffer_size, limits::kMaxWebAudioBufferSize));
-    }
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     EXPECT_EQ(limits::kMaxWebAudioBufferSize,
               media::AudioLatency::GetExactBufferSize(
                   base::Seconds((limits::kMaxAudioBufferSize * 1.1) /
@@ -108,13 +95,7 @@ class AudioLatencyTest : public testing::TestWithParam<AudioLatencyTestData> {
           base::Seconds(i / 1000.0), hardware_sample_rate, hardware_buffer_size,
           min_buffer_size, max_buffer_size, limits::kMaxWebAudioBufferSize);
       EXPECT_GE(buffer_size, previous_buffer_size);
-#if BUILDFLAG(IS_WIN)
-      EXPECT_TRUE(buffer_size == min_buffer_size ||
-                  buffer_size % multiplier == 0 ||
-                  buffer_size % max_buffer_size == 0);
-#else
       EXPECT_EQ(buffer_size, buffer_size / multiplier * multiplier);
-#endif
       previous_buffer_size = buffer_size;
     }
   }
@@ -124,10 +105,7 @@ class AudioLatencyTest : public testing::TestWithParam<AudioLatencyTestData> {
 
 TEST(AudioLatency, HighLatencyBufferSizes) {
   for (int i = 6400; i <= 204800; i *= 2)
-#if BUILDFLAG(IS_WIN)
-    EXPECT_EQ(2 * (i / 100),
-              AudioLatency::GetHighLatencyBufferSize(i, i / 100));
-#elif BUILDFLAG(USE_CRAS)
+#if BUILDFLAG(USE_CRAS)
     EXPECT_EQ(8 * (i / 100), AudioLatency::GetHighLatencyBufferSize(i, 32));
 #else
     EXPECT_EQ(2 * (i / 100), AudioLatency::GetHighLatencyBufferSize(i, 32));
@@ -165,14 +143,12 @@ TEST(AudioLatency, InteractiveBufferSizes) {
 TEST(AudioLatency, RtcBufferSizes) {
   for (int i = 6400; i < 204800; i *= 2) {
     EXPECT_EQ(i / 100, AudioLatency::GetRtcBufferSize(i, 0));
-#if BUILDFLAG(IS_WIN)
-    EXPECT_EQ(500, AudioLatency::GetRtcBufferSize(i, 500));
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
     EXPECT_EQ(i / 50, AudioLatency::GetRtcBufferSize(i, i / 50 - 1));
     EXPECT_EQ(i / 50 + 1, AudioLatency::GetRtcBufferSize(i, i / 50 + 1));
 #else
     EXPECT_EQ(i / 100, AudioLatency::GetRtcBufferSize(i, 500));
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_ANDROID)
   }
 }
 
@@ -183,20 +159,7 @@ TEST_P(AudioLatencyTest, ExactBufferSizes) {
 INSTANTIATE_TEST_SUITE_P(
     All,
     AudioLatencyTest,
-#if BUILDFLAG(IS_WIN)
-    // Windows 10 with supported driver will have valid min and max buffer sizes
-    // whereas older Windows will have zeros. The specific min, max and hardware
-    // are device-dependent.
-    testing::Values(std::make_tuple(44100, 440, 128, 440),
-                    std::make_tuple(44100, 440, 440, 440),
-                    std::make_tuple(44100, 440, 440, 880),
-                    std::make_tuple(44100, 440, 440, 4400),
-                    std::make_tuple(44100, 440, 128, 4196),
-                    std::make_tuple(44100, 440, 440, 4196),
-                    std::make_tuple(44100, 440, 0, 0),
-                    std::make_tuple(44100, 256, 128, 512),
-                    std::make_tuple(44100, 256, 0, 0))
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(USE_CRAS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(USE_CRAS)
     // These values are constant on Mac and ChromeOS, regardless of device.
     testing::Values(std::make_tuple(44100,
                                     256,

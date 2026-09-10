@@ -21,8 +21,6 @@
 
 #if BUILDFLAG(IS_ANDROID)
 #include "net/android/http_auth_negotiate_android.h"
-#elif BUILDFLAG(IS_WIN)
-#include "net/http/http_auth_sspi_win.h"
 #elif BUILDFLAG(IS_POSIX)
 #include "net/http/http_auth_gssapi_posix.h"
 #endif
@@ -42,9 +40,7 @@ class HttpAuthPreferences;
 
 class NET_EXPORT_PRIVATE HttpAuthHandlerNegotiate : public HttpAuthHandler {
  public:
-#if BUILDFLAG(IS_WIN)
-  typedef SSPILibrary AuthLibrary;
-#elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
   typedef GSSAPILibrary AuthLibrary;
 #endif
 

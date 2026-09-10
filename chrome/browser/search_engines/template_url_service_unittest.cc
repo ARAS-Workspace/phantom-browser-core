@@ -134,8 +134,7 @@ std::unique_ptr<TemplateURLData> CreateTestSearchEngine() {
   return result;
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Creates a `TemplateURLData` with some fake data generated from `keyword`
 // and with the `safe_for_autoreplace` field set according to the
 // corresponding parameter.
@@ -149,8 +148,7 @@ TemplateURLData CreateTestSearchEngineWithSafeForAutoreplace(
   data.safe_for_autoreplace = safe_for_autoreplace;
   return data;
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 void VerifyTemplateUrlCountsHistograms(
     const base::HistogramTester& histogram_tester,
@@ -876,8 +874,7 @@ TEST_F(TemplateURLServiceTest, Reset_SiteSearchPolicyEngine) {
   ASSERT_TRUE(prefs);
   const base::ListValue& overridden_keywords = prefs->GetList(
       EnterpriseSearchManager::kSiteSearchSettingsOverriddenKeywordsPrefName);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   EXPECT_EQ(1u, overridden_keywords.size());
   EXPECT_EQ(base::UTF16ToUTF8(u"keyword"), overridden_keywords[0].GetString());
 #else
@@ -920,8 +917,7 @@ TEST_F(TemplateURLServiceTest, Remove_SiteSearchPolicyEngine) {
   ASSERT_TRUE(prefs);
   const base::ListValue& overridden_keywords = prefs->GetList(
       EnterpriseSearchManager::kSiteSearchSettingsOverriddenKeywordsPrefName);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   EXPECT_EQ(1u, overridden_keywords.size());
   EXPECT_EQ(base::UTF16ToUTF8(u"keyword"), overridden_keywords[0].GetString());
 #else
@@ -2807,8 +2803,7 @@ TEST_F(TemplateURLServiceTest, TemplateURLCountsOnStartupHistogram) {
        {".NonFeaturedAllowUserOverrideSiteSearchSetByPolicy", 1}});
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 struct EnterpriseSearchTestParam {
   TemplateURLData::PolicyOrigin policy_origin;
@@ -3773,5 +3768,4 @@ TEST_P(TemplateURLServiceEnterpriseSearchForSiteSearch,
   }
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)

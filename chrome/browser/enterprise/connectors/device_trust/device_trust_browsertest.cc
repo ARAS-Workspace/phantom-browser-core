@@ -30,14 +30,6 @@
 #include "content/public/test/mock_navigation_throttle_registry.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/enterprise/connectors/device_trust/test/device_trust_test_environment_win.h"
-#include "chrome/browser/enterprise/test/test_constants.h"
-#include "chrome/browser/policy/chrome_browser_policy_connector.h"
-#include "components/enterprise/browser/controller/chrome_browser_cloud_management_controller.h"
-#endif  // #if BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ash/attestation/mock_tpm_challenge_key.h"
 #include "chrome/browser/ash/attestation/tpm_challenge_key.h"
@@ -73,12 +65,6 @@ constexpr char kChallengeV1[] =
     "2ZgSJhErFEQDvWjyX0cDuFX8fO2i40aAwJsFoX+Z5fHbd3kanTcK+ty56w==\""
     "}"
     "}";
-
-#if BUILDFLAG(IS_WIN)
-constexpr char kFakeNonce[] = "fake nonce";
-constexpr int kSuccessCode = 200;
-constexpr int kHardFailureCode = 400;
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_CHROMEOS)
 DeviceTrustConnectorState CreateManagedDeviceState() {
@@ -134,39 +120,18 @@ class DeviceTrustDesktopBrowserTest : public test::DeviceTrustBrowserTestBase {
 
   void SetUpInProcessBrowserTestFixture() override {
     test::DeviceTrustBrowserTestBase::SetUpInProcessBrowserTestFixture();
-#if BUILDFLAG(IS_WIN)
-    device_trust_test_environment_win_.emplace();
-    device_trust_test_environment_win_->SetExpectedDMToken(
-        enterprise::test::kBrowserDmToken);
-    device_trust_test_environment_win_->SetExpectedClientID(
-        enterprise::test::kBrowserClientId);
-
-    // This will set up a key before DeviceTrustKeyManager initializes.
-    // DTKM should just try to load this key instead of creating one itself.
-    // If create_preexisting_key_ is False, then DTKM is responsible for
-    // creating the key and put it in storage.
-    if (create_preexisting_key_) {
-      device_trust_test_environment_win_->SetUpExistingKey();
-    }
-#else  // BUILDFLAG(IS_WIN)
     scoped_persistence_delegate_factory_.emplace();
     scoped_rotation_command_factory_.emplace();
-#endif
   }
 
   // If set to true, will fake as if a key was already persisted on the device
   // before the browser starts.
   const bool create_preexisting_key_;
 
-#if BUILDFLAG(IS_WIN)
-  std::optional<DeviceTrustTestEnvironmentWin>
-      device_trust_test_environment_win_;
-#else  // BUILDFLAG(IS_WIN)
   std::optional<ScopedKeyPersistenceDelegateFactory>
       scoped_persistence_delegate_factory_;
   std::optional<ScopedKeyRotationCommandFactory>
       scoped_rotation_command_factory_;
-#endif
 };
 
 using DeviceTrustBrowserTest = DeviceTrustDesktopBrowserTest;
@@ -257,13 +222,13 @@ IN_PROC_BROWSER_TEST_P(DeviceTrustDelayedManagementBrowserTest,
   device_trust_mixin_->EnableUserInlinePolicy();
 
   DTAttestationResult success_result = DTAttestationResult::kSuccess;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // On desktop platforms, consent is required when the device is not managed.
   device_trust_mixin_->SetConsentGiven(true);
 
   // Also, attestation is not yet supported.
   success_result = DTAttestationResult::kSuccessNoSignature;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   ResetState();
   TriggerUrlNavigation();
@@ -308,147 +273,7 @@ IN_PROC_BROWSER_TEST_F(DeviceTrustBrowserTest, SignalsContract) {
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-
-using KeyRotationResult = DeviceTrustKeyManager::KeyRotationResult;
-
-// To test "create key" flows, there should be no pre-existing persisted key.
-// Setting create_preexisting_key to false will result in no key existing
-// when DeviceTrustKeyManager initializes, and it should create a key
-// in storage.
-class DeviceTrustCreateKeyBrowserTest : public DeviceTrustDesktopBrowserTest {
- protected:
-  DeviceTrustCreateKeyBrowserTest()
-      : DeviceTrustDesktopBrowserTest(/*create_preexisting_key=*/false) {}
-};
-
-IN_PROC_BROWSER_TEST_F(DeviceTrustCreateKeyBrowserTest,
-                       AttestationFullFlowKeyCreation) {
-  TriggerUrlNavigation();
-  VerifyAttestationFlowSuccessful();
-  // Make sure DeviceTrustKeyManager successfully created a key in storage
-  // via no-nonce key rotation.
-  VerifyKeyRotationSuccess(/*with_nonce=*/false);
-
-  EXPECT_FALSE(device_trust_test_environment_win_->GetWrappedKey().empty());
-}
-
-IN_PROC_BROWSER_TEST_F(DeviceTrustCreateKeyBrowserTest,
-                       AttestationFullFlowKeyCreationV1) {
-  SetChallengeValue(kChallengeV1);
-  TriggerUrlNavigation();
-  VerifyAttestationFlowFailure(test::kFailedToParseChallengeJsonResponse);
-  VerifyKeyRotationSuccess(/*with_nonce=*/false);
-
-  EXPECT_FALSE(device_trust_test_environment_win_->GetWrappedKey().empty());
-}
-
-// To test "create key" flows where the initial upload fails, the response code
-// needs to be mocked before the browser starts.
-class DeviceTrustCreateKeyUploadFailedBrowserTest
-    : public DeviceTrustCreateKeyBrowserTest {
- protected:
-  DeviceTrustCreateKeyUploadFailedBrowserTest()
-      : DeviceTrustCreateKeyBrowserTest() {}
-  void SetUpInProcessBrowserTestFixture() override {
-    DeviceTrustCreateKeyBrowserTest::SetUpInProcessBrowserTestFixture();
-    device_trust_test_environment_win_->SetUploadResult(kHardFailureCode);
-  }
-};
-
-// TODO(crbug.com/324104311): Fix flaky test.
-IN_PROC_BROWSER_TEST_F(DeviceTrustCreateKeyUploadFailedBrowserTest,
-                       DISABLED_AttestationFullFlowSucceedOnThirdAttempt) {
-  ASSERT_FALSE(device_trust_test_environment_win_->KeyExists());
-  TriggerUrlNavigation();
-  VerifyAttestationFlowSuccessful(DTAttestationResult::kSuccessNoSignature);
-  // DT attestation key should not be created if attestation fails.
-  ASSERT_FALSE(device_trust_test_environment_win_->KeyExists());
-
-  // Second attestation flow attempt fails when key upload fails again, this is
-  // for testing that consecutive failures does not break anything
-  ResetState();
-  TriggerUrlNavigation();
-  VerifyAttestationFlowSuccessful(DTAttestationResult::kSuccessNoSignature);
-  ASSERT_FALSE(device_trust_test_environment_win_->KeyExists());
-
-  // Third attestation flow attempt succeeds after two failed attempts, this is
-  // for testing that previous failed attempts does not affect new attempts from
-  // succeeding AND that metrics is working at the same time.
-  device_trust_test_environment_win_->SetUploadResult(kSuccessCode);
-  ResetState();
-  TriggerUrlNavigation();
-  VerifyAttestationFlowSuccessful();
-  ASSERT_TRUE(device_trust_test_environment_win_->KeyExists());
-}
-
-class DeviceTrustKeyRotationBrowserTest : public DeviceTrustDesktopBrowserTest {
- protected:
-  DeviceTrustKeyRotationBrowserTest() {
-    scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/
-        {
-            kDTCKeyUploadedBySharedAPIEnabled,
-        },
-        /*disabled_features=*/{kDTCKeyRotationEnabled});
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(DeviceTrustKeyRotationBrowserTest,
-                       RemoteCommandKeyRotationSuccess) {
-  // Make sure the key is present and store its current value.
-  std::vector<uint8_t> current_key_pair =
-      device_trust_test_environment_win_->GetWrappedKey();
-  ASSERT_FALSE(current_key_pair.empty());
-
-  auto* key_manager = g_browser_process->browser_policy_connector()
-                          ->chrome_browser_cloud_management_controller()
-                          ->GetDeviceTrustKeyManager();
-
-  base::test::TestFuture<KeyRotationResult> future_result;
-  key_manager->RotateKey(kFakeNonce, future_result.GetCallback());
-  ASSERT_EQ(future_result.Get(), KeyRotationResult::SUCCESS);
-
-  // Check that key still exists & is replaced with new value.
-  ASSERT_TRUE(device_trust_test_environment_win_->KeyExists());
-  EXPECT_NE(device_trust_test_environment_win_->GetWrappedKey(),
-            current_key_pair);
-}
-
-// Flaky on Win. See http://crbug.com/324937427.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_RemoteCommandKeyRotationFailure \
-  DISABLED_RemoteCommandKeyRotationFailure
-#else
-#define MAYBE_RemoteCommandKeyRotationFailure RemoteCommandKeyRotationFailure
-#endif
-IN_PROC_BROWSER_TEST_F(DeviceTrustKeyRotationBrowserTest,
-                       MAYBE_RemoteCommandKeyRotationFailure) {
-  // Make sure key presents and stores its current value.
-  std::vector<uint8_t> current_key_pair =
-      device_trust_test_environment_win_->GetWrappedKey();
-  ASSERT_FALSE(current_key_pair.empty());
-
-  // Force key upload to fail, in turn failing the key rotation
-  device_trust_test_environment_win_->SetUploadResult(kHardFailureCode);
-
-  auto* key_manager = g_browser_process->browser_policy_connector()
-                          ->chrome_browser_cloud_management_controller()
-                          ->GetDeviceTrustKeyManager();
-
-  base::test::TestFuture<KeyRotationResult> future_result;
-  key_manager->RotateKey(kFakeNonce, future_result.GetCallback());
-  ASSERT_EQ(future_result.Get(), KeyRotationResult::FAILURE);
-
-  // Check that key still exists & has the same value since rotation failed.
-  ASSERT_TRUE(device_trust_test_environment_win_->KeyExists());
-  EXPECT_EQ(device_trust_test_environment_win_->GetWrappedKey(),
-            current_key_pair);
-}
-
-#endif
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 class DeviceTrustBrowserTestWithConsent
     : public InteractiveBrowserTestMixin<DeviceTrustBrowserTest>,
@@ -787,7 +612,7 @@ INSTANTIATE_TEST_SUITE_P(
                      /*will_trigger_device_inline_flow=*/testing::Bool(),
                      /*will_trigger_user_inline_flow=*/testing::Bool()));
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_CHROMEOS)
 

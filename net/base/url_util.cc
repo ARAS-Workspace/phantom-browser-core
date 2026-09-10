@@ -8,8 +8,6 @@
 
 #if BUILDFLAG(IS_POSIX)
 #include <netinet/in.h>
-#elif BUILDFLAG(IS_WIN)
-#include <ws2tcpip.h>
 #endif
 
 #include <optional>

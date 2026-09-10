@@ -274,7 +274,7 @@ WebUIBrowserWindow* WebUIBrowserWindow::FromNativeWindow(
 // The code about Browser's activation state is copied from
 // BrowserView::Show().
 void WebUIBrowserWindow::Show() {
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_CHROMEOS)
   // The Browser associated with this browser window must become the active
   // browser at the time Show() is called. This is the natural behavior under
   // Windows and Chrome OS, but other platforms will not trigger
@@ -558,11 +558,6 @@ ui::ColorProviderKey WebUIBrowserWindow::GetColorProviderKey() const {
   // TODO(webium): special windows might need FrameType::kNative.
   key.frame_type = ui::ColorProviderKey::FrameType::kChromium;
 
-#if BUILDFLAG(IS_WIN)
-  if (theme_service && theme_service->UsingDeviceTheme()) {
-    key.frame_style = ui::ColorProviderKey::FrameStyle::kSystem;
-  }
-#endif
 
   return key;
 }

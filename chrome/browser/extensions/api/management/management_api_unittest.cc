@@ -1138,7 +1138,7 @@ TEST_F(ManagementApiSupervisedUserTest,
   const ExtensionId& extension_id = extension->id();
 
   bool is_locally_parent_approved = false;
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // Simulate a local approval grant for this extension.
   base::DictValue locally_approved;
   locally_approved.Set(extension_id, true);
@@ -1147,7 +1147,7 @@ TEST_F(ManagementApiSupervisedUserTest,
       std::move(locally_approved));
   is_locally_parent_approved = true;
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
   // Start with an initially disabled extension.
   ASSERT_TRUE(registry()->disabled_extensions().Contains(extension_id));

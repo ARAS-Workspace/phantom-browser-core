@@ -218,10 +218,6 @@ void ClipboardHostImpl::IsFormatAvailable(blink::mojom::ClipboardFormat format,
               case blink::mojom::ClipboardFormat::kPlaintext:
                 result =
                     formats.contains(ui::ClipboardFormatType::PlainTextType());
-#if BUILDFLAG(IS_WIN)
-                result |=
-                    formats.contains(ui::ClipboardFormatType::PlainTextAType());
-#endif
                 break;
               case blink::mojom::ClipboardFormat::kHtml:
                 result = formats.contains(ui::ClipboardFormatType::HtmlType());
@@ -231,7 +227,7 @@ void ClipboardHostImpl::IsFormatAvailable(blink::mojom::ClipboardFormat format,
                     ui::ClipboardFormatType::WebKitSmartPasteType());
                 break;
               case blink::mojom::ClipboardFormat::kBookmark:
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
                 result = formats.contains(ui::ClipboardFormatType::UrlType());
 #else
                 result = false;
@@ -1124,19 +1120,6 @@ void ClipboardHostImpl::ExtractText(
                                   std::move(callback));
               return;
             }
-#if BUILDFLAG(IS_WIN)
-            if (formats.contains(ui::ClipboardFormatType::PlainTextAType())) {
-              clipboard->ReadAsciiText(
-                  clipboard_buffer, data_dst,
-                  base::BindOnce(
-                      [](base::OnceCallback<void(std::u16string)> callback,
-                         std::string ascii) {
-                        std::move(callback).Run(base::ASCIIToUTF16(ascii));
-                      },
-                      std::move(callback)));
-              return;
-            }
-#endif
             std::move(callback).Run(std::u16string());
           },
           clipboard, clipboard_buffer, data_dst, std::move(callback)));

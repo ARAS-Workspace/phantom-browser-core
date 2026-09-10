@@ -20,8 +20,6 @@
 #if BUILDFLAG(IS_CHROMEOS)
 #include "media/capture/video/chromeos/video_capture_device_factory_chromeos.h"
 #include "media/capture/video/chromeos/video_capture_jpeg_decoder.h"
-#elif BUILDFLAG(IS_WIN)
-#include "media/capture/video/win/video_capture_device_factory_win.h"
 #endif
 
 namespace video_capture {
@@ -37,9 +35,6 @@ class DeviceMediaToMojoAdapter : public Device {
       std::unique_ptr<media::VideoCaptureDevice> device,
       media::MojoMjpegDecodeAcceleratorFactoryCB jpeg_decoder_factory_callback,
       scoped_refptr<base::SequencedTaskRunner> jpeg_decoder_task_runner);
-#elif BUILDFLAG(IS_WIN)
-  DeviceMediaToMojoAdapter(std::unique_ptr<media::VideoCaptureDevice> device,
-                           media::VideoCaptureDeviceFactory* factory);
 #else
   DeviceMediaToMojoAdapter(
       std::unique_ptr<media::VideoCaptureDevice> device);
@@ -86,9 +81,6 @@ class DeviceMediaToMojoAdapter : public Device {
 #endif  // BUILDFLAG(IS_CHROMEOS)
   std::unique_ptr<ReceiverMojoToMediaAdapter> receiver_;
   bool device_started_ = false;
-#if BUILDFLAG(IS_WIN)
-  scoped_refptr<media::DXGIDeviceManager> dxgi_device_manager_;
-#endif
   base::ThreadChecker thread_checker_;
   base::WeakPtrFactory<DeviceMediaToMojoAdapter> weak_factory_{this};
 };

@@ -121,9 +121,6 @@ void OnWebAppInstallShowInstallDialog(
 #if BUILDFLAG(IS_MAC)
   os_type = InstallOsType::kMac;
 #endif
-#if BUILDFLAG(IS_WIN)
-  os_type = InstallOsType::kWin;
-#endif
 
   switch (flow) {
     case WebAppInstallFlow::kInstallSite: {

@@ -22,9 +22,6 @@
 #include "partition_alloc/page_allocator.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
 #if BUILDFLAG(IS_POSIX)
 #include <errno.h>
 #endif
@@ -44,26 +41,6 @@
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/android_info.h"
 #endif
-
-#if BUILDFLAG(IS_WIN)
-
-#if defined(COMPILER_MSVC)
-// ssize_t needed for OutOfMemoryTest.
-#if defined(_WIN64)
-typedef __int64 ssize_t;
-#else
-typedef long ssize_t;
-#endif
-#endif
-
-// HeapQueryInformation function pointer.
-typedef BOOL(WINAPI* HeapQueryFn)(HANDLE,
-                                  HEAP_INFORMATION_CLASS,
-                                  PVOID,
-                                  SIZE_T,
-                                  PSIZE_T);
-
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
 
@@ -126,18 +103,7 @@ TEST(MemoryTest, AllocatorShimWorking) {
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-
-// Windows raises an exception in order to make the exit code unique to OOM.
-#define ASSERT_OOM_DEATH(statement) \
-  ASSERT_EXIT(statement,            \
-              testing::ExitedWithCode(base::win::kOomExceptionCode), "")
-
-#else
-
 #define ASSERT_OOM_DEATH(statement) ASSERT_DEATH(statement, "")
-
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace
 
@@ -252,41 +218,6 @@ TEST_F(OutOfMemoryDeathTest, AlignedAlloc) {
 }
 
 // POSIX does not define an aligned realloc function.
-#if BUILDFLAG(IS_WIN)
-TEST_F(OutOfMemoryDeathTest, AlignedRealloc) {
-  if (ShouldSkipTest()) {
-    return;
-  }
-  ASSERT_OOM_DEATH({
-    SetUpInDeathAssert();
-    [[maybe_unused]] void* volatile ptr =
-        _aligned_realloc(nullptr, test_size_, 8);
-  });
-}
-
-namespace {
-
-constexpr uint32_t kUnhandledExceptionExitCode = 0xBADA55;
-
-// This unhandled exception filter exits the process with an exit code distinct
-// from the exception code. This is to verify that the out of memory new handler
-// causes an unhandled exception.
-LONG WINAPI ExitingUnhandledExceptionFilter(EXCEPTION_POINTERS* ExceptionInfo) {
-  _exit(kUnhandledExceptionExitCode);
-}
-
-}  // namespace
-
-TEST_F(OutOfMemoryDeathTest, NewHandlerGeneratesUnhandledException) {
-  ASSERT_EXIT(
-      {
-        SetUpInDeathAssert();
-        SetUnhandledExceptionFilter(&ExitingUnhandledExceptionFilter);
-        [[maybe_unused]] void* volatile ptr = new char[test_size_];
-      },
-      testing::ExitedWithCode(kUnhandledExceptionExitCode), "");
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // OS X has no 2Gb allocation limit.
 // See https://crbug.com/169327.
@@ -357,18 +288,6 @@ TEST_F(OutOfMemoryDeathTest, SecurityAlignedAlloc) {
 }
 
 // POSIX does not define an aligned realloc function.
-#if BUILDFLAG(IS_WIN)
-TEST_F(OutOfMemoryDeathTest, SecurityAlignedRealloc) {
-  if (ShouldSkipTest()) {
-    return;
-  }
-  ASSERT_OOM_DEATH({
-    SetUpInDeathAssert();
-    [[maybe_unused]] void* volatile ptr =
-        _aligned_realloc(nullptr, insecure_test_size_, 8);
-  });
-}
-#endif  // BUILDFLAG(IS_WIN)
 #endif  // !BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
@@ -553,42 +472,7 @@ class OutOfMemoryHandledTest : public OutOfMemoryTest {
   }
 };
 
-#if BUILDFLAG(IS_WIN)
-
-namespace {
-
-DWORD HandleOutOfMemoryException(EXCEPTION_POINTERS* exception_ptrs,
-                                 size_t expected_size) {
-  EXPECT_EQ(base::win::kOomExceptionCode,
-            exception_ptrs->ExceptionRecord->ExceptionCode);
-  EXPECT_LE(1U, exception_ptrs->ExceptionRecord->NumberParameters);
-  EXPECT_EQ(expected_size,
-            exception_ptrs->ExceptionRecord->ExceptionInformation[0]);
-  return EXCEPTION_EXECUTE_HANDLER;
-}
-
-}  // namespace
-
-TEST_F(OutOfMemoryTest, TerminateBecauseOutOfMemoryReportsAllocSize) {
-// On Windows, TerminateBecauseOutOfMemory reports the attempted allocation
-// size in the exception raised.
-#if defined(ARCH_CPU_64_BITS)
-  // Test with a size larger than 32 bits on 64 bit machines.
-  const size_t kAttemptedAllocationSize = 0xBADA55F00DULL;
-#else
-  const size_t kAttemptedAllocationSize = 0xBADA55;
-#endif
-
-  __try {
-    base::TerminateBecauseOutOfMemory(kAttemptedAllocationSize);
-  } __except (HandleOutOfMemoryException(GetExceptionInformation(),
-                                         kAttemptedAllocationSize)) {
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
-
-#if defined(ARCH_CPU_32_BITS) && \
-    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#if defined(ARCH_CPU_32_BITS) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
 
 void TestAllocationsReleaseReservation(void* (*alloc_fn)(size_t),
                                        void (*free_fn)(void*)) {
@@ -648,8 +532,8 @@ TEST_F(OutOfMemoryHandledTest, NewReleasesReservation) {
       [](size_t size) { return static_cast<void*>(new char[size]); },
       [](void* ptr) { delete[] static_cast<char*>(ptr); });
 }
-#endif  // defined(ARCH_CPU_32_BITS) && (BUILDFLAG(IS_WIN) ||
-        // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
+#endif  // defined(ARCH_CPU_32_BITS) && (BUILDFLAG(IS_LINUX) ||
+        // BUILDFLAG(IS_CHROMEOS))
 
 #if BUILDFLAG(IS_ANDROID)
 
@@ -709,23 +593,6 @@ TEST_F(OutOfMemoryHandledTest, UncheckedCalloc) {
   EXPECT_FALSE(base::UncheckedCalloc(1, test_size_, &ptr));
   EXPECT_TRUE(ptr == nullptr);
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(OutOfMemoryHandledTest, UncheckedAlignedAlloc) {
-  static constexpr size_t kAlignment = 32;
-  void* ptr;
-  EXPECT_TRUE(base::UncheckedAlignedAlloc(kSafeMallocSize, kAlignment, &ptr));
-  EXPECT_TRUE(ptr != nullptr);
-  EXPECT_TRUE(base::IsAligned(ptr, 32));
-  base::UncheckedAlignedFree(ptr);
-
-  // test_size_ is too big for the aligned case. Scale it back a bit.
-  const size_t test_size =
-      std::numeric_limits<std::ptrdiff_t>::max() - 3 * base::GetPageSize();
-  EXPECT_FALSE(base::UncheckedAlignedAlloc(test_size, kAlignment, &ptr));
-  EXPECT_TRUE(ptr == nullptr);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #endif  // BUILDFLAG(IS_ANDROID)
 #endif  // !BUILDFLAG(IS_OPENBSD) && PA_BUILDFLAG(USE_ALLOCATOR_SHIM) &&

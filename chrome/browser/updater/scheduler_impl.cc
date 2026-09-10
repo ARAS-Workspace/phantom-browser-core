@@ -82,9 +82,6 @@ void WakeAllUpdaters(base::OnceClosure callback) {
 #if BUILDFLAG(IS_POSIX)
   // Don't inherit signals sent to the browser process group.
   options.new_process_group = true;
-#elif BUILDFLAG(IS_WIN)
-  // Don't group the updater wake process under the Chrome job.
-  options.force_breakaway_from_job_ = true;
 #endif
   CheckProcessDone(base::LaunchProcess(command_line, options),
                    std::move(callback));

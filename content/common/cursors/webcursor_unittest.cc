@@ -24,12 +24,6 @@
 #include "ui/gfx/image/image_unittest_util.h"
 #include "ui/wm/core/cursor_loader.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "ui/base/win/win_cursor.h"
-#endif
-
 namespace content {
 namespace {
 
@@ -138,39 +132,6 @@ TEST(WebCursorTest, CursorScaleFactor) {
 }
 
 #endif  // defined(USE_AURA)
-
-#if BUILDFLAG(IS_WIN)
-void ScaleCursor(float scale, int hotspot_x, int hotspot_y) {
-  WebCursor webcursor(ui::Cursor::NewCustom(
-      gfx::test::CreateBitmap(/*size=*/10), gfx::Point(hotspot_x, hotspot_y)));
-
-  display::Display display(/*id=*/1);
-  display.set_device_scale_factor(scale);
-  TestScreen screen(display);
-  webcursor.UpdateDisplayInfoForWindow(nullptr);
-
-  HCURSOR windows_cursor_handle =
-      ui::WinCursor::FromPlatformCursor(webcursor.GetNativeCursor().platform())
-          ->hcursor();
-  EXPECT_NE(nullptr, windows_cursor_handle);
-  ICONINFO windows_icon_info;
-  EXPECT_TRUE(GetIconInfo(windows_cursor_handle, &windows_icon_info));
-  EXPECT_FALSE(windows_icon_info.fIcon);
-  EXPECT_EQ(static_cast<DWORD>(scale * hotspot_x), windows_icon_info.xHotspot);
-  EXPECT_EQ(static_cast<DWORD>(scale * hotspot_y), windows_icon_info.yHotspot);
-}
-
-TEST(WebCursorTest, WindowsCursorScaledAtHiDpi) {
-  auto cursor_shape_client = std::make_unique<wm::CursorLoader>();
-  aura::client::SetCursorShapeClient(cursor_shape_client.get());
-
-  ScaleCursor(2.0f, 4, 6);
-  ScaleCursor(1.5f, 2, 8);
-  ScaleCursor(1.25f, 3, 7);
-
-  aura::client::SetCursorShapeClient(nullptr);
-}
-#endif
 
 }  // namespace
 }  // namespace content

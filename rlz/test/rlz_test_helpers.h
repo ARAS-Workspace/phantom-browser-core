@@ -15,10 +15,6 @@
 #include "base/files/scoped_temp_dir.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/test/test_reg_util_win.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chromeos/ash/components/system/fake_statistics_provider.h"
 #endif
@@ -36,9 +32,6 @@ class RlzLibTestNoMachineStateHelper {
   base::ScopedTempDir temp_dir_;
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  registry_util::RegistryOverrideManager override_manager_;
-#endif
 };
 
 class RlzLibTestNoMachineState : public ::testing::Test {

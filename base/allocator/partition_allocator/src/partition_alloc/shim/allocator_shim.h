@@ -75,7 +75,7 @@ void* UncheckedRealloc(void* ptr, size_t size);
 // Frees memory allocated with UncheckedAlloc().
 PA_COMPONENT_EXPORT(ALLOCATOR_SHIM) void UncheckedFree(void* ptr);
 
-#if PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC) || PA_BUILDFLAG(IS_WIN)
+#if PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
 
 // The aligned allocation functions are only available when PartitionAlloc is
 // acting as malloc or on Windows. Otherwise there may be nothing to forward

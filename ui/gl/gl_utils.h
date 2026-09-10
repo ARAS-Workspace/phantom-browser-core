@@ -13,10 +13,6 @@
 #include "ui/gl/gl_export.h"
 #include "ui/gl/gpu_preference.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <dxgi1_6.h>
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "base/files/scoped_file.h"
 #endif
@@ -54,18 +50,6 @@ GL_EXPORT const GlWorkarounds& GetGlWorkarounds();
 
 // Sets the GlWorkarounds. This should be called from the code hosting ui/gl.
 GL_EXPORT void SetGlWorkarounds(const GlWorkarounds& workarounds);
-
-#if BUILDFLAG(IS_WIN)
-// Labels swapchain with the name_prefix and its buffers with the string
-// name_prefix + _Buffer_ + <buffer_number>.
-GL_EXPORT void LabelSwapChainAndBuffers(IDXGISwapChain3* swap_chain,
-                                        const char* name_prefix);
-
-// Same as LabelSwapChainAndBuffers, but only does the buffers. Used for resize
-// operations.
-GL_EXPORT void LabelSwapChainBuffers(IDXGISwapChain3* swap_chain,
-                                     const char* name_prefix);
-#endif
 
 // The following functions expose functionalities from GLDisplayManagerEGL
 // and GLDisplayManagerX11 for access outside the ui/gl module. This is because

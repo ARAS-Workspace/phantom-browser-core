@@ -262,8 +262,7 @@ TEST_F(PartitionAllocStackTest, IteratePointersFindsParameterNesting8) {
 // to verify that the stack-scanning trampoline pushes callee-saved registers.
 //
 // The test uses a macro loop as asm() can only be passed string literals.
-#if defined(__clang__) && PA_BUILDFLAG(PA_ARCH_CPU_X86_64) && \
-    !PA_BUILDFLAG(IS_WIN)
+#if defined(__clang__) && PA_BUILDFLAG(PA_ARCH_CPU_X86_64)
 
 // Excluded from test: rbp
 #define FOR_ALL_CALLEE_SAVED_REGS(V) \
@@ -328,8 +327,7 @@ TEST_F(PartitionAllocStackTest, IteratePointersFindsCalleeSavedRegisters) {
 #undef FOR_ALL_CALLEE_SAVED_REGS
 }
 
-#endif  // defined(__clang__) && PA_BUILDFLAG(PA_ARCH_CPU_X86_64) &&
-        // !PA_BUILDFLAG(IS_WIN)
+#endif  // defined(__clang__) && PA_BUILDFLAG(PA_ARCH_CPU_X86_64)
 
 #if PA_BUILDFLAG(IS_LINUX) && \
     (PA_BUILDFLAG(PA_ARCH_CPU_X86) || PA_BUILDFLAG(PA_ARCH_CPU_X86_64))

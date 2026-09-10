@@ -31,11 +31,7 @@ class WebViewInteractiveUiTest : public InProcessBrowserTest {
 };
 
 // TODO(crbug.com/517764196): Fails on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_MouseMoveEventDelivered DISABLED_MouseMoveEventDelivered
-#else
 #define MAYBE_MouseMoveEventDelivered MouseMoveEventDelivered
-#endif
 IN_PROC_BROWSER_TEST_F(WebViewInteractiveUiTest,
                        MAYBE_MouseMoveEventDelivered) {
   // Create a widget with a WebView.

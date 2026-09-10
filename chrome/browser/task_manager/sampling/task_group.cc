@@ -20,10 +20,6 @@
 #include "content/public/browser/browser_thread.h"
 #include "gpu/ipc/common/memory_stats.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace task_manager {
 
 namespace {
@@ -31,43 +27,10 @@ namespace {
 // A mask for the refresh types that are done in the background thread.
 const int kBackgroundRefreshTypesMask =
     REFRESH_TYPE_CPU | REFRESH_TYPE_SWAPPED_MEM | REFRESH_TYPE_IDLE_WAKEUPS |
-#if BUILDFLAG(IS_WIN)
-    REFRESH_TYPE_START_TIME | REFRESH_TYPE_CPU_TIME |
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
     REFRESH_TYPE_FD_COUNT |
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
     REFRESH_TYPE_PRIORITY;
-
-#if BUILDFLAG(IS_WIN)
-// Gets the GDI and USER Handles on Windows at one shot.
-void GetWindowsHandles(base::ProcessHandle handle,
-                       int64_t* out_gdi_current,
-                       int64_t* out_gdi_peak,
-                       int64_t* out_user_current,
-                       int64_t* out_user_peak) {
-  *out_gdi_current = 0;
-  *out_gdi_peak = 0;
-  *out_user_current = 0;
-  *out_user_peak = 0;
-  // Get a handle to |process| that has PROCESS_QUERY_INFORMATION rights.
-  HANDLE current_process = GetCurrentProcess();
-  HANDLE process_with_query_rights;
-  if (DuplicateHandle(current_process, handle, current_process,
-                      &process_with_query_rights, PROCESS_QUERY_INFORMATION,
-                      false, 0)) {
-    *out_gdi_current = static_cast<int64_t>(
-        GetGuiResources(process_with_query_rights, GR_GDIOBJECTS));
-    *out_gdi_peak = static_cast<int64_t>(
-        GetGuiResources(process_with_query_rights, GR_GDIOBJECTS_PEAK));
-    *out_user_current = static_cast<int64_t>(
-        GetGuiResources(process_with_query_rights, GR_USEROBJECTS));
-    *out_user_peak = static_cast<int64_t>(
-        GetGuiResources(process_with_query_rights, GR_USEROBJECTS_PEAK));
-    CloseHandle(process_with_query_rights);
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace
 
@@ -162,12 +125,6 @@ void TaskGroup::Refresh(const gpu::VideoMemoryUsageStats& gpu_memory_stats,
   }
 
   // 3- Refresh Windows handles (if enabled).
-#if BUILDFLAG(IS_WIN)
-  if (TaskManagerObserver::IsResourceRefreshEnabled(REFRESH_TYPE_HANDLES,
-                                                    refresh_flags)) {
-    RefreshWindowsHandles();
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   int64_t shared_refresh_flags =
       refresh_flags & shared_sampler_->GetSupportedFlags();
@@ -231,10 +188,6 @@ void TaskGroup::RefreshGpuMemory(
 }
 
 void TaskGroup::RefreshWindowsHandles() {
-#if BUILDFLAG(IS_WIN)
-  GetWindowsHandles(process_handle_, &gdi_current_handles_, &gdi_peak_handles_,
-                    &user_current_handles_, &user_peak_handles_);
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
@@ -285,16 +238,10 @@ void TaskGroup::OnSamplerRefreshDone(
   if (results) {
     cpu_time_ = results->cpu_time;
     idle_wakeups_per_second_ = results->idle_wakeups_per_second;
-#if BUILDFLAG(IS_WIN)
-    hard_faults_per_second_ = results->hard_faults_per_second;
-#endif
     start_time_ = results->start_time;
   } else {
     cpu_time_ = base::TimeDelta();
     idle_wakeups_per_second_ = -1;
-#if BUILDFLAG(IS_WIN)
-    hard_faults_per_second_ = 0;
-#endif
     start_time_ = base::Time();
   }
 

@@ -17,16 +17,9 @@
 #include "base/containers/fixed_flat_set.h"
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #include "base/files/file_path.h"
 #include "remoting/host/base/process_util.h"
-#endif
-
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/scoped_handle.h"
-#include "base/win/trust_util.h"
 #endif
 
 #if BUILDFLAG(IS_MAC)
@@ -56,8 +49,6 @@ constexpr auto kAllowedCallerPrograms =
         "/opt/google/chrome-unstable/chrome",
     });
 
-#elif BUILDFLAG(IS_WIN)
-
 #elif BUILDFLAG(IS_MAC)
 
 constexpr auto kAllowedIdentifiers = std::to_array<const std::string_view>(
@@ -81,20 +72,6 @@ bool IsLaunchedByTrustedProcess() {
   // it's no longer pointing to the current Chrome binary.
   base::FilePath parent_image_path = GetProcessImagePath(parent_pid);
   return kAllowedCallerPrograms.contains(parent_image_path.value());
-#elif BUILDFLAG(IS_WIN)
-  base::ProcessId launcher_pid = GetLauncherProcessIdFromStdioPipes();
-  if (launcher_pid == base::kNullProcessId) {
-    LOG(ERROR) << "Failed to resolve launcher PID from stdio pipes.";
-    return false;
-  }
-
-  base::FilePath launcher_image_path = GetProcessImagePath(launcher_pid);
-  if (launcher_image_path.empty()) {
-    LOG(ERROR) << "Failed to get launcher process image path.";
-    return false;
-  }
-
-  return base::win::IsBinaryTrusted(launcher_image_path);
 #elif BUILDFLAG(IS_MAC)
   // TODO: crbug.com/410903981 - move away from PID-based security checks, which
   // might be susceptible of PID reuse attacks, if Apple provides APIs to query

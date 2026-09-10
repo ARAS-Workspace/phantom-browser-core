@@ -21,10 +21,6 @@
 #include "remoting/host/ipc_constants.h"
 #include "remoting/host/mojom/chromoting_host_services.mojom.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace remoting {
 
 namespace {
@@ -33,34 +29,12 @@ mojo::PendingRemote<mojom::ChromotingHostServices> ConnectToServer(
     const std::vector<mojo::NamedPlatformChannel::ServerName>& server_names) {
   for (const auto& server_name : server_names) {
     mojo::PlatformChannelEndpoint endpoint;
-#if BUILDFLAG(IS_WIN)
-    mojo::NamedPlatformChannel::Options options;
-    options.server_name = server_name;
-    options.verify_server_privilege = true;
-    endpoint = named_mojo_ipc_server::ConnectToServer(options);
-#else
     endpoint = named_mojo_ipc_server::ConnectToServer(server_name);
-#endif
     if (!endpoint.is_valid()) {
       VLOG(1) << "Cannot connect to IPC through server name " << server_name
               << ". Endpoint is invalid.";
       continue;
     }
-#if BUILDFLAG(IS_WIN)
-    DWORD peer_session_id;
-    if (!GetNamedPipeServerSessionId(
-            endpoint.platform_handle().GetHandle().get(), &peer_session_id)) {
-      PLOG(ERROR) << "GetNamedPipeServerSessionId failed";
-      continue;
-    }
-    // '0' (default) corresponds to the session the network process runs in.
-    if (peer_session_id != 0) {
-      LOG(ERROR)
-          << "Cannot establish connection with IPC server running in session: "
-          << peer_session_id;
-      continue;
-    }
-#endif
     auto invitation = mojo::IncomingInvitation::Accept(std::move(endpoint));
     auto message_pipe =
         invitation.ExtractMessagePipe(kChromotingHostServicesMessagePipeId);

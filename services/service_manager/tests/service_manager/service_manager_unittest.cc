@@ -255,9 +255,6 @@ class ServiceManagerTest : public testing::Test,
     CHECK(base::PathService::Get(base::DIR_OUT_TEST_DATA_ROOT, &target_path));
 
     target_path = target_path.AppendASCII(kTestTargetName);
-#if BUILDFLAG(IS_WIN)
-    target_path = target_path.AddExtensionASCII("exe");
-#endif
 
     base::CommandLine child_command_line(target_path);
     // Forward the wait-for-debugger flag but nothing else - we don't want to

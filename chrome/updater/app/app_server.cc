@@ -85,13 +85,8 @@ base::OnceClosure AppServer::ModeCheck() {
                             MakeInactiveUpdateServiceInternal());
     }
 
-#if BUILDFLAG(IS_WIN)
-    return base::BindOnce(&AppServer::Shutdown, this,
-                          std::to_underlying(UpdateService::Result::kInactive));
-#else
     return base::BindOnce(&AppServer::ActiveDuty, this,
                           MakeInactiveUpdateService());
-#endif
   }
 
   if (active_version != base::Version("0") && this_version > active_version) {
@@ -112,14 +107,8 @@ base::OnceClosure AppServer::ModeCheck() {
             MakeQualifyingUpdateServiceInternal(config, local_prefs));
       }
 
-#if BUILDFLAG(IS_WIN)
-      return base::BindOnce(
-          &AppServer::Shutdown, this,
-          std::to_underlying(UpdateService::Result::kInactive));
-#else
       return base::BindOnce(&AppServer::ActiveDuty, this,
                             MakeInactiveUpdateService());
-#endif
     }
   }
 

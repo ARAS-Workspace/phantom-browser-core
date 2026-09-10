@@ -72,15 +72,6 @@
 #include "base/pickle.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/synchronization/waitable_event.h"
-#include "components/app_launch_prefetch/app_launch_prefetch.h"
-#include "services/audio/public/mojom/audio_service.mojom.h"
-#include "services/network/public/mojom/network_service.mojom.h"
-#include "services/webnn/public/mojom/webnn_compiler_service.mojom.h"
-#include "services/webnn/webnn_switches.h"
-#endif
-
 #if BUILDFLAG(ENABLE_GPU_CHANNEL_MEDIA_CAPTURE)
 #include "base/task/sequenced_task_runner.h"
 #include "components/viz/host/gpu_client.h"
@@ -123,24 +114,6 @@ base::ScopedFD PassNetworkContextParentDirs(
   return read_fd;
 }
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_WIN)
-base::CommandLine::StringViewType UtilityToAppLaunchPrefetchArg(
-    const std::string& utility_type) {
-  // Set the default prefetch type for utility processes.
-  app_launch_prefetch::SubprocessType prefetch_type =
-      app_launch_prefetch::SubprocessType::kUtilityOther;
-
-  if (utility_type == network::mojom::NetworkService::Name_) {
-    prefetch_type = app_launch_prefetch::SubprocessType::kUtilityNetworkService;
-  } else if (utility_type == storage::mojom::StorageService::Name_) {
-    prefetch_type = app_launch_prefetch::SubprocessType::kUtilityStorage;
-  } else if (utility_type == audio::mojom::AudioService::Name_) {
-    prefetch_type = app_launch_prefetch::SubprocessType::kUtilityAudio;
-  }
-  return app_launch_prefetch::GetPrefetchSwitch(prefetch_type);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace
 
@@ -227,14 +200,6 @@ UtilityProcessHost::Options::WithExtraCommandLineSwitchKeyValues(
   extra_switch_key_values_ = std::move(switch_key_values);
   return *this;
 }
-
-#if BUILDFLAG(IS_WIN)
-UtilityProcessHost::Options& UtilityProcessHost::Options::WithPreloadLibraries(
-    const std::vector<base::FilePath>& preloads) {
-  preload_libraries_ = preloads;
-  return *this;
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 UtilityProcessHost::Options&
 UtilityProcessHost::Options::WithGpuClientAllowed() {
@@ -392,11 +357,6 @@ bool UtilityProcessHost::StartProcess() {
   std::string locale = GetContentClient()->browser()->GetApplicationLocale();
   cmd_line->AppendSwitchASCII(switches::kLang, locale);
 
-#if BUILDFLAG(IS_WIN)
-  cmd_line->AppendArgNative(
-      UtilityToAppLaunchPrefetchArg(options_.metrics_name_));
-#endif  // BUILDFLAG(IS_WIN)
-
   sandbox::policy::SetCommandLineFlagsForSandboxType(cmd_line.get(),
                                                      options_.sandbox_type_);
 
@@ -456,16 +416,6 @@ bool UtilityProcessHost::StartProcess() {
 #if BUILDFLAG(USE_CRAS)
       switches::kUseCras,
 #endif
-#if BUILDFLAG(IS_WIN)
-      switches::kDisableHighResTimer,
-      switches::kEnableExclusiveAudio,
-      switches::kForceWaveAudio,
-      switches::kRaiseTimerFrequency,
-      switches::kTrySupportedChannelLayouts,
-      switches::kWaveOutBuffers,
-      switches::kWebXrForceRuntime,
-      sandbox::policy::switches::kAddXrAppContainerCaps,
-#endif
 #if BUILDFLAG(ENABLE_VR)
       device::switches::kWebXrHandAnonymizationStrategy,
       device::switches::kWebXrMaxFramebufferScale,
@@ -485,16 +435,6 @@ bool UtilityProcessHost::StartProcess() {
 #endif
   };
   cmd_line->CopySwitchesFrom(browser_command_line, kSwitchNames);
-#if BUILDFLAG(IS_WIN)
-  // Propagate WebNN-specific switches to the compiler process regardless of
-  // sandbox type, since sandbox may be overridden by
-  // --disable-webnn-compiler-sandbox.
-  if (options_.metrics_name_ == webnn::mojom::WebNNCompilerService::Name_) {
-    cmd_line->CopySwitchesFrom(
-        browser_command_line,
-        switches::GetWebNNSwitchesCopiedFromGpuProcessHost());
-  }
-#endif
 
   network_session_configurator::CopyNetworkSwitches(browser_command_line,
                                                     cmd_line.get());
@@ -526,18 +466,6 @@ bool UtilityProcessHost::StartProcess() {
     cmd_line->AppendSwitchASCII(key, value);
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (media::IsMediaFoundationD3D11VideoCaptureEnabled()) {
-    // MediaFoundationD3D11VideoCapture requires Gpu memory buffers,
-    // which are unavailable if the GPU process isn't running or if
-    // D3D shared images are not supported.
-    if (!GpuDataManagerImpl::GetInstance()->IsGpuCompositingDisabled() &&
-        GpuDataManagerImpl::GetInstance()->GetGPUInfo().shared_image_d3d) {
-      cmd_line->AppendSwitch(switches::kVideoCaptureUseGpuMemoryBuffer);
-    }
-  }
-#endif
-
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
   options_.file_data_->files_to_preload.merge(
       GetV8SnapshotFilesToPreload(*cmd_line));
@@ -554,7 +482,7 @@ bool UtilityProcessHost::StartProcess() {
   }
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(ENABLE_GPU_CHANNEL_MEDIA_CAPTURE) && !BUILDFLAG(IS_WIN)
+#if BUILDFLAG(ENABLE_GPU_CHANNEL_MEDIA_CAPTURE)
   // Pass `kVideoCaptureUseGpuMemoryBuffer` flag to video capture service only
   // when the video capture use GPU memory buffer enabled.
   if (options_.metrics_name_ ==
@@ -571,23 +499,11 @@ bool UtilityProcessHost::StartProcess() {
       cmd_line->AppendSwitch(switches::kVideoCaptureUseGpuMemoryBuffer);
     }
   }
-#endif  // BUILDFLAG(ENABLE_GPU_CHANNEL_MEDIA_CAPTURE) && !BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(ENABLE_GPU_CHANNEL_MEDIA_CAPTURE)
 
   std::unique_ptr<UtilitySandboxedProcessLauncherDelegate> delegate =
       std::make_unique<UtilitySandboxedProcessLauncherDelegate>(
           options_.sandbox_type_, options_.env_, *cmd_line);
-
-#if BUILDFLAG(IS_WIN)
-  if (!options_.preload_libraries_.empty()) {
-    delegate->SetPreloadLibraries(options_.preload_libraries_);
-  }
-
-  // Not possible to transfer the event for an unsandboxed process.
-  if (!sandbox::policy::IsUnsandboxedSandboxType(options_.sandbox_type_)) {
-    delegate->SetBootstrapStatusEvent(bootstrap_signal_event_.emplace());
-  }
-
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(USE_ZYGOTE)
   if (options_.zygote_for_testing_.has_value()) {
@@ -628,13 +544,6 @@ void UtilityProcessHost::OnProcessCrashed(int exit_code) {
 
   Client::CrashType type = Client::CrashType::kPostIpcInitialization;
 
-#if BUILDFLAG(IS_WIN)
-  if (bootstrap_signal_event_) {
-    type = bootstrap_signal_event_->IsSignaled()
-               ? Client::CrashType::kPostIpcInitialization
-               : Client::CrashType::kPreIpcInitialization;
-  }
-#endif  // BUILDFLAG(IS_WIN)
   client->OnProcessCrashed(type);
 }
 

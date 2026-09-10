@@ -161,13 +161,6 @@ class PrintViewManager : public PrintViewManagerBase,
   virtual void PrintForSystemDialogImpl();
 
   // Helpers for GetPrintPreviewParams().
-#if BUILDFLAG(IS_WIN)
-  void OnDidUpdatePrintableArea(std::unique_ptr<PrinterQuery> printer_query,
-                                base::DictValue job_settings,
-                                std::unique_ptr<PrintSettings> print_settings,
-                                GetPrintPreviewParamsCallback callback,
-                                bool success);
-#endif
   void CompleteGetPrintPreviewParams(
       base::DictValue job_settings,
       std::unique_ptr<PrintSettings> print_settings,

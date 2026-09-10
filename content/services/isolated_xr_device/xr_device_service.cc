@@ -11,10 +11,6 @@
 #include "device/vr/buildflags/buildflags.h"
 #include "mojo/public/cpp/bindings/self_owned_receiver.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/com_init_check_hook.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(ENABLE_OPENXR)
 #include "device/vr/openxr/openxr_platform_helper.h"
 #endif  // BUILDFLAG(ENABLE_OPENXR)
@@ -26,9 +22,6 @@ XrDeviceService::XrDeviceService(
     scoped_refptr<base::SingleThreadTaskRunner> io_task_runner)
     : receiver_(this, std::move(receiver)),
       io_task_runner_(std::move(io_task_runner)) {
-#if BUILDFLAG(IS_WIN)
-  base::win::ComInitCheckHook::DisableCOMChecksForProcess();
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 XrDeviceService::~XrDeviceService() = default;

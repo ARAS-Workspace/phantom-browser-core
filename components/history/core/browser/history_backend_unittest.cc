@@ -825,11 +825,7 @@ const char16_t InMemoryHistoryBackendTest::kTestSearchTerm1[] = u"banana";
 const char16_t InMemoryHistoryBackendTest::kTestSearchTerm2[] = u"orange";
 
 // http://crbug.com/114287
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_Loaded DISABLED_Loaded
-#else
 #define MAYBE_Loaded Loaded
-#endif  // BUILDFLAG(IS_WIN)
 TEST_F(HistoryBackendTest, MAYBE_Loaded) {
   ASSERT_TRUE(backend_.get());
   ASSERT_TRUE(loaded_);

@@ -253,7 +253,7 @@ IN_PROC_BROWSER_TEST_F(BookmarkBarNavigationTest, SecFetchFromEmptyTab) {
   }
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 //  TODO(crbug.com/40648550): Test flaky on Mac and Windows.
 #define MAYBE_SecFetchSiteNoneFromNonEmptyTab \
   DISABLED_SecFetchSiteNoneFromNonEmptyTab
@@ -941,7 +941,7 @@ IN_PROC_BROWSER_TEST_F(
 // redirect chain.
 // TODO(crbug.com/479511794): disabled due to flakiness.
 // TODO(crbug.com/517929772): disabled due to flakiness.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_PrefetchingRedirectToSearchSite \
   DISABLED_PrefetchingRedirectToSearchSite
 #else
@@ -1141,12 +1141,7 @@ class BookmarkBarTest : public BookmarkBarTestBase {
 
 }  // namespace
 
-#if BUILDFLAG(IS_WIN)
-//  TODO(crbug.com/491651711): This test is flaky.
-#define MAYBE_AllBookmarksButtonHighlight DISABLED_AllBookmarksButtonHighlight
-#else
 #define MAYBE_AllBookmarksButtonHighlight AllBookmarksButtonHighlight
-#endif
 IN_PROC_BROWSER_TEST_F(BookmarkBarTest, MAYBE_AllBookmarksButtonHighlight) {
   TestContextMenuHighlight(bookmark_bar()->all_bookmarks_button());
 }
@@ -1163,12 +1158,7 @@ IN_PROC_BROWSER_TEST_F(BookmarkBarTest, BookmarkFolderButtonHighlight) {
   TestContextMenuHighlight(GetBookmarkButton(0));
 }
 
-#if BUILDFLAG(IS_WIN)
-//  TODO(crbug.com/491651711): This test is flaky.
-#define MAYBE_AppsPageShortcutHighlight DISABLED_AppsPageShortcutHighlight
-#else
 #define MAYBE_AppsPageShortcutHighlight AppsPageShortcutHighlight
-#endif
 IN_PROC_BROWSER_TEST_F(BookmarkBarTest, MAYBE_AppsPageShortcutHighlight) {
   TestContextMenuHighlight(GetAppsPageShortCut());
 }

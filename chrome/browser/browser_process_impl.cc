@@ -164,20 +164,9 @@
 #include "ui/base/ui_base_features.h"
 #include "ui/base/unowned_user_data/unowned_user_data_host.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#include "chrome/browser/browser_features.h"
-#include "chrome/browser/os_crypt/app_bound_encryption_provider_win.h"
-#include "chrome/installer/util/install_util.h"
-#include "components/app_launch_prefetch/app_launch_prefetch.h"
-#include "components/os_crypt/async/browser/dpapi_key_provider.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/chrome_browser_main_mac.h"
 #endif
-
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/win/isolated_browser_support.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ash/constants/ash_pref_names.h"
@@ -290,13 +279,13 @@ void OnLocalStatePrefsLoaded();
 #include "components/os_crypt/async/common/encryptor.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 // How often to check if the persistent instance of Chrome needs to restart
 // to install an update.
 static const int kUpdateCheckIntervalHours = 6;
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_OZONE)
 // How long to wait for the File thread to complete during EndSession, on Linux
 // and Windows. We have a timeout here because we're unable to run the UI
 // messageloop and there's some deadlock risk. Our only option is to exit
@@ -484,32 +473,6 @@ void BrowserProcessImpl::Init() {
   pref_change_registrar_.Add(
       metrics::prefs::kMetricsReportingEnabled,
       base::BindRepeating(&metrics::ApplyMetricsReportingPolicy));
-
-#if BUILDFLAG(IS_WIN)
-  // If the user pref on disk differs from the actual trusted state, it means
-  // either the registry was modified out-of-band, or the untrusted JSON was
-  // tampered with. In either case, the user pref is untrusted. Clear it to
-  // prevent an attacker from bypassing the trusted state when there is no
-  // policy.
-  const base::Value* user_value =
-      local_state()->GetUserPrefValue(prefs::kProcessIsolationEnabled);
-  if (user_value &&
-      user_value->GetIfBool().value_or(false) != chrome::IsIsolationEnabled()) {
-    local_state()->ClearPref(prefs::kProcessIsolationEnabled);
-  }
-
-  // After potentially clearing the untrusted user value, if the effective value
-  // of the pref (which now comes from policies, or a trusted user value, or
-  // default) differs from the actual state, queue a state update.
-  if (local_state()->GetBoolean(prefs::kProcessIsolationEnabled) !=
-      chrome::IsIsolationEnabled()) {
-    UpdateProcessIsolationState();
-  }
-  pref_change_registrar_.Add(
-      prefs::kProcessIsolationEnabled,
-      base::BindRepeating(&BrowserProcessImpl::UpdateProcessIsolationState,
-                          base::Unretained(this)));
-#endif  // BUILDFLAG(IS_WIN)
 
   DCHECK(!webrtc_event_log_manager_);
   webrtc_event_log_manager_ = WebRtcEventLogManager::CreateSingletonInstance();
@@ -896,7 +859,7 @@ void BrowserProcessImpl::EndSession() {
   //
   // If you change the condition here, be sure to also change
   // ProfileBrowserTests to match.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_OZONE)
   // Do a best-effort wait on the successful countdown of rundown tasks. Note
   // that if we don't complete "quickly enough", Windows will terminate our
   // process.
@@ -1292,13 +1255,6 @@ void BrowserProcessImpl::RegisterPrefs(PrefRegistrySimple* registry) {
 
   registry->RegisterBooleanPref(prefs::kAllowCrossOriginAuthPrompt, false);
 
-#if BUILDFLAG(IS_WIN)
-  // Isolation state is determined dynamically at startup based on the system
-  // configuration.
-  registry->RegisterBooleanPref(prefs::kProcessIsolationEnabled,
-                                chrome::IsIsolationEnabled());
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   registry->RegisterBooleanPref(prefs::kEulaAccepted, false);
 #endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
@@ -1382,7 +1338,7 @@ StartupData* BrowserProcessImpl::startup_data() {
   return startup_data_;
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 void BrowserProcessImpl::StartAutoupdateTimer() {
   autoupdate_timer_.Start(FROM_HERE, base::Hours(kUpdateCheckIntervalHours),
                           this, &BrowserProcessImpl::OnAutoupdateTimer);
@@ -1406,11 +1362,7 @@ activity_reporter::ActivityReporter* BrowserProcessImpl::activity_reporter() {
           return brand;
         }),
         base::BindRepeating(&updater::SetActive),
-#if BUILDFLAG(IS_WIN)
-        InstallUtil::IsPerUserInstall()
-#else
         false
-#endif
     );
   }
   return activity_reporter_.get();
@@ -1499,39 +1451,6 @@ void BrowserProcessImpl::PreCreateThreads() {
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-void BrowserProcessImpl::UpdateProcessIsolationState() {
-  chrome::SetIsolationState(
-      local_state()->GetBoolean(prefs::kProcessIsolationEnabled)
-          ? chrome::IsolationState::kProcessIsolation
-          : chrome::IsolationState::kIsolationDisabled,
-      local_state(),
-      base::BindOnce(&BrowserProcessImpl::OnProcessIsolationStateSet,
-                     base::Unretained(this)));
-}
-
-void BrowserProcessImpl::OnProcessIsolationStateSet(
-    base::expected<chrome::IsolationState, HRESULT> result) {
-  if (result.has_value()) {
-    return;
-  }
-
-  // Need to notify the UI that changing the switch hasn't worked, and switch
-  // it back again. However, to avoid reentrancy in the notification and
-  // `UpdateProcessIsolationState` being called again, unregister the
-  // notification before setting the pref.
-  pref_change_registrar_.Remove(prefs::kProcessIsolationEnabled);
-  // Pref is updated to the current isolation state to indicate to the UI when
-  // changing the process isolation state failed.
-  local_state()->SetBoolean(prefs::kProcessIsolationEnabled,
-                            chrome::IsIsolationEnabled());
-  pref_change_registrar_.Add(
-      prefs::kProcessIsolationEnabled,
-      base::BindRepeating(&BrowserProcessImpl::UpdateProcessIsolationState,
-                          base::Unretained(this)));
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 void BrowserProcessImpl::PreMainMessageLoopRun() {
   TRACE_EVENT0("startup", "BrowserProcessImpl::PreMainMessageLoopRun");
 
@@ -1552,24 +1471,6 @@ void BrowserProcessImpl::PreMainMessageLoopRun() {
         std::get<0>(*additional_provider_for_test_),
         std::move(std::get<1>(*additional_provider_for_test_)));
   }
-
-#if BUILDFLAG(IS_WIN)
-  // The DPAPI key provider requires os_crypt_async::Init to have already been
-  // called to initialize the key storage. This happens in
-  // ChromeBrowserMainPartsWin::PreCreateMainMessageLoop.
-  providers.emplace_back(std::make_pair(
-      /*precedence=*/10u,
-      std::make_unique<os_crypt_async::DPAPIKeyProvider>(local_state())));
-
-  providers.emplace_back(std::make_pair(
-      // Note: 15 is chosen to be higher than the 10 precedence above for
-      // DPAPI. This ensures that when the provider is enabled for
-      // encryption, the App-Bound encryption key is used and not the DPAPI
-      // one.
-      /*precedence=*/15u,
-      std::make_unique<os_crypt_async::AppBoundEncryptionProviderWin>(
-          local_state(), /*force_protection_level=*/std::nullopt)));
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_LINUX) && BUILDFLAG(USE_DBUS)
   base::CommandLine* cmd_line = base::CommandLine::ForCurrentProcess();
@@ -1912,7 +1813,7 @@ void BrowserProcessImpl::Unpin() {
 }
 
 // Mac is currently not supported.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 
 bool BrowserProcessImpl::IsRunningInBackground() const {
   // Check if browser is in the background.
@@ -1951,11 +1852,6 @@ void BrowserProcessImpl::RestartBackgroundInstance() {
     }
   }
 
-#if BUILDFLAG(IS_WIN)
-  new_cl->AppendArgNative(app_launch_prefetch::GetPrefetchSwitch(
-      app_launch_prefetch::SubprocessType::kBrowserBackground));
-#endif  // BUILDFLAG(IS_WIN)
-
   DLOG(WARNING) << "Shutting down current instance of the browser.";
   chrome::AttemptExit();
 
@@ -1985,4 +1881,4 @@ void BrowserProcessImpl::OnPendingRestartResult(
     RestartBackgroundInstance();
   }
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)

@@ -123,10 +123,6 @@ class OffTheRecordProfileImpl : public Profile {
   content::FederatedIdentityAutoReauthnPermissionContextDelegate*
   GetFederatedIdentityAutoReauthnPermissionContext() override;
 
-#if BUILDFLAG(IS_WIN)
-  void AckCrashForTracking() override;
-#endif
-
  protected:
   // Profile implementation.
   bool IsSignedIn() override;

@@ -17,10 +17,6 @@
 #include "content/public/browser/web_ui_data_source.h"
 #include "services/network/public/mojom/content_security_policy.mojom.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/ui/webui/sandbox/sandbox_handler.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/common/sandbox_status_extension_android.mojom.h"
 #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
@@ -87,10 +83,6 @@ void CreateAndAddDataSource(Profile* profile) {
 
 SandboxInternalsUI::SandboxInternalsUI(content::WebUI* web_ui)
     : content::WebUIController(web_ui) {
-#if BUILDFLAG(IS_WIN)
-  web_ui->AddMessageHandler(
-      std::make_unique<sandbox_handler::SandboxHandler>());
-#endif
   CreateAndAddDataSource(Profile::FromWebUI(web_ui));
 }
 

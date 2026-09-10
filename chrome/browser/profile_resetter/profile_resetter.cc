@@ -71,35 +71,6 @@
 #endif  // BUILDFLAG(ENABLE_SPELLCHECK)
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include "base/base_paths.h"
-#include "base/path_service.h"
-#include "chrome/installer/util/shell_util.h"
-
-namespace {
-
-void ResetShortcutsOnBlockingThread() {
-  // Get full path of chrome.
-  base::FilePath chrome_exe;
-  if (!base::PathService::Get(base::FILE_EXE, &chrome_exe))
-    return;
-
-  base::ScopedBlockingCall scoped_blocking_call(FROM_HERE,
-                                                base::BlockingType::MAY_BLOCK);
-  for (int location = ShellUtil::SHORTCUT_LOCATION_FIRST;
-       location <= ShellUtil::SHORTCUT_LOCATION_LAST; ++location) {
-    ShellUtil::ShortcutListMaybeRemoveUnknownArgs(
-        static_cast<ShellUtil::ShortcutLocation>(location),
-        ShellUtil::CURRENT_USER, chrome_exe, true, nullptr, nullptr);
-    ShellUtil::ResetShortcutFileAttributes(
-        static_cast<ShellUtil::ShortcutLocation>(location),
-        ShellUtil::CURRENT_USER, chrome_exe);
-  }
-}
-
-}  // namespace
-#endif  // BUILDFLAG(IS_WIN)
-
 ProfileResetter::ProfileResetter(Profile* profile)
     : profile_(profile),
       template_url_service_(TemplateURLServiceFactory::GetForProfile(profile_)),
@@ -423,16 +394,7 @@ void ProfileResetter::ResetPinnedTabs() {
 }
 
 void ProfileResetter::ResetShortcuts() {
-#if BUILDFLAG(IS_WIN)
-  base::ThreadPool::CreateCOMSTATaskRunner(
-      {base::MayBlock(), base::TaskPriority::USER_VISIBLE})
-      ->PostTaskAndReply(
-          FROM_HERE, base::BindOnce(&ResetShortcutsOnBlockingThread),
-          base::BindOnce(&ProfileResetter::MarkAsDone,
-                         weak_ptr_factory_.GetWeakPtr(), SHORTCUTS));
-#else
   MarkAsDone(SHORTCUTS);
-#endif
 }
 
 void ProfileResetter::ResetNtpCustomizations() {
@@ -580,29 +542,3 @@ void ProfileResetter::ResetKeyboardInputSettings() {
   MarkAsDone(KEYBOARD_SETTINGS);
 }
 #endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_WIN)
-std::vector<ShortcutCommand> GetChromeLaunchShortcuts(
-    const scoped_refptr<SharedCancellationFlag>& cancel) {
-  base::ScopedBlockingCall scoped_blocking_call(FROM_HERE,
-                                                base::BlockingType::MAY_BLOCK);
-  // Get full path of chrome.
-  base::FilePath chrome_exe;
-  if (!base::PathService::Get(base::FILE_EXE, &chrome_exe))
-    return std::vector<ShortcutCommand>();
-  std::vector<ShortcutCommand> shortcuts;
-  for (int location = ShellUtil::SHORTCUT_LOCATION_FIRST;
-       location <= ShellUtil::SHORTCUT_LOCATION_LAST; ++location) {
-    if (cancel.get() && cancel->data.IsSet())
-      break;
-    ShellUtil::ShortcutListMaybeRemoveUnknownArgs(
-        static_cast<ShellUtil::ShortcutLocation>(location),
-        ShellUtil::CURRENT_USER,
-        chrome_exe,
-        false,
-        cancel,
-        &shortcuts);
-  }
-  return shortcuts;
-}
-#endif  // BUILDFLAG(IS_WIN)

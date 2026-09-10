@@ -33,7 +33,7 @@ class ShortcutSubManagerBrowserTest : public WebAppBrowserTestBase {
   ~ShortcutSubManagerBrowserTest() override = default;
 };
 
-static_assert(BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC));
+static_assert(BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC));
 
 void FlushShortcutTasks() {
   {
@@ -87,23 +87,7 @@ IN_PROC_BROWSER_TEST_F(ShortcutSubManagerBrowserTest,
   EXPECT_TRUE(os_integration_override().IsRunOnOsLoginEnabled(secondary, app_id,
                                                               "A Web App"));
 
-#if BUILDFLAG(IS_WIN)
-  base::FilePath desktop_shortcut_path =
-      os_integration_override().GetShortcutPath(
-          secondary, os_integration_override().desktop(), app_id, "A Web App");
-  base::FilePath shortcut_path = os_integration_override().GetShortcutPath(
-      secondary, os_integration_override().application_menu(), app_id,
-      "A Web App");
-  base::FilePath startup_shortcut_path =
-      os_integration_override().GetShortcutPath(
-          secondary, os_integration_override().startup(), app_id, "A Web App");
-  EXPECT_FALSE(desktop_shortcut_path.empty());
-  EXPECT_TRUE(base::PathExists(desktop_shortcut_path));
-  EXPECT_FALSE(shortcut_path.empty());
-  EXPECT_TRUE(base::PathExists(shortcut_path));
-  EXPECT_FALSE(startup_shortcut_path.empty());
-  EXPECT_TRUE(base::PathExists(startup_shortcut_path));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   base::FilePath shortcut_path = os_integration_override().GetShortcutPath(
       secondary, os_integration_override().chrome_apps_folder(), app_id,
       "A Web App");
@@ -126,10 +110,7 @@ IN_PROC_BROWSER_TEST_F(ShortcutSubManagerBrowserTest,
 
   // Verify the shortcut(s) and run-on-OS-login entry were deleted.
   EXPECT_FALSE(base::PathExists(shortcut_path));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_FALSE(base::PathExists(desktop_shortcut_path));
-  EXPECT_FALSE(base::PathExists(startup_shortcut_path));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_FALSE(os_integration_override().IsRunOnOsLoginEnabled(
       secondary, app_id, "A Web App"));
 #endif

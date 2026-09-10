@@ -593,14 +593,6 @@ class DownloadExtensionTest : public ExtensionApiTest {
 
   std::string GetFilename(const char* path) {
     std::string result = downloads_directory().AppendASCII(path).AsUTF8Unsafe();
-#if BUILDFLAG(IS_WIN)
-    for (std::string::size_type next = result.find("\\");
-         next != std::string::npos;
-         next = result.find("\\", next)) {
-      result.replace(next, 1, "\\\\");
-      next += 2;
-    }
-#endif
     return result;
   }
 
@@ -2341,13 +2333,8 @@ IN_PROC_BROWSER_TEST_F(DownloadExtensionTest,
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 // TODO(crbug.com/405219117): Flaky on desktop Android.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DownloadExtensionTest_Download_Subdirectory \
-  DISABLED_DownloadExtensionTest_Download_Subdirectory
-#else
 #define MAYBE_DownloadExtensionTest_Download_Subdirectory \
   DownloadExtensionTest_Download_Subdirectory
-#endif
 IN_PROC_BROWSER_TEST_F(DownloadExtensionTest,
                        MAYBE_DownloadExtensionTest_Download_Subdirectory) {
   LoadExtension("downloads_split");
@@ -2670,9 +2657,6 @@ IN_PROC_BROWSER_TEST_F(DownloadExtensionTest,
   GoOnTheRecord();
   LoadExtension("downloads_split", /*enable_file_access=*/true);
   std::string download_url = "file:///";
-#if BUILDFLAG(IS_WIN)
-  download_url += "C:/";
-#endif
 
   std::optional<base::Value> result = RunFunctionAndReturnResult(
       base::MakeRefCounted<DownloadsDownloadFunction>(),

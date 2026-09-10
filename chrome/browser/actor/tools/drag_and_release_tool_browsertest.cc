@@ -261,13 +261,7 @@ IN_PROC_BROWSER_TEST_F(ActorDragAndReleaseToolBrowserTest,
   actor_task().Act(ToRequestList(action), result_success.GetCallback());
   ExpectOkResult(result_success);
 
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/447000769): Allow 1 pixel of slop - probably due to
-  // different display densities and the ToFlooredPoint above.
-  EXPECT_NEAR(50, GetRangeValue(*subframe, "#range"), 1);
-#else
   EXPECT_EQ(50, GetRangeValue(*subframe, "#range"));
-#endif
 }
 
 }  // namespace

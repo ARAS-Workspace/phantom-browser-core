@@ -40,10 +40,6 @@
 #include "extensions/browser/quota_service.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/test/test_reg_util_win.h"
-#endif
-
 namespace {
 
 class TestIncidentReportingService;
@@ -211,12 +207,6 @@ class IncidentReportingServiceTest : public testing::TestWithParam<bool> {
 
   void SetUp() override {
     testing::Test::SetUp();
-#if BUILDFLAG(IS_WIN)
-    // Redirect HKCU so that the platform state store used by the test doesn't
-    // collide with existing Chrome installs or other tests running in parallel.
-    ASSERT_NO_FATAL_FAILURE(
-        registry_override_manager_.OverrideRegistry(HKEY_CURRENT_USER));
-#endif
     ASSERT_TRUE(profile_manager_.SetUp());
     // Disable profile metrics reporting, otherwise the calls to
     // FastForwardUntilNoTasksRemain() never return.
@@ -621,10 +611,6 @@ class IncidentReportingServiceTest : public testing::TestWithParam<bool> {
     if (on_delayed_analysis_action_ == ON_DELAYED_ANALYSIS_ADD_INCIDENT)
       receiver->AddIncidentForProcess(MakeTestIncident(nullptr));
   }
-
-#if BUILDFLAG(IS_WIN)
-  registry_util::RegistryOverrideManager registry_override_manager_;
-#endif
 
   // A mapping of profile name to its corresponding properties.
   std::map<std::string, ProfileProperties> profile_properties_;

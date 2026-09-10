@@ -30,10 +30,6 @@
 #include "ui/views/layout/box_layout.h"
 #include "ui/views/view.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#endif
-
 namespace {
 
 std::optional<SkColor> ParseHexColor(const std::string& color_str) {
@@ -162,11 +158,7 @@ int main(int argc, char** argv) {
   if (command_line->HasSwitch("size")) {
     std::string size_str = command_line->GetSwitchValueASCII("size");
     if (size_str.empty() && !args.empty()) {
-#if BUILDFLAG(IS_WIN)
-      size_str = base::WideToUTF8(args.front());
-#else
       size_str = args.front();
-#endif
       args.erase(args.begin());
     }
     int parsed_size = 0;
@@ -182,11 +174,7 @@ int main(int argc, char** argv) {
   if (command_line->HasSwitch("icon-color")) {
     std::string color_str = command_line->GetSwitchValueASCII("icon-color");
     if (color_str.empty() && !args.empty()) {
-#if BUILDFLAG(IS_WIN)
-      color_str = base::WideToUTF8(args.front());
-#else
       color_str = args.front();
-#endif
       args.erase(args.begin());
     }
     icon_color = ParseHexColor(color_str);
@@ -201,11 +189,7 @@ int main(int argc, char** argv) {
     std::string color_str =
         command_line->GetSwitchValueASCII("background-color");
     if (color_str.empty() && !args.empty()) {
-#if BUILDFLAG(IS_WIN)
-      color_str = base::WideToUTF8(args.front());
-#else
       color_str = args.front();
-#endif
       args.erase(args.begin());
     }
     bg_color = ParseHexColor(color_str);

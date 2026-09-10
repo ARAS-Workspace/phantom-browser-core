@@ -25,16 +25,10 @@ static const char kMainWebrtcTestHtmlPage[] =
 
 enum class TargetVideoCaptureImplementation {
   DEFAULT,
-#if BUILDFLAG(IS_WIN)
-  WIN_MEDIA_FOUNDATION
-#endif
 };
 
 const TargetVideoCaptureImplementation kTargetVideoCaptureImplementations[] = {
     TargetVideoCaptureImplementation::DEFAULT,
-#if BUILDFLAG(IS_WIN)
-    TargetVideoCaptureImplementation::WIN_MEDIA_FOUNDATION
-#endif
 };
 
 // These tests runs on real webcams and ensure WebRTC can acquire webcams
@@ -47,15 +41,6 @@ class WebRtcWebcamBrowserTest
       public testing::WithParamInterface<TargetVideoCaptureImplementation> {
  public:
   WebRtcWebcamBrowserTest() {
-#if BUILDFLAG(IS_WIN)
-    if (GetParam() == TargetVideoCaptureImplementation::WIN_MEDIA_FOUNDATION) {
-      scoped_feature_list_.InitAndEnableFeature(
-          media::kMediaFoundationVideoCapture);
-    } else {
-      scoped_feature_list_.InitAndDisableFeature(
-          media::kMediaFoundationVideoCapture);
-    }
-#endif
   }
 
   void SetUpCommandLine(base::CommandLine* command_line) override {

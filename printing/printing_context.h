@@ -23,11 +23,6 @@ namespace printing {
 class MetafilePlayer;
 class PrintingContextFactoryForTest;
 
-#if BUILDFLAG(IS_WIN)
-class PageSetup;
-class PrintedPage;
-#endif
-
 // An abstraction of a printer context, implemented by objects that describe the
 // user selected printing context. This includes the OS-dependent UI to ask the
 // user about the print settings. Concrete implementations directly talk to the
@@ -57,11 +52,6 @@ class COMPONENT_EXPORT(PRINTING) PrintingContext {
     // Whether to show the system dialog.
     bool show_system_dialog;
 
-#if BUILDFLAG(IS_WIN)
-    // If showing the system dialog, the number of pages in the to-be-printed
-    // PDF. Only used on Windows.
-    int page_count;
-#endif
   };
 
   enum class OutOfProcessBehavior {
@@ -151,12 +141,6 @@ class COMPONENT_EXPORT(PRINTING) PrintingContext {
   virtual mojom::ResultCode NewDocument(
       const std::u16string& document_name) = 0;
 
-#if BUILDFLAG(IS_WIN)
-  // Renders a page.
-  virtual mojom::ResultCode RenderPage(const PrintedPage& page,
-                                       const PageSetup& page_setup) = 0;
-#endif
-
   // Prints the document contained in `metafile`.
   virtual mojom::ResultCode PrintDocument(const MetafilePlayer& metafile,
                                           const PrintSettings& settings,
@@ -175,12 +159,6 @@ class COMPONENT_EXPORT(PRINTING) PrintingContext {
 
   // Returns the native context used to print.
   virtual printing::NativeDrawingContext context() const = 0;
-
-#if BUILDFLAG(IS_WIN)
-  // Initializes with predefined settings.
-  virtual mojom::ResultCode InitWithSettingsForTest(
-      std::unique_ptr<PrintSettings> settings) = 0;
-#endif
 
   // Creates an instance of this object.
   static std::unique_ptr<PrintingContext> Create(

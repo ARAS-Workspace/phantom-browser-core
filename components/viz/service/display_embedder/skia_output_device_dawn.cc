@@ -21,12 +21,6 @@
 #include "ui/gfx/presentation_feedback.h"
 #include "ui/gfx/vsync_provider.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "components/viz/service/display_embedder/skia_output_device_dawn_d3d11_blt_mode.h"
-#include "ui/gl/child_window_win.h"
-#include "ui/gl/vsync_provider_win.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "gpu/ipc/common/gpu_surface_lookup.h"
 #include "ui/gl/android/scoped_a_native_window.h"
@@ -65,10 +59,6 @@ class SkiaOutputDeviceDawnSwapChain : public SkiaOutputDeviceDawn {
 
   bool Initialize(gpu::SurfaceHandle surface_handle) override;
 
-#if BUILDFLAG(IS_WIN)
-  gpu::SurfaceHandle GetChildSurfaceHandle() const override;
-#endif
-
  protected:
   bool ResizeBackbuffer() override;
   wgpu::Texture AcquireSwapChainTexture() override;
@@ -77,15 +67,6 @@ class SkiaOutputDeviceDawnSwapChain : public SkiaOutputDeviceDawn {
 
  private:
   wgpu::Surface surface_;
-
-#if BUILDFLAG(IS_WIN)
-  // D3D requires that we use flip model swap chains. Flip swap chains
-  // require that the swap chain be connected with DWM. DWM requires that the
-  // rendering windows are owned by the process that's currently doing the
-  // rendering. gl::ChildWindowWin creates and owns a window which is
-  // reparented by the browser to be a child of its window.
-  gl::ChildWindowWin child_window_;
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
   // Use ScopedANativeWindow to keep the window alive
@@ -101,18 +82,6 @@ std::unique_ptr<SkiaOutputDeviceDawn> SkiaOutputDeviceDawn::Create(
     gpu::SurfaceHandle surface_handle,
     gpu::MemoryTracker* memory_tracker,
     DidSwapBufferCompleteCallback did_swap_buffer_complete_callback) {
-#if BUILDFLAG(IS_WIN)
-  if (context_state->dawn_context_provider()->backend_type() ==
-      wgpu::BackendType::D3D11) {
-    auto output_device = std::make_unique<SkiaOutputDeviceDawnD3D11BltMode>(
-        context_state, origin, memory_tracker,
-        std::move(did_swap_buffer_complete_callback), PassKey());
-    if (!output_device->Initialize(surface_handle)) {
-      return nullptr;
-    }
-    return output_device;
-  }
-#endif
 
   auto output_device = std::make_unique<SkiaOutputDeviceDawnSwapChain>(
       context_state, origin, memory_tracker,
@@ -150,12 +119,6 @@ SkiaOutputDeviceDawn::SkiaOutputDeviceDawn(
 }
 
 SkiaOutputDeviceDawn::~SkiaOutputDeviceDawn() = default;
-
-#if BUILDFLAG(IS_WIN)
-gpu::SurfaceHandle SkiaOutputDeviceDawn::GetChildSurfaceHandle() const {
-  return gpu::kNullSurfaceHandle;
-}
-#endif
 
 bool SkiaOutputDeviceDawn::Reshape(const ReshapeParams& params) {
   DCHECK_EQ(params.transform, gfx::OVERLAY_TRANSFORM_NONE);
@@ -224,42 +187,9 @@ SkiaOutputDeviceDawnSwapChain::SkiaOutputDeviceDawnSwapChain(
                            std::move(did_swap_buffer_complete_callback),
                            pass_key) {}
 
-#if BUILDFLAG(IS_WIN)
-gpu::SurfaceHandle SkiaOutputDeviceDawnSwapChain::GetChildSurfaceHandle()
-    const {
-  return child_window_.window();
-}
-#endif
-
 bool SkiaOutputDeviceDawnSwapChain::Initialize(
     gpu::SurfaceHandle surface_handle) {
   wgpu::SurfaceDescriptor surface_desc;
-
-#if BUILDFLAG(IS_WIN)
-  gpu::SurfaceHandle window_handle_to_draw_to;
-
-  // Only D3D swapchain requires that the rendering windows are owned by the
-  // process that's currently doing the rendering.
-  switch (context_state_->dawn_context_provider()->backend_type()) {
-    case wgpu::BackendType::D3D11:
-    case wgpu::BackendType::D3D12:
-      child_window_.Initialize();
-      window_handle_to_draw_to = child_window_.window();
-      break;
-    default:
-      window_handle_to_draw_to = surface_handle;
-  }
-
-  vsync_provider_ =
-      std::make_unique<gl::VSyncProviderWin>(window_handle_to_draw_to);
-
-  // Create the wgpu::Surface from our HWND.
-  wgpu::SurfaceSourceWindowsHWND hwnd_desc;
-  hwnd_desc.hwnd = window_handle_to_draw_to;
-  hwnd_desc.hinstance = GetModuleHandle(nullptr);
-
-  surface_desc.nextInChain = &hwnd_desc;
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
   auto surface_record =
@@ -301,11 +231,6 @@ bool SkiaOutputDeviceDawnSwapChain::Initialize(
 }
 
 bool SkiaOutputDeviceDawnSwapChain::ResizeBackbuffer() {
-#if BUILDFLAG(IS_WIN)
-  if (child_window_.window()) {
-    child_window_.Resize(size_);
-  }
-#endif
 
   wgpu::SurfaceConfiguration config;
   config.device = context_state_->dawn_context_provider()->GetDevice();

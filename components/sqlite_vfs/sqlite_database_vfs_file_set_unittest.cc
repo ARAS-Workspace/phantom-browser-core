@@ -144,17 +144,9 @@ MULTIPROCESS_TEST_MAIN(CanOpenConnectionInChild) {
   auto pending_file_set = MakePendingFileSet(
       Client::kTest, directory, base_name, single_connection, journal_mode_wal);
 
-#if BUILDFLAG(IS_WIN)
-  // On Windows, the files cannot even be opened a second time if the parent
-  // used single_connection=true.
-  if (!pending_file_set.has_value()) {
-    return EXIT_FAILURE;
-  }
-#else
   // Other platforms don't have such protections -- single_connection is
   // checked below when the main database file is opened.
   CHECK(pending_file_set.has_value());
-#endif
 
   auto file_set =
       SqliteVfsFileSet::Bind(Client::kTest, *std::move(pending_file_set));
@@ -196,10 +188,6 @@ TEST_P(SqliteVfsFileSetTest, MultipleConnections) {
     child_command_line.AppendSwitch(kJournalModeWal);
   }
   base::LaunchOptions launch_options;
-#if BUILDFLAG(IS_WIN)
-  launch_options.start_hidden = true;
-  launch_options.feedback_cursor_off = true;
-#endif
   base::Process process = base::SpawnMultiProcessTestChild(
       "CanOpenConnectionInChild", child_command_line, launch_options);
 

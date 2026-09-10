@@ -64,31 +64,18 @@
 #include "device/vr/public/mojom/isolated_xr_service.mojom.h"       // nogncheck
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#include "sandbox/win/src/sandbox.h"
-#include "services/webnn/public/mojom/webnn_compiler_service.mojom.h"
-#include "services/webnn/webnn_compiler_service_impl.h"
-extern sandbox::TargetServices* g_utility_target_services;
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include "sandbox/linux/services/libc_interceptor.h"
 #include "sandbox/policy/mojom/sandbox.mojom.h"
 #include "sandbox/policy/sandbox_type.h"
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || (BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-                          (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)))
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
+    (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX))
 #include "services/shape_detection/public/mojom/shape_detection_service.mojom.h"  // nogncheck
 #include "services/shape_detection/shape_detection_service.h"  // nogncheck
-#endif  // BUILDFLAG(IS_WIN) || (BUILDFLAG(GOOGLE_CHROME_BRANDING) &&
-        // (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)))
-
-#if BUILDFLAG(IS_WIN)
-#include "media/mojo/mojom/media_foundation_service.mojom.h"  // nogncheck
-#include "media/mojo/services/media_foundation_service_broker.h"  // nogncheck
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && (BUILDFLAG(IS_CHROMEOS) ||
+        // BUILDFLAG(IS_LINUX))
 
 #if BUILDFLAG(IS_ANDROID)
 #include "media/mojo/mojom/mediadrm_support.mojom.h"       // nogncheck
@@ -125,14 +112,6 @@ NetworkBinderCreationCallback& GetNetworkBinderCreationCallbackForTesting() {
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-void EnsureSandboxedWin() {
-  // |g_utility_target_services| can be null if --no-sandbox is specified.
-  if (g_utility_target_services)
-    g_utility_target_services->LowerToken();
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(ENABLE_LIBRARY_CDMS)
 std::unique_ptr<media::CdmAuxiliaryHelper> CreateCdmHelper(
     media::mojom::FrameInterfaceFactory* interface_provider) {
@@ -145,9 +124,6 @@ class ContentCdmServiceClient final : public media::CdmService::Client {
   ~ContentCdmServiceClient() override = default;
 
   void EnsureSandboxed() override {
-#if BUILDFLAG(IS_WIN)
-    EnsureSandboxedWin();
-#endif
   }
 
   std::unique_ptr<media::CdmFactory> CreateCdmFactory(
@@ -177,10 +153,6 @@ class UtilityThreadVideoCaptureServiceImpl final
                                 /*create_system_monitor=*/true) {}
 
  private:
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedCOMInitializer com_initializer_{
-      base::win::ScopedCOMInitializer::kMTA};
-#endif  // BUILDFLAG(IS_WIN)
 };
 
 auto RunNetworkService(
@@ -243,20 +215,11 @@ auto RunAudio(mojo::PendingReceiver<audio::mojom::AudioService> receiver) {
   }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  auto* command_line = base::CommandLine::ForCurrentProcess();
-  if (command_line->HasSwitch(switches::kAudioProcessHighPriority)) {
-    auto success =
-        ::SetPriorityClass(::GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);
-    DCHECK(success);
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   return audio::CreateStandaloneService(std::move(receiver));
 }
 
-#if BUILDFLAG(IS_WIN) || (BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-                          (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)))
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
+    (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX))
 auto RunShapeDetectionService(
     mojo::PendingReceiver<shape_detection::mojom::ShapeDetectionService>
         receiver) {
@@ -286,20 +249,6 @@ auto RunAccessibilityService(
   return std::make_unique<ax::BrowserAccessibilityService>(std::move(receiver));
 }
 #endif  // BUILDFLAG(ENABLE_ACCESSIBILITY_SERVICE)
-
-#if BUILDFLAG(IS_WIN)
-auto RunMediaFoundationServiceBroker(
-    mojo::PendingReceiver<media::mojom::MediaFoundationServiceBroker>
-        receiver) {
-  return std::make_unique<media::MediaFoundationServiceBroker>(
-      std::move(receiver), base::BindOnce(&EnsureSandboxedWin));
-}
-
-auto RunWebNNCompilerService(
-    mojo::PendingReceiver<webnn::mojom::WebNNCompilerService> receiver) {
-  return std::make_unique<webnn::WebNNCompilerServiceImpl>(std::move(receiver));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
 auto RunMediaDrmSupportService(
@@ -416,8 +365,8 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
     services.Add(RunOnDeviceModel);
   }
 
-#if BUILDFLAG(IS_WIN) || (BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-                          (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)))
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
+    (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX))
   services.Add(RunShapeDetectionService);
 #endif
 
@@ -427,11 +376,6 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
                    ? base::ThreadType::kPresentation
                    : base::ThreadType::kDefault);
 #endif
-
-#if BUILDFLAG(IS_WIN)
-  services.Add(RunMediaFoundationServiceBroker);
-  services.Add(RunWebNNCompilerService);
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
   if (base::FeatureList::IsEnabled(media::kMediaDrmQueryInSeparateProcess)) {

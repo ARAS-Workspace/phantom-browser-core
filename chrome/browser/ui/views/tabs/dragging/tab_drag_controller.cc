@@ -2412,7 +2412,7 @@ void TabDragController::CompleteDrag() {
     }
 
     // If source window was maximized - maximize the new window as well.
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_MAC)
     // Keeping maximized state breaks snap to Grid on Windows when dragging
     // tabs from maximized windows. TODO:(crbug.com/41321838) Explore doing this
     // for other desktop OS's. kMaximizedStateRetainedOnTabDrag in
@@ -2424,7 +2424,7 @@ void TabDragController::CompleteDrag() {
     if (was_source_maximized_ || was_source_fullscreen_) {
       MaximizeAttachedWindow();
     }
-#endif  // !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_MAC)
+#endif  // !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_MAC)
   }
   OnContextStoppedDragging();
 

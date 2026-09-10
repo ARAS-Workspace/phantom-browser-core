@@ -275,17 +275,6 @@ class BASE_EXPORT CurrentUIThread : public CurrentThread {
   void Abort();
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  void RegisterNativeEventObserver(
-      MessagePumpForUI::NativeEventObserver* observer);
-  void UnregisterNativeEventObserver(
-      MessagePumpForUI::NativeEventObserver* observer);
-
-  // For testing only, allows overriding the current observer.
-  // Returns the previous observer.
-  MessagePumpForUI::NativeEventObserver* ResetNativeEventObserverForTesting(
-      MessagePumpForUI::NativeEventObserver* observer);
-#endif
 
  private:
   explicit CurrentUIThread(
@@ -307,12 +296,7 @@ class BASE_EXPORT CurrentIOThread : public CurrentThread {
 
   CurrentIOThread* operator->() { return this; }
 
-#if BUILDFLAG(IS_WIN)
-  // Please see MessagePumpWin for definitions of these methods.
-  [[nodiscard]] bool RegisterIOHandler(HANDLE file,
-                                       MessagePumpForIO::IOHandler* handler);
-  bool RegisterJobObject(HANDLE job, MessagePumpForIO::IOHandler* handler);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   // Please see WatchableIOMessagePumpPosix for definition.
   // Prefer base::FileDescriptorWatcher for non-critical IO.
   bool WatchFileDescriptor(int fd,
@@ -320,7 +304,7 @@ class BASE_EXPORT CurrentIOThread : public CurrentThread {
                            MessagePumpForIO::Mode mode,
                            MessagePumpForIO::FdWatchController* controller,
                            MessagePumpForIO::FdWatcher* delegate);
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 
 #if BUILDFLAG(IS_MAC) || \
     (BUILDFLAG(IS_IOS) && !BUILDFLAG(CRONET_BUILD) && !BUILDFLAG(IS_IOS_TVOS))

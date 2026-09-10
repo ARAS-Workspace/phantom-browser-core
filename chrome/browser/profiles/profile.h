@@ -497,11 +497,6 @@ class Profile : public content::BrowserContext {
   jni_zero::ScopedJavaLocalRef<jobject> GetJavaObject() const;
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-  // Track user acknowledgement of the crash bubble. For more information, see
-  // the definition of `ProfileLoadTracker`.
-  virtual void AckCrashForTracking() = 0;
-#endif
  protected:
   // Creates an OffTheRecordProfile which points to this Profile.
   static std::unique_ptr<Profile> CreateOffTheRecordProfile(

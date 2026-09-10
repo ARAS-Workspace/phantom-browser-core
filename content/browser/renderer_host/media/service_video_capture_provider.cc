@@ -247,12 +247,6 @@ ServiceVideoCaptureProvider::LazyConnectToService() {
       std::move(accelerator_factory));
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-  // Pass active gpu info.
-  GetVideoCaptureService().OnGpuInfoUpdate(
-      content::GpuDataManager::GetInstance()->GetGPUInfo().active_gpu().luid);
-#endif
-
   mojo::Remote<video_capture::mojom::VideoSourceProvider> source_provider;
   GetVideoCaptureService().ConnectToVideoSourceProvider(
       source_provider.BindNewPipeAndPassReceiver());
@@ -340,10 +334,6 @@ void ServiceVideoCaptureProvider::OnGpuInfoUpdate() {
     // Only need to notify the service if it's already running.
     return;
   }
-#if BUILDFLAG(IS_WIN)
-  GetVideoCaptureService().OnGpuInfoUpdate(
-      content::GpuDataManager::GetInstance()->GetGPUInfo().active_gpu().luid);
-#endif
 }
 
 }  // namespace content

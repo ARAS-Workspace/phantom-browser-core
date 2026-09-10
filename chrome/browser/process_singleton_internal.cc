@@ -24,10 +24,7 @@ ToProtoEnum(ProcessSingleton::RemoteProcessInteractionResult result) {
     CASE(TERMINATE_SUCCEEDED);
     CASE(TERMINATE_FAILED);
     CASE(REMOTE_PROCESS_NOT_FOUND);
-#if BUILDFLAG(IS_WIN)
-    CASE(TERMINATE_WAIT_TIMEOUT);
-    CASE(RUNNING_PROCESS_NOTIFY_ERROR);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
     CASE(TERMINATE_NOT_ENOUGH_PERMISSIONS);
     CASE(REMOTE_PROCESS_SHUTTING_DOWN);
     CASE(PROFILE_UNLOCKED);
@@ -47,10 +44,7 @@ ToProtoEnum(ProcessSingleton::RemoteProcessInteractionResult result) {
 perfetto::protos::pbzero::ProcessSingleton::RemoteHungProcessTerminateReason
 ToProtoEnum(ProcessSingleton::RemoteHungProcessTerminateReason reason) {
   switch (reason) {
-#if BUILDFLAG(IS_WIN)
-    CASE(USER_ACCEPTED_TERMINATION);
-    CASE(NO_VISIBLE_WINDOW_FOUND);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
     CASE(NOTIFY_ATTEMPTS_EXCEEDED);
     CASE(SOCKET_WRITE_FAILED);
     CASE(SOCKET_READ_FAILED);

@@ -150,8 +150,7 @@ MostVisitedURL MakeMostVisitedURL(const std::u16string& title,
   return result;
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 EnterpriseShortcut MakeEnterpriseShortcut(const std::u16string& title,
                                           const std::string& url,
                                           bool allow_user_edit = false,
@@ -165,8 +164,7 @@ EnterpriseShortcut MakeEnterpriseShortcut(const std::u16string& title,
   shortcut.is_hidden_by_user = is_hidden_by_user;
   return shortcut;
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 
 class MockTopSites : public TopSites {
  public:
@@ -2076,8 +2074,7 @@ TEST_F(MostVisitedSitesWithCustomLinksTest, ShouldHonorMaxNumNonCustomLinks) {
                   MatchesTile(kTestTitle1, kTestUrl1, TileSource::TOP_SITES)));
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 class MostVisitedSitesWithEnterpriseShortcutsTest
     : public MostVisitedSitesTest {
  public:
@@ -2501,8 +2498,7 @@ TEST_F(MostVisitedSitesWithEnterpriseShortcutsTest,
                              TileSource::POPULAR)));
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 
 // This a test for MostVisitedSites::MergeTiles(...) method, and thus has the
 // same scope as the method itself. This tests merging popular sites with

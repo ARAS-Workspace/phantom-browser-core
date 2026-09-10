@@ -38,13 +38,7 @@
 #include "ui/base/resource/resource_bundle_android.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <tuple>
-
-#include "ui/accessibility/platform/ax_platform_node_win.h"
-#else
 #include "ui/accessibility/platform/ax_platform_node_base.h"
-#endif
 
 namespace content {
 
@@ -83,15 +77,7 @@ class CheckForLeakedAxPlatformNodes : public testing::EmptyTestEventListener {
     // Dear reader: If your test is failing here, it is because the test is
     // either leaking UX objects (e.g., Views, Widgets, etc) or is using
     // accessibility APIs that are leaking AXPlatformNode instances.
-#if BUILDFLAG(IS_WIN)
-    auto [instance_count, dormant_count, live_count, ghost_count] =
-        ui::AXPlatformNodeWin::ResetCountsForTesting();
-    EXPECT_EQ(ghost_count, 0U)
-        << "This test is leaking COM interface references. If the test is not "
-           "explicitly using facilities such as IAccessible, then you may have "
-           "just found a bug in ui/accessibility/platform. Contact a member of "
-           "ui/accessibility/OWNERS for guidance.";
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     // The `AuraLinuxApplication` singleton is never destroyed.
     // TODO(accessibility): Consider moving it into AXPlatform in some way so
     // that it can be properly destroyed at shutdown.

@@ -18,9 +18,6 @@ AudioThreadImpl::AudioThreadImpl()
     : thread_("AudioThread"),
       hang_monitor_(nullptr, base::OnTaskRunnerDeleter(nullptr)) {
   base::Thread::Options thread_options;
-#if BUILDFLAG(IS_WIN)
-  thread_.init_com_with_mta(true);
-#endif
   CHECK(thread_.StartWithOptions(std::move(thread_options)));
 
 #if BUILDFLAG(IS_MAC)

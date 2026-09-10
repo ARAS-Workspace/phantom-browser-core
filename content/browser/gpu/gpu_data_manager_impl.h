@@ -34,11 +34,6 @@
 #include "ui/display/display_observer.h"
 #include "ui/gfx/gpu_extra_info.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#include "ui/gfx/mojom/dxgi_info.mojom.h"
-#endif
-
 class GURL;
 
 namespace gpu {
@@ -108,23 +103,6 @@ class CONTENT_EXPORT GpuDataManagerImpl : public GpuDataManager,
   void UpdateGpuInfo(
       const gpu::GPUInfo& gpu_info,
       const std::optional<gpu::GPUInfo>& gpu_info_for_hardware_gpu);
-#if BUILDFLAG(IS_WIN)
-  void UpdateDirectXInfo(uint32_t d3d12_feature_level,
-                         uint32_t directml_feature_level);
-  void UpdateDevicePerfInfo(const gpu::DevicePerfInfo& device_perf_info);
-  void UpdateOverlayInfo(const gpu::OverlayInfo& overlay_info);
-  void UpdateDXGIInfo(gfx::mojom::DXGIInfoPtr dxgi_info);
-  void UpdateDirectXRequestStatus(bool request_continues);
-  bool DirectXRequested() const;
-  void TerminateInfoCollectionGpuProcess();
-
-  // Information to Get/Set the LUID that the GPU Process should be launched on.
-  // Predominantly used by XR, so that we can ensure the GL context is created
-  // on the GPU that the headset is actually plugged into.
-  void SetUseAdapterLuid(const CHROME_LUID& luid);
-  void ClearUseAdapterLuid();
-  std::optional<CHROME_LUID> GetUseAdapterLuid() const;
-#endif
   // Called from BrowserMainLoop::PostCreateThreads().
   // TODO(content/browser/gpu/OWNERS): This should probably use a
   // BrowserMainParts override instead.

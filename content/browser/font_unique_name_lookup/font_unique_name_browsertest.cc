@@ -16,10 +16,6 @@
 #include "content/public/test/test_navigation_observer.h"
 #include "content/shell/browser/shell.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/files/scoped_temp_dir.h"
-#endif
-
 namespace content {
 namespace {
 
@@ -78,13 +74,6 @@ constexpr auto kExpectedFontFamilyNames = std::to_array({
     "Hiragino Maru Gothic Pro",
     "Hiragino Kaku Gothic StdN",
 });
-#elif BUILDFLAG(IS_WIN)
-constexpr auto kExpectedFontFamilyNames = std::to_array({
-    "Cambria Math",
-    "MingLiU_HKSCS-ExtB",
-    "NSimSun",
-    "Calibri",
-});
 #endif
 
 }  // namespace
@@ -107,9 +96,6 @@ class FontUniqueNameBrowserTest : public DevToolsProtocolTest {
 
  private:
   base::test::ScopedFeatureList feature_list_;
-#if BUILDFLAG(IS_WIN)
-  base::ScopedTempDir cache_directory_;
-#endif
 };
 
 // TODO(crbug.com/42050634): Make this work on Fuchsia.

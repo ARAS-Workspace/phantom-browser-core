@@ -16,10 +16,7 @@
 #include "third_party/skia/include/core/SkTypes.h"
 #include "third_party/skia/include/private/SkMalloc.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <malloc.h>
-#include <windows.h>
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #include <malloc/malloc.h>
 #else
 #include <malloc.h>
@@ -166,9 +163,7 @@ size_t sk_malloc_size(void* addr, size_t size) {
 
   size_t completeSize = 0;
 
-#if BUILDFLAG(IS_WIN)
-  completeSize = _msize(addr);
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   completeSize = malloc_size(addr);
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   completeSize = malloc_usable_size(addr);

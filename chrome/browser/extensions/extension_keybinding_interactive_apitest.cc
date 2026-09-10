@@ -519,12 +519,7 @@ IN_PROC_BROWSER_TEST_F(CommandsApiTest,
   EXPECT_EQ(std::string("basics browser action"), test_listener.message());
 }
 
-#if BUILDFLAG(IS_WIN)
-// Currently this feature is implemented on Windows only.
-#define MAYBE_AllowDuplicatedMediaKeys AllowDuplicatedMediaKeys
-#else
 #define MAYBE_AllowDuplicatedMediaKeys DISABLED_AllowDuplicatedMediaKeys
-#endif
 
 // Test that media keys go to all extensions that register for them.
 IN_PROC_BROWSER_TEST_F(CommandsApiTest, MAYBE_AllowDuplicatedMediaKeys) {

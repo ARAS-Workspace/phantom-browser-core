@@ -18,8 +18,6 @@
 
 #if BUILDFLAG(IS_POSIX)
 #include <unistd.h>
-#elif BUILDFLAG(IS_WIN)
-#include <shlobj.h>
 #endif
 
 namespace {
@@ -27,8 +25,6 @@ namespace {
 bool IsUserElevated() {
 #if BUILDFLAG(IS_POSIX)
   return getuid() == 0;
-#elif BUILDFLAG(IS_WIN)
-  return ::IsUserAnAdmin();
 #endif
 }
 

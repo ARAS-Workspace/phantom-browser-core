@@ -295,17 +295,7 @@ class FixtureWithMockMessagePump : public Fixture {
   }
 
   bool AlignsToLowRes() const override {
-#if BUILDFLAG(IS_WIN)
-    // On Windows, the alignment relies on the low-res clock, see
-    // MessagePump::AdjustDelayedRunTime(), as long as the leeway is
-    // equal-or-below kMinLowResolutionThresholdMs which it is in the way these
-    // tests are currently configured.
-    static_assert(kLeeway <=
-                  base::Milliseconds(Time::kMinLowResolutionThresholdMs));
-    return true;
-#else
     return false;
-#endif
   }
 
  private:
@@ -437,11 +427,9 @@ auto GetTestTypes() {
   return testing::Values(
       std::make_tuple(WakeUpType::kDefault, MetricsSampling::kMetricsOn),
       std::make_tuple(WakeUpType::kDefault, MetricsSampling::kMetricsOff)
-#if !BUILDFLAG(IS_WIN)
           ,
       std::make_tuple(WakeUpType::kAlign, MetricsSampling::kMetricsOn),
       std::make_tuple(WakeUpType::kAlign, MetricsSampling::kMetricsOff)
-#endif
   );
 }
 
@@ -4303,99 +4291,6 @@ TEST_P(SequenceManagerTest, CreateUnboundSequenceManagerWhichIsNeverBound) {
   // This should not crash.
   CreateUnboundSequenceManager();
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_P(SequenceManagerTest, NextWakeUpNeedsHighRes) {
-  auto queue = CreateTaskQueue();
-
-  // Only the third task needs high resolution timing.
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-  queue->task_runner()->PostTask(FROM_HERE, BindOnce(&NopTask));
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-  queue->task_runner()->PostDelayedTask(FROM_HERE, BindOnce(&NopTask),
-                                        Milliseconds(100));
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-  queue->task_runner()->PostDelayedTaskAt(
-      subtle::PostDelayedTaskPassKeyForTesting(), FROM_HERE, BindOnce(&NopTask),
-      sequence_manager()->NowTicks() + Milliseconds(10),
-      subtle::DelayPolicy::kPrecise);
-  EXPECT_TRUE(sequence_manager()->NextWakeUpNeedsHighRes());
-
-  // Running immediate tasks doesn't affect pending high resolution tasks.
-  RunLoop().RunUntilIdle();
-  EXPECT_TRUE(sequence_manager()->NextWakeUpNeedsHighRes());
-
-  // Advancing to just before a pending low resolution task doesn't mean that we
-  // have pending high resolution work.
-  AdvanceMockTickClock(Milliseconds(99));
-  RunLoop().RunUntilIdle();
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-
-  AdvanceMockTickClock(Milliseconds(100));
-  RunLoop().RunUntilIdle();
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-}
-
-TEST_P(SequenceManagerTest, NextWakeUpNeedsHighResLowPriority) {
-  auto queue = CreateTaskQueue();
-  queue->SetQueuePriority(TestQueuePriority::kLowPriority);
-
-  // No task should be considered high resolution in a low priority queue.
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-  queue->task_runner()->PostTask(FROM_HERE, BindOnce(&NopTask));
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-  queue->task_runner()->PostDelayedTask(FROM_HERE, BindOnce(&NopTask),
-                                        Milliseconds(100));
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-  queue->task_runner()->PostDelayedTaskAt(
-      subtle::PostDelayedTaskPassKeyForTesting(), FROM_HERE, BindOnce(&NopTask),
-      sequence_manager()->NowTicks() + Milliseconds(10),
-      subtle::DelayPolicy::kPrecise);
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-
-  // Increasing queue priority should enable high resolution timer.
-  queue->SetQueuePriority(TestQueuePriority::kNormalPriority);
-  EXPECT_TRUE(sequence_manager()->NextWakeUpNeedsHighRes());
-  queue->SetQueuePriority(TestQueuePriority::kLowPriority);
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-
-  // Running immediate tasks doesn't affect pending high resolution tasks.
-  RunLoop().RunUntilIdle();
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-
-  // Advancing to just before a pending low resolution task doesn't mean that we
-  // have pending high resolution work.
-  AdvanceMockTickClock(Milliseconds(99));
-  RunLoop().RunUntilIdle();
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-
-  AdvanceMockTickClock(Milliseconds(100));
-  RunLoop().RunUntilIdle();
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-}
-
-TEST_P(SequenceManagerTest, NextWakeUpNeedsHighResLowAndNormalPriorityQueues) {
-  auto queueLow = CreateTaskQueue();
-  queueLow->SetQueuePriority(TestQueuePriority::kLowPriority);
-  auto queueNormal = CreateTaskQueue();
-  queueNormal->SetQueuePriority(TestQueuePriority::kNormalPriority);
-
-  // No task should be considered high resolution in a low priority queue.
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-  queueLow->task_runner()->PostDelayedTaskAt(
-      subtle::PostDelayedTaskPassKeyForTesting(), FROM_HERE, BindOnce(&NopTask),
-      sequence_manager()->NowTicks() + Milliseconds(10),
-      subtle::DelayPolicy::kPrecise);
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-  queueNormal->task_runner()->PostDelayedTask(FROM_HERE, BindOnce(&NopTask),
-                                              Milliseconds(100));
-  EXPECT_FALSE(sequence_manager()->NextWakeUpNeedsHighRes());
-
-  // Increasing queue priority should enable high resolution timer.
-  queueLow->SetQueuePriority(TestQueuePriority::kNormalPriority);
-  EXPECT_TRUE(sequence_manager()->NextWakeUpNeedsHighRes());
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 namespace {
 

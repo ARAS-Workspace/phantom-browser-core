@@ -62,12 +62,6 @@
 #include "ash/constants/ash_switches.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/enterprise_util.h"
-#include "base/win/registry.h"
-#include "chrome/install_static/install_util.h"
-#endif
-
 namespace {
 
 // Extension ID of chrome/test/data/extensions/good.crx
@@ -85,45 +79,6 @@ enum AllowedBuckets {
   // Allow any buckets (no extra verifications performed).
   ALLOW_ANY
 };
-
-#if BUILDFLAG(IS_WIN)
-std::wstring GetRegistryPathForTestProfile() {
-  // Cleanup follow-up to http://crbug.com/40520015 for the previous location of
-  // this test key which had similar problems (to a lesser extent). It's
-  // redundant but harmless to have multiple callers hit this on the same
-  // machine. TODO(gab): remove this mid-june 2017.
-  base::win::RegKey key;
-  if (key.Open(HKEY_CURRENT_USER, L"SOFTWARE\\Chromium\\PrefHashBrowserTest",
-               KEY_SET_VALUE | KEY_WOW64_32KEY) == ERROR_SUCCESS) {
-    LONG result = key.DeleteKey(L"");
-    EXPECT_TRUE(result == ERROR_SUCCESS || result == ERROR_FILE_NOT_FOUND);
-  }
-
-  base::FilePath profile_dir;
-  EXPECT_TRUE(base::PathService::Get(chrome::DIR_USER_DATA, &profile_dir));
-
-  // |DIR_USER_DATA| usually has format %TMP%\12345_6789012345\user_data
-  // (unless running with --single-process-tests, where the format is
-  // %TMP%\scoped_dir12345_6789012345). Use the parent directory name instead of
-  // the leaf directory name "user_data" to avoid conflicts in parallel tests,
-  // which would try to modify the same registry key otherwise.
-  if (profile_dir.BaseName().value() == L"user_data") {
-    profile_dir = profile_dir.DirName();
-  }
-  // Try to detect regressions when |DIR_USER_DATA| test location changes, which
-  // could cause this test to become flaky. See http://crbug.com/40134176 for
-  // more details.
-  DCHECK(profile_dir.BaseName().value().find_first_of(L"0123456789") !=
-         std::string::npos);
-
-  // Use a location under the real PreferenceMACs path so that the backup
-  // cleanup logic in ChromeTestLauncherDelegate::PreSharding() for interrupted
-  // tests covers this test key as well.
-  return install_static::GetRegistryPath() +
-         L"\\PreferenceMACs\\PrefHashBrowserTest\\" +
-         profile_dir.BaseName().value();
-}
-#endif
 
 // Returns the number of times |histogram_name| was reported so far; adding the
 // results of the first 100 buckets (there are only ~19 reporting IDs as of this
@@ -192,11 +147,7 @@ std::optional<base::DictValue> ReadPrefsDictionary(
 // Returns whether external validation is supported on the platform through
 // storing MACs in the registry.
 bool SupportsRegistryValidation() {
-#if BUILDFLAG(IS_WIN)
-  return true;
-#else
   return false;
-#endif
 }
 
 #define PREF_HASH_BROWSER_TEST(fixture, test_name)                             \
@@ -313,40 +264,9 @@ class PrefHashBrowserTestBase : public extensions::ExtensionBrowserTest {
       chrome_prefs::DisableDomainCheckForTesting();
     }
 
-#if BUILDFLAG(IS_WIN)
-    // Avoid polluting prefs for the user and the bots by writing to a specific
-    // testing registry path.
-    registry_key_for_external_validation_ = GetRegistryPathForTestProfile();
-    ProfilePrefStoreManager::SetPreferenceValidationRegistryPathForTesting(
-        &registry_key_for_external_validation_);
-
-    // Keys should be unique, but to avoid flakes in the long run make sure an
-    // identical test key wasn't left behind by a previous test.
-    if (content::IsPreTest()) {
-      base::win::RegKey key;
-      if (key.Open(HKEY_CURRENT_USER,
-                   registry_key_for_external_validation_.c_str(),
-                   KEY_SET_VALUE | KEY_WOW64_32KEY) == ERROR_SUCCESS) {
-        LONG result = key.DeleteKey(L"");
-        ASSERT_TRUE(result == ERROR_SUCCESS || result == ERROR_FILE_NOT_FOUND);
-      }
-    }
-#endif
   }
 
   void TearDown() override {
-#if BUILDFLAG(IS_WIN)
-    // When done, delete the Registry key to avoid polluting the registry.
-    if (!content::IsPreTest()) {
-      std::wstring registry_key = GetRegistryPathForTestProfile();
-      base::win::RegKey key;
-      if (key.Open(HKEY_CURRENT_USER, registry_key.c_str(),
-                   KEY_SET_VALUE | KEY_WOW64_32KEY) == ERROR_SUCCESS) {
-        LONG result = key.DeleteKey(L"");
-        ASSERT_TRUE(result == ERROR_SUCCESS || result == ERROR_FILE_NOT_FOUND);
-      }
-    }
-#endif
     extensions::ExtensionBrowserTest::TearDown();
   }
 
@@ -475,20 +395,17 @@ class PrefHashBrowserTestBase : public extensions::ExtensionBrowserTest {
     if (!ProfilePrefStoreManager::kPlatformSupportsPreferenceTracking)
       return PROTECTION_DISABLED_ON_PLATFORM;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     // The strongest mode is enforced on Windows and MacOS in the absence of a
     // field trial.
     return PROTECTION_ENABLED_ALL;
 #else
     return PROTECTION_DISABLED_FOR_GROUP;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
   }
 
   int num_tracked_prefs_;
 
-#if BUILDFLAG(IS_WIN)
-  std::wstring registry_key_for_external_validation_;
-#endif
 };
 
 }  // namespace
@@ -1151,51 +1068,6 @@ class PrefHashBrowserTestUntrustedAdditionToPrefsAfterWipe
 
 PREF_HASH_BROWSER_TEST(PrefHashBrowserTestUntrustedAdditionToPrefsAfterWipe,
                        UntrustedAdditionToPrefsAfterWipe);
-
-#if BUILDFLAG(IS_WIN)
-class PrefHashBrowserTestRegistryValidationFailure
-    : public PrefHashBrowserTestBase {
- public:
-  void SetupPreferences() override {
-    profile()->GetPrefs()->SetString(prefs::kHomePage, "http://example.com");
-  }
-
-  void AttackPreferencesOnDisk(
-      base::DictValue* unprotected_preferences,
-      base::DictValue* protected_preferences) override {
-    std::wstring registry_key =
-        GetRegistryPathForTestProfile() + L"\\PreferenceMACs\\Default";
-    base::win::RegKey key;
-    ASSERT_EQ(ERROR_SUCCESS, key.Open(HKEY_CURRENT_USER, registry_key.c_str(),
-                                      KEY_SET_VALUE | KEY_WOW64_32KEY));
-    // An incorrect hash should still have the correct size.
-    ASSERT_EQ(ERROR_SUCCESS,
-              key.WriteValue(L"homepage", std::wstring(64, 'A').c_str()));
-  }
-
-  void VerifyReactionToPrefAttack() override {
-    EXPECT_EQ(
-        protection_level_ > PROTECTION_DISABLED_ON_PLATFORM
-            ? num_tracked_prefs()
-            : 0,
-        GetTrackedPrefHistogramCount(
-            user_prefs::tracked::kTrackedPrefHistogramUnchanged, ALLOW_ANY));
-
-    if (SupportsRegistryValidation()) {
-      // Expect that the registry validation caught the invalid MAC for pref #2
-      // (homepage).
-      EXPECT_EQ(protection_level_ > PROTECTION_DISABLED_ON_PLATFORM ? 1 : 0,
-                GetTrackedPrefHistogramCount(
-                    user_prefs::tracked::kTrackedPrefHistogramChanged,
-                    user_prefs::tracked::kTrackedPrefRegistryValidationSuffix,
-                    BEGIN_ALLOW_SINGLE_BUCKET + 2));
-    }
-  }
-};
-
-PREF_HASH_BROWSER_TEST(PrefHashBrowserTestRegistryValidationFailure,
-                       RegistryValidationFailure);
-#endif
 
 // Verifies that all preferences related to choice of default search engine are
 // protected.
@@ -2130,204 +2002,3 @@ class PrefHashBrowserTestDowngradeAttackPrevented
 
 PREF_HASH_BROWSER_TEST(PrefHashBrowserTestDowngradeAttackPrevented,
                        DowngradeAttackPrevented);
-
-#if BUILDFLAG(IS_WIN)
-// Tests the enterprise-specific fallback logic when EncryptedPrefHashing is
-// enabled. Simulates a roaming user by tampering with the legacy HMAC while
-// leaving the authoritative encrypted hash intact.
-class PrefHashBrowserTestEnterpriseEncryptedHmacFallback
-    : public PrefHashBrowserTestEncryptedBase {
- public:
-  PrefHashBrowserTestEnterpriseEncryptedHmacFallback() {
-    feature_list_.InitAndEnableFeature(tracked::kEncryptedPrefHashing);
-  }
-
-  void SetUpInProcessBrowserTestFixture() override {
-    PrefHashBrowserTestBase::SetUpInProcessBrowserTestFixture();
-    is_enterprise_device_for_testing_ =
-        base::SetIsEnterpriseDeviceForTesting(true);
-  }
-
-  void SetupPreferences() override {
-    // Set a value to ensure both MAC and encrypted hashes are written.
-    profile()->GetPrefs()->SetString(prefs::kHomePage, "http://roaming.com");
-  }
-
-  void AttackPreferencesOnDisk(
-      base::DictValue* unprotected_preferences,
-      base::DictValue* protected_preferences) override {
-    base::DictValue* const macs_dict =
-        protected_preferences->FindDictByDottedPath("protection.macs");
-    ASSERT_TRUE(macs_dict);
-
-    // Ensure both hash types were written in the PRE_ test.
-    const std::string encrypted_hash_key =
-        std::string(prefs::kHomePage) + kEncryptedHashSuffix;
-    ASSERT_TRUE(macs_dict->contains(prefs::kHomePage));
-    ASSERT_TRUE(macs_dict->contains(encrypted_hash_key));
-
-    // Tamper with the legacy HMAC, but leave the encrypted hash and the
-    // preference value untouched.
-    macs_dict->Set(prefs::kHomePage, "invalid_legacy_mac_for_roaming_user");
-  }
-
-  void VerifyReactionToPrefAttack() override {
-    // The initial HMAC check is skipped because the authoritative encrypted
-    // hash is present and valid. The preference value is therefore NOT reset.
-    EXPECT_EQ("http://roaming.com",
-              profile()->GetPrefs()->GetString(prefs::kHomePage));
-
-    // Verify that the encrypted hash was successfully used for validation.
-    histograms_.ExpectBucketCount(
-        user_prefs::tracked::kTrackedPrefHistogramUnchangedEncrypted,
-        2 /* homepage reporting_id */, 1);
-
-    // Verify no resets of any kind were performed.
-    histograms_.ExpectTotalCount(
-        user_prefs::tracked::kTrackedPrefHistogramReset, 0);
-    histograms_.ExpectTotalCount(
-        user_prefs::tracked::kTrackedPrefHistogramResetEncrypted, 0);
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-  std::optional<base::AutoReset<bool>> is_enterprise_device_for_testing_;
-};
-
-PREF_HASH_BROWSER_TEST(PrefHashBrowserTestEnterpriseEncryptedHmacFallback,
-                       EnterpriseEncryptedHmacFallback);
-
-// Tests that a tampered encrypted hash is caught and triggers a reset even on
-// an enterprise device.
-class PrefHashBrowserTestEnterpriseEncryptedTampered
-    : public PrefHashBrowserTestEncryptedBase {
- public:
-  PrefHashBrowserTestEnterpriseEncryptedTampered() {
-    feature_list_.InitAndEnableFeature(tracked::kEncryptedPrefHashing);
-  }
-
-  void SetUpInProcessBrowserTestFixture() override {
-    PrefHashBrowserTestBase::SetUpInProcessBrowserTestFixture();
-    is_enterprise_device_for_testing_ =
-        base::SetIsEnterpriseDeviceForTesting(true);
-  }
-
-  void SetupPreferences() override {
-    // Set a value to ensure both MAC and encrypted hashes are written.
-    profile()->GetPrefs()->SetString(prefs::kHomePage, "http://secure.com");
-  }
-
-  void AttackPreferencesOnDisk(
-      base::DictValue* unprotected_preferences,
-      base::DictValue* protected_preferences) override {
-    base::DictValue* const macs_dict =
-        protected_preferences->FindDictByDottedPath("protection.macs");
-    ASSERT_TRUE(macs_dict);
-
-    const std::string encrypted_hash_key =
-        std::string(prefs::kHomePage) + kEncryptedHashSuffix;
-    ASSERT_TRUE(macs_dict->contains(encrypted_hash_key));
-
-    // Tamper with the authoritative encrypted hash.
-    macs_dict->Set(encrypted_hash_key, "zacks_tampered_encrypted_hash");
-  }
-
-  void VerifyReactionToPrefAttack() override {
-    // The pref should be reset to its default (empty) value.
-    EXPECT_TRUE(profile()->GetPrefs()->GetString(prefs::kHomePage).empty());
-
-    // Verify that the reset was triggered by the encrypted hash validation.
-    histograms_.ExpectUniqueSample(
-        user_prefs::tracked::kTrackedPrefHistogramChangedEncrypted,
-        2 /* homepage reporting_id */, 1);
-    histograms_.ExpectUniqueSample(
-        user_prefs::tracked::kTrackedPrefHistogramResetEncrypted,
-        2 /* homepage reporting_id */, 1);
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-  std::optional<base::AutoReset<bool>> is_enterprise_device_for_testing_;
-};
-
-PREF_HASH_BROWSER_TEST(PrefHashBrowserTestEnterpriseEncryptedTampered,
-                       EnterpriseEncryptedTampered);
-
-// Tests that no enforcement is applied when the feature is disabled on an
-// enterprise device.
-class PrefHashBrowserTestEnterpriseFeatureDisabled
-    : public PrefHashBrowserTestEncryptedBase {
- public:
-  PrefHashBrowserTestEnterpriseFeatureDisabled() {
-    feature_list_.InitWithFeatures(
-        {}, {tracked::kEnableEncryptedTrackedPrefOnEnterprise});
-  }
-
- protected:
-  bool ShouldDisableDomainCheck() const override { return false; }
-
- public:
-  void SetUpInProcessBrowserTestFixture() override {
-    PrefHashBrowserTestBase::SetUpInProcessBrowserTestFixture();
-    is_enterprise_device_for_testing_ =
-        base::SetIsEnterpriseDeviceForTesting(true);
-  }
-
-  void SetupPreferences() override {
-    profile()->GetPrefs()->SetString(prefs::kHomePage, "http://example.com");
-  }
-
-  void AttackPreferencesOnDisk(
-      base::DictValue* unprotected_preferences,
-      base::DictValue* protected_preferences) override {
-    base::DictValue* macs_dict =
-        protected_preferences->FindDictByDottedPath("protection.macs");
-    if (!macs_dict) {
-      macs_dict =
-          unprotected_preferences->FindDictByDottedPath("protection.macs");
-    }
-    ASSERT_TRUE(macs_dict);
-
-    const std::string encrypted_hash_key =
-        std::string(prefs::kHomePage) + kEncryptedHashSuffix;
-    ASSERT_TRUE(macs_dict->contains(prefs::kHomePage));
-    ASSERT_TRUE(macs_dict->contains(encrypted_hash_key));
-
-    // Tamper with the legacy HMAC and the encrypted hash.
-    macs_dict->Set(prefs::kHomePage, "invalid_legacy_mac_for_roaming_user");
-    macs_dict->Set(encrypted_hash_key, "zacks_invalid_tampered_encrypted_hash");
-  }
-
-  void VerifyReactionToPrefAttack() override {
-    // The initial HMAC check is skipped because the authoritative encrypted
-    // hash is present and valid. The preference value is therefore NOT reset.
-    EXPECT_EQ("http://example.com",
-              profile()->GetPrefs()->GetString(prefs::kHomePage));
-
-    // Verify that the encrypted system correctly detected the tampering.
-    histograms_.ExpectBucketCount(
-        user_prefs::tracked::kTrackedPrefHistogramChangedEncrypted,
-        2 /* homepage reporting_id */, 1);
-
-    // Verify that we wanted to reset it, but didn't.
-    // This confirms no-enforcement logic in chrome_pref_service_factory.cc
-    // is correctly returning GROUP_NO_ENFORCEMENT for this case.
-    histograms_.ExpectTotalCount(
-        user_prefs::tracked::kTrackedPrefHistogramWantedResetEncrypted, 1);
-
-    // Verify no actual resets occurred. When the feature flag is off, the
-    // behavior is the same as when the logic was not introduced.
-    histograms_.ExpectTotalCount(
-        user_prefs::tracked::kTrackedPrefHistogramReset, 0);
-    histograms_.ExpectTotalCount(
-        user_prefs::tracked::kTrackedPrefHistogramResetEncrypted, 0);
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-  std::optional<base::AutoReset<bool>> is_enterprise_device_for_testing_;
-};
-
-PREF_HASH_BROWSER_TEST(PrefHashBrowserTestEnterpriseFeatureDisabled,
-                       EnterpriseFeatureDisabled);
-#endif  // BUILDFLAG(IS_WIN)

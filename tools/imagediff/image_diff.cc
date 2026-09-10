@@ -33,10 +33,6 @@
 #include "build/build_config.h"
 #include "tools/imagediff/image_diff_png.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "windows.h"
-#endif
-
 // Causes the app to remain open, waiting for pairs of filenames on stdin.
 // The caller is then responsible for terminating this app.
 static const char kOptionPollStdin[] = "use-stdin";
@@ -498,11 +494,7 @@ int DiffImages(const base::FilePath& file1,
 // program reads paths on stdin and the program that spawns it outputs
 // paths as non-wide strings anyway.
 base::FilePath FilePathFromASCII(const std::string& str) {
-#if BUILDFLAG(IS_WIN)
-  return base::FilePath(base::ASCIIToWide(str));
-#else
   return base::FilePath(str);
-#endif
 }
 
 // Parses a range command line option of the form "x-y", where x and y are both

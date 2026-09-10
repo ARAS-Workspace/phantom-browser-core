@@ -61,12 +61,12 @@
 #include "components/user_manager/user_names.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/web_applications/web_app_utils.h"
 #include "components/policy/core/browser/browser_policy_connector.h"
 #include "components/policy/core/common/mock_configuration_policy_provider.h"
 #include "components/policy/policy_constants.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 namespace {
 constexpr webapps::WebappInstallSource kInstallSource =
@@ -916,7 +916,7 @@ IN_PROC_BROWSER_TEST_P(WebInstallGuestModeTest,
             ukm::SourceIdType::APP_ID);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class WebInstallPolicyDisabledTest
     : public WebInstallCurrentDocumentBrowserTest {
  public:
@@ -1003,7 +1003,7 @@ IN_PROC_BROWSER_TEST_P(WebInstallPolicyDisabledTest,
                                web_app::WebInstallServiceType::kCurrentDocument,
                                1);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // Manifest validation for current document installs.
 // NOTE: Basic manifest validation tests (NoManifest, MissingId) are covered
@@ -1459,9 +1459,9 @@ INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(WebInstallCurrentDocumentBrowserTest);
 INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(
     WebInstallNotSupportedDialogBrowserTest);
 INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(WebInstallGuestModeTest);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(WebInstallPolicyDisabledTest);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(
     WebInstallCurrentDocumentBrowserTestManifestErrors);
 

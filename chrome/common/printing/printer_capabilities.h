@@ -24,10 +24,6 @@ struct PrinterBasicInfo;
 
 extern const char kPrinter[];
 
-#if BUILDFLAG(IS_WIN)
-std::string GetUserFriendlyName(std::string_view printer_name);
-#endif
-
 // Returns a value containing printer capabilities and settings for the device
 // registered as `device_name` in the `PrintBackend`.  The returned value is
 // suitable for passage to the WebUI in JSON.

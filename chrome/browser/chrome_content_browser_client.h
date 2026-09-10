@@ -560,21 +560,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       int child_process_id,
       content::PosixFileDescriptorInfo* mappings) override;
 #endif  // BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_WIN)
-  bool PreSpawnChild(sandbox::TargetConfig* config,
-                     sandbox::mojom::Sandbox sandbox_type,
-                     ChildSpawnFlags flags) override;
-  std::wstring GetAppContainerSidForSandboxType(
-      sandbox::mojom::Sandbox sandbox_type,
-      AppContainerFlags flags) override;
-  bool IsAppContainerDisabled(sandbox::mojom::Sandbox sandbox_type) override;
-  std::wstring GetLPACCapabilityNameForNetworkService() override;
-  bool IsUtilityCetCompatible(const std::string& utility_sub_type) override;
-  void SessionEnding(std::optional<DWORD> control_type) override;
-  bool ShouldEnableAudioProcessHighPriority() override;
-  bool ShouldRestrictCoreSharingOnRenderer() override;
-  std::optional<std::wstring> GetWindowsSecurityAttributeName() const override;
-#endif
   void ExposeInterfacesToRenderer(
       service_manager::BinderRegistry* registry,
       blink::AssociatedInterfaceRegistry* associated_registry,
@@ -1165,11 +1150,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
       content::BrowserContext* browser_context,
       const GURL& destination_url) override;
 
-#if BUILDFLAG(IS_WIN)
-  void OnTracingServiceStarted() override;
-  void OnTracingServiceStopped() override;
-#endif
-
 #if BUILDFLAG(ENABLE_PDF)
   std::optional<network::CrossOriginEmbedderPolicy>
   MaybeOverrideLocalURLCrossOriginEmbedderPolicy(
@@ -1415,10 +1395,6 @@ class ChromeContentBrowserClient : public content::ContentBrowserClient {
   bool is_minimal_mode_ = false;
 
   std::unique_ptr<MainThreadStackSamplingProfiler> sampling_profiler_;
-
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<WindowsSystemTracingClient> windows_system_tracing_client_;
-#endif
 
   base::WeakPtrFactory<ChromeContentBrowserClient> weak_factory_{this};
 };

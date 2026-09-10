@@ -92,12 +92,6 @@ MEDIA_EXPORT extern const char kAlsaOutputDevice[];
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
         // BUILDFLAG(IS_FREEBSD) || BUILDFLAG(IS_SOLARIS)
 
-#if BUILDFLAG(IS_WIN)
-MEDIA_EXPORT extern const char kEnableExclusiveAudio[];
-MEDIA_EXPORT extern const char kForceWaveAudio[];
-MEDIA_EXPORT extern const char kTrySupportedChannelLayouts[];
-MEDIA_EXPORT extern const char kWaveOutBuffers[];
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(USE_CRAS)
 MEDIA_EXPORT extern const char kSystemAecEnabled[];
@@ -321,9 +315,7 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(
     kVideoPipForceTrustedForMediaPlaybackForTesting);
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if !BUILDFLAG(IS_WIN)
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kUseSequencedTaskRunnerForMojoVEAProvider);
-#endif  // !BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
 // Note: please use IsOutOfProcessVideoDecodingEnabled() to determine if OOP-VD
@@ -358,9 +350,9 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(kPlatformEncryptedDolbyVision);
 
 #if BUILDFLAG(ENABLE_PLATFORM_HEVC)
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kPlatformHEVCDecoderSupport);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kPlatformHEVCEncoderSupport);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(IS_APPLE)
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kPlatformHEVCMain10EncoderSupport);
 #endif  // BUILDFLAG(IS_APPLE)
@@ -460,50 +452,13 @@ MEDIA_EXPORT BASE_DECLARE_FEATURE(kMacCatapLoopbackAudioForScreenShare);
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kUseSCContentSharingPicker);
 #endif  // BUILDFLAG(IS_MAC)
 
-#if (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN))
+#if BUILDFLAG(IS_MAC)
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kEnforceSystemEchoCancellation);
 MEDIA_EXPORT extern const base::FeatureParam<bool>
     kEnforceSystemEchoCancellationAllowAgcInTandem;
 MEDIA_EXPORT extern const base::FeatureParam<bool>
     kEnforceSystemEchoCancellationAllowNsInTandem;
-#endif  // (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN))
-
-#if BUILDFLAG(IS_WIN)
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kAllowMediaFoundationFrameServerMode);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kApplicationAudioCaptureWin);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kAudioDuckingWin);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kAudioOffload);
-MEDIA_EXPORT extern const base::FeatureParam<double> kAudioOffloadBufferTimeMs;
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kCastStreamingWinHardwareH264);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kD3D11Vp9kSVCHWDecoding);
-// Enables D3D12 video encode accelerator taking shared image as input.
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kD3D12SharedImageEncode);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kD3D12VideoDecoder);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kD3D12VideoEncodeAccelerator);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kD3D12VideoEncodeAcceleratorL1T3);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(
-    kD3D12VideoEncodeAcceleratorSharedHandleCaching);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kDirectShowGetPhotoState);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kHardwareSecureDecryptionRequireServerCert);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kIncludeIRCamerasInDeviceEnumeration);
-// Enables the batch audio/video buffers reading for media playback.
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaFoundationBatchRead);
-// Specify the batch read count between client renderer and remote renderer,
-// default value is 1.
-MEDIA_EXPORT extern const base::FeatureParam<int> kBatchReadCount;
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaFoundationClearPlayback);
-// For feature check of kMediaFoundationD3D11VideoCapture at runtime,
-// please use IsMediaFoundationD3D11VideoCaptureEnabled() instead.
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaFoundationD3D11VideoCapture);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaFoundationD3D11VideoCaptureZeroCopy);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaFoundationD3DVideoProcessing);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaFoundationMultiGpuAdapterSelection);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaFoundationSharedImageEncode);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaFoundationUseSoftwareRateCtrl);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaFoundationVideoCapture);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kMediaFoundationVideoEncodeAccelerator);
-MEDIA_EXPORT BASE_DECLARE_FEATURE(kProtectedMediaIdentifierIndicator);
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(SYSTEM_LOOPBACK_AS_AEC_REFERENCE)
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kSystemLoopbackAsAecReference);
@@ -598,10 +553,6 @@ MEDIA_EXPORT bool IsMacCatapSystemLoopbackCaptureSupported();
 MEDIA_EXPORT bool IsMacSckSystemLoopbackCaptureSupported();
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-MEDIA_EXPORT bool IsMediaFoundationD3D11VideoCaptureEnabled();
-MEDIA_EXPORT bool IsWindowsProcessLoopbackCaptureSupported();
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(SYSTEM_LOOPBACK_AS_AEC_REFERENCE)
 MEDIA_EXPORT base::TimeDelta GetAecAddedDelay();

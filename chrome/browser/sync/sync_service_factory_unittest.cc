@@ -161,7 +161,7 @@ class SyncServiceFactoryTest : public testing::Test {
 
     datatypes.Put(syncer::SAVED_TAB_GROUP);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
     datatypes.Put(syncer::DICTIONARY);
 #endif
 

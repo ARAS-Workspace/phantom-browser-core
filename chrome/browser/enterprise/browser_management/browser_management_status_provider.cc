@@ -13,9 +13,7 @@
 #include "components/policy/core/common/policy_namespace.h"
 #include "components/policy/core/common/policy_service.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "components/policy/core/common/management/platform_management_status_provider_win.h"
-#elif BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ash/policy/core/browser_policy_connector_ash.h"
 #include "chrome/browser/ash/profiles/profile_helper.h"
 #include "chrome/browser/browser_process_platform_part.h"
@@ -90,10 +88,6 @@ LocalDomainBrowserManagementStatusProvider::FetchAuthority() {
   if (g_browser_process->browser_policy_connector()
           ->HasMachineLevelPolicies()) {
     result = EnterpriseManagementAuthority::COMPUTER_LOCAL;
-#if BUILDFLAG(IS_WIN)
-    if (policy::DomainEnrollmentStatusProvider::IsEnrolledToDomain())
-      result = EnterpriseManagementAuthority::DOMAIN_LOCAL;
-#endif  // BUILDFLAG(IS_WIN)
   }
   return result;
 #endif  // BUILDFLAG(IS_CHROMEOS)

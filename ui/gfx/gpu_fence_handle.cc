@@ -21,11 +21,6 @@
 #endif
 
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/process/process_handle.h"
-#endif
 
 namespace {
 std::atomic<uint32_t> g_num_clones_counter{0};
@@ -41,18 +36,6 @@ gfx::GpuFenceHandle::ScopedPlatformFence PlatformDuplicate(
   g_num_clones_counter++;
 #if BUILDFLAG(IS_POSIX)
   return base::ScopedFD(HANDLE_EINTR(dup(scoped_fence.get())));
-#elif BUILDFLAG(IS_WIN)
-  const base::ProcessHandle process = ::GetCurrentProcess();
-  HANDLE duplicated_handle = INVALID_HANDLE_VALUE;
-  const BOOL result =
-      ::DuplicateHandle(process, scoped_fence.Get(), process,
-                        &duplicated_handle, 0, FALSE, DUPLICATE_SAME_ACCESS);
-  if (!result) {
-    const DWORD last_error = ::GetLastError();
-    base::debug::Alias(&last_error);
-    NOTREACHED();
-  }
-  return base::win::ScopedHandle(duplicated_handle);
 #else
   NOTREACHED();
 #endif
@@ -87,8 +70,6 @@ bool GpuFenceHandle::is_null() const {
 
 #if BUILDFLAG(IS_POSIX)
   return !smart_fence_.get()->scoped_fence_.is_valid();
-#elif BUILDFLAG(IS_WIN)
-  return !smart_fence_.get()->scoped_fence_.is_valid();
 #else
   return true;
 #endif
@@ -104,11 +85,6 @@ GpuFenceHandle::RefCountedScopedFence::~RefCountedScopedFence() = default;
 int GpuFenceHandle::Peek() const {
   return is_null() ? base::ScopedFD().get()
                    : smart_fence_.get()->scoped_fence_.get();
-}
-#elif BUILDFLAG(IS_WIN)
-HANDLE GpuFenceHandle::Peek() const {
-  return is_null() ? INVALID_HANDLE_VALUE
-                   : smart_fence_.get()->scoped_fence_.Get();
 }
 #endif
 

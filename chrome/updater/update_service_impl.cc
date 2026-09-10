@@ -25,10 +25,6 @@
 #include "chrome/updater/util/util.h"
 #include "components/policy/core/common/policy_types.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/updater/util/win_util.h"
-#endif
-
 namespace updater {
 
 UpdateServiceImpl::UpdateServiceImpl(UpdaterScope scope,
@@ -209,11 +205,7 @@ bool UpdateServiceImpl::IsEulaAccepted() {
 }
 
 bool UpdateServiceImpl::IsOemMode() {
-#if BUILDFLAG(IS_WIN)
-  return IsSystemInstall() && IsOemInstalling();
-#else
   return false;
-#endif
 }
 
 UpdateServiceImpl::~UpdateServiceImpl() {

@@ -51,10 +51,6 @@
 #include "ui/gfx/image/image_skia.h"
 #include "ui/gfx/image/image_skia_rep_default.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/gfx/win/icon_util.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/web_applications/os_integration/mac/app_shim_registry.h"
 #endif
@@ -65,18 +61,10 @@ namespace web_app {
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-base::LazyThreadPoolCOMSTATaskRunner g_shortcuts_task_runner =
-    LAZY_COM_STA_TASK_RUNNER_INITIALIZER(
-        base::TaskTraits({base::MayBlock(), base::TaskPriority::USER_VISIBLE,
-                          base::TaskShutdownBehavior::BLOCK_SHUTDOWN}),
-        base::SingleThreadTaskRunnerThreadMode::SHARED);
-#else
 base::LazyThreadPoolSequencedTaskRunner g_shortcuts_task_runner =
     LAZY_THREAD_POOL_SEQUENCED_TASK_RUNNER_INITIALIZER(
         base::TaskTraits({base::MayBlock(), base::TaskPriority::USER_VISIBLE,
                           base::TaskShutdownBehavior::BLOCK_SHUTDOWN}));
-#endif
 
 void CreatePlatformShortcutsAndPostCallback(
     const base::FilePath& shortcut_data_path,
@@ -387,10 +375,7 @@ base::FilePath GetOsIntegrationResourcesDirectoryForApp(
   std::string port(url.has_port() ? url.GetPort() : "80");
   std::string scheme_port(scheme + "_" + port);
 
-#if BUILDFLAG(IS_WIN)
-  base::FilePath::StringType host_path(base::UTF8ToWide(host));
-  base::FilePath::StringType scheme_port_path(base::UTF8ToWide(scheme_port));
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   base::FilePath::StringType host_path(host);
   base::FilePath::StringType scheme_port_path(scheme_port);
 #else
@@ -411,8 +396,6 @@ base::span<const int> GetDesiredIconSizesForShortcut() {
   static constexpr int kDesiredIconSizesForShortcut[] = {16,  32,  48,
                                                          128, 256, 512};
   return kDesiredIconSizesForShortcut;
-#elif BUILDFLAG(IS_WIN)
-  return IconUtil::kIconDimensions;
 #else
   static constexpr int kDesiredIconSizesForShortcut[] = {32};
   return kDesiredIconSizesForShortcut;

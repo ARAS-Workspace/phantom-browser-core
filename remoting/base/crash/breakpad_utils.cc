@@ -20,10 +20,6 @@
 #include "build/build_config.h"
 #include "remoting/base/version.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace remoting {
 
 // This class is allowlisted in thread_restrictions.h.
@@ -33,24 +29,10 @@ class ScopedAllowBlockingForCrashReporting : public base::ScopedAllowBlocking {
 namespace {
 
 const base::BasePathKey kBasePathKey =
-#if BUILDFLAG(IS_WIN)
-    // We can't use %TEMP% for Windows because our processes run as SYSTEM,
-    // Local Service, and the user. SYSTEM processes will write to %WINDIR%\Temp
-    // which we don't want to do and if a crash occurs before login, there isn't
-    // a user temp env var to query. Because of these issues, we store the crash
-    // dumps, which are usually < 100KB, in the install folder so they will get
-    // cleaned up when the user uninstalls or we push an update.
-    base::BasePathKey::DIR_ASSETS;
-#else
     base::BasePathKey::DIR_TEMP;
-#endif
 
 const base::FilePath::CharType kMinidumpsPath[] =
-#if BUILDFLAG(IS_WIN)
-    FILE_PATH_LITERAL("minidumps");
-#else
     FILE_PATH_LITERAL("chromoting/minidumps");
-#endif
 
 const base::FilePath::CharType kTempExtension[] = FILE_PATH_LITERAL("temp");
 const base::FilePath::CharType kJsonExtension[] = FILE_PATH_LITERAL("json");
@@ -62,35 +44,6 @@ const char kBreakpadProcessStartTimeKey[] = "process_start_time";
 const char kBreakpadProcessIdKey[] = "process_id";
 const char kBreakpadProcessNameKey[] = "process_name";
 const char kBreakpadProcessUptimeKey[] = "process_uptime";
-
-#if BUILDFLAG(IS_WIN)
-
-const wchar_t kCrashServerPipeName[] =
-    L"\\\\.\\pipe\\RemotingCrashService\\S-1-5-18";
-
-base::win::ScopedHandle GetClientHandleForCrashServerPipe() {
-  const ACCESS_MASK kPipeAccessMask = FILE_READ_ATTRIBUTES | FILE_READ_DATA |
-                                      FILE_WRITE_ATTRIBUTES | FILE_WRITE_DATA |
-                                      SYNCHRONIZE;
-  const DWORD kPipeFlagsAndAttributes =
-      SECURITY_IDENTIFICATION | SECURITY_SQOS_PRESENT;
-
-  SECURITY_ATTRIBUTES security_attributes = {0};
-  security_attributes.bInheritHandle = true;
-
-  base::win::ScopedHandle handle(
-      CreateFile(kCrashServerPipeName, kPipeAccessMask,
-                 /*dwShareMode=*/0, &security_attributes, OPEN_EXISTING,
-                 kPipeFlagsAndAttributes,
-                 /*hTemplateFile=*/nullptr));
-  if (!handle.get()) {
-    PLOG(ERROR) << "Failed to open named pipe to crash server.";
-  }
-
-  return handle;
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 base::FilePath GetMinidumpDirectoryPath() {
   base::FilePath base_path;

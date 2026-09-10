@@ -22,13 +22,6 @@
 #include "base/posix/eintr_wrapper.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <d3d11_1.h>
-#include "base/strings/stringprintf.h"
-#include "ui/gl/debug_utils.h"
-#include "ui/gl/direct_composition_support.h"
-#endif
-
 namespace gl {
 namespace {
 
@@ -125,45 +118,6 @@ const GlWorkarounds& GetGlWorkarounds() {
 void SetGlWorkarounds(const GlWorkarounds& workarounds) {
   g_workarounds = workarounds;
 }
-
-#if BUILDFLAG(IS_WIN)
-// Labels swapchain buffers with the string name_prefix + _Buffer_ +
-// <buffer_number>
-void LabelSwapChainBuffers(IDXGISwapChain3* swap_chain,
-                           const char* name_prefix) {
-  DXGI_SWAP_CHAIN_DESC1 desc;
-  HRESULT hr = swap_chain->GetDesc1(&desc);
-  if (FAILED(hr)) {
-    DLOG(ERROR) << "Failed to GetDesc1 from swap chain: "
-                << logging::SystemErrorCodeToString(hr);
-    return;
-  }
-  for (unsigned int i = 0; i < desc.BufferCount; i++) {
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> swap_chain_buffer;
-    hr = swap_chain->GetBuffer(i, IID_PPV_ARGS(&swap_chain_buffer));
-    if (FAILED(hr)) {
-      DLOG(ERROR) << "GetBuffer on swap chain buffer " << i
-                  << "failed: " << logging::SystemErrorCodeToString(hr);
-      return;
-    }
-    const std::string buffer_name =
-        base::StringPrintf("%s_Buffer_%d", name_prefix, i);
-    hr = SetDebugName(swap_chain_buffer.Get(), buffer_name.c_str());
-    if (FAILED(hr)) {
-      DLOG(ERROR) << "Failed to label swap chain buffer " << i << ": "
-                  << logging::SystemErrorCodeToString(hr);
-    }
-  }
-}
-
-// Labels swapchain with the name_prefix and its buffers with the string
-// name_prefix + _Buffer_ + <buffer_number>.
-void LabelSwapChainAndBuffers(IDXGISwapChain3* swap_chain,
-                              const char* name_prefix) {
-  SetDebugName(swap_chain, name_prefix);
-  LabelSwapChainBuffers(swap_chain, name_prefix);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 GLDisplay* GetDisplay(GpuPreference gpu_preference) {
   return GetDisplay(gpu_preference, gl::DisplayKey::kDefault);

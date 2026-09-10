@@ -73,10 +73,6 @@
 #include "chrome/browser/ui/download/download_display.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/views/win/hwnd_util.h"
-#endif
-
 namespace extensions {
 namespace {
 
@@ -664,39 +660,6 @@ IN_PROC_BROWSER_TEST_F(BrowserActionInteractiveViewsTest,
   chrome::CloseWindow(browser());
 }
 
-#if BUILDFLAG(IS_WIN)
-// Forcibly closing a browser HWND with a popup should not cause a crash.
-IN_PROC_BROWSER_TEST_F(BrowserActionInteractiveTest, DestroyHWNDDoesNotCrash) {
-  OpenPopupViaAPI(false);
-
-  ToolbarActionViewModel* popup_owner =
-      extensions_container()->popup_owner_for_testing();
-  ASSERT_TRUE(popup_owner);
-  const gfx::NativeView popup_view =
-      popup_owner->GetPopupNativeViewForTesting();
-  EXPECT_NE(gfx::NativeView(), popup_view);
-
-  const HWND popup_hwnd = views::HWNDForNativeView(popup_view);
-  EXPECT_EQ(TRUE, ::IsWindow(popup_hwnd));
-  const HWND browser_hwnd =
-      views::HWNDForNativeView(browser()->GetWindow()->GetNativeWindow());
-  EXPECT_EQ(TRUE, ::IsWindow(browser_hwnd));
-
-  // Create a new browser window to prevent the message loop from terminating.
-  browser()->OpenURL(
-      content::OpenURLParams(GURL("chrome://version"), content::Referrer(),
-                             WindowOpenDisposition::NEW_WINDOW,
-                             ui::PAGE_TRANSITION_TYPED, false),
-      /*navigation_handle_callback=*/{});
-
-  // Forcibly closing the browser HWND should not cause a crash.
-  EXPECT_EQ(TRUE, ::CloseWindow(browser_hwnd));
-  EXPECT_EQ(TRUE, ::DestroyWindow(browser_hwnd));
-  EXPECT_EQ(FALSE, ::IsWindow(browser_hwnd));
-  EXPECT_EQ(FALSE, ::IsWindow(popup_hwnd));
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 class MainFrameSizeWaiter : public content::WebContentsObserver {
  public:
   MainFrameSizeWaiter(content::WebContents* web_contents,
@@ -726,9 +689,7 @@ class MainFrameSizeWaiter : public content::WebContentsObserver {
 };
 
 // TODO(crbug.com/40791502): Test crashes on Windows
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_BrowserActionPopup DISABLED_BrowserActionPopup
-#elif BUILDFLAG(IS_LINUX) && \
+#if BUILDFLAG(IS_LINUX) && \
     (defined(THREAD_SANITIZER) || defined(ADDRESS_SANITIZER))
 // TODO(crbug.com/40803969): Test is flaky for linux tsan and asan builds
 #define MAYBE_BrowserActionPopup DISABLED_BrowserActionPopup

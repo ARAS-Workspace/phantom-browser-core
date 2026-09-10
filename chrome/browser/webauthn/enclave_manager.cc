@@ -795,8 +795,7 @@ base::flat_set<GaiaId> GetGaiaIDs(
 }
 
 std::string UserVerifyingLabelToString(crypto::UserVerifyingKeyLabel label) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   return label;
 #else
   return std::string("placeholder");
@@ -805,8 +804,7 @@ std::string UserVerifyingLabelToString(crypto::UserVerifyingKeyLabel label) {
 
 std::optional<crypto::UserVerifyingKeyLabel> UserVerifyingKeyLabelFromString(
     std::string saved_label) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   return saved_label;
 #else
   return std::nullopt;
@@ -1904,12 +1902,6 @@ class EnclaveManager::StateMachine {
             return;
           }
           if (state_machine->user_->wrapped_uv_private_key().empty()) {
-#if BUILDFLAG(IS_WIN)
-            // On Windows we don't want to create a UV key at registration
-            // time. Instead we defer creation until one is going to be
-            // used in a UV request.
-            state_machine->GenerateIdentityKey(DeferredUVKeyCreation());
-#else
             // Create a new UV key.
             key_provider->GenerateUserVerifyingSigningKey(
                 device::enclave::kSigningAlgorithms,
@@ -1933,7 +1925,6 @@ class EnclaveManager::StateMachine {
                       state_machine->GenerateIdentityKey(std::move(uv_key));
                     },
                     state_machine));
-#endif
             return;
           }
           // Use the existing UV key.
@@ -3619,16 +3610,6 @@ void EnclaveManager::GetUserVerifyingKeyForSignature(
     return;
   }
 
-#if BUILDFLAG(IS_WIN)
-  // On Windows, retrieving the UV key is slow so we cache it. On Mac, we avoid
-  // caching the key as we need to use a fresh LAContext every time we retrieve
-  // the key.
-  if (user_verifying_key_) {
-    std::move(callback).Run(user_verifying_key_);
-    return;
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   auto user_verifying_key_provider =
       GetUserVerifyingKeyProviderForSigning(std::move(options));
   if (!user_verifying_key_provider) {
@@ -3958,11 +3939,6 @@ EnclaveManager::UvKeyState EnclaveManager::uv_key_state(
     }
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (user_->deferred_uv_key_creation()) {
-    return UvKeyState::kUsesSystemUIDeferredCreation;
-  }
-#endif
   if (user_->wrapped_uv_private_key().empty()) {
     return UvKeyState::kNone;
   }

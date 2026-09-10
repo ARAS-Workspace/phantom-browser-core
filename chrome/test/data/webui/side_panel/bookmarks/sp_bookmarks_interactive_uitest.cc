@@ -19,8 +19,7 @@ class SidePanelBookmarksTest : public WebUIMochaFocusTest {
 
 // TODO(crbug.com/40882667): Flaky on Mac, Linux dbg, and Windows. Re-enable
 // this test.
-#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_LINUX) && !defined(NDEBUG)) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_LINUX) && !defined(NDEBUG))
 #define MAYBE_ShoppingList DISABLED_ShoppingList
 #else
 #define MAYBE_ShoppingList ShoppingList
@@ -47,7 +46,7 @@ IN_PROC_BROWSER_TEST_F(SidePanelPowerBookmarksTest,
 }
 
 // TODO(crbug.com/521419448): Flaky on Mac and Windows.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_DragManager DISABLED_DragManager
 #else
 #define MAYBE_DragManager DragManager
@@ -82,7 +81,7 @@ IN_PROC_BROWSER_TEST_F(SidePanelBookmarksAppTest, BookmarksMigrateUiChanges) {
 }
 
 // TODO(crbug.com/493823435) Investigate why this is failing.
-#if BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64))
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_TreeView DISABLED_TreeView
 #else
 #define MAYBE_TreeView TreeView

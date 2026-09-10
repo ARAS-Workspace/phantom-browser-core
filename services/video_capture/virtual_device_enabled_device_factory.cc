@@ -454,13 +454,4 @@ void VirtualDeviceEnabledDeviceFactory::OnDevicesChangedObserverDisconnected(
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-void VirtualDeviceEnabledDeviceFactory::OnGpuInfoUpdate(
-    const CHROME_LUID& luid) {
-  if (device_factory_) {
-    device_factory_->OnGpuInfoUpdate(luid);
-  }
-}
-#endif
-
 }  // namespace video_capture

@@ -18,14 +18,8 @@
 #include "gpu/ipc/service/gpu_ipc_service_export.h"
 #include "ui/gfx/gpu_extra_info.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
-#endif
 
 namespace gfx {
-#if BUILDFLAG(IS_WIN)
-class D3DSharedFence;
-#endif
 
 struct GpuFenceHandle;
 }  // namespace gfx
@@ -59,10 +53,6 @@ class GPU_IPC_SERVICE_EXPORT SharedImageStub {
   const scoped_refptr<gpu::GpuChannelSharedImageInterface>&
   shared_image_interface();
 
-#if BUILDFLAG(IS_WIN)
-  void CopyToGpuMemoryBufferAsync(const Mailbox& mailbox,
-                                  base::OnceCallback<void(bool)> callback);
-#endif
 
 
   void SetGpuExtraInfo(const gfx::GpuExtraInfo& gpu_extra_info);
@@ -95,16 +85,6 @@ class GPU_IPC_SERVICE_EXPORT SharedImageStub {
   void OnDestroySharedImage(const Mailbox& mailbox);
   void OnRegisterSharedImageUploadBuffer(base::ReadOnlySharedMemoryRegion shm);
   void OnCopyToGpuMemoryBuffer(const Mailbox& mailbox);
-#if BUILDFLAG(IS_WIN)
-  void OnRegisterDxgiFence(const Mailbox& mailbox,
-                           gfx::DXGIHandleToken dxgi_token,
-                           gfx::GpuFenceHandle fence_handle);
-  void OnUpdateDxgiFence(const Mailbox& mailbox,
-                         gfx::DXGIHandleToken dxgi_token,
-                         uint64_t fence_value);
-  void OnUnregisterDxgiFence(const Mailbox& mailbox,
-                             gfx::DXGIHandleToken dxgi_token);
-#endif  // BUILDFLAG(IS_WIN)
 
   void OnCreateSharedImagePool(mojom::CreateSharedImagePoolParamsPtr params);
   void OnDestroySharedImagePool(mojom::DestroySharedImagePoolParamsPtr params);
@@ -133,14 +113,6 @@ class GPU_IPC_SERVICE_EXPORT SharedImageStub {
   base::ReadOnlySharedMemoryRegion upload_memory_;
   base::ReadOnlySharedMemoryMapping upload_memory_mapping_;
 
-#if BUILDFLAG(IS_WIN)
-  // Fences held by external processes. Registered and signaled from ipc
-  // channel. Using DXGIHandleToken to identify the fence.
-  using DXGITokenToFenceMap =
-      absl::flat_hash_map<gfx::DXGIHandleToken,
-                          scoped_refptr<gfx::D3DSharedFence>>;
-  absl::flat_hash_map<Mailbox, DXGITokenToFenceMap> registered_dxgi_fences_;
-#endif
 
   base::WeakPtrFactory<SharedImageStub> weak_factory_{this};
 };

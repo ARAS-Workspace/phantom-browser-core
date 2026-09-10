@@ -12,10 +12,6 @@
 #include "build/build_config.h"
 #include "content/common/content_export.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/apple/scoped_nsautorelease_pool.h"
 #include "base/memory/stack_allocated.h"
@@ -43,13 +39,7 @@ struct CONTENT_EXPORT ContentMainParams {
 
   raw_ptr<ContentMainDelegate> delegate;
 
-#if BUILDFLAG(IS_WIN)
-  HINSTANCE instance = nullptr;
-
-  // |sandbox_info| should be initialized using InitializeSandboxInfo from
-  // content_main_win.h
-  raw_ptr<sandbox::SandboxInterfaceInfo> sandbox_info = nullptr;
-#elif !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   int argc = 0;
   raw_ptr<const char*> argv = nullptr;
 #endif
@@ -77,10 +67,7 @@ struct CONTENT_EXPORT ContentMainParams {
   // to launch main multiple times under the same conditions.
   ContentMainParams ShallowCopyForTesting() const {
     ContentMainParams copy(delegate);
-#if BUILDFLAG(IS_WIN)
-    copy.instance = instance;
-    copy.sandbox_info = sandbox_info;
-#elif !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
     copy.argc = argc;
     copy.argv = argv;
 #endif

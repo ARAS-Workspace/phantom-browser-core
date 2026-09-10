@@ -210,15 +210,9 @@ TEST(UrlFormatterTest, FormatUrl) {
        7},
 
       // -------- omit file: --------
-#if BUILDFLAG(IS_WIN)
-      {"omit file on Windows", "file:///C:/Users/homedirname/folder/file.pdf/",
-       kFormatUrlOmitFileScheme, base::UnescapeRule::NORMAL,
-       L"C:/Users/homedirname/folder/file.pdf/", static_cast<size_t>(-1)},
-#else
       {"omit file", "file:///Users/homedirname/folder/file.pdf/",
        kFormatUrlOmitFileScheme, base::UnescapeRule::NORMAL,
        L"/Users/homedirname/folder/file.pdf/", 0},
-#endif
       // -------- omit mailto: --------
       { "omit mailto", "mailto:foo@bar.com",
       kFormatUrlOmitMailToScheme, base::UnescapeRule::NORMAL,
@@ -271,19 +265,11 @@ TEST(UrlFormatterTest, FormatUrl) {
            kFormatUrlOmitTrivialSubdomains | kFormatUrlTrimAfterHost,
        base::UnescapeRule::NORMAL, L"view-source:https://www.google.com/foo",
        20},
-#if BUILDFLAG(IS_WIN)
-      {"view-source should not omit file on Windows",
-       "view-source:file:///C:/Users/homedirname/folder/file.pdf/",
-       kFormatUrlOmitDefaults | kFormatUrlOmitFileScheme,
-       base::UnescapeRule::NORMAL,
-       L"view-source:file:///C:/Users/homedirname/folder/file.pdf/", 19},
-#else
       {"view-source should not omit file",
        "view-source:file:///Users/homedirname/folder/file.pdf/",
        kFormatUrlOmitDefaults | kFormatUrlOmitFileScheme,
        base::UnescapeRule::NORMAL,
        L"view-source:file:///Users/homedirname/folder/file.pdf/", 19},
-#endif
 
       // -------- omit https --------
       {"omit https", "https://www.google.com/", kFormatUrlOmitHTTPS,

@@ -108,7 +108,7 @@ void AsyncPolicyLoader::Reload(bool force) {
 }
 
 bool AsyncPolicyLoader::ShouldFilterSensitivePolicies() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   DCHECK(platform_management_trustworthiness_.has_value());
 
   return *platform_management_trustworthiness_ <

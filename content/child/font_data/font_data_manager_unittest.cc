@@ -261,11 +261,7 @@ using FontDataManagerDeathTest = FontDataManagerUnitTest;
 TEST_F(FontDataManagerUnitTest, PrewarmFamilyCachesTypeface) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitAndEnableFeature(features::kFontDataManagerPrewarming);
-#if BUILDFLAG(IS_WIN)
-  base::cstring_view family_name = "Segoe UI";
-#else
   base::cstring_view family_name = "Arimo";
-#endif
   InitializePrewarmer();
 
   base::RunLoop run_loop;
@@ -283,11 +279,7 @@ TEST_F(FontDataManagerUnitTest, PrewarmFamilyCachesTypeface) {
 TEST_F(FontDataManagerUnitTest, FailedPrewarmDoesNotCacheFailure) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitAndEnableFeature(features::kFontDataManagerPrewarming);
-#if BUILDFLAG(IS_WIN)
-  base::cstring_view family_name = "Segoe UI";
-#else
   base::cstring_view family_name = "Arimo";
-#endif
   InitializePrewarmer();
   test_font_data_service_app_.set_fail_match_family(true);
 
@@ -316,11 +308,7 @@ TEST_F(FontDataManagerDeathTest, PrewarmingRequiresEnabledFeature) {
 
 TEST_F(FontDataManagerUnitTest, MatchFamilyStyle) {
   SkFontStyle style(400, 5, SkFontStyle::kUpright_Slant);
-#if BUILDFLAG(IS_WIN)
-  base::cstring_view family_name = "Segoe UI";
-#else
   base::cstring_view family_name = "Arimo";
-#endif
   sk_sp<SkTypeface> expected_typeface =
       skia::MakeTypefaceFromName(family_name.data(), style);
 
@@ -349,11 +337,7 @@ TEST_F(FontDataManagerUnitTest, MatchFamilyStyle) {
   EXPECT_EQ(test_font_data_service_app_.match_family_call_count(), 2u);
 
   // Test with a different family name and legacy method.
-#if BUILDFLAG(IS_WIN)
-  family_name = "Arial";
-#else
   family_name = "Tinos";
-#endif
   result = skia_font_manager_->legacyMakeTypeface(family_name.data(), style);
   result->getFamilyName(&result_family_name);
   EXPECT_STREQ(result_family_name.c_str(), family_name.data());
@@ -381,11 +365,7 @@ TEST_F(FontDataManagerUnitTest, LegacyMakeTypefaceNullFamilyName) {
 TEST_F(FontDataManagerUnitTest, MatchFamilyStyleWithMemoryRegion) {
   test_font_data_service_app_.set_use_memory_fallback(true);
   SkFontStyle style(400, 5, SkFontStyle::kUpright_Slant);
-#if BUILDFLAG(IS_WIN)
-  base::cstring_view family_name = "Segoe UI";
-#else
   base::cstring_view family_name = "Arimo";
-#endif
   sk_sp<SkTypeface> expected_typeface =
       skia::MakeTypefaceFromName(family_name.data(), style);
 
@@ -401,33 +381,10 @@ TEST_F(FontDataManagerUnitTest, MatchFamilyStyleWithMemoryRegion) {
 
 // TODO(crbug.com/462090356): Find an available font in Linux/ChromeOS with
 // multiples axes.
-#if BUILDFLAG(IS_WIN)
-TEST_F(FontDataManagerUnitTest, FontArgumentTest) {
-  // Bahnschrift is a font family with 2 axes hence coordinate count should
-  // be 2.
-  SkFourByteTag axis =
-      SkSetFourByteTag('w', 'g', 'h', 't');  // Tag for "Weight"
-  int font_weight = 400;
-  auto font_manager = sk_make_sp<TestFontDataManager>(2, 0, axis, font_weight);
-  font_manager->SetFontServiceForTesting(
-      test_font_data_service_app_.CreateRemote());
-  base::cstring_view family_name = "Bahnschrift";
-  SkString result_family_name;
-  sk_sp<SkTypeface> result = font_manager->matchFamilyStyle(
-      family_name.data(), {font_weight, 5, SkFontStyle::kUpright_Slant});
-  result->getFamilyName(&result_family_name);
-  EXPECT_STREQ(result_family_name.c_str(), family_name.data());
-  EXPECT_EQ(test_font_data_service_app_.match_family_call_count(), 1u);
-}
-#endif
 
 TEST_F(FontDataManagerUnitTest, MakeFromData) {
   SkFontStyle style(400, 5, SkFontStyle::kUpright_Slant);
-#if BUILDFLAG(IS_WIN)
-  base::cstring_view family_name = "Segoe UI";
-#else
   base::cstring_view family_name = "Arimo";
-#endif
   int ttc_index = 0;
   sk_sp<SkTypeface> typeface =
       skia::MakeTypefaceFromName(family_name.data(), style);
@@ -443,11 +400,7 @@ TEST_F(FontDataManagerUnitTest, MakeFromData) {
 TEST_F(FontDataManagerUnitTest, MatchFamilyStyleCharacter) {
   SkFontStyle style(400, 5, SkFontStyle::kUpright_Slant);
   SkUnichar uni_char = 0x0041;  // 'A'
-#if BUILDFLAG(IS_WIN)
-  base::cstring_view family_name = "Segoe UI";
-#else
   base::cstring_view family_name = "Arimo";
-#endif
   sk_sp<SkTypeface> expected_typeface =
       skia::MakeTypefaceFromName(family_name.data(), style);
 

@@ -136,10 +136,6 @@ class PartnerBookmarksReader;
 class Profile;
 class ProfileImpl;
 class ScopedAllowBlockingForProfile;
-#if BUILDFLAG(IS_WIN)
-class ProfileLoadTracker;
-class ScopedAllowBlockingForMediaFoundation;
-#endif
 class StartupTabProviderImpl;
 class WebEngineBrowserMainParts;
 struct StartupProfilePathInfo;
@@ -594,10 +590,6 @@ class BASE_EXPORT ScopedAllowBlocking {
   friend class ::GaiaConfig;
   friend class ::ProfileImpl;
   friend class ::ScopedAllowBlockingForProfile;
-#if BUILDFLAG(IS_WIN)
-  friend class ::ProfileLoadTracker;
-  friend class ::ScopedAllowBlockingForMediaFoundation;
-#endif
   friend class ::StartupTabProviderImpl;
   friend class ::WebEngineBrowserMainParts;
   friend class android_webview::AwBrowserContext;
@@ -666,12 +658,6 @@ class BASE_EXPORT ScopedAllowBlocking {
   friend class ui::SelectFileDialogLinux;
 #if BUILDFLAG(IS_MAC)
   friend class printing::PrintBackendServiceImpl;
-#endif
-#if BUILDFLAG(IS_WIN)
-  friend class base::win::OSInfo;
-  friend class content::SlowWebPreferenceCache;  // http://crbug.com/1262162
-  friend class media::GpuMojoMediaClientWin;     // https://crbug.com/360642944
-  friend class gfx::WUCBackdrop;
 #endif
 #if BUILDFLAG(IS_IOS)
   friend class ::ProfileIOSDirectoryBuilder;

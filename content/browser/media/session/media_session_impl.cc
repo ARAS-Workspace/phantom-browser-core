@@ -1114,7 +1114,7 @@ MediaSessionImpl::GetMediaSessionInfoSync() {
   if (is_ducking_)
     info->state = MediaSessionInfo::SessionState::kDucking;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // If this is a web app, mark this session so the browser won't
   // consider it when deciding which media session is "active". Needed because
   // the browser uses an ActiveMediaSessionController which automatically
@@ -1125,7 +1125,7 @@ MediaSessionImpl::GetMediaSessionInfoSync() {
       web_contents_delegate->ShouldUseInstancedSystemMediaControls();
 #else
   info->ignore_for_active_session = false;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
   if (always_ignore_for_active_session_for_testing_) {
     info->ignore_for_active_session = true;

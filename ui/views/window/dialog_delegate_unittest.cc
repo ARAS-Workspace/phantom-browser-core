@@ -350,16 +350,8 @@ TEST_F(DialogTest, HitTest_CloseButton) {
   frame->ResetWindowControls();
 
   const gfx::Rect close_button_bounds = frame->close_button()->bounds();
-#if BUILDFLAG(IS_WIN)
-  // On Win, a native tooltip is generated when HTCLOSE is returned.
-  // Since we are using views tooltip, do not return |HTCLOSE| to avoid double
-  // tooltips.
-  EXPECT_NE(HTCLOSE,
-            frame->NonClientHitTest(close_button_bounds.CenterPoint()));
-#else
   EXPECT_EQ(HTCLOSE,
             frame->NonClientHitTest(close_button_bounds.CenterPoint()));
-#endif
 }
 
 TEST_F(DialogTest, BoundsAccommodateTitle) {

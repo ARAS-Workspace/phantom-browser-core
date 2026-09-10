@@ -1177,7 +1177,7 @@ void RTCVideoEncoder::Impl::Enqueue(FrameChunk frame_chunk) {
 // On Windows and Android it is possible that RtcVideoEncoder is configured to
 // only accept native inputs, but the incoming frame is not backed by
 // GpuMemoryBuffer and is not a black frame.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   {
     // Check if the incoming frame is backed by owned or unowned memory type.
     // This could happen when: 1. Zero-copy capture feature is turned on but

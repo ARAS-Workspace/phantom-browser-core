@@ -76,10 +76,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#elif BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "chrome/test/chromedriver/keycode_text_conversion.h"
 #endif
 
 namespace {
@@ -516,21 +512,14 @@ Status LaunchDesktopChrome(network::mojom::URLLoaderFactory* factory,
 
   base::LaunchOptions options;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   // If minidump path is set in the capability, enable minidump for crashes.
   if (!capabilities.minidump_path.empty()) {
     VLOG(0) << "Minidump generation specified. Will save dumps to: "
             << capabilities.minidump_path;
 
-#if BUILDFLAG(IS_WIN)
-    // EnvironmentMap uses wide string
-    options.environment[L"CHROME_HEADLESS"] = L"1";
-    options.environment[L"BREAKPAD_DUMP_LOCATION"] =
-        base::SysUTF8ToWide(capabilities.minidump_path);
-#else
     options.environment["CHROME_HEADLESS"] = "1";
     options.environment["BREAKPAD_DUMP_LOCATION"] = capabilities.minidump_path;
-#endif
 
     if (!command.HasSwitch(kEnableCrashReport))
       command.AppendSwitch(kEnableCrashReport);
@@ -540,14 +529,12 @@ Status LaunchDesktopChrome(network::mojom::URLLoaderFactory* factory,
   // We need to allow new privileges so that chrome's setuid sandbox can run.
   options.allow_new_privs = true;
 #endif
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
+#endif  // BUILDFLAG(IS_POSIX)
 
-#if !BUILDFLAG(IS_WIN)
   if (!capabilities.log_path.empty())
     options.environment["CHROME_LOG_FILE"] = capabilities.log_path;
   if (capabilities.detach)
     options.new_process_group = true;
-#endif
 
   PipeBuilder pipe_builder;
   if (command.HasSwitch("remote-debugging-pipe")) {
@@ -571,21 +558,6 @@ Status LaunchDesktopChrome(network::mojom::URLLoaderFactory* factory,
       return Status(kSessionNotCreated, "couldn't open /dev/null");
     options.fds_to_remap.emplace_back(devnull.get(), STDERR_FILENO);
   }
-#elif BUILDFLAG(IS_WIN)
-  if (enable_chrome_logs) {
-    // On Windows, we must inherit the stdout/stderr handles, or the output from
-    // the browser will not be part of our output and thus not capturable by
-    // processes that call us.
-    options.stdin_handle = INVALID_HANDLE_VALUE;
-    options.stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    options.stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
-    options.handles_to_inherit.push_back(options.stdout_handle);
-    options.handles_to_inherit.push_back(options.stderr_handle);
-  }
-
-  if (!SwitchToUSKeyboardLayout())
-    VLOG(0) << "Cannot switch to US keyboard layout - some keys may be "
-        "interpreted incorrectly";
 #endif
 
 #if BUILDFLAG(IS_MAC)
@@ -597,11 +569,7 @@ Status LaunchDesktopChrome(network::mojom::URLLoaderFactory* factory,
 #endif  // BUILDFLAG(CHROMEDRIVER_DISCLAIM_RESPONSIBILITY)
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-  std::string command_string = base::WideToUTF8(command.GetCommandLineString());
-#else
   std::string command_string = command.GetCommandLineString();
-#endif
   VLOG(0) << "Launching " << base::ToLowerASCII(kBrowserShortName) << ": "
           << command_string;
   base::Process process = base::LaunchProcess(command, options);
@@ -713,11 +681,7 @@ Status LaunchDesktopChrome(network::mojom::URLLoaderFactory* factory,
   }
 
   if (chrome_status != base::TERMINATION_STATUS_STILL_RUNNING) {
-#if BUILDFLAG(IS_WIN)
-    const int chrome_exit_code = exit_code;
-#else
     const int chrome_exit_code = WEXITSTATUS(exit_code);
-#endif
     if (chrome_exit_code == CHROME_RESULT_CODE_NORMAL_EXIT_PROCESS_NOTIFIED ||
         chrome_exit_code == content::RESULT_CODE_NORMAL_EXIT) {
       return Status(kSessionNotCreated,
@@ -837,11 +801,7 @@ Status LaunchAndroidChrome(network::mojom::URLLoaderFactory* factory,
       return Status(kInvalidArgument, "user data dir can not be empty");
     }
 
-#if BUILDFLAG(IS_WIN)
-    user_data_dir = base::WideToUTF8(user_data_dir_value);
-#else
     user_data_dir = user_data_dir_value;
-#endif
   } else if (capabilities.prefs.get() || capabilities.local_state.get()) {
     user_data_dir = base::StringPrintf(
         kTempAndroidUserDataDirFormat, capabilities.android_package.c_str(),
@@ -921,12 +881,6 @@ Status LaunchReplayChrome(network::mojom::URLLoaderFactory* factory,
       return WrapStatusIfNeeded(status, kSessionNotCreated);
     }
   }
-
-#if BUILDFLAG(IS_WIN)
-  if (!SwitchToUSKeyboardLayout())
-    VLOG(0) << "Cannot switch to US keyboard layout - some keys may be "
-               "interpreted incorrectly";
-#endif
 
   std::unique_ptr<DevToolsHttpClient> devtools_http_client;
   bool retry = true;
@@ -1357,10 +1311,6 @@ std::string GetTerminationReason(base::TerminationStatus status) {
       return "crashed";
     case base::TERMINATION_STATUS_LAUNCH_FAILED:
       return "failed to launch";
-#if BUILDFLAG(IS_WIN)
-    case base::TERMINATION_STATUS_INTEGRITY_FAILURE:
-      return "integrity failure";
-#endif
     case base::TERMINATION_STATUS_EVICTED_FOR_MEMORY:
       return "evicted for memory";
     case base::TERMINATION_STATUS_MAX_ENUM:

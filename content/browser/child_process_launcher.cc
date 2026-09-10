@@ -132,9 +132,6 @@ ChildProcessLauncher::ChildProcessLauncher(
   TRACE_EVENT_BEGIN("startup", "ChildProcessLauncher",
                     CreateTracingTrackUnderChildProcess(
                         child_process_id, "ChildProcessLauncher"));
-#if BUILDFLAG(IS_WIN)
-  should_launch_elevated_ = delegate->ShouldLaunchElevated();
-#endif
 
   helper_ = base::MakeRefCounted<ChildProcessLauncherHelper>(
       child_process_id, std::move(command_line), std::move(delegate),
@@ -184,9 +181,6 @@ void ChildProcessLauncher::SetProcessPriority(
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 void ChildProcessLauncher::Notify(ChildProcessLauncherHelper::Process process,
-#if BUILDFLAG(IS_WIN)
-                                  DWORD last_error,
-#endif
                                   int error_code) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   // Corresponds to the TRACE_EVENT_BEGIN in ChildProcessLauncher.
@@ -217,9 +211,6 @@ void ChildProcessLauncher::Notify(ChildProcessLauncherHelper::Process process,
   } else {
     termination_info_.status = base::TERMINATION_STATUS_LAUNCH_FAILED;
     termination_info_.exit_code = error_code;
-#if BUILDFLAG(IS_WIN)
-    termination_info_.last_error = last_error;
-#endif
 
     // NOTE: May delete |this|.
     client_->OnProcessLaunchFailed(error_code);

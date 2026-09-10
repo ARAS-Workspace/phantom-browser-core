@@ -155,11 +155,7 @@ class VectorIconGallery : public View, public TextfieldController {
 
  private:
   void FileGoButtonPressed() {
-#if BUILDFLAG(IS_WIN)
-    base::FilePath path(base::UTF16ToWide(file_chooser_combobox_->GetText()));
-#else
     base::FilePath path(base::UTF16ToUTF8(file_chooser_combobox_->GetText()));
-#endif
 
     // If there is an extension, then it would not be a folder.
     if (path.Extension().size() == 0) {

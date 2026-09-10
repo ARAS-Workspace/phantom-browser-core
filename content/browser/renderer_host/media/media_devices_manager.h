@@ -55,7 +55,7 @@ using MediaDeviceEnumeration =
     std::array<blink::WebMediaDeviceInfoArray,
                static_cast<size_t>(MediaDeviceType::kNumMediaDeviceTypes)>;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 BASE_DECLARE_FEATURE(kReleaseVideoSourceProviderIfNotInUse);
 #endif
 
@@ -262,7 +262,7 @@ class CONTENT_EXPORT MediaDevicesManager
     get_salt_and_origin_cb_ = std::move(callback);
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   void UpdateVideoCaptureHostsEmptyState(bool empty);
 #endif
 
@@ -470,7 +470,7 @@ class CONTENT_EXPORT MediaDevicesManager
                           bool has_permission,
                           const MediaDeviceEnumeration& enumeration);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   void RegisterVideoCaptureDevicesChangedObserver();
   void OnDisconnectVideoSourceProviderTimer();
   void MaybeScheduleDisconnectVideoSourceProviderTimer();

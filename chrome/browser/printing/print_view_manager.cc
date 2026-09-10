@@ -43,10 +43,6 @@
 #include "chrome/browser/printing/oop_features.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/printing/print_job_manager.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/chromeos/policy/dlp/dlp_content_manager.h"
 #endif
@@ -240,17 +236,10 @@ void PrintViewManager::PrintPreviewDone() {
     return;
 
 // Send OnPrintPreviewDialogClosed message for 'afterprint' event.
-#if BUILDFLAG(IS_WIN)
-  // On Windows, we always send OnPrintPreviewDialogClosed. It's ok to dispatch
-  // 'afterprint' at this timing because system dialog printing on
-  // Windows doesn't need the original frame.
-  bool send_message = true;
-#else
   // On non-Windows, we don't need to send OnPrintPreviewDialogClosed when we
   // are switching to system dialog. PrintRenderFrameHelper is responsible to
   // dispatch 'afterprint' event.
   bool send_message = !is_switching_to_system_dialog_;
-#endif
   if (send_message) {
     // Only send a message about having closed if the RenderFrame is live and
     // PrintRenderFrame is connected. Normally IsPrintRenderFrameConnected()
@@ -451,28 +440,6 @@ void PrintViewManager::GetPrintPreviewParams(
           *print_settings);
     }
   }
-
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/40260379):  Remove this if the printable areas can be made
-  // fully available from `PrintBackend::GetPrinterSemanticCapsAndDefaults()`
-  // for in-browser queries.
-  if (printer_type == mojom::PrinterType::kLocal) {
-    // Without a document cookie to find a previous query, must generate a
-    // fresh printer query each time, even if the paper size didn't change.
-    std::unique_ptr<PrinterQuery> printer_query =
-        queue()->CreatePrinterQuery(CurrentTargetFrame().GetGlobalId());
-
-    auto* printer_query_ptr = printer_query.get();
-    auto* print_settings_ptr = print_settings.get();
-    printer_query_ptr->UpdatePrintableArea(
-        print_settings_ptr,
-        base::BindOnce(&PrintViewManager::OnDidUpdatePrintableArea,
-                       weak_factory_.GetWeakPtr(), std::move(printer_query),
-                       std::move(job_settings), std::move(print_settings),
-                       std::move(callback)));
-    return;
-  }
-#endif
 
   CompleteGetPrintPreviewParams(std::move(job_settings),
                                 std::move(print_settings), std::move(callback));
@@ -688,28 +655,6 @@ void PrintViewManager::SetPrintPreviewRenderFrameHost(
 void PrintViewManager::PrintForSystemDialogImpl() {
   GetPrintRenderFrame(print_preview_rfh_)->PrintForSystemDialog();
 }
-
-#if BUILDFLAG(IS_WIN)
-void PrintViewManager::OnDidUpdatePrintableArea(
-    std::unique_ptr<PrinterQuery> printer_query,
-    base::DictValue job_settings,
-    std::unique_ptr<PrintSettings> print_settings,
-    GetPrintPreviewParamsCallback callback,
-    bool success) {
-  if (!success) {
-    PRINTER_LOG(ERROR) << "Unable to update printable area for "
-                       << base::UTF16ToUTF8(print_settings->device_name())
-                       << " (paper vendor id "
-                       << print_settings->requested_media().vendor_id << ")";
-    std::move(callback).Run(nullptr);
-    return;
-  }
-  PRINTER_LOG(EVENT) << "Paper printable area updated for vendor id "
-                     << print_settings->requested_media().vendor_id;
-  CompleteGetPrintPreviewParams(std::move(job_settings),
-                                std::move(print_settings), std::move(callback));
-}
-#endif
 
 void PrintViewManager::CompleteGetPrintPreviewParams(
     base::DictValue job_settings,

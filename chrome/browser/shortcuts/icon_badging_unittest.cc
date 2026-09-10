@@ -93,12 +93,7 @@ void WriteTestIconsToDiskOrDie(const gfx::ImageFamily& family) {
 
     std::string width = base::ToString(image.Width());
     base::FilePath out_filename;
-#if BUILDFLAG(IS_WIN)
-    std::wstring width_str(width.begin(), width.end());
-    out_filename = shortcuts_path.Append(width_str);
-#else
     out_filename = shortcuts_path.Append(width);
-#endif  // BUILDFLAG(IS_WIN)
 
     out_filename = out_filename.AddExtension(FILE_PATH_LITERAL(".png"));
     const bool success = base::WriteFile(out_filename, png_output.value());
@@ -112,8 +107,6 @@ int GetOsSpecificSizes() {
   return 5;
 #elif BUILDFLAG(IS_LINUX)
   return 2;
-#elif BUILDFLAG(IS_WIN)
-  return 4;
 #endif
 }
 
@@ -152,12 +145,7 @@ TEST(IconBadgingTest, VerifyFromDisk) {
     base::FilePath icon_path_relative =
         base::FilePath(FILE_PATH_LITERAL("shortcuts/badging_icons"))
             .Append(GetCompileTimeTestFolders());
-#if BUILDFLAG(IS_WIN)
-    std::wstring width_str(width.begin(), width.end());
-    icon_path_relative = icon_path_relative.Append(width_str);
-#else
     icon_path_relative = icon_path_relative.Append(width);
-#endif  // BUILDFLAG(IS_WIN)
 
     icon_path_relative =
         icon_path_relative.AddExtension(FILE_PATH_LITERAL(".png"));

@@ -112,12 +112,7 @@
 #include "device/fido/cros/authenticator.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "device/fido/win/authenticator.h"
-#include "device/fido/win/webauthn_api.h"
-#endif
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 #include "content/browser/webauth/is_uvpaa.h"
 #endif
 
@@ -400,24 +395,6 @@ std::optional<device::CredProtectRequest> ProtectionPolicyToCredProtect(
               device::UserVerificationRequirement::kPreferred) {
         return device::CredProtectRequest::kUVRequired;
       }
-#if BUILDFLAG(IS_WIN)
-      // On Windows, if webauthn.dll is version two or below, rk=preferred
-      // cannot be expressed and will be mapped to rk=false. Some security keys
-      // have a bug where they'll return credProtect=1 when credProtect=2 is
-      // requested for non-discoverable credentials. Thus, for these versions
-      // of webauthn.dll, treat rk=preferred as rk=discouraged for the purposes
-      // of credProtect, because that's what will ultimately be sent to the
-      // security key.
-      //
-      // If a site explicitly requests a credProtect level, we'll still respect
-      // that because they are presumably going to check the response.
-      if (make_credential_options.resident_key ==
-              device::ResidentKeyRequirement::kPreferred &&
-          device::WinWebAuthnApi::GetDefault() &&
-          device::WinWebAuthnApi::GetDefault()->Version() < 3) {
-        return std::nullopt;
-      }
-#endif
       if (make_credential_options.resident_key !=
           device::ResidentKeyRequirement::kDiscouraged) {
         // Otherwise, kUVOrCredIDRequired is made the default unless
@@ -2118,7 +2095,7 @@ void AuthenticatorCommonImpl::ContinueIsUvpaaAfterOverrideCheck(
 #if BUILDFLAG(IS_MAC)
   IsUVPlatformAuthenticatorAvailable(GetBrowserContext(),
                                      std::move(uma_decorated_callback));
-#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#elif BUILDFLAG(IS_CHROMEOS)
   IsUVPlatformAuthenticatorAvailable(std::move(uma_decorated_callback));
 #else
   std::move(uma_decorated_callback).Run(false);
@@ -2240,12 +2217,6 @@ void AuthenticatorCommonImpl::ContinueReportAfterRpIdCheck(
         req_state_->caller_origin, req_state_->relying_party_id,
         options->all_accepted_credentials->user_id,
         options->all_accepted_credentials->all_accepted_credentials_ids);
-#if BUILDFLAG(IS_WIN)
-    device::WinWebAuthnApiAuthenticator::SignalAllAcceptedCredentials(
-        device::WinWebAuthnApi::GetDefault(), req_state_->relying_party_id,
-        options->all_accepted_credentials->user_id,
-        options->all_accepted_credentials->all_accepted_credentials_ids);
-#endif  // BUILDFLAG(IS_WIN)
   } else if (options->current_user_details) {
     UpdateVirtualAuthenticatorUserCreds(
         render_frame_host, req_state_->relying_party_id,
@@ -2259,11 +2230,6 @@ void AuthenticatorCommonImpl::ContinueReportAfterRpIdCheck(
         options->current_user_details->name,
         options->current_user_details->display_name);
   } else if (options->unknown_credential_id) {
-#if BUILDFLAG(IS_WIN)
-    device::WinWebAuthnApiAuthenticator::SignalUnknownCredential(
-        device::WinWebAuthnApi::GetDefault(), *options->unknown_credential_id,
-        req_state_->relying_party_id);
-#endif  // BUILDFLAG(IS_WIN)
     DeleteVirtualAuthenticatorCreds(render_frame_host,
                                     *options->unknown_credential_id,
                                     req_state_->relying_party_id);

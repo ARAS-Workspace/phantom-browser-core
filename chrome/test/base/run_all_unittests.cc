@@ -16,13 +16,10 @@
 #include "content/public/test/unittest_test_suite.h"
 #include "mojo/core/embedder/scoped_ipc_support.h"
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) &&               \
-    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) ||         \
-     (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) && \
-      !BUILDFLAG(IS_CHROMEOS)))
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) &&                                    \
+    (BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) && \
+                           !BUILDFLAG(IS_CHROMEOS)))
 #include "chrome/test/base/scoped_channel_override.h"
-#elif BUILDFLAG(IS_WIN)
-#include "chrome/install_static/test/scoped_install_details.h"
 #endif
 
 namespace {
@@ -61,18 +58,13 @@ int main(int argc, char** argv) {
       test_io_thread.task_runner(),
       mojo::core::ScopedIPCSupport::ShutdownPolicy::FAST);
 
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING) &&               \
-    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) ||         \
-     (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) && \
-      !BUILDFLAG(IS_CHROMEOS)))
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) &&                                    \
+    (BUILDFLAG(IS_MAC) || (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID) && \
+                           !BUILDFLAG(IS_CHROMEOS)))
   // Tests running in Google Chrome builds on Win/Mac/Lin should present
   // as stable channel by default.
   chrome::ScopedChannelOverride scoped_channel_override(
       chrome::ScopedChannelOverride::Channel::kStable);
-#elif BUILDFLAG(IS_WIN)
-  // Tests running in Chromium builds on Windows need basic InstallDetails even
-  // though there are no channels.
-  install_static::ScopedInstallDetails scoped_install_details;
 #endif
 
   return base::LaunchUnitTests(argc, argv,

@@ -15,7 +15,7 @@ namespace features {
 COMPONENTS_DOWNLOAD_EXPORT BASE_DECLARE_FEATURE(kParallelDownloading);
 
 // Whether we allow the download job resume in a backoff.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 COMPONENTS_DOWNLOAD_EXPORT BASE_DECLARE_FEATURE(kBackoffInDownloading);
 #endif
 COMPONENTS_DOWNLOAD_EXPORT bool IsBackoffInDownloadingEnabled();

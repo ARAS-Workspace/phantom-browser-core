@@ -31,10 +31,6 @@
 #include "third_party/blink/public/common/chrome_debug_urls.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/debug/invalid_access_win.h"
-#endif
-
 namespace content {
 
 class ScopedAllowWaitForDebugURL {
@@ -43,12 +39,6 @@ class ScopedAllowWaitForDebugURL {
 };
 
 namespace {
-
-#if BUILDFLAG(IS_WIN)
-const char kAsanCrashDomain[] = "crash";
-const char kAsanCorruptHeapBlock[] = "/browser-corrupt-heap-block";
-const char kAsanCorruptHeap[] = "/browser-corrupt-heap";
-#endif
 
 std::optional<viz::mojom::MemoryInvalidAccessType> MapCrashTypeToMojom(
     const std::string& crash_type) {
@@ -97,16 +87,6 @@ bool IsAsanDebugURL(const GURL& url) {
     return false;
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (!(url.is_valid() && url.SchemeIs(kChromeUIScheme) &&
-        url.DomainIs(kAsanCrashDomain) && url.has_path())) {
-    return false;
-  }
-  if (url.path() == kAsanCorruptHeapBlock || url.path() == kAsanCorruptHeap) {
-    return true;
-  }
-#endif
-
   return false;
 }
 
@@ -140,16 +120,6 @@ void HandleAsanDebugURL(const GURL& url) {
   }
 
 #if defined(ADDRESS_SANITIZER) || BUILDFLAG(IS_HWASAN)
-#if BUILDFLAG(IS_WIN)
-  if (url.path() == kAsanCorruptHeapBlock) {
-    base::debug::AsanCorruptHeapBlock();
-    return;
-  }
-  if (url.path() == kAsanCorruptHeap) {
-    base::debug::AsanCorruptHeap();
-    return;
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
 #endif
 }
@@ -183,9 +153,6 @@ bool IsDebugURL(const GURL& url) {
 
   if (url == blink::kChromeUIBrowserCrashURL ||
       url == blink::kChromeUIBrowserDcheckURL ||
-#if BUILDFLAG(IS_WIN)
-      url == blink::kChromeUIBrowserHeapCorruptionURL ||
-#endif
       url == blink::kChromeUIBrowserUIHang ||
       url == blink::kChromeUIDelayedBrowserUIHang ||
       url == blink::kChromeUIGpuCleanURL ||
@@ -234,12 +201,6 @@ void HandleDebugURL(const GURL& url,
     DCHECK(false);
     return;
   }
-#if BUILDFLAG(IS_WIN)
-  if (url == blink::kChromeUIBrowserHeapCorruptionURL) {
-    // Induce an intentional heap corruption in the browser process.
-    base::debug::win::TerminateWithHeapCorruption();
-  }
-#endif
   if (url == blink::kChromeUIBrowserUIHang) {
     HangCurrentThread();
     return;

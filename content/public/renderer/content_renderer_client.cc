@@ -25,10 +25,7 @@ namespace content {
 
 void ContentRendererClient::SetUpWebAssemblyTrapHandler() {
   constexpr bool use_v8_trap_handler =
-#if BUILDFLAG(IS_WIN)
-      // On Windows we use the default trap handler provided by V8.
-      true
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
       // On macOS, Crashpad uses exception ports to handle signals in a
       // different process. As we cannot just pass a callback to this other
       // process, we ask V8 to install its own signal handler to deal with

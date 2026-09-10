@@ -38,17 +38,6 @@
 #include "ui/views/widget/widget.h"
 #include "ui/views/widget/widget_delegate.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/shell_integration_win.h"
-#include "chrome/browser/ui/browser.h"
-#include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
-#include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
-#include "content/public/browser/web_contents.h"
-#include "ui/base/win/shell.h"
-#include "ui/views/win/hwnd_util.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ash/shell.h"
 #endif
@@ -336,9 +325,6 @@ class ScreenCaptureNotificationUIImpl : public ScreenCaptureNotificationUI {
 
  private:
   // Helper to set window id to parent browser window id for task bar grouping.
-#if BUILDFLAG(IS_WIN)
-  void SetWindowsAppId(views::Widget* widget);
-#endif
 
   std::u16string text_;
   base::WeakPtr<content::WebContents> capturing_web_contents_;
@@ -407,10 +393,6 @@ gfx::NativeViewId ScreenCaptureNotificationUIImpl::OnStarted(
                    size.width(), size.height());
   widget_->SetBounds(bounds);
 
-#if BUILDFLAG(IS_WIN)
-  SetWindowsAppId(widget_.get());
-#endif
-
   if (media_ids.empty() ||
       media_ids.front().type == DesktopMediaID::Type::TYPE_SCREEN) {
     // Focus the notification widget if sharing a screen.
@@ -425,34 +407,6 @@ gfx::NativeViewId ScreenCaptureNotificationUIImpl::OnStarted(
 
   return 0;
 }
-
-#if BUILDFLAG(IS_WIN)
-void ScreenCaptureNotificationUIImpl::SetWindowsAppId(views::Widget* widget) {
-  if (!capturing_web_contents_) {
-    return;
-  }
-  BrowserWindowInterface* browser =
-      GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
-          capturing_web_contents_.get());
-  // Can be nullptr from extension background page call.
-  if (!browser) {
-    return;
-  }
-  Browser* raw_browser = browser->GetBrowserForMigrationOnly();
-  const base::FilePath profile_path = browser->GetProfile()->GetPath();
-  std::wstring app_user_model_id =
-      browser->GetType() == BrowserWindowInterface::Type::TYPE_APP
-          ? shell_integration::win::GetAppUserModelIdForApp(
-                base::UTF8ToWide(BrowserInitState::From(raw_browser)
-                                     ->create_params()
-                                     .app_name),
-                profile_path)
-          : shell_integration::win::GetAppUserModelIdForBrowser(profile_path);
-  if (!app_user_model_id.empty()) {
-    ui::win::SetAppIdForWindow(app_user_model_id, views::HWNDForWidget(widget));
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace
 

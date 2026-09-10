@@ -33,8 +33,6 @@
 #elif BUILDFLAG(IS_CHROMEOS)
 #include "base/test/icu_test_util.h"
 #include "base/test/scoped_libc_timezone_override.h"
-#elif BUILDFLAG(IS_WIN)
-#include <windows.h>
 #endif
 
 namespace base {
@@ -207,9 +205,7 @@ TEST_F(TimeTest, UTCTimeT) {
   // C library time and exploded time.
   time_t now_t_1 = time(nullptr);
   struct tm tms;
-#if BUILDFLAG(IS_WIN)
-  gmtime_s(&tms, &now_t_1);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   gmtime_r(&now_t_1, &tms);
 #endif
 
@@ -241,9 +237,7 @@ TEST_F(TimeTest, LocalTimeT) {
   time_t now_t_1 = time(nullptr);
   struct tm tms;
 
-#if BUILDFLAG(IS_WIN)
-  localtime_s(&tms, &now_t_1);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   localtime_r(&now_t_1, &tms);
 #endif
 
@@ -373,10 +367,7 @@ TEST_F(TimeTest, ParseTimeTest1) {
 
   struct tm local_time = {};
   char time_buf[64] = {};
-#if BUILDFLAG(IS_WIN)
-  localtime_s(&local_time, &current_time);
-  asctime_s(time_buf, std::size(time_buf), &local_time);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   localtime_r(&current_time, &local_time);
   asctime_r(&local_time, time_buf);
 #endif
@@ -754,16 +745,6 @@ TEST_F(TimeTest, MaxConversions) {
             t.ToCFAbsoluteTime());
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  FILETIME ftime;
-  ftime.dwHighDateTime = std::numeric_limits<DWORD>::max();
-  ftime.dwLowDateTime = std::numeric_limits<DWORD>::max();
-  t = Time::FromFileTime(ftime);
-  EXPECT_TRUE(t.is_max());
-  ftime = t.ToFileTime();
-  EXPECT_EQ(std::numeric_limits<DWORD>::max(), ftime.dwHighDateTime);
-  EXPECT_EQ(std::numeric_limits<DWORD>::max(), ftime.dwLowDateTime);
-#endif
 }
 
 TEST_F(TimeTest, Min) {
@@ -1295,7 +1276,7 @@ TEST(TimeTicks, MaybeHighRes) {
 }
 #endif
 
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_APPLE)
 // Check that the low resolution tick value is "close" to the high resolution
 // tick value across platforms. This property holds on non-Apple platforms.
 TEST(TimeTicks, LowRes) {

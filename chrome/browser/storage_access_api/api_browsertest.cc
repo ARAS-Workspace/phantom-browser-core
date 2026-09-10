@@ -2333,14 +2333,8 @@ class StorageAccessAPIStorageBrowserTest
   bool IsStoragePartitioned() const { return std::get<1>(GetParam()); }
 };
 
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-// TODO(crbug.com/404576878): Test is flaky on Windows ASAN builds.
-#define MAYBE_ThirdPartyIFrameStorageRequestsAccess \
-  DISABLED_ThirdPartyIFrameStorageRequestsAccess
-#else
 #define MAYBE_ThirdPartyIFrameStorageRequestsAccess \
   ThirdPartyIFrameStorageRequestsAccess
-#endif
 // Validate that the Storage Access API will unblock other types of storage
 // access when a grant is given and that it only applies to the top-level/third
 // party pair requested on.
@@ -2377,11 +2371,7 @@ IN_PROC_BROWSER_TEST_P(StorageAccessAPIStorageBrowserTest,
   EXPECT_FALSE(storage::test::HasStorageAccessForFrame(GetFrame()));
 }
 // TODO(crbug.com/430495897): Test is flaky on Windows ASAN builds.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_NestedThirdPartyIFrameStorage DISABLED_NestedThirdPartyIFrameStorage
-#else
 #define MAYBE_NestedThirdPartyIFrameStorage NestedThirdPartyIFrameStorage
-#endif
 IN_PROC_BROWSER_TEST_P(StorageAccessAPIStorageBrowserTest,
                        MAYBE_NestedThirdPartyIFrameStorage) {
   EnsureUserInteractionOn(kHostC);

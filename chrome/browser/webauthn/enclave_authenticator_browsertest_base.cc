@@ -89,20 +89,10 @@ EnclaveAuthenticatorTestBase::EnclaveAuthenticatorTestBase()
       process_and_port_(StartWebAuthnEnclave(temp_dir_->GetPath())),
       enclave_override_(TestWebAuthnEnclaveIdentity(process_and_port_.second)),
       security_domain_service_(FakeSecurityDomainService::New(kSecretVersion)),
-#if BUILDFLAG(IS_WIN)
-      fake_webauthn_dll_(std::make_unique<device::FakeWinWebAuthnApi>()),
-      webauthn_dll_override_(
-          std::make_unique<device::WinWebAuthnApi::ScopedOverride>(
-              fake_webauthn_dll_.get())),
-#endif
       recovery_key_store_(FakeRecoveryKeyStore::New()),
       fake_hw_provider_(
           std::make_unique<WebAuthnScopedFakeUnexportableKeyProvider>()) {
-#if BUILDFLAG(IS_WIN)
-  fake_webauthn_dll_->set_available(false);
-  biometrics_override_ =
-      std::make_unique<device::fido::win::ScopedBiometricsOverride>(false);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   biometrics_override_ =
       std::make_unique<device::fido::mac::ScopedBiometricsOverride>(false);
   if (__builtin_available(macOS 13.5, *)) {
@@ -257,10 +247,6 @@ void EnclaveAuthenticatorTestBase::SetBiometricsEnabled(bool enabled) {
   biometrics_override_.reset();
   biometrics_override_ =
       std::make_unique<device::fido::mac::ScopedBiometricsOverride>(enabled);
-#elif BUILDFLAG(IS_WIN)
-  biometrics_override_.reset();
-  biometrics_override_ =
-      std::make_unique<device::fido::win::ScopedBiometricsOverride>(enabled);
 #endif
 }
 

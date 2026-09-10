@@ -48,15 +48,6 @@
 #include "ui/base/ui_base_paths.h"
 #include "ui/base/ui_base_switches.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/process_startup_helper.h"
-#include "base/win/win_util.h"
-#include "base/win/windows_version.h"
-#include "ui/gfx/switches.h"
-#endif
-
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_ANDROID)
 #include <locale.h>
 #include <signal.h>
@@ -122,28 +113,7 @@ bool IsSubprocess() {
 }
 
 void CommonSubprocessInit() {
-#if BUILDFLAG(IS_WIN)
-  // Lower non-browser processes to 0x27F so `csrss` notifies/terminates the
-  // browser process (0x280) first during OS shutdown. The browser's teardown
-  // or job handle cleanup then takes care of child processes before it can
-  // observe them dying unexpectedly.
-  ::SetProcessShutdownParameters(0x280 - 1, SHUTDOWN_NORETRY);
 
-  // HACK: Let Windows know that we have started.  This is needed to suppress
-  // the IDC_APPSTARTING cursor from being displayed for a prolonged period
-  // while a subprocess is starting.
-  if (base::win::IsUser32AndGdi32Available()) {
-    PostThreadMessage(GetCurrentThreadId(), WM_NULL, 0, 0);
-    MSG msg;
-    PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE);
-  }
-#endif
-
-#if !defined(OFFICIAL_BUILD) && BUILDFLAG(IS_WIN)
-  base::RouteStdioToConsole(false);
-  LoadLibraryA("dbghelp.dll");
-  LoadLibraryA("msdia140.dll");
-#endif
 }
 
 // Apply metadata to samples collected by the StackSamplingProfiler when tracing
@@ -226,20 +196,14 @@ NO_STACK_PROTECTOR int RunContentProcess(
     setenv("DBUS_SESSION_BUS_ADDRESS", "disabled:", kNoOverrideIfAlreadySet);
 #endif
 
-#if BUILDFLAG(IS_WIN)
-    base::win::RegisterInvalidParamHandler();
-#endif  // BUILDFLAG(IS_WIN)
-
 #if !BUILDFLAG(IS_ANDROID)
     // On Android, the command line is initialized when library is loaded.
     int argc = 0;
     const char** argv = nullptr;
 
-#if !BUILDFLAG(IS_WIN)
     // argc/argv are ignored on Windows; see command_line.h for details.
     argc = params.argc;
     argv = params.argv;
-#endif
 
     base::CommandLine::Init(argc, argv);
 
@@ -270,10 +234,6 @@ NO_STACK_PROTECTOR int RunContentProcess(
     setlocale(LC_NUMERIC, "C");
 
     SetupSignalHandlers();
-#endif
-
-#if BUILDFLAG(IS_WIN)
-    base::win::SetupCRT(*base::CommandLine::ForCurrentProcess());
 #endif
 
 #if BUILDFLAG(IS_MAC)
@@ -313,21 +273,6 @@ NO_STACK_PROTECTOR int RunContentProcess(
     if (exit_code >= 0) {
       return exit_code;
     }
-
-#if BUILDFLAG(IS_WIN)
-    base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
-    if (command_line->HasSwitch(switches::kHeadless)) {
-      // When running in headless mode we want stdio routed however if
-      // console does not exist we should not create one.
-      base::RouteStdioToConsole(/*create_console_if_not_found*/ false);
-    } else if (command_line->HasSwitch(switches::kEnableLogging)) {
-      // Route stdio to parent console (if any) or create one, do not create a
-      // console in children if handles are being passed.
-      bool create_console = command_line->GetSwitchValueASCII(
-                                switches::kEnableLogging) != "handle";
-      base::RouteStdioToConsole(create_console);
-    }
-#endif
 
     static base::NoDestructor<TracingEnabledStateObserver> tracing_observer;
   }

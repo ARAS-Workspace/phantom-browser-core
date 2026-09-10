@@ -146,8 +146,6 @@ std::string_view GetPlatformString() {
   return "linux";
 #elif BUILDFLAG(IS_MAC)
   return "mac";
-#elif BUILDFLAG(IS_WIN)
-  return "win";
 #elif BUILDFLAG(IS_DESKTOP_ANDROID)
   return "desktop_android";
 #else

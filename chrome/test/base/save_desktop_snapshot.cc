@@ -158,10 +158,6 @@ base::FilePath SaveDesktopSnapshot(const base::FilePath& output_dir) {
       exploded.millisecond);
   base::FilePath output_path = output_dir.AppendASCII(filename);
   uint32_t flags = base::File::FLAG_CREATE | base::File::FLAG_WRITE;
-#if BUILDFLAG(IS_WIN)
-  flags |=
-      base::File::FLAG_WIN_SHARE_DELETE | base::File::FLAG_CAN_DELETE_ON_CLOSE;
-#endif
   base::File file(output_path, flags);
 
   if (!file.IsValid()) {

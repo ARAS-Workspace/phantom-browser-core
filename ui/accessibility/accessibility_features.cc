@@ -188,37 +188,6 @@ bool IsCollectAccessibilityHeuristicInCanvasUkmEnabled() {
       ::features::kEnableCollectAccessibilityHeuristicInCanvasUkm);
 }
 
-#if BUILDFLAG(IS_WIN)
-BASE_FEATURE(kAccessibilityWinAXFragmentRootParent,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-bool IsAccessibilityWinAXFragmentRootParentEnabled() {
-  return base::FeatureList::IsEnabled(
-      ::features::kAccessibilityWinAXFragmentRootParent);
-}
-
-BASE_FEATURE(kFixNarratorWebContentContainment,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-bool IsFixNarratorWebContentContainmentEnabled() {
-  return base::FeatureList::IsEnabled(
-      ::features::kFixNarratorWebContentContainment);
-}
-
-BASE_FEATURE(kIChromeAccessible, base::FEATURE_DISABLED_BY_DEFAULT);
-bool IsIChromeAccessibleEnabled() {
-  return base::FeatureList::IsEnabled(::features::kIChromeAccessible);
-}
-
-BASE_FEATURE(kUiaDisconnectRootProviders, base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kUiaEventOptimization, base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kUiaMathMlSupport, base::FEATURE_ENABLED_BY_DEFAULT);
-bool IsUiaMathMlSupportEnabled() {
-  return base::FeatureList::IsEnabled(::features::kUiaMathMlSupport);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_CHROMEOS)
 bool IsDictationOfflineAvailable() {
   return base::FeatureList::IsEnabled(
@@ -553,13 +522,13 @@ bool IsMacAccessibilityTextOperationEnabled() {
 }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 BASE_FEATURE(kWasmTtsEngineAutoInstallDisabled,
              base::FEATURE_DISABLED_BY_DEFAULT);
 bool IsWasmTtsEngineAutoInstallDisabled() {
   return base::FeatureList::IsEnabled(
       ::features::kWasmTtsEngineAutoInstallDisabled);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 }  // namespace features

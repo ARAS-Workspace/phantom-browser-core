@@ -531,9 +531,6 @@ class CORE_EXPORT WebFrameWidgetImpl
                          ui::mojom::blink::DragOperation,
                          base::OnceClosure callback) override;
   void OnStartStylusWriting(
-#if BUILDFLAG(IS_WIN)
-      const gfx::Rect& focus_widget_rect_in_dips,
-#endif  // BUILDFLAG(IS_WIN)
       OnStartStylusWritingCallback callback) override;
 #if BUILDFLAG(IS_ANDROID)
   void PassImeRenderWidgetHost(
@@ -1187,13 +1184,6 @@ class CORE_EXPORT WebFrameWidgetImpl
   void NotifyLatchedScrollMarkerGroup(
       const cc::CompositorCommitData& commit_data);
 
-#if BUILDFLAG(IS_WIN)
-  // Computes a contiguous range of character bounds within proximity of
-  // `pivot_position` to enable gesture support for StylusHandwritingWin.
-  mojom::blink::ProximateCharacterRangeBoundsPtr
-  ComputeProximateCharacterBounds(
-      const PositionWithAffinity& pivot_position) const;
-#endif  // BUILDFLAG(IS_WIN)
 
   mojom::blink::InputCursorAnchorInfoPtr CalculateCursorAnchorInfo(
       bool update_requested);

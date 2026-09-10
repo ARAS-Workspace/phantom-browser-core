@@ -32,10 +32,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "media/mojo/mojom/media_foundation_service.mojom.h"
-#endif
-
 using GlobalMemoryDump = memory_instrumentation::GlobalMemoryDump;
 using GlobalMemoryDumpPtr = memory_instrumentation::mojom::GlobalMemoryDumpPtr;
 using HistogramProcessType = memory_instrumentation::HistogramProcessType;
@@ -527,15 +523,6 @@ MetricMap GetExpectedCdmServiceMetrics() {
   });
 }
 
-#if BUILDFLAG(IS_WIN)
-MetricMap GetExpectedMediaFoundationServiceMetrics() {
-  return MetricMap({{"ProcessType", static_cast<int64_t>(ProcessType::UTILITY)},
-                    {"Resident", 12},
-                    {"PrivateMemoryFootprint", 22},
-                    {"SharedMemoryFootprint", 32}});
-}
-#endif
-
 MetricMap GetExpectedPaintPreviewCompositorMetrics() {
   return MetricMap({
       {"ProcessType", static_cast<int64_t>(ProcessType::UTILITY)},
@@ -566,12 +553,6 @@ void PopulateMetrics(GlobalMemoryDumpPtr& global_dump,
     case HistogramProcessType::kGpu:
       PopulateGpuMetrics(global_dump, metrics_mb);
       return;
-#if BUILDFLAG(IS_WIN)
-    case HistogramProcessType::kMediaFoundationService:
-      PopulateUtilityMetrics(global_dump, metrics_mb,
-                             media::mojom::MediaFoundationServiceBroker::Name_);
-      return;
-#endif
     case HistogramProcessType::kPaintPreviewCompositor:
       PopulateUtilityMetrics(
           global_dump, metrics_mb,
@@ -600,10 +581,6 @@ MetricMap GetExpectedProcessMetrics(HistogramProcessType ptype) {
       return GetExpectedCdmServiceMetrics();
     case HistogramProcessType::kGpu:
       return GetExpectedGpuMetrics();
-#if BUILDFLAG(IS_WIN)
-    case HistogramProcessType::kMediaFoundationService:
-      return GetExpectedMediaFoundationServiceMetrics();
-#endif
     case HistogramProcessType::kPaintPreviewCompositor:
       return GetExpectedPaintPreviewCompositorMetrics();
     case HistogramProcessType::kRenderer:
@@ -758,9 +735,6 @@ INSTANTIATE_TEST_SUITE_P(
                     HistogramProcessType::kBrowser,
                     HistogramProcessType::kCdmService,
                     HistogramProcessType::kGpu,
-#if BUILDFLAG(IS_WIN)
-                    HistogramProcessType::kMediaFoundationService,
-#endif
                     HistogramProcessType::kPaintPreviewCompositor,
                     HistogramProcessType::kRenderer));
 

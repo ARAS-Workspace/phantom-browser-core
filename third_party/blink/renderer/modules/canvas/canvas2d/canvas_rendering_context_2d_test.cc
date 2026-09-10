@@ -3545,48 +3545,6 @@ TEST_P(CanvasRenderingContext2DTestLowLatency, LowLatencyIsSingleBuffered) {
   EXPECT_EQ(frame1_resource.get(), frame2_resource.get());
 }
 
-#if BUILDFLAG(IS_WIN)
-class CanvasRenderingContext2DTestSwapChain
-    : public CanvasRenderingContext2DTestAccelerated {
- protected:
-  CanvasRenderingContext2DTestSwapChain()
-      : CanvasRenderingContext2DTestAccelerated() {}
-
-  void ConfigureContextProvider(
-      viz::TestContextProvider& context_provider) override {
-    auto* test_raster = context_provider.GetTestRasterInterface();
-    test_raster->set_max_texture_size(1024);
-
-    gpu::SharedImageCapabilities shared_image_caps;
-    shared_image_caps.shared_image_swap_chain = true;
-    context_provider.SharedImageInterface()->SetCapabilities(shared_image_caps);
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-INSTANTIATE_PAINT_TEST_SUITE_P(CanvasRenderingContext2DTestSwapChain);
-
-TEST_P(CanvasRenderingContext2DTestSwapChain, LowLatencyIsSingleBuffered) {
-  CreateContext(kNonOpaque, kLowLatency);
-  // No need to set-up the layer bridge when testing low latency mode.
-  DrawSomething();
-  EXPECT_TRUE(Context2D()->getContextAttributes()->desynchronized());
-  EXPECT_FALSE(Context2D()->getContextAttributes()->willReadFrequently());
-  EXPECT_TRUE(CanvasElement().LowLatencyEnabled());
-  EXPECT_EQ(CanvasElement().GetRasterModeForCanvas2D(), RasterMode::kGPU);
-  EXPECT_TRUE(Context2D()->GetSharedImageProvider()->IsSingleBuffered());
-  auto frame1_resource =
-      Context2D()->GetSharedImageProvider()->ProduceCanvasResource();
-  EXPECT_TRUE(frame1_resource);
-  DrawSomething();
-  auto frame2_resource =
-      Context2D()->GetSharedImageProvider()->ProduceCanvasResource();
-  EXPECT_TRUE(frame2_resource);
-  EXPECT_EQ(frame1_resource.get(), frame2_resource.get());
-}
-#endif
 
 TEST_P(CanvasRenderingContext2DTest, DrawFocusWithContextLost) {
   CreateContext(kNonOpaque);

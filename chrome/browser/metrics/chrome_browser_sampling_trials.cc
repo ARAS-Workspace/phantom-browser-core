@@ -21,16 +21,16 @@ namespace {
 // Note that the trial name must be kept in sync with the server config
 // controlling sampling. If they don't match, then clients will be shuffled into
 // different groups when the server config takes over from the fallback trial.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 constexpr char kSamplingTrialName[] = "MetricsAndCrashSampling";
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(IS_ANDROID)
 constexpr char kPostFREFixSamplingTrialName[] =
     "PostFREFixMetricsAndCrashSampling";
 #endif  // BUILDFLAG(IS_ANDROID)
 constexpr char kUkmSamplingTrialName[] = "UkmSamplingRate";
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 // Appends a group to the sampling controlling |trial|. The group will be
 // associated with a variation param for reporting sampling |rate| in per mille.
 void AppendSamplingTrialGroup(const std::string& group_name,
@@ -110,7 +110,7 @@ void CreateFallbackSamplingTrial(
     trial->Activate();
   }
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // Unconditionally attempts to create a field trial to control client side
 // UKM sampling to use as a fallback when one hasn't been provided. This is
@@ -158,23 +158,11 @@ void CreateFallbackUkmSamplingTrial(
 void CreateFallbackSamplingTrialsIfNeeded(
     const base::FieldTrial::EntropyProvider& entropy_provider,
     base::FeatureList* feature_list) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 
   const bool is_stable = chrome::GetChannel() == version_info::Channel::STABLE;
 
   if (!base::FieldTrialList::TrialExists(kSamplingTrialName)) {
-#if BUILDFLAG(IS_WIN)
-
-    // On all channels except stable, we sample out at a minimal rate to ensure
-    // the code paths are exercised in the wild before hitting stable.
-    const int kPreStableSampledInRatePerMille = 990;    // 99%
-    const int kPreStableReportingFullRatePerMille = 5;  // 0.5%
-    // This leaves 0.5% for OutOfReportingSample.
-
-    const int kStableSampledInRatePerMille = 100;      // 10%
-    const int kStableReportingFullRatePerMille = 900;  // 90%
-
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
 
@@ -237,7 +225,7 @@ void CreateFallbackSamplingTrialsIfNeeded(
   }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 void CreateFallbackUkmSamplingTrialIfNeeded(

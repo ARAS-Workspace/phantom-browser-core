@@ -113,12 +113,10 @@ class TabStripBrowsertest : public InProcessBrowserTest {
   std::u16string GetCollapsedState(tab_groups::TabGroupId group) {
     std::u16string collapsed_state = std::u16string();
 
-#if !BUILDFLAG(IS_WIN)
     collapsed_state =
         tab_strip()->IsGroupCollapsed(group)
             ? l10n_util::GetStringUTF16(IDS_GROUP_AX_LABEL_COLLAPSED)
             : l10n_util::GetStringUTF16(IDS_GROUP_AX_LABEL_EXPANDED);
-#endif
 
     return collapsed_state;
   }

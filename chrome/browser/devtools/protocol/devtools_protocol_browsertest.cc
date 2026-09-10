@@ -132,11 +132,6 @@
 #include "extensions/test/extension_test_message_listener.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-#if BUILDFLAG(IS_WIN)
-#include "base/base_paths_win.h"
-#include "base/test/scoped_path_override.h"
-#endif
-
 using DevToolsProtocolTest = DevToolsProtocolTestBase;
 using testing::AllOf;
 using testing::Contains;
@@ -1752,13 +1747,6 @@ class ExtensionProtocolTest : public DevToolsProtocolTest {
       extension_registrar_;
   raw_ptr<extensions::ExtensionRegistry, DanglingUntriaged> extension_registry_;
   raw_ptr<content::WebContents, DanglingUntriaged> background_web_contents_;
-#if BUILDFLAG(IS_WIN)
-  // This is needed to stop ExtensionProtocolTestsfrom creating a
-  // shortcut in the Windows start menu. The override needs to last until the
-  // test is destroyed, because Windows shortcut tasks which create the shortcut
-  // can run after the test body returns.
-  base::ScopedPathOverride override_start_dir{base::DIR_START_MENU};
-#endif  // BUILDFLAG(IS_WIN
 
   // TODO(https://crbug.com/40804030): Remove this when updated to use MV3.
   extensions::ScopedTestMV2Enabler mv2_enabler_;

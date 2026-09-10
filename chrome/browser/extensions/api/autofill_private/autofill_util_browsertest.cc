@@ -88,7 +88,7 @@ IN_PROC_BROWSER_TEST_F(AutofillUtilTest, GenerateIbanList) {
 }
 
 IN_PROC_BROWSER_TEST_F(AutofillUtilTest, AuthenticateUser_SuccessfulAuth) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   base::MockCallback<base::OnceCallback<void(bool)>> mock_result_callback;
   const std::u16string mock_prompt_message = u"This is a mock message";
 
@@ -107,7 +107,7 @@ IN_PROC_BROWSER_TEST_F(AutofillUtilTest, AuthenticateUser_SuccessfulAuth) {
 }
 
 IN_PROC_BROWSER_TEST_F(AutofillUtilTest, AuthenticateUser_UnSuccessfulAuth) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   base::MockCallback<base::OnceCallback<void(bool)>> mock_result_callback;
   const std::u16string mock_prompt_message = u"This is a mock message";
 

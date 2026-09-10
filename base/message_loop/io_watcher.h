@@ -36,12 +36,7 @@ class BASE_EXPORT IOWatcher {
   // Returns null otherwise.
   static IOWatcher* Get();
 
-#if BUILDFLAG(IS_WIN)
-  // Please see MessagePumpWin for definitions of these methods.
-  [[nodiscard]] bool RegisterIOHandler(HANDLE file,
-                                       MessagePumpForIO::IOHandler* handler);
-  bool RegisterJobObject(HANDLE job, MessagePumpForIO::IOHandler* handler);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   class FdWatcher {
    public:
     virtual void OnFdReadable(int fd) = 0;
@@ -99,12 +94,7 @@ class BASE_EXPORT IOWatcher {
 
   // IOWatcher implementations must implement these methods for any applicable
   // platform(s).
-#if BUILDFLAG(IS_WIN)
-  virtual bool RegisterIOHandlerImpl(HANDLE file,
-                                     MessagePumpForIO::IOHandler* handler) = 0;
-  virtual bool RegisterJobObjectImpl(HANDLE job,
-                                     MessagePumpForIO::IOHandler* handler) = 0;
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   virtual std::unique_ptr<FdWatch> WatchFileDescriptorImpl(
       int fd,
       FdWatchDuration duration,

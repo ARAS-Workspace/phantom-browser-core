@@ -25,8 +25,8 @@ namespace webnn {
 //
 // For platforms using LiteRT, `litert::ContextImplLiteRt` is always available.
 
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC) && \
-    !BUILDFLAG(WEBNN_USE_TFLITE) && !BUILDFLAG(WEBNN_USE_LITERT)
+#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(WEBNN_USE_TFLITE) && \
+    !BUILDFLAG(WEBNN_USE_LITERT)
 
 class WebNNContextProviderImplTest : public testing::Test {
  public:

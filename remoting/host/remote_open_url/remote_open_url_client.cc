@@ -20,8 +20,6 @@
 
 #if BUILDFLAG(IS_LINUX)
 #include "remoting/host/remote_open_url/remote_open_url_client_delegate_linux.h"
-#elif BUILDFLAG(IS_WIN)
-#include "remoting/host/remote_open_url/remote_open_url_client_delegate_win.h"
 #endif
 
 namespace remoting {
@@ -33,8 +31,6 @@ constexpr base::TimeDelta kRequestTimeout = base::Seconds(5);
 std::unique_ptr<RemoteOpenUrlClient::Delegate> CreateDelegate() {
 #if BUILDFLAG(IS_LINUX)
   return std::make_unique<RemoteOpenUrlClientDelegateLinux>();
-#elif BUILDFLAG(IS_WIN)
-  return std::make_unique<RemoteOpenUrlClientDelegateWin>();
 #else
   NOTREACHED();
 #endif
@@ -72,11 +68,7 @@ void RemoteOpenUrlClient::Open(const base::CommandLine::StringType& arg,
 
   done_ = std::move(done);
 
-#if BUILDFLAG(IS_WIN)
-  GURL url(base::WideToUTF8(arg));
-#else
   GURL url(arg);
-#endif
 
   if (!url.is_valid()) {
     // It has been observed that in some Linux environments, a file:// URL might

@@ -680,12 +680,7 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::Bool());
 
 // TODO(crbug.com/41495158): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_StartBrowserWithThresholdWidth \
-  DISABLED_StartBrowserWithThresholdWidth
-#else
 #define MAYBE_StartBrowserWithThresholdWidth StartBrowserWithThresholdWidth
-#endif
 IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
                        MAYBE_StartBrowserWithThresholdWidth) {
   const auto threshold = overflow_threshold_width();
@@ -727,7 +722,7 @@ IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
                    "ResponsiveToolbar.OverflowButtonHidden"));
 }
 // TODO(crbug.com/41495158): Flaky on Windows.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_StartBrowserWithWidthSmallerThanThreshold \
   DISABLED_StartBrowserWithWidthSmallerThanThreshold
 #else
@@ -1175,11 +1170,7 @@ IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
 }
 
 // TODO(crbug.com/41495158): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DoNotShowIphWhenOverflowed DISABLED_DoNotShowIphWhenOverflowed
-#else
 #define MAYBE_DoNotShowIphWhenOverflowed DoNotShowIphWhenOverflowed
-#endif
 IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
                        MAYBE_DoNotShowIphWhenOverflowed) {
   const auto threshold = overflow_threshold_width();

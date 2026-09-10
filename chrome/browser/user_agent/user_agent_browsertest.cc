@@ -83,8 +83,6 @@ IN_PROC_BROWSER_TEST_F(ReduceUserAgentPlatformBrowserTest, NavigatorPlatform) {
             content::EvalJs(web_contents(), "navigator.platform"));
 #elif BUILDFLAG(IS_MAC)
   EXPECT_EQ("MacIntel", content::EvalJs(web_contents(), "navigator.platform"));
-#elif BUILDFLAG(IS_WIN)
-  EXPECT_EQ("Win32", content::EvalJs(web_contents(), "navigator.platform"));
 #else
   EXPECT_EQ("Linux x86_64",
             content::EvalJs(web_contents(), "navigator.platform"));

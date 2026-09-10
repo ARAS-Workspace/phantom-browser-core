@@ -31,11 +31,7 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "rlz/win/lib/machine_deal.h"
-#else
 #include "base/time/time.h"
-#endif
 
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chromeos/ash/components/system/factory_ping_embargo_check.h"
@@ -71,12 +67,7 @@ TEST_F(FinancialPingTest, FormRequest) {
   std::string brand_string = rlz_lib::SupplementaryBranding::GetBrand();
   const char* brand = brand_string.empty() ? "GGLA" : brand_string.c_str();
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(rlz_lib::MachineDealCode::Set("dcc_value"));
-#define DCC_PARAM "&dcc=dcc_value"
-#else
 #define DCC_PARAM ""
-#endif
 
   EXPECT_TRUE(rlz_lib::SetAccessPointRlz(rlz_lib::IETB_SEARCH_BOX,
       "TbRlzValue"));

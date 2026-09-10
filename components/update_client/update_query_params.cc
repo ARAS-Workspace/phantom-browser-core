@@ -12,10 +12,6 @@
 #include "components/version_info/version_info.h"
 #include "third_party/abseil-cpp/absl/strings/str_format.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 namespace update_client {
 
 namespace {
@@ -27,8 +23,6 @@ constexpr char kUnknown[] = "unknown";
 constexpr std::string_view kOs =
 #if BUILDFLAG(IS_APPLE)
     "mac";
-#elif BUILDFLAG(IS_WIN)
-    "win";
 #elif BUILDFLAG(IS_ANDROID)
     "android";
 #elif BUILDFLAG(IS_CHROMEOS)

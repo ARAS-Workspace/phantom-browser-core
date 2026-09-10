@@ -736,17 +736,10 @@ class ServiceWorkerRegistrationAtStartupTest
 };
 
 // Disabled on Win due an unrelated bug: https://crbug.com/41491822.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PRE_ExtensionActivationDoesNotReregister \
-  DISABLED_PRE_ExtensionActivationDoesNotReregister
-#define MAYBE_ExtensionActivationDoesNotReregister \
-  DISABLED_ExtensionActivationDoesNotReregister
-#else
 #define MAYBE_PRE_ExtensionActivationDoesNotReregister \
   PRE_ExtensionActivationDoesNotReregister
 #define MAYBE_ExtensionActivationDoesNotReregister \
   ExtensionActivationDoesNotReregister
-#endif
 // Tests that Service Worker registration for existing extension isn't issued
 // upon browser restart.
 // Regression test for https://crbug.com/41417476.
@@ -2723,14 +2716,8 @@ using ServiceWorkerWebRequestEarlyListenerTest =
     ServiceWorkerWithEarlyMessageListenerTest<kListenerAdded>;
 
 // Disabled on win due to flakiness: https://crbug.com/40718882.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PRE_FilteredEventsAfterRestart \
-  DISABLED_PRE_FilteredEventsAfterRestart
-#define MAYBE_FilteredEventsAfterRestart DISABLED_FilteredEventsAfterRestart
-#else
 #define MAYBE_PRE_FilteredEventsAfterRestart PRE_FilteredEventsAfterRestart
 #define MAYBE_FilteredEventsAfterRestart FilteredEventsAfterRestart
-#endif
 IN_PROC_BROWSER_TEST_F(ServiceWorkerBasedBackgroundTest,
                        MAYBE_PRE_FilteredEventsAfterRestart) {
   ExtensionTestMessageListener listener_added("ready");

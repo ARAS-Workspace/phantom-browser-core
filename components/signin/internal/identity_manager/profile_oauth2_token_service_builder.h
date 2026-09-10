@@ -15,10 +15,6 @@
 #include "base/memory/scoped_refptr.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "components/signin/internal/identity_manager/mutable_profile_oauth2_token_service_delegate.h"
-#endif
-
 class AccountTrackerService;
 class PrefService;
 class ProfileOAuth2TokenService;
@@ -62,10 +58,6 @@ std::unique_ptr<ProfileOAuth2TokenService> BuildProfileOAuth2TokenService(
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 #if BUILDFLAG(IS_IOS)
     std::unique_ptr<DeviceAccountsProvider> device_accounts_provider,
-#endif
-#if BUILDFLAG(IS_WIN)
-    MutableProfileOAuth2TokenServiceDelegate::FixRequestErrorCallback
-        reauth_callback,
 #endif
     SigninClient* signin_client);
 #endif  // COMPONENTS_SIGNIN_INTERNAL_IDENTITY_MANAGER_PROFILE_OAUTH2_TOKEN_SERVICE_BUILDER_H_

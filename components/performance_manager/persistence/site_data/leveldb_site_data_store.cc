@@ -323,22 +323,8 @@ DatabaseSizeResult LevelDBSiteDataStore::AsyncHelper::GetDatabaseSize() {
   base::ScopedBlockingCall scoped_blocking_call(FROM_HERE,
                                                 base::BlockingType::MAY_BLOCK);
   DatabaseSizeResult ret;
-#if BUILDFLAG(IS_WIN)
-  // Windows has an annoying mis-feature that the size of an open file is not
-  // written to the parent directory until the file is closed. Since this is a
-  // diagnostic interface that should be rarely called, go to the trouble of
-  // closing and re-opening the database in order to get an up-to date size to
-  // report.
-  db_.reset();
-#endif
   ret.on_disk_size = base::ByteSize(
       base::checked_cast<uint64_t>(base::ComputeDirectorySize(db_path_)));
-#if BUILDFLAG(IS_WIN)
-  OpenOrCreateDatabase();
-  if (!db_) {
-    return DatabaseSizeResult();
-  }
-#endif
 
   // Default read options will fill the cache as we go.
   std::unique_ptr<leveldb::Iterator> iterator(

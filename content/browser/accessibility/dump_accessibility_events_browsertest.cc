@@ -35,11 +35,6 @@
 #include "ui/accessibility/platform/browser_accessibility_manager.h"
 #include "ui/accessibility/platform/inspect/ax_api_type.h"
 #include "ui/accessibility/platform/inspect/ax_tree_formatter.h"
-#if BUILDFLAG(IS_WIN)
-#include "base/test/run_until.h"
-#include "ui/accessibility/platform/ax_platform_node_win.h"
-#include "ui/accessibility/platform/browser_accessibility_manager_win.h"
-#endif
 
 namespace content {
 
@@ -49,22 +44,6 @@ using ui::AXTreeFormatter;
 namespace {
 
 void WaitForWindowsAccessibilityEventTestTeardown() {
-#if BUILDFLAG(IS_WIN)
-  // Dump event tests inspect Windows accessibility objects while the page is
-  // live. Shell teardown can briefly leave destroyed nodes waiting on those
-  // COM references to release.
-  const auto get_ghost_count = [] {
-    return ui::AXPlatformNodeWin::GetCounts().ghost_nodes;
-  };
-  if (get_ghost_count() == 0) {
-    return;
-  }
-
-  EXPECT_TRUE(base::test::RunUntil([&] { return get_ghost_count() == 0; }))
-      << "Timed out waiting for Windows accessibility event test teardown; "
-      << get_ghost_count()
-      << " AXPlatformNodeWin COM references are still alive.";
-#endif
 }
 
 }  // namespace
@@ -436,13 +415,8 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsTest,
 }
 
 // TODO(crbug.com/40844027): Flaky on win
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_AccessibilityEventsAriaComboBoxExpand \
-  DISABLED_AccessibilityEventsAriaComboBoxExpand
-#else
 #define MAYBE_AccessibilityEventsAriaComboBoxExpand \
   AccessibilityEventsAriaComboBoxExpand
-#endif
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsTest,
                        MAYBE_AccessibilityEventsAriaComboBoxExpand) {
   RunEventTest(FILE_PATH_LITERAL("aria-combo-box-expand.html"));
@@ -864,13 +838,8 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsTest,
 }
 
 // TODO(crbug.com/399735836): Fix failure on Windows
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_AccessibilityEventsDescriptionChangeSubtree \
-  DISABLED_AccessibilityEventsDescriptionChangeSubtree
-#else
 #define MAYBE_AccessibilityEventsDescriptionChangeSubtree \
   AccessibilityEventsDescriptionChangeSubtree
-#endif
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsTest,
                        MAYBE_AccessibilityEventsDescriptionChangeSubtree) {
   RunEventTest(FILE_PATH_LITERAL("description-changed-subtree.html"));
@@ -1025,7 +994,7 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsTestExceptUIA,
 
 // TODO(crbug.com/40780161): Flaky on Linux and Win.
 // TODO(crbug.com/40779330): locks up with popup open, only on Mac
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_AccessibilityEventsMenuListExpand \
   DISABLED_AccessibilityEventsMenuListExpand
 #else
@@ -1061,7 +1030,7 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsTest,
 // fail due to the leak.
 // TODO(crbug.com/424781310): Re-enable these tests on Windows once the leak
 // issue is resolved.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsWithMaterialDesignTest,
                        MaterialDesignButtonEvents) {
   RunEventTest(FILE_PATH_LITERAL("material-design-button.html"));
@@ -1136,7 +1105,7 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsWithMaterialDesignTest,
                        MaterialDesignChipsEvents) {
   RunEventTest(FILE_PATH_LITERAL("material-design-chips.html"));
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_IOS)
+#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 
 // TODO(crbug.com/40841326): disabled on UIA
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsTestExceptUIA,
@@ -1232,12 +1201,6 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsTest,
 
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityEventsTest,
                        AccessibilityEventsSamePageLinkNavigation) {
-#if BUILDFLAG(IS_WIN)
-  if (!ui::BrowserAccessibilityManagerWin::
-          IsUiaActiveTextPositionChangedEventSupported()) {
-    return;
-  }
-#endif
   RunEventTest(FILE_PATH_LITERAL("same-page-link-navigation.html"));
 }
 

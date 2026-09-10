@@ -260,10 +260,6 @@ void NetExportMessageHandler::OnStopNetLog(const base::ListValue& list) {
                             chrome_browser_net::GetPrerenderInfo(profile));
   ui_thread_polled_data.Set("extensionInfo",
                             chrome_browser_net::GetExtensionInfo(profile));
-#if BUILDFLAG(IS_WIN)
-  ui_thread_polled_data.Set("serviceProviders",
-                            chrome_browser_net::GetWindowsServiceProviders());
-#endif
 
   file_writer_->StopNetLog(std::move(ui_thread_polled_data));
 }

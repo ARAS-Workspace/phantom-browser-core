@@ -15,10 +15,6 @@
 #include "components/enterprise/browser/reporting/reporting_delegate_factory.h"
 #include "components/policy/core/common/cloud/cloud_policy_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/wmi.h"
-#endif
-
 namespace em = enterprise_management;
 
 namespace enterprise_reporting {
@@ -79,12 +75,7 @@ std::string ReportGenerator::GetOSUserName() {
 }
 
 std::string ReportGenerator::GetSerialNumber() {
-#if BUILDFLAG(IS_WIN)
-  return base::WideToUTF8(
-      base::win::WmiComputerSystemInfo::Get().serial_number());
-#else
   return std::string();
-#endif
 }
 
 void ReportGenerator::GenerateReport(

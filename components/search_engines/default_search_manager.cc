@@ -24,9 +24,9 @@
 #include "components/search_engines/template_url_prepopulate_data.h"
 #include "services/preferences/tracked/pref_hash_filter.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "base/enterprise_util.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 namespace {
 bool g_fallback_search_engines_disabled = false;
@@ -408,7 +408,7 @@ void DefaultSearchManager::NotifyObserver() {
 void DefaultSearchManager::HandleDefaultSearchEngineTampering(
     const base::DictValue& url_dict,
     const base::DictValue& mirrored_dict) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
   if (!base::FeatureList::IsEnabled(
           switches::kResetTamperedDefaultSearchEngine)) {
@@ -478,7 +478,7 @@ void DefaultSearchManager::HandleDefaultSearchEngineTampering(
   }
   base::UmaHistogramEnumeration(kDefaultSearchEngineMirrorCheckOutcomeMetric,
                                 outcome);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 }
 
 bool DefaultSearchManager::HasRecentPrefReset() {

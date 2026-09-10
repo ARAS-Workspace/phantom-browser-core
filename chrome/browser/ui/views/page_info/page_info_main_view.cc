@@ -154,10 +154,6 @@ PageInfoMainView::PageInfoMainView(
       ->SetProperty(views::kMarginsKey,
                     gfx::Insets::TLBR(0, 0, hover_list_spacing, 0));
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_VR)
-  page_feature_info_view_ = AddChildView(std::make_unique<views::View>());
-#endif
-
   security_container_view_ = AddChildView(CreateContainerView());
 
   permissions_view_ = AddChildView(std::make_unique<views::View>());
@@ -486,75 +482,6 @@ void PageInfoMainView::SetIdentityInfo(const IdentityInfo& identity_info) {
 }
 
 void PageInfoMainView::SetPageFeatureInfo(const PageFeatureInfo& info) {
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_VR)
-  // For now, this has only VR settings.
-  if (!info.is_vr_presentation_in_headset) {
-    return;
-  }
-
-  ChromeLayoutProvider* layout_provider = ChromeLayoutProvider::Get();
-  page_feature_info_view_
-      ->SetLayoutManager(std::make_unique<views::FlexLayout>())
-      ->SetOrientation(views::LayoutOrientation::kVertical);
-  auto* content_view =
-      page_feature_info_view_->AddChildView(std::make_unique<views::View>());
-  auto* flex_layout =
-      content_view->SetLayoutManager(std::make_unique<views::FlexLayout>());
-
-  auto icon = std::make_unique<NonAccessibleImageView>();
-  icon->SetImage(PageInfoViewFactory::GetImageModel(
-      features::IsRoundedIconsEnabled() ? vector_icons::kCardboardFilledIcon
-                                        : vector_icons::kVrHeadsetOldIcon));
-  content_view->AddChildView(std::move(icon));
-
-  auto label = std::make_unique<views::Label>(
-      l10n_util::GetStringUTF16(IDS_PAGE_INFO_VR_PRESENTING_TEXT),
-      views::style::CONTEXT_DIALOG_BODY_TEXT, views::style::STYLE_PRIMARY);
-  label->SetHorizontalAlignment(gfx::ALIGN_LEFT);
-  const int icon_label_spacing = layout_provider->GetDistanceMetric(
-      views::DISTANCE_RELATED_LABEL_HORIZONTAL);
-  label->SetProperty(views::kMarginsKey,
-                     gfx::Insets::VH(0, icon_label_spacing));
-  label->SetProperty(
-      views::kFlexBehaviorKey,
-      views::FlexSpecification(views::MinimumFlexSizeRule::kScaleToZero,
-                               views::MaximumFlexSizeRule::kUnbounded)
-          .WithWeight(1));
-  content_view->AddChildView(std::move(label));
-
-  auto exit_button = std::make_unique<views::MdTextButton>(
-      base::BindRepeating(
-          [](PageInfoMainView* view) {
-            view->GetWidget()->Close();
-#if BUILDFLAG(ENABLE_VR)
-            vr::VrTabHelper::ExitVrPresentation();
-#endif
-          },
-          this),
-      l10n_util::GetStringUTF16(IDS_PAGE_INFO_VR_TURN_OFF_BUTTON_TEXT));
-  exit_button->SetID(PageInfoViewFactory::VIEW_ID_PAGE_INFO_BUTTON_END_VR);
-  exit_button->SetStyle(ui::ButtonStyle::kProminent);
-  // Set views::kInternalPaddingKey for flex layout to account for internal
-  // button padding when calculating margins.
-  exit_button->SetProperty(views::kInternalPaddingKey,
-                           gfx::Insets::VH(exit_button->GetInsets().top(), 0));
-  content_view->AddChildView(std::move(exit_button));
-
-  flex_layout->SetInteriorMargin(layout_provider->GetInsetsMetric(
-      ChromeInsetsMetric::INSETS_PAGE_INFO_HOVER_BUTTON));
-
-  // Distance for multi content list is used, but split in half, since there is
-  // a separator in the middle of it.
-  const int separator_spacing =
-      layout_provider->GetDistanceMetric(DISTANCE_CONTENT_LIST_VERTICAL_MULTI) /
-      2;
-  auto* separator = page_feature_info_view_->AddChildView(
-      std::make_unique<views::Separator>());
-  separator->SetProperty(views::kMarginsKey,
-                         gfx::Insets::VH(separator_spacing, 0));
-
-  PreferredSizeChanged();
-#endif
 }
 
 void PageInfoMainView::OnPermissionChanged(

@@ -173,11 +173,6 @@
 #include "ui/base/cocoa/cursor_accessibility_scale_factor.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/aura/window.h"
-#include "ui/aura/window_tree_host.h"
-#endif
-
 using blink::DragOperationsMask;
 using blink::WebGestureEvent;
 using blink::WebInputEvent;
@@ -2766,22 +2761,6 @@ void RenderWidgetHostImpl::ForwardDelegatedInkPoint(
       [&](perfetto::EventContext ctx) {
         ctx.AddDebugAnnotation("delegated point",
                                delegated_ink_point.ToString());
-#if BUILDFLAG(IS_WIN)
-        aura::Window* root_window = view_->GetNativeView()->GetRootWindow();
-        if (root_window) {
-          const HWND hwnd = root_window->GetHost()->GetAcceleratedWidget();
-          POINT client_pt = {
-              static_cast<LONG>(delegated_ink_point.point().x()),
-              static_cast<LONG>(delegated_ink_point.point().y())};
-          ::ClientToScreen(hwnd, &client_pt);
-          const gfx::PointF screen_point =
-              gfx::PointF(client_pt.x, client_pt.y);
-          ctx.AddDebugAnnotation("screen point", screen_point.ToString());
-        } else {
-          ctx.AddDebugAnnotation(
-              "screen point", "Can't convert to screen point - no root window");
-        }
-#endif
       });
 
   // Calling this will result in IPC calls to get |delegated_ink_point| to
@@ -3134,17 +3113,6 @@ void RenderWidgetHostImpl::StartDragging(
   gfx::ImageSkia image = gfx::ImageSkia::CreateFromBitmap(bitmap, scale);
   gfx::Vector2d offset = cursor_offset_in_dip;
   gfx::Rect rect = drag_obj_rect_in_dip;
-#if BUILDFLAG(IS_WIN)
-  // Scale the offset by device scale factor, otherwise the drag
-  // image location doesn't line up with the drop location (drag destination).
-  // TODO(crbug.com/40859305): this conversion should not be necessary.
-  gfx::Vector2dF scaled_offset = static_cast<gfx::Vector2dF>(offset);
-  scaled_offset.Scale(scale);
-  offset = gfx::ToRoundedVector2d(scaled_offset);
-  gfx::RectF scaled_rect = static_cast<gfx::RectF>(rect);
-  scaled_rect.Scale(scale);
-  rect = gfx::ToRoundedRect(scaled_rect);
-#endif
   view->StartDragging(source_rfh, filtered_data, drag_operations_mask, image,
                       offset, rect, *event_info);
 }
@@ -3464,18 +3432,12 @@ void RenderWidgetHostImpl::MaybeNotifyReadyForInput() {
 }
 
 void RenderWidgetHostImpl::UpdateElementFocusForStylusWriting(
-#if BUILDFLAG(IS_WIN)
-    const gfx::Rect& focus_widget_rect_in_dips
-#endif  // BUILDFLAG(IS_WIN)
 ) {
   if (blink_frame_widget_) {
     auto callback = base::BindOnce(
         &RenderWidgetHostImpl::OnUpdateElementFocusForStylusWritingHandled,
         weak_factory_.GetWeakPtr());
     blink_frame_widget_->OnStartStylusWriting(
-#if BUILDFLAG(IS_WIN)
-        focus_widget_rect_in_dips,
-#endif  // BUILDFLAG(IS_WIN)
         std::move(callback));
   }
 }
@@ -3485,19 +3447,6 @@ void RenderWidgetHostImpl::OnUpdateElementFocusForStylusWritingHandled(
   if (!view_) {
     return;
   }
-#if BUILDFLAG(IS_WIN)
-  if (focus_result && focus_result->proximate_bounds) {
-    if (focus_result->proximate_bounds->range.length() !=
-        focus_result->proximate_bounds->widget_bounds_in_dips.size()) {
-      mojo::ReportBadMessage("mismatched range and bounds length received");
-      return;
-    }
-    if (focus_result->proximate_bounds->range.is_reversed()) {
-      mojo::ReportBadMessage("unexpected reversed range");
-      return;
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
   view_->OnEditElementFocusedForStylusWriting(std::move(focus_result));
 }
 
@@ -3859,7 +3808,7 @@ void RenderWidgetHostImpl::GotResponseToForceRedraw(int snapshot_id) {
   if (pending_browser_snapshots_.empty()) {
     return;
   }
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   // On Mac, when using CoreAnimation, or Win32 when using GDI, there is a
   // delay between when content is drawn to the screen, and when the
   // snapshot will actually pick up that content. Insert a manual delay of

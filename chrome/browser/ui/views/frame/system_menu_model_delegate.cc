@@ -35,13 +35,6 @@
 #include "chrome/common/pref_names.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "ui/aura/window.h"
-#include "ui/aura/window_tree_host.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 SystemMenuModelDelegate::SystemMenuModelDelegate(
     ui::AcceleratorProvider* provider,
     BrowserWindowInterface* browser)
@@ -69,26 +62,6 @@ bool SystemMenuModelDelegate::IsCommandIdEnabled(int command_id) const {
   if (command_id == IDC_GLIC_TOGGLE_PIN) {
     return glic::GlicEnabling::IsEnabledForProfile(browser_->GetProfile());
   }
-
-#if BUILDFLAG(IS_WIN)
-  if (features::IsMenuSimplificationEnabled()) {
-    BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser_);
-    if (browser_view) {
-      switch (command_id) {
-        case IDC_RESTORE_WINDOW:
-          return browser_view->IsMaximized() || browser_view->IsMinimized();
-        case IDC_MOVE_WINDOW:
-          return !browser_view->IsMaximized();
-        case IDC_SIZE_WINDOW:
-          return !browser_view->IsMaximized() && browser_view->CanResize();
-        case IDC_MINIMIZE_WINDOW:
-          return browser_view->CanMinimize();
-        case IDC_MAXIMIZE_WINDOW:
-          return !browser_view->IsMaximized() && browser_view->CanMaximize();
-      }
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   return chrome::IsCommandEnabled(browser_, command_id);
 }

@@ -22,9 +22,6 @@
 #include "ipc/mach_port_attachment_mac.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ipc/handle_attachment_win.h"
-#endif
 
 
 namespace IPC {
@@ -79,10 +76,6 @@ mojo::ScopedHandle MessageAttachment::TakeMojoHandle() {
       attachment->reset_mach_port_ownership();
       return mojo::MakeScopedHandle(mojo::Handle(wrapped_handle));
     }
-#elif BUILDFLAG(IS_WIN)
-    case Type::WIN_HANDLE:
-      return mojo::WrapPlatformFile(base::win::ScopedHandle(
-          static_cast<internal::HandleAttachmentWin*>(this)->Take()));
 #endif
     default:
       break;
@@ -119,16 +112,6 @@ scoped_refptr<MessageAttachment> MessageAttachment::CreateFromMojoHandle(
       mach_port = static_cast<mach_port_t>(platform_handle.value);
     return new internal::MachPortAttachmentMac(
         mach_port, internal::MachPortAttachmentMac::FROM_WIRE);
-  }
-#elif BUILDFLAG(IS_WIN)
-  if (type == Type::WIN_HANDLE) {
-    base::PlatformFile platform_file = base::kInvalidPlatformFile;
-    if (platform_handle.type == MOJO_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE) {
-      platform_file =
-          reinterpret_cast<base::PlatformFile>(platform_handle.value);
-    }
-    return new internal::HandleAttachmentWin(
-        platform_file, internal::HandleAttachmentWin::FROM_WIRE);
   }
 #endif
   NOTREACHED();

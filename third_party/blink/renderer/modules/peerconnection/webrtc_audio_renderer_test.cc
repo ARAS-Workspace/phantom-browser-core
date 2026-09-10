@@ -396,8 +396,6 @@ TEST_F(WebRtcAudioRendererTest, DISABLED_VerifySinkParameters) {
   static const int kExpectedBufferSize = kHardwareSampleRate / 100;
 #elif BUILDFLAG(IS_ANDROID)
   static const int kExpectedBufferSize = 2 * kHardwareSampleRate / 100;
-#elif BUILDFLAG(IS_WIN)
-  static const int kExpectedBufferSize = kHardwareBufferSize;
 #else
 #error Unknown platform.
 #endif

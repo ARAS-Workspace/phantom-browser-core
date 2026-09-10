@@ -29,10 +29,6 @@ class BrowserPrintingContextFactoryForTest
       PrintingContext::OutOfProcessBehavior out_of_process_behavior) override;
 
   void SetPrinterNameForSubsequentContexts(const std::string& printer_name);
-#if BUILDFLAG(IS_WIN)
-  void SetPrinterLanguageTypeForSubsequentContexts(
-      mojom::PrinterLanguageType printer_language_type);
-#endif
   void SetUserSettingsPageRangesForSubsequentContext(
       const PageRanges& page_ranges);
 
@@ -41,10 +37,6 @@ class BrowserPrintingContextFactoryForTest
   void SetFailedErrorOnNewDocument(bool cause_errors);
   void SetJobIdOnNewDocument(int job_id);
   void SetAccessDeniedErrorOnNewDocument(bool cause_errors);
-#if BUILDFLAG(IS_WIN)
-  void SetAccessDeniedErrorOnRenderPage(bool cause_errors);
-  void SetFailedErrorForRenderPage(uint32_t page_number);
-#endif
   void SetAccessDeniedErrorOnRenderDocument(bool cause_errors);
   void SetAccessDeniedErrorOnDocumentDone(bool cause_errors);
   void SetFailErrorOnUseDefaultSettings();
@@ -62,9 +54,6 @@ class BrowserPrintingContextFactoryForTest
       const std::string& printer_name);
 
   std::string printer_name_;
-#if BUILDFLAG(IS_WIN)
-  std::optional<mojom::PrinterLanguageType> printer_language_type_;
-#endif
   std::optional<PageRanges> page_ranges_;
 
   bool failed_error_for_update_printer_settings_ = false;
@@ -72,10 +61,6 @@ class BrowserPrintingContextFactoryForTest
   bool failed_error_for_new_document_ = false;
   bool access_denied_errors_for_new_document_ = false;
   std::optional<int> new_document_job_id_;
-#if BUILDFLAG(IS_WIN)
-  bool access_denied_errors_for_render_page_ = false;
-  uint32_t failed_error_for_render_page_number_ = 0;
-#endif
   bool access_denied_errors_for_render_document_ = false;
   bool access_denied_errors_for_document_done_ = false;
   bool fail_on_use_default_settings_ = false;

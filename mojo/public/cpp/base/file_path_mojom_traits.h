@@ -12,26 +12,14 @@
 #include "mojo/public/cpp/bindings/struct_traits.h"
 #include "mojo/public/mojom/base/file_path.mojom-shared.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/containers/span.h"
-#endif
-
 namespace mojo {
 
 template <>
 struct COMPONENT_EXPORT(MOJO_BASE_SHARED_TRAITS)
     StructTraits<mojo_base::mojom::FilePathDataView, base::FilePath> {
-#if BUILDFLAG(IS_WIN)
-  static base::span<const uint16_t> path(const base::FilePath& path) {
-    return UNSAFE_TODO(
-        base::span(reinterpret_cast<const uint16_t*>(path.value().data()),
-                   path.value().size()));
-  }
-#else
   static const base::FilePath::StringType& path(const base::FilePath& path) {
     return path.value();
   }
-#endif
 
   static bool Read(mojo_base::mojom::FilePathDataView data,
                    base::FilePath* out);
@@ -40,11 +28,7 @@ struct COMPONENT_EXPORT(MOJO_BASE_SHARED_TRAITS)
 template <>
 struct COMPONENT_EXPORT(MOJO_BASE_SHARED_TRAITS)
     StructTraits<mojo_base::mojom::RelativeFilePathDataView, base::FilePath> {
-#if BUILDFLAG(IS_WIN)
-  static base::span<const uint16_t> path(const base::FilePath& path);
-#else
   static const base::FilePath::StringType& path(const base::FilePath& path);
-#endif
 
   static bool Read(mojo_base::mojom::RelativeFilePathDataView data,
                    base::FilePath* out);

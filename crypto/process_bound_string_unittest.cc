@@ -70,29 +70,5 @@ using ProcessBoundEncryptionTest = ::testing::Test;
 // Short String Optimization means that the custom allocator is never used for
 // the test string, meaning it never gets cleared. Which is fine, since it was
 // never encrypted anyway.
-#if BUILDFLAG(IS_WIN)
-// Reading into freed memory upsets sanitizers.
-#if !defined(ADDRESS_SANITIZER) && !defined(THREAD_SANITIZER) && \
-    !defined(MEMORY_SANITIZER)
-TEST_F(ProcessBoundEncryptionTest, Encryption) {
-  [[maybe_unused]] const char* data;
-  {
-    crypto::ProcessBound<std::string> process_bound(std::string("hello"));
-    crypto::SecureString secure = process_bound.secure_value();
-    constexpr std::array<uint8_t, 5> kPlainText = {'h', 'e', 'l', 'l', 'o'};
-    EXPECT_THAT(process_bound.maybe_encrypted_data_,
-                ::testing::Not(ContainsSubsequence(kPlainText)));
-    EXPECT_STREQ(secure.c_str(), "hello");
-    data = secure.data();
-  }
-// In debug builds, frees are poisoned after the SecureString allocator has
-// zeroed it, so this check can only take place for release builds.
-#if defined(NDEBUG)
-  EXPECT_EQ(data[0], '\x00');
-#endif  // defined(NDEBUG)
-}
-#endif  // !defined(ADDRESS_SANITIZER) && !defined(THREAD_SANITIZER) &&
-        // !defined(MEMORY_SANITIZER)
-#endif  // #if BUILDFLAG(IS_WIN)
 
 }  // namespace crypto

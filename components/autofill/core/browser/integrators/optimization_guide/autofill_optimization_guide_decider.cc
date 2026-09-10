@@ -231,8 +231,8 @@ void AddOptimizationTypesForBnplIssuers(
     const std::vector<BnplIssuer>& bnpl_issuers,
     base::flat_set<optimization_guide::proto::OptimizationType>&
         optimization_types) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
+    BUILDFLAG(IS_ANDROID)
   auto bnpl_issuer_allowlist_can_be_loaded =
       [&bnpl_issuers](BnplIssuer::IssuerId issuer_id) {
         return std::ranges::contains(bnpl_issuers, issuer_id,
@@ -282,8 +282,8 @@ void AddOptimizationTypesForBnplIssuers(
             : optimization_guide::proto::BUY_NOW_PAY_LATER_ALLOWLIST_KLARNA);
 #endif  // BUILDFLAG(IS_ANDROID)
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
+        // BUILDFLAG(IS_ANDROID)
 }
 
 }  // namespace

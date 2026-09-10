@@ -24,20 +24,10 @@ TEST(LLVMProfileUtilTest, ReplacesDefaultPrefix) {
                                    ProfileProcessType::kRenderer),
             "/renderer-%p.profraw");
 
-#if BUILDFLAG(IS_WIN)
-  // Windows directory paths with backslashes.
-  EXPECT_EQ(GetLLVMProfileFilename("C:\\Users\\profile\\default-%p-%m.profraw",
-                                   ProfileProcessType::kRenderer),
-            "C:\\Users\\profile\\renderer-%p-%m.profraw");
-  EXPECT_EQ(GetLLVMProfileFilename("\\\\server\\share\\default-%p.profraw",
-                                   ProfileProcessType::kRenderer),
-            "\\\\server\\share\\renderer-%p.profraw");
-#else
   // On non-Windows, backslashes are treated as regular filename characters.
   EXPECT_EQ(GetLLVMProfileFilename("/path/to/profile\\default-%2m.profraw",
                                    ProfileProcessType::kRenderer),
             "");
-#endif
 
   // Paths without "default-" prefix are left untouched (returns empty string).
   EXPECT_EQ(GetLLVMProfileFilename("custom-%p.profraw",

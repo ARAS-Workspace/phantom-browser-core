@@ -154,13 +154,7 @@ void SetupGlobalEnvironmentIfNeeded() {
   // Initialize CommandLine if not already initialized. Since this is a DLL,
   // just use empty arguments.
   if (!base::CommandLine::InitializedForCurrentProcess()) {
-#if BUILDFLAG(IS_WIN)
-    // Use InitUsingArgvForTesting() instead of Init() to avoid dependency on
-    // shell32 API which might not work in the sandbox. See crbug.com/1242710.
-    base::CommandLine::InitUsingArgvForTesting(0, nullptr);
-#else
     base::CommandLine::Init(0, nullptr);
-#endif
   }
 }
 

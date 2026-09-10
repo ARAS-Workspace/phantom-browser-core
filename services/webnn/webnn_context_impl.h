@@ -287,11 +287,6 @@ class COMPONENT_EXPORT(WEBNN_SERVICE) WebNNContextImpl
       mojom::TensorInfoPtr tensor_info,
       WebNNTensorImpl::RepresentationPtr representation) = 0;
 
-#if BUILDFLAG(IS_WIN)
-  // Kill the GPU process to destroy all contexts.
-  void DestroyAllContextsAndKillGpuProcess();
-#endif  // BUILDFLAG(IS_WIN)
-
   // Adds a graph to this context.
   void AddGraphImpl(scoped_refptr<WebNNGraphImpl> graph_impl);
 

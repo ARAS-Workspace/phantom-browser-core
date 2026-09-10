@@ -414,11 +414,7 @@ IN_PROC_BROWSER_TEST_F(BrowserCloseManagerBrowserTest, PRE_TestSessionRestore) {
 // Flaky on chromium.chromeos, chromium.linux, and chromium.mac bots. See
 // https://crbug.com/40729351. It was flaky on Windows, but crrev.com/c/2559156,
 // which added retries to ReplaceFile, should fix the Windows flakiness.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TestSessionRestore TestSessionRestore
-#else
 #define MAYBE_TestSessionRestore DISABLED_TestSessionRestore
-#endif
 IN_PROC_BROWSER_TEST_F(BrowserCloseManagerBrowserTest,
                        MAYBE_TestSessionRestore) {
   // The testing framework launches Chrome with about:blank as args.

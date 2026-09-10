@@ -304,8 +304,7 @@ TEST_F(AutofillAiWalletUtilsTest, GetAddEntityTypeStringForI18n_Branded) {
       GetAddEntityTypeStringForI18n(EntityType(EntityTypeName::kDriversLicense),
                                     /*is_wallet_branded=*/false),
       l10n_util::GetStringUTF8(IDS_AUTOFILL_AI_ADD_DRIVERS_LICENSE_ENTITY));
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
   EXPECT_EQ(
       GetAddEntityTypeStringForI18n(EntityType(EntityTypeName::kDriversLicense),
                                     /*is_wallet_branded=*/true),

@@ -43,10 +43,6 @@
 #include "ui/gl/progress_reporter.h"
 #include "ui/gl/scoped_make_current.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "gpu/command_buffer/service/shared_image/d3d_image_backing_factory.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace gpu {
 namespace gles2 {
 
@@ -1727,14 +1723,6 @@ void GLES2DecoderPassthroughImpl::BeginDecoding() {
       TRACE_EVENT_CATEGORY_ENABLED(TRACE_DISABLED_BY_DEFAULT("gpu.decoder"));
   gpu_debug_commands_ = log_commands() || debug() || gpu_trace_commands_;
 
-#if BUILDFLAG(IS_WIN)
-  if (!resources_->ResumeSharedImageAccessIfNeeded(api())) {
-    LOG(ERROR) << "  GLES2DecoderPassthroughImpl: Failed to resume shared "
-                  "image access.";
-    group_->LoseContexts(error::kUnknown);
-  }
-#endif
-
   auto it = active_queries_.find(GL_COMMANDS_ISSUED_CHROMIUM);
   if (it != active_queries_.end()) {
     DCHECK_EQ(it->second.command_processing_start_time, base::TimeTicks());
@@ -1750,10 +1738,6 @@ void GLES2DecoderPassthroughImpl::EndDecoding() {
   if (has_activated_pixel_local_storage_) {
     api()->glFramebufferPixelLocalStorageInterruptANGLEFn();
   }
-
-#if BUILDFLAG(IS_WIN)
-  resources_->SuspendSharedImageAccessIfNeeded();
-#endif
 
   gpu_tracer_->EndDecoding();
 

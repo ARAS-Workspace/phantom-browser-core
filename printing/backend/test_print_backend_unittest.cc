@@ -21,10 +21,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/gfx/geometry/size.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/test/gmock_expected_support.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace printing {
 
 namespace {

@@ -430,11 +430,7 @@ class ClearSiteDataHandlerBrowserTest : public ContentBrowserTest {
 // may or may not send the header, so there are 8 configurations to test.
 
 // Crashes on Win only. https://crbug.com/741189
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_RedirectNavigation DISABLED_RedirectNavigation
-#else
 #define MAYBE_RedirectNavigation RedirectNavigation
-#endif
 IN_PROC_BROWSER_TEST_F(ClearSiteDataHandlerBrowserTest,
                        MAYBE_RedirectNavigation) {
   std::array<GURL, 3> page_urls = {
@@ -480,11 +476,7 @@ IN_PROC_BROWSER_TEST_F(ClearSiteDataHandlerBrowserTest,
 // chain may or may not send the header, so there are 8 configurations to test.
 
 // Crashes on Win only. https://crbug.com/741189
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_RedirectResourceLoad DISABLED_RedirectResourceLoad
-#else
 #define MAYBE_RedirectResourceLoad RedirectResourceLoad
-#endif
 IN_PROC_BROWSER_TEST_F(ClearSiteDataHandlerBrowserTest,
                        MAYBE_RedirectResourceLoad) {
   std::array<GURL, 3> resource_urls = {
@@ -783,11 +775,7 @@ IN_PROC_BROWSER_TEST_F(ClearSiteDataHandlerBrowserTest,
 // if credentials are allowed in that fetch.
 
 // Crashes on Win only. https://crbug.com/741189
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_Credentials DISABLED_Credentials
-#else
 #define MAYBE_Credentials Credentials
-#endif
 IN_PROC_BROWSER_TEST_F(ClearSiteDataHandlerBrowserTest, MAYBE_Credentials) {
   GURL page_template = https_server()->GetURL("origin1.com", "/");
   GURL same_origin_resource =

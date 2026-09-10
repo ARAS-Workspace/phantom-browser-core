@@ -23,7 +23,7 @@ using SearchApiTest = ExtensionApiTest;
 // Test various scenarios, such as the use of input different parameters.
 // Disabled due to flakes on Mac and Win testers; see
 // https://crbug.com/394345948.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_Normal DISABLED_Normal
 #else
 #define MAYBE_Normal Normal

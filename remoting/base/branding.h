@@ -10,11 +10,6 @@
 
 namespace remoting {
 
-#if BUILDFLAG(IS_WIN)
-// Windows chromoting service name.
-extern const wchar_t kWindowsServiceName[];
-#endif
-
 // Returns the a directory for storing chromoting config files. Depending on the
 // platform, different users may get different config directories.
 base::FilePath GetConfigDir();

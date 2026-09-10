@@ -11,10 +11,6 @@ std::u16string FakeLocalizedStringProvider(MessageId message_id) {
   switch (message_id) {
     case DEFAULT_AUDIO_DEVICE_NAME:
       return u"Default";
-#if BUILDFLAG(IS_WIN)
-    case COMMUNICATIONS_AUDIO_DEVICE_NAME:
-      return u"Communications";
-#endif
 #if BUILDFLAG(IS_ANDROID)
     case GENERIC_AUDIO_DEVICE_NAME:
       return u"Nameless audio device (generic)";

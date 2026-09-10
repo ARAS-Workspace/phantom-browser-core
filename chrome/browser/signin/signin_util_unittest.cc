@@ -481,7 +481,7 @@ TEST_F(SigninUtilHistorySyncOptinTest,
       test_sync_service(), {syncer::UserSelectableType::kTabs}));
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 TEST_F(SigninUtilHistorySyncOptinTest, HasExplicitlyDisabledHistorySync) {
   SignInAndSetUpSyncService();
   EXPECT_FALSE(signin_util::HasExplicitlyDisabledHistorySync(
@@ -717,7 +717,7 @@ INSTANTIATE_TEST_SUITE_P(All,
                          [](const auto& info) {
                            return GetUserSelectableTypeName(info.param);
                          });
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 class SignedInStatesTest : public base::test::WithFeatureOverride,

@@ -171,15 +171,6 @@ TEST(EncodingSupportTest, EnablesH264HardwareEncoderProperly) {
   feature.InitAndDisableFeature(kCastStreamingMacHardwareH264);
   EXPECT_FALSE(
       IsHardwareEnabled(VideoCodec::kH264, GetValidProfiles(), k1080p, 30.0));
-#elif BUILDFLAG(IS_WIN)
-  base::test::ScopedFeatureList feature(kCastStreamingWinHardwareH264);
-  EXPECT_TRUE(
-      IsHardwareEnabled(VideoCodec::kH264, GetValidProfiles(), k1080p, 30.0));
-
-  feature.Reset();
-  feature.InitAndDisableFeature(kCastStreamingWinHardwareH264);
-  EXPECT_FALSE(
-      IsHardwareEnabled(VideoCodec::kH264, GetValidProfiles(), k1080p, 30.0));
 #else
   EXPECT_EQ(true, IsHardwareEnabled(VideoCodec::kH264, GetValidProfiles(),
                                     k1080p, 30.0));

@@ -750,7 +750,6 @@ TEST_P(SpellCheckTest, SpellCheckText) {
        L"\x092E\x0947\x0902 \x0914\x0930 \x0909\x092A\x092F\x094B\x0917\x0940 "
        L"\x092C\x0928\x093E\x0928\x093E \x0939\x0948."},
       {
-#if !BUILDFLAG(IS_WIN)
           // Hungarian
           "hu-HU",
           L"A Google azt a k\x00FCldet\x00E9st v\x00E1llalta mag\x00E1ra, "
@@ -759,8 +758,6 @@ TEST_P(SpellCheckTest, SpellCheckText) {
           L"el\x00E9rhet\x0151v\x00E9, "
           L"illetve haszn\x00E1lhat\x00F3v\x00E1 tegye."},
       {
-#endif  // !BUILDFLAG(IS_WIN)
-        // Croatian
           "hr-HR",
           // L"Googleova " - to be added.
           L"je misija organizirati svjetske informacije i u\x010Diniti ih "
@@ -810,7 +807,6 @@ TEST_P(SpellCheckTest, SpellCheckText) {
        L"zasob\x00F3w informacji, aby sta\x0142y si\x0119 one powszechnie "
        L"dost\x0119pne i u\x017Cyteczne."},
       {
-#if !BUILDFLAG(IS_WIN)
           // Portuguese (Brazil)
           "pt-BR",
           L"A miss\x00E3o do "
@@ -824,8 +820,6 @@ TEST_P(SpellCheckTest, SpellCheckText) {
 #endif
           L"acess\x00EDveis e \x00FAteis em car\x00E1ter universal."},
       {
-#endif  // !BUILDFLAG(IS_WIN)
-        // Portuguese (Portugal)
           "pt-PT",
           L"O "
 #if !BUILDFLAG(IS_APPLE)
@@ -888,7 +882,6 @@ TEST_P(SpellCheckTest, SpellCheckText) {
        L"samlade information och g\x00F6ra den tillg\x00E4nglig f\x00F6r "
        L"alla."},
       {
-#if !BUILDFLAG(IS_WIN)
           // Turkish
           "tr-TR",
           // L"Google\x2019\x0131n " - to be added.
@@ -896,8 +889,6 @@ TEST_P(SpellCheckTest, SpellCheckText) {
           L"organize etmek ve evrensel olarak eri\x015Filebilir ve "
           L"kullan\x0131\x015Fl\x0131 k\x0131lmakt\x0131r."},
       {
-#endif  // !BUILDFLAG(IS_WIN)
-        // Ukrainian
           "uk-UA",
           L"\x041c\x0456\x0441\x0456\x044f "
           L"\x043a\x043e\x043c\x043f\x0430\x043d\x0456\x0457 Google "
@@ -920,7 +911,6 @@ TEST_P(SpellCheckTest, SpellCheckText) {
        L"th\x1EBF gi\x1EDBi va l\x00E0m cho n\x00F3 universal c\x00F3 "
        L"th\x1EC3 truy c\x1EADp va h\x1EEFu d\x1EE5ng h\x01A1n."},
       {
-#if !BUILDFLAG(IS_WIN)
           // Korean
           "ko",
           L"Google\xC758 \xBAA9\xD45C\xB294 \xC804\xC138\xACC4\xC758 "
@@ -929,8 +919,6 @@ TEST_P(SpellCheckTest, SpellCheckText) {
           L"\xD3B8\xB9AC\xD558\xAC8C \xC774\xC6A9\xD560 \xC218 "
           L"\xC788\xB3C4\xB85D \xD558\xB294 \xAC83\xC785\xB2C8\xB2E4."},
       {
-#endif  // !BUILDFLAG(IS_WIN)
-        // Albanian
           "sq",
           L"Misioni i Google \x00EBsht\x00EB q\x00EB t\x00EB organizoj\x00EB "
           L"informacionin e bot\x00EBs dhe t\x00EB b\x00EBjn\x00EB at\x00EB "

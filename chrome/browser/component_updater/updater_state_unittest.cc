@@ -20,17 +20,16 @@ namespace component_updater {
 class UpdaterStateTest : public testing::Test {};
 
 TEST_F(UpdaterStateTest, SerializeChromium) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   EXPECT_STREQ("0", UpdaterState::GetState(false).at("ismachine").c_str());
   EXPECT_STREQ("1", UpdaterState::GetState(true).at("ismachine").c_str());
 #else
   EXPECT_TRUE(UpdaterState::GetState(false).empty());
   EXPECT_TRUE(UpdaterState::GetState(true).empty());
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 }
 
-#if (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)) && \
-    BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#if BUILDFLAG(IS_MAC) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 TEST_F(UpdaterStateTest, SerializeChromePerUser) {
   {
@@ -115,7 +114,6 @@ TEST_F(UpdaterStateTest, SerializeChromePerUser) {
   }
 }
 
-#endif  // (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)) &&
-        // BUILDFLAG(GOOGLE_CHROME_BRANDING)
+#endif  // BUILDFLAG(IS_MAC) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 }  // namespace component_updater

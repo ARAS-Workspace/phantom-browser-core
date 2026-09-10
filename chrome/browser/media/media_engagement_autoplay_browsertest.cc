@@ -29,11 +29,7 @@
 namespace {
 
 base::FilePath GetPythonPath() {
-#if BUILDFLAG(IS_WIN)
-  return base::FilePath(FILE_PATH_LITERAL("vpython3.bat"));
-#else
   return base::FilePath(FILE_PATH_LITERAL("vpython3"));
-#endif
 }
 
 const base::FilePath kTestDataPath = base::FilePath(

@@ -69,12 +69,6 @@
 #include "gpu/command_buffer/service/dawn_context_provider.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <dxgi1_3.h>
-
-#include "ui/gl/gl_angle_util_win.h"
-#endif
-
 #if BUILDFLAG(ENABLE_VULKAN)
 #include "gpu/vulkan/vulkan_device_queue.h"
 #include "gpu/vulkan/vulkan_fence_helper.h"
@@ -100,41 +94,6 @@ constexpr base::MemoryConsumerTraits kGpuChannelManagerTraits(
     base::MemoryConsumerTraits::InformationRetention::kLossless,
     // Asynchronous since AsyncMemoryConsumerRegistration is used.
     base::MemoryConsumerTraits::ExecutionType::kAsynchronous);
-
-#if BUILDFLAG(IS_WIN)
-void TrimD3DResources(const scoped_refptr<SharedContextState>& context_state) {
-  // Graphics drivers periodically allocate internal memory buffers in
-  // order to speed up subsequent rendering requests. These memory allocations
-  // in general lead to increased memory usage by the overall system.
-  // Calling Trim discards internal memory buffers allocated for the app,
-  // reducing its memory footprint.
-  // Calling Trim method does not change the rendering state of the
-  // graphics device and has no effect on rendering operations.
-  // There is a brief performance hit when internal buffers are reallocated
-  // during the first rendering operations after the Trim call, therefore
-  // apps should only call Trim when going idle for a period of time or during
-  // low memory conditions.
-  Microsoft::WRL::ComPtr<ID3D11Device> d3d11_device;
-  if (context_state) {
-    d3d11_device = context_state->GetD3D11Device();
-  }
-  if (d3d11_device) {
-    Microsoft::WRL::ComPtr<IDXGIDevice3> dxgi_device;
-    HRESULT hr = d3d11_device.As(&dxgi_device);
-    CHECK_EQ(hr, S_OK);
-    dxgi_device->Trim();
-  }
-
-  Microsoft::WRL::ComPtr<ID3D11Device> angle_d3d11_device =
-      gl::QueryD3D11DeviceObjectFromANGLE();
-  if (angle_d3d11_device && angle_d3d11_device != d3d11_device) {
-    Microsoft::WRL::ComPtr<IDXGIDevice3> dxgi_device;
-    HRESULT hr = angle_d3d11_device.As(&dxgi_device);
-    CHECK_EQ(hr, S_OK);
-    dxgi_device->Trim();
-  }
-}
-#endif
 
 void GL_APIENTRY CrashReportOnGLErrorDebugCallback(GLenum source,
                                                    GLenum type,
@@ -879,9 +838,6 @@ void GpuChannelManager::OnReleaseMemory() {
     persistent_caches_->PurgeMemory(memory_pressure_level);
   }
 
-#if BUILDFLAG(IS_WIN)
-  TrimD3DResources(shared_context_state_);
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 scoped_refptr<SharedContextState> GpuChannelManager::GetSharedContextState(

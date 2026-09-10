@@ -27,10 +27,6 @@
 #include "build/build_config.h"
 #include "ui/base/resource/resource_handle.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#endif
-
 namespace base {
 class FilePath;
 class RefCountedStaticMemory;
@@ -154,11 +150,7 @@ class COMPONENT_EXPORT(UI_DATA_PACK) DataPack : public ResourceHandle {
 
   struct ErrorState {
     FailureReason reason;
-#if BUILDFLAG(IS_WIN)
-    DWORD error;
-#else
     int error;
-#endif
     base::File::Error file_error;
 
     friend bool operator==(const ErrorState& lhs,

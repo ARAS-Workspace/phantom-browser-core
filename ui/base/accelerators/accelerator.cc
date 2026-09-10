@@ -27,11 +27,7 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
-#if !BUILDFLAG(IS_WIN) && (defined(USE_AURA) || BUILDFLAG(IS_MAC))
+#if (defined(USE_AURA) || BUILDFLAG(IS_MAC))
 #include "ui/events/keycodes/keyboard_code_conversion.h"
 #endif
 
@@ -228,25 +224,7 @@ std::u16string Accelerator::GetKeyCodeStringForShortcut() const {
 #endif
 
   if (key_string.empty()) {
-#if BUILDFLAG(IS_WIN)
-    // Our fallback is to try translate the key code to a regular character
-    // unless it is one of digits (VK_0 to VK_9). Some keyboard
-    // layouts have characters other than digits assigned in
-    // an unshifted mode (e.g. French AZERY layout has 'a with grave
-    // accent' for '0'). For display in the menu (e.g. Ctrl-0 for the
-    // default zoom level), we leave VK_[0-9] alone without translation.
-    wchar_t key;
-    if (base::IsAsciiDigit(std::to_underlying(key_code_))) {
-      key = static_cast<wchar_t>(key_code_);
-    } else {
-      key = LOWORD(::MapVirtualKeyW(key_code_, MAPVK_VK_TO_CHAR));
-    }
-    // If there is no translation for the given |key_code_| (e.g.
-    // VKEY_UNKNOWN), |::MapVirtualKeyW| returns 0.
-    if (key != 0) {
-      key_string += key;
-    }
-#elif defined(USE_AURA) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if defined(USE_AURA) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
     const uint16_t c = DomCodeToUsLayoutCharacter(
         UsLayoutKeyboardCodeToDomCode(key_code_), false);
     if (c != 0) {
@@ -400,8 +378,6 @@ std::vector<std::u16string> Accelerator::GetLongFormModifiers() const {
     modifiers.push_back(l10n_util::GetStringUTF16(IDS_APP_COMMAND_KEY));
 #elif BUILDFLAG(IS_CHROMEOS)
     modifiers.push_back(l10n_util::GetStringUTF16(IDS_APP_SEARCH_KEY));
-#elif BUILDFLAG(IS_WIN)
-    modifiers.push_back(l10n_util::GetStringUTF16(IDS_APP_WINDOWS_KEY));
 #elif BUILDFLAG(IS_LINUX)
     modifiers.push_back(l10n_util::GetStringUTF16(IDS_APP_SUPER_KEY));
 #else

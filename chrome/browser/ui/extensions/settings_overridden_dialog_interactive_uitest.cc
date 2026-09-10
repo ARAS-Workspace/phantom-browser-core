@@ -640,11 +640,7 @@ IN_PROC_BROWSER_TEST_F(SettingsOverriddenExplicitChoiceDialogInteractiveUiTest,
 
 // See implementation. Depending on platform, the descriptive paragraph in the
 // dialog either acts as a focusable element, or not.
-#if BUILDFLAG(IS_WIN)
-  const bool focusable_description = true;
-#else
   const bool focusable_description = false;
-#endif
 
   RunTestSequence(
       InstrumentTab(kWebContentsId),

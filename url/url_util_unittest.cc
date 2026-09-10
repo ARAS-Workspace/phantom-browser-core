@@ -584,18 +584,6 @@ std::optional<std::string> CanonicalizeSpec(std::string_view spec,
 }
 }  // namespace
 
-#if BUILDFLAG(IS_WIN)
-// Regression test for https://crbug.com/1252658.
-TEST_F(URLUtilTest, TestCanonicalizeWindowsPathWithLeadingNUL) {
-  auto PrefixWithNUL = [](std::string&& s) -> std::string { return '\0' + s; };
-  EXPECT_EQ(CanonicalizeSpec(PrefixWithNUL("w:"), /*trim_path_end=*/false),
-            std::make_optional("file:///W:"));
-  EXPECT_EQ(CanonicalizeSpec(PrefixWithNUL("\\\\server\\share"),
-                             /*trim_path_end=*/false),
-            std::make_optional("file://server/share"));
-}
-#endif
-
 TEST_F(URLUtilTest, TestCanonicalizeIdempotencyWithLeadingControlCharacters) {
   std::string spec = "_w:";
   // Loop over all C0 control characters and the space character.

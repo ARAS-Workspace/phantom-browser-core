@@ -86,10 +86,6 @@
 #include "ui/views/widget/widget.h"
 #include "ui/wm/core/coordinate_conversion.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "ui/base/ime/linux/text_edit_command_auralinux.h"
 #include "ui/linux/linux_ui.h"
@@ -766,9 +762,7 @@ bool Textfield::OnMousePressed(const ui::MouseEvent& event) {
     if (!had_focus) {
       RequestFocusWithPointer(ui::EventPointerType::kMouse);
     }
-#if !BUILDFLAG(IS_WIN)
     ShowVirtualKeyboardIfEnabled();
-#endif
   }
 
   if (ui::Clipboard::IsSupportedClipboardBuffer(
@@ -1851,21 +1845,6 @@ gfx::Rect Textfield::GetSelectionBoundingBox() const {
   return gfx::Rect();
 }
 
-#if BUILDFLAG(IS_WIN)
-std::optional<gfx::Rect> Textfield::GetProximateCharacterBounds(
-    const gfx::Range& range) const {
-  NOTIMPLEMENTED_LOG_ONCE();
-  return std::nullopt;
-}
-
-std::optional<size_t> Textfield::GetProximateCharacterIndexFromPoint(
-    const gfx::Point& screen_point_in_dips,
-    ui::IndexFromPointFlags flags) const {
-  NOTIMPLEMENTED_LOG_ONCE();
-  return std::nullopt;
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 bool Textfield::GetCompositionCharacterBounds(size_t index,
                                               gfx::Rect* rect) const {
   DCHECK(rect);
@@ -2143,7 +2122,7 @@ bool Textfield::ShouldDoLearning() {
   return false;
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // TODO(crbug.com/41452689): Implement this method to support Korean IME
 // reconversion feature on native text fields (e.g. find bar).
 bool Textfield::SetCompositionFromExistingText(
@@ -2202,15 +2181,6 @@ void Textfield::GetActiveTextInputControlLayoutBounds(
   ConvertRectToScreen(this, &origin);
   *control_bounds = origin;
 }
-
-#if BUILDFLAG(IS_WIN)
-// TODO(crbug.com/41452689): Implement this method once TSF supports
-// reconversion features on native text fields.
-void Textfield::SetActiveCompositionForAccessibility(
-    const gfx::Range& range,
-    const std::u16string& active_composition_text,
-    bool is_composition_committed) {}
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Textfield, views::ViewObserver overrides:
@@ -2530,11 +2500,6 @@ void Textfield::RequestFocusWithPointer(ui::EventPointerType pointer_type) {
 
 void Textfield::RequestFocusForGesture(const ui::GestureEventDetails& details) {
   bool show_virtual_keyboard = true;
-#if BUILDFLAG(IS_WIN)
-  show_virtual_keyboard =
-      details.primary_pointer_type() == ui::EventPointerType::kTouch ||
-      details.primary_pointer_type() == ui::EventPointerType::kPen;
-#endif
 
   RequestFocusWithPointer(details.primary_pointer_type());
   if (show_virtual_keyboard) {
@@ -2663,11 +2628,6 @@ ui::TextEditCommand Textfield::GetCommandForKeyEvent(
 #endif
     case ui::VKEY_BACK:
       if (!control) {
-#if BUILDFLAG(IS_WIN)
-        if (alt) {
-          return shift ? ui::TextEditCommand::REDO : ui::TextEditCommand::UNDO;
-        }
-#endif
         return ui::TextEditCommand::DELETE_BACKWARD;
       }
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)

@@ -90,10 +90,6 @@ bool GetInstalledBinaryPath(const base::FilePath::StringType& binary,
 
   base::FilePath path = dir_path.Append(binary);
 
-#if BUILDFLAG(IS_WIN)
-  path = path.ReplaceExtension(FILE_PATH_LITERAL("exe"));
-#endif  // BUILDFLAG(IS_WIN)
-
   *full_path = path;
   return true;
 }

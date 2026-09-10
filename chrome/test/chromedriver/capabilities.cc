@@ -1175,11 +1175,7 @@ void Switches::SetSwitch(const std::string& name) {
 }
 
 void Switches::SetSwitch(const std::string& name, const std::string& value) {
-#if BUILDFLAG(IS_WIN)
-  switch_map_[name] = base::UTF8ToWide(value);
-#else
   switch_map_[name] = value;
-#endif
 }
 
 void Switches::SetSwitch(const std::string& name, const base::FilePath& value) {
@@ -1189,13 +1185,8 @@ void Switches::SetSwitch(const std::string& name, const base::FilePath& value) {
 void Switches::SetMultivaluedSwitch(const std::string& name,
                                     const std::string& value,
                                     const std::string_view& delimiter) {
-#if BUILDFLAG(IS_WIN)
-  auto native_value = base::UTF8ToWide(value);
-  auto native_delimiter = base::UTF8ToWide(delimiter);
-#else
   const auto& native_value = value;
   const auto& native_delimiter = delimiter;
-#endif
   NativeString& switch_value = switch_map_[name];
   if (switch_value.size() > 0 && !switch_value.ends_with(native_delimiter)) {
     switch_value += native_delimiter;
@@ -1221,11 +1212,7 @@ void Switches::SetFromSwitches(const Switches& switches) {
     // The value in `switch_iter.second` is `NativeString`.
     // `SetSwitch` and `SetMultivaluedSwitch` expect `std::string` (UTF8).
     // Convert `NativeString` to `std::string` before passing.
-#if BUILDFLAG(IS_WIN)
-    auto native_value = base::WideToUTF8(switch_iter.second);
-#else
     const auto& native_value = switch_iter.second;
-#endif
     const auto multivalued_iter = kMultivaluedSwitches.find(switch_iter.first);
     if (multivalued_iter != kMultivaluedSwitches.end()) {
       SetMultivaluedSwitch(switch_iter.first, native_value,
@@ -1272,11 +1259,7 @@ bool Switches::HasSwitch(const std::string& name) const {
 
 std::string Switches::GetSwitchValue(const std::string& name) const {
   NativeString value = GetSwitchValueNative(name);
-#if BUILDFLAG(IS_WIN)
-  return base::WideToUTF8(value);
-#else
   return value;
-#endif
 }
 
 Switches::NativeString Switches::GetSwitchValueNative(

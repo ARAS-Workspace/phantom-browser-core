@@ -89,10 +89,6 @@
 #include "ui/views/widget/tooltip_manager.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/views/win/pen_event_handler_util.h"
-#endif
-
 #if defined(USE_AURA)
 #endif
 
@@ -843,18 +839,6 @@ void Tab::OnGestureEvent(ui::GestureEvent* event) {
                                     views::AsViewClass<View>(this));
 
       if (!closing()) {
-#if BUILDFLAG(IS_WIN)
-        // If the pen is down on the tab, let pen events fall through to the
-        // default window handler until the pen is raised. This allows the
-        // default window handler to execute drag-drop on the window when it's
-        // moved by its tab, e.g., when the window has a single tab or when a
-        // tab is being detached.
-        const bool is_pen = event->details().primary_pointer_type() ==
-                            ui::EventPointerType::kPen;
-        if (is_pen) {
-          views::UseDefaultHandlerForPenEventsUntilPenUp();
-        }
-#endif
         controller_->MaybeStartDrag(this, cloned_event, original_selection);
       }
       break;

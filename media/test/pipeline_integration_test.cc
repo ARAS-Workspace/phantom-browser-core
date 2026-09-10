@@ -51,10 +51,6 @@
 #include "media/filters/mac/audio_toolbox_audio_decoder.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "media/filters/win/media_foundation_audio_decoder.h"
-#endif
-
 #define EXPECT_AUDIO_HASH(expected)                        \
   EXPECT_TRUE(GetAudioHash().IsEquivalent(expected, 0.04)) \
       << "Audio hashes differ. Expected: " << expected     \
@@ -2074,7 +2070,7 @@ TEST_F(PipelineIntegrationTest, BasicPlaybackHashed_M4A) {
   EXPECT_AUDIO_HASH("3.77,4.53,4.75,3.48,3.67,3.76,");
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 std::unique_ptr<AudioDecoder> CreateXheAacDecoder(
     scoped_refptr<base::SequencedTaskRunner> task_runner,
     MediaLog& media_log) {
@@ -2082,8 +2078,6 @@ std::unique_ptr<AudioDecoder> CreateXheAacDecoder(
   return std::make_unique<AudioToolboxAudioDecoder>(media_log.Clone());
 #elif BUILDFLAG(IS_ANDROID)
   return std::make_unique<MediaCodecAudioDecoder>(task_runner);
-#elif BUILDFLAG(IS_WIN)
-  return MediaFoundationAudioDecoder::Create();
 #else
 #error "xHE-AAC decoding is not supported on this platform.";
 #endif
@@ -2149,7 +2143,7 @@ TEST_F(PipelineIntegrationTest, MSE_BasicPlaybackXHE_AAC) {
   Play();
   ASSERT_TRUE(WaitUntilOnEnded());
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 
 std::vector<std::unique_ptr<VideoDecoder>> CreateFailingVideoDecoder() {
   std::vector<std::unique_ptr<VideoDecoder>> failing_video_decoder;

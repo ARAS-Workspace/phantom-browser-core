@@ -77,12 +77,6 @@ using testing::Contains;
 using testing::Eq;
 using testing::Field;
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/scoped_handle.h"
-#endif
-
 // TODO(crbug.com/41451310): Fix memory leaks in tests and re-enable on LSAN.
 #ifdef LEAK_SANITIZER
 #define MAYBE_NonEmptyCorruptSimpleCacheDoesNotRecover \
@@ -102,11 +96,7 @@ const int kLargeNumEntries = 512;
 
 // The size of the HTTP cache is multiplied by 4 by default on non-Windows.
 constexpr bool kHTTPCacheSizeIsIncreased =
-#if BUILDFLAG(IS_WIN)
-    false;
-#else
     true;
-#endif
 
 }  // namespace
 
@@ -2543,22 +2533,12 @@ void DiskCacheBackendTest::BackendRecoverRemove() {
   ASSERT_TRUE(success_) << "remove_head4";
 }
 
-#if BUILDFLAG(IS_WIN)
-// http://crbug.com/396392
-#define MAYBE_RecoverRemove DISABLED_RecoverRemove
-#else
 #define MAYBE_RecoverRemove RecoverRemove
-#endif
 TEST_F(DiskCacheBackendTest, MAYBE_RecoverRemove) {
   BackendRecoverRemove();
 }
 
-#if BUILDFLAG(IS_WIN)
-// http://crbug.com/396392
-#define MAYBE_NewEvictionRecoverRemove DISABLED_NewEvictionRecoverRemove
-#else
 #define MAYBE_NewEvictionRecoverRemove NewEvictionRecoverRemove
-#endif
 TEST_F(DiskCacheBackendTest, MAYBE_NewEvictionRecoverRemove) {
   SetNewEviction();
   BackendRecoverRemove();
@@ -3932,20 +3912,6 @@ TEST_F(DiskCacheBackendTest, FileSharing) {
   {
     auto file = base::MakeRefCounted<disk_cache::File>(false);
     file->Init(name);
-
-#if BUILDFLAG(IS_WIN)
-    DWORD sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
-    DWORD access = GENERIC_READ | GENERIC_WRITE;
-    base::win::ScopedHandle file2(CreateFile(name.value().c_str(), access,
-                                             sharing, nullptr, OPEN_EXISTING, 0,
-                                             nullptr));
-    EXPECT_FALSE(file2.is_valid());
-
-    sharing |= FILE_SHARE_DELETE;
-    file2.Set(CreateFile(name.value().c_str(), access, sharing, nullptr,
-                         OPEN_EXISTING, 0, nullptr));
-    EXPECT_TRUE(file2.is_valid());
-#endif
 
     EXPECT_TRUE(base::DeleteFile(name));
 

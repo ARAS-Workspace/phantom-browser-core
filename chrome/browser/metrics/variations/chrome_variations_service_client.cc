@@ -38,7 +38,7 @@
 #include "chromeos/ash/components/settings/cros_settings.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "base/enterprise_util.h"
 #endif
 
@@ -99,7 +99,7 @@ ChromeVariationsServiceClient::TakeSeedFromNativeVariationsSeedStore() {
 }
 
 bool ChromeVariationsServiceClient::IsEnterprise() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return base::IsEnterpriseDevice();
 #elif BUILDFLAG(IS_CHROMEOS)
   return ash::InstallAttributes::Get()->IsEnterpriseManaged();

@@ -194,13 +194,10 @@ void DeviceFactoryImpl::CreateAndAddNewDevice(
   device_entry = std::make_unique<DeviceMediaToMojoAdapter>(
       std::move(media_device), jpeg_decoder_factory_callback_,
       jpeg_decoder_task_runner_);
-#elif BUILDFLAG(IS_WIN)  // BUILDFLAG(IS_CHROMEOS)
-  device_entry = std::make_unique<DeviceMediaToMojoAdapter>(
-      std::move(media_device), capture_system_->GetFactory());
-#else                    // BUILDFLAG(IS_WIN)
+#else
   device_entry =
       std::make_unique<DeviceMediaToMojoAdapter>(std::move(media_device));
-#endif                   // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
   DeviceInfo info{device_entry.get(), media::VideoCaptureError::kNone};
   std::move(create_callback).Run(std::move(info));
@@ -216,11 +213,5 @@ void DeviceFactoryImpl::OnClientConnectionErrorOrClose(
     active_devices_by_id_.erase(device_id);
   }
 }
-
-#if BUILDFLAG(IS_WIN)
-void DeviceFactoryImpl::OnGpuInfoUpdate(const CHROME_LUID& luid) {
-  capture_system_->GetFactory()->OnGpuInfoUpdate(luid);
-}
-#endif
 
 }  // namespace video_capture

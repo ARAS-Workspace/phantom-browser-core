@@ -56,7 +56,7 @@ class TestCollaborationControllerDelegateDesktop
   MOCK_METHOD(collaboration::ServiceStatus, GetServiceStatus, (), (override));
 };
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 std::unique_ptr<KeyedService> CreateTestSyncService(content::BrowserContext*) {
   return std::make_unique<syncer::TestSyncService>();
 }
@@ -409,7 +409,7 @@ IN_PROC_BROWSER_TEST_F(CollaborationControllerDelegateDesktopInteractiveUITest,
       browser()->tab_strip_model()->GetActiveWebContents()->GetVisibleURL());
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class
     CollaborationControllerDelegateDesktopInteractiveUITestWithHistorySyncOptIn
     : public InteractiveBrowserTest {
@@ -808,4 +808,4 @@ IN_PROC_BROWSER_TEST_F(
       signin_metrics::AccessPoint::kCollaborationShareTabGroup,
       /*expected_bucket_count=*/1);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

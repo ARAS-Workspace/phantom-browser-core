@@ -8,12 +8,6 @@
 #include "base/notreached.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <aclapi.h>
-#include <sddl.h>
-#endif  // BUILDFLAG(IS_WIN)
 
 #include <algorithm>
 #include <array>
@@ -93,11 +87,6 @@
 #if BUILDFLAG(IS_MAC)
 #include <ApplicationServices/ApplicationServices.h>
 #endif  // BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_WIN)
-#include "base/base_paths_win.h"
-#include "ui/display/win/screen_win.h"
-#include "ui/gfx/mojom/dxgi_info.mojom.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 namespace content {
 
@@ -120,105 +109,6 @@ NOINLINE void FatalGpuProcessLaunchFailureOnBackground() {
 }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-// This function checks the created file to ensure it wasn't redirected
-// to another location using a symbolic link or a hard link.
-bool ValidateFileHandle(HANDLE cache_file_handle,
-                        const base::FilePath& cache_file_path) {
-  // Check that the file wasn't hardlinked to something else.
-  BY_HANDLE_FILE_INFORMATION file_info = {};
-  if (!::GetFileInformationByHandle(cache_file_handle, &file_info))
-    return false;
-  if (file_info.nNumberOfLinks > 1)
-    return false;
-
-  // Check the final path matches the expected path.
-  wchar_t final_path_buffer[MAX_PATH];
-  if (!::GetFinalPathNameByHandle(cache_file_handle, final_path_buffer,
-                                  _countof(final_path_buffer),
-                                  FILE_NAME_NORMALIZED | VOLUME_NAME_DOS)) {
-    return false;
-  }
-  // Returned string should start with \\?\. If not then fail validation.
-  if (!base::StartsWith(final_path_buffer, L"\\\\?\\",
-                        base::CompareCase::INSENSITIVE_ASCII)) {
-    return false;
-  }
-  // Expected filename and actual file name must be an exact match.
-  return cache_file_path == base::FilePath(&final_path_buffer[4]);
-}
-
-// Generate Intel cache file names depending on the app name.
-bool GetIntelCacheFileNames(std::vector<base::FilePath::StringType>* names) {
-  DCHECK(names);
-  DCHECK(names->empty());
-  base::FilePath module_path;
-  if (!base::PathService::Get(base::FILE_EXE, &module_path))
-    return false;
-  module_path = module_path.BaseName().RemoveExtension();
-  base::FilePath::StringType module_name = module_path.value();
-  if (module_name.size() == 0)
-    return false;
-  // The Intel shader cache files should be appName_[0|1|2].
-  names->push_back(module_name + L"_0");
-  names->push_back(module_name + L"_1");
-  names->push_back(module_name + L"_2");
-  return true;
-}
-
-void EnableIntelShaderCache() {
-  base::FilePath dir;
-  if (!base::PathService::Get(base::DIR_COMMON_APP_DATA, &dir))
-    return;
-  dir = dir.Append(L"Intel").Append(L"ShaderCache");
-  if (!base::DirectoryExists(dir))
-    return;
-
-  PSECURITY_DESCRIPTOR sd = nullptr;
-  ULONG sd_length = 0;
-  // Set Full Access to All Users and Administrators, then grant RWX to
-  // AppContainers and Low Privilege AppContainers.
-  BOOL success = ::ConvertStringSecurityDescriptorToSecurityDescriptor(
-      L"D:(A;;FA;;;AU)(A;;FA;;;BA)(A;;GRGWGX;;;S-1-15-2-1)(A;;GRGWGX;;;S-1-15-"
-      L"2-2)",
-      SDDL_REVISION_1, &sd, &sd_length);
-  if (!success)
-    return;
-  DCHECK(sd);
-  DCHECK_LT(0u, sd_length);
-  std::unique_ptr<void, decltype(::LocalFree)*> sd_holder(sd, ::LocalFree);
-  PACL dacl = nullptr;
-  BOOL present = FALSE, defaulted = FALSE;
-  success = ::GetSecurityDescriptorDacl(sd, &present, &dacl, &defaulted);
-  if (!success)
-    return;
-  DCHECK(present);
-  DCHECK(dacl);
-  DCHECK(!defaulted);
-
-  std::vector<base::FilePath::StringType> cache_file_names;
-  if (!GetIntelCacheFileNames(&cache_file_names))
-    return;
-  for (const auto& cache_file_name : cache_file_names) {
-    base::FilePath cache_file_path = dir.Append(cache_file_name);
-    HANDLE cache_file_handle = ::CreateFileW(
-        cache_file_path.value().c_str(), WRITE_DAC,
-        FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_ALWAYS, 0, nullptr);
-    base::win::ScopedHandle handle_holder(cache_file_handle);
-    if (cache_file_handle == INVALID_HANDLE_VALUE ||
-        !ValidateFileHandle(cache_file_handle, cache_file_path)) {
-      continue;
-    }
-
-    DWORD result = ::SetSecurityInfo(cache_file_handle, SE_KERNEL_OBJECT,
-                                     DACL_SECURITY_INFORMATION, nullptr,
-                                     nullptr, dacl, nullptr);
-    if (result != ERROR_SUCCESS) {
-      LOG(ERROR) << "SetSecurityInfo returned " << result;
-    }
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // These values are persistent to logs. Entries should not be renumbered and
 // numeric values should never be reused.
@@ -416,50 +306,6 @@ NOINLINE void IntentionallyCrashBrowserForUnusableGpuProcess() {
   LOG(FATAL) << "GPU process isn't usable. Goodbye.";
 }
 
-#if BUILDFLAG(IS_WIN)
-void CollectExtraDevicePerfInfo(const gpu::GPUInfo& gpu_info,
-                                gpu::DevicePerfInfo* device_perf_info) {
-  device_perf_info->intel_gpu_generation = gpu::GetIntelGpuGeneration(gpu_info);
-  const gpu::GPUInfo::GPUDevice& device = gpu_info.active_gpu();
-  if (device.vendor_id == 0xffff /* internal flag for software rendering */ ||
-      device.vendor_id == 0x15ad /* VMware */ ||
-      // Starting with Windows 8, an adapter called the "Microsoft Basic Render
-      // Driver" is always present. This adapter has a VendorId of 0x1414 and a
-      // DeviceID of 0x8c. The Microsoft vendor id is used for other,
-      // non-software devices such as Xbox, so we must also check the device id.
-      (device.vendor_id == 0x1414 && device.device_id == 0x8c) /* WARP */ ||
-      gl::IsSoftwareGLImplementation(
-          gpu_info.gl_implementation_parts) /* SwiftShader */) {
-    device_perf_info->software_rendering = true;
-  }
-}
-
-// Provides a bridge whereby display::win::ScreenWin can ask the GPU process
-// about the HDR status of the system.
-class HDRProxy {
- public:
-  static void Initialize() {
-    display::win::GetScreenWin()->SetRequestHDRStatusCallback(
-        base::BindRepeating(&HDRProxy::RequestHDRStatus));
-  }
-
-  static void RequestHDRStatus() {
-    auto* gpu_process_host =
-        GpuProcessHost::Get(GPU_PROCESS_KIND_SANDBOXED, false);
-    if (gpu_process_host) {
-      auto* gpu_service = gpu_process_host->gpu_host()->gpu_service();
-      gpu_service->RequestDXGIInfo(base::BindOnce(&HDRProxy::GotResult));
-    } else {
-      GotResult(gfx::mojom::DXGIInfo::New());
-    }
-  }
-
-  static void GotResult(gfx::mojom::DXGIInfoPtr dxgi_info) {
-    display::win::GetScreenWin()->SetDXGIInfo(std::move(dxgi_info));
-  }
-};
-
-#endif  // BUILDFLAG(IS_WIN)
 }  // anonymous namespace
 
 GpuDataManagerImplPrivate::GpuDataManagerImplPrivate(GpuDataManagerImpl* owner)
@@ -467,9 +313,6 @@ GpuDataManagerImplPrivate::GpuDataManagerImplPrivate(GpuDataManagerImpl* owner)
       observer_list_(base::MakeRefCounted<GpuDataManagerObserverList>()) {
   DCHECK(owner_);
   InitializeGpuModes();
-#if BUILDFLAG(IS_WIN)
-  EnableIntelShaderCache();
-#endif  // BUILDFLAG(IS_WIN)
   base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
   if (command_line->HasSwitch(switches::kDisableGpuCompositing)) {
     SetGpuCompositingDisabled();
@@ -661,73 +504,6 @@ void GpuDataManagerImplPrivate::RequestGpuInfoIfNeeded(
 
 void GpuDataManagerImplPrivate::RequestGpuSupportedDirectXVersion(
     bool delayed) {
-#if BUILDFLAG(IS_WIN)
-  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
-  base::TimeDelta delta;
-  if (delayed &&
-      !command_line->HasSwitch(switches::kNoDelayForDX12VulkanInfoCollection)) {
-    delta = base::Seconds(120);
-  }
-
-  base::OnceClosure task = base::BindOnce(
-      [](base::TimeDelta delta) {
-        GpuDataManagerImpl* manager = GpuDataManagerImpl::GetInstance();
-        if (manager->DirectXRequested()) {
-          return;
-        }
-
-        base::CommandLine* command_line =
-            base::CommandLine::ForCurrentProcess();
-        if (command_line->HasSwitch(
-                switches::kDisableGpuProcessForDX12InfoCollection)) {
-          manager->UpdateDirectXRequestStatus(false);
-          return;
-        }
-
-        // No info collection for software GL implementation (id == 0xffff) or
-        // abnormal situation (id == 0). There are a few crash reports on
-        // exit_or_terminate_process() during process teardown. The GPU ID
-        // should be available by the time this task starts to run. In the case
-        // of no delay, which is for testing only, don't check the GPU ID
-        // because the ID is not available yet.
-        const gpu::GPUInfo::GPUDevice& gpu = manager->GetGPUInfo().gpu;
-        if ((gpu.vendor_id == 0xffff && gpu.device_id == 0xffff) ||
-            (!delta.is_zero() && gpu.vendor_id == 0 && gpu.device_id == 0)) {
-          manager->UpdateDirectXRequestStatus(false);
-          return;
-        }
-
-        GpuProcessHost* host = GpuProcessHost::Get(
-            GPU_PROCESS_KIND_INFO_COLLECTION, true /* force_create */);
-        if (!host) {
-          manager->UpdateDirectXRequestStatus(false);
-          return;
-        }
-
-        manager->UpdateDirectXRequestStatus(true);
-        host->info_collection_gpu_service()
-            ->GetGpuSupportedDirectXVersionAndDevicePerfInfo(
-                base::BindOnce([](uint32_t d3d12_feature_level,
-                                  uint32_t highest_shader_model_version,
-                                  uint32_t directml_feature_level,
-                                  const gpu::DevicePerfInfo& device_perf_info) {
-                  GpuDataManagerImpl* manager =
-                      GpuDataManagerImpl::GetInstance();
-                  manager->UpdateDirectXInfo(d3d12_feature_level,
-                                             directml_feature_level);
-                  // UpdateDirectXInfo() needs to be called before
-                  // UpdateDevicePerfInfo() because only the latter calls
-                  // NotifyGpuInfoUpdate().
-                  manager->UpdateDevicePerfInfo(device_perf_info);
-                  manager->TerminateInfoCollectionGpuProcess();
-                  gpu::RecordGpuSupportedDx12VersionHistograms(
-                      d3d12_feature_level, highest_shader_model_version);
-                }));
-      },
-      delta);
-
-  GetUIThreadTaskRunner({})->PostDelayedTask(FROM_HERE, std::move(task), delta);
-#endif
 }
 
 void GpuDataManagerImplPrivate::RequestDawnInfo(bool delayed,
@@ -852,18 +628,7 @@ bool GpuDataManagerImplPrivate::IsEssentialGpuInfoAvailable() const {
 }
 
 bool GpuDataManagerImplPrivate::IsDx12VulkanVersionAvailable() const {
-#if BUILDFLAG(IS_WIN)
-  // Certain gpu_integration_test needs dx12 info. If this info is needed,
-  // --no-delay-for-dx12-vulkan-info-collection should be added to the browser
-  // command line, so that the collection of this info isn't delayed. This
-  // function returns the status of availability to the tests based on whether
-  // gpu info has been requested or not.
-
-  return gpu_info_dx_valid_ || !gpu_info_dx_requested_ ||
-         gpu_info_dx_request_failed_;
-#else
   return true;
-#endif
 }
 
 bool GpuDataManagerImplPrivate::IsGpuFeatureInfoAvailable() const {
@@ -928,14 +693,6 @@ void GpuDataManagerImplPrivate::UnblockDomainFrom3DAPIs(const GURL& url) {
 void GpuDataManagerImplPrivate::UpdateGpuInfo(
     const gpu::GPUInfo& gpu_info,
     const std::optional<gpu::GPUInfo>& gpu_info_for_hardware_gpu) {
-#if BUILDFLAG(IS_WIN)
-  // If GPU process crashes and launches again, GPUInfo will be sent back from
-  // the new GPU process again, and may overwrite the DX12, Vulkan, info we
-  // already collected. This is to make sure it doesn't happen.
-  uint32_t directml_feature_level = gpu_info_.directml_feature_level;
-  uint32_t d3d12_feature_level = gpu_info_.d3d12_feature_level;
-  uint32_t vulkan_version = gpu_info_.vulkan_version;
-#endif
   gpu_info_ = gpu_info;
   RecordDiscreteGpuHistograms(gpu_info_);
   RecordNpuHistograms(gpu_info_);
@@ -950,17 +707,6 @@ void GpuDataManagerImplPrivate::UpdateGpuInfo(
         gpu_info.hardware_supports_vulkan;
   }
 #endif
-#if BUILDFLAG(IS_WIN)
-  if (d3d12_feature_level != 0) {
-    gpu_info_.d3d12_feature_level = d3d12_feature_level;
-  }
-  if (vulkan_version != 0) {
-    gpu_info_.vulkan_version = vulkan_version;
-  }
-  if (directml_feature_level != 0) {
-    gpu_info_.directml_feature_level = directml_feature_level;
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   bool needs_to_update_gpu_info_for_hardware_gpu =
       !gpu_info_for_hardware_gpu_.IsInitialized();
@@ -972,17 +718,10 @@ void GpuDataManagerImplPrivate::UpdateGpuInfo(
     const gpu::GPUInfo::GPUDevice& active_gpu = gpu_info_.active_gpu();
     const gpu::GPUInfo::GPUDevice& cached_active_gpu =
         gpu_info_for_hardware_gpu_.active_gpu();
-#if BUILDFLAG(IS_WIN)
-    if (active_gpu.luid.HighPart != cached_active_gpu.luid.HighPart &&
-        active_gpu.luid.LowPart != cached_active_gpu.luid.LowPart) {
-      needs_to_update_gpu_info_for_hardware_gpu = true;
-    }
-#else
     if (active_gpu.vendor_id != cached_active_gpu.vendor_id ||
         active_gpu.device_id != cached_active_gpu.device_id) {
       needs_to_update_gpu_info_for_hardware_gpu = true;
     }
-#endif  // BUILDFLAG(IS_WIN)
   }
 
   if (needs_to_update_gpu_info_for_hardware_gpu) {
@@ -1007,95 +746,6 @@ void GpuDataManagerImplPrivate::UpdateGpuInfo(
   NotifyGpuInfoUpdate();
 }
 
-#if BUILDFLAG(IS_WIN)
-
-void GpuDataManagerImplPrivate::UpdateDirectXInfo(
-    uint32_t d3d12_feature_level,
-    uint32_t directml_feature_level) {
-  gpu_info_.d3d12_feature_level = d3d12_feature_level;
-  gpu_info_.directml_feature_level = directml_feature_level;
-  gpu_info_dx_valid_ = true;
-  // No need to call NotifyGpuInfoUpdate() because UpdateDirectXInfo() is
-  // always called together with UpdateDevicePerfInfo, which calls
-  // NotifyGpuInfoUpdate().
-}
-
-void GpuDataManagerImplPrivate::UpdateDevicePerfInfo(
-    const gpu::DevicePerfInfo& device_perf_info) {
-  gpu::DevicePerfInfo mutable_device_perf_info = device_perf_info;
-  CollectExtraDevicePerfInfo(gpu_info_, &mutable_device_perf_info);
-  gpu::SetDevicePerfInfo(mutable_device_perf_info);
-  // No need to call GetContentClient()->SetGpuInfo().
-  NotifyGpuInfoUpdate();
-}
-
-void GpuDataManagerImplPrivate::UpdateOverlayInfo(
-    const gpu::OverlayInfo& overlay_info) {
-  gpu_info_.overlay_info = overlay_info;
-
-  // No need to call GetContentClient()->SetGpuInfo().
-  NotifyGpuInfoUpdate();
-}
-
-void GpuDataManagerImplPrivate::UpdateDXGIInfo(
-    gfx::mojom::DXGIInfoPtr dxgi_info) {
-  // Calling out into HDRProxy::GotResult may end up re-entering us via
-  // GpuDataManagerImpl::OnDisplayRemoved/OnDisplayAdded. Both of these
-  // take the owner's lock. To avoid recursive locks, we PostTask
-  // HDRProxy::GotResult so that it runs outside of the lock.
-  GetUIThreadTaskRunner({})->PostTask(
-      FROM_HERE, base::BindOnce(&HDRProxy::GotResult, std::move(dxgi_info)));
-}
-
-void GpuDataManagerImplPrivate::UpdateDirectXRequestStatus(
-    bool request_continues) {
-  gpu_info_dx_requested_ = true;
-  gpu_info_dx_request_failed_ = !request_continues;
-
-  if (gpu_info_dx_request_failed_) {
-    gpu::DevicePerfInfo device_perf_info;
-    gpu::CollectDevicePerfInfo(&device_perf_info, /*in_browser_process=*/true);
-    UpdateDevicePerfInfo(device_perf_info);
-  }
-}
-
-bool GpuDataManagerImplPrivate::DirectXRequested() const {
-  return gpu_info_dx_requested_;
-}
-
-void GpuDataManagerImplPrivate::TerminateInfoCollectionGpuProcess() {
-  // Wait until DX12/Vulkan and DevicePerfInfo requests are all complete.
-  // gpu_info_dx12_valid_ is always updated before device_perf_info
-  if (gpu_info_dx_requested_ && !gpu_info_dx_request_failed_ &&
-      !gpu::GetDevicePerfInfo().has_value()) {
-    return;
-  }
-
-  // GpuProcessHost::Get() calls GpuDataManagerImpl functions and causes a
-  // re-entry of lock.
-  base::AutoUnlock unlock(owner_->lock_);
-  // GpuProcessHost::Get() only runs on the IO thread. Get() can be called
-  // directly here from TerminateInfoCollectionGpuProcess(), which also runs on
-  // the IO thread.
-  GpuProcessHost* host = GpuProcessHost::Get(GPU_PROCESS_KIND_INFO_COLLECTION,
-                                             /*force_create=*/false );
-  if (host)
-    host->ForceShutdown();
-}
-
-void GpuDataManagerImplPrivate::SetUseAdapterLuid(const CHROME_LUID& luid) {
-  use_adapter_luid_ = luid;
-}
-
-void GpuDataManagerImplPrivate::ClearUseAdapterLuid() {
-  use_adapter_luid_ = std::nullopt;
-}
-
-std::optional<CHROME_LUID> GpuDataManagerImplPrivate::GetUseAdapterLuid()
-    const {
-  return use_adapter_luid_;
-}
-#endif
 
 void GpuDataManagerImplPrivate::PostCreateThreads() {
   base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
@@ -1107,26 +757,6 @@ void GpuDataManagerImplPrivate::PostCreateThreads() {
   RequestDawnInfo(/*delayed=*/delay_dawn_collection,
                   /*collect_metrics=*/true);
 
-#if BUILDFLAG(IS_WIN)
-  if (command_line->HasSwitch(switches::kNoDelayForDX12VulkanInfoCollection)) {
-    // This is for the info collection test of the gpu integration tests.
-    RequestGpuInfoIfNeeded(GpuDataManagerImpl::kGpuInfoRequestDirectX,
-                           /*delayed=*/false);
-  } else {
-    // Launch the info collection GPU process to collect DX12 and DirectML
-    // support information for UMA at the start of the browser. Not to affect
-    // Chrome startup, this is done in a delayed mode,  i.e., 120 seconds after
-    // Chrome startup.
-    RequestGpuInfoIfNeeded(GpuDataManagerImpl::kGpuInfoRequestDirectX,
-                           /*delayed=*/true);
-  }
-
-  // Observer for display change.
-  display_observer_.emplace(owner_);
-
-  // Initialization for HDR status update.
-  HDRProxy::Initialize();
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 void GpuDataManagerImplPrivate::UpdateDawnInfo(
@@ -1286,18 +916,6 @@ void GpuDataManagerImplPrivate::AppendGpuCommandLine(
     command_line->AppendSwitchASCII(switches::kUseGL, use_gl);
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (browser_command_line->HasSwitch(switches::kUseAdapterLuid)) {
-    command_line->AppendSwitchASCII(
-        switches::kUseAdapterLuid,
-        browser_command_line->GetSwitchValueASCII(switches::kUseAdapterLuid));
-  } else if (use_adapter_luid_.has_value()) {
-    std::string luid_string =
-        base::NumberToString(use_adapter_luid_->HighPart) + "," +
-        base::NumberToString(use_adapter_luid_->LowPart);
-    command_line->AppendSwitchASCII(switches::kUseAdapterLuid, luid_string);
-  }
-#endif
 }
 
 void GpuDataManagerImplPrivate::UpdateGpuPreferences(
@@ -1322,19 +940,9 @@ void GpuDataManagerImplPrivate::UpdateGpuPreferences(
   const base::CommandLine* command_line =
       base::CommandLine::ForCurrentProcess();
   gpu_preferences->gpu_startup_dialog =
-#if BUILDFLAG(IS_WIN)
-      (kind == GPU_PROCESS_KIND_INFO_COLLECTION &&
-       command_line->HasSwitch(switches::kGpu2StartupDialog)) ||
-#endif
       (kind == GPU_PROCESS_KIND_SANDBOXED &&
        command_line->HasSwitch(switches::kGpuStartupDialog));
 
-#if BUILDFLAG(IS_WIN)
-  if (kind == GPU_PROCESS_KIND_INFO_COLLECTION) {
-    gpu_preferences->disable_gpu_watchdog = true;
-    gpu_preferences->enable_perf_data_collection = true;
-  }
-#endif
 
 #if BUILDFLAG(IS_OZONE)
   gpu_preferences->message_pump_type = ui::OzonePlatform::GetInstance()

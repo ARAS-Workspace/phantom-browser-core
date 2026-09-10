@@ -20,10 +20,6 @@
 #include "base/apple/scoped_mach_port.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include <signal.h>
 #endif
@@ -77,37 +73,6 @@ namespace crash_reporter {
 //
 // On iOS, this will return false if Crashpad initialization fails.
 bool InitializeCrashpad(bool initial_client, const std::string& process_type);
-
-#if BUILDFLAG(IS_WIN)
-// This is the same as InitializeCrashpad(), but rather than launching a
-// crashpad_handler executable, relaunches the executable at |exe_path| or the
-// current executable if |exe_path| is empty with a command line argument of
-// --type=crashpad-handler. If |user_data_dir| is non-empty, it is added to the
-// handler's command line for use by Chrome Crashpad extensions. |attachments|,
-// if not empty, indicates a list of files to be attached to a generated report.
-bool InitializeCrashpadWithEmbeddedHandler(
-    bool initial_client,
-    const std::string& process_type,
-    const std::string& user_data_dir,
-    const base::FilePath& exe_path,
-    const std::vector<base::FilePath>& attachments = {});
-
-// This version of InitializeCrashpadWithEmbeddedHandler is used to call an
-// embedded crash handler that comes from an entry point in a DLL. The command
-// line for these kind of embedded handlers is usually:
-// C:\Windows\System32\rundll.exe <path to dll>,<entrypoint> ...
-// In this situation the exe_path is not sufficient to allow spawning a crash
-// handler through the DLL so |initial_arguments| needs to be passed to specify
-// the DLL entry point. |attachments|, if not empty, indicates a list of files
-// to be attached to a generated report.
-bool InitializeCrashpadWithDllEmbeddedHandler(
-    bool initial_client,
-    const std::string& process_type,
-    const std::string& user_data_dir,
-    const base::FilePath& exe_path,
-    const std::vector<std::string>& initial_arguments,
-    const std::vector<base::FilePath>& attachments = {});
-#endif  // BUILDFLAG(IS_WIN)
 
 // Returns the CrashpadClient for this process. This will lazily create it if
 // it does not already exist. This is called as part of InitializeCrashpad.
@@ -287,18 +252,6 @@ bool GetHandlerSocket(int* sock, pid_t* pid);
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 namespace internal {
-
-#if BUILDFLAG(IS_WIN)
-// Returns platform specific annotations. This is broken out on Windows only so
-// that it may be reused by GetCrashKeysForKasko.
-void GetPlatformCrashpadAnnotations(
-    std::map<std::string, std::string>* annotations);
-
-// The thread functions that implement the InjectDumpForHungInput in the
-// target process.
-DWORD WINAPI DumpProcessForHungInputThread(void* param);
-
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
 // Starts the handler process with an initial client connected on fd,

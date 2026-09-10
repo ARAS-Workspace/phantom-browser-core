@@ -371,7 +371,7 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest, SpaceConstrained) {
   const int original_left_container_width = toolbar_left_container->width();
   EXPECT_GT(original_left_container_width, 0);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   const int original_window_title_width = window_title->width();
   EXPECT_GT(original_window_title_width, 0);
 #endif
@@ -395,7 +395,7 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest, SpaceConstrained) {
   EXPECT_TRUE(toolbar_left_container->GetVisible());
   EXPECT_EQ(toolbar_left_container->width(), original_left_container_width);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   EXPECT_GT(window_title->width(), 0);
   EXPECT_LT(window_title->width(), original_window_title_width);
 #endif
@@ -423,7 +423,7 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest, SpaceConstrained) {
   EXPECT_FALSE(toolbar_left_container->GetVisible());
 
   // The window title should be clipped to 0 width.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   EXPECT_EQ(window_title->width(), 0);
 #endif
 
@@ -1533,7 +1533,7 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
 }
 
 // TODO(crbug.com/40827841): Enable for mac/win when flakiness has been fixed.
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_MAC)
 // Test to ensure crbug.com/40822808 won't reproduce.
 IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
                        PopupFromWcoAppToItself) {
@@ -1584,7 +1584,7 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
                       "window.navigator.windowControlsOverlay.visible")
                    .ExtractBool());
 }
-#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#endif  // !BUILDFLAG(IS_MAC)
 
 // TODO(crbug.com/405233966): Re-enable this test
 #if BUILDFLAG(IS_MAC)
@@ -1796,28 +1796,11 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
   // not `HTCAPTION`. The widget ownership varies between platforms so using
   // different widgets based on platform.
 
-#if BUILDFLAG(IS_WIN)
-  views::NamedWidgetShownWaiter widget_waiter(
-      views::test::AnyWidgetTestPasskey{}, "FindBarHost");
-  // Press Ctrl+F to open find bar.
-  input::NativeWebKeyboardEvent event(
-      blink::WebKeyboardEvent::Type::kRawKeyDown,
-      blink::WebInputEvent::kControlKey,
-      blink::WebInputEvent::GetStaticTimeStampForTests());
-  event.windows_key_code = ui::VKEY_F;
-  event.skip_if_unhandled = false;
-  browser_view->GetActiveWebContents()
-      ->GetPrimaryMainFrame()
-      ->GetRenderViewHost()
-      ->GetWidget()
-      ->ForwardKeyboardEvent(event);
-#else
   views::NamedWidgetShownWaiter widget_waiter(
       views::test::AnyWidgetTestPasskey{}, "PermissionPromptBubbleBaseView");
   content::ExecuteScriptAsyncWithoutUserGesture(
       browser_view->GetActiveWebContents(),
       "navigator.geolocation.getCurrentPosition(() => {});");
-#endif  // BUILDFLAG(IS_WIN)
 
   views::Widget* widget = widget_waiter.WaitIfNeededAndGet();
   ASSERT_TRUE(base::test::RunUntil([&]() { return widget->IsVisible(); }));
@@ -1889,15 +1872,6 @@ IN_PROC_BROWSER_TEST_F(WebAppFrameToolbarBrowserTest_WindowControlsOverlay,
 
   // WCO stays enabled in fullscreen.
   EXPECT_TRUE(browser_view->IsWindowControlsOverlayEnabled());
-
-#if BUILDFLAG(IS_WIN)
-  // The top-right overlay area must not hit-test as caption, which would
-  // swallow clicks meant for app UI (https://crbug.com/518849412).
-  gfx::Point top_right(browser_view->width() - 1, 0);
-  views::View::ConvertPointToTarget(browser_view, browser_view->parent(),
-                                    &top_right);
-  EXPECT_NE(browser_view->NonClientHitTest(top_right), HTCAPTION);
-#endif  // BUILDFLAG(IS_WIN)
 
   // Exiting fullscreen keeps WCO enabled.
   ui_test_utils::FullscreenWaiter exit_waiter(

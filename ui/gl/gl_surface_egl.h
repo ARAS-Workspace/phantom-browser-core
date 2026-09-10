@@ -8,10 +8,6 @@
 #include "base/memory/raw_ptr.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 

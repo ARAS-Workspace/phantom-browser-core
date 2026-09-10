@@ -436,7 +436,7 @@ bool MediaRouterIntegrationBrowserTest::RequiresMediaRouteProviders() const {
 }
 
 // TODO(crbug.com/1238758): Test is flaky on Windows and Linux.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_Basic MANUAL_Basic
 #elif BUILDFLAG(IS_CHROMEOS)
 // TODO(crbug.com/380369297): Test fixture is not compatible with ChromeOS.
@@ -449,7 +449,7 @@ IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest, MAYBE_Basic) {
 }
 
 // TODO(crbug.com/40784325): Test is flaky on Windows and Linux.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_SendAndOnMessage MANUAL_SendAndOnMessage
 #elif BUILDFLAG(IS_CHROMEOS)
 // TODO(crbug.com/380369297): Test fixture is not compatible with ChromeOS.
@@ -477,7 +477,7 @@ IN_PROC_BROWSER_TEST_F(MediaRouterIntegrationBrowserTest, MAYBE_CloseOnError) {
 }
 
 // TODO(crbug.com/40784296): Test is flaky.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_Fail_SendMessage MANUAL_Fail_SendMessage
 #else
 #define MAYBE_Fail_SendMessage Fail_SendMessage

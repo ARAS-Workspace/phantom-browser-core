@@ -436,13 +436,8 @@ IN_PROC_BROWSER_TEST_P(PDFExtensionAccessibilityTestWithOopifOverride,
 }
 
 // TODO(crbug.com/330202391): Fix the flakiness on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PdfAccessibilityContextMenuAction \
-  DISABLED_PdfAccessibilityContextMenuAction
-#else
 #define MAYBE_PdfAccessibilityContextMenuAction \
   PdfAccessibilityContextMenuAction
-#endif  // BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_P(PDFExtensionAccessibilityTestWithOopifOverride,
                        MAYBE_PdfAccessibilityContextMenuAction) {
   // TODO(crbug.com/324636880): Remove this once the test passes for OOPIF PDF.
@@ -1429,15 +1424,6 @@ class PdfSearchifyIntegrationTest
       expected_file_suffix =
           FILE_PATH_LITERAL("-expected-without-pdf-searchify");
     }
-#if BUILDFLAG(IS_WIN)
-    // When OCR is unavailable, each test input has a separate expected output
-    // for Windows. Otherwise, only "blank_image.pdf" has a separate expected
-    // output for Windows.
-    if (!is_ocr_available ||
-        pdf_path.BaseName().value() == FILE_PATH_LITERAL("blank_image.pdf")) {
-      expected_file_suffix += FILE_PATH_LITERAL("-win");
-    }
-#endif  // BUILDFLAG(IS_WIN)
     expected_file_suffix += FILE_PATH_LITERAL(".txt");
 
     // Replace the extension of `pdf_path` with `expected_file_suffix`. However

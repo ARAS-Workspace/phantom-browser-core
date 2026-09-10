@@ -228,10 +228,6 @@ void ExitTypeService::CheckUserAckedCrash() {
     return;
   }
 
-#if BUILDFLAG(IS_WIN)
-  profile_->AckCrashForTracking();
-#endif
-
   waiting_for_user_to_ack_crash_ = false;
 
   if (exit_type_to_apply_on_ack_.has_value()) {

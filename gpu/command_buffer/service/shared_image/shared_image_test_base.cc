@@ -146,7 +146,7 @@ GrContextType SharedImageTestBase::gr_context_type() {
 }
 
 bool SharedImageTestBase::IsGraphiteDawnSupported() {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   return true;
 #elif BUILDFLAG(IS_ANDROID) && BUILDFLAG(SKIA_USE_DAWN)
   // Any Android Q+ devices where we have compiled Graphite/Dawn should work.

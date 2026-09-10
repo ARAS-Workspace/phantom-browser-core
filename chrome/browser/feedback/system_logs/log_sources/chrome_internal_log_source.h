@@ -38,12 +38,7 @@ class ChromeInternalLogSource : public SystemLogsSource {
   void PopulateOnboardingTime(SystemLogsResponse* response);
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-  void PopulateEnrolledToDomain(SystemLogsResponse* response);
-  void PopulateInstallerBrandCode(SystemLogsResponse* response);
-#endif
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   void PopulateLastUpdateState(SystemLogsResponse* response);
 #endif
 };

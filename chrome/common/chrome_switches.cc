@@ -863,92 +863,13 @@ const char kUniqueTempDirSuffix[] = "unique-temp-dir-suffix";
 const char kNoOpForTestingProcess[] = "no-op-for-testing";
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-// Force-enables the profile shortcut manager. This is needed for tests since
-// they use a custom-user-data-dir which disables this.
-const char kEnableProfileShortcutManager[] = "enable-profile-shortcut-manager";
-
-// Indicates that this launch of the browser originated from the installer
-// (i.e., following a successful new install or over-install). This triggers
-// browser behaviors for this specific launch, such as a welcome announcement
-// for accessibility software (see https://crbug.com/40685905).
-extern const char kFromInstaller[] = "from-installer";
-
-// Indicates that this launch of the browser originated from the Legacy Browser
-// Support for Edge extension's native host. This is recorded in UMA.
-extern const char kFromBrowserSwitcher[] = "from-browser-switcher";
-
-// Makes Windows happy by allowing it to show "Enable access to this program"
-// checkbox in Add/Remove Programs->Set Program Access and Defaults. This only
-// shows an error box because the only way to hide Chrome is by uninstalling
-// it.
-const char kHideIcons[] = "hide-icons";
-
-// Whether or not the browser should warn if the profile is on a network share.
-// This flag is only relevant for Windows currently.
-const char kNoNetworkProfileWarning[] = "no-network-profile-warning";
-
-// Whether this process should PrefetchVirtualMemory on the contents of
-// Chrome.dll. This warms up the pages in memory to speed up startup but might
-// not be required in later renderers and/or GPU. For experiment info see
-// crbug.com/40234091.
-const char kNoPreReadMainDll[] = "no-pre-read-main-dll";
-
-// Used in combination with kNotificationLaunchId to specify the inline reply
-// entered in the toast in the Windows Action Center.
-const char kNotificationInlineReply[] = "notification-inline-reply";
-
-// Used for launching Chrome when a toast displayed in the Windows Action Center
-// has been activated. Should contain the launch ID encoded by Chrome.
-const char kNotificationLaunchId[] = "notification-launch-id";
-
-// See kHideIcons.
-const char kShowIcons[] = "show-icons";
-
-// When rendezvousing with an existing process, used to indicate that the
-// StartupInfoW of the new Chrome process had dwFlags == STARTF_TITLEISAPPID.
-// This is used to record launch metrics.
-const char kSourceAppId[] = "source-app-id";
-
-// When rendezvousing with an existing process, used to pass the path of the
-// shortcut that launched the new Chrome process. This is used to record launch
-// metrics.
-const char kSourceShortcut[] = "source-shortcut";
-
-// Identifies Chrome instances that start in foreground mode at startup to
-// record related metrics.
-const char kStartupForegroundLaunch[] = "startup-foreground-launch";
-
-// Runs un-installation steps that were done by chrome first-run.
-const char kUninstall[] = "uninstall";
-
-// Specifies that the WebApp with the specified id should be uninstalled.
-const char kUninstallAppId[] = "uninstall-app-id";
-
-// Specifies that the browser is running isolated and should not attempt to
-// start a second isolated browser.
-const char kIsolated[] = "isolated";
-
-// Specifies the version of the Progressive-Web-App launcher that launched
-// Chrome, used to determine whether to update all launchers.
-// NOTE: changing this switch requires adding legacy handling for the previous
-// method, as older PWA launchers still using this switch will rely on Chrome to
-// update them to use the new method.
-const char kPwaLauncherVersion[] = "pwa-launcher-version";
-
-// Passes the Win32 HANDLE value (as an integer) of the parent process
-// to wait for during relaunch.
-const char kWaitForParentHandle[] = "wait-for-parent-handle";
-
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(ENABLE_PRINT_PREVIEW) && !defined(OFFICIAL_BUILD)
 // Enables support to debug printing subsystem.
 const char kDebugPrint[] = "debug-print";
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 
 // Causes the browser to launch directly in guest mode.
 const char kGuest[] = "guest";
@@ -996,7 +917,7 @@ const char kGlicGuestUrlPresetStaging[] = "glic-guest-url-preset-staging";
 const char kGlicGuestUrlPresetPreprod[] = "glic-guest-url-preset-preprod";
 const char kGlicGuestUrlPresetProd[] = "glic-guest-url-preset-prod";
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 // Writes open and installed web apps for each profile to the specified file
 // without launching a new browser window or tab. Pass a absolute file path
 // to specify where to output the information. Can be used together with

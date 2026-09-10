@@ -9,12 +9,6 @@
 #include "chrome/utility/importer/bookmarks_file_importer.h"
 #include "chrome/utility/importer/firefox_importer.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/common/importer/edge_importer_utils_win.h"
-#include "chrome/utility/importer/edge_importer_win.h"
-#include "chrome/utility/importer/ie_importer_win.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/apple/foundation_util.h"
 #include "chrome/utility/importer/safari_importer.h"
@@ -25,15 +19,6 @@ namespace importer {
 scoped_refptr<Importer> CreateImporterByType(
     user_data_importer::ImporterType type) {
   switch (type) {
-#if BUILDFLAG(IS_WIN)
-    case user_data_importer::TYPE_IE:
-      return new IEImporter();
-    case user_data_importer::TYPE_EDGE:
-      // If legacy mode we pass back an IE importer.
-      if (IsEdgeFavoritesLegacyMode())
-        return new IEImporter();
-      return new EdgeImporter();
-#endif
     case user_data_importer::TYPE_BOOKMARKS_FILE:
       return new BookmarksFileImporter();
 #if !BUILDFLAG(IS_CHROMEOS)

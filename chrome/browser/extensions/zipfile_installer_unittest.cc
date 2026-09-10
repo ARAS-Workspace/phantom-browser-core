@@ -314,16 +314,8 @@ TEST_F(ZipFileInstallerLocationTest, CannotCreateContainingDirectoryZip) {
   // just an error since other things can cause an error.
   RunInstaller(
       /*zip_name=*/"good.zip", /*expect_error=*/true, /*unzip_dir_root=*/
-#if !BUILDFLAG(IS_WIN)
       base::FilePath(
           FILE_PATH_LITERAL("/NonExistentDirectory/UnpackedExtensions"))
-#else
-      // Windows will create unexpected paths so we use explicitly disallowed
-      // characters in the Windows filesystem to ensure creating this directory
-      // fails.
-      base::FilePath(
-          FILE_PATH_LITERAL("|<IllegalWinDirName>|/UnpackedExtensions"))
-#endif  // !BUILDFLAG(IS_WIN)
   );
 }
 

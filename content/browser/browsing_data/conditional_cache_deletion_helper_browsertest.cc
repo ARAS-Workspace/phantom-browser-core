@@ -150,11 +150,7 @@ IN_PROC_BROWSER_TEST_F(ConditionalCacheDeletionHelperBrowserTest, Condition) {
 // Tests that ConditionalCacheDeletionHelper correctly constructs a condition
 // for time and URL.
 // crbug.com/1010102: fails on win.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TimeAndURL DISABLED_TimeAndURL
-#else
 #define MAYBE_TimeAndURL TimeAndURL
-#endif
 IN_PROC_BROWSER_TEST_F(ConditionalCacheDeletionHelperBrowserTest,
                        MAYBE_TimeAndURL) {
   // Create some entries.

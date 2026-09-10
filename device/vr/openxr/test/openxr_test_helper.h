@@ -23,9 +23,6 @@
 #include "third_party/openxr/src/include/openxr/openxr.h"
 #include "third_party/skia/include/core/SkColor.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <wrl.h>
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 #include "ui/gl/gl_bindings.h"
@@ -121,11 +118,6 @@ class OpenXrTestHelper {
   bool UpdateViews(XrViewConfigurationType view_config_type,
                    XrView views[],
                    uint32_t size);
-#if BUILDFLAG(IS_WIN)
-  void SetD3DDevice(ID3D11Device* d3d_device);
-  const std::vector<Microsoft::WRL::ComPtr<ID3D11Texture2D>>&
-  GetSwapchainTextures() const;
-#endif
 #if BUILDFLAG(IS_ANDROID)
   void SetOpenGLESInfo(EGLDisplay display, EGLContext context);
   const std::vector<uint32_t>& GetSwapchainTextureIDs(XrSwapchain swapchain);
@@ -218,10 +210,7 @@ class OpenXrTestHelper {
   };
 
   void ReinitializeTextures();
-#if BUILDFLAG(IS_WIN)
-  void CreateTextures(uint32_t width, uint32_t height);
-  void CopyTextureDataIntoFrameData(uint32_t x_start, device::ViewData& data);
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   void CreateTextures(XrSwapchain swapchain);
   void CopyTextureDataIntoFrameData(XrSwapchain swapchain,
                                     uint32_t x_start,
@@ -265,11 +254,7 @@ class OpenXrTestHelper {
 
   // TODO(https://crbug.com/381076468): Consider abstractions for platform
   // specific code.
-#if BUILDFLAG(IS_WIN)
-  Microsoft::WRL::ComPtr<ID3D11Device> d3d_device_;
-  uint32_t acquired_swapchain_texture_ = 0;
-  std::vector<Microsoft::WRL::ComPtr<ID3D11Texture2D>> textures_arr_;
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // Acquired swapchain texture per swapchain.
   absl::flat_hash_map<XrSwapchain, uint32_t> acquired_swapchain_textures_;
   absl::flat_hash_map<XrSwapchain, std::vector<uint32_t>>

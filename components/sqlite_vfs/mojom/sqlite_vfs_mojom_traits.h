@@ -93,13 +93,11 @@ struct COMPONENT_EXPORT(SQLITE_VFS_MOJOM_TRAITS)
     return std::move(pending_file_set.wal_index_file);
   }
 
-#if !BUILDFLAG(IS_WIN)
   static base::File wal_index_file_read_only(
       sqlite_vfs::PendingFileSet& pending_file_set) {
     CHECK_EQ(pending_file_set.read_write, true);
     return std::move(pending_file_set.wal_index_file_read_only);
   }
-#endif
 
   static base::UnsafeSharedMemoryRegion shared_lock(
       sqlite_vfs::PendingFileSet& pending_file_set) {

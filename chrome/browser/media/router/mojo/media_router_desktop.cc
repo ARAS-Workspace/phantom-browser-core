@@ -54,10 +54,6 @@
 #include "services/network/public/mojom/socket_factory.mojom.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/media/router/mojo/media_route_provider_util_win.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "extensions/common/constants.h"
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
@@ -152,11 +148,6 @@ void MediaRouterDesktop::Initialize() {
             &MediaRouterDesktop::OnLocalDiscoveryPermissionRejected,
             weak_factory_.GetWeakPtr()));
     InitializeMediaRouteProviders();
-#if BUILDFLAG(IS_WIN)
-    CanFirewallUseLocalPorts(
-        base::BindOnce(&MediaRouterDesktop::OnFirewallCheckComplete,
-                       weak_factory_.GetWeakPtr()));
-#endif
   }
 }
 
@@ -415,7 +406,7 @@ bool MediaRouterDesktop::RegisterMediaSinksObserver(
     MediaSinksObserver* observer) {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_MAC)
   // On Windows and macOS, where discovery might trigger a permission
   // prompt, do not start discovery service.
   if (media_sink_service_) {
@@ -852,29 +843,6 @@ void MediaRouterDesktop::InitializeRedirectionMediaRouteProvider() {
   NOTREACHED() << "Redirection Media Route Provider is not enabled.";
 #endif  // BUILDFLAG(ENABLE_MEDIA_REMOTING_REDIRECTION)
 }
-
-#if BUILDFLAG(IS_WIN)
-void MediaRouterDesktop::EnsureMdnsDiscoveryEnabled() {
-  DCHECK(media_sink_service_);
-  media_sink_service_->StartMdnsDiscovery();
-}
-
-void MediaRouterDesktop::OnFirewallCheckComplete(
-    bool firewall_can_use_local_ports) {
-  if (firewall_can_use_local_ports) {
-    GetLogger()->LogInfo(
-        mojom::LogCategory::kDiscovery, kLoggerComponent,
-        "Windows firewall allows mDNS. Ensuring mDNS discovery is enabled.", "",
-        "", "");
-    EnsureMdnsDiscoveryEnabled();
-  } else {
-    GetLogger()->LogInfo(mojom::LogCategory::kDiscovery, kLoggerComponent,
-                         "Windows firewall does not allows mDNS. mDNS "
-                         "discovery can be enabled by user gesture.",
-                         "", "", "");
-  }
-}
-#endif
 
 std::string MediaRouterDesktop::GetHashToken() {
   return GetReceiverIdHashToken(

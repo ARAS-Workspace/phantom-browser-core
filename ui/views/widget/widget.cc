@@ -150,19 +150,6 @@ void NotifyCaretBoundsChanged(ui::InputMethod* input_method) {
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-ui::mojom::WindowShowState GetShowState(views::Widget* widget) {
-  if (widget->IsMaximized()) [[unlikely]] {
-    return ui::mojom::WindowShowState::kMaximized;
-  } else if (widget->IsMinimized()) [[unlikely]] {
-    return ui::mojom::WindowShowState::kMinimized;
-  } else if (widget->IsFullscreen()) [[unlikely]] {
-    return ui::mojom::WindowShowState::kFullscreen;
-  }
-  return ui::mojom::WindowShowState::kNormal;
-}
-#endif
-
 }  // namespace
 
 class Widget::ScopedCallStackLock {
@@ -2031,13 +2018,7 @@ bool Widget::OnNativeWidgetActivationChanged(bool active) {
                                 this);
       root = widget;
     }
-#if BUILDFLAG(IS_WIN)
-    // Windows shuffles child widgets when the application re-gains
-    // activation, so re-order to ensure z-order sublevels.
-    root->GetSublevelManager()->EnsureOwnerTreeSublevel();
-#else
     std::ignore = root;
-#endif
   }
 
   const bool was_paint_as_active = ShouldPaintAsActive();
@@ -2194,13 +2175,6 @@ void Widget::OnNativeWidgetSizeChanged(const gfx::Size& new_size) {
   observers_.Notify(&WidgetObserver::OnWidgetBoundsChanged, this,
                     GetWindowBoundsInScreen());
 
-#if BUILDFLAG(IS_WIN)
-  ui::mojom::WindowShowState show_state = GetShowState(this);
-  if (saved_show_state_ != show_state) {
-    OnNativeWidgetWindowShowStateChanged();
-    saved_show_state_ = show_state;
-  }
-#endif
 }
 
 void Widget::OnNativeWidgetUserResizeStarted() {
@@ -2756,20 +2730,6 @@ void Widget::SetAllowScreenshots(bool allow) {
 bool Widget::AreScreenshotsAllowed() {
   return native_widget_ ? native_widget_->AreScreenshotsAllowed() : true;
 }
-
-#if BUILDFLAG(IS_WIN)
-void Widget::SetExcludeFromScreenCapture(bool exclude) {
-  if (native_widget_) {
-    native_widget_->SetExcludeFromScreenCapture(exclude);
-  }
-
-  // Propagate the exclusion property to children to ensure that context menus,
-  // etc. are also updated.
-  ForEachOwnedWidget(GetNativeView(), [exclude](Widget* child) {
-    child->SetExcludeFromScreenCapture(exclude);
-  });
-}
-#endif
 
 void Widget::UpdateAccessibleNameForRootView() {
   if (root_view_) {

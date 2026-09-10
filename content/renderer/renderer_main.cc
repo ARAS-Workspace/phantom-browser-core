@@ -61,10 +61,6 @@
 #include "third_party/webrtc_overrides/init_webrtc.h"  // nogncheck
 #include "ui/base/ui_base_switches.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "components/startup_metric_utils/renderer/startup_metric_utils.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/library_loader/library_loader_hooks.h"
 #endif  // BUILDFLAG(IS_ANDROID)
@@ -112,9 +108,6 @@ std::unique_ptr<base::MessagePump> CreateMainThreadMessagePump() {
 
 void LogTimeToStartRunLoop(const base::CommandLine& command_line,
                            base::TimeTicks run_loop_start_time) {
-#if BUILDFLAG(IS_WIN)
-  startup_metric_utils::GetRenderer().RecordRunLoopStart(run_loop_start_time);
-#endif
 
   if (!command_line.HasSwitch(switches::kRendererProcessLaunchTimeTicks)) {
     return;
@@ -176,7 +169,7 @@ int RendererMain(MainFunctionParams parameters) {
 
   InitializeSkia();
 
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
   // On Linux, Windows, and ChromeOS, the font manager is overridden or
   // specially handled in RendererBlinkPlatformImpl(). On other platforms,
   // initialise the default one on a thread pool, to avoid blocking on it later.
@@ -239,7 +232,7 @@ int RendererMain(MainFunctionParams parameters) {
       }
     }
 
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
     // Sandbox is enabled before RenderProcess initialization on all platforms,
     // except Windows and Mac.
     // TODO(markus): Check if it is OK to remove ifdefs for Windows and Mac.
@@ -276,16 +269,6 @@ int RendererMain(MainFunctionParams parameters) {
     base::RunLoop run_loop;
     new RenderThreadImpl(run_loop.QuitClosure(),
                          std::move(main_thread_scheduler));
-
-#if BUILDFLAG(IS_WIN)
-    // Now that Mojo is initialized, but before the sandbox is enabled, set up
-    // DirectReceiver.
-    if (base::FeatureList::IsEnabled(
-            blink::features::kDirectCompositorThreadIpc)) {
-      // Pre-initialize a transport since a feature that will use it is enabled.
-      mojo::CreateDirectReceiverTransportBeforeSandbox();
-    }
-#endif  // BUILDFLAG(IS_WIN)
 
     if (need_sandbox) {
       should_run_loop = platform.EnableSandbox();

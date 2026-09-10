@@ -25,11 +25,6 @@
 #include "sandbox/policy/mojom/sandbox.mojom.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/files/file_path.h"
-#include "base/types/pass_key.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace base {
 class Process;
 }  // namespace base
@@ -119,19 +114,6 @@ class CONTENT_EXPORT ServiceProcessHost {
     // Will be called on the UI thread.
     Options& WithObserver(base::WeakPtr<Observer> observer);
 
-#if BUILDFLAG(IS_WIN)
-    // Specifies libraries to preload before the sandbox is locked down. Paths
-    // should be absolute paths. Libraries will be preloaded before sandbox
-    // lockdown. They should later be "loaded" in the utility process using the
-    // same paths after lockdown.
-    // Note that preloading does not occur with --no-sandbox - hence the need to
-    // load in the utility with the full path - this api exists to make the
-    // libraries available for later loading in the sandbox.
-    Options& WithPreloadedLibraries(
-        std::vector<base::FilePath> preload_libraries,
-        base::PassKey<ServiceProcessHostPreloadLibraries> passkey);
-#endif  // BUILDFLAG(IS_WIN)
-
     // Allows the viz.mojom.Gpu client to be bound via the process host on
     // platforms where that is supported. This option will be removed in future.
     // Prefer to avoid setting this option and instead bind the client directly
@@ -153,9 +135,6 @@ class CONTENT_EXPORT ServiceProcessHost {
     std::vector<std::pair<std::string, std::string>> extra_switch_key_values;
     base::OnceCallback<void(const base::Process&)> process_callback;
     base::WeakPtr<Observer> observer;
-#if BUILDFLAG(IS_WIN)
-    std::vector<base::FilePath> preload_libraries;
-#endif  // BUILDFLAG(IS_WIN)
     std::optional<bool> allow_gpu_client;
     std::optional<base::Process::Priority> priority;
   };

@@ -48,10 +48,6 @@
 #include "ui/gl/gl_utils.h"
 #include "ui/gl/init/gl_factory.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#endif
-
 namespace gpu {
 
 GLES2CommandBufferStub::GLES2CommandBufferStub(
@@ -79,14 +75,12 @@ gpu::ContextResult GLES2CommandBufferStub::Initialize(
 
   const auto& attribs = *init_params.attribs->get_gles();
 
-#if !BUILDFLAG(IS_WIN)
   if (attribs.context_type == CONTEXT_TYPE_OPENGLES2 &&
       !channel_->is_gpu_host()) {
     LOG(ERROR) << "ContextResult::kFatalFailure: CONTEXT_TYPE_OPENGLES2 is not "
                   "allowed";
     return gpu::ContextResult::kFatalFailure;
   }
-#endif
 
   GpuChannelManager* manager = channel_->gpu_channel_manager();
   DCHECK(manager);

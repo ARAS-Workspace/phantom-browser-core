@@ -22,7 +22,7 @@ class SignalsAggregator : public KeyedService {
 
   ~SignalsAggregator() override = default;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Will asynchronously collect signals whose names are specified in the
   // `request` object, and will also use a `user_context` to validate that the
   // user has permissions to the device's signals. Invokes `callback` with the
@@ -32,7 +32,7 @@ class SignalsAggregator : public KeyedService {
   virtual void GetSignalsForUser(const UserContext& user_context,
                                  const SignalsAggregationRequest& request,
                                  GetSignalsCallback callback) = 0;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   // Will asynchronously collect signals whose names are specified in the
   // `request` object. Uses the current context (browser management and current

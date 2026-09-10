@@ -32,10 +32,10 @@
 #include "extensions/test/test_extension_dir.h"
 
 namespace {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 constexpr char16_t kSearchOverrideExtensionName[] =
     u"Search Override Extension";
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 }  // namespace
 
 class SettingsOverriddenParamsProvidersBrowserTest
@@ -47,7 +47,7 @@ class SettingsOverriddenParamsProvidersBrowserTest
         TemplateURLServiceFactory::GetForProfile(browser()->GetProfile()));
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // Makes asynchronous parameter collection synchronous fortesting, by waiting
   // in a run loop for icon resource fetching to complete.
   std::optional<ExtensionSettingsOverriddenDialog::Params>
@@ -128,7 +128,7 @@ class SettingsOverriddenParamsProvidersBrowserTest
 
 // The chrome_settings_overrides API that allows extensions to override the
 // default search provider is only available on Windows and Mac.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
 class SearchOverriddenParamsProvidersBrowserTest
     : public SettingsOverriddenParamsProvidersBrowserTest,
@@ -582,7 +582,7 @@ INSTANTIATE_TEST_SUITE_P(All,
                            return info.param ? "ExplicitChoice" : "KeepOrBack";
                          });
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 // Tests the dialog display when the default search engine has changed; in this
 // case, we should display the generic dialog.
@@ -628,7 +628,7 @@ class ExtensionControllingSearchExplicitChoiceParamsBrowserTest
 
 // The chrome_settings_overrides API that allows extensions to override the
 // default search provider is only available on Windows and Mac.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
 IN_PROC_BROWSER_TEST_F(
     ExtensionControllingSearchExplicitChoiceParamsBrowserTest,
@@ -760,4 +760,4 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_EQ(extension_turl->short_name(), new_setting.value().text);
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)

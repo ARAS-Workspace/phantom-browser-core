@@ -34,10 +34,7 @@
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-const char* kPrefKey = prefs::kCloudApAuthEnabled;
-const char* kPolicyKey = policy::key::kCloudAPAuthEnabled;
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 const char* kPrefKey = prefs::kAndroidEntraSSOEnabled;
 const char* kPolicyKey = policy::key::kAndroidEntraSsoEnabled;
 #endif
@@ -73,7 +70,7 @@ class PlatformAuthPolicyObserverTest : public PlatformBrowserTest {
 #endif
 };
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(PlatformAuthPolicyObserverTest, EnableThenDisable) {
   // Initialize the policy handler.
   PrefService* prefs = g_browser_process->local_state();
@@ -270,4 +267,4 @@ IN_PROC_BROWSER_TEST_F(PlatformAuthPolicyObserverTest, UnmanagedDevice) {
 
   platform_auth_policy_observer_.reset();
 }
-#endif  //  BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_ANDROID)

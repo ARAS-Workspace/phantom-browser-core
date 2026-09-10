@@ -117,10 +117,6 @@
 #include "chromeos/components/kiosk/kiosk_utils.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#endif
-
 namespace web_app {
 namespace {
 
@@ -219,12 +215,7 @@ base::DictValue ToDebugDict(const apps::AppLaunchParams& params) {
   value.Set("disposition", static_cast<int>(params.disposition));
   value.Set("override_url", params.override_url.spec());
   value.Set("restore_id", params.restore_id);
-#if BUILDFLAG(IS_WIN)
-  value.Set("command_line",
-            base::WideToUTF8(params.command_line.GetCommandLineString()));
-#else
   value.Set("command_line", params.command_line.GetCommandLineString());
-#endif
   value.Set("current_directory",
             base::FilePathToValue(params.current_directory));
   value.Set("launch_source", static_cast<int>(params.launch_source));

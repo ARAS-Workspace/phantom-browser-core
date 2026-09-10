@@ -2339,8 +2339,7 @@ TEST_F(BrowserAutofillManagerTest,
   // Verify that the amount extraction is not triggered.
   EXPECT_CALL(amount_extraction_manager(), TriggerCheckoutAmountExtraction)
       .Times(0);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(*autofill_manager().GetPaymentsBnplManager(),
               NotifyOfSuggestionGeneration)
       .Times(0);
@@ -2378,8 +2377,7 @@ TEST_F(BrowserAutofillManagerTest,
   // Verify that the amount extraction is not triggered.
   EXPECT_CALL(amount_extraction_manager(), TriggerCheckoutAmountExtraction)
       .Times(0);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(*autofill_manager().GetPaymentsBnplManager(),
               NotifyOfSuggestionGeneration)
       .Times(0);
@@ -2422,8 +2420,7 @@ TEST_F(BrowserAutofillManagerTest,
   // Verify that the amount extraction is not triggered.
   EXPECT_CALL(amount_extraction_manager(), TriggerCheckoutAmountExtraction)
       .Times(0);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   EXPECT_CALL(*autofill_manager().GetPaymentsBnplManager(),
               NotifyOfSuggestionGeneration)
       .Times(0);
@@ -2748,8 +2745,7 @@ TEST_F(BrowserAutofillManagerTest,
       AutofillTriggerSource::kPopup, /*blocked_fields=*/{});
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 TEST_F(BrowserAutofillManagerTest, FillOrPreviewForm_CreditCard_Bnpl) {
   base::test::ScopedFeatureList scoped_feature_list(
       features::kAutofillEnableBuyNowPayLaterSyncing);
@@ -2788,8 +2784,7 @@ TEST_F(BrowserAutofillManagerTest, FillOrPreviewForm_CreditCard_Bnpl) {
       AutofillTriggerSource::kPopup,
       /*blocked_fields=*/{});
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(BrowserAutofillManagerTest,
        OnCreditCardFetchedSuccessfully_CardInfoRetrievalEnrolledCard) {
@@ -2824,8 +2819,7 @@ TEST_F(BrowserAutofillManagerTest,
 // Therefore, the system will only check for supported BNPL issuers on these
 // platforms.
 // TODO(crbug.com/401370610): Update when BNPL is launched to other platform.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Tests that, in the BNPL flow, a VCN is not fetched again due to prior
 // authorization.
 TEST_F(BrowserAutofillManagerTest,
@@ -2850,8 +2844,7 @@ TEST_F(BrowserAutofillManagerTest,
       form.fields().front().global_id(), &credit_card,
       AutofillTriggerSource::kPopup, /*blocked_fields=*/{});
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 // Test that the importing logic is called on form submit.
 TEST_F(BrowserAutofillManagerTest, FormSubmitted_FormDataImporter) {
@@ -6384,8 +6377,7 @@ TEST_F(BrowserAutofillManagerTest_MockAutofillAi,
   EXPECT_TRUE(external_delegate()->on_suggestions_returned_seen());
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 class BrowserAutofillManagerTest_MockAutofillAi_WithModel
     : public BrowserAutofillManagerTest_MockAutofillAi {
  public:
@@ -6552,8 +6544,7 @@ TEST_F(BrowserAutofillManagerTest_MockAutofillAi_WithModel,
   SeeForm(/*may_run_model=*/false);
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 // Ensure that focus events are properly reported to the AutofillFields.
 TEST_F(BrowserAutofillManagerTest, OnFocusOnFormField_FocusReporting) {

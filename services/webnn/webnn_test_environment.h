@@ -10,16 +10,7 @@
 #include "gpu/command_buffer/service/scheduler.h"
 #include "services/webnn/webnn_context_provider_impl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "services/webnn/host/execution_provider_initializer.h"
-#include "ui/gfx/mojom/dxgi_info.mojom.h"
-#endif
-
 namespace webnn {
-
-#if BUILDFLAG(IS_WIN)
-struct EpDeviceInfo;
-#endif
 
 namespace test {
 
@@ -55,20 +46,6 @@ class FakeGpuHostForTesting : public viz::mojom::GpuHost {
                        const std::string& key,
                        const std::string& shader) override;
   void ClearGrShaderDiskCache() override;
-#if BUILDFLAG(IS_WIN)
-  void DidUpdateOverlayInfo(const gpu::OverlayInfo& overlay_info) override;
-  void DidUpdateDXGIInfo(gfx::mojom::DXGIInfoPtr dxgi_info) override;
-  void EnsureWebNNExecutionProvidersReady(
-      EnsureWebNNExecutionProvidersReadyCallback callback) override;
-  void RequestWebNNCompilerContext(
-      webnn::mojom::CreateContextOptionsPtr context_options,
-      const webnn::ContextProperties& context_properties,
-      const webnn::EpDeviceInfo& target_device,
-      mojo::PendingReceiver<webnn::mojom::WebNNCompilerContext>
-          compiler_context_receiver,
-      mojo::PendingRemote<webnn::mojom::WebNNModelLoader> model_loader_remote)
-      override;
-#endif
   void CreateWebNNWeightsFile(CreateWebNNWeightsFileCallback callback) override;
 
  private:

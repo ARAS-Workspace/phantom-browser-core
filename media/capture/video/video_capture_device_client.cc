@@ -181,18 +181,8 @@ FourccAndFlip GetFourccAndFlipFromPixelFormat(
         // Linux RGB24 defines red at lowest byte address,
         // see http://linuxtv.org/downloads/v4l-dvb-apis/packed-rgb.html.
         return {libyuv::FOURCC_RAW};
-      } else if constexpr (BUILDFLAG(IS_WIN)) {
-        // Windows RGB24 defines blue at lowest byte,
-        // see https://msdn.microsoft.com/en-us/library/windows/desktop/dd407253
-
-        // TODO(wjia): Currently, for RGB24 on WIN, capture device always passes
-        // in positive src_width and src_height. Remove this hardcoded value
-        // when negative src_height is supported. The negative src_height
-        // indicates that vertical flipping is needed.
-        return {libyuv::FOURCC_24BG, true};
       } else {
-        NOTREACHED()
-            << "RGB24 is only available in Linux and Windows platforms";
+        NOTREACHED() << "RGB24 is only available in Linux platforms";
       }
     case media::PIXEL_FORMAT_ARGB:
       // Windows platforms e.g. send the data vertically flipped sometimes.
@@ -521,17 +511,6 @@ void VideoCaptureDeviceClient::OnIncomingCapturedImage(
                                     natural_size, metadata, frame_feedback_id);
     return;
   }
-#elif BUILDFLAG(IS_WIN)
-  if (shared_image->usage().Has(gpu::SHARED_IMAGE_USAGE_SCANOUT)) {
-    // On Windows, shared images backed by DXGI textures (e.g. from WGC texture
-    // capture) cannot be CPU-mapped. Use the zero-copy path to pass the GPU
-    // texture directly to downstream consumers (e.g. video encoder).
-    OnIncomingCapturedImageZeroCopy(std::move(shared_image), frame_format,
-                                    clockwise_rotation, reference_time,
-                                    timestamp, capture_begin_timestamp,
-                                    natural_size, metadata, frame_feedback_id);
-    return;
-  }
 #endif
 
   int destination_width = shared_image->size().width();
@@ -704,9 +683,6 @@ VideoCaptureDeviceClient::CreateReadyFrameFromExternalBuffer(
                                   buffer.color_space);
   buffer_for_reserve_id.client_shared_image =
       std::move(buffer.client_shared_image);
-#if BUILDFLAG(IS_WIN)
-  buffer_for_reserve_id.imf_buffer = std::move(buffer.imf_buffer);
-#endif
   VideoCaptureDevice::Client::ReserveResult reservation_result_code =
       buffer_pool_->ReserveIdForExternalBuffer(std::move(buffer_for_reserve_id),
                                                visible_rect.size(),

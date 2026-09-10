@@ -31,7 +31,7 @@
 #include "ui/base/ui_base_features.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/startup/default_browser_prompt/pin_infobar/pin_infobar_controller.h"
 #include "components/omnibox/browser/vector_icons.h"
 #endif
@@ -105,7 +105,7 @@ void RegisterInfoBars() {
     browser_infobar_manager->Register(std::move(spec));
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (infobars::IsInfoBarMigrated(
           infobars::InfoBarDelegate::PIN_INFOBAR_DELEGATE)) {
     CHECK(browser_infobar_manager);

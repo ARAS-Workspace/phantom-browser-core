@@ -129,12 +129,6 @@ COMPONENT_EXPORT(SEARCH_ENGINES_SWITCHES)
 BASE_DECLARE_FEATURE(kSearchSettingsUpdateV2);
 #endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
 
-#if BUILDFLAG(IS_WIN)
-// When enabled, will reject encrypted keyword table hashes that are weakly
-// encrypted.
-COMPONENT_EXPORT(SEARCH_ENGINES_SWITCHES)
-BASE_DECLARE_FEATURE(kRejectWeakKeywordHashes);
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace switches
 

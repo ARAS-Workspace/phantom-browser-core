@@ -186,12 +186,6 @@ const char* const kPersistentPrefNames[] = {
     prefs::kDevToolsDiscoverTCPTargetsEnabled,
     prefs::kDevToolsTCPDiscoveryConfig,
 
-#if BUILDFLAG(IS_WIN)
-    // The total number of times that network profile warning is shown is
-    // aggregated between regular and incognito modes.
-    prefs::kNetworkProfileWarningsLeft,
-#endif
-
     // Tab stats metrics are aggregated between regular and incognio mode.
     prefs::kTabStatsTotalTabCountMax,
     prefs::kTabStatsMaxTabsPerWindow,

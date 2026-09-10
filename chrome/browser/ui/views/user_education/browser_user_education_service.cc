@@ -150,10 +150,6 @@
 #include "components/user_education/views/help_bubble_factory_mac.h"
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/ui/search_promotion/search_promotion_manager.h"
-#include "chrome/browser/ui/search_promotion/search_promotion_manager_factory.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/ui/webui/extensions_zero_state_promo/zero_state_promo_ui.h"
@@ -285,8 +281,7 @@ CreateNavigationAction(GURL target) {
       std::move(target));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 void NavigateToSettingsPage(ContextPtr ctx,
                             user_education::FeaturePromoHandle promo_handle) {
   BrowserWindowInterface* const browser = GetBrowser(ctx);
@@ -305,8 +300,7 @@ void NavigateToSettingsPage(ContextPtr ctx,
       browser, *app_id,
       web_app::AppSettingsPageEntryPoint::kNavigationCapturingIphBubble);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 
@@ -1403,7 +1397,7 @@ void MaybeRegisterChromeFeaturePromos(
                 "Triggered when a shared tab becomes the active tab.")));
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // kIPHSupervisedUserProfileSigninFeature:
   registry.RegisterFeature(std::move(
       FeaturePromoSpecification::CreateForCustomAction(
@@ -1476,7 +1470,7 @@ void MaybeRegisterChromeFeaturePromos(
           .SetMetadata(142, "ddac@google.com",
                        "Triggered for a signed-in user who hasn't turned on "
                        "sync yet, after the sync-to-signin migration.")));
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   // kIPHTabSearchComboButtonFeature:
   registry.RegisterFeature(std::move(
@@ -1709,8 +1703,7 @@ void MaybeRegisterChromeFeaturePromos(
                        "Triggered to inform users of the availability of the "
                        "new translate screen feature on the Lens Overlay.")));
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   // kIPHDesktopPWAsLinkCapturingLaunch:
   registry.RegisterFeature(std::move(
       FeaturePromoSpecification::CreateForCustomAction(
@@ -1838,7 +1831,7 @@ void MaybeRegisterChromeFeaturePromos(
                          "Triggered when Price Tracking alerts are enabled.")));
   }
 
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(ENABLE_COMPOSE)
   // kIPHComposeMSBBSettingsFeature:
@@ -1897,61 +1890,6 @@ void MaybeRegisterChromeFeaturePromos(
                        "Triggered when the vertical tabs is enabled and the "
                        "user has not enabled expand on hover before.")));
 
-#if BUILDFLAG(IS_WIN)
-  // kIPHSearchPromotionFeature:
-  // Query the Finch experiment arm at registration time to decide which
-  // localized strings (Arm A promo only vs Arms B, C, D promo and install)
-  // should populate this promo bubble.
-  //
-  // TODO(b/467255671): Re-evaluate tracking feature usage to suppress
-  // the promo once experiments are complete. Similarly if launch
-  // occurs the values may need changing to re-show.
-  std::string arm_str = feature_engagement::kSearchPromotionArm.Get();
-
-  int body_id = IDS_SEARCH_PROMOTION_IPH_BODY_ARM_A;
-  int cta_id = IDS_SEARCH_PROMOTION_IPH_CTA_ARM_A;
-  int dismiss_id = IDS_SEARCH_PROMOTION_IPH_DISMISS_ARM_A;
-  int title_id = IDS_SEARCH_PROMOTION_IPH_TITLE_ARM_A;
-
-  if (arm_str == feature_engagement::kSearchPromotionArmB ||
-      arm_str == feature_engagement::kSearchPromotionArmC ||
-      arm_str == feature_engagement::kSearchPromotionArmD) {
-    body_id = IDS_SEARCH_PROMOTION_IPH_BODY_ARM_B;
-    cta_id = IDS_SEARCH_PROMOTION_IPH_CTA_ARM_B;
-    dismiss_id = IDS_SEARCH_PROMOTION_IPH_DISMISS_ARM_B;
-    title_id = IDS_SEARCH_PROMOTION_IPH_TITLE_ARM_B;
-  }
-
-  // Register the Search Promotion IPH as a custom action promo. The bubble
-  // anchors to the App Menu (three dots) button on the main browser toolbar.
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForCustomAction(
-          feature_engagement::kIPHSearchPromotionFeature,
-          kToolbarAppMenuButtonElementId, body_id, cta_id,
-          base::BindRepeating(
-              [](ContextPtr ctx,
-                 user_education::FeaturePromoHandle /*promo_handle*/) {
-                Browser* browser = GetBrowser(ctx);
-                if (browser) {
-                  // Delegate execution to the active SearchPromotionManager
-                  // service to trigger the relevant promotion action
-                  // corresponding to the Finch arm.
-                  SearchPromotionManager* manager =
-                      SearchPromotionManagerFactory::GetForProfile(
-                          browser->GetProfile());
-                  if (manager) {
-                    manager->OnPromoAccepted();
-                  }
-                }
-              }))
-          .SetBubbleTitleText(title_id)
-          .SetCustomActionIsDefault(true)
-          .SetCustomActionDismissText(dismiss_id)
-          .SetBubbleArrow(HelpBubbleArrow::kTopRight)
-          .SetMetadata(150, "qlucyk@chromium.org",
-                       "Triggered when user performs Google searches and is "
-                       "eligible for the promo.")));
-#endif  // BUILDFLAG(IS_WIN)
 
   // kIPHSplitViewHorizontalIndirectAccessFeature:
   if (tabs::IsSplitViewHorizontalIndirectAccessEnabled()) {
@@ -2396,7 +2334,7 @@ void MaybeRegisterChromeNewBadges(user_education::NewBadgeRegistry& registry) {
           153, "kristislee@google.com",
           "Shown on the Line Focus menu item in Reading Mode settings menu.")));
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   registry.RegisterFeature(user_education::NewBadgeSpecification(
       switches::kCrossDeviceSigninFromDesktop,
       user_education::Metadata(

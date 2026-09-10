@@ -183,13 +183,6 @@
 #include "content/renderer/theme_helper_mac.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <objbase.h>
-
-#include <windows.h>
-
-#include "content/renderer/media/win/dcomp_texture_factory.h"
-#endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include "content/child/sandboxed_process_thread_type_handler.h"
@@ -1001,12 +994,6 @@ media::GpuVideoAcceleratorFactories* RenderThreadImpl::GetGpuFactories() {
 #endif
   const bool enable_media_stream_gpu_memory_buffers = enable_gpu_memory_buffers;
   bool enable_video_gpu_memory_buffers = enable_gpu_memory_buffers;
-#if BUILDFLAG(IS_WIN)
-  enable_video_gpu_memory_buffers =
-      enable_video_gpu_memory_buffers &&
-      (cmd_line->HasSwitch(switches::kEnableGpuMemoryBufferVideoFrames) ||
-       gpu_channel_host->gpu_info().overlay_info.supports_overlays);
-#endif  // BUILDFLAG(IS_WIN)
 
   auto codec_factory = CreateMediaMojoCodecFactory(
       media_context_provider, enable_video_decode_accelerator,
@@ -1130,21 +1117,6 @@ RenderThreadImpl::SharedMainThreadContextProvider() {
   return shared_main_thread_contexts_;
 }
 
-#if BUILDFLAG(IS_WIN)
-scoped_refptr<DCOMPTextureFactory> RenderThreadImpl::GetDCOMPTextureFactory() {
-  DCHECK(IsMainThread());
-  if (!dcomp_texture_factory_.get() || dcomp_texture_factory_->IsLost()) {
-    scoped_refptr<gpu::GpuChannelHost> channel = EstablishGpuChannelSync();
-    if (!channel) {
-      dcomp_texture_factory_ = nullptr;
-      return nullptr;
-    }
-    dcomp_texture_factory_ = DCOMPTextureFactory::Create(
-        std::move(channel), GetMediaSequencedTaskRunner());
-  }
-  return dcomp_texture_factory_;
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 base::WaitableEvent* RenderThreadImpl::GetShutdownEvent() {
   return ChildProcess::current()->GetShutDownEvent();

@@ -179,17 +179,7 @@ class ApplyManifestMigrationCommandTest : public WebAppTest {
       return SK_ColorTRANSPARENT;
     }
 
-#if BUILDFLAG(IS_WIN)
-    std::optional<SkColor> desktop_color =
-        fake_os_integration().GetShortcutIconTopLeftColor(
-            profile(), fake_os_integration().desktop(), app_id, app_name);
-    std::optional<SkColor> application_menu_icon_color =
-        fake_os_integration().GetShortcutIconTopLeftColor(
-            profile(), fake_os_integration().application_menu(), app_id,
-            app_name);
-    EXPECT_EQ(desktop_color.value(), application_menu_icon_color.value());
-    return desktop_color.value();
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     std::optional<SkColor> icon_color =
         fake_os_integration().GetShortcutIconTopLeftColor(
             profile(), fake_os_integration().chrome_apps_folder(), app_id,

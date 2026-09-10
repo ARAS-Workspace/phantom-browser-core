@@ -83,10 +83,6 @@
 #include "services/network/public/mojom/url_response_head.mojom.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "base/files/file_path.h"
 #include "chrome/browser/ui/web_applications/test/isolated_web_app_test_utils.h"
@@ -1118,20 +1114,12 @@ class CaptivePortalBrowserTest : public InProcessBrowserTest {
       ongoing_mock_requests_;
   std::vector<mojo::ScopedMessagePipeHandle> abandoned_client_pipes_;
   std::atomic<bool> behind_captive_portal_;
-#if BUILDFLAG(IS_WIN)
-  std::optional<base::win::ScopedDomainStateForTesting> scoped_domain_;
-#endif
   bool intercept_bad_cert_ = true;
   bool browser_closed_ = false;
 };
 
 CaptivePortalBrowserTest::CaptivePortalBrowserTest()
     : behind_captive_portal_(true) {
-#if BUILDFLAG(IS_WIN)
-      // Mark as not enterprise managed to prevent the secure DNS mode from
-      // being downgraded to off.
-      scoped_domain_.emplace(false);
-#endif
 }
 
 CaptivePortalBrowserTest::~CaptivePortalBrowserTest() = default;
@@ -3338,11 +3326,7 @@ IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
 }
 
 // TODO(crbug.com/339524384) Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SecureDnsCaptivePortal DISABLED_SecureDnsCaptivePortal
-#else
 #define MAYBE_SecureDnsCaptivePortal SecureDnsCaptivePortal
-#endif
 IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest, MAYBE_SecureDnsCaptivePortal) {
   PrefService* pref_service = g_browser_process->local_state();
 #if BUILDFLAG(IS_CHROMEOS)
@@ -3389,11 +3373,7 @@ IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest, MAYBE_SecureDnsCaptivePortal) {
 // probe that fails. After logging in, the secure DNS error happens again,
 // triggering a captive portal probe that now succeeds.
 // TODO(crbug.com/339524384) Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SecureDnsErrorTriggersCheck DISABLED_SecureDnsErrorTriggersCheck
-#else
 #define MAYBE_SecureDnsErrorTriggersCheck SecureDnsErrorTriggersCheck
-#endif
 IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
                        MAYBE_SecureDnsErrorTriggersCheck) {
   PrefService* pref_service = g_browser_process->local_state();
@@ -3440,13 +3420,8 @@ IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
 // DNS error, which does not trigger another captive portal check. Only one
 // login tab should exist.
 // TODO(crbug.com/339524384) Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SlowLoadSecureDnsErrorWithCaptivePortal \
-  DISABLED_SlowLoadSecureDnsErrorWithCaptivePortal
-#else
 #define MAYBE_SlowLoadSecureDnsErrorWithCaptivePortal \
   SlowLoadSecureDnsErrorWithCaptivePortal
-#endif
 IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
                        MAYBE_SlowLoadSecureDnsErrorWithCaptivePortal) {
   PrefService* pref_service = g_browser_process->local_state();
@@ -3483,7 +3458,7 @@ IN_PROC_BROWSER_TEST_F(CaptivePortalBrowserTest,
 // check that should succeed.
 // TODO(crbug.com/339524384) Flaky on Windows.
 // TODO(crbug.com/463028193) Flaky on Mac.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_SlowLoadSecureDnsErrorAfterLogin \
   DISABLED_SlowLoadSecureDnsErrorAfterLogin
 #else

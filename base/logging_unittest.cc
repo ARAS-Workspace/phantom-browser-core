@@ -41,11 +41,6 @@
 #include <ucontext.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <excpt.h>
-#endif  // BUILDFLAG(IS_WIN)
 
 
 #include <optional>
@@ -361,59 +356,8 @@ TEST_F(LoggingTest, DuplicateLogFile) {
 }
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if !CHECK_WILL_STREAM() && BUILDFLAG(IS_WIN)
-// Tell clang to not optimize this function or else it will remove the CHECKs.
-[[clang::optnone]] NOINLINE void CheckContainingFunc(int death_location) {
-  CHECK(death_location != 1);
-  CHECK(death_location != 2);
-  CHECK(death_location != 3);
-}
-
-int GetCheckExceptionData(EXCEPTION_POINTERS* p, DWORD* code, void** addr) {
-  *code = p->ExceptionRecord->ExceptionCode;
-  *addr = p->ExceptionRecord->ExceptionAddress;
-  return EXCEPTION_EXECUTE_HANDLER;
-}
-
-TEST_F(LoggingTest, CheckCausesDistinctBreakpoints) {
-  DWORD code1 = 0;
-  DWORD code2 = 0;
-  DWORD code3 = 0;
-  void* addr1 = nullptr;
-  void* addr2 = nullptr;
-  void* addr3 = nullptr;
-
-  // Record the exception code and addresses.
-  __try {
-    CheckContainingFunc(1);
-  } __except (
-      GetCheckExceptionData(GetExceptionInformation(), &code1, &addr1)) {
-  }
-
-  __try {
-    CheckContainingFunc(2);
-  } __except (
-      GetCheckExceptionData(GetExceptionInformation(), &code2, &addr2)) {
-  }
-
-  __try {
-    CheckContainingFunc(3);
-  } __except (
-      GetCheckExceptionData(GetExceptionInformation(), &code3, &addr3)) {
-  }
-
-  // Ensure that the exception codes are correct (in particular, breakpoints,
-  // not access violations).
-  EXPECT_EQ(STATUS_BREAKPOINT, code1);
-  EXPECT_EQ(STATUS_BREAKPOINT, code2);
-  EXPECT_EQ(STATUS_BREAKPOINT, code3);
-
-  // Ensure that none of the CHECKs are colocated.
-  EXPECT_NE(addr1, addr2);
-  EXPECT_NE(addr1, addr3);
-  EXPECT_NE(addr2, addr3);
-}
-#elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_IOS) && (defined(ARCH_CPU_X86_FAMILY) || defined(ARCH_CPU_ARM_FAMILY))
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_IOS) && \
+    (defined(ARCH_CPU_X86_FAMILY) || defined(ARCH_CPU_ARM_FAMILY))
 
 int g_child_crash_pipe;
 
@@ -764,11 +708,7 @@ TEST_F(LoggingTest, BuildCrashString) {
 
   // BuildCrashString() should strip path/to/file prefix.
   LogMessage msg(
-#if BUILDFLAG(IS_WIN)
-      "..\\foo\\bar\\file.cc",
-#else
       "../foo/bar/file.cc",
-#endif  // BUILDFLAG(IS_WIN)
       42, LOGGING_ERROR);
   msg.stream() << "Hello";
   EXPECT_EQ("file.cc:42: Hello", msg.BuildCrashString());
@@ -776,11 +716,7 @@ TEST_F(LoggingTest, BuildCrashString) {
 
 TEST_F(LoggingTest, SystemErrorNotChanged) {
   auto set_last_error = [](logging::SystemErrorCode error) {
-#if BUILDFLAG(IS_WIN)
-    ::SetLastError(error);
-#else
     errno = error;
-#endif
   };
 
   SystemErrorCode during_streaming = 0;
@@ -814,11 +750,7 @@ TEST_F(LoggingTest, SystemErrorNotChanged) {
 
 TEST_F(LoggingTest, CorrectSystemErrorUsed) {
   auto set_last_error = [](logging::SystemErrorCode error) {
-#if BUILDFLAG(IS_WIN)
-    ::SetLastError(error);
-#else
     errno = error;
-#endif
   };
 
   // Use a static because only captureless lambdas can be converted to a

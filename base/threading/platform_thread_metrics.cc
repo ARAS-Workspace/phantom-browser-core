@@ -45,7 +45,7 @@ std::string GetCurrentProcessName(CurrentProcess::NameKey key) {
 
 // Apple and Windows have platform-specific create methods.
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE)
 
 // static
 std::unique_ptr<PlatformThreadMetrics>
@@ -70,7 +70,7 @@ std::unique_ptr<PlatformThreadMetrics> PlatformThreadMetrics::CreateFromId(
   return WrapUnique(new PlatformThreadMetrics(tid));
 }
 
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_APPLE)
 
 PlatformThreadMetrics::~PlatformThreadMetrics() = default;
 

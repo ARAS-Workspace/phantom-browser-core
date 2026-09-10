@@ -181,8 +181,4 @@ BASE_EXPORT bool HexStringToSpan(std::string_view input,
 
 }  // namespace base
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/string_number_conversions_win.h"
-#endif
-
 #endif  // BASE_STRINGS_STRING_NUMBER_CONVERSIONS_H_

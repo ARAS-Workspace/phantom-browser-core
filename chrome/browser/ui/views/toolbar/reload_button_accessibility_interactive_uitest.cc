@@ -146,11 +146,7 @@ INSTANTIATE_TEST_SUITE_P(All, ReloadButtonAccessibilityTest, testing::Bool());
 
 // Tests that clicking the reload button correctly transitions to a stop button
 // during loading and back to reload when loading is finished or stopped.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ReloadStateTransition DISABLED_ReloadStateTransition
-#else
 #define MAYBE_ReloadStateTransition ReloadStateTransition
-#endif
 // TODO(behamilton): On Windows this test is flaky.
 IN_PROC_BROWSER_TEST_P(ReloadButtonAccessibilityTest,
                        MAYBE_ReloadStateTransition) {
@@ -237,7 +233,7 @@ IN_PROC_BROWSER_TEST_P(ReloadButtonAccessibilityTest, MAYBE_NormalReload) {
 // Tests that clicking the reload button with a modifier (Shift) performs a
 // hard reload (bypassing cache).
 // TODO(behamilton): On Windows this test is flaky.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_HardReloadModifier DISABLED_HardReloadModifier
 #else
 #define MAYBE_HardReloadModifier HardReloadModifier
@@ -280,7 +276,7 @@ IN_PROC_BROWSER_TEST_P(ReloadButtonAccessibilityTest,
 
 // Middle-clicking is not supported by ClickMouse on Macs
 // TODO(behamilton): On Windows this test is flaky.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_MiddleClickReload DISABLED_MiddleClickReload
 #else
 #define MAYBE_MiddleClickReload MiddleClickReload

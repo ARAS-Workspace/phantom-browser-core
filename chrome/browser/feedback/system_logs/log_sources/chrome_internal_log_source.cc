@@ -65,17 +65,6 @@
 #include "third_party/icu/source/i18n/unicode/timezone.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#include "base/win/windows_version.h"
-#include "ui/base/win/hidden_window.h"
-
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#include "base/strings/stringprintf.h"
-#include "chrome/browser/google/google_update_win.h"
-#endif
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/mac/mac_util.h"
 #include "chrome/browser/updater/updater.h"
@@ -123,23 +112,12 @@ constexpr char kRecordedAuthEvents[] = "RECORDED_AUTH_EVENTS";
 constexpr char kOsVersionTag[] = "OS VERSION";
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-constexpr char kUsbKeyboardDetected[] = "usb_keyboard_detected";
-constexpr char kIsEnrolledToDomain[] = "enrolled_to_domain";
-constexpr char kInstallerBrandCode[] = "installer_brand_code";
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-constexpr char kInstallResultCode[] = "install_result_code";
-constexpr char kInstallLocation[] = "install_location";
-#endif
-#endif  // BUILDFLAG(IS_WIN)
-
-#if (BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 constexpr char kUpdateErrorCode[] = "update_error_code";
 constexpr char kUpdateHresult[] = "update_hresult";
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 constexpr char kCpuArch[] = "cpu_arch";
 #endif
 
@@ -327,38 +305,6 @@ std::string GetChromeVersionString() {
   return browser_version;
 }
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-// Returns true if the path identified by |key| with the PathService is a parent
-// or ancestor of |child|.
-bool IsParentOf(int key, const base::FilePath& child) {
-  base::FilePath path;
-  return base::PathService::Get(key, &path) && path.IsParent(child);
-}
-
-// Returns a string representing the overall install location of the browser.
-// "Program Files" and "Program Files (x86)" are both considered "per-machine"
-// locations (for all users), whereas anything in a user's local app data dir is
-// considered a "per-user" location. This function returns an answer that gives,
-// in essence, the broad category of location without checking that the browser
-// is operating out of the exact expected install directory. It is interesting
-// to know via feedback reports if updates are failing with
-// CANNOT_UPGRADE_CHROME_IN_THIS_DIRECTORY, which checks the exact directory,
-// yet the reported install_location is not "unknown".
-std::string DetermineInstallLocation() {
-  base::FilePath exe_path;
-
-  if (base::PathService::Get(base::FILE_EXE, &exe_path)) {
-    if (IsParentOf(base::DIR_PROGRAM_FILESX86, exe_path) ||
-        IsParentOf(base::DIR_PROGRAM_FILES, exe_path)) {
-      return "per-machine";
-    }
-    if (IsParentOf(base::DIR_LOCAL_APP_DATA, exe_path))
-      return "per-user";
-  }
-  return "unknown";
-}
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-
 #if BUILDFLAG(IS_MAC)
 std::string MacCpuArchAsString() {
   switch (base::mac::GetCPUType()) {
@@ -371,43 +317,6 @@ std::string MacCpuArchAsString() {
   }
 }
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_WIN)
-std::string WinCpuArchAsString() {
-#if defined(ARCH_CPU_ARM64)
-  return "arm64";
-#else
-  bool emulated = base::win::OSInfo::IsRunningEmulatedOnArm64();
-#if defined(ARCH_CPU_X86)
-  if (emulated) {
-    return "32-bit emulated";
-  }
-  return "32-bit";
-#else   // defined(ARCH_CPU_X86)
-  if (emulated) {
-    return "64-bit emulated";
-  }
-  return "64-bit";
-#endif  // defined(ARCH_CPU_X86)
-#endif  // defined(ARCH_CPU_ARM64)
-}
-
-void PopulateUsbKeyboardDetected(std::unique_ptr<SystemLogsResponse> response,
-                                 SysLogsSourceCallback callback) {
-  auto on_keyboard_check = [](std::unique_ptr<SystemLogsResponse> response,
-                              SysLogsSourceCallback callback, bool result,
-                              std::string reason) {
-    reason.insert(0, result ? "Keyboard Detected:\n" : "No Keyboard:\n");
-    response->emplace(kUsbKeyboardDetected, reason);
-    std::move(callback).Run(std::move(response));
-  };
-
-  base::win::IsDeviceSlateWithKeyboard(
-      ui::GetHiddenWindow(),
-      base::BindOnce(on_keyboard_check, std::move(response),
-                     std::move(callback)));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace
 
@@ -440,18 +349,12 @@ void ChromeInternalLogSource::Fetch(SysLogsSourceCallback callback) {
     PopulateVariations(response.get());
   }
 #endif
-#if BUILDFLAG(IS_WIN)
-  PopulateEnrolledToDomain(response.get());
-  PopulateInstallerBrandCode(response.get());
-#endif
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   PopulateLastUpdateState(response.get());
 #endif
 
 #if BUILDFLAG(IS_MAC)
   response->emplace(kCpuArch, MacCpuArchAsString());
-#elif BUILDFLAG(IS_WIN)
-  response->emplace(kCpuArch, WinCpuArchAsString());
 #endif
 
   std::string skia_graphite_status = "unknown";
@@ -496,10 +399,6 @@ void ChromeInternalLogSource::Fetch(SysLogsSourceCallback callback) {
   PopulateMonitorInfoAsync(
       response.get(), base::BindOnce(&OnPopulateMonitorInfoAsync,
                                      std::move(response), std::move(callback)));
-#elif BUILDFLAG(IS_WIN)
-  // Fetch keyboard info then run callback. Keyboard info may require some
-  // expensive WMI queries which should not run on the UI thread.
-  PopulateUsbKeyboardDetected(std::move(response), std::move(callback));
 #else
   // On other platforms, we're done. Invoke the callback.
   std::move(callback).Run(std::move(response));
@@ -649,46 +548,6 @@ void ChromeInternalLogSource::PopulateOnboardingTime(
 }
 
 #endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_WIN)
-void ChromeInternalLogSource::PopulateEnrolledToDomain(
-    SystemLogsResponse* response) {
-  response->emplace(kIsEnrolledToDomain, base::win::IsEnrolledToDomain()
-                                             ? "Enrolled to domain"
-                                             : "Not enrolled to domain");
-}
-
-void ChromeInternalLogSource::PopulateInstallerBrandCode(
-    SystemLogsResponse* response) {
-  std::string brand;
-  google_brand::GetBrand(&brand);
-  response->emplace(kInstallerBrandCode,
-                    brand.empty() ? "Unknown brand code" : brand);
-}
-
-void ChromeInternalLogSource::PopulateLastUpdateState(
-    SystemLogsResponse* response) {
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  const std::optional<UpdateState> update_state = GetLastUpdateState();
-  if (!update_state)
-    return;  // There is nothing to include if no update check has completed.
-
-  response->emplace(kUpdateErrorCode,
-                    base::NumberToString(update_state->error_code));
-  response->emplace(kInstallLocation, DetermineInstallLocation());
-
-  if (update_state->error_code == GOOGLE_UPDATE_NO_ERROR)
-    return;  // There is nothing more to include if the last check succeeded.
-
-  response->emplace(kUpdateHresult,
-                    base::StringPrintf("0x%08lX", update_state->hresult));
-  if (update_state->installer_exit_code) {
-    response->emplace(kInstallResultCode,
-                      base::NumberToString(*update_state->installer_exit_code));
-  }
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
 void ChromeInternalLogSource::PopulateLastUpdateState(

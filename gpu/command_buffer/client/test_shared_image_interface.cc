@@ -39,8 +39,6 @@ gfx::GpuMemoryBufferType GetNativeBufferType() {
   return gfx::IO_SURFACE_BUFFER;
 #elif BUILDFLAG(IS_ANDROID)
   return gfx::ANDROID_HARDWARE_BUFFER;
-#elif BUILDFLAG(IS_WIN)
-  return gfx::DXGI_SHARED_HANDLE;
 #else
   // Ozone
   return gfx::NATIVE_PIXMAP;

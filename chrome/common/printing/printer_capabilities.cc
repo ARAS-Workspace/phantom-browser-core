@@ -29,11 +29,6 @@
 #include "printing/print_job_constants.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/string_split.h"
-#include "base/strings/utf_string_conversions.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/common/printing/ipp_l10n.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
@@ -140,27 +135,6 @@ base::Value AssemblePrinterCapabilities(const std::string& device_name,
 }
 
 }  // namespace
-
-#if BUILDFLAG(IS_WIN)
-std::string GetUserFriendlyName(std::string_view printer_name) {
-  // `printer_name` may be a UNC path like \\printserver\printername.
-  if (!base::StartsWith(printer_name, "\\\\",
-                        base::CompareCase::INSENSITIVE_ASCII)) {
-    return std::string(printer_name);
-  }
-
-  // If it is a UNC path, split the "printserver\printername" portion and
-  // generate a friendly name, like Windows does.
-  std::string_view printer_name_trimmed = printer_name.substr(2);
-  std::vector<std::string_view> tokens = base::SplitStringPiece(
-      printer_name_trimmed, "\\", base::KEEP_WHITESPACE, base::SPLIT_WANT_ALL);
-  if (tokens.size() != 2 || tokens[0].empty() || tokens[1].empty())
-    return std::string(printer_name);
-  return l10n_util::GetStringFUTF8(
-      IDS_PRINT_PREVIEW_FRIENDLY_WIN_NETWORK_PRINTER_NAME,
-      base::UTF8ToUTF16(tokens[1]), base::UTF8ToUTF16(tokens[0]));
-}
-#endif
 
 base::DictValue AssemblePrinterSettings(const std::string& device_name,
                                         const PrinterBasicInfo& basic_info,

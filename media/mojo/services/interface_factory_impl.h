@@ -73,13 +73,6 @@ class InterfaceFactoryImpl final
           client_extension,
       mojo::PendingReceiver<mojom::Renderer> receiver) final;
 #endif  // BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_WIN)
-  void CreateMediaFoundationRenderer(
-      mojo::PendingRemote<mojom::MediaLog> media_log_remote,
-      mojo::PendingReceiver<mojom::Renderer> receiver,
-      mojo::PendingReceiver<mojom::MediaFoundationRendererExtension>
-          renderer_extension_receiver) final;
-#endif  // BUILDFLAG(IS_WIN)
 
   void CreateCdm(const CdmConfig& cdm_config, CreateCdmCallback callback) final;
 
@@ -94,7 +87,7 @@ class InterfaceFactoryImpl final
   void SetReceiverDisconnectHandler();
   void OnReceiverDisconnect();
 
-#if BUILDFLAG(ENABLE_MOJO_RENDERER) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(ENABLE_MOJO_RENDERER)
   // Creates MojoRendererService for `renderer`, bind it to `receiver` and add
   // them to `renderer_receivers_`.
   void AddRenderer(std::unique_ptr<media::Renderer> renderer,
@@ -133,7 +126,7 @@ class InterfaceFactoryImpl final
   mojo::UniqueReceiverSet<mojom::AudioEncoder> audio_encoder_receivers_;
 #endif  // BUILDFLAG(ENABLE_MOJO_VIDEO_ENCODER)
 
-#if BUILDFLAG(ENABLE_MOJO_RENDERER) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(ENABLE_MOJO_RENDERER)
   // TODO(xhwang): Use MojoMediaLog for Renderer.
   NullMediaLog media_log_;
   mojo::UniqueReceiverSet<mojom::Renderer> renderer_receivers_;

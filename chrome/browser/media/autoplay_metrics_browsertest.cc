@@ -62,7 +62,7 @@ class AutoplayMetricsBrowserTest : public InProcessBrowserTest {
 };
 
 // Flaky on various platforms. https://crbug.com/40703784
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_RecordAutoplayAttemptUkm DISABLED_RecordAutoplayAttemptUkm
 #else
 #define MAYBE_RecordAutoplayAttemptUkm RecordAutoplayAttemptUkm

@@ -36,11 +36,7 @@
 namespace content {
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-const char kShellExecutableName[] = "content_shell.exe";
-#else
 const char kShellExecutableName[] = "content_shell";
-#endif
 
 base::FilePath GetCurrentDirectory() {
   base::FilePath current_directory;

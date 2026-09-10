@@ -185,15 +185,12 @@ const char kPdfPrinterDisabled[] = "pdfPrinterDisabled";
 // Name of a dictionary field indicating whether the destinations are managed by
 // the PrinterTypeDenyList enterprise policy.
 const char kDestinationsManaged[] = "destinationsManaged";
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // Name of a dictionary pref holding the policy value for whether the
 // "Print as image" option should be available to the user in the Print Preview
 // for a PDF job.
 const char kPrintPdfAsImageAvailability[] = "printPdfAsImageAvailability";
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-// Name of dictionary pref holding policy value for whether the
-// "Print as image" option should default to set in Print Preview for
-// a PDF job.
+#endif  // BUILDFLAG(IS_MAC)
 const char kPrintPdfAsImage[] = "printPdfAsImage";
 
 // Gets the print job settings dictionary from |json_str|. Assumes the Print
@@ -287,7 +284,7 @@ base::DictValue GetPolicies(const PrefService& prefs) {
     policies.Set(kMediaSize, std::move(paper_size_policy));
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   base::DictValue print_as_image_available_for_pdf_policy;
   if (prefs.HasPrefPath(prefs::kPrintPdfAsImageAvailability)) {
     print_as_image_available_for_pdf_policy.Set(
@@ -297,7 +294,7 @@ base::DictValue GetPolicies(const PrefService& prefs) {
     policies.Set(kPrintPdfAsImageAvailability,
                  std::move(print_as_image_available_for_pdf_policy));
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
   base::DictValue print_as_image_for_pdf_default_policy;
   if (prefs.HasPrefPath(prefs::kPrintPdfAsImageDefault)) {

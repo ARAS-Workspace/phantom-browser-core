@@ -57,9 +57,6 @@
 #include "chrome/browser/ui/toasts/toast_features.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#include "chrome/browser/browser_features.h"
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 #if BUILDFLAG(ENABLE_COMPOSE)
 #include "chrome/browser/compose/compose_enabling.h"
@@ -83,11 +80,11 @@ using SettingsTest = SettingsBrowserTest;
 
 // Note: Keep tests below in alphabetical ordering.
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(SettingsTest, A11yPage) {
   RunTest("settings/a11y_page_test.js", "mocha.run()");
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 IN_PROC_BROWSER_TEST_F(SettingsTest, AccountPage) {
   RunTest("settings/account_page_test.js", "mocha.run()");
@@ -134,11 +131,11 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, WalletablePassDetectionToggle) {
   RunTest("settings/walletable_pass_detection_toggle_test.js", "mocha.run()");
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(SettingsTest, AxAnnotationsSection) {
   RunTest("settings/ax_annotations_section_test.js", "mocha.run()");
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 IN_PROC_BROWSER_TEST_F(SettingsTest, BatteryPage) {
   RunTest("settings/battery_page_test.js", "mocha.run()");
@@ -324,7 +321,7 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, MetricsConsentRestructureDisabled) {
 }
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(SettingsTest, PasskeysSubpage) {
   RunTest("settings/passkeys_subpage_test.js", "mocha.run()");
 }
@@ -1322,10 +1319,6 @@ IN_PROC_BROWSER_TEST_F(SettingsTest, ZoomLevels) {
 #if !BUILDFLAG(IS_CHROMEOS)
 class SettingsSystemPageTest : public SettingsBrowserTest {
  private:
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  base::test::ScopedFeatureList scoped_feature_list_{
-      features::kRegisterOsUpdateHandlerWin};
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
 };
 
 IN_PROC_BROWSER_TEST_F(SettingsSystemPageTest, SystemPage) {
@@ -1651,7 +1644,7 @@ IN_PROC_BROWSER_TEST_F(SettingsRouteTest, DynamicParameters) {
 
 // Copied from Polymer 2 test:
 // Failing on ChromiumOS dbg. https://crbug.com/263415119
-#if (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)) && !defined(NDEBUG)
+#if BUILDFLAG(IS_CHROMEOS) && !defined(NDEBUG)
 #define MAYBE_NonExistentRoute DISABLED_NonExistentRoute
 #else
 #define MAYBE_NonExistentRoute NonExistentRoute
@@ -1666,7 +1659,7 @@ class SettingsSiteDetailsTest : public SettingsBrowserTest {};
 // https://crbug.com/41378604 - later for other platforms in crbug.com/40106090.
 // TODO(https://crbug.com/510377224): Re-enable test on windows
 // TODO(crbug.com/543717125): Re-enable test on Mac.
-#if !defined(NDEBUG) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if !defined(NDEBUG) || BUILDFLAG(IS_MAC)
 #define MAYBE_SiteDetails DISABLED_SiteDetails
 #else
 #define MAYBE_SiteDetails SiteDetails
@@ -1792,11 +1785,7 @@ IN_PROC_BROWSER_TEST_F(YourSavedInfoTest, AutofillPage) {
 }
 
 // TODO(crbug.com/545478765): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_AutofillPageIndex DISABLED_AutofillPageIndex
-#else
 #define MAYBE_AutofillPageIndex AutofillPageIndex
-#endif
 IN_PROC_BROWSER_TEST_F(YourSavedInfoTest, MAYBE_AutofillPageIndex) {
   RunTest("settings/autofill_page_index_test.js", "mocha.run()");
 }

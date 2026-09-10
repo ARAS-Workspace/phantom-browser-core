@@ -190,11 +190,6 @@
 #include "ui/base/test/scoped_fake_nswindow_fullscreen.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/i18n/rtl.h"
-#include "base/test/file_path_reparse_point_win.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ash/constants/ash_switches.h"
 #include "chrome/test/base/testing_profile.h"
@@ -421,18 +416,8 @@ class BrowserTest : public extensions::ExtensionBrowserTest {
   std::u16string LocaleWindowCaptionFromPageTitle(
       const std::u16string& expected_title) {
     std::u16string page_title = WindowCaptionFromPageTitle(expected_title);
-#if BUILDFLAG(IS_WIN)
-    std::string locale = g_browser_process->GetApplicationLocale();
-    if (base::i18n::GetTextDirectionForLocale(locale.c_str()) ==
-        base::i18n::RIGHT_TO_LEFT) {
-      base::i18n::WrapStringWithLTRFormatting(&page_title);
-    }
-
-    return page_title;
-#else
     // Do we need to use the above code on POSIX as well?
     return page_title;
-#endif
   }
 
   void OpenURLFromTab(WebContents* source, OpenURLParams params) {
@@ -691,7 +676,7 @@ IN_PROC_BROWSER_TEST_F(
 // Warning: this test can take >30 seconds when running on a slow (low
 // memory?) Mac builder.
 // Test is flaky on Win, Linux, Mac: https://crbug.com/40702340.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_ThirtyFourTabs DISABLED_ThirtyFourTabs
 #else
 #define MAYBE_ThirtyFourTabs ThirtyFourTabs
@@ -1316,11 +1301,7 @@ IN_PROC_BROWSER_TEST_F(BrowserTest, TabClosingWhenRemovingExtension) {
 // Open with --app-id=<id>, and see that an application window opens by default.
 #if !BUILDFLAG(IS_CHROMEOS)
 // TODO(https://crbug.com/399807131): Re-enable on chrome win builders.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_AppIdSwitch DISABLED_AppIdSwitch
-#else
 #define MAYBE_AppIdSwitch AppIdSwitch
-#endif
 IN_PROC_BROWSER_TEST_F(BrowserTest, MAYBE_AppIdSwitch) {
   base::HistogramTester tester;
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -1346,15 +1327,6 @@ IN_PROC_BROWSER_TEST_F(BrowserTest, MAYBE_AppIdSwitch) {
   ASSERT_TRUE(launch_done.Wait());
   Browser* app_browser = browser_created_observer.Wait();
   EXPECT_EQ(app_browser->GetType(), BrowserWindowInterface::Type::TYPE_APP);
-
-#if BUILDFLAG(IS_WIN)
-  {  // From launch_mode_recorder.cc:
-    constexpr char kLaunchModesHistogram[] = "Launch.Mode2";
-    const base::HistogramBase::Sample32 kWebAppOther = 22;
-
-    tester.ExpectUniqueSample(kLaunchModesHistogram, kWebAppOther, 1);
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   // Check that the number of browsers and tabs is correct.
   EXPECT_EQ(2u, ProfileBrowserCollection::GetForProfile(browser()->GetProfile())
@@ -2253,110 +2225,6 @@ IN_PROC_BROWSER_TEST_F(KioskModeTest, DoNotChangeBounds) {
   ASSERT_EQ(old_bounds, new_bounds);
 }
 #endif  // BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_WIN)
-// This test verifies that Chrome can be launched with a user-data-dir path
-// which contains non ASCII characters.
-class LaunchBrowserWithNonAsciiUserDatadir : public BrowserTest {
- public:
-  LaunchBrowserWithNonAsciiUserDatadir() = default;
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    ASSERT_TRUE(temp_dir_.CreateUniqueTempDir());
-    base::FilePath tmp_profile = temp_dir_.GetPath().AppendASCII("tmp_profile");
-    tmp_profile = tmp_profile.Append(L"Test Chrome G\u00E9raldine");
-
-    ASSERT_TRUE(base::CreateDirectory(tmp_profile));
-    command_line->AppendSwitchPath(switches::kUserDataDir, tmp_profile);
-  }
-
-  base::ScopedTempDir temp_dir_;
-};
-
-IN_PROC_BROWSER_TEST_F(LaunchBrowserWithNonAsciiUserDatadir,
-                       TestNonAsciiUserDataDir) {
-  // Verify that the window is present.
-  ASSERT_TRUE(browser());
-  ASSERT_TRUE(browser()->GetProfile());
-  // Verify that the profile has been added correctly to the
-  // ProfileAttributesStorage.
-  ASSERT_EQ(1u, g_browser_process->profile_manager()
-                    ->GetProfileAttributesStorage()
-                    .GetNumberOfProfiles());
-}
-
-// This test verifies that Chrome can be launched with a user-data-dir path
-// which contains a reparse point. This is important because sandbox
-// policy validates that paths passed to policy rules do not contain
-// reparse points. New code in Chrome that adjusts the sandbox can
-// accidentally pass paths with reparse points to the sandbox and cause
-// Chrome not to start anymore.
-class LaunchBrowserWithReparsePointUserDatadir : public BrowserTest {
- public:
-  LaunchBrowserWithReparsePointUserDatadir() = default;
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    ASSERT_TRUE(temp_dir_.CreateUniqueTempDir());
-    base::FilePath tmp_profile = temp_dir_.GetPath().AppendASCII("profile");
-    ASSERT_TRUE(base::CreateDirectory(tmp_profile));
-    base::FilePath reparse_profile =
-        temp_dir_.GetPath().AppendASCII("profile_reparse");
-    ASSERT_TRUE(base::CreateDirectory(reparse_profile));
-    auto reparse_point =
-        base::test::FilePathReparsePoint::Create(reparse_profile, tmp_profile);
-    ASSERT_TRUE(reparse_point.has_value());
-    reparse_point_.emplace(std::move(reparse_point.value()));
-    command_line->AppendSwitchPath(switches::kUserDataDir, reparse_profile);
-  }
-
-  base::ScopedTempDir temp_dir_;
-  std::optional<base::test::FilePathReparsePoint> reparse_point_;
-};
-
-IN_PROC_BROWSER_TEST_F(LaunchBrowserWithReparsePointUserDatadir,
-                       TestReparsePointUserDataDir) {
-  // Verify that the window is present.
-  ASSERT_TRUE(browser());
-  ASSERT_TRUE(browser()->GetProfile());
-  // Verify that the profile has been added correctly to the
-  // ProfileAttributesStorage.
-  ASSERT_EQ(1u, g_browser_process->profile_manager()
-                    ->GetProfileAttributesStorage()
-                    .GetNumberOfProfiles());
-}
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN)
-// This test verifies that Chrome can be launched with a user-data-dir path
-// which trailing slashes.
-class LaunchBrowserWithTrailingSlashDatadir : public BrowserTest {
- public:
-  LaunchBrowserWithTrailingSlashDatadir() = default;
-
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    ASSERT_TRUE(temp_dir_.CreateUniqueTempDir());
-    base::FilePath tmp_profile = temp_dir_.GetPath().AppendASCII("tmp_profile");
-    tmp_profile = tmp_profile.Append(L"Test Chrome\\");
-
-    ASSERT_TRUE(base::CreateDirectory(tmp_profile));
-    command_line->AppendSwitchPath(switches::kUserDataDir, tmp_profile);
-  }
-
-  base::ScopedTempDir temp_dir_;
-};
-
-IN_PROC_BROWSER_TEST_F(LaunchBrowserWithTrailingSlashDatadir,
-                       TestTrailingSlashUserDataDir) {
-  // Verify that the window is present.
-  ASSERT_TRUE(browser());
-  ASSERT_TRUE(browser()->GetProfile());
-  // Verify that the profile has been added correctly to the
-  // ProfileAttributesStorage.
-  ASSERT_EQ(1u, g_browser_process->profile_manager()
-                    ->GetProfileAttributesStorage()
-                    .GetNumberOfProfiles());
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(ENABLE_BACKGROUND_MODE)
 // Tests to ensure that the browser continues running in the background after

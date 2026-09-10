@@ -868,9 +868,6 @@ class CONTENT_EXPORT RenderWidgetHostImpl
   void OnStartStylusWriting() override;
   void OnUnconfirmedTapConvertedToTap() override;
   void UpdateElementFocusForStylusWriting(
-#if BUILDFLAG(IS_WIN)
-      const gfx::Rect& focus_widget_rect_in_dips
-#endif  // BUILDFLAG(IS_WIN)
       ) override;
   bool IsAutoscrollInProgress() override;
   void OnAutoscrollTargetResolved(bool success);

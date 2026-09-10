@@ -175,13 +175,13 @@ class CleanExitBeacon {
   // |beacon_file_path_|.
   void WriteBeaconFile(bool exited_cleanly) const;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
   // Returns whether Chrome exited cleanly in the previous session according to
   // the platform-specific beacon (the registry for Windows or NSUserDefaults
   // for iOS). Returns std::nullopt if the platform-specific location does not
   // have beacon info.
   std::optional<bool> ExitedCleanly();
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_IOS)
 
 #if BUILDFLAG(IS_IOS)
   // Returns true if the NSUserDefaults beacon value is set.

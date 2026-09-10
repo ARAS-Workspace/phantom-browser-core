@@ -331,22 +331,6 @@ class COMPONENT_EXPORT(PRINT_BACKEND) PrintBackend
       const std::string& printer_name,
       PrinterSemanticCapsAndDefaults* printer_info) = 0;
 
-#if BUILDFLAG(IS_WIN)
-  // Gets the capabilities and defaults for a specific printer.
-  virtual mojom::ResultCode GetPrinterCapsAndDefaults(
-      const std::string& printer_name,
-      PrinterCapsAndDefaults* printer_info) = 0;
-
-  // Gets the printable area for just a single paper size.  Returns nullopt if
-  // there is any error in retrieving this data.
-  // TODO(crbug.com/40260379):  Remove this if the printable areas can be made
-  // fully available from `GetPrinterSemanticCapsAndDefaults()`.
-  virtual std::optional<gfx::Rect> GetPaperPrintableArea(
-      const std::string& printer_name,
-      const std::string& paper_vendor_id,
-      const gfx::Size& paper_size_um) = 0;
-#endif
-
   // Gets the information about driver for a specific printer.  A maximum of
   // 4 elements can be in the returned result, due to limitations on how this
   // is intended to be used for crash keys by `ScopedPrinterInfo`.

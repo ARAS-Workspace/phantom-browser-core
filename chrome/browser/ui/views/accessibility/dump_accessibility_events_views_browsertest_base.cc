@@ -27,12 +27,6 @@
 #include "ui/aura/window_tree_host.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/accessibility/platform/ax_platform_node_win.h"
-#include "ui/accessibility/platform/inspect/ax_event_recorder_win.h"
-#include "ui/accessibility/platform/inspect/ax_event_recorder_win_uia.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "ui/views/widget/desktop_aura/desktop_window_tree_host_platform.h"
 
@@ -58,17 +52,6 @@ void CleanupViewsAXEventRecorderMac();
 #endif
 
 namespace views {
-
-#if BUILDFLAG(IS_WIN)
-namespace {
-
-void WaitForNoGhostAXPlatformNodeWin() {
-  EXPECT_TRUE(base::test::RunUntil(
-      [] { return ui::AXPlatformNodeWin::GetCounts().ghost_nodes == 0u; }));
-}
-
-}  // namespace
-#endif
 
 // --- EventRecordingSession implementation ---
 
@@ -219,11 +202,6 @@ void DumpAccessibilityEventsViewsTestBase::TearDownOnMainThread() {
 
   widget_.reset();
 
-#if BUILDFLAG(IS_WIN)
-  // Let COM/UIA releases finish before gtest's platform-node leak listener.
-  WaitForNoGhostAXPlatformNodeWin();
-#endif
-
   InProcessBrowserTest::TearDownOnMainThread();
 }
 
@@ -348,26 +326,7 @@ DumpAccessibilityEventsViewsTestBase::CreateEventRecorder() {
 
   ui::AXTreeSelector selector;
 
-#if BUILDFLAG(IS_WIN)
-#if defined(USE_AURA)
-  // On Windows, we need to provide the native widget handle to scope event
-  // recording to our test window. Mac and Linux event recorders use different
-  // mechanisms (e.g., Mac uses the root accessible element directly, Linux
-  // AT-SPI uses process ID filtering).
-  selector.widget = reinterpret_cast<gfx::AcceleratedWidget>(
-      native_window->GetHost()->GetAcceleratedWidget());
-#endif
-
-  switch (GetApiType()) {
-    case ui::AXApiType::kWinIA2:
-      return std::make_unique<ui::AXEventRecorderWin>(
-          base::GetCurrentProcId(), selector, ui::AXEventRecorderWin::kSync);
-    case ui::AXApiType::kWinUIA:
-      return std::make_unique<ui::AXEventRecorderWinUia>(selector);
-    default:
-      return nullptr;
-  }
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (GetApiType() != ui::AXApiType::kMac) {
     return nullptr;
   }

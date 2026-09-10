@@ -116,10 +116,7 @@ void MojoVideoEncodeAcceleratorProvider::CreateVideoEncodeAccelerator(
       get_helper_cb, gpu_task_runner_);
 
   scoped_refptr<base::TaskRunner> runner;
-#if BUILDFLAG(IS_WIN)
-  runner = base::ThreadPool::CreateCOMSTATaskRunner(
-      {base::MayBlock()}, base::SingleThreadTaskRunnerThreadMode::DEDICATED);
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   runner = base::ThreadPool::CreateSequencedTaskRunner({base::MayBlock()});
 #else
   runner = base::SequencedTaskRunner::GetCurrentDefault();

@@ -22,10 +22,6 @@
 #include "net/base/port_util.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 base::span<const uint8_t, 16> TestProtobufCredId() {
   return base::span<const uint8_t>(kTestProtobuf).subspan<20, 16>();
 }
@@ -47,30 +43,6 @@ std::pair<base::Process, uint16_t> StartWebAuthnEnclave(base::FilePath cwd) {
   std::array<char, 6> port_str;
 
   for (int i = 0; i < 10; i++) {
-#if BUILDFLAG(IS_WIN)
-    HANDLE read_handle;
-    HANDLE write_handle;
-    SECURITY_ATTRIBUTES security_attributes;
-
-    security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
-    security_attributes.bInheritHandle = TRUE;
-    security_attributes.lpSecurityDescriptor = NULL;
-    CHECK(CreatePipe(&read_handle, &write_handle, &security_attributes, 0));
-
-    subprocess_opts.stdin_handle = INVALID_HANDLE_VALUE;
-    subprocess_opts.stdout_handle = write_handle;
-    subprocess_opts.stderr_handle = INVALID_HANDLE_VALUE;
-    subprocess_opts.handles_to_inherit.push_back(write_handle);
-    enclave_process = base::LaunchProcess(base::CommandLine(enclave_bin_path),
-                                          subprocess_opts);
-    CloseHandle(write_handle);
-    CHECK(enclave_process->IsValid());
-
-    DWORD read_bytes;
-    CHECK(ReadFile(read_handle, port_str.data(), sizeof(port_str), &read_bytes,
-                   NULL));
-    CloseHandle(read_handle);
-#else
     int fds[2];
     CHECK(!pipe(fds));
     subprocess_opts.fds_to_remap.emplace_back(fds[1], 1);
@@ -82,7 +54,6 @@ std::pair<base::Process, uint16_t> StartWebAuthnEnclave(base::FilePath cwd) {
     const ssize_t read_bytes =
         HANDLE_EINTR(read(fds[0], port_str.data(), sizeof(port_str)));
     close(fds[0]);
-#endif
 
     CHECK(read_bytes > 0);
     // We don't need to include the whitespace character in the string view so

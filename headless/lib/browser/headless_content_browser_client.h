@@ -101,9 +101,6 @@ class HeadlessContentBrowserClient : public content::ContentBrowserClient {
   bool CanAcceptUntrustedExchangesIfNeeded() override;
   device::GeolocationSystemPermissionManager*
   GetGeolocationSystemPermissionManager() override;
-#if BUILDFLAG(IS_WIN)
-  void SessionEnding(std::optional<DWORD> control_type) override;
-#endif
 
   void OnNetworkServiceCreated(
       ::network::mojom::NetworkService* network_service) override;

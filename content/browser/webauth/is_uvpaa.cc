@@ -17,11 +17,6 @@
 #include "device/fido/mac/authenticator.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "device/fido/win/authenticator.h"
-#include "device/fido/win/webauthn_api.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "device/fido/cros/authenticator.h"
 #endif
@@ -43,14 +38,6 @@ void IsUVPlatformAuthenticatorAvailable(
   }
   device::fido::mac::TouchIdAuthenticator::IsAvailable(*config,
                                                        std::move(callback));
-}
-
-#elif BUILDFLAG(IS_WIN)
-void IsUVPlatformAuthenticatorAvailable(
-    IsUVPlatformAuthenticatorAvailableCallback callback) {
-  device::WinWebAuthnApiAuthenticator::
-      IsUserVerifyingPlatformAuthenticatorAvailable(
-          device::WinWebAuthnApi::GetDefault(), std::move(callback));
 }
 
 #elif BUILDFLAG(IS_CHROMEOS)

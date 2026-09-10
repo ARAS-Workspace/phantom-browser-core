@@ -4,17 +4,6 @@
 
 #include "components/viz/demo/host/demo_host_display_client.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace demo {
-
-#if BUILDFLAG(IS_WIN)
-void DemoHostDisplayClient::AddChildWindowToBrowser(
-    gpu::SurfaceHandle child_window) {
-  SetParent(child_window, widget());
-}
-#endif
 
 }  // namespace demo

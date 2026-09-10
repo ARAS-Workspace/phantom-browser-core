@@ -381,7 +381,7 @@ const ui::ImageModel PageInfoViewFactory::GetPermissionIcon(
                          ? vector_icons::kDownloadIcon
                          : vector_icons::kFileDownloadChromeRefreshOldIcon);
       break;
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
     case ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER:
       icon = show_blocked_badge
                  ? &(features::IsRoundedIconsEnabled()
@@ -679,7 +679,7 @@ const ui::ImageModel PageInfoViewFactory::GetPermissionIcon(
                    ? vector_icons::kDownload2FilledIcon
                    : vector_icons::kFileDownloadOldIcon);
       break;
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
     case ContentSettingsType::PROTECTED_MEDIA_IDENTIFIER:
       icon = &vector_icons::kProtectedContentCustomIcon;
       break;

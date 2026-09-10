@@ -1092,7 +1092,7 @@ TEST_P(AppManagementPageHandlerTestBase, NavigationCapturingUserChoice) {
   base::test::TestFuture<app_management::mojom::AppPtr> app_future;
   handler()->GetApp(app_id, app_future.GetCallback());
   bool expected_value = true;
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   expected_value =
       base::FeatureList::IsEnabled(apps::features::kUpdateAppStringsOnSettings);
 #endif

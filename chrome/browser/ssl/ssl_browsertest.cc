@@ -4786,7 +4786,7 @@ class SSLBlockingPageIDNTest
 };
 
 // Flaky on mac OS and Windows: https://crbug.com/41300407
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_SSLBlockingPageDecodesIDN DISABLED_SSLBlockingPageDecodesIDN
 #else
 #define MAYBE_SSLBlockingPageDecodesIDN SSLBlockingPageDecodesIDN

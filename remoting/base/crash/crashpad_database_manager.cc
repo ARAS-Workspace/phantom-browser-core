@@ -21,10 +21,7 @@
 #include "third_party/crashpad/crashpad/client/crash_report_database.h"
 #include "third_party/crashpad/crashpad/client/settings.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/base_paths.h"
-#include "base/strings/utf_string_conversions.h"
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -34,7 +31,7 @@
 #include "remoting/base/file_path_util_linux.h"
 #include "remoting/base/passwd_utils.h"
 #include "remoting/base/username.h"
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX)
 
 namespace remoting {
 namespace {
@@ -134,11 +131,7 @@ void SetupCrashpadDirectories() {
 
 base::FilePath GetCrashpadDatabasePath() {
   static const base::NoDestructor<base::FilePath> database_path([]() {
-#if BUILDFLAG(IS_WIN)
-    base::FilePath path;
-    base::PathService::Get(base::BasePathKey::DIR_ASSETS, &path);
-    return path.Append(kChromotingCrashpadDatabasePath);
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     if (getuid() == 0) {
       return GetDaemonProcessCrashpadDatabasePath();
     }
@@ -203,13 +196,8 @@ bool CrashpadDatabaseManager::InitializeCrashpadDatabase() {
   base::FilePath database_path = GetCrashpadDatabasePath();
   base::File::Error error;
   if (!base::CreateDirectoryAndGetError(database_path, &error)) {
-#if BUILDFLAG(IS_WIN)
-    logger_->LogError("Unable to get directory for crash database: " +
-                      base::WideToUTF8(database_path.value()));
-#else
     logger_->LogError("Unable to get directory for crash database: " +
                       database_path.value());
-#endif
     logger_->LogError("File Error: " + base::File::ErrorToString(error));
     return false;
   }
@@ -311,11 +299,7 @@ void CrashpadDatabaseManager::LogCrashReportInfo(
   } else {
     logger_->Log("  Crash id: " + id + " (http://go/crash/" + id + ")");
   }
-#if BUILDFLAG(IS_WIN)
-  logger_->Log("    path: " + base::WideToUTF8(report.file_path.value()));
-#else
   logger_->Log("    path: " + report.file_path.value());
-#endif
   logger_->Log("    uuid: " + report.uuid.ToString());
   logger_->Log("    created: " + base::TimeFormatHTTP(base::Time::FromTimeT(
                                      report.creation_time)));

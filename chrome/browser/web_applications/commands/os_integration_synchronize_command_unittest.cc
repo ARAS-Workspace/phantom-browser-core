@@ -430,13 +430,7 @@ TEST_F(OsIntegrationSynchronizeCommandTest,
   ASSERT_TRUE(states.has_value());
   const proto::os_state::WebAppOsIntegration& os_integration_state =
       states.value();
-#if BUILDFLAG(IS_WIN)
-  ASSERT_TRUE(os_integration_state.has_uninstall_registration());
-  EXPECT_TRUE(
-      os_integration_state.uninstall_registration().registered_with_os());
-#else
   ASSERT_FALSE(os_integration_state.has_uninstall_registration());
-#endif
 }
 
 TEST_F(OsIntegrationSynchronizeCommandTest, UpgradeToFullyInstalled) {

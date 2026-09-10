@@ -86,11 +86,6 @@
 #include "extensions/browser/pref_names.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/enterprise_util.h"
-#include "services/preferences/tracked/features.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 using content::BrowserContext;
 using content::BrowserThread;
 
@@ -101,13 +96,6 @@ using PrefTrackingStrategy =
 using ValueType = prefs::mojom::TrackedPreferenceMetadata::ValueType;
 
 namespace {
-
-#if BUILDFLAG(IS_WIN)
-// Whether we are in testing mode; can be enabled via
-// DisableDomainCheckForTesting(). Forces startup checks to ignore the presence
-// of a domain when determining the active SettingsEnforcement group.
-bool g_disable_domain_check_for_testing = false;
-#endif  // BUILDFLAG(IS_WIN)
 
 // These preferences must be kept in sync with the TrackedPreference enum in
 // tools/metrics/histograms/metadata/settings/enums.xml. To add a new
@@ -162,10 +150,6 @@ const auto kTrackedPrefs = std::to_array<prefs::TrackedPreferenceMetadata>({
      PrefTrackingStrategy::ATOMIC, ValueType::PERSONAL},
     {29, prefs::kMediaStorageIdSalt, EnforcementLevel::ENFORCE_ON_LOAD,
      PrefTrackingStrategy::ATOMIC, ValueType::IMPERSONAL},
-#if BUILDFLAG(IS_WIN)
-    {32, prefs::kMediaCdmOriginData, EnforcementLevel::ENFORCE_ON_LOAD,
-     PrefTrackingStrategy::ATOMIC, ValueType::IMPERSONAL},
-#endif  // BUILDFLAG(IS_WIN)
     {33, prefs::kGoogleServicesLastSignedInUsername,
      EnforcementLevel::ENFORCE_ON_LOAD, PrefTrackingStrategy::ATOMIC,
      ValueType::PERSONAL},
@@ -211,21 +195,11 @@ enum SettingsEnforcementGroup {
 };
 
 SettingsEnforcementGroup GetSettingsEnforcementGroup() {
-#if BUILDFLAG(IS_WIN)
-  if (!g_disable_domain_check_for_testing) {
-    static const bool is_domain_joined = base::IsEnterpriseDevice();
-    if (is_domain_joined &&
-        !base::FeatureList::IsEnabled(
-            tracked::kEnableEncryptedTrackedPrefOnEnterprise)) {
-      return GROUP_NO_ENFORCEMENT;
-    }
-  }
-#endif
 
   // Use the strongest enforcement setting on Windows and MacOS. Remember to
   // update the OFFICIAL_BUILD section of extension_startup_browsertest.cc and
   // pref_hash_browsertest.cc when updating the default value below.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return GROUP_ENFORCE_DEFAULT;
 #else
   return GROUP_NO_ENFORCEMENT;
@@ -537,9 +511,6 @@ std::unique_ptr<sync_preferences::PrefServiceSyncable> CreateProfilePrefs(
 }
 
 void DisableDomainCheckForTesting() {
-#if BUILDFLAG(IS_WIN)
-  g_disable_domain_check_for_testing = true;
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 bool InitializePrefsFromMasterPrefs(

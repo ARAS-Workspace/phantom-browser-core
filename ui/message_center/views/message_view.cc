@@ -47,11 +47,7 @@ namespace message_center {
 namespace {
 
 bool ShouldShowAeroShadowBorder() {
-#if BUILDFLAG(IS_WIN)
-  return true;
-#else
   return false;
-#endif
 }
 
 // Helper function to setup focus ring shapes for `MessageView`.

@@ -41,11 +41,6 @@
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "ui/base/resource/resource_bundle.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/installer/util/google_update_settings.h"
-#include "components/language/core/browser/pref_names.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ash/policy/core/browser_policy_connector_ash.h"
 #include "chrome/browser/ash/settings/about_flags.h"
@@ -163,19 +158,6 @@ void ChromeFeatureListCreator::CreatePrefService() {
 // TODO(asvitkine): This is done here so that the pref is set before
 // VariationsService queries the locale. This should potentially be moved to
 // somewhere better, e.g. as a helper in first_run namespace.
-#if BUILDFLAG(IS_WIN)
-  if (first_run::IsChromeFirstRun()) {
-    // During first run we read the google_update registry key to find what
-    // language the user selected when downloading the installer. This
-    // becomes our default language in the prefs.
-    // Other platforms obey the system locale.
-    std::wstring install_lang;
-    if (GoogleUpdateSettings::GetLanguage(&install_lang)) {
-      local_state_->SetString(language::prefs::kApplicationLocale,
-                              base::WideToASCII(install_lang));
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 void ChromeFeatureListCreator::ConvertFlagsToSwitches() {

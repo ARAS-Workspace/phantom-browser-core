@@ -294,8 +294,8 @@ BrowserAccessibilityStateImpl* BrowserAccessibilityStateImpl::GetInstance() {
 }
 
 // On Android, Mac, Windows and Linux there are platform-specific subclasses.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC) && \
-    !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_LINUX) && \
+    !BUILDFLAG(IS_CHROMEOS)
 // static
 std::unique_ptr<BrowserAccessibilityStateImpl>
 BrowserAccessibilityStateImpl::Create() {
@@ -339,14 +339,8 @@ BrowserAccessibilityStateImpl::BrowserAccessibilityStateImpl()
   if (command_line.HasSwitch(switches::kDisableRendererAccessibility)) {
     disallow_changes = true;
   } else if (command_line.HasSwitch(switches::kForceRendererAccessibility)) {
-#if BUILDFLAG(IS_WIN)
-    std::string ax_mode_bundle =
-        base::WideToUTF8(command_line.GetSwitchValueNative(
-            switches::kForceRendererAccessibility));
-#else
     std::string ax_mode_bundle = command_line.GetSwitchValueNative(
         switches::kForceRendererAccessibility);
-#endif
 
     if (ax_mode_bundle.empty()) {
       // For backwards compatibility, when --force-renderer-accessibility has no

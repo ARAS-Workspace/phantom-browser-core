@@ -5,10 +5,6 @@
 #include "build/build_config.h"
 #include "chrome/enterprise_companion/enterprise_companion.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 #if ENTERPRISE_COMPANION_TEST_ONLY
 // This symbol is normally declared in //base:test_support and defined in
 // //base. Adding a dependency on //base:test_support forces the executable to
@@ -38,12 +34,5 @@ void MaybeAllowCheckIsTest() {
 int main(int argc, const char* argv[]) {
   MaybeAllowCheckIsTest();
   return enterprise_companion::EnterpriseCompanionMain(argc, argv);
-}
-#elif BUILDFLAG(IS_WIN)
-int APIENTRY wWinMain(HINSTANCE instance, HINSTANCE prev, wchar_t*, int) {
-  MaybeAllowCheckIsTest();
-  // `argc` and `argv` are ignored by `base::CommandLine` for Windows. Instead,
-  // the implementation parses `GetCommandLineW()` directly.
-  return enterprise_companion::EnterpriseCompanionMain(0, nullptr);
 }
 #endif

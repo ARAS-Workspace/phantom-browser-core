@@ -124,7 +124,7 @@ class ExtensionStartupTestBase : public InProcessBrowserTest {
                                        paths);
       command_line->AppendSwitch(
           extensions::switches::kDisableExtensionsFileAccessCheck);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     } else {
       // In Windows and MacOS builds, it is not possible to disable settings
       // enforcement.

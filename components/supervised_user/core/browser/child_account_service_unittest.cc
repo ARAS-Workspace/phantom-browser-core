@@ -188,7 +188,7 @@ TEST_F(ChildAccountServiceTest, GetGoogleAuthStateNotAuthenticatedNotSignedIn) {
 
 // Tests that SafeSearch is correctly enforced for a supervised profile on Mac,
 // Linux, and Windows,.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_F(ChildAccountServiceTest, UpdateForceGoogleSafeSearch) {
   // SafeSearch should not be forced for signed-out users.
   ASSERT_FALSE(GetUserPerferences().GetBoolean(

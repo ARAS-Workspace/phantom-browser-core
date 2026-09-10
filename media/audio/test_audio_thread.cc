@@ -15,9 +15,6 @@ TestAudioThread::TestAudioThread() : TestAudioThread(false) {}
 TestAudioThread::TestAudioThread(bool use_real_thread) {
   if (use_real_thread) {
     thread_ = std::make_unique<base::Thread>("AudioThread");
-#if BUILDFLAG(IS_WIN)
-    thread_->init_com_with_mta(true);
-#endif
     CHECK(thread_->Start());
     task_runner_ = thread_->task_runner();
   } else {

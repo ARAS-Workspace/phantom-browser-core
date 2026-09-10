@@ -4873,15 +4873,9 @@ TEST(CanonicalCookieTest, CreateSanitizedCookie_Logic) {
       base::Time(), false /*secure*/, false /*httponly*/,
       CookieSameSite::NO_RESTRICTION, COOKIE_PRIORITY_DEFAULT,
       std::nullopt /*partition_key*/, &status);
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(double_backslash_ipv6_cookie);
-  EXPECT_TRUE(double_backslash_ipv6_cookie->IsCanonical());
-  EXPECT_TRUE(status.IsInclude());
-#else
   EXPECT_FALSE(double_backslash_ipv6_cookie);
   EXPECT_TRUE(status.HasExactlyExclusionReasonsForTesting(
       {CookieInclusionStatus::ExclusionReason::EXCLUDE_INVALID_DOMAIN}));
-#endif
 
   // Confirm multiple error types can be set.
   EXPECT_FALSE(CanonicalCookie::CreateSanitizedCookie(
@@ -5071,15 +5065,10 @@ TEST(CanonicalCookieTest, CreateSanitizedCookie_UnknownSchemeUrl) {
       base::Time(), base::Time(), base::Time(), /*secure=*/false,
       /*httponly=*/false, CookieSameSite::NO_RESTRICTION,
       COOKIE_PRIORITY_DEFAULT, /*partition_key=*/std::nullopt, &status);
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(status.IsInclude());
-  EXPECT_TRUE(cc);
-#else
   EXPECT_FALSE(status.IsInclude());
   EXPECT_FALSE(cc);
   EXPECT_TRUE(status.HasExactlyExclusionReasonsForTesting(
       {CookieInclusionStatus::ExclusionReason::EXCLUDE_INVALID_DOMAIN}));
-#endif  // IS_WIN
 
   CookieInclusionStatus status2;
   EXPECT_TRUE(CanonicalCookie::CreateSanitizedCookie(

@@ -129,7 +129,7 @@ inline constexpr char kDefaultSupervisedUserFilteringBehavior[] =
     "profile.managed.default_filtering_behavior";
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // An integer pref that stores the current state of the local extension
 // parent approval migration when the feature
 // `kEnableSupervisedUserSkipParentApprovalToInstallExtensions` becomes enabled.
@@ -137,7 +137,7 @@ inline constexpr char kDefaultSupervisedUserFilteringBehavior[] =
 // `supervised user::LocallyParentApprovedExtensionsMigrationState`.
 inline constexpr char kLocallyParentApprovedExtensionsMigrationState[] =
     "profile.managed.locally_parent_approved_extensions_migration_state";
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // A dictionary pref that stores the extension Ids that are treated as
 // parent-approved on a Desktop device when the feature

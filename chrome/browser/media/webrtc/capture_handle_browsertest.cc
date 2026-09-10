@@ -408,7 +408,7 @@ IN_PROC_BROWSER_TEST_F(
 
 // TODO(crbug.com/40185394): Test disabled on Mac due to multiple failing bots.
 // TODO(crbug.com/40211291, crbug.com/40864623): Flaky on Chrome OS and Windows.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_HandleExposedIfCallingFrameAllowlistedEvenIfTopLevelNotAllowlisted \
   DISABLED_HandleExposedIfCallingFrameAllowlistedEvenIfTopLevelNotAllowlisted
 #else
@@ -702,13 +702,8 @@ IN_PROC_BROWSER_TEST_F(CaptureHandleBrowserTest,
 }
 
 // TODO(crbug.com/40772597): Disabled because of flakiness.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_RegularTabCannotReadIncognitoTabCaptureHandle \
-  DISABLED_RegularTabCannotReadIncognitoTabCaptureHandle
-#else
 #define MAYBE_RegularTabCannotReadIncognitoTabCaptureHandle \
   RegularTabCannotReadIncognitoTabCaptureHandle
-#endif
 IN_PROC_BROWSER_TEST_F(CaptureHandleBrowserTest,
                        MAYBE_RegularTabCannotReadIncognitoTabCaptureHandle) {
   TabInfo captured_tab =
@@ -762,13 +757,8 @@ IN_PROC_BROWSER_TEST_F(CaptureHandleBrowserTest,
 }
 
 // TODO(crbug.com/40772597): Disabled because of flakiness.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_IncognitoTabCanReadIncognitoTabCaptureHandleIfSelfCapture \
-  DISABLED_IncognitoTabCanReadIncognitoTabCaptureHandleIfSelfCapture
-#else
 #define MAYBE_IncognitoTabCanReadIncognitoTabCaptureHandleIfSelfCapture \
   IncognitoTabCanReadIncognitoTabCaptureHandleIfSelfCapture
-#endif
 IN_PROC_BROWSER_TEST_F(
     CaptureHandleBrowserTest,
     MAYBE_IncognitoTabCanReadIncognitoTabCaptureHandleIfSelfCapture) {

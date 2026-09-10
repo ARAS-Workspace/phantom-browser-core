@@ -96,13 +96,6 @@ static_assert(
     2 == static_cast<int>(
              IndexedDBExternalObject::ObjectType::kFileSystemAccessHandle));
 
-#if BUILDFLAG(IS_WIN)
-// This exists as an escape hatch and/or to experiment with its impact on
-// reliability metrics.
-BASE_FEATURE(kIdbSqliteExclusiveDatabaseFileLock,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
-
 // The delay before a released `DatabaseConnection` actually destructs. This
 // gives the page a chance to re-open the same database without the overhead of
 // closing and re-opening the underlying SQLite connection.
@@ -1236,12 +1229,6 @@ Status DatabaseConnection::Init(std::optional<std::u16string_view> name) {
                      .set_wal_commit_callback(base::BindRepeating(
                          &DatabaseConnection::OnWalFileWritten,
                          wal_checkpoint_weak_factory_.GetWeakPtr()));
-
-#if BUILDFLAG(IS_WIN)
-  // *Enforce* exclusivity on Windows, for the purposes of reliability.
-  options.set_exclusive_database_file_lock(
-      base::FeatureList::IsEnabled(kIdbSqliteExclusiveDatabaseFileLock));
-#endif
 
   if (g_vfs_name_override) {
     options.set_vfs_name_discouraged(g_vfs_name_override);

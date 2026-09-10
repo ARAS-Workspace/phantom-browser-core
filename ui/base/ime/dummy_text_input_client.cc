@@ -85,19 +85,6 @@ gfx::Rect DummyTextInputClient::GetSelectionBoundingBox() const {
   return gfx::Rect();
 }
 
-#if BUILDFLAG(IS_WIN)
-std::optional<gfx::Rect> DummyTextInputClient::GetProximateCharacterBounds(
-    const gfx::Range& range) const {
-  return std::nullopt;
-}
-
-std::optional<size_t> DummyTextInputClient::GetProximateCharacterIndexFromPoint(
-    const gfx::Point& screen_point_in_dips,
-    IndexFromPointFlags flags) const {
-  return std::nullopt;
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 bool DummyTextInputClient::GetCompositionCharacterBounds(
     size_t index,
     gfx::Rect* rect) const {
@@ -175,7 +162,7 @@ bool DummyTextInputClient::ShouldDoLearning() {
   return false;
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 bool DummyTextInputClient::SetCompositionFromExistingText(
     const gfx::Range& range,
     const std::vector<ui::ImeTextSpan>& ui_ime_text_spans) {
@@ -225,12 +212,5 @@ bool DummyTextInputClient::AddGrammarFragments(
 void DummyTextInputClient::GetActiveTextInputControlLayoutBounds(
     std::optional<gfx::Rect>* control_bounds,
     std::optional<gfx::Rect>* selection_bounds) {}
-
-#if BUILDFLAG(IS_WIN)
-void DummyTextInputClient::SetActiveCompositionForAccessibility(
-    const gfx::Range& range,
-    const std::u16string& active_composition_text,
-    bool is_composition_committed) {}
-#endif
 
 }  // namespace ui

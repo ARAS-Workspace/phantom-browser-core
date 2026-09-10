@@ -37,17 +37,6 @@ IN_PROC_BROWSER_TEST_F(SandboxStatusUITest, testBPFSandboxEnabled) {
 }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-// This test is for Windows only.
-using SandboxStatusWindowsUITest = WebUIMochaBrowserTest;
-// TODO(crbug.com/40670321) Flaky on Windows.
-IN_PROC_BROWSER_TEST_F(SandboxStatusWindowsUITest, DISABLED_testSandboxStatus) {
-  set_test_loader_host(chrome::kChromeUISandboxHost);
-  RunTestWithoutTestLoader("sandbox/sandbox_test.js",
-                           "runMochaTest('Sandbox', 'SandboxStatus')");
-}
-#endif
-
 using GPUSandboxStatusUITest = WebUIMochaBrowserTest;
 
 // This test is disabled because it can only pass on real hardware. We

@@ -28,10 +28,6 @@
 #include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel.h"
 #include "chromeos/ash/components/mojo_proxy/mojo_core/public/cpp/platform/platform_channel_server.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace mojo_legacy {
 namespace core {
 
@@ -410,50 +406,6 @@ void NodeController::SendBrokerClientInvitationOnIOThread(
     // |BIND_SYNC_BROKER| message from the invited client.
     node_connection_params = std::move(connection_params);
   } else {
-#if BUILDFLAG(IS_WIN)
-    // On Windows, if `target_process` is invalid we can't duplicate a pipe
-    // handle to the remote client. In that case we instead open a new named
-    // pipe and send the client its name via the broker. Once connected, the new
-    // named pipe will be used for the client Channel.
-    if (!target_process.IsValid()) {
-      NamedPlatformChannel::Options options;
-      NamedPlatformChannel named_channel(options);
-
-      const bool is_untrusted_process =
-          connection_params.is_untrusted_process();
-      BrokerHost* broker_host =
-          new BrokerHost(base::Process(), std::move(connection_params),
-                         process_error_callback);
-      broker_host->SendNamedChannel(named_channel.GetServerName());
-
-      // NOTE: The callback given here binds to `this` unretained. This is safe
-      // because in production NodeController lives forever. In tests which do
-      // tear it down, the IO thread is always destroyed first so this callback
-      // will never run after NodeController destruction.
-      PlatformChannelServer::WaitForConnection(
-          named_channel.TakeServerEndpoint(),
-          base::BindOnce(
-              [](base::Process target_process,
-                 const ports::NodeName& temporary_node_name,
-                 const ProcessErrorCallback& process_error_callback,
-                 bool is_untrusted_process, NodeController* node_controller,
-                 PlatformChannelEndpoint endpoint) {
-                if (!endpoint.is_valid()) {
-                  return;
-                }
-
-                ConnectionParams params(std::move(endpoint));
-                params.set_is_untrusted_process(is_untrusted_process);
-                node_controller->FinishSendBrokerClientInvitationOnIOThread(
-                    std::move(target_process), std::move(params),
-                    temporary_node_name, Channel::HandlePolicy::kRejectHandles,
-                    process_error_callback);
-              },
-              std::move(target_process), temporary_node_name,
-              process_error_callback, is_untrusted_process, this));
-      return;
-    }
-#endif
 
     std::optional<ConnectionParams> params = CreateSyncNodeConnectionParams(
         target_process, std::move(connection_params), process_error_callback,
@@ -754,23 +706,6 @@ void NodeController::SendPeerEvent(const ports::NodeName& name,
     return;
   }
   scoped_refptr<NodeChannel> peer = GetPeerChannel(name);
-#if BUILDFLAG(IS_WIN)
-  if (event_message->has_handles()) {
-    // If we're sending a message with handles we aren't the destination
-    // node's inviter or broker (i.e. we don't know its process handle), ask
-    // the broker to relay for us.
-    scoped_refptr<NodeChannel> broker = GetBrokerChannel();
-    if (!peer || !peer->HasRemoteProcessHandle()) {
-      if (!GetConfiguration().is_broker_process && broker) {
-        broker->RelayEventMessage(name, std::move(event_message));
-      } else {
-        base::AutoLock lock(broker_lock_);
-        pending_relay_messages_[name].emplace(std::move(event_message));
-      }
-      return;
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   if (peer) {
     peer->SendChannelMessage(std::move(event_message));
@@ -1014,14 +949,6 @@ void NodeController::OnAddBrokerClient(const ports::NodeName& from_node,
       this, std::move(connection_params), Channel::HandlePolicy::kAcceptHandles,
       io_task_runner_, ProcessErrorCallback());
 
-#if BUILDFLAG(IS_WIN)
-  // The broker must have a working handle to the client process in order to
-  // properly copy other handles to and from the client.
-  if (!scoped_process_handle.IsValid()) {
-    DLOG(ERROR) << "Broker rejecting client with invalid process handle.";
-    return;
-  }
-#endif
   client->SetRemoteProcessHandle(std::move(scoped_process_handle));
 
   AddPeer(client_name, client, true /* start_channel */);
@@ -1135,18 +1062,6 @@ void NodeController::OnAcceptBrokerClient(const ports::NodeName& from_node,
     }
     pending_broker_clients.pop();
   }
-
-#if BUILDFLAG(IS_WIN)
-  // Have the broker relay any messages we have waiting.
-  for (auto& entry : pending_relay_messages) {
-    const ports::NodeName& destination = entry.first;
-    auto& message_queue = entry.second;
-    while (!message_queue.empty()) {
-      broker->RelayEventMessage(destination, std::move(message_queue.front()));
-      message_queue.pop();
-    }
-  }
-#endif
 
   DVLOG(1) << "Client " << name_ << " accepted by broker " << broker_name;
 }
@@ -1266,13 +1181,7 @@ void NodeController::OnIntroduce(const ports::NodeName& from_node,
     return;
   }
 
-#if BUILDFLAG(IS_WIN)
-  // Introduced peers are never our broker nor our inviter, so we never accept
-  // handles from them directly.
-  constexpr auto kPeerHandlePolicy = Channel::HandlePolicy::kRejectHandles;
-#else
   constexpr auto kPeerHandlePolicy = Channel::HandlePolicy::kAcceptHandles;
-#endif
 
   scoped_refptr<NodeChannel> channel = NodeChannel::Create(
       this,
@@ -1319,49 +1228,6 @@ void NodeController::OnBroadcast(const ports::NodeName& from_node,
     iter.second->SendChannelMessage(SerializeEventMessage(std::move(clone)));
   }
 }
-
-#if BUILDFLAG(IS_WIN)
-void NodeController::OnRelayEventMessage(const ports::NodeName& from_node,
-                                         base::ProcessHandle from_process,
-                                         const ports::NodeName& destination,
-                                         Channel::MessagePtr message) {
-  // The broker should always know which process this came from.
-  DCHECK(from_process != base::kNullProcessHandle);
-  DCHECK(io_task_runner_->RunsTasksInCurrentSequence());
-
-  if (GetBrokerChannel()) {
-    // Only the broker should be asked to relay a message.
-    LOG(ERROR) << "Non-broker refusing to relay message.";
-    DropPeer(from_node, nullptr);
-    return;
-  }
-
-  if (destination == name_) {
-    // Great, we can deliver this message locally.
-    OnEventMessage(from_node, std::move(message));
-    return;
-  }
-
-  scoped_refptr<NodeChannel> peer = GetPeerChannel(destination);
-  if (peer) {
-    peer->EventMessageFromRelay(from_node, std::move(message));
-  } else {
-    DLOG(ERROR) << "Dropping relay message for unknown node " << destination;
-  }
-}
-
-void NodeController::OnEventMessageFromRelay(const ports::NodeName& from_node,
-                                             const ports::NodeName& source_node,
-                                             Channel::MessagePtr message) {
-  if (GetPeerChannel(from_node) != GetBrokerChannel()) {
-    LOG(ERROR) << "Refusing relayed message from non-broker node.";
-    DropPeer(from_node, nullptr);
-    return;
-  }
-
-  OnEventMessage(source_node, std::move(message));
-}
-#endif
 
 void NodeController::OnAcceptPeer(const ports::NodeName& from_node,
                                   const ports::NodeName& token,

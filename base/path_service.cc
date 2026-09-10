@@ -16,16 +16,8 @@
 #include "build/build_config.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <shellapi.h>
-#include <shlobj.h>
-#endif
-
-#define ENABLE_BEHAVIOUR_OVERRIDE_PROVIDER                                    \
-  ((BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)) || \
-   BUILDFLAG(IS_WIN))
+#define ENABLE_BEHAVIOUR_OVERRIDE_PROVIDER \
+  (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID))
 
 namespace base {
 
@@ -34,9 +26,7 @@ bool EnvOverridePathProvider(int key, FilePath* result);
 
 bool PathProvider(int key, FilePath* result);
 
-#if BUILDFLAG(IS_WIN)
-bool PathProviderWin(int key, FilePath* result);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 bool PathProviderMac(int key, FilePath* result);
 #elif BUILDFLAG(IS_IOS)
 bool PathProviderIOS(int key, FilePath* result);
@@ -75,18 +65,6 @@ Provider base_provider = {PathProvider, nullptr,
 #endif
                           true};
 
-#if BUILDFLAG(IS_WIN)
-Provider win_provider = {PathProviderWin, &base_provider,
-#ifndef NDEBUG
-                         PATH_WIN_START, PATH_WIN_END,
-#endif
-                         true};
-Provider base_provider_win = {EnvOverridePathProvider, &win_provider,
-#ifndef NDEBUG
-                              PATH_START, PATH_END,
-#endif
-                              true};
-#endif
 
 #if BUILDFLAG(IS_MAC)
 Provider base_provider_mac = {PathProviderMac, &base_provider,
@@ -134,9 +112,7 @@ struct PathData {
   bool cache_disabled = false;  // Don't use cache if true;
 
   PathData() {
-#if BUILDFLAG(IS_WIN)
-    providers = &base_provider_win;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     providers = &base_provider_mac;
 #elif BUILDFLAG(IS_IOS)
     providers = &base_provider_ios;

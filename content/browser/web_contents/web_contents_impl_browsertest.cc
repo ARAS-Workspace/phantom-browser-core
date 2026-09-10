@@ -444,7 +444,7 @@ IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest,
 }
 
 // Crashes under ThreadSanitizer, http://crbug.com/356758.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID) || defined(THREAD_SANITIZER)
+#if BUILDFLAG(IS_ANDROID) || defined(THREAD_SANITIZER)
 #define MAYBE_GetSizeForNewRenderView DISABLED_GetSizeForNewRenderView
 #else
 #define MAYBE_GetSizeForNewRenderView DISABLED_GetSizeForNewRenderView
@@ -721,13 +721,8 @@ IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest, ResourceLoadComplete) {
 // Same as WebContentsImplBrowserTest.ResourceLoadComplete but with resources
 // retrieved from the network cache.
 // TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-#define MAYBE_ResourceLoadCompleteFromNetworkCache \
-  DISABLED_ResourceLoadCompleteFromNetworkCache
-#else
 #define MAYBE_ResourceLoadCompleteFromNetworkCache \
   ResourceLoadCompleteFromNetworkCache
-#endif
 IN_PROC_BROWSER_TEST_F(WebContentsImplBrowserTest,
                        MAYBE_ResourceLoadCompleteFromNetworkCache) {
   ResourceLoadObserver observer(shell());

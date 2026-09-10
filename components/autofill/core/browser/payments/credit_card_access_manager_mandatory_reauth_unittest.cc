@@ -67,7 +67,7 @@ class CreditCardAccessManagerMandatoryReauthTestBase
     // flag is on and the pref is enabled, or if the device is automotive.
     if (IsMandatoryReauthEnabled()) {
       ON_CALL(mandatory_reauth_manager(),
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_IOS)
               AuthenticateWithMessage)
           .WillByDefault(RunOnceCallbackRepeatedly<1>(
 #elif BUILDFLAG(IS_ANDROID)
@@ -77,7 +77,7 @@ class CreditCardAccessManagerMandatoryReauthTestBase
               MandatoryReauthResponseIsSuccess()));
     } else {
       EXPECT_CALL(mandatory_reauth_manager(),
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_IOS)
                   AuthenticateWithMessage)
 #elif BUILDFLAG(IS_ANDROID)
                   Authenticate)

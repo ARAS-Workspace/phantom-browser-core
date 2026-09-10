@@ -1424,7 +1424,7 @@ TEST_F(ExtensionManagementServiceTest, IsForceInstalledInLowTrustEnvironment) {
         CreateForcedExtension(kTargetExtension3, Extension::NO_FLAGS);
 
     constexpr bool expect_low_trust =
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
         true;
 #else
         false;
@@ -1449,7 +1449,7 @@ TEST_F(ExtensionManagementServiceTest, IsForceInstalledInLowTrustEnvironment) {
 
 TEST_F(ExtensionManagementServiceTest,
        IsGreylistedForceInstalledInLowTrustEnvironment) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   base::test::ScopedFeatureList feature_list(
       kDisableForceInstalledExtensionsInLowTrustEnviromentWhenGreylisted);
 #endif
@@ -1471,7 +1471,7 @@ TEST_F(ExtensionManagementServiceTest,
         ExtensionPrefs::Get(profile_.get()));
 
     constexpr bool expect_greylisted_in_low_trust =
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
         true;
 #else
         false;
@@ -1553,7 +1553,7 @@ TEST_F(ExtensionManagementServiceTest,
         CreateForcedExtension(kTargetExtension3, Extension::NO_FLAGS);
 
     bool expect_blocked =
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
         true;
 #else
         false;

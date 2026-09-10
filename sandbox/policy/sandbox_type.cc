@@ -34,29 +34,20 @@ constexpr char kServiceSandbox[] = "service";
 constexpr char kServiceSandboxWithJit[] = "service_with_jit";
 constexpr char kSpeechRecognitionSandbox[] = "speech_recognition";
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 constexpr char kPrintBackendSandbox[] = "print_backend";
 constexpr char kScreenAISandbox[] = "screen_ai";
 #endif
 
-#if BUILDFLAG(IS_WIN)
-constexpr char kNoneSandboxAndElevatedPrivileges[] = "none_and_elevated";
-constexpr char kPdfConversionSandbox[] = "pdf_conversion";
-constexpr char kXrCompositingSandbox[] = "xr_compositing";
-constexpr char kIconReaderSandbox[] = "icon_reader";
-constexpr char kMediaFoundationCdmSandbox[] = "mf_cdm";
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
 constexpr char kMirroringSandbox[] = "mirroring";
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 constexpr char kProxyResolverSandbox[] = "proxy_resolver";
 constexpr char kWebNNModelCompilationSandbox[] = "webnn_model_compilation";
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-
+#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 constexpr char kShapeDetectionSandbox[] = "shape_detection";
@@ -88,11 +79,6 @@ bool IsUnsandboxedSandboxType(Sandbox sandbox_type) {
   if (sandbox_type == Sandbox::kNoSandbox) {
     return true;
   }
-#if BUILDFLAG(IS_WIN)
-  if (sandbox_type == Sandbox::kNoSandboxAndElevatedPrivileges) {
-    return true;
-  }
-#endif
   return false;
 }
 
@@ -126,13 +112,6 @@ void SetCommandLineFlagsForSandboxType(base::CommandLine* command_line,
     case Sandbox::kCdm:
     case Sandbox::kPrintCompositor:
     case Sandbox::kAudio:
-#if BUILDFLAG(IS_WIN)
-    case Sandbox::kNoSandboxAndElevatedPrivileges:
-    case Sandbox::kXrCompositing:
-    case Sandbox::kPdfConversion:
-    case Sandbox::kIconReader:
-    case Sandbox::kMediaFoundationCdm:
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
     case Sandbox::kShapeDetection:
 #if BUILDFLAG(USE_LINUX_VIDEO_ACCELERATION)
@@ -148,12 +127,11 @@ void SetCommandLineFlagsForSandboxType(base::CommandLine* command_line,
 #if BUILDFLAG(IS_MAC)
     case Sandbox::kMirroring:
 #endif  // BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     case Sandbox::kProxyResolver:
     case Sandbox::kWebNNModelCompilation:
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     case Sandbox::kPrintBackend:
     case Sandbox::kScreenAI:
 #endif
@@ -225,10 +203,6 @@ std::string StringFromUtilitySandboxType(Sandbox sandbox_type) {
   switch (sandbox_type) {
     case Sandbox::kNoSandbox:
       return kNoneSandbox;
-#if BUILDFLAG(IS_WIN)
-    case Sandbox::kNoSandboxAndElevatedPrivileges:
-      return kNoneSandboxAndElevatedPrivileges;
-#endif  // BUILDFLAG(IS_WIN)
     case Sandbox::kNetwork:
       return kNetworkSandbox;
     case Sandbox::kOnDeviceModelExecution:
@@ -247,8 +221,7 @@ std::string StringFromUtilitySandboxType(Sandbox sandbox_type) {
       return kServiceSandboxWithJit;
     case Sandbox::kSpeechRecognition:
       return kSpeechRecognitionSandbox;
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     case Sandbox::kPrintBackend:
       return kPrintBackendSandbox;
     case Sandbox::kScreenAI:
@@ -258,26 +231,16 @@ std::string StringFromUtilitySandboxType(Sandbox sandbox_type) {
     case Sandbox::kOnDeviceTranslation:
       return kOnDeviceTranslationSandbox;
 #endif
-#if BUILDFLAG(IS_WIN)
-    case Sandbox::kXrCompositing:
-      return kXrCompositingSandbox;
-    case Sandbox::kPdfConversion:
-      return kPdfConversionSandbox;
-    case Sandbox::kIconReader:
-      return kIconReaderSandbox;
-    case Sandbox::kMediaFoundationCdm:
-      return kMediaFoundationCdmSandbox;
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_MAC)
     case Sandbox::kMirroring:
       return kMirroringSandbox;
 #endif  // BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     case Sandbox::kProxyResolver:
       return kProxyResolverSandbox;
     case Sandbox::kWebNNModelCompilation:
       return kWebNNModelCompilationSandbox;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
     case Sandbox::kShapeDetection:
       return kShapeDetectionSandbox;
@@ -328,11 +291,6 @@ sandbox::mojom::Sandbox UtilitySandboxTypeFromString(
   if (sandbox_string == kNoneSandbox) {
     return Sandbox::kNoSandbox;
   }
-#if BUILDFLAG(IS_WIN)
-  if (sandbox_string == kNoneSandboxAndElevatedPrivileges) {
-    return Sandbox::kNoSandboxAndElevatedPrivileges;
-  }
-#endif
 
   if (sandbox_string == kNetworkSandbox) {
     return Sandbox::kNetwork;
@@ -346,26 +304,12 @@ sandbox::mojom::Sandbox UtilitySandboxTypeFromString(
   if (sandbox_string == kPrintCompositorSandbox) {
     return Sandbox::kPrintCompositor;
   }
-#if BUILDFLAG(IS_WIN)
-  if (sandbox_string == kXrCompositingSandbox) {
-    return Sandbox::kXrCompositing;
-  }
-  if (sandbox_string == kPdfConversionSandbox) {
-    return Sandbox::kPdfConversion;
-  }
-  if (sandbox_string == kIconReaderSandbox) {
-    return Sandbox::kIconReader;
-  }
-  if (sandbox_string == kMediaFoundationCdmSandbox) {
-    return Sandbox::kMediaFoundationCdm;
-  }
-#endif
 #if BUILDFLAG(IS_MAC)
   if (sandbox_string == kMirroringSandbox) {
     return Sandbox::kMirroring;
   }
 #endif
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (sandbox_string == kProxyResolverSandbox) {
     return Sandbox::kProxyResolver;
   }
@@ -379,8 +323,7 @@ sandbox::mojom::Sandbox UtilitySandboxTypeFromString(
   if (sandbox_string == kSpeechRecognitionSandbox) {
     return Sandbox::kSpeechRecognition;
   }
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   if (sandbox_string == kPrintBackendSandbox) {
     return Sandbox::kPrintBackend;
   }

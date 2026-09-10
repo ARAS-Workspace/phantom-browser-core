@@ -13,15 +13,9 @@
 
 namespace base::rust::file_path {
 
-#if BUILDFLAG(IS_WIN)
-std::unique_ptr<FilePath> CreateFilePathFromWide(
-    ::rust::Slice<const uint16_t> wide);
-::rust::Slice<const uint16_t> FilePathToWide(const FilePath& path);
-#else
 std::unique_ptr<FilePath> CreateFilePathFromBytes(
     ::rust::Slice<const uint8_t> bytes);
 ::rust::Slice<const uint8_t> FilePathToBytes(const FilePath& path);
-#endif
 
 }  // namespace base::rust::file_path
 

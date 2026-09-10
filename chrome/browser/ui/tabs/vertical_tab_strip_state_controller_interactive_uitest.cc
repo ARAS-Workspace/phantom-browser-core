@@ -154,11 +154,7 @@ class VerticalTabStripInteractiveUiTest : public InteractiveBrowserTest {
 };
 
 // Unable to programmatically click System Context Menu Items in Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_VerifyTabsToTheSideButton DISABLED_VerifyTabsToTheSideButton
-#else
 #define MAYBE_VerifyTabsToTheSideButton VerifyTabsToTheSideButton
-#endif
 // This test checks that we can click the show tabs to the side button
 IN_PROC_BROWSER_TEST_F(VerticalTabStripInteractiveUiTest,
                        MAYBE_VerifyTabsToTheSideButton) {
@@ -177,11 +173,7 @@ IN_PROC_BROWSER_TEST_F(VerticalTabStripInteractiveUiTest,
 }
 
 // Unable to programmatically click System Context Menu Items in Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_VerifyTabsToTheTopButton DISABLED_VerifyTabsToTheTopButton
-#else
 #define MAYBE_VerifyTabsToTheTopButton VerifyTabsToTheTopButton
-#endif
 // This test checks that we can click the show tabs at the top button
 IN_PROC_BROWSER_TEST_F(VerticalTabStripInteractiveUiTest,
                        MAYBE_VerifyTabsToTheTopButton) {
@@ -205,13 +197,8 @@ IN_PROC_BROWSER_TEST_F(VerticalTabStripInteractiveUiTest,
 }
 
 // Unable to programmatically click System Context Menu Items in Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_EnablingExpandOnHoverSystemContextMenu \
-  DISABLED_EnablingExpandOnHoverSystemContextMenu
-#else
 #define MAYBE_EnablingExpandOnHoverSystemContextMenu \
   EnablingExpandOnHoverSystemContextMenu
-#endif
 // This test checks that we can enable the expand on hover behavior via the
 // system context menu.
 IN_PROC_BROWSER_TEST_F(VerticalTabStripInteractiveUiTest,
@@ -241,13 +228,8 @@ IN_PROC_BROWSER_TEST_F(VerticalTabStripInteractiveUiTest,
 }
 
 // Unable to programmatically click System Context Menu Items in Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DisablingExpandOnHoverSystemContextMenu \
-  DISABLED_DisablingExpandOnHoverSystemContextMenu
-#else
 #define MAYBE_DisablingExpandOnHoverSystemContextMenu \
   DisablingExpandOnHoverSystemContextMenu
-#endif
 // This test checks that we can disable the expand on hover behavior via the
 // system context menu.
 IN_PROC_BROWSER_TEST_F(VerticalTabStripInteractiveUiTest,
@@ -275,12 +257,7 @@ IN_PROC_BROWSER_TEST_F(VerticalTabStripInteractiveUiTest,
 }
 
 // Unable to programmatically click System Context Menu Items in Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ToggleCollapseSystemContextMenu \
-  DISABLED_ToggleCollapseSystemContextMenu
-#else
 #define MAYBE_ToggleCollapseSystemContextMenu ToggleCollapseSystemContextMenu
-#endif
 // This test checks that we can toggle the collapse state via the system context
 // menu.
 IN_PROC_BROWSER_TEST_F(VerticalTabStripInteractiveUiTest,

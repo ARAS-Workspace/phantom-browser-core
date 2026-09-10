@@ -26,11 +26,6 @@
 #include "components/remote_cocoa/browser/application_host.h"
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/aura/window.h"
-#include "ui/aura/window_tree_host.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace {
 
 #if BUILDFLAG(IS_MAC)
@@ -42,19 +37,6 @@ remote_cocoa::ApplicationHost* GetApplicationHostFromWebContents(
       web_contents ? web_contents->GetNativeView() : gfx::NativeView());
 }
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_WIN)
-intptr_t GetHWNDFromWebContents(content::WebContents* web_contents) {
-  // Get the HWND for the window containing the web contents (Recreation
-  // of HWNDForNativeView).
-  gfx::NativeView native_view = web_contents->GetNativeView();
-  if (native_view && native_view->GetRootWindow()) {
-    return reinterpret_cast<intptr_t>(
-        native_view->GetHost()->GetAcceleratedWidget());
-  }
-  return -1;
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace
 
@@ -155,14 +137,6 @@ void WebAppSystemMediaControlsManager::OnFocusGained(
   // if the controls don't exist, we need to make an SMC and the
   // controls object.
   if (!existing_controls) {
-#if BUILDFLAG(IS_WIN)
-    // `window` is -1 if no HWND found.
-    intptr_t window = GetHWNDFromWebContents(web_contents);
-    std::unique_ptr<system_media_controls::SystemMediaControls>
-        system_media_controls =
-            system_media_controls::SystemMediaControls::Create(
-                media::AudioManager::GetGlobalAppName(), window);
-#else
     remote_cocoa::ApplicationHost* application_host =
         GetApplicationHostFromWebContents(web_contents);
 
@@ -177,7 +151,6 @@ void WebAppSystemMediaControlsManager::OnFocusGained(
       system_media_controls->SetOnBridgeCreatedCallbackForTesting(
           on_system_media_controls_bridge_created_callback_for_testing_);
     }
-#endif  // BUILDFLAG(IS_WIN)
 
     if (!system_media_controls) {
       return;

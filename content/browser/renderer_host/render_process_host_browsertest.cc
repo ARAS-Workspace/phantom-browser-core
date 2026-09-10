@@ -86,18 +86,6 @@
 #include "third_party/blink/public/common/chrome_debug_urls.h"
 #include "third_party/blink/public/common/features.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/features.h"
-#include "base/files/file.h"
-#include "base/files/file_path.h"
-#include "base/files/file_util.h"
-#include "base/test/bind.h"
-#include "base/test/metrics/histogram_tester.h"
-#include "base/test/scoped_feature_list.h"
-#include "mojo/public/cpp/platform/platform_handle_security_util_win.h"
-#include "sandbox/policy/switches.h"
-#endif
-
 using testing::_;
 using testing::InSequence;
 using testing::Mock;
@@ -386,7 +374,7 @@ class ObserverLogger : public RenderProcessHostObserver {
 
 // Flaky on Android. http://crbug.com/759514.
 // TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
-#if BUILDFLAG(IS_ANDROID) || (BUILDFLAG(IS_WIN) && !defined(NDEBUG))
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_AllProcessExitedCallsBeforeAnyHostDestroyedCalls \
   DISABLED_AllProcessExitedCallsBeforeAnyHostDestroyedCalls
 #else
@@ -837,7 +825,7 @@ IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
 }
 
 // Test is flaky on Android builders: https://crbug.com/875179
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_KeepAliveRendererProcess_Hung \
   DISABLED_KeepAliveRendererProcess_Hung
 #else
@@ -901,7 +889,7 @@ IN_PROC_BROWSER_TEST_P(RenderProcessHostTest,
 }
 
 // Test is flaky on Android builders: https://crbug.com/875179
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_FetchKeepAliveRendererProcess_Hung \
   DISABLED_FetchKeepAliveRendererProcess_Hung
 #else
@@ -2028,100 +2016,6 @@ IN_PROC_BROWSER_TEST_P(RenderProcessHostTest, ForEachFrameNestedFrameDeletion) {
   // isn't found at that time when iterating over other frames in the process.
   EXPECT_EQ(0, rfh_deletion_observer.render_frame_host_iterator_count());
 }
-
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_P(RenderProcessHostTest, ZeroExecutionTimes) {
-  // This test only works if the renderer process is sandboxed.
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          sandbox::policy::switches::kNoSandbox)) {
-    return;
-  }
-  base::HistogramTester histogram_tester;
-  RenderProcessHost* process =
-      RenderProcessHostImpl::CreateRenderProcessHostForTesting(
-          ShellContentBrowserClient::Get()->browser_context(), nullptr);
-  RenderProcessHostWatcher process_watcher(
-      process, RenderProcessHostWatcher::WATCH_FOR_PROCESS_READY);
-  process->Init();
-  process_watcher.Wait();
-  EXPECT_TRUE(process->IsReady());
-  histogram_tester.ExpectUniqueSample(
-      "BrowserRenderProcessHost.SuspendedChild.UserExecutionRecorded", false,
-      1);
-  histogram_tester.ExpectUniqueSample(
-      "BrowserRenderProcessHost.SuspendedChild.KernelExecutionRecorded", false,
-      1);
-  process->Cleanup();
-}
-
-class RenderProcessHostWriteableFileTest
-    : public RenderProcessHostTestBase,
-      public ::testing::WithParamInterface</*add_no_execute_flags=*/bool> {
- protected:
-  bool ShouldMarkNoExecute() { return GetParam(); }
-};
-
-// This test verifies that the renderer process is wired up correctly with the
-// mojo invitation flag that indicates that it's untrusted. The other half of
-// this test that verifies that a security violation actually causes a DCHECK
-// lives in mojo/core, and can't live here as death tests are not supported for
-// browser tests.
-IN_PROC_BROWSER_TEST_P(RenderProcessHostWriteableFileTest,
-                       PassUnsafeWriteableExecutableFile) {
-  // This test only works if DCHECKs are enabled.
-#if !DCHECK_IS_ON()
-  GTEST_SKIP();
-#else
-  // This test only works if the renderer process is sandboxed.
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          sandbox::policy::switches::kNoSandbox)) {
-    GTEST_SKIP();
-  }
-
-  base::ScopedAllowBlockingForTesting allow_blocking;
-
-  ASSERT_TRUE(embedded_test_server()->Start());
-  GURL test_url = embedded_test_server()->GetURL("/simple_page.html");
-  EXPECT_TRUE(NavigateToURL(shell(), test_url));
-  RenderProcessHost* rph =
-      shell()->web_contents()->GetPrimaryMainFrame()->GetProcess();
-
-  mojo::Remote<mojom::TestService> test_service;
-  rph->BindReceiver(test_service.BindNewPipeAndPassReceiver());
-
-  uint32_t flags = base::File::FLAG_OPEN_ALWAYS | base::File::FLAG_READ |
-                   base::File::FLAG_WRITE;
-  if (ShouldMarkNoExecute()) {
-    flags = base::File::AddFlagsForPassingToUntrustedProcess(flags);
-  }
-
-  base::FilePath file_path;
-  base::CreateTemporaryFile(&file_path);
-  base::File temp_file_writeable(file_path, flags);
-  ASSERT_TRUE(temp_file_writeable.IsValid());
-
-  bool error_was_called = false;
-  mojo::SetUnsafeFileHandleCallbackForTesting(
-      base::BindLambdaForTesting([&error_was_called]() -> bool {
-        error_was_called = true;
-        return true;
-      }));
-
-  base::RunLoop run_loop;
-  test_service->PassWriteableFile(std::move(temp_file_writeable),
-                                  run_loop.QuitClosure());
-  run_loop.Run();
-
-  bool should_violation_occur = !ShouldMarkNoExecute();
-  EXPECT_EQ(should_violation_occur, error_was_called);
-#endif  // DCHECK_IS_ON()
-}
-
-INSTANTIATE_TEST_SUITE_P(All,
-                         RenderProcessHostWriteableFileTest,
-                         /*add_no_execute_flags=*/testing::Bool());
-
-#endif  // BUILDFLAG(IS_WIN)
 
 // This test verifies that the Pseudonymization salt that is generated in the
 // browser process is correctly synchronized with a child process, in this case,

@@ -68,11 +68,6 @@
 #include "ui/base/ui_base_features.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "device/fido/win/fake_webauthn_api.h"
-#include "device/fido/win/webauthn_api.h"
-#endif
-
 namespace {
 
 using testing::ElementsAre;
@@ -869,11 +864,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
        // If older webauthn.dll is present, don't jump to it since it doesn't do
        // hybrid.
        {L, mc, {cable}, {has_winapi, rk, hint_hybrid}, {winapi, hybrid}, qr},
-#if BUILDFLAG(IS_WIN)
-       // ... but do if it supports hybrid.
-       {L, mc, {cable}, {has_winapi, win_hybrid, rk, hint_hybrid}, {winapi},
-        plat_ui},
-#endif
 
        // create(): Client device hint should jump to the platform
        // authenticator.
@@ -910,11 +900,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
        // If older webauthn.dll is present, don't jump to it since it doesn't do
        // hybrid.
        {L, ga, {cable}, {has_winapi, rk, hint_hybrid}, {hybrid, winapi}, qr},
-#if BUILDFLAG(IS_WIN)
-       // ... but do if it supports hybrid.
-       {L, ga, {cable}, {has_winapi, win_hybrid, rk, hint_hybrid}, {winapi},
-        plat_ui},
-#endif
        // If credentials are found on a platform authenticator, they are still
        // shown.
        {L, ga, {usb, internal, cable}, {one_cred, rk, hint_hybrid},
@@ -927,46 +912,9 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
        // we can enumerate platform authenticators and do a good job.
        {L, ga, {usb, cable, internal}, {rk, hint_plat}, {hybrid}, qr},
 
-#if BUILDFLAG(IS_WIN)
-      // Windows tests.
-      // Mix of internal credentials, but no USB/NFC.
-      // This should jump to Windows, as there is a match with the local
-      // authenticator.
-      {L,
-       ga,
-       {cable},
-       {two_cred, has_winapi, only_hybrid_or_internal,
-        has_plat},
-       {c(wincred1), c(wincred2), hybrid},
-       plat_ui},
-      // Mix of internal credentials, and USB/NFC (empty allow list).
-      // This should default to Windows, and on cancel offer dispatching to the
-      // Windows API for USB/NFC.
-      {L,
-       ga,
-       {cable},
-       {two_cred, has_winapi, empty_al, has_plat},
-       {c(wincred1), c(wincred2), hybrid, winapi},
-       plat_ui},
-
-      // Tests where Windows handles hybrid with internal credentials only.
-      // This should dispatch directly to the Windows API.
-      {L,
-       ga,
-       {},
-       {two_cred, has_winapi, win_hybrid, only_internal, has_plat},
-       {c(wincred1), c(wincred2)},
-       plat_ui},
-#endif  // BUILDFLAG(IS_WIN)
   };
   // clang-format on
 #undef L
-
-#if BUILDFLAG(IS_WIN)
-  device::FakeWinWebAuthnApi fake_win_webauthn_api;
-  device::WinWebAuthnApi::ScopedOverride win_webauthn_api_override(
-      &fake_win_webauthn_api);
-#endif
 
   auto RunTest = [&](const Test& test) {
     SCOPED_TRACE(static_cast<int>(test.expected_first_step));
@@ -977,12 +925,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
         test.transports)));
     SCOPED_TRACE(RequestTypeToString(test.request_type));
     SCOPED_TRACE(testing::Message() << "At line number: " << test.line_num);
-
-#if BUILDFLAG(IS_WIN)
-    bool has_win_hybrid =
-        test.params.contains(TransportAvailabilityParam::kWindowsHandlesHybrid);
-    fake_win_webauthn_api.set_version(has_win_hybrid ? 7 : 4);
-#endif
 
     TransportAvailabilityInfo transports_info;
     if (test.params.contains(TransportAvailabilityParam::kBleDisabled)) {
@@ -1188,173 +1130,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, Mechanisms) {
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST_F(AuthenticatorRequestDialogControllerTest, WinCancel) {
-  // Simulate the user canceling the Windows native UI, both with and without
-  // that UI being immediately triggered. If it was immediately triggered then
-  // canceling it should show the mechanism selection UI.
-
-  device::FakeWinWebAuthnApi fake_win_webauthn_api;
-  device::WinWebAuthnApi::ScopedOverride win_webauthn_api_override(
-      &fake_win_webauthn_api);
-
-  for (const int win_webauthn_api_version : {4, 7}) {
-    fake_win_webauthn_api.set_version(win_webauthn_api_version);
-    for (const bool is_passkey_request : {false, true}) {
-      SCOPED_TRACE(testing::Message() << "passkey req? " << is_passkey_request);
-      SCOPED_TRACE(testing::Message() << "win v" << win_webauthn_api_version);
-
-      TransportAvailabilityInfo tai;
-      tai.make_credential_attachment =
-          device::AuthenticatorAttachment::kCrossPlatform;
-      tai.request_type = device::FidoRequestType::kMakeCredential;
-      tai.attestation_conveyance_preference =
-          device::AttestationConveyancePreference::kNone;
-      tai.has_win_native_api_authenticator = true;
-      tai.win_native_ui_shows_resident_credential_notice = true;
-      tai.available_transports.insert(device::FidoTransportProtocol::kHybrid);
-      tai.resident_key_requirement =
-          is_passkey_request ? device::ResidentKeyRequirement::kRequired
-                             : device::ResidentKeyRequirement::kDiscouraged;
-      tai.ble_status = BleStatus::kOn;
-
-      auto model =
-          base::MakeRefCounted<AuthenticatorRequestDialogModel>(main_rfh());
-      AuthenticatorRequestDialogController controller(model.get(), main_rfh());
-      controller.saved_authenticators().emplace_back(
-          "ID", AuthenticatorTransport::kInternal,
-          device::AuthenticatorType::kWinNative);
-      controller.set_cable_transport_info("fido:/1234");
-
-      UpdateModelBeforeStartFlow(model.get(), tai, /*is_off_the_record=*/false);
-      controller.StartFlow(std::move(tai), {});
-
-      const bool win_ui_was_immediately_triggered =
-          !is_passkey_request || win_webauthn_api_version == 7;
-      if (!win_ui_was_immediately_triggered) {
-        EXPECT_NE(model->step(), Step::kNotStarted);
-        // Canceling the Windows UI ends the request because the user must have
-        // selected the Windows option first.
-        EXPECT_FALSE(controller.OnWinUserCancelled());
-        continue;
-      }
-
-      EXPECT_EQ(model->step(), Step::kPlatformAuthenticator);
-
-      if (win_webauthn_api_version >= 7) {
-        // Windows handles hybrid itself starting with this version, so
-        // canceling shouldn't try to show Chrome UI.
-        EXPECT_FALSE(controller.OnWinUserCancelled());
-        continue;
-      }
-
-      // Canceling the Windows native UI should be handled.
-      EXPECT_TRUE(controller.OnWinUserCancelled());
-      // The mechanism selection sheet should now be showing.
-      EXPECT_EQ(model->step(), Step::kMechanismSelection);
-      // Canceling the Windows UI ends the request because the user must have
-      // selected the Windows option first.
-      EXPECT_FALSE(controller.OnWinUserCancelled());
-    }
-  }
-}
-
-// Simulate the user cancelling the Windows native UI after it was automatically
-// dispatched to because a matching credential for Windows Hello was found for
-// an allow-list request.
-// Regression test for crbug.com/40280770.
-TEST_F(AuthenticatorRequestDialogControllerTest,
-       WinCancel_AfterMatchingLocalCred) {
-  device::FakeWinWebAuthnApi fake_win_webauthn_api;
-  device::WinWebAuthnApi::ScopedOverride win_webauthn_api_override(
-      &fake_win_webauthn_api);
-
-  fake_win_webauthn_api.set_version(4);
-
-  TransportAvailabilityInfo tai;
-  tai.request_type = device::FidoRequestType::kGetAssertion;
-  tai.has_win_native_api_authenticator = true;
-  tai.has_empty_allow_list = false;
-  tai.available_transports.insert(device::FidoTransportProtocol::kHybrid);
-  tai.ble_status = BleStatus::kOn;
-  tai.recognized_credentials = {kWinCred1};
-  tai.has_platform_authenticator_credential = device::FidoRequestHandlerBase::
-      RecognizedCredential::kHasRecognizedCredential;
-
-  auto model =
-      base::MakeRefCounted<AuthenticatorRequestDialogModel>(main_rfh());
-  AuthenticatorRequestDialogController controller(model.get(), main_rfh());
-  controller.saved_authenticators().emplace_back(
-      "ID", AuthenticatorTransport::kInternal,
-      device::AuthenticatorType::kWinNative);
-  controller.set_cable_transport_info("fido:/1234");
-  UpdateModelBeforeStartFlow(model.get(), tai, /*is_off_the_record=*/false);
-  controller.StartFlow(std::move(tai), {});
-
-  // The Windows native UI should have been triggered.
-  EXPECT_EQ(model->step(), Step::kPlatformAuthenticator);
-
-  // Canceling the Windows native UI should be handled.
-  EXPECT_TRUE(controller.OnWinUserCancelled());
-
-  // The mechanism selection sheet should now be showing.
-  EXPECT_EQ(model->step(), Step::kMechanismSelection);
-
-  // Canceling the Windows UI ends the request because the user must have
-  // selected the Windows option first.
-  EXPECT_FALSE(controller.OnWinUserCancelled());
-}
-
-TEST_F(AuthenticatorRequestDialogControllerTest, WinNoPlatformAuthenticator) {
-  TransportAvailabilityInfo tai;
-  tai.request_type = device::FidoRequestType::kMakeCredential;
-  tai.attestation_conveyance_preference =
-      device::AttestationConveyancePreference::kNone;
-  tai.make_credential_attachment = device::AuthenticatorAttachment::kAny;
-  tai.request_is_internal_only = true;
-  tai.win_is_uvpaa = false;
-  tai.has_win_native_api_authenticator = true;
-  auto model =
-      base::MakeRefCounted<AuthenticatorRequestDialogModel>(main_rfh());
-  UpdateModelBeforeStartFlow(model.get(), tai, /*is_off_the_record=*/false);
-  AuthenticatorRequestDialogController controller(model.get(), main_rfh());
-  controller.StartFlow(std::move(tai), {});
-  EXPECT_EQ(model->step(), Step::kErrorWindowsHelloNotEnabled);
-  EXPECT_FALSE(model->offer_try_again_in_ui);
-}
-
-// Tests that if a WebAuthn request with an empty allow-list has a matching
-// Windows Hello credential, the request is dispatched to Windows with an empty
-// allow list (i.e. no filtering takes place).
-// Regression test for https://crbug.com/448351425.
-TEST_F(AuthenticatorRequestDialogControllerTest, WinCredMatchEmptyAllowList) {
-  static constexpr char kWinAuthenticatorId[] = "win-authenticator";
-  TransportAvailabilityInfo tai;
-  tai.request_type = device::FidoRequestType::kGetAssertion;
-  tai.win_is_uvpaa = true;
-  tai.recognized_credentials = {kWinCred1};
-  tai.has_win_native_api_authenticator = true;
-  tai.has_empty_allow_list = true;
-  auto model =
-      base::MakeRefCounted<AuthenticatorRequestDialogModel>(main_rfh());
-  UpdateModelBeforeStartFlow(model.get(), tai, /*is_off_the_record=*/false);
-  AuthenticatorRequestDialogController controller(model.get(), main_rfh());
-  controller.saved_authenticators().emplace_back(
-      kWinAuthenticatorId, AuthenticatorTransport::kInternal,
-      device::AuthenticatorType::kWinNative);
-  base::test::TestFuture<std::string> request_future;
-  controller.SetRequestCallback(
-      request_future.GetRepeatingCallback<const std::string&>());
-  controller.SetAccountPreselectedCallback(base::BindLambdaForTesting(
-      [](device::DiscoverableCredentialMetadata cred) {
-        FAIL() << "Should not have narrowed the allow list";
-      }));
-  controller.StartFlow(std::move(tai), {});
-  EXPECT_EQ(model->step(), Step::kPlatformAuthenticator);
-  EXPECT_EQ(request_future.Get(), kWinAuthenticatorId);
-}
-#endif
-
 TEST_F(AuthenticatorRequestDialogControllerTest, NoAvailableTransports) {
   testing::StrictMock<MockDialogModelObserver> mock_observer;
   auto model =
@@ -1411,14 +1186,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, GpmDisabledForCreate) {
 }
 
 TEST_F(AuthenticatorRequestDialogControllerTest, Cable2ndFactorFlows) {
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/41490900): Get test to pass in the webauthn supports
-  // hybrid case.
-  device::FakeWinWebAuthnApi fake_win_webauthn_api;
-  device::WinWebAuthnApi::ScopedOverride win_webauthn_api_override(
-      &fake_win_webauthn_api);
-  fake_win_webauthn_api.set_version(4);
-#endif  // BUILDFLAG(IS_WIN)
 
   enum class Profile {
     NORMAL,
@@ -1578,12 +1345,6 @@ class AuthenticatorRequestDialogControllerBluetoothTest
 
   void SetUp() override {
     AuthenticatorRequestDialogControllerTest::SetUp();
-#if BUILDFLAG(IS_WIN)
-    win_webauthn_api_override_ =
-        std::make_unique<device::WinWebAuthnApi::ScopedOverride>(
-            &fake_win_webauthn_api_);
-    fake_win_webauthn_api_.set_version(4);
-#endif  // BUILDFLAG(IS_WIN)
   }
 
   AuthenticatorRequestDialogControllerBluetoothTest(
@@ -1592,11 +1353,6 @@ class AuthenticatorRequestDialogControllerBluetoothTest
       const AuthenticatorRequestDialogControllerBluetoothTest&) = delete;
 
  private:
-#if BUILDFLAG(IS_WIN)
-  device::FakeWinWebAuthnApi fake_win_webauthn_api_;
-  std::unique_ptr<device::WinWebAuthnApi::ScopedOverride>
-      win_webauthn_api_override_;
-#endif  // BUILDFLAG(IS_WIN)
 };
 
 TEST_F(AuthenticatorRequestDialogControllerBluetoothTest,
@@ -1932,40 +1688,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, ConditionalUICancelRequest) {
   model->observers.RemoveObserver(&mock_observer);
 }
 
-#if BUILDFLAG(IS_WIN)
-// Tests that cancelling the Windows Platform authenticator during a Conditional
-// UI request restarts it.
-TEST_F(AuthenticatorRequestDialogControllerTest, ConditionalUIWindowsCancel) {
-  testing::StrictMock<MockDialogModelObserver> mock_observer;
-  auto model =
-      base::MakeRefCounted<AuthenticatorRequestDialogModel>(main_rfh());
-  AuthenticatorRequestDialogController controller(model.get(), main_rfh());
-  model->observers.AddObserver(&mock_observer);
-  controller.saved_authenticators().emplace_back(
-      /*device_id=*/"internal", AuthenticatorTransport::kInternal,
-      device::AuthenticatorType::kOther);
-
-  EXPECT_CALL(mock_observer, OnStepTransition());
-  TransportAvailabilityInfo transports_info;
-  transports_info.attestation_conveyance_preference =
-      device::AttestationConveyancePreference::kNone;
-  controller.SetUIPresentation(UIPresentation::kAutofill);
-  UpdateModelBeforeStartFlow(model.get(), transports_info,
-                             /*is_off_the_record=*/false);
-  controller.StartFlow(std::move(transports_info), {});
-  EXPECT_EQ(model->step(), Step::kPasskeyAutofill);
-  testing::Mock::VerifyAndClearExpectations(&mock_observer);
-
-  // Simulate the Windows authenticator cancelling.
-  EXPECT_CALL(mock_observer, OnStepTransition());
-  EXPECT_CALL(mock_observer, OnStartOver());
-  controller.OnWinUserCancelled();
-  EXPECT_EQ(model->step(), Step::kPasskeyAutofill);
-  testing::Mock::VerifyAndClearExpectations(&mock_observer);
-  model->observers.RemoveObserver(&mock_observer);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_MAC)
 // Tests that a transport = internal virtual authenticator can be dispatched to
 // on Mac.
@@ -2105,35 +1827,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest,
   controller.OnAccountPreselected(cred.cred_id);
   ASSERT_TRUE(base::test::RunUntil([&] { return preselect_num_called == 1; }));
 }
-
-#if BUILDFLAG(IS_WIN)
-// Regression test for crbug.com/40280124.
-TEST_F(AuthenticatorRequestDialogControllerTest, JumpToWindowsWithNewUI) {
-  auto model =
-      base::MakeRefCounted<AuthenticatorRequestDialogModel>(main_rfh());
-  AuthenticatorRequestDialogController controller(model.get(), main_rfh());
-
-  TransportAvailabilityInfo transports_info;
-  transports_info.request_type = device::FidoRequestType::kGetAssertion;
-  transports_info.available_transports = kAllTransports;
-  transports_info.has_win_native_api_authenticator = true;
-  transports_info.has_empty_allow_list = false;
-  transports_info.has_platform_authenticator_credential = device::
-      FidoRequestHandlerBase::RecognizedCredential::kHasRecognizedCredential;
-  transports_info.recognized_credentials = {kWinCred1, kWinCred2};
-
-  controller.saved_authenticators().emplace_back(
-      /*device_id=*/"win", AuthenticatorTransport::kInternal,
-      device::AuthenticatorType::kWinNative);
-
-  RequestCallbackReceiver request_callback;
-  controller.SetRequestCallback(request_callback.Callback());
-  UpdateModelBeforeStartFlow(model.get(), transports_info,
-                             /*is_off_the_record=*/false);
-  controller.StartFlow(std::move(transports_info), {});
-  EXPECT_EQ(request_callback.WaitForResult(), "win");
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
 TEST_F(AuthenticatorRequestDialogControllerTest, BluetoothPermissionPrompt) {
@@ -2299,11 +1992,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, DeduplicateAccounts) {
 // Tests the text on the hybrid button label.
 // Regression test for crbug.com/328698086.
 TEST_F(AuthenticatorRequestDialogControllerTest, HybridButtonLabel) {
-#if BUILDFLAG(IS_WIN)
-  device::FakeWinWebAuthnApi fake_win_webauthn_api;
-  device::WinWebAuthnApi::ScopedOverride win_webauthn_api_override(
-      &fake_win_webauthn_api);
-#endif
   constexpr int kPhoneOrSk =
       IDS_WEBAUTHN_PASSKEY_PHONE_TABLET_OR_SECURITY_KEY_LABEL;
   constexpr int kPhone = IDS_WEBAUTHN_PASSKEY_PHONE_OR_TABLET_LABEL;
@@ -2595,228 +2283,6 @@ TEST_F(AuthenticatorRequestDialogControllerTest, MechanismsFromUserAccounts) {
   EXPECT_EQ(result.source, device::AuthenticatorType::kOther);
   EXPECT_EQ(request_callback.WaitForResult(), kLocalAuthenticatorId);
 }
-
-#if BUILDFLAG(IS_WIN)
-
-using HasCreds = device::FidoRequestHandlerBase::RecognizedCredential;
-constexpr int kNoWinButton = -1;
-constexpr int kNoChromeUI = -2;
-constexpr int kHelloOrSk = IDS_WEBAUTHN_TRANSPORT_WINDOWS_HELLO_OR_SECURITY_KEY;
-constexpr int kHello = IDS_WEBAUTHN_TRANSPORT_WINDOWS_HELLO;
-constexpr int kSk = IDS_WEBAUTHN_TRANSPORT_EXTERNAL_SECURITY_KEY;
-constexpr int kPhoneOrSk =
-    IDS_WEBAUTHN_PASSKEY_PHONE_TABLET_OR_SECURITY_KEY_LABEL;
-constexpr int kPhone = IDS_WEBAUTHN_PASSKEY_PHONE_OR_TABLET_LABEL;
-#define L __LINE__
-struct {
-  int line_num;
-  bool has_sk;
-  bool has_hybrid;
-  bool has_internal;
-  bool supports_hybrid;
-  bool has_uvpaa;
-  HasCreds has_creds;
-  int expected_button;
-} kWinHelloButtonGetAssertionTestCases[] = {
-    // Windows v7+ with all transports.
-    {L, true, true, true, true, true, HasCreds::kHasRecognizedCredential,
-     kPhoneOrSk},
-
-    // Windows v7+ with only security keys.
-    {L, true, false, false, true, true, HasCreds::kNoRecognizedCredential, kSk},
-
-    // Windows v7+ with only phones.
-    {L, false, true, false, true, true, HasCreds::kNoRecognizedCredential,
-     kPhone},
-
-    // Windows v7+ with only internal creds.
-    {L, false, false, true, true, true, HasCreds::kHasRecognizedCredential,
-     kNoChromeUI},
-
-    // Windows v7+ with empty allow-list.
-    {L, false, false, false, true, true, HasCreds::kHasRecognizedCredential,
-     kPhoneOrSk},
-
-    // Windows v5+ with all transports.
-    {L, true, true, true, false, true, HasCreds::kHasRecognizedCredential, kSk},
-
-    // Windows v5+ with only security keys
-    {L, true, false, false, false, true, HasCreds::kNoRecognizedCredential,
-     kSk},
-
-    // Windows v5+ with only phones.
-    {L, false, true, false, false, true, HasCreds::kNoRecognizedCredential,
-     kNoWinButton},
-
-    // Windows v5+ with only internal creds.
-    {L, false, false, true, false, true, HasCreds::kHasRecognizedCredential,
-     kNoChromeUI},
-
-    // Windows v5+ with empty allow-list.
-    {L, false, false, false, false, true, HasCreds::kHasRecognizedCredential,
-     kSk},
-
-    // Windows <v4 with all transports.
-    {L, true, true, true, false, true, HasCreds::kUnknown, kHelloOrSk},
-
-    // Windows <v4 with only security keys.
-    {L, true, false, false, false, true, HasCreds::kUnknown, kSk},
-
-    // Windows <v4 with only phones.
-    {L, false, true, false, false, true, HasCreds::kUnknown, kNoWinButton},
-
-    // Windows <v4 with only internal creds.
-    {L, false, false, true, false, true, HasCreds::kUnknown, kHello},
-
-    // Windows <v4 with empty allow-list.
-    {L, false, false, false, false, true, HasCreds::kUnknown, kHelloOrSk},
-
-    // Windows <v4 with empty allow-list and no Win Hello.
-    {L, false, false, false, false, false, HasCreds::kUnknown, kSk},
-};
-#undef L
-
-TEST_F(AuthenticatorRequestDialogControllerTest,
-       WindowsHelloButtonLabel_GetAssertion) {
-  device::FakeWinWebAuthnApi fake_win_webauthn_api;
-  device::WinWebAuthnApi::ScopedOverride win_webauthn_api_override(
-      &fake_win_webauthn_api);
-  for (const auto& test_case : kWinHelloButtonGetAssertionTestCases) {
-    auto model =
-        base::MakeRefCounted<AuthenticatorRequestDialogModel>(main_rfh());
-    AuthenticatorRequestDialogController controller(model.get(), main_rfh());
-    controller.SetAccountPreselectedCallback(base::DoNothing());
-
-    TransportAvailabilityInfo transports_info;
-    transports_info.has_win_native_api_authenticator = true;
-    transports_info.request_type = device::FidoRequestType::kGetAssertion;
-    transports_info.transport_list_did_include_security_key = test_case.has_sk;
-    transports_info.transport_list_did_include_hybrid = test_case.has_hybrid;
-    transports_info.transport_list_did_include_internal =
-        test_case.has_internal;
-    transports_info.has_platform_authenticator_credential = test_case.has_creds;
-    transports_info.win_is_uvpaa = test_case.has_uvpaa;
-    if (test_case.has_creds == HasCreds::kHasRecognizedCredential) {
-      transports_info.recognized_credentials = {kCred1};
-    }
-    if (!test_case.has_sk && !test_case.has_hybrid && !test_case.has_internal) {
-      transports_info.has_empty_allow_list = true;
-    }
-    fake_win_webauthn_api.set_version(test_case.supports_hybrid ? 7 : 4);
-    SCOPED_TRACE(testing::Message() << "Line number: " << test_case.line_num);
-    SCOPED_TRACE(testing::Message() << "SK: " << test_case.has_sk);
-    SCOPED_TRACE(testing::Message() << "Hybrid: " << test_case.has_hybrid);
-    SCOPED_TRACE(testing::Message() << "Internal: " << test_case.has_internal);
-    SCOPED_TRACE(testing::Message() << "Win isUVPAA: " << test_case.has_uvpaa);
-    SCOPED_TRACE(testing::Message()
-                 << "Has creds: " << static_cast<int>(test_case.has_creds));
-    SCOPED_TRACE(testing::Message()
-                 << "Handles hybrid: " << test_case.supports_hybrid);
-    UpdateModelBeforeStartFlow(model.get(), transports_info,
-                               /*is_off_the_record=*/false);
-    controller.StartFlow(std::move(transports_info), {});
-    auto win_button_it =
-        std::ranges::find_if(model->mechanisms, [](const auto& m) {
-          return std::holds_alternative<
-              AuthenticatorRequestDialogModel::Mechanism::WindowsAPI>(m.type);
-        });
-    if (test_case.expected_button == kNoWinButton) {
-      EXPECT_EQ(win_button_it, model->mechanisms.end());
-    } else if (test_case.expected_button == kNoChromeUI) {
-      // In these cases, Chrome should have invoked the Windows UI immediately.
-      EXPECT_EQ(model->step(), Step::kPlatformAuthenticator);
-    } else {
-      ASSERT_NE(win_button_it, model->mechanisms.end());
-      EXPECT_EQ(win_button_it->name,
-                l10n_util::GetStringUTF16(test_case.expected_button));
-      switch (test_case.expected_button) {
-        case kHelloOrSk:
-        case kHello:
-          EXPECT_EQ(win_button_it->icon, features::IsRoundedIconsEnabled()
-                                             ? kLaptopWindowsIcon
-                                             : kLaptopOldIcon);
-          break;
-        case kSk:
-          EXPECT_EQ(win_button_it->icon, features::IsRoundedIconsEnabled()
-                                             ? kSecurityKeyIcon
-                                             : kUsbSecurityKeyOldIcon);
-          break;
-        case kPhoneOrSk:
-        case kPhone:
-          EXPECT_EQ(win_button_it->icon, features::IsRoundedIconsEnabled()
-                                             ? kMobileIcon
-                                             : kSmartphoneOldIcon);
-          break;
-        default:
-          NOTREACHED();
-      }
-    }
-  }
-}
-
-struct {
-  device::AuthenticatorAttachment attachment;
-  bool has_uvpaa;
-  int expected_button;
-} kWinHelloButtonMakeCredentialTestCases[] = {
-    // For make credential, we will only show the authenticator picker when
-    // Windows does not do hybrid. Therefore, there is no option for "Hello,
-    // Security Key, or Phone".
-    {device::AuthenticatorAttachment::kAny, true, kHelloOrSk},
-    {device::AuthenticatorAttachment::kCrossPlatform, true, kSk},
-    {device::AuthenticatorAttachment::kPlatform, true, kHello},
-    {device::AuthenticatorAttachment::kAny, false, kSk},
-};
-
-TEST_F(AuthenticatorRequestDialogControllerTest,
-       WindowsHelloButtonLabel_MakeCredential) {
-  device::FakeWinWebAuthnApi fake_win_webauthn_api;
-  device::WinWebAuthnApi::ScopedOverride win_webauthn_api_override(
-      &fake_win_webauthn_api);
-  for (const auto& test_case : kWinHelloButtonMakeCredentialTestCases) {
-    auto model =
-        base::MakeRefCounted<AuthenticatorRequestDialogModel>(main_rfh());
-    AuthenticatorRequestDialogController controller(model.get(), main_rfh());
-    TransportAvailabilityInfo transports_info;
-    transports_info.has_win_native_api_authenticator = true;
-    transports_info.request_type = device::FidoRequestType::kMakeCredential;
-    transports_info.attestation_conveyance_preference =
-        device::AttestationConveyancePreference::kNone;
-    transports_info.make_credential_attachment = test_case.attachment;
-    fake_win_webauthn_api.set_version(4);
-    transports_info.win_is_uvpaa = test_case.has_uvpaa;
-    SCOPED_TRACE(testing::Message()
-                 << "Attachment: " << static_cast<int>(test_case.attachment));
-    UpdateModelBeforeStartFlow(model.get(), transports_info,
-                               /*is_off_the_record=*/false);
-    controller.StartFlow(std::move(transports_info), {});
-    auto win_button_it =
-        std::ranges::find_if(model->mechanisms, [](const auto& m) {
-          return std::holds_alternative<
-              AuthenticatorRequestDialogModel::Mechanism::WindowsAPI>(m.type);
-        });
-    ASSERT_NE(win_button_it, model->mechanisms.end());
-    EXPECT_EQ(win_button_it->name,
-              l10n_util::GetStringUTF16(test_case.expected_button));
-    switch (test_case.expected_button) {
-      case kHelloOrSk:
-      case kHello:
-        EXPECT_EQ(win_button_it->icon, features::IsRoundedIconsEnabled()
-                                           ? kLaptopWindowsIcon
-                                           : kLaptopOldIcon);
-        break;
-      case kSk:
-        EXPECT_EQ(win_button_it->icon, features::IsRoundedIconsEnabled()
-                                           ? kSecurityKeyIcon
-                                           : kUsbSecurityKeyOldIcon);
-        break;
-      default:
-        NOTREACHED();
-    }
-  }
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_F(AuthenticatorRequestDialogControllerTest,
        NoICloudKeychainMechanism_ModalImmediate_UnknownCredStatus) {

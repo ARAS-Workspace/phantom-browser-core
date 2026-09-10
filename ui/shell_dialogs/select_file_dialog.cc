@@ -31,21 +31,7 @@ ui::SelectFileDialogFactory* dialog_factory_ = nullptr;
 void TruncateStringToSize(base::FilePath::StringType* string, size_t size) {
   if (string->size() <= size)
     return;
-#if BUILDFLAG(IS_WIN)
-  const auto* c_str = base::as_u16cstr(string->c_str());
-  for (size_t i = 0; i < string->size(); ++i) {
-    base_icu::UChar32 codepoint;
-    size_t original_i = i;
-    if (!base::ReadUnicodeCharacter(std::u16string_view(c_str, size), &i,
-                                    &codepoint) ||
-        i >= size) {
-      string->resize(original_i);
-      return;
-    }
-  }
-#else
   base::TruncateUTF8ToByteSize(*string, size, string);
-#endif
 }
 
 }  // namespace

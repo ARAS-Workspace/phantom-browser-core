@@ -73,10 +73,6 @@ CreateMutableProfileOAuthDelegate(
     scoped_refptr<TokenWebData> token_web_data,
     SigninClient* signin_client,
     unexportable_keys::UnexportableKeyService* unexportable_key_service,
-#if BUILDFLAG(IS_WIN)
-    MutableProfileOAuth2TokenServiceDelegate::FixRequestErrorCallback
-        reauth_callback,
-#endif
     network::NetworkConnectionTracker* network_connection_tracker) {
   // When signin cookies are cleared on exit, all tokens should also be cleared.
   RevokeAllTokensOnLoad revoke_all_tokens_on_load =
@@ -95,11 +91,7 @@ CreateMutableProfileOAuthDelegate(
       signin_client, account_tracker_service, network_connection_tracker,
       token_web_data, revoke_all_tokens_on_load,
       std::move(token_binding_helper),
-#if BUILDFLAG(IS_WIN)
-      reauth_callback
-#else
       MutableProfileOAuth2TokenServiceDelegate::FixRequestErrorCallback()
-#endif  // BUILDFLAG(IS_WIN)
   );
 }
 #endif  // BUILDFLAG(IS_ANDROID)
@@ -122,10 +114,6 @@ CreateOAuth2TokenServiceDelegate(
 #if BUILDFLAG(IS_IOS)
     std::unique_ptr<DeviceAccountsProvider> device_accounts_provider,
 #endif
-#if BUILDFLAG(IS_WIN)
-    MutableProfileOAuth2TokenServiceDelegate::FixRequestErrorCallback
-        reauth_callback,
-#endif
     network::NetworkConnectionTracker* network_connection_tracker) {
 #if BUILDFLAG(IS_ANDROID)
   return CreateAndroidOAuthDelegate(account_tracker_service);
@@ -143,9 +131,6 @@ CreateOAuth2TokenServiceDelegate(
   return CreateMutableProfileOAuthDelegate(
       account_tracker_service, delete_signin_cookies_on_exit, token_web_data,
       signin_client, unexportable_key_service,
-#if BUILDFLAG(IS_WIN)
-      reauth_callback,
-#endif  // BUILDFLAG(IS_WIN)
       network_connection_tracker);
 #else
   NOTREACHED();
@@ -169,10 +154,6 @@ std::unique_ptr<ProfileOAuth2TokenService> BuildProfileOAuth2TokenService(
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 #if BUILDFLAG(IS_IOS)
     std::unique_ptr<DeviceAccountsProvider> device_accounts_provider,
-#endif
-#if BUILDFLAG(IS_WIN)
-    MutableProfileOAuth2TokenServiceDelegate::FixRequestErrorCallback
-        reauth_callback,
 #endif
     SigninClient* signin_client) {
 // On ChromeOS the device ID is not managed by the token service.
@@ -198,9 +179,6 @@ std::unique_ptr<ProfileOAuth2TokenService> BuildProfileOAuth2TokenService(
 #endif
 #if BUILDFLAG(IS_IOS)
                         std::move(device_accounts_provider),
-#endif
-#if BUILDFLAG(IS_WIN)
-                        reauth_callback,
 #endif
                         network_connection_tracker));
 }

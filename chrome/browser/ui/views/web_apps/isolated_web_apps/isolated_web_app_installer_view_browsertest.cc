@@ -53,7 +53,6 @@ namespace web_app {
 
 // TODO(crbug.com/478831891): Fix and enable
 // `IsolatedWebAppInstallerViewUiPixelTest` for Windows.
-#if !BUILDFLAG(IS_WIN)
 namespace {
 
 using Step = IsolatedWebAppInstallerModel::Step;
@@ -300,6 +299,5 @@ INSTANTIATE_TEST_SUITE_P(,
                          IsolatedWebAppInstallerViewUiPixelTest,
                          testing::ValuesIn(kTestParam),
                          &ParamToTestSuffix);
-#endif  // !BUILDFLAG(IS_WIN)
 
 }  // namespace web_app

@@ -939,7 +939,7 @@ TEST(OverlayTest, OverlaysProcessorHasStrategy) {
   EXPECT_GE(2U, overlay_processor->GetStrategyCount());
 }
 
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_APPLE)
 
 TEST_F(FullscreenOverlayTest, DRMDefaultBlackOptimization) {
   auto pass = CreateRenderPass();
@@ -4187,9 +4187,7 @@ TEST_F(UnderlayTest, CandidateNoDamageWhenQuadSharedStateNoOccludingDamage) {
     }
   }
 }
-#endif  // !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_WIN)
-
-
+#endif  // !BUILDFLAG(IS_APPLE)
 
 void AddQuad(gfx::Rect quad_rect,
              const gfx::Transform& quad_to_target_transform,

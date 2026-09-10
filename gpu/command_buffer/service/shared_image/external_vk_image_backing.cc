@@ -824,15 +824,6 @@ bool ExternalVkImageBacking::CreateGLTexture(bool is_passthrough,
     api->glImportMemoryFdEXTFn(memory_object->id(), image_info.fAlloc.fSize,
                                GL_HANDLE_TYPE_OPAQUE_FD_EXT,
                                memory_fd.release());
-#elif BUILDFLAG(IS_WIN)
-    auto memory_handle = vulkan_image->GetMemoryHandle();
-    if (!memory_handle.is_valid()) {
-      return false;
-    }
-    memory_object.emplace(api);
-    api->glImportMemoryWin32HandleEXTFn(
-        memory_object->id(), image_info.fAlloc.fSize,
-        GL_HANDLE_TYPE_OPAQUE_WIN32_EXT, memory_handle.Take());
 #else
 #error Unsupported OS
 #endif

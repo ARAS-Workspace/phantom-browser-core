@@ -28,13 +28,6 @@
 #include "gpu/command_buffer/service/shared_image/shared_image_representation.h"
 #include "ui/gl/trace_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "gpu/command_buffer/service/dxgi_shared_handle_manager.h"
-#include "ui/gfx/win/d3d_shared_fence.h"
-#include "ui/gl/direct_composition_support.h"
-#include "ui/gl/gl_angle_util_win.h"
-#endif
-
 #if BUILDFLAG(IS_OZONE)
 #include "components/viz/common/gpu/vulkan_context_provider.h"
 #include "gpu/config/gpu_finch_features.h"
@@ -98,18 +91,9 @@ SharedImageManager::SharedImageManager(
     viz::VulkanContextProvider* vulkan_context_provider,
     scoped_refptr<base::SingleThreadTaskRunner> io_runner)
     : display_context_on_another_thread_(display_context_on_another_thread)
-#if BUILDFLAG(IS_WIN)
-      ,
-      dxgi_shared_handle_manager_(
-          base::MakeRefCounted<DXGISharedHandleManager>())
-#endif
 #if BUILDFLAG(IS_OZONE)
       ,
       vulkan_context_provider_(vulkan_context_provider)
-#endif
-#if BUILDFLAG(IS_WIN)
-      ,
-      io_runner_(std::move(io_runner))
 #endif
 {
   DCHECK(!display_context_on_another_thread || thread_safe);
@@ -495,24 +479,6 @@ SharedImageManager::ProduceLegacyOverlay(const Mailbox& mailbox,
 }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-void SharedImageManager::UpdateExternalFence(
-    const Mailbox& mailbox,
-    scoped_refptr<gfx::D3DSharedFence> external_fence) {
-  CALLED_ON_VALID_THREAD();
-  AutoLock autolock(this);
-  auto* backing = GetBacking(mailbox);
-  if (!backing) {
-    LOG(ERROR)
-        << "SharedImageManager::ProduceVideoDecode: Trying to Produce a D3D"
-           "representation from a non-existent mailbox.";
-    return;
-  }
-
-  backing->UpdateExternalFence(std::move(external_fence));
-}
-#endif
-
 std::optional<SharedImageUsageSet> SharedImageManager::GetUsageForMailbox(
     const Mailbox& mailbox) {
   AutoLock autolock(this);
@@ -652,8 +618,6 @@ bool SharedImageManager::SupportsScanoutImages() {
   return true;
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   return supports_overlays_on_ozone_;
-#elif BUILDFLAG(IS_WIN)
-  return gl::DirectCompositionTextureSupported();
 #else
   return false;
 #endif

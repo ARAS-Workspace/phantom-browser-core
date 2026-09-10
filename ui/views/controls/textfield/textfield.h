@@ -52,7 +52,7 @@
 #include "ui/views/view_observer.h"
 #include "ui/views/word_lookup_client.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include <vector>
 #endif
 
@@ -465,13 +465,6 @@ class VIEWS_EXPORT Textfield : public View,
   bool CanComposeInline() const override;
   gfx::Rect GetCaretBounds() const override;
   gfx::Rect GetSelectionBoundingBox() const override;
-#if BUILDFLAG(IS_WIN)
-  std::optional<gfx::Rect> GetProximateCharacterBounds(
-      const gfx::Range& range) const override;
-  std::optional<size_t> GetProximateCharacterIndexFromPoint(
-      const gfx::Point& screen_point_in_dips,
-      ui::IndexFromPointFlags flags) const override;
-#endif  // BUILDFLAG(IS_WIN)
   bool GetCompositionCharacterBounds(size_t index,
                                      gfx::Rect* rect) const override;
   bool HasCompositionText() const override;
@@ -500,7 +493,7 @@ class VIEWS_EXPORT Textfield : public View,
   // Set whether the text should be used to improve typing suggestions.
   void SetShouldDoLearning(bool value) { should_do_learning_ = value; }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   bool SetCompositionFromExistingText(
       const gfx::Range& range,
       const std::vector<ui::ImeTextSpan>& ui_ime_text_spans) override;
@@ -517,13 +510,6 @@ class VIEWS_EXPORT Textfield : public View,
   void GetActiveTextInputControlLayoutBounds(
       std::optional<gfx::Rect>* control_bounds,
       std::optional<gfx::Rect>* selection_bounds) override;
-
-#if BUILDFLAG(IS_WIN)
-  void SetActiveCompositionForAccessibility(
-      const gfx::Range& range,
-      const std::u16string& active_composition_text,
-      bool is_composition_committed) override;
-#endif
 
   // ViewObserver overrides:
   void OnViewFocused(views::View* observed_view) override;

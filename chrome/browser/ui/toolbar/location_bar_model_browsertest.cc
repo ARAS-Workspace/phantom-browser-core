@@ -127,19 +127,11 @@ const std::vector<TestItem>& TestItems() {
           "https://www3.nhk.or.jp/nhkworld",
           "www3.nhk.or.jp/nhkworld",
       },
-#if BUILDFLAG(IS_WIN)
-      {
-          GURL("file:///c:/path/to/file"),
-          "file:///C:/path/to/file",
-          "C:/path/to/file",
-      },
-#else
       {
           GURL("file:///path/to/file"),
           "file:///path/to/file",
           "/path/to/file",
       },
-#endif
       {
           GURL("data:text/plain;base64,SGVsbG8sIFdvcmxkIQ=="),
           "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==",

@@ -44,12 +44,6 @@
 #include "crypto/hash.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <shlobj.h>
-
-#include "base/win/windows_version.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace update_client {
 
 #if BUILDFLAG(IS_CHROMEOS)
@@ -179,14 +173,7 @@ std::optional<base::DictValue> ReadManifest(const base::FilePath& unpack_path) {
 }
 
 std::string GetArchitecture() {
-#if BUILDFLAG(IS_WIN)
-  const base::win::OSInfo* os_info = base::win::OSInfo::GetInstance();
-  return (os_info->IsWowX86OnARM64() || os_info->IsWowAMD64OnARM64())
-             ? kArchArm64
-             : base::SysInfo().OperatingSystemArchitecture();
-#else   // BUILDFLAG(IS_WIN)
   return base::SysInfo().OperatingSystemArchitecture();
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 bool RetryFileOperation(
@@ -223,16 +210,6 @@ bool CreateScopedTempDirectory(base::ScopedTempDir& dir) {
 #endif
   return dir.CreateUniqueTempDir();
 }
-
-#if BUILDFLAG(IS_WIN)
-base::FilePath::StringType UTF8ToStringType(const std::string& utf8) {
-  return base::UTF8ToWide(utf8);
-}
-
-std::string StringTypeToUTF8(const base::FilePath::StringType& stringtype) {
-  return base::WideToUTF8(stringtype);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 void CleanupDirectoriesOlderThan(const base::FilePath& dir,
                                  const base::FilePath::StringType& matcher,

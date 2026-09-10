@@ -170,11 +170,7 @@ class ProfileAttributesTestObserver
 };
 
 size_t GetDefaultAvatarIconResourceIDAtIndex(int index) {
-#if BUILDFLAG(IS_WIN)
-  return profiles::GetOldDefaultAvatar2xIconResourceIDAtIndex(index);
-#else
   return profiles::GetDefaultAvatarIconResourceIDAtIndex(index);
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 std::u16string ConcatenateGaiaAndProfileNames(

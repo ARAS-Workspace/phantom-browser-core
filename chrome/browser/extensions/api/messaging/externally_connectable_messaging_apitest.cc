@@ -409,7 +409,6 @@ IN_PROC_BROWSER_TEST_F(ExternallyConnectableMessagingTest, NotInstalled) {
 
 // TODO(kalman): Most web messaging tests disabled on windows due to extreme
 // flakiness. See http://crbug.com/40354939.
-#if !BUILDFLAG(IS_WIN)
 
 // Tests two extensions on the same sites: one web connectable, one not.
 IN_PROC_BROWSER_TEST_F(ExternallyConnectableMessagingTest,
@@ -1101,7 +1100,5 @@ IN_PROC_BROWSER_TEST_F(ExternallyConnectableMessagingTest,
             CanConnectAndSendMessagesToMainFrame(invalid.get()));
 }
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS)
-
-#endif  // !BUILDFLAG(IS_WIN)
 
 }  // namespace extensions

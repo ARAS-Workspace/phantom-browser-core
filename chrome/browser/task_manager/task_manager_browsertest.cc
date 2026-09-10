@@ -1576,11 +1576,7 @@ class PrerenderTaskBrowserTest : public TaskManagerBrowserTest {
 }  // namespace
 
 // TODO(crbug.com/40232771): Flaky on Windows7.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ProperlyShowsTasks DISABLED_ProperlyShowsTasks
-#else
 #define MAYBE_ProperlyShowsTasks ProperlyShowsTasks
-#endif
 // Tests that the task manager properly:
 // 1. shows the Prerender entry when the speculation rule is injected;
 // 2. shows the Prerender entry when the manager is closed and reopened.
@@ -1647,12 +1643,7 @@ IN_PROC_BROWSER_TEST_F(PrerenderTaskBrowserTest, MAYBE_ProperlyShowsTasks) {
 }
 
 // TODO(crbug.com/40232771): Flaky on Windows7.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DeletesTaskAfterPrerenderKilled \
-  DISABLED_DeletesTaskAfterPrerenderKilled
-#else
 #define MAYBE_DeletesTaskAfterPrerenderKilled DeletesTaskAfterPrerenderKilled
-#endif
 // Tests that the task manager properly deletes the prerender task once the
 // prerender is cancelled.
 IN_PROC_BROWSER_TEST_F(PrerenderTaskBrowserTest,
@@ -1690,13 +1681,8 @@ IN_PROC_BROWSER_TEST_F(PrerenderTaskBrowserTest,
 }
 
 // TODO(crbug.com/40232771): Flaky on Windows7.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DeletesTaskAfterTriggerPageKilled \
-  DISABLED_DeletesTaskAfterTriggerPageKilled
-#else
 #define MAYBE_DeletesTaskAfterTriggerPageKilled \
   DeletesTaskAfterTriggerPageKilled
-#endif
 // Tests that the task manager properly deletes the task of the trigger tab and
 // prerender when the trigger is terminated.
 IN_PROC_BROWSER_TEST_F(PrerenderTaskBrowserTest,
@@ -1736,13 +1722,8 @@ IN_PROC_BROWSER_TEST_F(PrerenderTaskBrowserTest,
 }
 
 // TODO(crbug.com/40232771): Flaky on Windows7.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ProperlyShowsPrerenderTaskByAutocompletePredictor \
-  DISABLED_ProperlyShowsPrerenderTaskByAutocompletePredictor
-#else
 #define MAYBE_ProperlyShowsPrerenderTaskByAutocompletePredictor \
   ProperlyShowsPrerenderTaskByAutocompletePredictor
-#endif
 // Test that the autocomplete action predictor trigger Prerender tasks are
 // properly displayed. Such predictor is used to trigger Omnibox Prerender.
 IN_PROC_BROWSER_TEST_F(
@@ -1816,13 +1797,8 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // TODO(crbug.com/40232771): Flaky on Windows7.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_OmniboxPrerenderActivationClearsTask \
-  DISABLED_OmniboxPrerenderActivationClearsTask
-#else
 #define MAYBE_OmniboxPrerenderActivationClearsTask \
   OmniboxPrerenderActivationClearsTask
-#endif
 // Test that the Omnibox-triggered prerender activation clears the prerender
 // entry in the task manager.
 IN_PROC_BROWSER_TEST_F(PrerenderTaskBrowserTest,
@@ -1868,11 +1844,7 @@ IN_PROC_BROWSER_TEST_F(PrerenderTaskBrowserTest,
 }
 
 // TODO(crbug.com/40232771): Flaky on Windows7.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_NewTabPrerenderShowsTask DISABLED_NewTabPrerenderShowsTask
-#else
 #define MAYBE_NewTabPrerenderShowsTask NewTabPrerenderShowsTask
-#endif
 // Tests that prerendering a new tab (target_hint=_blank) shows a "Prerender:"
 // entry in the task manager, and that the entry disappears after activation and
 // is replaced by a regular tab entry.
@@ -1921,13 +1893,8 @@ IN_PROC_BROWSER_TEST_F(PrerenderTaskBrowserTest,
 }
 
 // TODO(crbug.com/40232771): Flaky on Windows7.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_NewTabPrerenderDeletesTaskOnCancel \
-  DISABLED_NewTabPrerenderDeletesTaskOnCancel
-#else
 #define MAYBE_NewTabPrerenderDeletesTaskOnCancel \
   NewTabPrerenderDeletesTaskOnCancel
-#endif
 // Tests that cancelling a new tab prerender removes its entry from the task
 // manager.
 IN_PROC_BROWSER_TEST_F(PrerenderTaskBrowserTest,

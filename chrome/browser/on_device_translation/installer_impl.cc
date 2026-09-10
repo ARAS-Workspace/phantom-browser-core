@@ -33,10 +33,6 @@
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "services/on_device_model/public/mojom/download_observer.mojom.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace on_device_translation {
 namespace {
 
@@ -80,11 +76,7 @@ GetLanguagePackInfoFromCommandLine() {
       command_line->GetSwitchValueNative(kTranslateKitPackagePaths);
   std::vector<base::CommandLine::StringType> splitted_strings =
       base::SplitString(packages_string,
-#if BUILDFLAG(IS_WIN)
-                        L",",
-#else   // !BUILDFLAG(IS_WIN)
                         ",",
-#endif  // BUILDFLAG(IS_WIN)
                         base::KEEP_WHITESPACE, base::SPLIT_WANT_ALL);
   if (splitted_strings.size() % 3 != 0) {
     LOG(ERROR) << "Invalid --" << kTranslateKitPackagePaths << " flag.";
@@ -100,13 +92,8 @@ GetLanguagePackInfoFromCommandLine() {
     }
     std::string language1;
     std::string language2;
-#if BUILDFLAG(IS_WIN)
-    language1 = base::WideToUTF8(*(it++));
-    language2 = base::WideToUTF8(*(it++));
-#else  // !BUILDFLAG(IS_WIN)
     language1 = *(it++);
     language2 = *(it++);
-#endif
 
     std::optional<SupportedLanguage> supported_language1 =
         ToSupportedLanguage(language1);

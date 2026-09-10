@@ -33,13 +33,8 @@ base::FilePath GetDefaultFilepathForPasswordFile(
     const base::FilePath::StringType& default_extension) {
   base::FilePath default_path;
   base::PathService::Get(chrome::DIR_USER_DOCUMENTS, &default_path);
-#if BUILDFLAG(IS_WIN)
-  std::wstring file_name = base::UTF8ToWide(
-      l10n_util::GetStringUTF8(IDS_PASSWORD_MANAGER_DEFAULT_EXPORT_FILENAME));
-#else
   std::string file_name =
       l10n_util::GetStringUTF8(IDS_PASSWORD_MANAGER_DEFAULT_EXPORT_FILENAME);
-#endif
   return default_path.Append(file_name).AddExtension(default_extension);
 }
 
@@ -156,11 +151,7 @@ void PasswordExportController::ExportDone() {
 void PasswordExportController::OnExportProgress(
     const password_manager::PasswordExportInfo& progress) {
   if (progress.status == password_manager::ExportProgressStatus::kSucceeded) {
-#if !BUILDFLAG(IS_WIN)
     last_exported_path_ = base::FilePath(progress.file_path);
-#else
-    last_exported_path_ = base::FilePath(base::UTF8ToWide(progress.file_path));
-#endif
   }
   on_export_progress_callback_.Run(progress);
 }

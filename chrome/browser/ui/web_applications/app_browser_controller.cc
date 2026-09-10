@@ -570,11 +570,11 @@ std::u16string AppBrowserController::GetLaunchFlashText() const {
   // web bundle. The flash text is not needed on platforms that already display
   // the app name in the title bar (e.g. Mac, Windows, and Linux).
   if (IsIsolatedWebApp()) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     return std::u16string();
-#else   // !(BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX))
+#else
     return GetAppShortName();
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   }
   return GetFormattedUrlOrigin();
 }
@@ -838,10 +838,6 @@ void AppBrowserController::AddColorMixers(
   // the frame colors here. Because BrowserFrameViewWin overrides
   // GetCaptionColor, special handling is needed to ensure ToolbarButton
   // foreground color matches the rest of the title bar elements on Windows.
-#if BUILDFLAG(IS_WIN)
-  mixer[kColorFrameCaptionActive] = {kColorCaptionForegroundActive};
-  mixer[kColorFrameCaptionInactive] = {kColorCaptionForegroundInactive};
-#endif  // BUILDFLAG(IS_WIN)
   mixer[kColorToolbar] = {ui::kColorFrameActive};
   mixer[kColorToolbarTextDefault] = {kColorFrameCaptionActive};
   mixer[kColorToolbarTextDisabledDefault] = {kColorFrameCaptionInactive};
@@ -856,12 +852,8 @@ void AppBrowserController::AddColorMixers(
   // kColorFrameCaptionInactive, however on other platforms this might be the
   // same color as the active caption color. So on non-windows we derive the
   // disabled color from the regular toolbar color.
-#if BUILDFLAG(IS_WIN)
-  mixer[kColorToolbarButtonIconDisabled] = {kColorFrameCaptionInactive};
-#else
   mixer[kColorToolbarButtonIconDisabled] = {ui::GetResultingPaintColor(
       {ui::kColorSysStateDisabled}, {kColorToolbar})};
-#endif
   mixer[kColorToolbarButtonIconInactive] = {kColorToolbarButtonIconDisabled};
 
   // App menu highlight colors in PWA window should be derived from the (active)

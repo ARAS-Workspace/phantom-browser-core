@@ -153,13 +153,8 @@ TEST_F(CanvasTest, StringWidthCacheIdMutationResilience) {
   cache.Clear();
 
   // Create different typefaces to simulate ID change.
-#if BUILDFLAG(IS_WIN)
-  std::string font1 = "Arial";
-  std::string font2 = "Courier New";
-#else
   std::string font1 = "sans-serif";
   std::string font2 = "monospace";
-#endif
 
   std::array<sk_sp<SkTypeface>, 3> tfs;
   tfs[0] = skia::MakeTypefaceFromName(font1.c_str(), SkFontStyle());

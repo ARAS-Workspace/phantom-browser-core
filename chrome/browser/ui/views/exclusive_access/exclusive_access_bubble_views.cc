@@ -39,10 +39,6 @@
 #include "ui/views/widget/widget.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/base/l10n/l10n_util_win.h"
-#endif
-
 bool ExclusiveAccessBubbleViews::skip_presentation_delay_for_testing_ = false;
 bool ExclusiveAccessBubbleViews::simulate_gpu_hang_for_testing_ = false;
 

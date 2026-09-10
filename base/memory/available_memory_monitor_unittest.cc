@@ -20,20 +20,10 @@ namespace {
 // Helper to cleanly construct cross-platform mock samples.
 std::optional<AvailableMemoryMonitor::MemorySample> CreateSample(
     uint64_t phys_bytes
-#if BUILDFLAG(IS_WIN)
-    ,
-    uint64_t avail_commit_bytes = 0,
-    uint64_t total_commit_bytes = 0
-#endif
 ) {
   AvailableMemoryMonitor::MemorySample sample;
   sample.timestamp = base::TimeTicks::Now();
   sample.available_physical_bytes = base::ByteSize(phys_bytes);
-
-#if BUILDFLAG(IS_WIN)
-  sample.available_commit_bytes = base::ByteSize(avail_commit_bytes);
-  sample.total_commit_bytes = base::ByteSize(total_commit_bytes);
-#endif
 
   return sample;
 }
@@ -199,35 +189,5 @@ TEST_F(AvailableMemoryMonitorTest, LateObserverCanAccessCachedData) {
   monitor.RemoveObserver(&observer1);
   monitor.RemoveObserver(&observer2);
 }
-
-#if BUILDFLAG(IS_WIN)
-
-TEST_F(AvailableMemoryMonitorTest, WindowsCommitBytesPlumbing) {
-  TestAvailableMemoryMonitor monitor;
-  // Create a mock sample with 100 physical, 200 available commit, 300 total
-  // commit.
-  monitor.SetFakeSample(CreateSample(100, 200, 300));
-
-  TestObserver observer;
-  monitor.AddObserver(&observer);
-
-  // Force a check to simulate the timer firing.
-  monitor.OnMemoryCheckTimer();
-
-  // Verify the cache holds the correct Windows-specific commit bytes.
-  ASSERT_TRUE(monitor.GetLastSample().has_value());
-  EXPECT_EQ(monitor.GetLastSample()->available_commit_bytes,
-            base::ByteSize(200));
-  EXPECT_EQ(monitor.GetLastSample()->total_commit_bytes, base::ByteSize(300));
-
-  // Verify the observer payload received the correct Windows-specific bytes.
-  ASSERT_EQ(observer.sample_count(), 1);
-  ASSERT_TRUE(observer.last_sample().has_value());
-  EXPECT_EQ(observer.last_sample()->available_commit_bytes,
-            base::ByteSize(200));
-  EXPECT_EQ(observer.last_sample()->total_commit_bytes, base::ByteSize(300));
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace base

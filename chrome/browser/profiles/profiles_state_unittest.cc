@@ -94,7 +94,7 @@ class IsGuestModeEnabledTest : public testing::TestWithParam<bool> {
   bool BrowserGuestModePrefValue() { return GetParam(); }
 
   bool HideGuestModeForSupervisedUsersFeatureEnabled() {
-    return BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN);
+    return BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC);
   }
 
   Profile* CreateNormalProfile() {

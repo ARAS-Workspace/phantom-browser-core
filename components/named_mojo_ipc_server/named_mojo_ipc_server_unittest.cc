@@ -354,22 +354,6 @@ TEST_P(NamedMojoIpcServerTest, RemoteProcessTerminated_ConnectionRemoved) {
 
 // On Windows the server endpoint must be recreated between connections. The
 // following tests check this behavior.
-#if BUILDFLAG(IS_WIN)
-TEST_P(NamedMojoIpcServerTest,
-       RemoteTerminatedBeforeBound_NewServerEndpointCreated) {
-  base::Process child_process =
-      LaunchClientProcess(kClientProcessExitAfterConnectSwitch);
-  WaitForProcessExit(child_process);
-  WaitForServerEndpointCreated();
-}
-
-TEST_P(NamedMojoIpcServerTest,
-       RemoteConnectsAndHangs_NewServerEndpointCreated) {
-  base::Process child_process =
-      LaunchClientProcess(kClientProcessHangAfterConnectSwitch);
-  WaitForServerEndpointCreated();
-}
-#endif
 
 TEST_P(NamedMojoIpcServerTest, ParallelIpcs) {
   base::MockCallback<EchoStringHandler> mock_echo_string_handler;
@@ -387,11 +371,6 @@ TEST_P(NamedMojoIpcServerTest, ParallelIpcs) {
       });
 
   base::Process child_process_1 = LaunchClientProcess();
-#if BUILDFLAG(IS_WIN)
-  // Wait for the named pipe to be recreated. Otherwise, the next client
-  // connection races this event.
-  WaitForServerEndpointCreated();
-#endif
   base::Process child_process_2 = LaunchClientProcess();
 
   WaitForProcessExit(child_process_1);

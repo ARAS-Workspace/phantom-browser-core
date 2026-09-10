@@ -37,11 +37,6 @@ namespace blink {
 
 // Define HAVE_DENORMAL if we support flushing denormals to zero.
 
-#if BUILDFLAG(IS_WIN) && defined(COMPILER_MSVC)
-// Windows compiled using MSVC with SSE2
-#define HAVE_DENORMAL 1
-#endif
-
 #if defined(COMPILER_GCC) && defined(ARCH_CPU_X86_FAMILY)
 // X86 chips can flush denormals
 #define HAVE_DENORMAL 1
@@ -78,25 +73,6 @@ class DenormalModifier {
   static inline void SetCsr(int a) {
     int temp = a;
     asm volatile("ldmxcsr %0" : : "m"(temp));
-  }
-
-#elif BUILDFLAG(IS_WIN) && defined(COMPILER_MSVC)
- public:
-  static void DisableDenormals() { SetCsr(_DN_FLUSH); }
-
-  static void EnableDenormals() { SetCsr(_DN_SAVE); }
-
- protected:
-  static inline unsigned GetCsr() {
-    unsigned result;
-    _controlfp_s(&result, 0, 0);
-    return result;
-  }
-
-  static inline void SetCsr(unsigned a) {
-    // http://stackoverflow.com/questions/637175/possible-bug-in-controlfp-s-may-not-restore-control-word-correctly
-    unsigned unused;
-    _controlfp_s(&unused, a, _MCW_DN);
   }
 
 #elif defined(ARCH_CPU_ARM_FAMILY)

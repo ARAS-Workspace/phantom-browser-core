@@ -90,10 +90,6 @@
 #include "ui/aura/window.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/aura/window_tree_host.h"
-#endif
-
 using base::ASCIIToUTF16;
 using bookmarks::BookmarkModel;
 using bookmarks::BookmarkNode;
@@ -684,11 +680,7 @@ class BookmarkBarViewTest1 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_Basic DISABLED_Basic
-#else
 #define MAYBE_Basic Basic
-#endif
 VIEW_TEST(BookmarkBarViewTest1, MAYBE_Basic)
 
 // Brings up menu, clicks on empty space and make sure menu hides.
@@ -734,11 +726,7 @@ class BookmarkBarViewTest2 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_HideOnDesktopClick DISABLED_HideOnDesktopClick
-#else
 #define MAYBE_HideOnDesktopClick HideOnDesktopClick
-#endif
 VIEW_TEST(BookmarkBarViewTest2, MAYBE_HideOnDesktopClick)
 
 // Brings up menu. Moves over child to make sure submenu appears, moves over
@@ -790,11 +778,7 @@ class BookmarkBarViewTest3 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_Submenus DISABLED_Submenus
-#else
 #define MAYBE_Submenus Submenus
-#endif
 VIEW_TEST(BookmarkBarViewTest3, MAYBE_Submenus)
 
 // Observer that posts a task upon the context menu creation.
@@ -875,11 +859,7 @@ class BookmarkBarViewTest4 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ContextMenus DISABLED_ContextMenus
-#else
 #define MAYBE_ContextMenus ContextMenus
-#endif
 VIEW_TEST(BookmarkBarViewTest4, MAYBE_ContextMenus)
 
 // Tests drag and drop within the same menu.
@@ -953,12 +933,7 @@ class BookmarkBarViewTest6 : public BookmarkBarViewEventTestBase {
   }
 };
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_OpenMenuOnClickAndHold DISABLED_OpenMenuOnClickAndHold
-#else
 #define MAYBE_OpenMenuOnClickAndHold OpenMenuOnClickAndHold
-#endif  // BUILDFLAG(IS_WIN)
-// If this flakes, disable and log details in http://crbug.com/40432443.
 TEST_F(BookmarkBarViewTest6, MAYBE_OpenMenuOnClickAndHold) {
 #if BUILDFLAG(IS_OZONE)
   // TODO (crbug.com/41496199): This test is failing under wayland.
@@ -1021,11 +996,7 @@ class BookmarkBarViewTest7 : public BookmarkBarViewDragTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DNDToDifferentMenu DISABLED_DNDToDifferentMenu
-#else
 #define MAYBE_DNDToDifferentMenu DNDToDifferentMenu
-#endif
 VIEW_TEST(BookmarkBarViewTest7, MAYBE_DNDToDifferentMenu)
 
 // Drags from one menu to next so that original menu closes, then back to
@@ -1089,11 +1060,7 @@ class BookmarkBarViewTest8 : public BookmarkBarViewDragTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DNDBackToOriginatingMenu DISABLED_DNDBackToOriginatingMenu
-#else
 #define MAYBE_DNDBackToOriginatingMenu DNDBackToOriginatingMenu
-#endif
 VIEW_TEST(BookmarkBarViewTest8, MAYBE_DNDBackToOriginatingMenu)
 
 // Moves the mouse over the scroll button and makes sure we get scrolling.
@@ -1177,11 +1144,7 @@ class BookmarkBarViewTest9 : public BookmarkBarViewEventTestBase {
 // hover the scroll buttons sends the mouse to the wrong location, so it never
 // winds up over the button, so the test times out.
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ScrollButtonScrolls DISABLED_ScrollButtonScrolls
-#else
 #define MAYBE_ScrollButtonScrolls ScrollButtonScrolls
-#endif
 TEST_F(BookmarkBarViewTest9, MAYBE_ScrollButtonScrolls) {
 #if BUILDFLAG(IS_OZONE)
   if (::ui::OzonePlatform::RunningOnWaylandForTest()) {
@@ -1289,11 +1252,7 @@ class BookmarkBarViewTest10 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_KeyEvents DISABLED_KeyEvents
-#else
 #define MAYBE_KeyEvents KeyEvents
-#endif
 VIEW_TEST(BookmarkBarViewTest10, MAYBE_KeyEvents)
 
 // Make sure the menu closes with the following sequence: show menu, show
@@ -1355,7 +1314,7 @@ class BookmarkBarViewTest11 : public BookmarkBarViewEventTestBase {
 
 // TODO(crbug.com/40282036): Fails on latest versions of ChromeOS.
 // TODO(crbug.com/337055374): Flaky on Windows.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_CloseMenuAfterClosingContextMenu \
   DISABLED_CloseMenuAfterClosingContextMenu
 #else
@@ -1434,11 +1393,7 @@ class BookmarkBarViewTest12 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CloseWithModalDialog DISABLED_CloseWithModalDialog
-#else
 #define MAYBE_CloseWithModalDialog CloseWithModalDialog
-#endif
 VIEW_TEST(BookmarkBarViewTest12, MAYBE_CloseWithModalDialog)
 
 // Tests clicking on the separator of a context menu (this is for coverage of
@@ -1500,11 +1455,7 @@ class BookmarkBarViewTest13 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ClickOnContextMenuSeparator DISABLED_ClickOnContextMenuSeparator
-#else
 #define MAYBE_ClickOnContextMenuSeparator ClickOnContextMenuSeparator
-#endif
 VIEW_TEST(BookmarkBarViewTest13, MAYBE_ClickOnContextMenuSeparator)
 
 // Makes sure right clicking on a folder on the bookmark bar doesn't result in
@@ -1540,11 +1491,7 @@ class BookmarkBarViewTest14 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ContextMenus2 DISABLED_ContextMenus2
-#else
 #define MAYBE_ContextMenus2 ContextMenus2
-#endif
 VIEW_TEST(BookmarkBarViewTest14, MAYBE_ContextMenus2)
 
 // Makes sure deleting from the context menu keeps the bookmark menu showing.
@@ -1607,11 +1554,7 @@ class BookmarkBarViewTest15 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_MenuStaysVisibleAfterDelete DISABLED_MenuStaysVisibleAfterDelete
-#else
 #define MAYBE_MenuStaysVisibleAfterDelete MenuStaysVisibleAfterDelete
-#endif
 VIEW_TEST(BookmarkBarViewTest15, MAYBE_MenuStaysVisibleAfterDelete)
 
 // Tests that we don't crash or get stuck if the parent of a menu is closed.
@@ -1638,11 +1581,7 @@ class BookmarkBarViewTest16 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DeleteMenu DISABLED_DeleteMenu
-#else
 #define MAYBE_DeleteMenu DeleteMenu
-#endif
 VIEW_TEST(BookmarkBarViewTest16, MAYBE_DeleteMenu)
 
 // Makes sure right clicking on an item while a context menu is already showing
@@ -1712,7 +1651,7 @@ class BookmarkBarViewTest17 : public BookmarkBarViewEventTestBase {
 
 // TODO(crbug.com/40282036): Fails on latest versions of ChromeOS.
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_ContextMenus3 DISABLED_ContextMenus3
 #else
 #define MAYBE_ContextMenus3 ContextMenus3
@@ -1762,13 +1701,8 @@ class BookmarkBarViewTest18 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_BookmarkBarViewTest18_SiblingMenu \
-  DISABLED_BookmarkBarViewTest18_SiblingMenu
-#else
 #define MAYBE_BookmarkBarViewTest18_SiblingMenu \
   BookmarkBarViewTest18_SiblingMenu
-#endif
 VIEW_TEST(BookmarkBarViewTest18, MAYBE_BookmarkBarViewTest18_SiblingMenu)
 
 // Verifies mousing over an already open sibling menu doesn't prematurely cancel
@@ -1826,13 +1760,8 @@ class BookmarkBarViewTest19 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_BookmarkBarViewTest19_SiblingMenu \
-  DISABLED_BookmarkBarViewTest19_SiblingMenu
-#else
 #define MAYBE_BookmarkBarViewTest19_SiblingMenu \
   BookmarkBarViewTest19_SiblingMenu
-#endif
 VIEW_TEST(BookmarkBarViewTest19, MAYBE_BookmarkBarViewTest19_SiblingMenu)
 
 // Verify that when clicking a mouse button outside a context menu,
@@ -1927,11 +1856,7 @@ END_METADATA
 // TODO(crbug.com/40947483): Flaky on Windows.
 // TODO (crbug.com/41496199): This test is failing under Windows.
 // This skips it until it can be fixed.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ContextMenuExitTest DISABLED_ContextMenuExitTest
-#else
 #define MAYBE_ContextMenuExitTest ContextMenuExitTest
-#endif  // BUILDFLAG(IS_WIN)
 TEST_F(BookmarkBarViewTest20, MAYBE_ContextMenuExitTest) {
 #if BUILDFLAG(IS_OZONE)
   // TODO (crbug.com/41496199): This test is failing under wayland.
@@ -2005,11 +1930,7 @@ class BookmarkBarViewTest21 : public BookmarkBarViewEventTestBase {
 
 // If this flakes, disable and log details in http://crbug.com/40432443.
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ContextMenusForEmptyFolder DISABLED_ContextMenusForEmptyFolder
-#else
 #define MAYBE_ContextMenusForEmptyFolder ContextMenusForEmptyFolder
-#endif
 VIEW_TEST(BookmarkBarViewTest21, MAYBE_ContextMenusForEmptyFolder)
 
 // Test that closing the source browser window while dragging a bookmark does
@@ -2053,11 +1974,7 @@ class BookmarkBarViewTest22 : public BookmarkBarViewDragTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CloseSourceBrowserDuringDrag DISABLED_CloseSourceBrowserDuringDrag
-#else
 #define MAYBE_CloseSourceBrowserDuringDrag CloseSourceBrowserDuringDrag
-#endif
 VIEW_TEST(BookmarkBarViewTest22, MAYBE_CloseSourceBrowserDuringDrag)
 
 // Tests opening a context menu for a bookmark node from the keyboard.
@@ -2122,11 +2039,7 @@ class BookmarkBarViewTest23 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ContextMenusKeyboard DISABLED_ContextMenusKeyboard
-#else
 #define MAYBE_ContextMenusKeyboard ContextMenusKeyboard
-#endif
 VIEW_TEST(BookmarkBarViewTest23, MAYBE_ContextMenusKeyboard)
 
 // Test that pressing escape on a menu opened via the keyboard dismisses the
@@ -2187,90 +2100,6 @@ class BookmarkBarViewTest24 : public BookmarkBarViewEventTestBase {
 // Flaky on Linux (https://crbug.com/40757658).
 VIEW_TEST(BookmarkBarViewTest24, DISABLED_ContextMenusKeyboardEscape)
 
-#if BUILDFLAG(IS_WIN)
-// Tests that pressing the key KEYCODE closes the menu.
-template <ui::KeyboardCode KEYCODE>
-class BookmarkBarViewTest25 : public BookmarkBarViewEventTestBase {
- protected:
-  void DoTestOnMessageLoop() override {
-    // Move the mouse to the first folder on the bookmark bar and press the
-    // mouse.
-    OpenMenuByClick(GetBookmarkButton(0),
-                    CreateEventTask(this, &BookmarkBarViewTest25::Step2));
-  }
-
- private:
-  void Step2() {
-    // Send KEYCODE key event, which should close the menu.
-    ASSERT_TRUE(ui_controls::SendKeyPressNotifyWhenDone(
-        window()->GetNativeWindow(), KEYCODE, false, false, false, false,
-        CreateEventTask(this, &BookmarkBarViewTest25::Step3)));
-  }
-
-  void Step3() {
-    ASSERT_FALSE(MenuIsShowing());
-    Done();
-  }
-};
-
-// Tests that pressing F10 system key closes the menu.
-using BookmarkBarViewTest25F10 = BookmarkBarViewTest25<ui::VKEY_F10>;
-// TODO(crbug.com/41493431) flaky on windows
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_F10ClosesMenu DISABLED_F10ClosesMenu
-#else
-#define MAYBE_F10ClosesMenu F10ClosesMenu
-#endif
-VIEW_TEST(BookmarkBarViewTest25F10, MAYBE_F10ClosesMenu)
-
-// Tests that pressing Alt system key closes the menu.
-using BookmarkBarViewTest25Alt = BookmarkBarViewTest25<ui::VKEY_MENU>;
-// TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_AltClosesMenu DISABLED_AltClosesMenu
-#else
-#define MAYBE_AltClosesMenu AltClosesMenu
-#endif
-VIEW_TEST(BookmarkBarViewTest25Alt, MAYBE_AltClosesMenu)
-
-// Tests that WM_CANCELMODE closes the menu.
-class BookmarkBarViewTest26 : public BookmarkBarViewEventTestBase {
- protected:
-  void DoTestOnMessageLoop() override {
-    // Move the mouse to the first folder on the bookmark bar and press the
-    // mouse.
-    OpenMenuByClick(GetBookmarkButton(0),
-                    CreateEventTask(this, &BookmarkBarViewTest26::Step2));
-  }
-
- private:
-  void Step2() {
-    // Send WM_CANCELMODE, which should close the menu. The message is sent
-    // synchronously, however, we post a task to make sure that the message is
-    // processed completely before finishing the test.
-    ::SendMessage(window()->GetNativeView()->GetHost()->GetAcceleratedWidget(),
-                  WM_CANCELMODE, 0, 0);
-
-    base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
-        FROM_HERE,
-        base::BindOnce(&BookmarkBarViewTest26::Step3, base::Unretained(this)));
-  }
-
-  void Step3() {
-    ASSERT_FALSE(MenuIsShowing());
-    Done();
-  }
-};
-
-// TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CancelModeClosesMenu DISABLED_CancelModeClosesMenu
-#else
-#define MAYBE_CancelModeClosesMenu CancelModeClosesMenu
-#endif
-VIEW_TEST(BookmarkBarViewTest26, MAYBE_CancelModeClosesMenu)
-#endif
-
 class BookmarkBarViewTest27 : public BookmarkBarViewEventTestBase {
  protected:
   void DoTestOnMessageLoop() override {
@@ -2292,13 +2121,8 @@ class BookmarkBarViewTest27 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_MiddleClickOnFolderOpensAllBookmarks \
-  DISABLED_MiddleClickOnFolderOpensAllBookmarks
-#else
 #define MAYBE_MiddleClickOnFolderOpensAllBookmarks \
   MiddleClickOnFolderOpensAllBookmarks
-#endif
 VIEW_TEST(BookmarkBarViewTest27, MAYBE_MiddleClickOnFolderOpensAllBookmarks)
 
 #endif  // BUILDFLAG(IS_MAC)
@@ -2327,13 +2151,8 @@ class BookmarkBarViewTest28 : public BookmarkBarViewEventTestBase {
 };
 
 // TODO(crbug.com/40947483): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ClickWithModifierOnFolderOpensAllBookmarks \
-  DISABLED_ClickWithModifierOnFolderOpensAllBookmarks
-#else
 #define MAYBE_ClickWithModifierOnFolderOpensAllBookmarks \
   ClickWithModifierOnFolderOpensAllBookmarks
-#endif
 
 VIEW_TEST(BookmarkBarViewTest28,
           MAYBE_ClickWithModifierOnFolderOpensAllBookmarks)

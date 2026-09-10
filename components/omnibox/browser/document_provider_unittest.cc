@@ -719,7 +719,7 @@ TEST_F(DocumentProviderTest, GenerateLastModifiedString) {
                 base::TimeFormatAsIso8601(modified_last_year), local_now),
             u"8/27/17");
 }
-#endif  // !BUILDFLAG(IS_IOS) && !BUILDFLAG(IS_WIN)
+#endif  // !BUILDFLAG(IS_IOS)
 
 TEST_F(DocumentProviderTest, GetURLForDeduping) {
   // Checks that |url_string| is a URL for opening |expected_id|. An empty ID

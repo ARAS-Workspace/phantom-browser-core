@@ -118,13 +118,8 @@ TEST_P(BrowserSwitcherSitelistTest, CanonicalizeRule) {
     CheckCanonicalizedRule("*://example.com/", "Example.Com/");
     CheckCanonicalizedRule("!*://example.com/abc", "!Example.Com/Abc");
     CheckCanonicalizedRule("*://example.com/", "/Example.Com");
-#if BUILDFLAG(IS_WIN)
-    CheckCanonicalizedRule("*://example.com/", "//Example.Com");
-    CheckCanonicalizedRule("!*://example.com/", "!//Example.Com");
-#else
     CheckCanonicalizedRule("file:///example.com", "//Example.Com");
     CheckCanonicalizedRule("!file:///example.com", "!//Example.Com");
-#endif
     CheckCanonicalizedRule("http://example.com/", "HTTP://EXAMPLE.COM");
     CheckCanonicalizedRule("http://example.com/abc", "HTTP://EXAMPLE.COM/ABC");
     CheckCanonicalizedRule("*://example.com:8080/test",
@@ -175,25 +170,12 @@ TEST_P(BrowserSwitcherSitelistTest, CanonicalizeRulesLikeMicrosoft) {
                          "://example.com");
   CheckCanonicalizedRule("",  // *://bar.com/
                          "mailto:foo@bar.com");
-#if BUILDFLAG(IS_WIN)
-  CheckCanonicalizedRule("file:///c:/src/",  // *://c/src
-                         "C:/src/");
-  CheckCanonicalizedRule("file:///c:/src",  // *://c/src
-                         "C:\\src");
-  CheckCanonicalizedRule("*://var/",  // file://var/
-                         "//var");
-  CheckCanonicalizedRule("*://var/www",  // file://var/www
-                         "//var/www");
-  CheckCanonicalizedRule("file:///c:/src",  // *://file//c:/src
-                         "file://c:/src");
-#else
   CheckCanonicalizedRule("file:///var",  // *://var
                          "//var");
   CheckCanonicalizedRule("file:///var/www",  // *://var/www
                          "//var/www");
   CheckCanonicalizedRule("",  // *://file//c:/src
                          "file://c:/src");
-#endif
 }
 
 TEST_P(BrowserSwitcherSitelistTest, ShouldRedirectWildcard) {

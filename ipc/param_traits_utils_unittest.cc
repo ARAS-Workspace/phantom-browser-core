@@ -21,10 +21,6 @@
 #include "mojo/public/cpp/system/message_pipe.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace IPC {
 namespace {
 
@@ -243,24 +239,6 @@ TEST(IPCMessageUtilsTest, ListValueConversion) {
   ASSERT_TRUE(ParamTraits<base::ListValue>::Read(&message, &iter, &read_value));
   EXPECT_EQ(list_value, read_value);
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST(IPCMessageUtilsTest, ScopedHandle) {
-  HANDLE raw_dupe_handle;
-  ASSERT_TRUE(::DuplicateHandle(::GetCurrentProcess(), ::GetCurrentProcess(),
-                                ::GetCurrentProcess(), &raw_dupe_handle, 0,
-                                FALSE, DUPLICATE_SAME_ACCESS));
-  base::win::ScopedHandle dupe_handle(raw_dupe_handle);
-
-  Message message;
-  WriteParam(&message, dupe_handle);
-
-  base::PickleIterator iter(message);
-  base::win::ScopedHandle read_handle;
-  EXPECT_TRUE(ReadParam(&message, &iter, &read_handle));
-  EXPECT_TRUE(read_handle.is_valid());
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace
 }  // namespace IPC

@@ -92,14 +92,11 @@
 #endif
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+    BUILDFLAG(IS_APPLE)
 #include "third_party/blink/renderer/controller/highest_pmf_reporter.h"
 #endif
 
 // #if expression should match the one in InitializeCommon
-#if !defined(ARCH_CPU_X86_64) && !defined(ARCH_CPU_ARM64) && BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
 
 namespace blink {
 
@@ -123,24 +120,6 @@ BlinkInitializer& GetBlinkInitializer() {
 
 void InitializeCommon(Platform* platform, mojo::BinderMap* binders) {
 // #if expression should match the one around #include <windows.h>
-#if !defined(ARCH_CPU_X86_64) && !defined(ARCH_CPU_ARM64) && BUILDFLAG(IS_WIN)
-  // Reserve address space on 32 bit Windows, to make it likelier that large
-  // array buffer allocations succeed.
-  BOOL is_wow_64 = -1;
-  if (!IsWow64Process(GetCurrentProcess(), &is_wow_64)) {
-    is_wow_64 = FALSE;
-  }
-  if (!is_wow_64) {
-    // Try to reserve as much address space as we reasonably can.
-    const size_t kMB = 1024 * 1024;
-    for (size_t size = 512 * kMB; size >= 32 * kMB; size -= 16 * kMB) {
-      if (partition_alloc::ReserveAddressSpace(size)) {
-        break;
-      }
-    }
-  }
-#endif  // !defined(ARCH_CPU_X86_64) && !defined(ARCH_CPU_ARM64) &&
-        // BUILDFLAG(IS_WIN)
 
   // These Initialize() methods for renderer extensions initialize strings which
   // must be done before calling CoreInitializer::Initialize() which is called
@@ -320,7 +299,7 @@ void BlinkInitializer::RegisterMemoryWatchers(Platform* platform) {
   MemorySaverController::Initialize();
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+    BUILDFLAG(IS_APPLE)
   // Start reporting the highest private memory footprint after the first
   // navigation.
   HighestPmfReporter::Initialize(main_thread_task_runner);

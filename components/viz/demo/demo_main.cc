@@ -34,10 +34,6 @@
 #include "ui/ozone/public/surface_factory_ozone.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/platform_window/win/win_window.h"
-#endif
-
 namespace {
 
 // Initializes and owns the components from base necessary to run the app.
@@ -124,8 +120,6 @@ class DemoWindow : public ui::PlatformWindowDelegate {
 #if BUILDFLAG(IS_OZONE)
     return ui::OzonePlatform::GetInstance()->CreatePlatformWindow(
         this, std::move(props));
-#elif BUILDFLAG(IS_WIN)
-    return std::make_unique<ui::WinWindow>(this, props.bounds);
 #else
     NOTIMPLEMENTED();
     return nullptr;

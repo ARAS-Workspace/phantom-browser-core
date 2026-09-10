@@ -17,17 +17,6 @@
 #include "device/fido/hid/fido_hid_discovery.h"
 #include "device/fido/public/features.h"
 
-#if BUILDFLAG(IS_WIN)
-// clang-format off
-// rpc.h needs to be included before winuser.h.
-#include <rpc.h>
-#include <Winuser.h>
-// clang-format on
-
-#include "device/fido/win/discovery.h"
-#include "device/fido/win/webauthn_api.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_MAC)
 #include "base/process/process_info.h"
 #include "device/fido/mac/discovery.h"
@@ -136,22 +125,6 @@ FidoDiscoveryFactory::SingleDiscovery(
   ret.emplace_back(std::move(discovery));
   return ret;
 }
-
-#if BUILDFLAG(IS_WIN)
-std::unique_ptr<FidoDiscoveryBase>
-FidoDiscoveryFactory::MaybeCreateWinWebAuthnApiDiscovery() {
-  // TODO(martinkr): Inject the window from which the request originated.
-  // Windows uses this parameter to center the dialog over the parent. The
-  // dialog should be centered over the originating Chrome Window; the
-  // foreground window may have changed to something else since the request
-  // was issued.
-  WinWebAuthnApi* const api = WinWebAuthnApi::GetDefault();
-  return api && api->IsAvailable()
-             ? std::make_unique<WinWebAuthnApiAuthenticatorDiscovery>(
-                   GetForegroundWindow(), api)
-             : nullptr;
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
 std::vector<std::unique_ptr<FidoDiscoveryBase>>

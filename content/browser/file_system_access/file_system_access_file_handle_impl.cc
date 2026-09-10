@@ -51,10 +51,6 @@
 #include "content/public/common/content_paths.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include <sys/clonefile.h>
 
@@ -113,14 +109,6 @@ bool HasWritePermission(const base::FilePath& path) {
   }
 
   if (!(mode & base::FILE_PERMISSION_WRITE_BY_USER)) {
-    return false;
-  }
-#elif BUILDFLAG(IS_WIN)
-  DWORD attrs = ::GetFileAttributes(path.value().c_str());
-  if (attrs == INVALID_FILE_ATTRIBUTES) {
-    return true;
-  }
-  if (attrs & FILE_ATTRIBUTE_READONLY) {
     return false;
   }
 #endif  // BUILDFLAG(IS_POSIX)

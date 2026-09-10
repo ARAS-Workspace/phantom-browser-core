@@ -19,10 +19,6 @@
 #include "sandbox/policy/features.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "sandbox/policy/win/sandbox_win.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -35,46 +31,6 @@ bool RendererIsJitless(RenderProcessHost* rph) {
   // command line here, but there's no portable interface to do so.
   return rph->IsJitDisabled();
 }
-
-#if BUILDFLAG(IS_WIN)
-bool RendererHasDynamicCodeMitigation(RenderProcessHost* rph) {
-  // Multiple renderer processes might have started. Grab a reference to the
-  // base::Process itself as well as grabbing the process ID; this ensures that
-  // the process doesn't actually die during the RunLoop::Run() call below, so
-  // its pid cannot be reused and confuse the test.
-  base::Process proc = rph->GetProcess().Duplicate();
-  base::ProcessId renderer_process_id = proc.Pid();
-
-  base::RunLoop run_loop;
-  base::Value out_args;
-  sandbox::policy::SandboxWin::GetPolicyDiagnostics(
-      base::BindLambdaForTesting([&run_loop, &out_args](base::Value args) {
-        out_args = std::move(args);
-        run_loop.Quit();
-      }));
-  run_loop.Run();
-
-  const base::ListValue* process_list = out_args.GetIfList();
-  CHECK(process_list);
-
-  for (const base::Value& process_value : *process_list) {
-    const base::DictValue* process = process_value.GetIfDict();
-    CHECK(process);
-    double pid = *process->FindDouble("processId");
-    if (base::checked_cast<base::ProcessId>(pid) != renderer_process_id) {
-      continue;
-    }
-
-    std::string mitigations = *process->FindString("desiredMitigations");
-    uint64_t mask = 0;
-    CHECK(base::HexStringToUInt64(mitigations, &mask));
-
-    return !!(mask & sandbox::MITIGATION_DYNAMIC_CODE_DISABLE);
-  }
-
-  return false;
-}
-#endif  // IS_WIN
 
 }  // namespace
 
@@ -136,9 +92,6 @@ IN_PROC_BROWSER_TEST_F(JitPolicyBrowserTest, JitDisabledImpliesJitless) {
   // With JIT disabled, the renderer process should be jitless and have the
   // DynamicCode mitigation applied.
   EXPECT_TRUE(RendererIsJitless(rph));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(RendererHasDynamicCodeMitigation(rph));
-#endif
 }
 
 // This test asserts that navigating to a JIT-enabled site results in a renderer
@@ -154,9 +107,6 @@ IN_PROC_BROWSER_TEST_F(JitPolicyBrowserTest, JitEnabledImpliesNoJitless) {
   // With JIT enabled, the renderer process should have JIT and not have the
   // DynamicCode mitigation applied.
   EXPECT_FALSE(RendererIsJitless(rph));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_FALSE(RendererHasDynamicCodeMitigation(rph));
-#endif
 }
 
 }  // namespace content

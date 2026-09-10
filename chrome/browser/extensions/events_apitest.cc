@@ -446,11 +446,7 @@ IN_PROC_BROWSER_TEST_F(EventsApiTest,
 
 // This test is OK on Windows, but times out on other platforms.
 // https://crbug.com/41383852
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_NewlyIntroducedListener NewlyIntroducedListener
-#else
 #define MAYBE_NewlyIntroducedListener DISABLED_NewlyIntroducedListener
-#endif
 // Tests that if an extension's updated version has a new lazy listener, it
 // fires properly after the update.
 IN_PROC_BROWSER_TEST_F(EventsApiTest, MAYBE_NewlyIntroducedListener) {
@@ -930,7 +926,7 @@ INSTANTIATE_TEST_SUITE_P(EventPage,
 using ServiceWorkerEventAckBrowserTest = EventDispatchingApiTest;
 
 // TODO(crbug.com/383086263): Flaky on Mac and Windows.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_RendererProcessGoesAway_ClearsUnackedEventData \
   DISABLED_RendererProcessGoesAway_ClearsUnackedEventData
 #else

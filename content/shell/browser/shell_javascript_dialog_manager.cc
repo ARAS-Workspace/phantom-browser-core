@@ -37,7 +37,7 @@ void ShellJavaScriptDialogManager::RunJavaScriptDialog(
     return;
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   *did_suppress_message = false;
 
   if (dialog_) {
@@ -79,7 +79,7 @@ void ShellJavaScriptDialogManager::RunBeforeUnloadDialog(
     return;
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   if (dialog_) {
     // Seriously!?
     std::move(callback).Run(true, std::u16string());
@@ -103,7 +103,7 @@ void ShellJavaScriptDialogManager::RunBeforeUnloadDialog(
 
 void ShellJavaScriptDialogManager::CancelDialogs(WebContents* web_contents,
                                                  bool reset_state) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   if (dialog_) {
     dialog_->Cancel();
     dialog_.reset();
@@ -120,7 +120,7 @@ void ShellJavaScriptDialogManager::CancelDialogs(WebContents* web_contents,
 }
 
 void ShellJavaScriptDialogManager::DialogClosed(ShellJavaScriptDialog* dialog) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   DCHECK_EQ(dialog, dialog_.get());
   dialog_.reset();
 #else

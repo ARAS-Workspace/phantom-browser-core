@@ -15,10 +15,10 @@
 #include "components/device_signals/core/common/common_types.h"
 #include "components/device_signals/core/system_signals/platform_utils.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "base/file_version_info.h"
 #include "base/strings/utf_string_conversions.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 namespace device_signals {
 
@@ -66,7 +66,7 @@ FilePathMap<bool> BasePlatformDelegate::AreExecutablesRunning(
   return running_map;
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
 std::optional<PlatformDelegate::ProductMetadata>
 BasePlatformDelegate::GetProductMetadata(const base::FilePath& file_path) {
@@ -103,6 +103,6 @@ BasePlatformDelegate::GetProductMetadata(const base::FilePath& file_path) {
   return product_metadata;
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace device_signals

@@ -1246,7 +1246,7 @@ TEST_F(AddressDataManagerTest, ClearUrlsFromBrowsingHistoryInTimeRange) {
       address_data_manager().IsNewProfileImportBlockedForDomain(second_url));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 TEST_F(AddressDataManagerTest,
        IsEligibleForAddressAccountStorageSigninPending) {
@@ -1275,7 +1275,7 @@ TEST_F(AddressDataManagerTest,
   // Account storage is not eligible.
   EXPECT_FALSE(address_data_manager().IsEligibleForAddressAccountStorage());
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // Tests that any `kAccountNameEmail` is created on construction of
 // `AddressDataManager`.

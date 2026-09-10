@@ -146,12 +146,6 @@ class PrintBackendServiceManager {
       mojom::PrintBackendService::GetPrinterSemanticCapsAndDefaultsCallback
           callback);
 #endif
-#if BUILDFLAG(IS_WIN)
-  void GetPaperPrintableArea(
-      const std::string& printer_name,
-      const PrintSettings::RequestedMedia& media,
-      mojom::PrintBackendService::GetPaperPrintableAreaCallback callback);
-#endif
   ContextId EstablishPrintingContext(ClientId client_id,
                                      const std::string& printer_name
 #if BUILDFLAG(ENABLE_OOP_BASIC_PRINT_DIALOG)
@@ -201,16 +195,6 @@ class PrintBackendServiceManager {
       std::optional<PrintSettings> settings,
 #endif
       mojom::PrintBackendService::StartPrintingCallback callback);
-#if BUILDFLAG(IS_WIN)
-  void RenderPrintedPage(
-      ClientId client_id,
-      const std::string& printer_name,
-      int document_cookie,
-      const PrintedPage& page,
-      mojom::MetafileDataType page_data_type,
-      base::ReadOnlySharedMemoryRegion serialized_page_data,
-      mojom::PrintBackendService::RenderPrintedPageCallback callback);
-#endif
   void RenderPrintedDocument(
       ClientId client_id,
       const std::string& printer_name,
@@ -311,10 +295,6 @@ class PrintBackendServiceManager {
       RemoteSavedCallbacks<
           mojom::PrintBackendService::GetPrinterSemanticCapsAndDefaultsResult>;
 #endif
-#if BUILDFLAG(IS_WIN)
-  using RemoteSavedGetPaperPrintableAreaCallbacks =
-      RemoteSavedCallbacks<const gfx::Rect&>;
-#endif
   using RemoteSavedUseDefaultSettingsCallbacks =
       RemoteSavedCallbacks<PrintSettingsResult>;
 #if BUILDFLAG(ENABLE_OOP_BASIC_PRINT_DIALOG)
@@ -325,10 +305,6 @@ class PrintBackendServiceManager {
       RemoteSavedCallbacks<PrintSettingsResult>;
   using RemoteSavedStartPrintingCallbacks =
       RemoteSavedCallbacks<mojom::ResultCode, int /*job_id*/>;
-#if BUILDFLAG(IS_WIN)
-  using RemoteSavedRenderPrintedPageCallbacks =
-      RemoteSavedCallbacks<mojom::ResultCode>;
-#endif
   using RemoteSavedRenderPrintedDocumentCallbacks =
       RemoteSavedCallbacks<mojom::ResultCode>;
   using RemoteSavedDocumentDoneCallbacks =
@@ -409,16 +385,6 @@ class PrintBackendServiceManager {
   // Get the total number of clients registered.
   size_t GetClientsRegisteredCount() const;
 
-#if BUILDFLAG(IS_WIN)
-  // Query if printer driver has known reasons for requiring elevated
-  // privileges in order to operate.  In these cases relying upon fallback
-  // after an access-denied error is not preferable.  Any such reasons are
-  // platform specific.
-  bool PrinterDriverKnownToRequireElevatedPrivilege(
-      const std::string& printer_name,
-      ClientType client_type) const;
-#endif
-
   // Determines if a service should be sandboxed when launched.
   bool ShouldServiceBeSandboxed(const std::string& printer_name,
                                 ClientType client_type) const;
@@ -492,10 +458,6 @@ class PrintBackendServiceManager {
   RemoteSavedGetPrinterSemanticCapsAndDefaultsCallbacks&
   GetRemoteSavedGetPrinterSemanticCapsAndDefaultsCallbacks(bool sandboxed);
 #endif
-#if BUILDFLAG(IS_WIN)
-  RemoteSavedGetPaperPrintableAreaCallbacks&
-  GetRemoteSavedGetPaperPrintableAreaCallbacks(bool sandboxed);
-#endif
   RemoteSavedUseDefaultSettingsCallbacks&
   GetRemoteSavedUseDefaultSettingsCallbacks(bool sandboxed);
 #if BUILDFLAG(ENABLE_OOP_BASIC_PRINT_DIALOG)
@@ -506,10 +468,6 @@ class PrintBackendServiceManager {
   GetRemoteSavedUpdatePrintSettingsCallbacks(bool sandboxed);
   RemoteSavedStartPrintingCallbacks& GetRemoteSavedStartPrintingCallbacks(
       bool sandboxed);
-#if BUILDFLAG(IS_WIN)
-  RemoteSavedRenderPrintedPageCallbacks&
-  GetRemoteSavedRenderPrintedPageCallbacks(bool sandboxed);
-#endif
   RemoteSavedRenderPrintedDocumentCallbacks&
   GetRemoteSavedRenderPrintedDocumentCallbacks(bool sandboxed);
   RemoteSavedDocumentDoneCallbacks& GetRemoteSavedDocumentDoneCallbacks(
@@ -569,10 +527,6 @@ class PrintBackendServiceManager {
       mojom::PrintBackendService::GetPrinterSemanticCapsAndDefaultsResult
           printer_caps);
 #endif
-#if BUILDFLAG(IS_WIN)
-  void OnDidGetPaperPrintableArea(const CallbackContext& context,
-                                  const gfx::Rect& printable_area_um);
-#endif
   void OnDidUseDefaultSettings(const CallbackContext& context,
                                PrintSettingsResult settings);
 #if BUILDFLAG(ENABLE_OOP_BASIC_PRINT_DIALOG)
@@ -584,10 +538,6 @@ class PrintBackendServiceManager {
   void OnDidStartPrinting(const CallbackContext& context,
                           mojom::ResultCode result,
                           int job_id);
-#if BUILDFLAG(IS_WIN)
-  void OnDidRenderPrintedPage(const CallbackContext& context,
-                              mojom::ResultCode result);
-#endif
   void OnDidRenderPrintedDocument(const CallbackContext& context,
                                   mojom::ResultCode result);
   void OnDidDocumentDone(const CallbackContext& context,
@@ -664,12 +614,6 @@ class PrintBackendServiceManager {
   RemoteSavedGetPrinterSemanticCapsAndDefaultsCallbacks
       unsandboxed_saved_get_printer_semantic_caps_and_defaults_callbacks_;
 #endif
-#if BUILDFLAG(IS_WIN)
-  RemoteSavedGetPaperPrintableAreaCallbacks
-      sandboxed_saved_get_paper_printable_area_callbacks_;
-  RemoteSavedGetPaperPrintableAreaCallbacks
-      unsandboxed_saved_get_paper_printable_area_callbacks_;
-#endif
   RemoteSavedUseDefaultSettingsCallbacks
       sandboxed_saved_use_default_settings_callbacks_;
   RemoteSavedUseDefaultSettingsCallbacks
@@ -686,12 +630,6 @@ class PrintBackendServiceManager {
       unsandboxed_saved_update_print_settings_callbacks_;
   RemoteSavedStartPrintingCallbacks sandboxed_saved_start_printing_callbacks_;
   RemoteSavedStartPrintingCallbacks unsandboxed_saved_start_printing_callbacks_;
-#if BUILDFLAG(IS_WIN)
-  RemoteSavedRenderPrintedPageCallbacks
-      sandboxed_saved_render_printed_page_callbacks_;
-  RemoteSavedRenderPrintedPageCallbacks
-      unsandboxed_saved_render_printed_page_callbacks_;
-#endif
   RemoteSavedRenderPrintedDocumentCallbacks
       sandboxed_saved_render_printed_document_callbacks_;
   RemoteSavedRenderPrintedDocumentCallbacks
@@ -707,13 +645,6 @@ class PrintBackendServiceManager {
   // that (and thus fail with access denied errors) then we need to fallback to
   // performing the operation with modified restrictions.
   base::flat_set<std::string> drivers_requiring_elevated_privilege_;
-
-#if BUILDFLAG(IS_WIN)
-  // Support for process model where there can be multiple PrintBackendService
-  // instances.  This is necessary because Windows printer drivers are not
-  // thread safe.  Map key is a printer name.
-  base::flat_map<std::string, RemoteId> remote_id_map_;
-#endif
 
   // Used as base for generating `RemoteId` values.  Only used internally
   // within browser process management code, so a simple incrementating

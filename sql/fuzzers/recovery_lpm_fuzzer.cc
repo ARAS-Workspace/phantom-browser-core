@@ -70,15 +70,7 @@ std::optional<base::CommandLine> GetCommandLine() {
   }
   std::vector<std::string> argv = base::SplitString(
       additional_args, " ", base::TRIM_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
-#if BUILDFLAG(IS_WIN)
-  std::vector<std::wstring> wargv(argv.size());
-  std::ranges::transform(
-      argv.begin(), argv.end(), wargv.begin(),
-      [](std::string str) { return std::wstring(str.begin(), str.end()); });
-  return base::CommandLine::FromArgvWithoutProgram(wargv);
-#else
   return base::CommandLine::FromArgvWithoutProgram(argv);
-#endif
 }
 
 // Initializes and manages state shared between fuzzer iterations. Use this to

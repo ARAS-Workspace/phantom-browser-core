@@ -39,11 +39,6 @@
 #include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/install_static/install_modes.h"
-#include "chrome/install_static/test/scoped_install_details.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 using ::testing::AnyNumber;
 
 namespace {

@@ -32,11 +32,7 @@ void HeadlessCrashReporterClient::GetProductInfo(
 }
 
 bool HeadlessCrashReporterClient::GetCrashDumpLocation(
-#if BUILDFLAG(IS_WIN)
-    std::wstring* crash_dir
-#else
     base::FilePath* crash_dir
-#endif
 ) {
   base::FilePath crash_directory = crash_dumps_dir_;
   if (crash_directory.empty() &&
@@ -47,11 +43,7 @@ bool HeadlessCrashReporterClient::GetCrashDumpLocation(
   if (crash_dumps_dir_.empty()) {
     crash_directory = crash_directory.Append(FILE_PATH_LITERAL("Crashpad"));
   }
-#if BUILDFLAG(IS_WIN)
-  *crash_dir = crash_directory.value();
-#else
   *crash_dir = std::move(crash_directory);
-#endif
   return true;
 }
 

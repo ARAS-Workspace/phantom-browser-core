@@ -421,8 +421,7 @@ TEST_F(SanitizedImageSourceTest, AnimatedImage) {
 }
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_F(SanitizedImageSourceTest, AnimatedImageWithStaticEncode) {
   const std::string test_body = "abc";
   const std::string test_url = "https://foo.com/img.png";
@@ -456,10 +455,9 @@ TEST_F(SanitizedImageSourceTest, AnimatedImageWithStaticEncode) {
 
   task_environment_.RunUntilIdle();
 }
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) ||
-        // BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 TEST_F(SanitizedImageSourceTest, AnimatedImageWithStaticEncodeFalse) {
   const std::string test_body = "abc";
   const std::string test_url = "https://foo.com/img.png";
@@ -506,4 +504,4 @@ TEST_F(SanitizedImageSourceTest, AnimatedImageWithStaticEncodeFalse) {
   run_loop.Run();
 }
 
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

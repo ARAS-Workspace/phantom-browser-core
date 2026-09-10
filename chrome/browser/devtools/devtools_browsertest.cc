@@ -985,13 +985,8 @@ IN_PROC_BROWSER_TEST_F(DevToolsBeforeUnloadTest, TestDockedDevToolsClose) {
 // we try to close the inspected page.
 //
 // TODO(crbug.com/40679397): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TestDockedDevToolsInspectedTabClose \
-  DISABLED_TestDockedDevToolsInspectedTabClose
-#else
 #define MAYBE_TestDockedDevToolsInspectedTabClose \
   TestDockedDevToolsInspectedTabClose
-#endif
 IN_PROC_BROWSER_TEST_F(DevToolsBeforeUnloadTest,
                        MAYBE_TestDockedDevToolsInspectedTabClose) {
   RunBeforeUnloadTest(
@@ -1768,11 +1763,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsExtensionTest, DevToolsExtensionInItself) {
 // Tests that a devtools (not a devtools extension) Iframe can be injected into
 // devtools.  http://crbug.com/41229189
 // crbug.com/40717554: flaky on win
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DevtoolsInDevTools DISABLED_DevtoolsInDevTools
-#else
 #define MAYBE_DevtoolsInDevTools DevtoolsInDevTools
-#endif
 IN_PROC_BROWSER_TEST_F(DevToolsTest, MAYBE_DevtoolsInDevTools) {
   GURL devtools_url = GURL(chrome::kChromeUIDevToolsURL);
 
@@ -1912,7 +1903,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsExtensionTest,
 
 // Disabled on Windows due to flakiness. http://crbug.com/40967938
 // TODO(crbug.com/425268770): Flaky on Linux.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_TestDevToolsExtensionMessaging \
   DISABLED_TestDevToolsExtensionMessaging
 #else
@@ -2367,7 +2358,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest,
 // Tests that debugger works correctly if pause event occurs when DevTools
 // frontend is being loaded.
 // Flaky on win and linux: crbug.com/40134806.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_TestPauseWhenLoadingDevTools DISABLED_TestPauseWhenLoadingDevTools
 #else
 #define MAYBE_TestPauseWhenLoadingDevTools TestPauseWhenLoadingDevTools
@@ -2614,11 +2605,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, testCloseActionRecorded) {
 // Test that showing a certificate in devtools does not crash the process.
 // Disabled on windows as this opens a modal in its own thread, which leads to a
 // test timeout.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_testShowCertificate DISABLED_testShowCertificate
-#else
 #define MAYBE_testShowCertificate testShowCertificate
-#endif
 IN_PROC_BROWSER_TEST_F(DevToolsTest, MAYBE_testShowCertificate) {
   OpenDevToolsWindow("about:blank", true);
   RunTestFunction(window_, "testShowCertificate");
@@ -2822,8 +2809,7 @@ IN_PROC_BROWSER_TEST_F(WorkerDevToolsTest, InspectSharedWorker) {
 }
 
 // Flaky on multiple platforms. See http://crbug.com/40202857
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #define MAYBE_PauseInSharedWorkerInitialization \
   DISABLED_PauseInSharedWorkerInitialization
 #else
@@ -3396,7 +3382,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsTest, TestRawHeadersWithRedirectAndHSTS) {
 
 // Tests that OpenInNewTab filters URLs.
 // TODO(crbug.com/40847130): Flaky on Windows and Linux.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_TestOpenInNewTabFilter DISABLED_TestOpenInNewTabFilter
 #else
 #define MAYBE_TestOpenInNewTabFilter TestOpenInNewTabFilter
@@ -4702,11 +4688,7 @@ class ActiveTabChangedObserver : public TabStripModelObserver {
 };
 
 // TODO: crbug.com/337141755 - Flaky on Windows ASAN.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_PausedDebuggerFocus DISABLED_PausedDebuggerFocus
-#else
 #define MAYBE_PausedDebuggerFocus PausedDebuggerFocus
-#endif
 IN_PROC_BROWSER_TEST_F(DevToolsProcessPerSiteTest, MAYBE_PausedDebuggerFocus) {
   const GURL url = embedded_test_server()->GetURL("foo.test", "/hello.html");
 

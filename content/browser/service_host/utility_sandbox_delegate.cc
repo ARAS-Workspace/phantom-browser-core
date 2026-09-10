@@ -14,11 +14,6 @@
 #include "media/gpu/buildflags.h"
 #include "sandbox/policy/mojom/sandbox.mojom.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "content/public/browser/content_browser_client.h"
-#include "content/public/common/content_client.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(USE_ZYGOTE)
 #include "content/common/zygote/zygote_handle_impl_linux.h"
 #include "sandbox/policy/sandbox_type.h"
@@ -45,26 +40,14 @@ UtilitySandboxedProcessLauncherDelegate::
       env_(env),
 #endif
       sandbox_type_(sandbox_type),
-#if BUILDFLAG(IS_WIN)
-      app_container_disabled_(
-          GetContentClient()->browser()->IsAppContainerDisabled(sandbox_type)),
-#endif
       cmd_line_(cmd_line) {
 #if DCHECK_IS_ON()
   bool supported_sandbox_type =
       sandbox_type_ == sandbox::mojom::Sandbox::kNoSandbox ||
-#if BUILDFLAG(IS_WIN)
-      sandbox_type_ ==
-          sandbox::mojom::Sandbox::kNoSandboxAndElevatedPrivileges ||
-      sandbox_type_ == sandbox::mojom::Sandbox::kXrCompositing ||
-      sandbox_type_ == sandbox::mojom::Sandbox::kPdfConversion ||
-      sandbox_type_ == sandbox::mojom::Sandbox::kIconReader ||
-      sandbox_type_ == sandbox::mojom::Sandbox::kMediaFoundationCdm ||
-#endif
 #if BUILDFLAG(IS_MAC)
       sandbox_type_ == sandbox::mojom::Sandbox::kMirroring ||
 #endif
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
       sandbox_type_ == sandbox::mojom::Sandbox::kProxyResolver ||
       sandbox_type_ == sandbox::mojom::Sandbox::kWebNNModelCompilation ||
 #endif
@@ -89,8 +72,7 @@ UtilitySandboxedProcessLauncherDelegate::
       sandbox_type_ == sandbox::mojom::Sandbox::kTts ||
       sandbox_type_ == sandbox::mojom::Sandbox::kNearby ||
 #endif  // BUILDFLAG(IS_CHROMEOS)
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
       sandbox_type_ == sandbox::mojom::Sandbox::kScreenAI ||
       sandbox_type_ == sandbox::mojom::Sandbox::kPrintBackend ||
 #endif
@@ -154,8 +136,7 @@ ZygoteCommunication* UtilitySandboxedProcessLauncherDelegate::GetZygote() {
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
       sandbox_type_ == sandbox::mojom::Sandbox::kShapeDetection ||
 #endif
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
       sandbox_type_ == sandbox::mojom::Sandbox::kPrintBackend ||
       sandbox_type_ == sandbox::mojom::Sandbox::kScreenAI ||
 #endif

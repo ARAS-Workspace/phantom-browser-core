@@ -76,7 +76,7 @@ TEST_F(OSExchangeDataTest, TestURLExchangeFormats) {
 // TODO(crbug.com/406978702): string -> URL conversion is only implemented on
 // some platforms—and it is not consistently implemented across all platforms.
 // Maybe this will be fixed one day...
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 static constexpr bool kSupportsStringToUrlCoercion = true;
 static constexpr bool kStringToUrlCoercionPopulatesTitle = true;
 #elif BUILDFLAG(IS_OZONE) && defined(USE_AURA)
@@ -263,19 +263,10 @@ TEST_F(OSExchangeDataTest, TestPickledData) {
 }
 
 TEST_F(OSExchangeDataTest, TestFilenames) {
-#if BUILDFLAG(IS_WIN)
-  const std::vector<FileInfo> kTestFilenames = {
-      {base::FilePath(FILE_PATH_LITERAL("C:\\tmp\\test_file1")),
-       base::FilePath()},
-      {base::FilePath(FILE_PATH_LITERAL("C:\\tmp\\test_file2")),
-       base::FilePath()},
-  };
-#else
   const std::vector<FileInfo> kTestFilenames = {
       {base::FilePath(FILE_PATH_LITERAL("/tmp/test_file1")), base::FilePath()},
       {base::FilePath(FILE_PATH_LITERAL("/tmp/test_file2")), base::FilePath()},
   };
-#endif
 
   const OSExchangeData copy([&] {
     OSExchangeData data;

@@ -19,10 +19,6 @@
 #include "build/build_config.h"
 #include "mojo/public/cpp/bindings/self_owned_receiver.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace storage {
 
 namespace {
@@ -279,15 +275,7 @@ void FilesystemImpl::UnlockFileLocal(const base::FilePath& path) {
 mojom::PathAccessInfoPtr FilesystemImpl::GetPathAccessLocal(
     const base::FilePath& path) {
   mojom::PathAccessInfoPtr info;
-#if BUILDFLAG(IS_WIN)
-  uint32_t attributes = ::GetFileAttributes(path.value().c_str());
-  if (attributes != INVALID_FILE_ATTRIBUTES) {
-    info = mojom::PathAccessInfo::New();
-    info->can_read = true;
-    if ((attributes & FILE_ATTRIBUTE_READONLY) == 0)
-      info->can_write = true;
-  }
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   const char* const c_path = path.value().c_str();
   if (!access(c_path, F_OK)) {
     info = mojom::PathAccessInfo::New();

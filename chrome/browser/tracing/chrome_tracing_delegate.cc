@@ -52,11 +52,6 @@
 #include "chromeos/dbus/constants/dbus_switches.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/task/thread_pool.h"
-#include "chrome/installer/util/system_tracing_util.h"
-#endif
-
 namespace {
 
 using tracing::BackgroundTracingStateManager;
@@ -170,44 +165,6 @@ ChromeTracingDelegate::CreateChromeMetadataPacketRecorder() const {
   return base::BindRepeating(&tracing::FillChromeMetadataPacket,
                              chrome::GetChannel());
 }
-
-#if BUILDFLAG(IS_WIN)
-void ChromeTracingDelegate::GetSystemTracingState(
-    base::OnceCallback<void(bool service_supported, bool service_enabled)>
-        on_tracing_state) {
-  base::ThreadPool::PostTaskAndReplyWithResult(
-      FROM_HERE, {base::MayBlock{}},
-      base::BindOnce([]() -> std::pair<bool, bool> {
-        return {installer::IsSystemTracingServiceSupported(),
-                installer::IsSystemTracingServiceRegistered()};
-      }),
-      base::BindOnce(
-          [](base::OnceCallback<void(bool service_supported,
-                                     bool service_enabled)> on_tracing_state,
-             std::pair<bool, bool> state) {
-            std::move(on_tracing_state).Run(state.first, state.second);
-          },
-          std::move(on_tracing_state)));
-}
-
-void ChromeTracingDelegate::EnableSystemTracing(
-    base::OnceCallback<void(bool success)> on_complete) {
-  base::ThreadPool::PostTaskAndReplyWithResult(
-      FROM_HERE, {base::MayBlock{}}, base::BindOnce([]() {
-        return installer::ElevateAndRegisterSystemTracingService();
-      }),
-      std::move(on_complete));
-}
-
-void ChromeTracingDelegate::DisableSystemTracing(
-    base::OnceCallback<void(bool success)> on_complete) {
-  base::ThreadPool::PostTaskAndReplyWithResult(
-      FROM_HERE, {base::MayBlock{}}, base::BindOnce([]() {
-        return installer::ElevateAndDeregisterSystemTracingService();
-      }),
-      std::move(on_complete));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 bool ChromeTracingDelegate::IsSystemWideTracingEnabled() {
 #if BUILDFLAG(IS_CHROMEOS)

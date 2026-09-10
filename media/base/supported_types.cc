@@ -33,10 +33,6 @@
 #include "media/base/android/media_codec_util.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 namespace media {
 
 namespace {
@@ -298,7 +294,7 @@ bool IsDecoderAACSupported(const AudioType& type) {
     return true;
   }
 #if BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) && \
-    (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN))
+    (BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_MAC))
   return GetSupplementalDecoderAudioTypeCache()->IsProfileSupported(type);
 #else
   return false;
@@ -318,27 +314,19 @@ bool IsDecoderDolbyVisionProfileSupported(const VideoType& type) {
 
 bool IsDecoderDolbyAc3Eac3Supported(const AudioType& type) {
 #if BUILDFLAG(ENABLE_PLATFORM_AC3_EAC3_AUDIO)
-#if BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) && \
-    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC))
+#if BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) && BUILDFLAG(IS_MAC)
   return GetSupplementalDecoderAudioTypeCache()->IsProfileSupported(type);
 #else
   // Keep 'true' for other platforms as old code snippet.
   return true;
-#endif  // BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) && (BUILDFLAG(IS_WIN) ||
-        // BUILDFLAG(IS_MAC))
+#endif  // BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) && BUILDFLAG(IS_MAC)
 #else
   return false;
 #endif  // BUILDFLAG(ENABLE_PLATFORM_AC3_EAC3_AUDIO)
 }
 
 bool IsDecoderDolbyAc4Supported(const AudioType& type) {
-#if BUILDFLAG(ENABLE_PLATFORM_AC4_AUDIO) && \
-    BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) && BUILDFLAG(IS_WIN)
-  return GetSupplementalDecoderAudioTypeCache()->IsProfileSupported(type);
-#else
   return false;
-#endif  // BUILDFLAG(ENABLE_PLATFORM_AC4_AUDIO) &&
-        // BUILDFLAG(ENABLE_MOJO_AUDIO_DECODER) && BUILDFLAG(IS_WIN)
 }
 
 bool IsEncoderH264BuiltInVideoType(const VideoType& type) {

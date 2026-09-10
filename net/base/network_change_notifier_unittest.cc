@@ -106,13 +106,8 @@ TEST(NetworkChangeNotifierTest, IgnoreTeredoOnWindows) {
   interface_teredo.friendly_name = "Teredo Tunneling Pseudo-Interface";
   list.push_back(interface_teredo);
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(NetworkChangeNotifier::CONNECTION_NONE,
-            NetworkChangeNotifier::ConnectionTypeFromInterfaceList(list));
-#else
   EXPECT_EQ(NetworkChangeNotifier::CONNECTION_ETHERNET,
             NetworkChangeNotifier::ConnectionTypeFromInterfaceList(list));
-#endif
 }
 
 TEST(NetworkChangeNotifierTest, IgnoreAirdropOnMac) {

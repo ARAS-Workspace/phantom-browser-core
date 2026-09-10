@@ -193,10 +193,6 @@ class FakeSequencedTaskSource : public SequencedTaskSource {
         EnqueueOrder::FromIntForTesting(13), EnqueueOrder(), queue_time);
   }
 
-#if BUILDFLAG(IS_WIN)
-  bool NextWakeUpNeedsHighRes() override { return next_wakeup_needs_high_res; }
-#endif
-
   void OnBeginWork() override {}
 
   void SetNextWakeUpNeedsHighRes(bool state) {
@@ -763,82 +759,6 @@ TEST_F(ThreadControllerWithMessagePumpTest, RunWithTimeout) {
   thread_controller_.Run(true, Seconds(15));
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST_F(ThreadControllerWithMessagePumpTest, SetHighResolutionTimer) {
-  MockCallback<OnceClosure> task;
-  task_source_.AddTask(FROM_HERE, task.Get(), FromNow(Seconds(5)),
-                       clock_.NowTicks());
-
-  SingleThreadTaskRunner::CurrentDefaultHandle handle(
-      MakeRefCounted<FakeTaskRunner>());
-
-  EXPECT_CALL(*message_pump_, Run(_))
-      .WillOnce([&](MessagePump::Delegate* delegate) {
-        // Should initially not be in high resolution.
-        EXPECT_FALSE(
-            thread_controller_.MainThreadOnlyForTesting().in_high_res_mode);
-
-        // Ensures timer resolution is set to high resolution.
-        task_source_.SetNextWakeUpNeedsHighRes(true);
-        delegate->DoIdleWork();
-        EXPECT_TRUE(
-            thread_controller_.MainThreadOnlyForTesting().in_high_res_mode);
-
-        // Ensures time resolution is set back to low resolution.
-        task_source_.SetNextWakeUpNeedsHighRes(false);
-        delegate->DoIdleWork();
-        EXPECT_FALSE(
-            thread_controller_.MainThreadOnlyForTesting().in_high_res_mode);
-
-        EXPECT_CALL(*message_pump_, Quit());
-        thread_controller_.Quit();
-      });
-
-  RunLoop run_loop;
-  run_loop.Run();
-}
-TEST_F(ThreadControllerWithMessagePumpTest,
-       SetHighResolutionTimerWithPowerSuspend) {
-  MockCallback<OnceClosure> task;
-  task_source_.AddTask(FROM_HERE, task.Get(), FromNow(Seconds(5)),
-                       clock_.NowTicks());
-
-  SingleThreadTaskRunner::CurrentDefaultHandle handle(
-      MakeRefCounted<FakeTaskRunner>());
-
-  EXPECT_CALL(*message_pump_, Run(_))
-      .WillOnce([&](MessagePump::Delegate* delegate) {
-        // Should initially not be in high resolution.
-        EXPECT_FALSE(
-            thread_controller_.MainThreadOnlyForTesting().in_high_res_mode);
-
-        // The power suspend notification is sent.
-        thread_controller_.ThreadControllerPowerMonitorForTesting()
-            ->OnSuspend();
-
-        // The timer resolution should NOT be updated during power suspend.
-        task_source_.SetNextWakeUpNeedsHighRes(true);
-        delegate->DoIdleWork();
-        EXPECT_FALSE(
-            thread_controller_.MainThreadOnlyForTesting().in_high_res_mode);
-
-        // The power resume notification is sent.
-        thread_controller_.ThreadControllerPowerMonitorForTesting()->OnResume();
-
-        // Ensures timer resolution is set to high resolution.
-        delegate->DoIdleWork();
-        EXPECT_TRUE(
-            thread_controller_.MainThreadOnlyForTesting().in_high_res_mode);
-
-        EXPECT_CALL(*message_pump_, Quit());
-        thread_controller_.Quit();
-      });
-
-  RunLoop run_loop;
-  run_loop.Run();
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 TEST_F(ThreadControllerWithMessagePumpTest,
        ScheduleDelayedWorkWithPowerSuspend) {
   SingleThreadTaskRunner::CurrentDefaultHandle handle(
@@ -1118,7 +1038,7 @@ TEST_F(ThreadControllerWithMessagePumpTest, DoWorkBatchesForSetTime) {
 }
 
 // TODO(https://crbug.com/341965228): Deflake and re-enable.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_ThreadControllerActiveAdvancedNesting \
   DISABLED_ThreadControllerActiveAdvancedNesting
 #else
@@ -1267,7 +1187,7 @@ TEST_F(ThreadControllerWithMessagePumpTest,
 }
 
 // TODO(https://crbug.com/341965228): Deflake and re-enable.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_ThreadControllerActiveNestedNativeLoop \
   DISABLED_ThreadControllerActiveNestedNativeLoop
 #else
@@ -1385,7 +1305,7 @@ TEST_F(ThreadControllerWithMessagePumpTest,
 }
 
 // TODO(https://crbug.com/341965228): Deflake and re-enable.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_ThreadControllerActiveUnusedNativeLoop \
   DISABLED_ThreadControllerActiveUnusedNativeLoop
 #else
@@ -1469,7 +1389,7 @@ TEST_F(ThreadControllerWithMessagePumpTest,
 }
 
 // TODO(https://crbug.com/341965228): Deflake and re-enable.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_ThreadControllerActiveNestedNativeLoopWithoutAllowance \
   DISABLED_ThreadControllerActiveNestedNativeLoopWithoutAllowance
 #else
@@ -1562,7 +1482,7 @@ TEST_F(ThreadControllerWithMessagePumpTest,
 }
 
 // TODO(https://crbug.com/341965228): Deflake and re-enable.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_ThreadControllerActiveMultipleNativeLoopsUnderOneApplicationTask \
   DISABLED_ThreadControllerActiveMultipleNativeLoopsUnderOneApplicationTask
 #else
@@ -1658,7 +1578,7 @@ TEST_F(ThreadControllerWithMessagePumpTest,
 }
 
 // TODO(https://crbug.com/341965228): Deflake and re-enable.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_ThreadControllerActiveNativeLoopsReachingIdle \
   DISABLED_ThreadControllerActiveNativeLoopsReachingIdle
 #else
@@ -1771,7 +1691,7 @@ TEST_F(ThreadControllerWithMessagePumpTest,
 }
 
 // TODO(https://crbug.com/341965228): Deflake and re-enable.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_ThreadControllerActiveQuitNestedWhileApplicationIdle \
   DISABLED_ThreadControllerActiveQuitNestedWhileApplicationIdle
 #else

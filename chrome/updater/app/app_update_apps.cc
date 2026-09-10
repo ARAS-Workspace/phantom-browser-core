@@ -25,10 +25,6 @@
 #include "chrome/updater/service_proxy_factory.h"
 #include "chrome/updater/update_service.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace updater {
 
 namespace {
@@ -121,22 +117,6 @@ class AppUpdateApps : public App {
 };
 
 int AppUpdateApps::Initialize() {
-#if BUILDFLAG(IS_WIN)
-  if (!::AttachConsole(ATTACH_PARENT_PROCESS) && !::AllocConsole()) {
-    return ::GetLastError();
-  }
-  for (const auto [filename, mode, stream] :
-       std::vector<std::tuple<const char*, const char*, FILE*>>{
-           {"CONIN$", "r", stdin},
-           {"CONOUT$", "w", stdout},
-           {"CONOUT$", "w", stderr}}) {
-    FILE* file;
-    const errno_t err = freopen_s(&file, filename, mode, stream);
-    if (err) {
-      return err;
-    }
-  }
-#endif
 
   return kErrorOk;
 }

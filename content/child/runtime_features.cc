@@ -300,10 +300,6 @@ void SetRuntimeFeaturesFromChromiumFeatures() {
           {"FencedFramesLocalUnpartitionedDataAccess",
            raw_ref(blink::features::kFencedFramesLocalUnpartitionedDataAccess)},
 
-#if BUILDFLAG(IS_WIN)
-          {"FontDataServiceForCSSLocalFonts",
-           raw_ref(features::kFontDataServiceForCSSLocalFonts)},
-#endif
           {"HstsTopLevelNavigationsOnly",
            raw_ref(net::features::kHstsTopLevelNavigationsOnly)},
           {"KeyboardAccessibleTooltip",

@@ -33,7 +33,7 @@ constexpr char kGoogleHomeURL[] = "https://www.google.com";
 constexpr char kYoutubeDomain[] = "https://www.youtube.com";
 constexpr char kChildTestEmail[] = "child@example.com";
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 constexpr char kYoutubeAccountsDomain[] = "https://accounts.youtube.com";
 #endif
 
@@ -221,7 +221,7 @@ TEST_F(SupervisedUserGoogleAuthNavigationThrottleTest,
                 ->throttles()
                 .back()
                 ->WillStartRequest());
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // On desktop platforms, non-YouTube navigation are permitted.
   EXPECT_EQ(content::NavigationThrottle::PROCEED,
             CreateNavigationThrottle(GURL(kGoogleSearchURL))
@@ -300,7 +300,7 @@ TEST_F(SupervisedUserGoogleAuthNavigationThrottleTest,
 
 // In order to correctly perform authentication to youtube.com, its
 // infrastructure (accounts.youtube.com) must be allowed.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 TEST_F(
     SupervisedUserGoogleAuthNavigationThrottleTest,
     NavigationForPendingSignedInSupervisedUsersAllowsYouTubeInfrastructureInSubframes) {
@@ -354,7 +354,7 @@ TEST_F(
                 .back()
                 ->WillStartRequest());
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 TEST_F(SupervisedUserGoogleAuthNavigationThrottleTest,
        NavigationForNotFreshSupervisedUsers) {

@@ -206,9 +206,7 @@ std::ostream& operator<<(std::ostream& os, const ListIdentifier& id) {
 }
 
 PlatformType GetCurrentPlatformType() {
-#if BUILDFLAG(IS_WIN)
-  return WINDOWS_PLATFORM;
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   return LINUX_PLATFORM;
 #elif BUILDFLAG(IS_IOS)
   return IOS_PLATFORM;

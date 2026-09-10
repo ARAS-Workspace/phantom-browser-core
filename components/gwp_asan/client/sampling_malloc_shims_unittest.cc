@@ -30,12 +30,7 @@
 // These tests install global allocator shims so they are not safe to run in
 // multi-threaded contexts. Instead they're implemented as multi-process tests.
 
-#if BUILDFLAG(IS_WIN)
-#include <malloc.h>
-static size_t GetUsableSize(void* mem) {
-  return _msize(mem);
-}
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #include <malloc/malloc.h>
 static size_t GetUsableSize(void* mem) {
   return malloc_size(mem);
@@ -153,14 +148,6 @@ MULTIPROCESS_TEST_MAIN_WITH_SETUP(
       allocationCheck([&] { return calloc(1, page_size); }, &free, &failures));
   EXPECT_TRUE(allocationCheck([&] { return realloc(nullptr, page_size); },
                               &free, &failures));
-
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(allocationCheck([&] { return _aligned_malloc(123, 16); },
-                              &_aligned_free, &failures));
-  EXPECT_TRUE(
-      allocationCheck([&] { return _aligned_realloc(nullptr, 123, 16); },
-                      &_aligned_free, &failures));
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_POSIX)
   EXPECT_TRUE(allocationCheck(
@@ -303,29 +290,6 @@ TEST_F(SamplingMallocShimsTest, GetSizeEstimate) {
   runTest("GetSizeEstimate");
 }
 #endif
-
-#if BUILDFLAG(IS_WIN)
-MULTIPROCESS_TEST_MAIN_WITH_SETUP(
-    AlignedRealloc,
-    SamplingMallocShimsTest::multiprocessTestSetup) {
-  // Exercise the _aligned_* shims and ensure that we handle them stably.
-  constexpr size_t kAllocationSize = 123;
-  constexpr size_t kAllocationAlignment = 64;
-  for (size_t i = 0; i < kLoopIterations; i++) {
-    void* ptr = _aligned_malloc(kAllocationSize, kAllocationAlignment);
-    CHECK(ptr);
-    ptr = _aligned_realloc(ptr, kAllocationSize * 2, kAllocationAlignment);
-    CHECK(ptr);
-    _aligned_free(ptr);
-  }
-
-  return kSuccess;
-}
-
-TEST_F(SamplingMallocShimsTest, AlignedRealloc) {
-  runTest("AlignedRealloc");
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // PartitionAlloc-Everywhere does not support batch_malloc / batch_free.
 #if BUILDFLAG(IS_APPLE) && !PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)

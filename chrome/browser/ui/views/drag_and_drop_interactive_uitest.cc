@@ -78,11 +78,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/containers/span.h"
-#include "ui/base/dragdrop/os_exchange_data_provider_win.h"
-#endif
-
 namespace chrome {
 namespace {
 
@@ -745,17 +740,6 @@ class DragAndDropBrowserTest : public InProcessBrowserTest,
     return drag_simulator_->SimulateDragEnter(kMiddleOfRightFrame, file_infos);
   }
 
-#if BUILDFLAG(IS_WIN)
-  bool SimulateDragEnterToRightFrame(
-      const std::vector<std::pair<base::FilePath, base::span<const uint8_t>>>&
-          file_infos,
-      DWORD tymed) {
-    AssertTestPageIsLoaded();
-    return drag_simulator_->SimulateDragEnter(kMiddleOfRightFrame, file_infos,
-                                              tymed);
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   bool SimulateDropInRightFrame() {
     AssertTestPageIsLoaded();
     return drag_simulator_->SimulateDrop(kMiddleOfRightFrame);
@@ -950,83 +934,6 @@ IN_PROC_BROWSER_TEST_P(DragAndDropBrowserTest, DropValidUrlFromOutside) {
   EXPECT_FALSE(ui_test_utils::IsViewFocused(browser(), VIEW_ID_OMNIBOX));
   EXPECT_TRUE(ui_test_utils::IsViewFocused(browser(), VIEW_ID_TAB_CONTAINER));
 }
-
-#if BUILDFLAG(IS_WIN)
-// Scenario: Drag and drop a file from outside the browser and it should have
-// associated file type, fetched from it's diplay_name. Test coverage:
-// dragenter, dragover, drop DOM events. Note: this test uses a file with a
-// known extension and temporary path.
-IN_PROC_BROWSER_TEST_P(DragAndDropBrowserTest, DragAndDropVirtualFiles) {
-  ASSERT_TRUE(NavigateToTestPage("a.test"));
-  ASSERT_TRUE(NavigateRightFrame("a.test", "drop_target.html"));
-  // Prepare a test file with a known extension and temporary path.
-  std::vector<std::pair<base::FilePath, base::span<const uint8_t>>> file_infos;
-  base::FilePath test_file = chrome_test_utils::GetTestFilePath(
-      base::FilePath(), base::FilePath().AppendASCII("test_document.pdf"));
-  file_infos.emplace_back(test_file,
-                          base::byte_span_from_cstring("just some data"));
-
-  // Set up a script in the right frame to listen for dragenter, dragover, and
-  // drop, and record file type for each event.
-  ASSERT_TRUE(ExecJs(GetRightFrame(),
-                     R"(
-      window.eventFileTypes = {dragenter: '', dragover: '', drop: ''};
-      document.addEventListener('dragenter', function(e) {
-        if (e.dataTransfer && e.dataTransfer.items &&
-        e.dataTransfer.items.length > 0) {
-          window.eventFileTypes.dragenter = e.dataTransfer.items[0].type;
-        }
-      });
-      document.addEventListener('dragover', function(e) {
-        if (e.dataTransfer && e.dataTransfer.items &&
-        e.dataTransfer.items.length > 0) {
-          window.eventFileTypes.dragover = e.dataTransfer.items[0].type;
-        }
-      });
-      document.addEventListener('drop', function(e) {
-        if (e.dataTransfer && e.dataTransfer.items &&
-        e.dataTransfer.items.length > 0) {
-          window.eventFileTypes.drop = e.dataTransfer.items[0].type;
-        }
-      });
-    )"));
-
-  // Simulate dragging the file into the right frame.
-  DOMDragEventWaiter dragenter_waiter("dragenter", GetRightFrame());
-  ASSERT_TRUE(SimulateDragEnterToRightFrame(file_infos, TYMED_HGLOBAL));
-  std::string dragenter_event;
-  ASSERT_TRUE(dragenter_waiter.WaitForNextMatchingEvent(&dragenter_event));
-
-  // Simulate dragover event.
-  DOMDragEventWaiter dragover_waiter("dragover", GetRightFrame());
-  ASSERT_TRUE(SimulateMouseMoveToRightFrame());
-  std::string dragover_event;
-  ASSERT_TRUE(dragover_waiter.WaitForNextMatchingEvent(&dragover_event));
-
-  // Simulate drop event.
-  DOMDragEventWaiter drop_waiter("drop", GetRightFrame());
-  ASSERT_TRUE(SimulateDropInRightFrame());
-  std::string drop_event;
-  ASSERT_TRUE(drop_waiter.WaitForNextMatchingEvent(&drop_event));
-
-  // Query the file types received by the renderer for each event.
-  std::string dragenter_type =
-      EvalJs(GetRightFrame(), "window.eventFileTypes.dragenter")
-          .ExtractString();
-  std::string dragover_type =
-      EvalJs(GetRightFrame(), "window.eventFileTypes.dragover").ExtractString();
-  std::string drop_type =
-      EvalJs(GetRightFrame(), "window.eventFileTypes.drop").ExtractString();
-
-  // For a pdf file, the type should be "application/pdf".
-  EXPECT_TRUE(dragenter_type == "application/pdf")
-      << "Renderer received dragenter file type: " << dragenter_type;
-  EXPECT_TRUE(dragover_type == "application/pdf")
-      << "Renderer received dragover file type: " << dragover_type;
-  EXPECT_TRUE(drop_type == "application/pdf")
-      << "Renderer received drop file type: " << drop_type;
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // Scenario: drag a URL into the Omnibox.  This is a regression test for
 // https://crbug.com/40496018.
@@ -1288,12 +1195,7 @@ IN_PROC_BROWSER_TEST_P(DragAndDropBrowserTest, DragStartInFrame) {
   SimulateMouseUp();
 }
 
-#if BUILDFLAG(IS_WIN)
-// There is no known way to execute test-controlled tasks during
-// a drag-and-drop loop run by Windows OS.
-#define MAYBE_DragSameOriginImageBetweenFrames \
-  DISABLED_DragSameOriginImageBetweenFrames
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Failing to receive final drop event on linux crbug.com/40803504.
 // TODO(crbug.com/442927728): Fix failing test on ChromeOS
 #define MAYBE_DragSameOriginImageBetweenFrames \
@@ -1326,7 +1228,7 @@ IN_PROC_BROWSER_TEST_P(DragAndDropBrowserTest,
                                /*image_crossorigin_attr=*/false);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_DragCorsSameOriginImageBetweenFrames \
   DISABLED_DragCorsSameOriginImageBetweenFrames
 #else
@@ -1348,7 +1250,7 @@ IN_PROC_BROWSER_TEST_P(DragAndDropBrowserTest,
                                /*image_crossorigin_attr=*/true);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_DragCrossOriginImageBetweenFrames \
   DISABLED_DragCrossOriginImageBetweenFrames
 #else
@@ -1610,7 +1512,7 @@ void DragAndDropBrowserTest::DragImageBetweenFrames_Step3(
 // a drag-and-drop loop run by Windows OS.
 // Also disable the test on Linux due to flaky: crbug.com/40163536
 // TODO(crbug.com/40876472): Enable on ChromeOS once flakiness is fixed.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_DragImageFromDisappearingFrame \
   DISABLED_DragImageFromDisappearingFrame
 #else
@@ -1742,9 +1644,7 @@ void DragAndDropBrowserTest::DragImageFromDisappearingFrame_Step3(
 // There is no known way to execute test-controlled tasks during
 // a drag-and-drop loop run by Windows OS.
 // TODO(b:361552512): Flaky on Chrome OS
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CrossSiteDrag DISABLED_CrossSiteDrag
-#elif BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_CrossSiteDrag DISABLED_CrossSiteDrag
 #else
 #define MAYBE_CrossSiteDrag CrossSiteDrag
@@ -1854,11 +1754,7 @@ void DragAndDropBrowserTest::CrossSiteDrag_Step3(
 
 // There is no known way to execute test-controlled tasks during
 // a drag-and-drop loop run by Windows OS.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CrossNavCrossSiteDrag DISABLED_CrossNavCrossSiteDrag
-#else
 #define MAYBE_CrossNavCrossSiteDrag CrossNavCrossSiteDrag
-#endif
 
 struct DragAndDropBrowserTest::CrossNavCrossSiteDrag_TestState {
   // Tracks events in the left frame of the initial site.
@@ -1962,7 +1858,7 @@ void DragAndDropBrowserTest::CrossNavCrossSiteDrag_Step3(
 
 // There is no known way to execute test-controlled tasks during
 // a drag-and-drop loop run by Windows OS.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 // TODO(crbug.com/442927728): Fix failing test on Linux and ChromeOS
 // https://crbug.com/40248270: Flaky at ChromeOS ASAN and Debug builds
 #define MAYBE_CrossTabDrag DISABLED_CrossTabDrag

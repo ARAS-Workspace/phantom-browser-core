@@ -160,7 +160,7 @@
 #include "extensions/browser/updater/null_extension_cache.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/common/extensions/manifest_handlers/settings_overrides_handler.h"
 #endif
 
@@ -1186,7 +1186,7 @@ void ChromeExtensionsBrowserClient::
       URLOverrides::GetChromeURLOverrides(extension).count("newtab");
   bool default_search_engine_set = false;
   // SettingsOverrides are only available on Windows and macOS.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   const SettingsOverrides* settings = SettingsOverrides::Get(extension);
   default_search_engine_set = settings && settings->search_engine &&
                               settings->search_engine->is_default;

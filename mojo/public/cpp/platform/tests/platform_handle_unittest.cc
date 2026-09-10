@@ -26,13 +26,7 @@
 #include <mach/mach_vm.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/scoped_handle.h"
-#else
 #include "base/files/scoped_file.h"
-#endif
 
 namespace mojo {
 namespace {
@@ -41,9 +35,6 @@ namespace {
 // We run all PlatformHandle once for each type of handle available on the
 // target platform.
 enum class HandleType {
-#if BUILDFLAG(IS_WIN)
-  kHandle,
-#endif
 #if BUILDFLAG(IS_POSIX)
   kFileDescriptor,
 #endif
@@ -117,36 +108,21 @@ class PlatformHandleTest : public testing::Test,
                              base::File::FLAG_READ);
     test_file.WriteAtCurrentPos(base::as_byte_span(kTestData));
 
-#if BUILDFLAG(IS_WIN)
-    return PlatformHandle(
-        base::win::ScopedHandle(test_file.TakePlatformFile()));
-#else
     return PlatformHandle(base::ScopedFD(test_file.TakePlatformFile()));
-#endif
   }
 
   // Returns the contents of a platform file referenced by |handle|. Used to
   // verify that |handle| is in fact the platform file handle it's expected to
   // be. See |GetObjectContents()|.
   std::string GetFileContents(PlatformHandle& handle) {
-#if BUILDFLAG(IS_WIN)
-    // We must temporarily release ownership of the handle due to how File
-    // interacts with ScopedHandle.
-    base::File file(handle.TakeHandle());
-#else
     // Do the same as Windows for consistency, even though it is not necessary.
     base::File file(handle.TakeFD());
-#endif
     std::vector<char> buffer(kTestData.size());
     file.Read(0, base::as_writable_byte_span(buffer));
     std::string contents(buffer.begin(), buffer.end());
 
 // Let |handle| retain ownership.
-#if BUILDFLAG(IS_WIN)
-    handle = PlatformHandle(base::win::ScopedHandle(file.TakePlatformFile()));
-#else
     handle = PlatformHandle(base::ScopedFD(file.TakePlatformFile()));
-#endif
 
     return contents;
   }
@@ -248,26 +224,9 @@ TEST_P(PlatformHandleTest, CStructConversion) {
   EXPECT_EQ(kTestData, GetObjectContents(handle));
 }
 
-#if BUILDFLAG(IS_WIN) && !DCHECK_IS_ON()
-// In DCHECK builds these explode but we include defense-in-depth measures as
-// third party code can cause unexpected values to manifest in handles.
-TEST_P(PlatformHandleTest, InvalidHandles) {
-  // Validate the security assumption that a pseudo handle cannot be adopted as
-  // a PlatformHandle and that it cannot be cloned to a valid handle.
-  PlatformHandle invalid((base::win::ScopedHandle(::GetCurrentThread())));
-  EXPECT_FALSE(invalid.is_valid());
-  PlatformHandle cloned = invalid.Clone();
-  EXPECT_FALSE(cloned.is_valid());
-  EXPECT_EQ(invalid.ReleaseHandle(), nullptr);
-  EXPECT_EQ(cloned.ReleaseHandle(), nullptr);
-}
-#endif  // BUILDFLAG(IS_WIN) && !DCHECK_IS_ON()
-
 INSTANTIATE_TEST_SUITE_P(All,
                          PlatformHandleTest,
-#if BUILDFLAG(IS_WIN)
-                         testing::Values(HandleType::kHandle)
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
                          testing::Values(HandleType::kFileDescriptor,
                                          HandleType::kMachPort)
 #elif BUILDFLAG(IS_POSIX)

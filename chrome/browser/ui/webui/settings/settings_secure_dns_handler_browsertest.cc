@@ -27,10 +27,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ash/login/session/user_session_manager.h"
 #include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
@@ -131,14 +127,7 @@ class SecureDnsHandlerTest : public InProcessBrowserTest {
   SecureDnsHandlerTest& operator=(const SecureDnsHandlerTest&) = delete;
 
  protected:
-#if BUILDFLAG(IS_WIN)
-  SecureDnsHandlerTest()
-      // Mark as not enterprise managed to prevent the secure DNS mode from
-      // being downgraded to off.
-      : scoped_domain_(false) {}
-#else
   SecureDnsHandlerTest() = default;
-#endif
   ~SecureDnsHandlerTest() override = default;
 
   // InProcessBrowserTest:
@@ -259,9 +248,6 @@ class SecureDnsHandlerTest : public InProcessBrowserTest {
   testing::NiceMock<policy::MockConfigurationPolicyProvider> provider_;
 
  private:
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedDomainStateForTesting scoped_domain_;
-#endif
 };
 
 IN_PROC_BROWSER_TEST_F(SecureDnsHandlerTest, SecureDnsModes) {

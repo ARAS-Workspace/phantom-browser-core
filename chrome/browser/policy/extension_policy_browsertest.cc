@@ -110,10 +110,6 @@
 #include "components/webapps/browser/installable/installable_metrics.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ash/constants/ash_features.h"
 #include "ash/constants/ash_switches.h"
@@ -1204,12 +1200,6 @@ class ExtensionPinningTest : public extensions::ExtensionBrowserTest {
   // the |id|.
   void SetExtensionSettingsPolicy(const std::string& update_url_suffix,
                                   const std::string& id) {
-#if BUILDFLAG(IS_WIN)
-    // Unless enterprise managed, policy handler only allows extensions from the
-    // Chrome Webstore to be force installed. Mark enterprise managed for
-    // windows.
-    base::win::ScopedDomainStateForTesting scoped_domain(true);
-#endif
 
     ASSERT_TRUE(embedded_test_server()->Started());
     GURL update_url = embedded_test_server()->GetURL(update_url_suffix);
@@ -1611,7 +1601,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest,
 // repaired (reinstalled) even if hashes file is damaged too.
 // crbug.com/40150293: flaky on win
 // crbug.com/512086953: flaky on android
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_CorruptedNonWebstoreExtensionWithDamagedHashesRepaired \
   DISABLED_CorruptedNonWebstoreExtensionWithDamagedHashesRepaired
 #else
@@ -1926,9 +1916,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest,
       embedded_test_server()->GetURL("/extensions/good_v1_update_manifest.xml");
 
 // Mark as enterprise managed.
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedDomainStateForTesting scoped_domain(true);
-#endif
 
   extensions::ExtensionRegistrar* registrar = extension_registrar();
   extensions::ExtensionRegistry* registry = extension_registry();
@@ -2219,9 +2206,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionPolicyTest,
   ExtensionRequestInterceptor interceptor;
 
 // Mark as enterprise managed.
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedDomainStateForTesting scoped_domain(true);
-#endif
   extensions::ExtensionRegistry* registry = extension_registry();
   extensions::ExtensionPrefs* extension_prefs =
       extensions::ExtensionPrefs::Get(profile());

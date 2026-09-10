@@ -3239,7 +3239,7 @@ class FencedFrameNavigationBrowserTest : public ChromeNavigationBrowserTest {
 // link in a new tab". Otherwise, the top-level navigation would be blocked.
 // This is why this test is located in the Chrome layer and not in the
 // DocumentIsolationPolicy browsertests in content/.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_TopLevelDataURLNavigationWithDocumentIsolationPolicy \
   DISABLED_TopLevelDataURLNavigationWithDocumentIsolationPolicy
 #else

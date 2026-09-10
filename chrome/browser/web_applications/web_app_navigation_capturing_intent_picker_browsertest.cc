@@ -158,13 +158,8 @@ IN_PROC_BROWSER_TEST_F(WebAppNavigationCapturingIntentPickerBrowserTest,
 // Test that the intent picker shows up for chrome://password-manager, since it
 // is installable.
 // TODO(crbug.com/545478765): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DoShowIconAndBubbleOnChromePasswordManagerPage \
-  DISABLED_DoShowIconAndBubbleOnChromePasswordManagerPage
-#else
 #define MAYBE_DoShowIconAndBubbleOnChromePasswordManagerPage \
   DoShowIconAndBubbleOnChromePasswordManagerPage
-#endif
 IN_PROC_BROWSER_TEST_F(WebAppNavigationCapturingIntentPickerBrowserTest,
                        MAYBE_DoShowIconAndBubbleOnChromePasswordManagerPage) {
   GURL password_manager_url("chrome://password-manager");

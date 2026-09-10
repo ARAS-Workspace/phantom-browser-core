@@ -43,13 +43,8 @@
 #include "remoting/host/linux/systemd_user_env_setter.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/functional/bind.h"
-#include "remoting/host/win/session_interaction_strategy.h"
-#else
 #include "remoting/host/create_desktop_interaction_strategy_factory.h"
 #include "remoting/host/host_main.h"
-#endif
 
 namespace remoting {
 
@@ -130,22 +125,9 @@ int DesktopProcessMain() {
                                  io_task_runner, std::move(message_pipe));
 
   // Create a platform-dependent environment factory.
-#if BUILDFLAG(IS_WIN)
-  // base::Unretained() is safe here: |desktop_process| outlives run_loop.Run().
-  auto inject_sas_closure = base::BindRepeating(
-      &DesktopProcess::InjectSas, base::Unretained(&desktop_process));
-  auto lock_workstation_closure = base::BindRepeating(
-      &DesktopProcess::LockWorkstation, base::Unretained(&desktop_process));
-  auto interaction_strategy_factory =
-      std::make_unique<SessionInteractionStrategyFactory>(
-          ui_task_runner, ui_task_runner, video_capture_task_runner,
-          input_task_runner, std::move(inject_sas_closure),
-          std::move(lock_workstation_closure));
-#else   // !BUILDFLAG(IS_WIN)
   auto interaction_strategy_factory = CreateDesktopInteractionStrategyFactory(
       ui_task_runner, ui_task_runner, video_capture_task_runner,
       input_task_runner);
-#endif  // !BUILDFLAG(IS_WIN)
   auto desktop_environment_factory =
       std::make_unique<Me2MeDesktopEnvironmentFactory>(
           ui_task_runner, ui_task_runner,

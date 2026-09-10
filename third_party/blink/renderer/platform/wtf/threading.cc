@@ -11,12 +11,12 @@
 
 namespace blink {
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_ANDROID)
 base::PlatformThreadId CurrentThread() {
   thread_local base::PlatformThreadId g_id = base::PlatformThread::CurrentId();
   return g_id;
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_WIN)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 // For debugging only -- whether a non-main thread has been created.
 
@@ -49,19 +49,5 @@ void Threading::Initialize() {
   Threading::static_data_ = new ThreadSpecific<Threading>;
   WtfThreading();
 }
-
-#if BUILDFLAG(IS_WIN) && defined(COMPILER_MSVC)
-size_t Threading::ThreadStackSize() {
-  // Needed to bootstrap Threading on Windows, because this value is needed
-  // before the main thread data is fully initialized.
-  if (!Threading::static_data_->IsSet())
-    return internal::ThreadStackSize();
-
-  Threading& data = WtfThreading();
-  if (!data.thread_stack_size_)
-    data.thread_stack_size_ = internal::ThreadStackSize();
-  return data.thread_stack_size_;
-}
-#endif
 
 }  // namespace blink

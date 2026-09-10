@@ -59,14 +59,7 @@ class MediaItemUIDeviceSelectorViewDumpAccessibilityEventsTest
   std::vector<ui::AXPropertyFilter> DefaultFilters() const override {
     std::vector<ui::AXPropertyFilter> filters;
 
-#if BUILDFLAG(IS_WIN)
-    filters.emplace_back("EVENT_OBJECT_STATECHANGE*",
-                         ui::AXPropertyFilter::ALLOW);
-    filters.emplace_back("ExpandCollapseExpandCollapseState*",
-                         ui::AXPropertyFilter::ALLOW);
-    filters.emplace_back("StructureChanged*", ui::AXPropertyFilter::DENY);
-    filters.emplace_back("AriaProperties*", ui::AXPropertyFilter::DENY);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     filters.emplace_back("AXExpandedChanged*", ui::AXPropertyFilter::ALLOW);
 #endif
 

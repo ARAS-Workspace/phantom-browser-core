@@ -38,11 +38,6 @@
 #include "ui/aura/window.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/base/win/message_box_win.h"
-#include "ui/views/win/hwnd_util.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/cocoa/simple_message_box_cocoa.h"
 #endif
@@ -50,19 +45,6 @@
 namespace {
 
 static bool g_message_box_is_showing_sync = false;
-
-#if BUILDFLAG(IS_WIN)
-UINT GetMessageBoxFlagsFromType(chrome::MessageBoxType type) {
-  UINT flags = MB_SETFOREGROUND;
-  switch (type) {
-    case chrome::MESSAGE_BOX_TYPE_WARNING:
-      return flags | MB_OK | MB_ICONWARNING;
-    case chrome::MESSAGE_BOX_TYPE_QUESTION:
-      return flags | MB_YESNO | MB_ICONQUESTION;
-  }
-  NOTREACHED();
-}
-#endif
 
 chrome::MessageBoxResult ShowSync(gfx::NativeWindow parent,
                                   std::u16string_view title,
@@ -97,9 +79,6 @@ bool CanUseNativeMessageBox(bool has_checkbox) {
   // Only Windows and macOS have native message box.
 #if BUILDFLAG(IS_MAC)
   return true;
-#elif BUILDFLAG(IS_WIN)
-  // Windows message box cannot display checkbox.
-  return !has_checkbox;
 #else
   return false;
 #endif
@@ -140,14 +119,7 @@ void ShowNativeMessageBox(gfx::NativeWindow parent,
                           MessageBoxDialog::MessageBoxResultCallback callback) {
   const bool has_checkbox = !checkbox_text.empty();
   CHECK(CanUseNativeMessageBox(has_checkbox));
-#if BUILDFLAG(IS_WIN)
-  int result = ui::MessageBox(views::HWNDForNativeWindow(parent),
-                              base::AsWString(message), base::AsWString(title),
-                              GetMessageBoxFlagsFromType(type));
-  std::move(callback).Run((result == IDYES || result == IDOK)
-                              ? chrome::MESSAGE_BOX_RESULT_YES
-                              : chrome::MESSAGE_BOX_RESULT_NO);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // Even though this function could return a value synchronously here in
   // principle, in practice call sites do not expect any behavior other than a
   // return of DEFERRED and an invocation of the callback.

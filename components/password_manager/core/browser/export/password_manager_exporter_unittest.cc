@@ -48,11 +48,7 @@ using DeleteCallback = PasswordManagerExporter::DeleteCallback;
 using SetPosixFilePermissionsCallback =
     PasswordManagerExporter::SetPosixFilePermissionsCallback;
 
-#if BUILDFLAG(IS_WIN)
-const base::FilePath::CharType kNullFileName[] = FILE_PATH_LITERAL("/nul");
-#else
 const base::FilePath::CharType kNullFileName[] = FILE_PATH_LITERAL("/dev/null");
-#endif
 
 // Creates a hardcoded set of credentials for tests.
 PasswordForm CreateTestPassword() {
@@ -71,11 +67,7 @@ PasswordExportInfo CreateExportInProgressInfo() {
 PasswordExportInfo CreateSuccessfulExportInfo(const base::FilePath& path) {
   return {
       .status = ExportProgressStatus::kSucceeded,
-#if !BUILDFLAG(IS_WIN)
       .file_path = path.value(),
-#else
-      .file_path = base::WideToUTF8(path.value()),
-#endif
   };
 }
 

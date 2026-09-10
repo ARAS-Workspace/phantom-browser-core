@@ -8,7 +8,7 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #include <memory>
 #include <utility>
@@ -18,11 +18,6 @@
 #include "components/device_signals/core/browser/signals_types.h"
 #include "components/device_signals/core/common/common_types.h"
 #include "extensions/browser/extension_function.h"
-
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/sys_string_conversions.h"
-#include "components/device_signals/core/common/win/win_types.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 using SignalCollectionError = device_signals::SignalCollectionError;
 using PresenceValue = device_signals::PresenceValue;
@@ -87,7 +82,7 @@ std::vector<std::string> EncodeHashes(
   return encoded_strings;
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
 std::optional<device_signals::RegistryHive> ConvertHiveFromApi(
     api::enterprise_reporting_private::RegistryHive api_hive) {
@@ -119,7 +114,7 @@ api::enterprise_reporting_private::RegistryHive ConvertHiveToApi(
   }
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace
 
@@ -188,7 +183,7 @@ std::optional<ParsedSignalsError> ConvertFileSystemInfoResponse(
   return std::nullopt;
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
 std::vector<device_signals::GetSettingsOptions> ConvertSettingsOptions(
     const std::vector<api::enterprise_reporting_private::GetSettingsOptions>&
@@ -238,83 +233,8 @@ std::optional<ParsedSignalsError> ConvertSettingsResponse(
   return std::nullopt;
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_WIN)
-
-std::optional<ParsedSignalsError> ConvertAvProductsResponse(
-    const device_signals::SignalsAggregationResponse& aggregation_response,
-    std::vector<api::enterprise_reporting_private::AntiVirusSignal>* arg_list) {
-  auto error = TryParseError(aggregation_response,
-                             aggregation_response.av_signal_response);
-  if (error) {
-    return error.value();
-  }
-
-  std::vector<api::enterprise_reporting_private::AntiVirusSignal>
-      api_av_signals;
-  const auto& av_response = aggregation_response.av_signal_response.value();
-  const size_t upper_bound =
-      std::min(kGeneralSignalUpperLimit, av_response.av_products.size());
-  for (size_t i = 0U; i < upper_bound; ++i) {
-    const auto& av_product = av_response.av_products[i];
-    api::enterprise_reporting_private::AntiVirusSignal api_av_signal;
-    api_av_signal.display_name = av_product.display_name;
-
-    switch (av_product.state) {
-      case device_signals::AvProductState::kOn:
-        api_av_signal.state =
-            api::enterprise_reporting_private::AntiVirusProductState::kOn;
-        break;
-      case device_signals::AvProductState::kOff:
-        api_av_signal.state =
-            api::enterprise_reporting_private::AntiVirusProductState::kOff;
-        break;
-      case device_signals::AvProductState::kSnoozed:
-        api_av_signal.state =
-            api::enterprise_reporting_private::AntiVirusProductState::kSnoozed;
-        break;
-      case device_signals::AvProductState::kExpired:
-        api_av_signal.state =
-            api::enterprise_reporting_private::AntiVirusProductState::kExpired;
-        break;
-    }
-
-    api_av_signals.push_back(std::move(api_av_signal));
-  }
-
-  *arg_list = std::move(api_av_signals);
-  return std::nullopt;
-}
-
-std::optional<ParsedSignalsError> ConvertHotfixesResponse(
-    const device_signals::SignalsAggregationResponse& aggregation_response,
-    std::vector<api::enterprise_reporting_private::HotfixSignal>* arg_list) {
-  auto error = TryParseError(aggregation_response,
-                             aggregation_response.hotfix_signal_response);
-  if (error) {
-    return error.value();
-  }
-
-  std::vector<api::enterprise_reporting_private::HotfixSignal>
-      api_hotfix_signals;
-  const auto& hotfix_response =
-      aggregation_response.hotfix_signal_response.value();
-  const size_t upper_bound =
-      std::min(kGeneralSignalUpperLimit, hotfix_response.hotfixes.size());
-  for (size_t i = 0U; i < upper_bound; ++i) {
-    const auto& hotfix = hotfix_response.hotfixes[i];
-    api::enterprise_reporting_private::HotfixSignal api_hotfix;
-    api_hotfix.hotfix_id = hotfix.hotfix_id;
-    api_hotfix_signals.push_back(std::move(api_hotfix));
-  }
-
-  *arg_list = std::move(api_hotfix_signals);
-  return std::nullopt;
-}
-
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 }  // namespace extensions
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

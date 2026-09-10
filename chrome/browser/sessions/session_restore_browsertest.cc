@@ -2420,7 +2420,7 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreTest, RecordNormalTabWindowDiff) {
 }
 
 // Test is flaky on Linux and Windows: https://crbug.com/40170555
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_LINUX)
 namespace {
 
 class MultiBrowserObserver : public BrowserCollectionObserver {

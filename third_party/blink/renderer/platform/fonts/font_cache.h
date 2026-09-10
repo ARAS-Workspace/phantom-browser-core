@@ -136,7 +136,7 @@ class PLATFORM_EXPORT FontCache final {
 
   void Invalidate();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   static WebFontPrewarmer* GetFontPrewarmer() { return prewarmer_; }
   static void SetFontPrewarmer(WebFontPrewarmer* prewarmer) {
     prewarmer_ = prewarmer;
@@ -169,46 +169,6 @@ class PLATFORM_EXPORT FontCache final {
 #if !BUILDFLAG(IS_MAC)
   static void SetSystemFontFamily(const AtomicString&);
 #endif
-
-#if BUILDFLAG(IS_WIN)
-  // TODO(https://crbug.com/808221) System font style configuration is not
-  // related to FontCache. Move it somewhere else, e.g. to WebThemeEngine.
-  static bool AntialiasedTextEnabled() { return antialiased_text_enabled_; }
-  static bool LcdTextEnabled() { return lcd_text_enabled_; }
-  static void SetAntialiasedTextEnabled(bool enabled) {
-    antialiased_text_enabled_ = enabled;
-  }
-  static void SetLCDTextEnabled(bool enabled) { lcd_text_enabled_ = enabled; }
-  // Functions to cache and retrieve the system font metrics.
-  static void SetMenuFontMetrics(const AtomicString& family_name,
-                                 int32_t font_height);
-  static void SetSmallCaptionFontMetrics(const AtomicString& family_name,
-                                         int32_t font_height);
-  static void SetStatusFontMetrics(const AtomicString& family_name,
-                                   int32_t font_height);
-  static int32_t MenuFontHeight() { return menu_font_height_; }
-  static const AtomicString& MenuFontFamily() {
-    return *menu_font_family_name_;
-  }
-  static int32_t SmallCaptionFontHeight() { return small_caption_font_height_; }
-  static const AtomicString& SmallCaptionFontFamily() {
-    return *small_caption_font_family_name_;
-  }
-  static int32_t StatusFontHeight() { return status_font_height_; }
-  static const AtomicString& StatusFontFamily() {
-    return *status_font_family_name_;
-  }
-
-  const SimpleFontData* GetFallbackFamilyNameFromHardcodedChoices(
-      const FontDescription&,
-      UChar32 codepoint,
-      FontFallbackPriority fallback_priority);
-
-  const SimpleFontData* GetDWriteFallbackFamily(
-      const FontDescription&,
-      UChar32 codepoint,
-      FontFallbackPriority fallback_priority);
-#endif  // BUILDFLAG(IS_WIN)
 
   static void AcceptLanguagesChanged(const String&);
 
@@ -285,7 +245,7 @@ class PLATFORM_EXPORT FontCache final {
                                    const FontFaceCreationParams&,
                                    std::string& name);
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
   // SkFontMgr_FCI::onMatchFamilyStyleCharacter always crashes.
   static const FontPlatformData* CreateFontPlatformDataForCharacter(
       SkFontMgr*,
@@ -307,21 +267,9 @@ class PLATFORM_EXPORT FontCache final {
   const SimpleFontData* FallbackOnStandardFontStyle(const FontDescription&,
                                                     UChar32);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   static WebFontPrewarmer* prewarmer_;
 #endif
-
-#if BUILDFLAG(IS_WIN)
-  static bool antialiased_text_enabled_;
-  static bool lcd_text_enabled_;
-  // The system font metrics cache.
-  static AtomicString* menu_font_family_name_;
-  static int32_t menu_font_height_;
-  static AtomicString* small_caption_font_family_name_;
-  static int32_t small_caption_font_height_;
-  static AtomicString* status_font_family_name_;
-  static int32_t status_font_height_;
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   static float device_scale_factor_;

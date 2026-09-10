@@ -62,7 +62,7 @@
 // in the factory's GetWebUIFactoryFunction, so these don't work there yet.
 // Also avoid burdening test bots on mobile platforms where webui omnibox
 // isn't ready and the platform-specific views implementation is in scope.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 // Base class for omnibox browser and ui tests.
 class OmniboxPopupViewWebUITest : public InProcessBrowserTest {
@@ -420,11 +420,7 @@ IN_PROC_BROWSER_TEST_P(OmniboxPopupDimensionsTest, DimensionsAndAnchoring) {
   popup_view->presenter()->Hide();
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PopupResizeWindow DISABLED_PopupResizeWindow
-#else
 #define MAYBE_PopupResizeWindow PopupResizeWindow
-#endif
 IN_PROC_BROWSER_TEST_F(OmniboxPopupViewWebUITest, MAYBE_PopupResizeWindow) {
   CreatePopupForTestQuery();
 
@@ -637,4 +633,4 @@ IN_PROC_BROWSER_TEST_P(OmniboxPopupViewWebUIFrameCacheTest, FrameCacheUsage) {
 }
 #endif
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

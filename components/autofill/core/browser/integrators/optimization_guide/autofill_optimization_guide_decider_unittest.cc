@@ -823,8 +823,8 @@ TEST_F(AutofillOptimizationGuideDeciderTest,
   guide().OnDidParseForm(form_structure, payments_data_manager());
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
+    BUILDFLAG(IS_ANDROID)
 class BuyNowPayLaterAutofillOptimizationGuideDeciderTest
     : public AutofillOptimizationGuideDeciderTest,
       public testing::WithParamInterface<bool> {
@@ -1265,8 +1265,8 @@ TEST_P(
   EXPECT_TRUE(guide().IsUrlEligibleForBnplIssuer(
       BnplIssuer::IssuerId::kBnplKlarna, GURL("https://www.testurl.test")));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
+        // BUILDFLAG(IS_ANDROID)
 
 // Test that the ablation site lists are registered in case the ablation
 // experiment is enabled.

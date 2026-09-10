@@ -20,10 +20,6 @@
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/shortcut.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(ENABLE_PROCESS_SINGLETON)
 namespace web_app {
 
@@ -90,78 +86,6 @@ IN_PROC_BROWSER_TEST_F(WebAppAutomationBrowserTest,
   EXPECT_TRUE(AppBrowserController::IsForWebApp(browser_created_observer.Wait(),
                                                 app_id));
 }
-
-#if BUILDFLAG(IS_WIN)
-class WebAppAutomationShortcutBrowserTest
-    : public WebAppAutomationBrowserTest,
-      public testing::WithParamInterface<bool> {
- public:
-  WebAppAutomationShortcutBrowserTest() = default;
-  ~WebAppAutomationShortcutBrowserTest() override = default;
-
-  bool enable_automation() const { return GetParam(); }
-
-  void ValidateShortcut(const base::FilePath& shortcut_path,
-                        webapps::AppId app_id,
-                        bool has_automation_switch) {
-    EXPECT_TRUE(base::PathExists(shortcut_path))
-        << "Shortcut path does not exist: " << shortcut_path.value();
-    std::wstring cmd_line_string;
-    EXPECT_TRUE(
-        base::win::ResolveShortcut(shortcut_path, nullptr, &cmd_line_string));
-    cmd_line_string = L"program " + cmd_line_string;
-    base::CommandLine shortcut_cmd_line =
-        base::CommandLine::FromString(cmd_line_string);
-    EXPECT_TRUE(
-        shortcut_cmd_line.HasSwitch(switches::kProfileDirectory) &&
-        shortcut_cmd_line.GetSwitchValuePath(switches::kProfileDirectory) ==
-            profile()->GetPath().BaseName());
-    EXPECT_TRUE(shortcut_cmd_line.HasSwitch(switches::kAppId) &&
-                shortcut_cmd_line.GetSwitchValueASCII(switches::kAppId) ==
-                    app_id);
-    EXPECT_EQ(shortcut_cmd_line.HasSwitch(switches::kEnableAutomation),
-              has_automation_switch);
-  }
-};
-
-IN_PROC_BROWSER_TEST_P(WebAppAutomationShortcutBrowserTest, ShortcutCreation) {
-  base::ScopedAllowBlockingForTesting allow_blocking;
-
-  if (enable_automation()) {
-    base::CommandLine::ForCurrentProcess()->AppendSwitch(
-        switches::kEnableAutomation);
-  }
-  webapps::AppId app_id = InstallWebAppFromPage(browser(), test_url());
-
-  EXPECT_EQ(proto::InstallState::INSTALLED_WITH_OS_INTEGRATION,
-            provider()->registrar_unsafe().GetInstallState(app_id));
-  EXPECT_TRUE(os_integration_override().IsShortcutCreated(
-      profile(), app_id,
-      provider()->registrar_unsafe().GetAppShortName(app_id)));
-
-  base::FilePath desktop_shortcut_path =
-      os_integration_override().GetShortcutPath(
-          profile(), os_integration_override().desktop(), app_id,
-          provider()->registrar_unsafe().GetAppShortName(app_id));
-  base::FilePath app_menu_shortcut_path =
-      os_integration_override().GetShortcutPath(
-          profile(), os_integration_override().application_menu(), app_id,
-          provider()->registrar_unsafe().GetAppShortName(app_id));
-  ValidateShortcut(desktop_shortcut_path, app_id,
-                   /*has_automation_switch=*/enable_automation());
-  ValidateShortcut(app_menu_shortcut_path, app_id,
-                   /*has_automation_switch=*/enable_automation());
-}
-
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    WebAppAutomationShortcutBrowserTest,
-    testing::Bool(),
-    [](const testing::TestParamInfo<
-        WebAppAutomationShortcutBrowserTest::ParamType>& info) {
-      return info.param ? "WithAutomation" : "WithoutAutomation";
-    });
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace web_app
 #endif  // BUILDFLAG(ENABLE_PROCESS_SINGLETON)

@@ -471,11 +471,7 @@ class UpdaterUtilApp : public App {
  public:
   UpdaterUtilApp()
       : service_proxy_(
-#if BUILDFLAG(IS_WIN)
-            CreateUpdateServiceProxyMojo(Scope())
-#else   // BUILDFLAG(IS_WIN)
             CreateUpdateServiceProxy(Scope())
-#endif  // BUILDFLAG(IS_WIN)
         ) {
   }
 

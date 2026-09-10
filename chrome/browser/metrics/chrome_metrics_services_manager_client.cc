@@ -49,14 +49,6 @@
 #include "chrome/browser/ui/android/tab_model/tab_model_list.h"
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/registry.h"
-#include "chrome/common/chrome_constants.h"
-#include "chrome/install_static/install_util.h"
-#include "components/crash/core/app/crash_export_thunks.h"
-#include "components/crash/core/app/crashpad.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ash/settings/stats_reporting_controller.h"
 #include "components/metrics/structured/recorder.h"
@@ -150,11 +142,7 @@ void OnCrosMetricsReportingSettingChange(
 // Returns the name of a key under HKEY_CURRENT_USER that can be used to store
 // backups of metrics data. Unused except on Windows.
 std::wstring GetRegistryBackupKey() {
-#if BUILDFLAG(IS_WIN)
-  return install_static::GetRegistryPath().append(L"\\StabilityMetrics");
-#else
   return std::wstring();
-#endif
 }
 
 }  // namespace
@@ -206,7 +194,7 @@ bool ChromeMetricsServicesManagerClient::IsClientInSampleForMetrics() {
   return IsClientInSampleImpl(g_browser_process->local_state());
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 // static
 bool ChromeMetricsServicesManagerClient::IsClientInSampleForCrashes() {
 #if BUILDFLAG(IS_ANDROID)
@@ -249,7 +237,7 @@ bool ChromeMetricsServicesManagerClient::IsClientInSampleForCrashes() {
       metrics::internal::kMetricsReportingFeature, "disable_crashes", false);
   return !crashes_are_disabled;
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // static
 bool ChromeMetricsServicesManagerClient::GetSamplingRatePerMille(int* rate) {
@@ -370,27 +358,3 @@ bool ChromeMetricsServicesManagerClient::IsOffTheRecordSessionActive() {
   return ::IsOffTheRecordSessionActive();
 #endif
 }
-
-#if BUILDFLAG(IS_WIN)
-void ChromeMetricsServicesManagerClient::UpdateRunningServices(
-    bool may_record,
-    bool may_upload) {
-  // First, set the registry value so that Crashpad will have the sampling state
-  // now and for subsequent runs. Note that Crashpad uses *both* the registry
-  // value and the value sent from SetUploadConsent below.
-  // We use IsClientInSampleForCrash() which checks the feature for if crashes
-  // are allowed.
-  install_static::SetCollectStatsInSample(IsClientInSampleForCrashes());
-
-  // The intent here is to set the value of the consent. However, since right
-  // now we have may_record which is based off both consent and the Feature
-  // state, this is redundant with the above value. This is pretty confusing
-  // right now, and we may want to rethink this. One extra complexity here is we
-  // currently check the disable_crashes parameter, which does not go
-  // into may_record. This is because this is specifically intending to test for
-  // consent, and as mentioned, on the crashpad side we check both. See
-  // SetUploadConsent() in components/crash/core/app/crashpad.cc for how this
-  // gets used.
-  SetUploadConsent_ExportThunk(may_record && may_upload);
-}
-#endif  // BUILDFLAG(IS_WIN)

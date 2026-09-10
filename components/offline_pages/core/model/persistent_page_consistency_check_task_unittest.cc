@@ -50,11 +50,7 @@ class PersistentPageConsistencyCheckTaskTest : public ModelTaskTestBase {
 
 // This test is affected by https://crbug.com/725685, which only affects windows
 // platform.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ClearExpiredPersistentPages DISABLED_ClearExpiredPersistentPages
-#else
 #define MAYBE_ClearExpiredPersistentPages ClearExpiredPersistentPages
-#endif
 TEST_F(PersistentPageConsistencyCheckTaskTest,
        MAYBE_ClearExpiredPersistentPages) {
   base::Time expire_time = base::Time::Now() - base::Days(400);
@@ -109,13 +105,8 @@ TEST_F(PersistentPageConsistencyCheckTaskTest,
   EXPECT_FALSE(IsPageMissingFile(page6));
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ClearExpiredPersistentPagesByFilePath \
-  DISABLED_ClearExpiredPersistentPagesByFilePath
-#else
 #define MAYBE_ClearExpiredPersistentPagesByFilePath \
   ClearExpiredPersistentPagesByFilePath
-#endif
 TEST_F(PersistentPageConsistencyCheckTaskTest,
        MAYBE_ClearExpiredPersistentPagesByFilePath) {
   base::Time expire_time = base::Time::Now() - base::Days(400);

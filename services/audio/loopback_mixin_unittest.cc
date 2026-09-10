@@ -130,7 +130,7 @@ TEST_F(LoopbackMixinTest,
   }
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 
 TEST_F(LoopbackMixinTest,
        MaybeCreate_SucceedsWithRestrictOwnAudioBrowserLoopbackIdAndFeature) {

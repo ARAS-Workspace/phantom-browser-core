@@ -56,15 +56,6 @@ constexpr const char* kAllowListPrefixesForAllPlatforms[] = {
 #if BUILDFLAG(IS_MAC)
 constexpr const char* kAllowListPrefixesForPlatform[] = {
     "/Default/Visited Links"};
-#elif BUILDFLAG(IS_WIN)
-constexpr const char* kAllowListPrefixesForPlatform[] = {
-    "/Default/databases-off-the-record",
-    "/Default/heavy_ad_intervention_opt_out.db", "/Default/Top Sites",
-    "/GrShaderCache/old_GPUCache",
-
-    // This file only contains the path to the latest executable of Chrome,
-    // therefore it's safe to be written in Incognito.
-    "/Last Browser"};
 #elif BUILDFLAG(IS_CHROMEOS)
 constexpr const char* kAllowListPrefixesForPlatform[] = {
     "/Default/Local Storage/leveldb/CURRENT",

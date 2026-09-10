@@ -281,7 +281,7 @@ IN_PROC_BROWSER_TEST_F(AppMenuModelTest, GlobalError) {
   EXPECT_EQ(1, error1->execute_count());
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 IN_PROC_BROWSER_TEST_F(AppMenuModelTest, DefaultBrowserPrompt) {
   DefaultBrowserPromptManager::GetInstance()->MaybeShowPrompt();
   FakeIconDelegate fake_delegate;
@@ -297,7 +297,7 @@ IN_PROC_BROWSER_TEST_F(AppMenuModelTest, DefaultBrowserPrompt) {
       model.GetIndexOfCommandId(IDC_SET_BROWSER_AS_DEFAULT).value();
   EXPECT_TRUE(model.IsEnabledAt(default_prompt_index));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 IN_PROC_BROWSER_TEST_F(AppMenuModelTest, PerformanceItem) {
   AppMenuModel model(this, browser());

@@ -152,11 +152,7 @@ TEST_F(PrefURLListMatcherTest, IP) {
 
 TEST_F(PrefURLListMatcherTest, File) {
   PrefURLListMatcher matcher(&pref_service_, kTestPref);
-#if BUILDFLAG(IS_WIN)
-  std::string path = "file://c:\\\\path";
-#else
   std::string path = "file:///home/path";
-#endif
 
   SetPref({path});
   EXPECT_EQ(path, *matcher.GetMatchedURL(GURL(path)));

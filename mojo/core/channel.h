@@ -242,14 +242,6 @@ class MOJO_SYSTEM_IMPL_EXPORT Channel
     };
     static_assert(sizeof(MachPortsExtraHeader) == 2,
                   "sizeof(MachPortsExtraHeader) must be 2 bytes");
-#elif BUILDFLAG(IS_WIN)
-    struct HandleEntry {
-      // The windows HANDLE. HANDLEs are guaranteed to fit inside 32-bits.
-      // See: https://msdn.microsoft.com/en-us/library/aa384203(VS.85).aspx
-      uint32_t handle;
-    };
-    static_assert(sizeof(HandleEntry) == 4,
-                  "sizeof(HandleEntry) must be 4 bytes");
 #endif
 #pragma pack(pop)
 

@@ -436,7 +436,6 @@ class CrashReporterTest : public HeadlessBrowserTest,
   base::FilePath crash_dumps_dir_;
 };
 
-#if !BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_F(CrashReporterTest, GenerateMinidump) {
   content::ScopedAllowRendererCrashes scoped_allow_renderer_crashes;
 
@@ -505,7 +504,6 @@ IN_PROC_BROWSER_TEST_F(CrashReporterTest, GenerateMinidump) {
     bc.Close();
   }
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, PermissionManagerAlwaysASK) {
   GURL url("https://example.com");
@@ -587,11 +585,7 @@ class BrowserTargetTracingTest : public HeadlessBrowserTest {
 };
 
 // Flaky, http://crbug.com/1269261.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_BrowserTargetTracing DISABLED_BrowserTargetTracing
-#else
 #define MAYBE_BrowserTargetTracing BrowserTargetTracing
-#endif  // BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_F(BrowserTargetTracingTest, MAYBE_BrowserTargetTracing) {
   RunTest();
 }

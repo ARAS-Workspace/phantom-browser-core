@@ -89,11 +89,7 @@ class RenderThreadImplDiscardableMemoryBrowserTest : public ContentBrowserTest {
 };
 
 // TODO(crbug.com/362224383): This test was flaky on Windows ASan bots.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_LockDiscardableMemory DISABLED_LockDiscardableMemory
-#else
 #define MAYBE_LockDiscardableMemory LockDiscardableMemory
-#endif
 IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,
                        MAYBE_LockDiscardableMemory) {
   const size_t kSize = 1024 * 1024;  // 1MiB.
@@ -171,13 +167,8 @@ IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,
 }
 
 // TODO(crbug.com/362120461): This test was flaky on Windows bots.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ReleaseFreeDiscardableMemory_ByCriticalPressure \
-  DISABLED_ReleaseFreeDiscardableMemory_ByCriticalPressure
-#else
 #define MAYBE_ReleaseFreeDiscardableMemory_ByCriticalPressure \
   ReleaseFreeDiscardableMemory_ByCriticalPressure
-#endif
 IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,
                        MAYBE_ReleaseFreeDiscardableMemory_ByCriticalPressure) {
   const size_t kSize = 1024 * 1024;  // 1MiB.
@@ -208,11 +199,7 @@ IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,
 }
 
 // TODO(crbug.com/364379688): This test is flaky on Windows ASan bots.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_CheckReleaseMemory DISABLED_CheckReleaseMemory
-#else
 #define MAYBE_CheckReleaseMemory CheckReleaseMemory
-#endif
 IN_PROC_BROWSER_TEST_F(RenderThreadImplDiscardableMemoryBrowserTest,
                        MAYBE_CheckReleaseMemory) {
   std::vector<std::unique_ptr<base::DiscardableMemory>> all_memory;

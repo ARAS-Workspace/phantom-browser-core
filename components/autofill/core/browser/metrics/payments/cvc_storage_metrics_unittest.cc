@@ -57,14 +57,12 @@ class CvcStorageMetricsTest
       card_.set_guid(kCardGuid);
       test_paydm().AddCreditCard(card_);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
       // Disable mandatory reauth as it is not part of this test and will
       // interfere with the card retrieval flow.
       autofill_client().GetPrefs()->SetBoolean(
           prefs::kAutofillPaymentMethodsMandatoryReauth, false);
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID) ||
-        // BUILDFLAG(IS_IOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_IOS)
     } else {
       // Add a masked server card.
       card_ = test::WithCvc(test::GetMaskedServerCard());

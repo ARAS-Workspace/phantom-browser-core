@@ -8,10 +8,6 @@
 
 #if BUILDFLAG(IS_POSIX)
 #include "base/files/scoped_file.h"
-#elif BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/scoped_handle.h"
 #endif
 
 #if BUILDFLAG(IS_APPLE)
@@ -25,9 +21,7 @@ void ExtractPlatformHandlesFromSharedMemoryRegionHandle(
     base::subtle::ScopedPlatformSharedMemoryHandle handle,
     PlatformHandle* extracted_handle,
     PlatformHandle* extracted_readonly_handle) {
-#if BUILDFLAG(IS_WIN)
-  *extracted_handle = PlatformHandle(base::win::ScopedHandle(handle.Take()));
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   // This is a Mach port. Same code as above and below, but separated for
   // clarity.
   *extracted_handle = PlatformHandle(std::move(handle));
@@ -44,10 +38,7 @@ base::subtle::ScopedPlatformSharedMemoryHandle
 CreateSharedMemoryRegionHandleFromPlatformHandles(
     PlatformHandle handle,
     PlatformHandle readonly_handle) {
-#if BUILDFLAG(IS_WIN)
-  DCHECK(!readonly_handle.is_valid());
-  return handle.TakeHandle();
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   DCHECK(!readonly_handle.is_valid());
   return handle.TakeMachSendRight();
 #elif BUILDFLAG(IS_ANDROID)
@@ -65,30 +56,15 @@ MojoResult UnwrapAndClonePlatformProcessHandle(
     return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
   }
 
-#if BUILDFLAG(IS_WIN)
-  base::ProcessHandle in_handle = reinterpret_cast<base::ProcessHandle>(
-      static_cast<uintptr_t>(process_handle->value));
-#else
   base::ProcessHandle in_handle =
       static_cast<base::ProcessHandle>(process_handle->value);
-#endif
 
   if (in_handle == base::kNullProcessHandle) {
     process = base::Process();
     return MOJO_LEGACY_RESULT_OK;
   }
 
-#if BUILDFLAG(IS_WIN)
-  base::ProcessHandle out_handle;
-  if (!::DuplicateHandle(::GetCurrentProcess(), in_handle,
-                         ::GetCurrentProcess(), &out_handle, 0, FALSE,
-                         DUPLICATE_SAME_ACCESS)) {
-    return MOJO_LEGACY_RESULT_INVALID_ARGUMENT;
-  }
-  process = base::Process(out_handle);
-#else
   process = base::Process(in_handle);
-#endif
   return MOJO_LEGACY_RESULT_OK;
 }
 

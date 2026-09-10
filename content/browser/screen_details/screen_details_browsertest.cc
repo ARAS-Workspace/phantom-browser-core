@@ -90,7 +90,7 @@ class FakeScreenDetailsTest : public ScreenDetailsTest {
 
 // TODO(crbug.com/40115071): Windows crashes static casting to ScreenWin.
 // TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_GetScreensFaked DISABLED_GetScreensFaked
 #else
 #define MAYBE_GetScreensFaked GetScreensFaked
@@ -129,7 +129,7 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest, MAYBE_GetScreensFaked) {
 
 // TODO(crbug.com/40115071): Windows crashes static casting to ScreenWin.
 // TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_IsExtendedFaked DISABLED_IsExtendedFaked
 #else
 #define MAYBE_IsExtendedFaked IsExtendedFaked
@@ -148,7 +148,7 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest, MAYBE_IsExtendedFaked) {
 
 // TODO(crbug.com/40115071): Windows crashes static casting to ScreenWin.
 // TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_ScreenOnchangeNoPermission DISABLED_ScreenOnchangeNoPermission
 #else
 #define MAYBE_ScreenOnchangeNoPermission ScreenOnchangeNoPermission
@@ -199,7 +199,7 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest,
 
 // TODO(crbug.com/40115071): Windows crashes static casting to ScreenWin.
 // TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_ScreenOnChangeForIsExtended DISABLED_ScreenOnChangeForIsExtended
 #else
 #define MAYBE_ScreenOnChangeForIsExtended ScreenOnChangeForIsExtended
@@ -248,7 +248,7 @@ IN_PROC_BROWSER_TEST_F(FakeScreenDetailsTest,
 
 // TODO(crbug.com/40115071): Windows crashes static casting to ScreenWin.
 // TODO(crbug.com/40115071): Android requires a GetDisplayNearestView overload.
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_ScreenOnChangeForAttributes DISABLED_ScreenOnChangeForAttributes
 #else
 #define MAYBE_ScreenOnChangeForAttributes ScreenOnChangeForAttributes

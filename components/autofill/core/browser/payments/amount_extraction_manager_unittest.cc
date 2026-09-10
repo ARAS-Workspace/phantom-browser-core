@@ -223,8 +223,7 @@ class AmountExtractionManagerTest
       mock_ai_amount_extraction_callback_;
 };
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 TEST_F(AmountExtractionManagerTest, ShouldTriggerWhenEligible) {
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitWithFeatures(
@@ -335,8 +334,7 @@ TEST_F(AmountExtractionManagerTest,
       IsEmpty());
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 TEST_F(
     AmountExtractionManagerTest,
     PayLaterTabs_AiBasedAmountExtractionShouldNotTriggerWhenNoBnplSuggestionAndNoLoadingThrobber) {
@@ -440,11 +438,9 @@ TEST_F(
           /*field_type=*/FieldType::CREDIT_CARD_NUMBER),
       IsEmpty());
 }
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_LINUX) && \
-    !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
 TEST_F(AmountExtractionManagerTest,
        PayLaterTabs_AiBasedAmountExtractionNotTriggeredOnNonDesktop) {
   base::test::ScopedFeatureList scoped_feature_list;
@@ -463,8 +459,7 @@ TEST_F(AmountExtractionManagerTest,
           /*field_type=*/FieldType::CREDIT_CARD_NUMBER),
       IsEmpty());
 }
-#endif  // #if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_LINUX)
-        // && !BUILDFLAG(IS_CHROMEOS)
+#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(AmountExtractionManagerTest,
        AiBasedAmountExtractionShouldNotTriggerWhenAutofillDisabled) {
@@ -2248,8 +2243,7 @@ TEST_F(AmountExtractionManagerTest, TriggerWithAi_CancelsPreviousRequest) {
            nullptr);
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 }  // namespace autofill::payments

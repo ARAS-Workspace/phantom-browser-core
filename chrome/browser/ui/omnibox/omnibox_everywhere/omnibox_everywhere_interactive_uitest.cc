@@ -272,7 +272,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxEverywhereBrowserTest,
       InvokeViaHotkey(), CheckWidgetVisible(false));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_IgnoreDragToMoveInNoDragRegion IgnoreDragToMoveInNoDragRegion
 #else
 #define MAYBE_IgnoreDragToMoveInNoDragRegion \
@@ -400,7 +400,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxEverywhereBrowserTest,
   gfx::Point dragged_origin;
   DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kOmniboxWebContentsId);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   // TODO(crbug.com/40249472): Modal drag loops in tests aren't supported on
   // MacOS and Windows. Manually set widget bounds to test position retention
   // across re-invocations.

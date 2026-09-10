@@ -160,13 +160,6 @@ class PolicyWatcherTest : public testing::Test {
     username_false_.Set(key::kRemoteAccessHostMatchUsername, false);
 #endif
 
-#if BUILDFLAG(IS_WIN)
-    remote_assistance_uiaccess_true_.Set(
-        key::kRemoteAccessHostAllowUiAccessForRemoteAssistance, true);
-    remote_assistance_uiaccess_false_.Set(
-        key::kRemoteAccessHostAllowUiAccessForRemoteAssistance, false);
-#endif
-
     deprecated_policies_.Set(key::kRemoteAccessHostDomain, kHostDomain);
     deprecated_policies_.Set(key::kRemoteAccessHostClientDomain, kClientDomain);
     // Deprecated policies should get converted if new ones aren't present.
@@ -317,9 +310,6 @@ class PolicyWatcherTest : public testing::Test {
     dict.Set(key::kRemoteAccessHostAllowRemoteAccessConnections, true);
     dict.Set(key::kRemoteAccessHostMaximumSessionDurationMinutes, 0);
     dict.Set(key::kRemoteAccessHostAllowPinAuthentication, base::Value());
-#endif
-#if BUILDFLAG(IS_WIN)
-    dict.Set(key::kRemoteAccessHostAllowUiAccessForRemoteAssistance, false);
 #endif
 
     ASSERT_THAT(&dict, IsPolicies(&GetDefaultValues()))
@@ -504,17 +494,6 @@ TEST_P(MisspelledPolicyTest, WarningLogged) {
 
   ON_CALL(mock_log, Log(_, _, _, _, _)).WillByDefault(testing::Return(true));
 
-#if BUILDFLAG(IS_WIN)
-  // The PolicyWatcher on Windows tries to open a handle to the Chrome policy
-  // registry key on Windows which fails on the Chromium bots. The warning that
-  // gets logged cases the subsequent log assertion to fail so this check was
-  // added so the test runs locally and in the bot environment.
-  EXPECT_CALL(mock_log, Log(logging::LOGGING_WARNING, _, _, _, _))
-      .With(testing::Args<4>(
-          ContainsSubstring("Failed to open Chrome policy registry key")))
-      .Times(testing::AtMost(1));
-#endif
-
   EXPECT_CALL(mock_log, Log(logging::LOGGING_WARNING, _, _, _, _))
       .With(testing::Args<4>(ContainsSubstring(misspelled_policy_name)))
       .Times(1);
@@ -576,15 +555,6 @@ TEST_F(PolicyWatcherTest, RemoteAssistanceUiAccess) {
   testing::InSequence sequence;
   EXPECT_CALL(mock_policy_callback_,
               OnPolicyUpdatePtr(IsPolicies(&nat_true_others_default_)));
-#if BUILDFLAG(IS_WIN)
-  // This setting only affects Windows, it is ignored on other platforms so the
-  // 2 SetPolicies calls won't result in any calls to OnPolicyUpdate.
-  EXPECT_CALL(mock_policy_callback_,
-              OnPolicyUpdatePtr(IsPolicies(&remote_assistance_uiaccess_true_)));
-  EXPECT_CALL(
-      mock_policy_callback_,
-      OnPolicyUpdatePtr(IsPolicies(&remote_assistance_uiaccess_false_)));
-#endif  // BUILDFLAG(IS_WIN)
 
   SetPolicies(empty_);
   StartWatching();

@@ -1234,21 +1234,6 @@ IN_PROC_BROWSER_TEST_F(DiceBrowserTest, RevokePrimaryAccountInAuthErrorState) {
 
 // Checks that Dice request header is not set from request from WebUI.
 // See https://crbug.com/40391545
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(DiceBrowserTest, NoDiceFromWebUI) {
-  // Navigate to Gaia and from the native tab, which uses an extension.
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), GURL("chrome:chrome-signin?reason=6")));
-
-  // Check that the request had no Dice request header.
-  if (dice_request_header_.empty()) {
-    WaitForClosure(&chrome_signin_embedded_quit_closure_);
-  }
-  EXPECT_EQ(kNoDiceRequestHeader, dice_request_header_);
-  EXPECT_EQ(0, reconcilor_blocked_count_);
-  WaitForReconcilorUnblockedCount(0);
-}
-#endif
 
 // Tests that turning off Dice via preferences works when singed out.
 IN_PROC_BROWSER_TEST_F(DiceBrowserTest, PRE_TurnOffDice_SignedOut) {
@@ -2161,11 +2146,6 @@ class DiceManageAccountBrowserTest : public DiceBrowserTest {
             true) {}
 
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    // Shortcut deletion delays tests shutdown on Win-7 and results in time out.
-    // See crbug.com/40686320.
-    AppShortcutManager::SuppressShortcutsForTesting();
-#endif
     DiceBrowserTest::SetUp();
   }
 

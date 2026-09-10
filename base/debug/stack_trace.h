@@ -23,11 +23,6 @@
 #include <unistd.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-struct _EXCEPTION_POINTERS;
-struct _CONTEXT;
-#endif
-
 namespace base::debug {
 
 // Enables stack dump to console output on exception and signals.
@@ -40,15 +35,6 @@ namespace base::debug {
 // that are loaded in memory and caches their file descriptors (this cannot be
 // done in official builds because it has security implications).
 BASE_EXPORT bool EnableInProcessStackDumping();
-
-#if BUILDFLAG(IS_WIN)
-// Returns `true` if EnableInProcessStackDumping() was called and succeeded.
-// Only supported on Windows.
-BASE_EXPORT bool InProcessStackDumpingEnabledForTesting();
-
-// Allows tests to exercise code that runs when symbolization is not available.
-BASE_EXPORT bool DisableInProcessStackDumpingForTesting();
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_POSIX)
 // Sets a first-chance callback for the stack dump signal handler. This callback
@@ -96,14 +82,6 @@ class BASE_EXPORT StackTrace {
   // as returned by Addresses()). Only the first `kMaxTraces` of the span will
   // be used.
   explicit StackTrace(span<const void* const> trace);
-
-#if BUILDFLAG(IS_WIN)
-  // Creates a stacktrace for an exception.
-  // Note: this function will throw an import not found (StackWalk64) exception
-  // on system without dbghelp 5.1.
-  StackTrace(_EXCEPTION_POINTERS* exception_pointers);
-  StackTrace(const _CONTEXT* context);
-#endif
 
   // Returns true if this current test environment is expected to have
   // symbolized frames when printing a stack trace.
@@ -163,10 +141,6 @@ class BASE_EXPORT StackTrace {
 
   // Returns true if generation of symbolized stack traces is to be suppressed.
   static bool ShouldSuppressOutput();
-
-#if BUILDFLAG(IS_WIN)
-  void InitTrace(const _CONTEXT* context_record);
-#endif
 
   std::array<const void*, kMaxTraces> trace_;
 

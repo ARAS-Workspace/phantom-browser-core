@@ -106,14 +106,6 @@ const blink::UserAgentMetadata& MockRenderThread::GetUserAgentMetadata() {
   return kUserAgentMetadata;
 }
 
-#if BUILDFLAG(IS_WIN)
-void MockRenderThread::PreCacheFont(const LOGFONT& log_font) {
-}
-
-void MockRenderThread::ReleaseCachedFonts() {
-}
-#endif
-
 void MockRenderThread::SetFieldTrialGroup(const std::string& trial_name,
                                           const std::string& group_name) {}
 

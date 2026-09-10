@@ -75,16 +75,6 @@ ServiceProcessHost::Options& ServiceProcessHost::Options::WithObserver(
   return *this;
 }
 
-#if BUILDFLAG(IS_WIN)
-ServiceProcessHost::Options&
-ServiceProcessHost::Options::WithPreloadedLibraries(
-    std::vector<base::FilePath> preloads,
-    base::PassKey<ServiceProcessHostPreloadLibraries> passkey) {
-  preload_libraries = std::move(preloads);
-  return *this;
-}
-#endif  // #if BUILDFLAG(IS_WIN)
-
 ServiceProcessHost::Options& ServiceProcessHost::Options::WithGpuClient(
     base::PassKey<ServiceProcessHostGpuClient> passkey) {
 #if BUILDFLAG(ENABLE_GPU_CHANNEL_MEDIA_CAPTURE)

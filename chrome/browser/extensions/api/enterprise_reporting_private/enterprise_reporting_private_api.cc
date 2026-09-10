@@ -29,7 +29,7 @@
 #include "components/enterprise/connectors/core/reporting_constants.h"
 #include "google_apis/gaia/gaia_id.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include <optional>
 
 #include "base/strings/string_util.h"
@@ -40,7 +40,7 @@
 #include "components/device_signals/core/browser/signals_types.h"
 #include "components/device_signals/core/browser/user_context.h"
 #include "components/device_signals/core/common/signals_features.h"  // nogncheck
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 #include "chrome/browser/enterprise/connectors/reporting/realtime_reporting_client.h"
@@ -261,12 +261,12 @@ api::enterprise_reporting_private::ContextInfo ToContextInfo(
 }
 
 bool AllowClientCertificateReportingForUsers() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   return base::FeatureList::IsEnabled(
       enterprise_signals::features::kAllowClientCertificateReportingForUsers);
 #else
   return false;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 }
 
 bool IsProfilePrefManaged(Profile* profile, std::string_view pref_name) {
@@ -274,7 +274,7 @@ bool IsProfilePrefManaged(Profile* profile, std::string_view pref_name) {
   return pref && pref->IsManaged();
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 device_signals::SignalsAggregationRequest CreateAggregationRequest(
     device_signals::SignalName signal_name) {
@@ -307,7 +307,7 @@ bool CanReturnResponse(content::BrowserContext* browser_context) {
   return browser_context && !browser_context->ShutdownStarted();
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 }  // namespace
 
@@ -524,15 +524,6 @@ EnterpriseReportingPrivateGetDeviceInfoFunction::ToDeviceInfo(
 
 ExtensionFunction::ResponseAction
 EnterpriseReportingPrivateGetDeviceInfoFunction::Run() {
-#if BUILDFLAG(IS_WIN)
-  base::ThreadPool::CreateCOMSTATaskRunner({})->PostTaskAndReplyWithResult(
-      FROM_HERE,
-      base::BindOnce(&enterprise_signals::DeviceInfoFetcher::Fetch,
-                     enterprise_signals::DeviceInfoFetcher::CreateInstance()),
-      base::BindOnce(&EnterpriseReportingPrivateGetDeviceInfoFunction::
-                         OnDeviceInfoRetrieved,
-                     this));
-#else
   base::ThreadPool::CreateTaskRunner({base::MayBlock()})
       ->PostTaskAndReplyWithResult(
           FROM_HERE,
@@ -542,7 +533,6 @@ EnterpriseReportingPrivateGetDeviceInfoFunction::Run() {
           base::BindOnce(&EnterpriseReportingPrivateGetDeviceInfoFunction::
                              OnDeviceInfoRetrieved,
                          this));
-#endif  // BUILDFLAG(IS_WIN)
 
   return RespondLater();
 }
@@ -653,7 +643,7 @@ void EnterpriseReportingPrivateGetCertificateFunction::OnClientCertFetched(
   Respond(WithArguments(ret.ToValue()));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // getFileSystemInfo
 
@@ -725,9 +715,9 @@ void EnterpriseReportingPrivateGetFileSystemInfoFunction::OnSignalRetrieved(
           arg_list)));
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
 // getSettings
 
@@ -796,104 +786,7 @@ void EnterpriseReportingPrivateGetSettingsFunction::OnSignalRetrieved(
           arg_list)));
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_WIN)
-
-// getAvInfo
-
-EnterpriseReportingPrivateGetAvInfoFunction::
-    EnterpriseReportingPrivateGetAvInfoFunction() = default;
-EnterpriseReportingPrivateGetAvInfoFunction::
-    ~EnterpriseReportingPrivateGetAvInfoFunction() = default;
-
-ExtensionFunction::ResponseAction
-EnterpriseReportingPrivateGetAvInfoFunction::Run() {
-  std::optional<api::enterprise_reporting_private::GetAvInfo::Params> params =
-      api::enterprise_reporting_private::GetAvInfo::Params::Create(args());
-  EXTENSION_FUNCTION_VALIDATE(params);
-
-  StartSignalCollection(
-      GaiaId(params->user_context.user_id),
-      CreateAggregationRequest(signal_name()), browser_context(),
-      base::BindOnce(
-          &EnterpriseReportingPrivateGetAvInfoFunction::OnSignalRetrieved, this,
-          base::TimeTicks::Now()));
-
-  return RespondLater();
-}
-
-void EnterpriseReportingPrivateGetAvInfoFunction::OnSignalRetrieved(
-    base::TimeTicks start_time,
-    device_signals::SignalsAggregationResponse response) {
-  if (!CanReturnResponse(browser_context())) {
-    // The browser is no longer accepting responses, so just bail.
-    return;
-  }
-
-  std::vector<api::enterprise_reporting_private::AntiVirusSignal> arg_list;
-  auto parsed_error = ConvertAvProductsResponse(response, &arg_list);
-
-  if (parsed_error) {
-    LogSignalCollectionFailed(signal_name(), start_time, parsed_error->error,
-                              parsed_error->is_top_level_error);
-    Respond(Error(device_signals::ErrorToString(parsed_error->error)));
-    return;
-  }
-
-  LogSignalCollectionSucceeded(signal_name(), start_time, arg_list.size());
-  Respond(ArgumentList(
-      api::enterprise_reporting_private::GetAvInfo::Results::Create(arg_list)));
-}
-
-// getHotfixes
-
-EnterpriseReportingPrivateGetHotfixesFunction::
-    EnterpriseReportingPrivateGetHotfixesFunction() = default;
-EnterpriseReportingPrivateGetHotfixesFunction::
-    ~EnterpriseReportingPrivateGetHotfixesFunction() = default;
-
-ExtensionFunction::ResponseAction
-EnterpriseReportingPrivateGetHotfixesFunction::Run() {
-  std::optional<api::enterprise_reporting_private::GetHotfixes::Params> params =
-      api::enterprise_reporting_private::GetHotfixes::Params::Create(args());
-  EXTENSION_FUNCTION_VALIDATE(params);
-
-  StartSignalCollection(
-      GaiaId(params->user_context.user_id),
-      CreateAggregationRequest(signal_name()), browser_context(),
-      base::BindOnce(
-          &EnterpriseReportingPrivateGetHotfixesFunction::OnSignalRetrieved,
-          this, base::TimeTicks::Now()));
-
-  return RespondLater();
-}
-
-void EnterpriseReportingPrivateGetHotfixesFunction::OnSignalRetrieved(
-    base::TimeTicks start_time,
-    device_signals::SignalsAggregationResponse response) {
-  if (!CanReturnResponse(browser_context())) {
-    // The browser is no longer accepting responses, so just bail.
-    return;
-  }
-
-  std::vector<api::enterprise_reporting_private::HotfixSignal> arg_list;
-  auto parsed_error = ConvertHotfixesResponse(response, &arg_list);
-
-  if (parsed_error) {
-    LogSignalCollectionFailed(signal_name(), start_time, parsed_error->error,
-                              parsed_error->is_top_level_error);
-    Respond(Error(device_signals::ErrorToString(parsed_error->error)));
-    return;
-  }
-
-  LogSignalCollectionSucceeded(signal_name(), start_time, arg_list.size());
-  Respond(ArgumentList(
-      api::enterprise_reporting_private::GetHotfixes::Results::Create(
-          arg_list)));
-}
-
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 // reportDataMaskingEvent
 

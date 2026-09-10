@@ -43,12 +43,6 @@
 #include "ui/views/widget/desktop_aura/desktop_native_widget_aura.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/strings/string_util_win.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "components/remote_cocoa/browser/scoped_cg_window_id.h"
 #endif
@@ -69,48 +63,6 @@ static const int kDefaultAuraCount = 1;
 #else
 static const int kDefaultAuraCount = 0;
 #endif
-
-#if BUILDFLAG(IS_WIN)
-constexpr char kWindowTitle[] = "NativeDesktopMediaList Test Window";
-constexpr wchar_t kWideWindowTitle[] = L"NativeDesktopMediaList Test Window";
-constexpr wchar_t kWindowClass[] = L"NativeDesktopMediaListTestWindowClass";
-
-struct WindowInfo {
-  HWND hwnd;
-  HINSTANCE window_instance;
-  ATOM window_class;
-};
-
-WindowInfo CreateTestWindow() {
-  WindowInfo info;
-  ::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-                          GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                      reinterpret_cast<LPCWSTR>(&DefWindowProc),
-                      &info.window_instance);
-
-  WNDCLASS window_class = {};
-  window_class.hInstance = info.window_instance;
-  window_class.lpfnWndProc = &DefWindowProc;
-  window_class.lpszClassName = kWindowClass;
-  info.window_class = ::RegisterClass(&window_class);
-
-  info.hwnd =
-      ::CreateWindow(kWindowClass, kWideWindowTitle, WS_OVERLAPPEDWINDOW,
-                     CW_USEDEFAULT, CW_USEDEFAULT, /*width=*/100,
-                     /*height=*/100, /*parent_window=*/nullptr,
-                     /*menu_bar=*/nullptr, info.window_instance,
-                     /*additional_params=*/nullptr);
-
-  ::ShowWindow(info.hwnd, SW_SHOWNORMAL);
-  ::UpdateWindow(info.hwnd);
-  return info;
-}
-
-void DestroyTestWindow(WindowInfo info) {
-  ::DestroyWindow(info.hwnd);
-  ::UnregisterClass(MAKEINTATOM(info.window_class), info.window_instance);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // Returns the given index, offset by a fixed value such that it does not
 // collide with Aura window IDs. Intended for usage with indices that are passed
@@ -229,21 +181,6 @@ class FakeWindowCapturer : public ThumbnailCapturer {
   }
 
   bool GetSourceList(SourceList* windows) override {
-#if BUILDFLAG(IS_WIN)
-    // WebRTC calls `GetWindowTextLength` and `GetWindowText` to get the title
-    // of every window. If the window is owned by the current process, these
-    // functions will send a `WM_GETTEXT` message to the window. This can cause
-    // a deadlock if the message loop is waiting on `GetSourceList`. To avoid
-    // this issue, WebRTC exposes the `enumerate_current_process_windows` which,
-    // when set to false, prevents these APIs from being called on windows from
-    // the current process.
-    if (options_.enumerate_current_process_windows()) {
-      for (const Source& source : window_list_) {
-        HWND hwnd = reinterpret_cast<HWND>(source.id);
-        ::GetWindowTextLength(hwnd);  // Side-effect: Sends WM_GETTEXT message.
-      }
-    }
-#endif  // BUILDFLAG(IS_WIN)
 
     base::AutoLock lock(window_list_lock_);
     *windows = window_list_;
@@ -288,10 +225,6 @@ class NativeDesktopMediaListTest : public ChromeViewsTestBase {
       delete;
 
   void TearDown() override {
-#if BUILDFLAG(IS_WIN)
-    if (window_open_)
-      DestroyTestWindow(window_info_);
-#endif  // BUILDFLAG(IS_WIN
 
     for (auto& desktop_widget : desktop_widgets_)
       desktop_widget.reset();
@@ -332,11 +265,7 @@ class NativeDesktopMediaListTest : public ChromeViewsTestBase {
 
     // Get the native window's id.
     gfx::AcceleratedWidget widget = host->GetAcceleratedWidget();
-#if BUILDFLAG(IS_WIN)
-    window.id = reinterpret_cast<DesktopMediaID::Id>(widget);
-#else
     window.id = widget;
-#endif
 
     // Get the aura window's id.
     DesktopMediaID aura_id = DesktopMediaID::RegisterNativeWindow(
@@ -353,11 +282,7 @@ class NativeDesktopMediaListTest : public ChromeViewsTestBase {
     aura::Window* aura_window = desktop_widgets_[index]->GetNativeWindow();
     gfx::AcceleratedWidget widget =
         aura_window->GetHost()->GetAcceleratedWidget();
-#if BUILDFLAG(IS_WIN)
-    int native_id = reinterpret_cast<DesktopMediaID::Id>(widget);
-#else
     int native_id = widget;
-#endif
     // Remove the widget and associated aura window.
     desktop_widgets_.erase(desktop_widgets_.begin() + index);
     // Remove the aura window from the window list.
@@ -376,21 +301,12 @@ class NativeDesktopMediaListTest : public ChromeViewsTestBase {
     webrtc::DesktopCaptureOptions options =
         content::desktop_capture::CreateDesktopCaptureOptions();
 
-#if BUILDFLAG(IS_WIN)
-    // This option should always be false on Windows so we avoid a potential
-    // deadlock.
-    EXPECT_FALSE(options.enumerate_current_process_windows());
-#endif  // BUILDFLAG(IS_WIN)
-
     window_capturer_ = new FakeWindowCapturer(options);
 
     // Only set `add_current_process_windows` if we're using real test windows.
     // The tests that use fake windows will have their expectations fail if
     // `model_` picks up other windows on the system.
     bool add_current_process_windows = false;
-#if BUILDFLAG(IS_WIN)
-    add_current_process_windows = window_open_;
-#endif  // BUILDFLAG(IS_WIN)
     model_ = std::make_unique<NativeDesktopMediaList>(
         DesktopMediaList::Type::kWindow,
         base::WrapUnique(window_capturer_.get()), add_current_process_windows,
@@ -483,13 +399,6 @@ class NativeDesktopMediaListTest : public ChromeViewsTestBase {
     testing::Mock::VerifyAndClearExpectations(&observer_);
   }
 
-#if BUILDFLAG(IS_WIN)
-  void CreateRealWindow() {
-    window_open_ = true;
-    window_info_ = CreateTestWindow();
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
  protected:
   // Must be listed before |model_|, so it's destroyed last.
   MockObserver observer_;
@@ -502,10 +411,6 @@ class NativeDesktopMediaListTest : public ChromeViewsTestBase {
   std::map<DesktopMediaID::Id, DesktopMediaID::Id> native_aura_id_map_;
   std::unique_ptr<NativeDesktopMediaList> model_;
 
-#if BUILDFLAG(IS_WIN)
-  bool window_open_ = false;
-  WindowInfo window_info_;
-#endif  // BUILDFLAG(IS_WIN)
 };
 
 TEST_F(NativeDesktopMediaListTest, Windows) {
@@ -736,88 +641,6 @@ TEST_F(NativeDesktopMediaListTest, EmptyThumbnail) {
   EXPECT_EQ(model_->GetSource(0).id.id, WindowIndex(0));
   EXPECT_EQ(model_->GetSource(0).thumbnail.size(), gfx::Size());
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(NativeDesktopMediaListTest, GetSourceListAvoidsDeadlock) {
-  // We need a real window so we can send a message and reproduce the deadlock
-  // scenario. This window must be created on a different thread than from where
-  // `GetSourceList` will be called. Otherwise, it can directly invoke the
-  // window procedure and avoid the deadlock.
-  base::Thread window_thread("GetSourceListDeadlockTestWindowThread");
-  window_thread.Start();
-  base::RunLoop run_loop;
-  WindowInfo info;
-  window_thread.task_runner()->PostTaskAndReplyWithResult(
-      FROM_HERE, base::BindOnce(&CreateTestWindow),
-      base::BindLambdaForTesting([&](WindowInfo window_info) {
-        info = window_info;
-        run_loop.Quit();
-      }));
-  // After this point, the window will be unresponsive because we've quit its
-  // message loop. This means any messages sent to the window will cause a
-  // deadlock.
-  run_loop.Run();
-  EXPECT_NE(info.hwnd, static_cast<HWND>(0));
-
-  // These `options` should have the `enumerate_current_process_windows`
-  // option set to false, so that `GetSourceList` won't send a `WM_GETTEXT`
-  // message to our window.
-  webrtc::DesktopCaptureOptions options =
-      content::desktop_capture::CreateDesktopCaptureOptions();
-  EXPECT_FALSE(options.enumerate_current_process_windows());
-  auto window_capturer = std::make_unique<FakeWindowCapturer>(options);
-  window_capturer->SetWindowList(
-      {{reinterpret_cast<intptr_t>(info.hwnd), kWindowTitle}});
-
-  // This should not hang, because we told it to ignore windows owned by the
-  // current process.
-  webrtc::DesktopCapturer::SourceList source_list;
-  EXPECT_TRUE(window_capturer->GetSourceList(&source_list));
-
-  window_thread.task_runner()->PostTask(
-      FROM_HERE, base::BindOnce(&DestroyTestWindow, info));
-  window_thread.Stop();
-}
-
-TEST_F(NativeDesktopMediaListTest, CollectsCurrentProcessWindows) {
-  // We need a real window so we can ensure windows owned by the current
-  // process are picked up by `model_` even if they aren't enumerated by the
-  // capturer.
-  CreateRealWindow();
-  CreateCapturerAndModel();
-  UpdateModel();
-
-  // Ensure that `model_` is finding and adding the window to it's sources, and
-  // not getting it from the capturer.
-  webrtc::DesktopCapturer::SourceList source_list;
-  EXPECT_TRUE(window_capturer_->GetSourceList(&source_list));
-  EXPECT_EQ(source_list.size(), 0ull);
-
-  content::DesktopMediaID::Id window_id =
-      reinterpret_cast<intptr_t>(window_info_.hwnd);
-  DesktopMediaList::Source source = GetSourceFromModel(window_id);
-  EXPECT_EQ(source.id.id, window_id);
-  EXPECT_STREQ(base::as_wcstr(source.name.c_str()), kWideWindowTitle);
-}
-
-TEST_F(NativeDesktopMediaListTest, MinimizedCurrentProcessWindows) {
-  CreateRealWindow();
-  CreateCapturerAndModel();
-
-  webrtc::DesktopCapturer::SourceList source_list;
-  EXPECT_TRUE(window_capturer_->GetSourceList(&source_list));
-  EXPECT_EQ(source_list.size(), 0ull);
-
-  // If we minimize the window it should not appear in `model_`s sources.
-  ::ShowWindow(window_info_.hwnd, SW_MINIMIZE);
-  UpdateModel();
-  DesktopMediaList::Source source =
-      GetSourceFromModel(reinterpret_cast<intptr_t>(window_info_.hwnd));
-
-  // We expect the source is not found.
-  EXPECT_EQ(source.id.id, content::DesktopMediaID::kNullId);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
 TEST_F(NativeDesktopMediaListTest, NonDelegatedScopedCGWindowIDCollision) {

@@ -17,10 +17,6 @@
 #include "ui/gfx/geometry/rect.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/views/widget/native_widget_aura.h"
-#endif
-
 ContentsBorderController::ContentsBorderController(BrowserView* browser_view) {
   for (ContentsContainerView* contents_container_view :
        browser_view->GetContentsContainerViews()) {

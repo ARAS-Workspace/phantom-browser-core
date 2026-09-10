@@ -305,7 +305,7 @@ class VIZ_SERVICE_EXPORT SkiaRenderer : public DirectRenderer {
     std::unique_ptr<BufferQueue> buffer_queue;
   };
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE)
   bool CanSkipRenderPassOverlay(
       AggregatedRenderPassId render_pass_id,
       const AggregatedRenderPassDrawQuad* rpdq,
@@ -403,7 +403,7 @@ class VIZ_SERVICE_EXPORT SkiaRenderer : public DirectRenderer {
   // Specific for SkDDL.
   const raw_ptr<SkiaOutputSurface> skia_output_surface_;
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE)
   // Tracks RenderPassDrawQuad and render pass overlay backings that are
   // currently in use and available for re-using via mailboxes.
   // RenderPassBacking.generate_mipmap is not used.
@@ -412,7 +412,7 @@ class VIZ_SERVICE_EXPORT SkiaRenderer : public DirectRenderer {
   // order.
   std::vector<RenderPassOverlayParams> in_flight_render_pass_overlay_backings_;
   std::vector<RenderPassOverlayParams> available_render_pass_overlay_backings_;
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE)
 
   // Lock set for resources that are used for the current frame. All resources
   // in this set will be unlocked with a sync token when the frame is done in
@@ -421,7 +421,7 @@ class VIZ_SERVICE_EXPORT SkiaRenderer : public DirectRenderer {
   // It is only used with DDL.
   DisplayResourceProviderSkia::LockSetForExternalUse lock_set_for_external_use_;
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE)
   // A reference to an entry in |in_flight_render_pass_overlay_backings_|. If
   // this is the last reference, the backing will be moved to
   // |available_render_pass_overlay_backings_| on destruction.
@@ -451,15 +451,15 @@ class VIZ_SERVICE_EXPORT SkiaRenderer : public DirectRenderer {
     // The mailbox of the |RenderPassOverlayParams|'s backing.
     gpu::Mailbox mailbox_;
   };
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE)
 
   struct OverlayLock {
     OverlayLock(DisplayResourceProvider* resource_provider,
                 ResourceId resource_id);
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE)
     OverlayLock(SkiaRenderer* renderer, const gpu::Mailbox& mailbox);
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE)
 
     ~OverlayLock();
 
@@ -470,11 +470,11 @@ class VIZ_SERVICE_EXPORT SkiaRenderer : public DirectRenderer {
     OverlayLock& operator=(const OverlayLock&) = delete;
 
     const gpu::Mailbox& mailbox() const {
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE)
       if (render_pass_lock.has_value()) {
         return render_pass_lock->mailbox();
       }
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE)
 
       DCHECK(resource_lock.has_value());
       return resource_lock->mailbox();
@@ -506,9 +506,9 @@ class VIZ_SERVICE_EXPORT SkiaRenderer : public DirectRenderer {
     std::optional<DisplayResourceProviderSkia::ScopedReadLockSharedImage>
         resource_lock;
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE)
     std::optional<ScopedInFlightRenderPassOverlayBackingRef> render_pass_lock;
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_OZONE)
   };
 
   // Locks for overlays that are pending for SwapBuffers().

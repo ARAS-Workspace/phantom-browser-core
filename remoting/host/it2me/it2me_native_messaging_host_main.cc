@@ -48,32 +48,9 @@
 #include "remoting/base/crash/crash_reporting_crashpad.h"
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <commctrl.h>
-#include "remoting/base/crash/crash_reporting_breakpad.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace remoting {
 
 namespace {
-
-#if BUILDFLAG(IS_WIN) && defined(OFFICIAL_BUILD)
-bool CurrentProcessHasUiAccess() {
-  HANDLE process_token;
-  OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &process_token);
-
-  DWORD size;
-  DWORD uiaccess_value = 0;
-  if (!GetTokenInformation(process_token, TokenUIAccess, &uiaccess_value,
-                           sizeof(uiaccess_value), &size)) {
-    PLOG(ERROR) << "GetTokenInformation() failed";
-  }
-  CloseHandle(process_token);
-  return uiaccess_value != 0;
-}
-#endif  // BUILDFLAG(IS_WIN) && defined(OFFICIAL_BUILD)
 
 }  // namespace
 
@@ -110,19 +87,9 @@ int It2MeNativeMessagingHostMain(int argc, char** argv) {
   if (IsUsageStatsAllowed()) {
 #if BUILDFLAG(IS_LINUX)
     InitializeCrashpadReporting();
-#elif BUILDFLAG(IS_WIN)
-    InitializeBreakpadReporting();
 #endif  // BUILDFLAG(IS_LINUX)
   }
 #endif  // defined(REMOTING_ENABLE_CRASH_REPORTING)
-
-#if BUILDFLAG(IS_WIN)
-  // Register and initialize common controls.
-  INITCOMMONCONTROLSEX info;
-  info.dwSize = sizeof(info);
-  info.dwICC = ICC_STANDARD_CLASSES;
-  InitCommonControlsEx(&info);
-#endif  // BUILDFLAG(IS_WIN)
 
   // Required to find the ICU data file, used by some file_util routines.
   base::i18n::InitializeICU();
@@ -153,69 +120,7 @@ int It2MeNativeMessagingHostMain(int argc, char** argv) {
   base::File write_file;
   bool is_process_elevated_ = false;
 
-#if BUILDFLAG(IS_WIN)
-
-  const base::CommandLine* command_line =
-      base::CommandLine::ForCurrentProcess();
-
-  if (command_line->HasSwitch(kElevateSwitchName)) {
-    is_process_elevated_ = true;
-#if defined(OFFICIAL_BUILD)
-    // Unofficial builds won't have 'UiAccess' since it requires signing.
-    if (!CurrentProcessHasUiAccess()) {
-      LOG(ERROR) << "UiAccess permission missing from elevated It2Me process.";
-    }
-#endif  // defined(OFFICIAL_BUILD)
-
-    // The UiAccess binary should always have the "input" and "output" switches
-    // specified, they represent the name of the named pipes that should be used
-    // in place of stdin and stdout.
-    DCHECK(command_line->HasSwitch(kInputSwitchName));
-    DCHECK(command_line->HasSwitch(kOutputSwitchName));
-
-    // presubmit: allow wstring
-    std::wstring input_pipe_name =
-        command_line->GetSwitchValueNative(kInputSwitchName);
-    // presubmit: allow wstring
-    std::wstring output_pipe_name =
-        command_line->GetSwitchValueNative(kOutputSwitchName);
-
-    // A NULL SECURITY_ATTRIBUTES signifies that the handle can't be inherited.
-    read_file =
-        base::File(CreateFile(input_pipe_name.c_str(), GENERIC_READ, 0, nullptr,
-                              OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr));
-    if (!read_file.IsValid()) {
-      PLOG(ERROR) << "CreateFile failed on '" << input_pipe_name << "'";
-      return kInitializationFailed;
-    }
-
-    write_file = base::File(CreateFile(output_pipe_name.c_str(), GENERIC_WRITE,
-                                       0, nullptr, OPEN_EXISTING,
-                                       FILE_ATTRIBUTE_NORMAL, nullptr));
-    if (!write_file.IsValid()) {
-      PLOG(ERROR) << "CreateFile failed on '" << output_pipe_name << "'";
-      return kInitializationFailed;
-    }
-  } else {
-    // GetStdHandle() returns pseudo-handles for stdin and stdout even if
-    // the hosting executable specifies "Windows" subsystem. However the
-    // returned handles are invalid in that case unless standard input and
-    // output are redirected to a pipe or file.
-    read_file = base::File(GetStdHandle(STD_INPUT_HANDLE));
-    write_file = base::File(GetStdHandle(STD_OUTPUT_HANDLE));
-
-    // After the native messaging channel starts, the native messaging reader
-    // will keep doing blocking read operations on the input named pipe.
-    // If any other thread tries to perform any operation on STDIN, it will also
-    // block because the input named pipe is synchronous (non-overlapped).
-    // It is pretty common for a DLL to query the device info (GetFileType) of
-    // the STD* handles at startup. So any LoadLibrary request can potentially
-    // be blocked. To prevent that from happening we close STDIN and STDOUT
-    // handles as soon as we retrieve the corresponding file handles.
-    SetStdHandle(STD_INPUT_HANDLE, nullptr);
-    SetStdHandle(STD_OUTPUT_HANDLE, nullptr);
-  }
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   PipeMessagingChannel::OpenAndBlockStdio(read_file, write_file);
 #else
 #error Not implemented.

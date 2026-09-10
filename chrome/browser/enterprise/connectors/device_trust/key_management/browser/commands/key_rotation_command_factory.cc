@@ -17,13 +17,11 @@
 #include "components/policy/core/common/cloud/device_management_service.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/enterprise/connectors/device_trust/key_management/browser/commands/win_key_rotation_command.h"
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #include "chrome/browser/enterprise/connectors/device_trust/key_management/browser/commands/linux_key_rotation_command.h"
 #elif BUILDFLAG(IS_MAC)
 #include "chrome/browser/enterprise/connectors/device_trust/key_management/browser/commands/mac_key_rotation_command.h"
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX)
 
 namespace enterprise_connectors {
 
@@ -51,9 +49,7 @@ KeyRotationCommandFactory* KeyRotationCommandFactory::GetInstance() {
 std::unique_ptr<KeyRotationCommand> KeyRotationCommandFactory::CreateCommand(
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
     policy::DeviceManagementService* device_management_service) {
-#if BUILDFLAG(IS_WIN)
-  return std::make_unique<WinKeyRotationCommand>();
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   return std::make_unique<LinuxKeyRotationCommand>(url_loader_factory);
 #elif BUILDFLAG(IS_MAC)
   auto cloud_delegate =
@@ -63,7 +59,7 @@ std::unique_ptr<KeyRotationCommand> KeyRotationCommandFactory::CreateCommand(
   return std::make_unique<MacKeyRotationCommand>(std::move(cloud_delegate));
 #else
   return nullptr;
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
 // static

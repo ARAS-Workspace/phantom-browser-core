@@ -47,10 +47,6 @@ namespace {
 
 bool g_initialized = false;
 
-#if defined(COMPONENT_BUILD) && BUILDFLAG(IS_WIN)
-constinit thread_local bool g_is_main_thread = false;
-#endif
-
 }  // namespace
 
 base::PlatformThreadId g_main_thread_identifier;
@@ -59,10 +55,6 @@ base::PlatformThreadId g_main_thread_identifier;
 // On Android going through libc (gettid) is faster than runtime-lib emulation.
 bool IsMainThread() {
   return CurrentThread() == g_main_thread_identifier;
-}
-#elif defined(COMPONENT_BUILD) && BUILDFLAG(IS_WIN)
-bool IsMainThread() {
-  return g_is_main_thread;
 }
 #else
 constinit thread_local bool g_is_main_thread = false;

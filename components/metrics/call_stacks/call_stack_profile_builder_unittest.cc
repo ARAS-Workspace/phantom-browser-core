@@ -85,13 +85,8 @@ TEST(CallStackProfileBuilderTest, ProfilingCompleted) {
       kProfileParams, nullptr, mock_closure.Get());
   base::MetadataRecorder metadata_recorder;
 
-#if BUILDFLAG(IS_WIN)
-  uint64_t module_md5 = 0x46C3E4166659AC02ULL;
-  base::FilePath module_path(L"c:\\some\\path\\to\\chrome.exe");
-#else
   uint64_t module_md5 = 0x554838A8451AC36CULL;
   base::FilePath module_path("/some/path/to/chrome");
-#endif
 
   const uintptr_t module_base_address1 = 0x1000;
   base::TestModule module1(module_base_address1);
@@ -292,13 +287,8 @@ TEST(CallStackProfileBuilderTest, Modules) {
   base::Frame frame1 = {0x1010, nullptr};
 
   const uintptr_t module_base_address2 = 0x1100;
-#if BUILDFLAG(IS_WIN)
-  uint64_t module_md5 = 0x46C3E4166659AC02ULL;
-  base::FilePath module_path(L"c:\\some\\path\\to\\chrome.exe");
-#else
   uint64_t module_md5 = 0x554838A8451AC36CULL;
   base::FilePath module_path("/some/path/to/chrome");
-#endif
   base::TestModule module2(module_base_address2);
   module2.set_id("2");
   module2.set_debug_basename(module_path);
@@ -344,13 +334,8 @@ TEST(CallStackProfileBuilderTest, DedupModules) {
 
   const uintptr_t module_base_address = 0x1000;
 
-#if BUILDFLAG(IS_WIN)
-  uint64_t module_md5 = 0x46C3E4166659AC02ULL;
-  base::FilePath module_path(L"c:\\some\\path\\to\\chrome.exe");
-#else
   uint64_t module_md5 = 0x554838A8451AC36CULL;
   base::FilePath module_path("/some/path/to/chrome");
-#endif
 
   base::TestModule module(module_base_address);
   module.set_id("1");

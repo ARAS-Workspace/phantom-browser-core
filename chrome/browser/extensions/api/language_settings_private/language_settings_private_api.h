@@ -36,11 +36,6 @@ class LanguageSettingsPrivateGetLanguageListFunction
   // ExtensionFunction overrides.
   ResponseAction Run() override;
 
-#if BUILDFLAG(IS_WIN)
-  void OnDictionariesInitialized();
-  void UpdateSupportedPlatformDictionaries();
-#endif  // BUILDFLAG(IS_WIN)
-
  private:
   base::ListValue language_list_;
 };

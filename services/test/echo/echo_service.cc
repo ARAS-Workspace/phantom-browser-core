@@ -15,14 +15,6 @@
 #include "base/memory/shared_memory_mapping.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <winevt.h>
-
-#include "base/native_library.h"
-#endif
-
 #include <string>
 
 #include "base/memory/scoped_refptr.h"
@@ -52,55 +44,8 @@ void EchoService::Quit() {
 }
 
 void EchoService::Crash() {
-#if BUILDFLAG(IS_WIN)
-  // Avoid symbolizing a stack we won't use.
-  base::debug::DisableInProcessStackDumpingForTesting();
-#endif
   base::ImmediateCrash();
 }
-
-#if BUILDFLAG(IS_WIN)
-void EchoService::DelayLoad() {
-  // This causes wevtapi.dll to be delay loaded. It should not work from inside
-  // a sandboxed process.
-  EVT_HANDLE handle = ::EvtCreateRenderContext(0, nullptr, 0);
-  ::EvtClose(handle);
-}
-
-void EchoService::LoadNativeLibrary(const ::base::FilePath& library,
-                                    bool call_sec32_delayload,
-                                    LoadNativeLibraryCallback callback) {
-  // This attempts to load a library inside the sandbox - it should fail unless
-  // the library was in `ServiceProcessHostOptions::WithPreloadedLibraries()`.
-  base::NativeLibraryLoadError error;
-  // We leak the module as preloading already leaked it.
-  HMODULE hmod = base::LoadNativeLibrary(library, &error);
-  if (!hmod) {
-    std::move(callback).Run(LoadStatus::kFailedLoadLibrary, error.code);
-    return;
-  }
-
-  // Calls an exported function that calls a delayloaded function that should
-  // be loaded in the utility (as secur32.dll is imported by chrome.dll).
-  if (call_sec32_delayload) {
-    BOOL(WINAPI * fn)() = nullptr;
-    fn = reinterpret_cast<decltype(fn)>(
-        GetProcAddress(hmod, "FnCallsDelayloadFn"));
-    if (!fn) {
-      std::move(callback).Run(LoadStatus::kFailedGetProcAddress,
-                              GetLastError());
-      return;
-    }
-    BOOL ret = fn();
-    if (!ret) {
-      std::move(callback).Run(LoadStatus::kFailedCallingDelayLoad,
-                              GetLastError());
-      return;
-    }
-  }
-  std::move(callback).Run(LoadStatus::kSuccess, ERROR_SUCCESS);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 void EchoService::DecryptEncrypt(
     scoped_refptr<os_crypt_async::Encryptor> encryptor,

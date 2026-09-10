@@ -74,10 +74,6 @@
 #include "ui/gfx/switches.h"
 #include "ui/gl/gl_switches.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/time/time.h"
-#endif
-
 namespace ui {
 
 #if !BUILDFLAG(IS_IOS)
@@ -196,13 +192,6 @@ Compositor::Compositor(const viz::FrameSinkId& frame_sink_id,
   settings.enable_elastic_overscroll_for_subscroll =
       base::FeatureList::IsEnabled(
           features::kOverscrollEffectOnNonRootScrollers);
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  // Rasterized tiles must be overlay candidates to be forwarded.
-  // This is very similar to the line above for Apple.
-  settings.use_gpu_memory_buffer_resources =
-      features::IsDelegatedCompositingEnabled();
 #endif
 
   // Set use_gpu_memory_buffer_resources to false to disable delegated

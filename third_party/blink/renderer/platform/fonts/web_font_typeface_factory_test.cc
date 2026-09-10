@@ -9,10 +9,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/renderer/platform/fonts/opentype/font_format_check.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "third_party/blink/renderer/platform/fonts/win/dwrite_font_format_support.h"
-#endif
-
 namespace blink {
 
 using ::testing::AtLeast;
@@ -43,26 +39,18 @@ sk_sp<SkTypeface> expect_not_called(sk_sp<SkData>) {
 const WebFontTypefaceFactory::FontInstantiator g_expect_system{
     .make_system = expect_called,
     .make_fontations = expect_not_called,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
     .make_fallback = expect_not_called,
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
+#endif  // BUILDFLAG(IS_APPLE)
 };
 
 const WebFontTypefaceFactory::FontInstantiator g_expect_fontations{
     .make_system = expect_not_called,
     .make_fontations = expect_called,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
     .make_fallback = expect_not_called,
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
+#endif  // BUILDFLAG(IS_APPLE)
 };
-
-#if BUILDFLAG(IS_WIN)
-const WebFontTypefaceFactory::FontInstantiator g_expect_fallback{
-    .make_system = expect_not_called,
-    .make_fontations = expect_not_called,
-    .make_fallback = expect_called,
-};
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
 
 TEST(WebFontTypefaceFactoryTest, DefaultAlwaysSystem) {
   sk_sp<SkData> data = SkData::MakeEmpty();
@@ -115,12 +103,7 @@ TEST(WebFontTypefaceFactoryTest, FontationsSelectedVariableSystem) {
   MockFontFormatCheck mock_font_format_check(data);
 
   sk_sp<SkTypeface> out_typeface;
-#if BUILDFLAG(IS_WIN)
-  const WebFontTypefaceFactory::FontInstantiator& expectation =
-      DWriteVersionSupportsVariations() ? g_expect_system : g_expect_fallback;
-#else
   const WebFontTypefaceFactory::FontInstantiator& expectation = g_expect_system;
-#endif
   WebFontTypefaceFactory::CreateTypeface(SkData::MakeEmpty(), out_typeface,
                                          mock_font_format_check, expectation);
 }
@@ -146,13 +129,8 @@ TEST(WebFontTypefaceFactoryTest, FontationsSelectedVariableColrV0) {
       .WillRepeatedly(Return(true));
   sk_sp<SkTypeface> out_typeface;
 
-#if BUILDFLAG(IS_WIN)
-  const WebFontTypefaceFactory::FontInstantiator& expectation =
-      DWriteVersionSupportsVariations() ? g_expect_system : g_expect_fontations;
-#else
   const WebFontTypefaceFactory::FontInstantiator& expectation =
       g_expect_fontations;
-#endif
   WebFontTypefaceFactory::CreateTypeface(SkData::MakeEmpty(), out_typeface,
                                          mock_font_format_check, expectation);
 }
@@ -191,12 +169,7 @@ TEST(WebFontTypefaceFactoryTest, MAYBE_VariationsWinFallbackIfNeeded) {
       .WillRepeatedly(Return(true));
   sk_sp<SkTypeface> out_typeface;
 
-#if BUILDFLAG(IS_WIN)
-  const WebFontTypefaceFactory::FontInstantiator& expectation =
-      DWriteVersionSupportsVariations() ? g_expect_system : g_expect_fallback;
-#else
   const WebFontTypefaceFactory::FontInstantiator& expectation = g_expect_system;
-#endif
   WebFontTypefaceFactory::CreateTypeface(SkData::MakeEmpty(), out_typeface,
                                          mock_font_format_check, expectation);
 }

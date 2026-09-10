@@ -280,10 +280,7 @@ bool RenderViewContextMenuViews::GetAcceleratorForCommandId(
     }
 
     case IDC_CONTENT_CONTEXT_EMOJI:
-#if BUILDFLAG(IS_WIN)
-      *accel = ui::Accelerator(ui::VKEY_OEM_PERIOD, ui::EF_COMMAND_DOWN);
-      return true;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
       *accel = ui::Accelerator(ui::VKEY_SPACE,
                                ui::EF_COMMAND_DOWN | ui::EF_CONTROL_DOWN);
       return true;

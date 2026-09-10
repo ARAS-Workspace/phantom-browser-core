@@ -264,7 +264,7 @@ class InteractionTestUtilSimulatorBrowser
       if (auto* const browser_view =
               BrowserView::GetBrowserViewForBrowser(browser)) {
         if (browser_view->GetWidget() == view->GetWidget()) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
           // Bring the browser window to the front using the most aggressive
           // method for the current platform. If this is not done, then mouse
           // events might not get routed to the correct surface.
@@ -277,7 +277,7 @@ class InteractionTestUtilSimulatorBrowser
           // Use the default logic to activate the browser.
           return views::test::InteractionTestUtilSimulatorViews::ActivateWidget(
               view->GetWidget());
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
         }
       }
     }

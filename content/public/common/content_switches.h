@@ -261,23 +261,6 @@ CONTENT_EXPORT extern const char kPreventResizingContentsForTesting[];
 CONTENT_EXPORT extern const char kEnableSpeechDispatcher[];
 #endif
 
-#if BUILDFLAG(IS_WIN)
-CONTENT_EXPORT extern const char kPrefetchArgumentRenderer[];
-CONTENT_EXPORT extern const char kPrefetchArgumentGpu[];
-CONTENT_EXPORT extern const char kPrefetchArgumentOther[];
-// This switch contains the device scale factor passed to certain processes
-// like renderers, etc.
-CONTENT_EXPORT extern const char kDeviceScaleFactor[];
-CONTENT_EXPORT extern const char kDisableLegacyIntermediateWindow[];
-// Switch to pass the font cache shared memory handle to the renderer.
-CONTENT_EXPORT extern const char kFontCacheSharedHandle[];
-CONTENT_EXPORT extern const char kRaiseTimerFrequency[];
-CONTENT_EXPORT extern const char kGpu2StartupDialog[];
-CONTENT_EXPORT extern const char kAudioProcessHighPriority[];
-// Pipe names for the incoming and outbound messages.
-CONTENT_EXPORT extern const char kRemoteDebuggingIoPipes[];
-#endif
-
 #if defined(ENABLE_IPC_FUZZER)
 extern const char kIpcDumpDirectory[];
 extern const char kIpcFuzzerTestcase[];

@@ -154,7 +154,7 @@ TEST(BrowsingDataLifetimePolicyHandler,
   EXPECT_FALSE(enabled);
 
   // Set ClearBrowsingDataOnExitList for some other types.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   base::ListValue clear_browsing_data_list = base::ListValue()
                                                  .Append("autofill")
                                                  .Append("password_signin")

@@ -19,10 +19,6 @@
 #include "components/performance_manager/public/graph/process_node.h"
 #include "content/public/browser/child_process_host.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#endif
-
 namespace performance_manager {
 
 namespace {
@@ -65,10 +61,6 @@ base::Value GetProcessValueDict(const base::Process& process) {
 
   // On Windows, handle is a void *. On Fuchsia it's an int. On other platforms
   // it is equal to the pid, so don't bother to record it.
-#if BUILDFLAG(IS_WIN)
-  ret.Set("handle",
-          static_cast<int>(base::win::HandleToUint32(process.Handle())));
-#endif
 
   // Most processes are not current, so only show the outliers.
   if (process.is_current()) {
@@ -81,28 +73,15 @@ base::Value GetProcessValueDict(const base::Process& process) {
   }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  // Creation time is always available on Windows, even for dead processes.
-  // On other platforms it is available only for valid processes (see below).
-  ret.Set("creation_time",
-          base::TimeFormatTimeOfDayWithMilliseconds(process.CreationTime()));
-#endif
-
   if (process.IsValid()) {
     // These properties can only be accessed for valid processes.
     ret.Set("os_priority", process.GetOSPriority());
 #if !BUILDFLAG(IS_APPLE)
     ret.Set("priority", base::ProcessPriorityToString(process.GetPriority()));
 #endif
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_ANDROID)
     ret.Set("creation_time",
             base::TimeFormatTimeOfDayWithMilliseconds(process.CreationTime()));
-#endif
-#if BUILDFLAG(IS_WIN)
-    // Most processes are running, so only show the outliers.
-    if (!process.IsRunning()) {
-      ret.Set("is_running", false);
-    }
 #endif
   } else {
     ret.Set("is_valid", false);

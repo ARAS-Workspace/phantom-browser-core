@@ -28,7 +28,7 @@
 #include "third_party/blink/renderer/platform/wtf/shared_buffer.h"
 #include "third_party/blink/renderer/platform/wtf/text/atomic_string.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "ui/base/test/skia_gold_matching_algorithm.h"  // nogncheck
 #include "ui/base/test/skia_gold_pixel_diff.h"          // nogncheck
 #endif
@@ -1357,7 +1357,7 @@ TEST_P(JPEGImageDecoderSuiteTest, VerifyJPEGSuiteImage) {
 
 // On Linux, skip Skia Gold pixel comparison due to flaky goldctl network
 // timeouts (crbug.com/422362214). Size validation above is sufficient.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   raw_ptr<ui::test::SkiaGoldPixelDiff> skia_gold =
       ui::test::SkiaGoldPixelDiff::GetSession();
   ui::test::PositiveIfOnlyImageAlgorithm positive_if_exact_image_only;
@@ -1368,7 +1368,7 @@ TEST_P(JPEGImageDecoderSuiteTest, VerifyJPEGSuiteImage) {
   EXPECT_TRUE(skia_gold->CompareScreenshot(golden_name, *result_image,
                                            &positive_if_exact_image_only))
       << jpg_path;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 }
 
 // The ExpectedResult is determined empirically. Files using arithmetic

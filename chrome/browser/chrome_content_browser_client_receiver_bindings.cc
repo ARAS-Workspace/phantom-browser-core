@@ -57,9 +57,6 @@
 
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/plugins/plugin_observer_android.h"
-#elif BUILDFLAG(IS_WIN)
-#include "chrome/browser/win/conflicts/module_database.h"
-#include "chrome/browser/win/conflicts/module_event_sink_impl.h"
 #elif BUILDFLAG(IS_CHROMEOS)
 #include "chromeos/ash/components/mojo_service_manager/utility_process_bridge.h"
 #include "chromeos/components/cdm_factory_daemon/cdm_factory_daemon_proxy_ash.h"
@@ -74,9 +71,9 @@
 #include "extensions/browser/extensions_browser_client.h"
 #endif
 
-#if BUILDFLAG(ENABLE_LIBRARY_CDMS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(ENABLE_LIBRARY_CDMS)
 #include "chrome/browser/media/cdm_document_service_impl.h"
-#endif  // BUILDFLAG(ENABLE_LIBRARY_CDMS) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(ENABLE_LIBRARY_CDMS)
 
 #if BUILDFLAG(ENABLE_LIBRARY_CDMS)
 #include "chrome/browser/media/output_protection_impl.h"
@@ -252,28 +249,6 @@ void ChromeContentBrowserClient::ExposeInterfacesToRenderer(
   }
 #endif  // BUILDFLAG(SAFE_BROWSING_AVAILABLE)
 
-#if BUILDFLAG(IS_WIN)
-  // Add the ModuleEventSink interface. This is the interface used by renderer
-  // processes to notify the browser of modules in their address space. The
-  // process handle is not yet available at this point so pass in a callback
-  // to allow to retrieve a duplicate at the time the interface is actually
-  // created.
-  auto get_process = base::BindRepeating(
-      [](int id) -> base::Process {
-        auto* host = content::RenderProcessHost::FromID(id);
-        if (host)
-          return host->GetProcess().Duplicate();
-        return base::Process();
-      },
-      render_process_host->GetDeprecatedID());
-  registry->AddInterface<mojom::ModuleEventSink>(
-      base::BindRepeating(
-          &ModuleEventSinkImpl::Create, std::move(get_process),
-          content::PROCESS_TYPE_RENDERER,
-          base::BindRepeating(&ModuleDatabase::HandleModuleLoadEvent)),
-      ui_task_runner);
-#endif
-
   for (auto& ep : extra_parts_) {
     ep->ExposeInterfacesToRenderer(registry, associated_registry,
                                    render_process_host);
@@ -303,12 +278,12 @@ void ChromeContentBrowserClient::BindMediaServiceReceiver(
   }
 #endif  // BUILDFLAG(ENABLE_LIBRARY_CDMS)
 
-#if BUILDFLAG(ENABLE_LIBRARY_CDMS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(ENABLE_LIBRARY_CDMS)
   if (auto r = receiver.As<media::mojom::CdmDocumentService>()) {
     CdmDocumentServiceImpl::Create(render_frame_host, std::move(r));
     return;
   }
-#endif  // BUILDFLAG(ENABLE_LIBRARY_CDMS) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(ENABLE_LIBRARY_CDMS)
 
 #if BUILDFLAG(ENABLE_MOJO_CDM) && BUILDFLAG(IS_ANDROID)
   if (auto r = receiver.As<media::mojom::MediaDrmStorage>()) {

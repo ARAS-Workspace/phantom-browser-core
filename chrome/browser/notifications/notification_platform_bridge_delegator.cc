@@ -26,10 +26,6 @@
 #include "chrome/browser/notifications/notification_platform_bridge_message_center.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/notifications/notification_platform_bridge_win.h"
-#endif
-
 namespace {
 
 // Returns if the current platform has system notifications enabled.
@@ -52,8 +48,6 @@ namespace {
 bool SystemNotificationsEnabled(Profile* profile) {
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   return true;
-#elif BUILDFLAG(IS_WIN)
-  return NotificationPlatformBridgeWin::SystemNotificationEnabled();
 #else
 #if BUILDFLAG(IS_LINUX)
   if (profile) {

@@ -27,12 +27,6 @@ enum {
   DIR_CRASH_METRICS,      // Directory where crash metrics are written.
   DIR_CRASH_DUMPS,        // Directory where crash dumps are written.
   DIR_LOCAL_TRACES,       // Directory where local traces are written.
-#if BUILDFLAG(IS_WIN)
-  DIR_WATCHER_DATA,       // Directory where the Chrome watcher stores
-                          // data.
-  DIR_ROAMING_USER_DATA,  // Directory where user data is stored that
-                          // needs to be roamed between computers.
-#endif
   DIR_RESOURCES,               // Directory containing separate file resources
                                // used by Chrome at runtime.
   DIR_APP_DICTIONARIES,        // Directory where the global dictionaries are.

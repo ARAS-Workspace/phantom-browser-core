@@ -118,14 +118,9 @@ void RecoveryComponentActionHandler::RunCommand(
   VLOG(1) << "run command: " << cmdline.GetCommandLineString();
   auto process_or_error = [&cmdline]() -> base::expected<base::Process, int> {
     base::LaunchOptions options;
-#if BUILDFLAG(IS_WIN)
-    options.start_hidden = true;
-#endif
     base::Process process = base::LaunchProcess(cmdline, options);
     if (!process.IsValid()) {
-#if BUILDFLAG(IS_WIN)
-      return base::unexpected(::GetLastError());
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
       return base::unexpected(errno);
 #else
       return base::unexpected(0);
@@ -212,7 +207,7 @@ RecoveryImprovedInstallerPolicy::GetInstallerAttributes() const {
 
 void RegisterRecoveryImprovedComponent(ComponentUpdateService* cus,
                                        PrefService* prefs) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   DVLOG(1) << "Registering RecoveryImproved component.";
 
   // |cus| keeps a reference to the |installer| in the CrxComponent instance.

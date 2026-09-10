@@ -35,10 +35,6 @@
 #include "mojo/public/cpp/system/invitation.h"
 #include "services/resource_coordinator/public/mojom/memory_instrumentation/memory_instrumentation.mojom.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/object_watcher.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include "content/browser/child_thread_type_switcher_linux.h"
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
@@ -64,9 +60,6 @@ class CONTENT_EXPORT BrowserChildProcessHostImpl
     : public BrowserChildProcessHost,
       public ChildProcessHostDelegate,
       public metrics::HistogramChildProcess,
-#if BUILDFLAG(IS_WIN)
-      public base::win::ObjectWatcher::Delegate,
-#endif
       public ChildProcessLauncher::Client,
       public memory_instrumentation::mojom::CoordinatorConnector,
       public base::MemoryPressureListener {
@@ -203,11 +196,6 @@ class CONTENT_EXPORT BrowserChildProcessHostImpl
       base::WeakPtr<BrowserChildProcessHostImpl> process,
       const std::string& error);
 
-#if BUILDFLAG(IS_WIN)
-  // ObjectWatcher::Delegate implementation.
-  void OnObjectSignaled(HANDLE object) override;
-#endif
-
   ChildProcessData data_;
   std::string metrics_name_;
   raw_ptr<BrowserChildProcessHostDelegate> delegate_;
@@ -216,13 +204,6 @@ class CONTENT_EXPORT BrowserChildProcessHostImpl
       coordinator_connector_receiver_{this};
   mojo::BinderMapWithContext<BrowserChildProcessHost*> binder_map_;
   std::unique_ptr<ChildProcessLauncher> child_process_launcher_;
-
-#if BUILDFLAG(IS_WIN)
-  // Watches to see if the child process exits before the IPC channel has
-  // been connected. Thereafter, its exit is determined by an error on the
-  // IPC channel.
-  base::win::ObjectWatcher early_exit_watcher_;
-#endif
 
   // The memory allocator, if any, in which the process will write its metrics.
   std::unique_ptr<base::PersistentMemoryAllocator> metrics_allocator_;

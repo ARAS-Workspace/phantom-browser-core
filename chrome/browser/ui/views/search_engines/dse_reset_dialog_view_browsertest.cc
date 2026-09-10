@@ -33,7 +33,7 @@
 #include "ui/views/widget/widget.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 namespace {
 
 // Returns the DSE reset bubble if it is currently showing, otherwise nullptr.
@@ -295,4 +295,4 @@ INSTANTIATE_TEST_SUITE_P(
                             /*hash=*/after_acknowledged_reset_time,
                             /*expected_show=*/true}));
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)

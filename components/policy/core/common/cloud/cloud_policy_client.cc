@@ -920,32 +920,25 @@ void CloudPolicyClient::FetchPolicyInternal(
 
   em::DeviceManagementRequest* request = config->request();
 
-#if BUILDFLAG(IS_WIN)
-  em::PolicyFetchRequest* cbcm_policy_fetch_request = nullptr;
-#endif
 
   // Build policy fetch requests.
   em::DevicePolicyRequest* policy_request = request->mutable_policy_request();
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   em::PolicyFetchRequest* fetch_request = nullptr;
 #endif
   for (const auto& type_to_fetch : types_to_fetch) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     fetch_request = AddPolicyFetchRequest(policy_request, type_to_fetch);
     // Only set browser device identifier for CBCM Chrome cloud policy on
     // desktop.
     if (type_to_fetch.policy_type() ==
         dm_protocol::kChromeMachineLevelUserCloudPolicyType) {
-#if BUILDFLAG(IS_WIN)
-        cbcm_policy_fetch_request = fetch_request;
-#else
       fetch_request->set_allocated_browser_device_identifier(
           GetBrowserDeviceIdentifier().release());
-#endif  // BUILDFLAG(IS_WIN)
     }
 #else
     AddPolicyFetchRequest(policy_request, type_to_fetch);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   }
 
   void OnPromotionEligibilityDetermined(
@@ -971,15 +964,6 @@ void CloudPolicyClient::FetchPolicyInternal(
 
   // CBCM policy fetch request on Windows needs to get device identifier on a
   // background COM thread.
-#if BUILDFLAG(IS_WIN)
-  if (cbcm_policy_fetch_request) {
-    GetBrowserDeviceIdentifierAsync(
-        base::BindOnce(&CloudPolicyClient::SetBrowserDeviceIdentifier,
-                       weak_ptr_factory_.GetWeakPtr(),
-                       cbcm_policy_fetch_request, std::move(config)));
-    return;
-  }
-#endif  // BUILDFLAG(IS_WIN)
   if (reason == PolicyFetchReason::kExtensionInstall) {
     request_jobs_.push_back(service_->CreateJob(std::move(config)));
   } else {
@@ -1051,16 +1035,6 @@ void CloudPolicyClient::GenerateChromeProfileChallenge(
   request_jobs_.push_back(service_->CreateJob(std::move(config)));
 }
 
-#if BUILDFLAG(IS_WIN)
-void CloudPolicyClient::SetBrowserDeviceIdentifier(
-    em::PolicyFetchRequest* request,
-    std::unique_ptr<DMServerJobConfiguration> config,
-    std::unique_ptr<em::BrowserDeviceIdentifier> identifier) {
-  request->set_allocated_browser_device_identifier(
-      GetBrowserDeviceIdentifier().release());
-  unique_request_job_ = service_->CreateJob(std::move(config));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 void CloudPolicyClient::UploadPolicyValidationReport(
     CloudPolicyValidatorBase::Status status,

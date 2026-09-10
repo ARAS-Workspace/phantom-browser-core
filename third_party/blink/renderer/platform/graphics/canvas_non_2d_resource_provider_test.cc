@@ -94,9 +94,6 @@ class CanvasNon2DResourceProviderTest : public testing::Test {
 
     gpu::SharedImageCapabilities shared_image_caps;
     shared_image_caps.supports_scanout_shared_images = true;
-#if BUILDFLAG(IS_WIN)
-    shared_image_caps.shared_image_swap_chain = true;
-#endif
     test_context_provider_->SharedImageInterface()->SetCapabilities(
         shared_image_caps);
 
@@ -169,11 +166,9 @@ TEST_F(CanvasNon2DResourceProviderTest, AcceleratedOverlay) {
 #if BUILDFLAG(IS_MAC)
   EXPECT_TRUE(GetSkImageInfo(provider.get()) ==
               kInfo.makeColorType(kBGRA_8888_SkColorType));
-#elif !BUILDFLAG(IS_WIN)
+#else
   EXPECT_TRUE(GetSkImageInfo(provider.get()) ==
               kInfo.makeColorType(kRGBA_8888_SkColorType));
-#else
-  EXPECT_TRUE(GetSkImageInfo(provider.get()) == kInfo);
 #endif
 }
 
@@ -306,11 +301,9 @@ TEST_F(CanvasNon2DResourceProviderTest,
 #if BUILDFLAG(IS_MAC)
   EXPECT_TRUE(GetSkImageInfo(provider.get()) ==
               kInfo.makeColorType(kBGRA_8888_SkColorType));
-#elif !BUILDFLAG(IS_WIN)
+#else
   EXPECT_TRUE(GetSkImageInfo(provider.get()) ==
               kInfo.makeColorType(kRGBA_8888_SkColorType));
-#else
-  EXPECT_TRUE(GetSkImageInfo(provider.get()) == kInfo);
 #endif
 }
 

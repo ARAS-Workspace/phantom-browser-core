@@ -28,30 +28,9 @@
 #include "base/threading/thread.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/access_token.h"
-#include "base/win/scoped_com_initializer.h"
-#include "base/win/sid.h"
-#include "chrome/updater/util/win_util.h"
-#endif
-
 namespace enterprise_companion {
 
 namespace {
-
-#if BUILDFLAG(IS_WIN)
-
-bool IsSystemProcess() {
-  std::optional<base::win::AccessToken> token =
-      base::win::AccessToken::FromCurrentProcess();
-  if (!token) {
-    VPLOG(1) << "AccessToken::FromCurrentProcess failed";
-    return false;
-  }
-
-  return token->User() == base::win::Sid(base::win::WellKnownSid::kLocalSystem);
-}
-#endif
 
 // AppServer runs the EnterpriseCompanion Mojo IPC server process.
 class AppServer : public App {
@@ -67,15 +46,6 @@ class AppServer : public App {
  protected:
   void FirstTaskRun() override {
     DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-#if BUILDFLAG(IS_WIN)
-    if (!com_initializer_.Succeeded()) {
-      VLOG(1) << "Failed to initialize COM";
-      Shutdown(EnterpriseCompanionStatus(
-          ApplicationError::kCOMInitializationFailed));
-      return;
-    }
-#endif
 
     lock_ = CreateScopedLock();
     if (!lock_) {
@@ -119,47 +89,7 @@ class AppServer : public App {
         network::SharedURLLoaderFactory::Create(
             std::move(pending_url_loader_factory));
 
-#if BUILDFLAG(IS_WIN)
-    base::RepeatingClosure before_each_request = base::BindRepeating(
-        [](scoped_refptr<base::SequencedTaskRunner> net_thread_task_runner) {
-          // Try to impersonate the logged-in user. Impersonation is attempted
-          // on every request and lasts for the lifetime of the net thread, or
-          // until a new request is received. Skip impersonation if the process
-          // is not running as the SYSTEM user, which should only be true in
-          // tests.
-          if (!IsSystemProcess()) {
-            return;
-          }
-          net_thread_task_runner->PostTask(
-              FROM_HERE, base::BindOnce([] {
-                // If the thread is already impersonating it is necessary to
-                // terminate impersonation before impersonating again, as the
-                // logged-in user could be different across attempts.
-                // Additionally, if the thread is impersonating a user that has
-                // logged off it is preferable to terminate the impersonation
-                // even if there is no other logged-in user to impersonate;
-                // else, the security context may be disconnected from
-                // environmental resources (including network credentials).
-                if (!::RevertToSelf()) {
-                  VPLOG(1) << "Failed to revert net thread impersonation";
-                }
-                std::optional<base::win::AccessToken> token =
-                    updater::GetLoggedOnUserToken();
-                VLOG_IF(2, !token.has_value())
-                    << __func__ << ": GetLoggedOnUserToken failed";
-                if (token.has_value()) {
-                  if (!::ImpersonateLoggedOnUser(token->get())) {
-                    VPLOG(1)
-                        << "Failed to impersonate logged on user. Networking "
-                           "may fail.";
-                  }
-                }
-              }));
-        },
-        net_thread_.task_runner());
-#else
     base::RepeatingClosure before_each_request = base::DoNothing();
-#endif
 
     VLOG(1) << "Launching Chrome Enterprise Companion App";
     stub_ =
@@ -175,10 +105,6 @@ class AppServer : public App {
   SEQUENCE_CHECKER(sequence_checker_);
 #if !BUILDFLAG(IS_MAC)
   base::Thread net_thread_{"Network"};
-#endif
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedCOMInitializer com_initializer_{
-      base::win::ScopedCOMInitializer::kMTA};
 #endif
   base::SequenceBound<URLLoaderFactoryProvider> url_loader_factory_provider_;
   std::unique_ptr<ScopedLock> lock_;

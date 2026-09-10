@@ -485,12 +485,6 @@ class VIEWS_EXPORT Widget : public internal::NativeWidgetDelegate,
     // the default desktop for new windows.
     gfx::NativeWindow context = gfx::NativeWindow();
 
-#if BUILDFLAG(IS_WIN)
-    // If true, force the window not to be shown in the taskbar, even for
-    // window types that do appear in the taskbar by default.
-    bool dont_show_in_taskbar = false;
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_LINUX)
     // Only used by X11, for root level windows. Specifies the res_name and
     // res_class fields, respectively, of the WM_CLASS window property. Controls
@@ -1507,13 +1501,6 @@ class VIEWS_EXPORT Widget : public internal::NativeWidgetDelegate,
   // Called to enable or disable screenshots of this widget.
   void SetAllowScreenshots(bool allow);
   bool AreScreenshotsAllowed();
-
-#if BUILDFLAG(IS_WIN)
-  // Called to exclude this window from screen capture.
-  // Note: On macOS, equivalent functionality is handled at the capturer
-  // level via ScreenCaptureKit (see screen_capture_kit_device_mac.mm).
-  void SetExcludeFromScreenCapture(bool exclude);
-#endif
 
   // Called when we become / stop being `child_widget`'s parent.
   void OnChildAdded(Widget* child_widget);

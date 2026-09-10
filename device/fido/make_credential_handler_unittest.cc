@@ -55,10 +55,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "device/fido/win/fake_webauthn_api.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 using ::testing::_;
 using ::testing::DoAll;
 using ::testing::Return;
@@ -885,21 +881,5 @@ TEST_F(FidoMakeCredentialHandlerTest, ReportTransportMetric) {
                                 FidoTransportProtocol::kUsbHumanInterfaceDevice,
                                 1);
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(FidoMakeCredentialHandlerTest, ReportTransportMetricWin) {
-  FakeWinWebAuthnApi win_api;
-  win_api.set_version(WEBAUTHN_API_VERSION_6);
-  win_api.set_transport(WEBAUTHN_CTAP_TRANSPORT_BLE);
-  WinWebAuthnApi::ScopedOverride win_webauthn_api_override(&win_api);
-  base::HistogramTester histograms;
-  fake_discovery_factory_->set_discover_win_webauthn_api_authenticator(true);
-  auto request_handler = CreateMakeCredentialHandler();
-  EXPECT_TRUE(future().Wait());
-  EXPECT_EQ(MakeCredentialStatus::kSuccess, std::get<0>(future().Get()));
-  histograms.ExpectUniqueSample(kResponseTransportHistogram,
-                                FidoTransportProtocol::kBluetoothLowEnergy, 1);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace device

@@ -18,10 +18,6 @@
 #include "base/trace_event/trace_event.h"
 #include "sql/error_delegate_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace net {
 
 SQLitePersistentStoreBackendBase::SQLitePersistentStoreBackendBase(
@@ -260,11 +256,6 @@ void SQLitePersistentStoreBackendBase::DatabaseErrorCallback(
     sql::UmaHistogramSqliteResult(
         base::StrCat({histogram_tag_.value, ".ErrorInitializeDB"}), error);
 
-#if BUILDFLAG(IS_WIN)
-    base::UmaHistogramSparse(
-        base::StrCat({histogram_tag_.value, ".WinGetLastErrorInitializeDB"}),
-        ::GetLastError());
-#endif  // BUILDFLAG(IS_WIN)
   }
 
   // Don't just do the close/delete here, as we are being called by |db| and

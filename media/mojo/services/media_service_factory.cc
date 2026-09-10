@@ -17,10 +17,6 @@
 #include "media/mojo/services/android_mojo_media_client.h"  // nogncheck
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "media/mojo/services/media_foundation_mojo_media_client.h"
-#endif
-
 namespace media {
 
 std::unique_ptr<MediaService> CreateMediaService(
@@ -28,9 +24,6 @@ std::unique_ptr<MediaService> CreateMediaService(
 #if BUILDFLAG(IS_ANDROID)
   return std::make_unique<MediaService>(
       std::make_unique<AndroidMojoMediaClient>(), std::move(receiver));
-#elif BUILDFLAG(IS_WIN)
-  return std::make_unique<MediaService>(
-      std::make_unique<MediaFoundationMojoMediaClient>(), std::move(receiver));
 #else
   NOTREACHED() << "No MediaService implementation available.";
 #endif

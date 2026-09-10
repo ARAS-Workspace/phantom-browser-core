@@ -442,42 +442,7 @@ class RenderViewImplTest : public RenderViewTest {
                    int key_code,
                    MockKeyboard::Modifiers modifiers,
                    std::u16string* output) {
-#if BUILDFLAG(IS_WIN)
-    // Retrieve the Unicode character for the given tuple (keyboard-layout,
-    // key-code, and modifiers).
-    // Exit when a keyboard-layout driver cannot assign a Unicode character to
-    // the tuple to prevent sending an invalid key code to the RenderView
-    // object.
-    CHECK(mock_keyboard_.get());
-    CHECK(output);
-    int length =
-        mock_keyboard_->GetCharacters(layout, key_code, modifiers, output);
-    if (length != 1)
-      return -1;
-
-    // Create IPC messages from Windows messages and send them to our
-    // back-end.
-    // A keyboard event of Windows consists of three Windows messages:
-    // WM_KEYDOWN, WM_CHAR, and WM_KEYUP.
-    // WM_KEYDOWN and WM_KEYUP sends virtual-key codes. On the other hand,
-    // WM_CHAR sends a composed Unicode character.
-    CHROME_MSG msg1 = {NULL, WM_KEYDOWN, static_cast<WPARAM>(key_code), 0};
-    ui::KeyEvent evt1(msg1);
-    input::NativeWebKeyboardEvent keydown_event(evt1);
-    SendNativeKeyEvent(keydown_event);
-
-    CHROME_MSG msg2 = {NULL, WM_CHAR, (*output)[0], 0};
-    ui::KeyEvent evt2(msg2);
-    input::NativeWebKeyboardEvent char_event(evt2);
-    SendNativeKeyEvent(char_event);
-
-    CHROME_MSG msg3 = {NULL, WM_KEYUP, static_cast<WPARAM>(key_code), 0};
-    ui::KeyEvent evt3(msg3);
-    input::NativeWebKeyboardEvent keyup_event(evt3);
-    SendNativeKeyEvent(keyup_event);
-
-    return length;
-#elif BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_OZONE)
     return SendKeyEventOzone(layout, key_code, modifiers, output);
 #else
     NOTIMPLEMENTED();
@@ -2607,12 +2572,7 @@ class RenderViewImplTextInputMessageOrder : public RenderViewImplTest {
 };
 
 // Failing on Windows; see https://crbug.com/1134571.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_MessageOrderInDidChangeSelection \
-  DISABLED_MessageOrderInDidChangeSelection
-#else
 #define MAYBE_MessageOrderInDidChangeSelection MessageOrderInDidChangeSelection
-#endif
 TEST_F(RenderViewImplTextInputMessageOrder,
        MAYBE_MessageOrderInDidChangeSelection) {
   LoadHTML("<textarea id=\"test\"></textarea>");
@@ -3432,52 +3392,5 @@ TEST_F(RenderViewImplTest, CollapseSelectionNotChangeFocus) {
                                                  &is_body_again));
   EXPECT_EQ(1, is_body_again);
 }
-
-#if BUILDFLAG(IS_WIN)
-class RenderViewImplContrastGammaSettingsTest : public RenderViewImplTest {
- protected:
-  void SetUp() override {
-    RenderViewImplTest::SetUp();
-    feature_list_.InitAndEnableFeature(
-        features::kUseGammaContrastRegistrySettings);
-  }
-  base::test::ScopedFeatureList feature_list_;
-};
-
-TEST_F(RenderViewImplContrastGammaSettingsTest,
-       ContrastGammaSetRendererPreferences) {
-  LoadHTML(R"HTML(
-      <input id='test' type='text'></input>
-    )HTML");
-
-  // Use non-default values for contrast and gamma.
-  constexpr float test_contrast = 0.95;
-  static_assert(test_contrast != SK_GAMMA_CONTRAST);
-  static_assert(test_contrast >= SkSurfaceProps::kMinContrastInclusive);
-  static_assert(test_contrast <= SkSurfaceProps::kMaxContrastInclusive);
-
-  constexpr float test_gamma = 3.99;
-  static_assert(test_gamma != SK_GAMMA_EXPONENT);
-  static_assert(test_gamma >= SkSurfaceProps::kMinGammaInclusive);
-  static_assert(test_gamma < SkSurfaceProps::kMaxGammaExclusive);
-
-  blink::RendererPreferences renderer_preferences =
-      web_view_->GetRendererPreferences();
-  EXPECT_NE(renderer_preferences.text_contrast, test_contrast);
-  EXPECT_NE(renderer_preferences.text_gamma, test_gamma);
-
-  // Set the non-default values on `RendererPreferences`.
-  renderer_preferences.text_contrast = test_contrast;
-  renderer_preferences.text_gamma = test_gamma;
-  web_view_->SetRendererPreferences(renderer_preferences);
-
-  // `GetSkSurfaceProps` should have the updated contrast and
-  // gamma properties from above.
-  SkSurfaceProps surface_props =
-      skia::LegacyDisplayGlobals::GetSkSurfaceProps();
-  EXPECT_EQ(surface_props.textContrast(), test_contrast);
-  EXPECT_EQ(surface_props.textGamma(), test_gamma);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace content

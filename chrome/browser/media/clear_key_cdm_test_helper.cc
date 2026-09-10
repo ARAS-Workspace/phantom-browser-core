@@ -33,19 +33,3 @@ void RegisterClearKeyCdm(base::CommandLine* command_line,
                                    cdm_path.value());
 }
 #endif  // BUILDFLAG(ENABLE_LIBRARY_CDMS)
-
-#if BUILDFLAG(IS_WIN)
-void RegisterMediaFoundationClearKeyCdm(
-    std::vector<base::test::FeatureRefAndParams>& features) {
-  // MediaFoundation ClearKey is a loadable_module used only in tests.
-  base::FilePath cdm_path;
-  base::PathService::Get(base::DIR_OUT_TEST_DATA_ROOT, &cdm_path);
-  cdm_path = cdm_path.AppendASCII(base::GetLoadableModuleName(
-      media::kMediaFoundationClearKeyCdmLibraryName));
-
-  features.push_back(base::test::FeatureRefAndParams(
-      media::kExternalClearKeyForTesting,
-      {{media::kMediaFoundationClearKeyCdmPathForTesting.name,
-        cdm_path.MaybeAsASCII()}}));
-}
-#endif  // BUILDFLAG(IS_WIN)

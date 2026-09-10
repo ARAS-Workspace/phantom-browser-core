@@ -22,11 +22,7 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "testing/perf/perf_result_reporter.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/windows_types.h"
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include <pthread.h>
 #endif
 
@@ -43,9 +39,6 @@ constexpr char kMetricBaseReadWrite[] = "read_write";
 constexpr char kMetricSuffixThroughput[] = "_throughput";
 constexpr char kMetricSuffixOperationTime[] = "_operation_time";
 constexpr char kStoryBaseTLS[] = "thread_local_storage";
-#if BUILDFLAG(IS_WIN)
-constexpr char kStoryBasePlatformFLS[] = "platform_fiber_local_storage";
-#endif  // BUILDFLAG(IS_WIN)
 constexpr char kStoryBasePlatformTLS[] = "platform_thread_local_storage";
 constexpr char kStoryBaseCPPTLS[] = "c++_platform_thread_local_storage";
 constexpr char kStorySuffixFourThreads[] = "_4_threads";
@@ -190,39 +183,7 @@ TEST_F(ThreadLocalStoragePerfTest, ThreadLocalStorage) {
             kCount, 4);
 }
 
-#if BUILDFLAG(IS_WIN)
-
-void WINAPI destroy(void*) {}
-
-TEST_F(ThreadLocalStoragePerfTest, PlatformFls) {
-  DWORD key = FlsAlloc(destroy);
-  ASSERT_NE(PlatformThreadLocalStorage::TLS_KEY_OUT_OF_INDEXES, key);
-
-  auto read = [&] { return reinterpret_cast<intptr_t>(FlsGetValue(key)); };
-  auto write = [&](intptr_t value) {
-    FlsSetValue(key, reinterpret_cast<void*>(value));
-  };
-
-  Benchmark(kStoryBasePlatformFLS, read, write, 10000000, 1);
-  Benchmark(std::string(kStoryBasePlatformFLS) + kStorySuffixFourThreads, read,
-            write, kCount, 4);
-}
-
-TEST_F(ThreadLocalStoragePerfTest, PlatformTls) {
-  DWORD key = TlsAlloc();
-  ASSERT_NE(PlatformThreadLocalStorage::TLS_KEY_OUT_OF_INDEXES, key);
-
-  auto read = [&] { return reinterpret_cast<intptr_t>(TlsGetValue(key)); };
-  auto write = [&](intptr_t value) {
-    TlsSetValue(key, reinterpret_cast<void*>(value));
-  };
-
-  Benchmark(kStoryBasePlatformTLS, read, write, 10000000, 1);
-  Benchmark(std::string(kStoryBasePlatformTLS) + kStorySuffixFourThreads, read,
-            write, kCount, 4);
-}
-
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 
 TEST_F(ThreadLocalStoragePerfTest, PlatformTls) {
   pthread_key_t key;

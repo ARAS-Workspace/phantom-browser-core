@@ -13,11 +13,6 @@
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "remoting/host/win/evaluate_3d_display_mode.h"
-#include "remoting/host/win/evaluate_d3d.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX)
 #include "remoting/base/username.h"
 #endif
@@ -68,9 +63,7 @@ inline constexpr bool IsNonOfficialBuild() {
 }
 
 bool IsMultiProcessHost() {
-#if BUILDFLAG(IS_WIN)
-  return true;
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   // The Linux host is multi-process only when GetHostAttributes() is called in
   // the network process, which is run as the CRD network user.
   return GetUsername() == GetNetworkProcessUsername();
@@ -108,10 +101,6 @@ std::string GetHostAttributes() {
       result.push_back(attribute.name);
     }
   }
-#if BUILDFLAG(IS_WIN)
-  GetD3DCapabilities(&result);
-  result.push_back("Win10+");
-#endif
 
   return base::JoinString(result, kSeparator);
 }

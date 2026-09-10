@@ -67,16 +67,6 @@
 #include "content/shell/app/shell_main_delegate_mac.h"
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-#include <initguid.h>
-#include <windows.h>
-
-#include "base/logging_win.h"
-#include "base/win/scoped_handle.h"
-#include "base/win/win_util.h"
-#include "content/shell/common/v8_crashpad_support_win.h"
-#endif
-
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
 #include "v8/include/v8-wasm-trap-handler-posix.h"
 #endif
@@ -97,9 +87,6 @@ enum class LoggingDest {
   kFile,
   kStderr,
   kSystem,
-#if BUILDFLAG(IS_WIN)
-  kHandle,
-#endif
 };
 
 content::ShellCrashReporterClient& GetShellCrashReporterClient() {
@@ -107,23 +94,6 @@ content::ShellCrashReporterClient& GetShellCrashReporterClient() {
       shell_crash_client;
   return *shell_crash_client;
 }
-
-#if BUILDFLAG(IS_WIN)
-// If "Content Shell" doesn't show up in your list of trace providers in
-// Sawbuck, add these registry entries to your machine (NOTE the optional
-// Wow6432Node key for x64 machines):
-// 1. Find:  HKLM\SOFTWARE\[Wow6432Node\]Google\Sawbuck\Providers
-// 2. Add a subkey with the name "{6A3E50A4-7E15-4099-8413-EC94D8C2A4B6}"
-// 3. Add these values:
-//    "default_flags"=dword:00000001
-//    "default_level"=dword:00000004
-//    @="Content Shell"
-
-// {6A3E50A4-7E15-4099-8413-EC94D8C2A4B6}
-const GUID kContentShellProviderName = {
-    0x6a3e50a4, 0x7e15, 0x4099,
-        { 0x84, 0x13, 0xec, 0x94, 0xd8, 0xc2, 0xa4, 0xb6 } };
-#endif
 
 void InitLogging(const base::CommandLine& command_line) {
   LoggingDest dest = LoggingDest::kFile;
@@ -135,27 +105,6 @@ void InitLogging(const base::CommandLine& command_line) {
   } else if (logging_dest == "system") {
     dest = LoggingDest::kSystem;
   }
-
-#if BUILDFLAG(IS_WIN)
-  // On Windows child process may be given a handle in the --log-file switch.
-  base::win::ScopedHandle log_handle;
-  if (logging_dest == "handle") {
-    auto handle_str = command_line.GetSwitchValueNative(switches::kLogFile);
-    uint32_t handle_value = 0;
-    if (base::StringToUint(handle_str, &handle_value)) {
-      // This handle is owned by the logging framework and is closed when the
-      // process exits.
-      HANDLE duplicate = nullptr;
-      if (::DuplicateHandle(GetCurrentProcess(),
-                            base::win::Uint32ToHandle(handle_value),
-                            GetCurrentProcess(), &duplicate, 0, FALSE,
-                            DUPLICATE_SAME_ACCESS)) {
-        log_handle.Set(duplicate);
-        dest = LoggingDest::kHandle;
-      }
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   base::FilePath log_filename;
   if (dest == LoggingDest::kFile) {
@@ -171,14 +120,6 @@ void InitLogging(const base::CommandLine& command_line) {
   }
 
   logging::LoggingSettings settings;
-#if BUILDFLAG(IS_WIN)
-  if (dest == LoggingDest::kHandle) {
-    // TODO(crbug.com/328285906) Use a ScopedHandle in logging settings.
-    settings.log_file = log_handle.release();
-  } else {
-    settings.log_file = nullptr;
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   if (dest == LoggingDest::kFile) {
     settings.log_file_path = log_filename.value();
@@ -221,15 +162,6 @@ std::optional<int> ShellMainDelegate::BasicStartupComplete() {
 
 #if BUILDFLAG(IS_ANDROID)
   Compositor::Initialize();
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  // Enable trace control and transport through event tracing for Windows.
-  logging::LogEventProvider::Initialize(kContentShellProviderName);
-
-  v8_crashpad_support::SetUp();
-
-  base::win::EnableStrictHandleCheckingForCurrentProcess();
 #endif
 
 #if BUILDFLAG(IS_MAC)

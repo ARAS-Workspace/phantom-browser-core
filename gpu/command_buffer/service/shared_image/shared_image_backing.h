@@ -34,11 +34,6 @@
 #include "ui/gfx/gpu_memory_buffer_handle.h"
 #include "ui/gfx/native_pixmap.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <d3d11.h>
-#include <wrl/client.h>
-#endif
-
 #if BUILDFLAG(ENABLE_VULKAN)
 #include "gpu/vulkan/vulkan_device_queue.h"
 #include "gpu/vulkan/vulkan_image.h"
@@ -125,12 +120,8 @@ enum class SharedImageBackingType {
   kMaxValue = kDawn
 };
 
-#if BUILDFLAG(IS_WIN)
-using VideoDevice = Microsoft::WRL::ComPtr<ID3D11Device>;
-#else
 // This parameter is only used on Windows so null is expected.
 using VideoDevice = void*;
-#endif  // BUILDFLAG(IS_WIN)
 
 // Represents the actual storage (GL texture, VkImage, GMB) for a SharedImage.
 // Should not be accessed directly, instead is accessed through a
@@ -358,11 +349,6 @@ class GPU_GLES2_EXPORT SharedImageBacking {
 #if BUILDFLAG(IS_ANDROID)
   virtual std::unique_ptr<LegacyOverlayImageRepresentation>
   ProduceLegacyOverlay(SharedImageManager* manager, MemoryTypeTracker* tracker);
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  virtual void UpdateExternalFence(
-      scoped_refptr<gfx::D3DSharedFence> external_fence);
 #endif
 
   // Updates the estimated size if memory usage changes after creation.

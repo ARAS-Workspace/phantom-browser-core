@@ -51,11 +51,6 @@
 #include "ui/gl/gl_switches.h"
 #include "ui/ozone/public/ozone_switches.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/dark_mode_support.h"
-#include "base/win/resource_exhaustion.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if defined(HEADLESS_USE_EMBEDDED_RESOURCES)
 #include "headless/embedded_resource_pack_data.h"     // nogncheck
 #include "headless/embedded_resource_pack_strings.h"  // nogncheck
@@ -95,20 +90,6 @@ base::LazyInstance<HeadlessCrashReporterClient>::Leaky g_headless_crash_client =
 
 const char kLogFileName[] = "CHROME_LOG_FILE";
 const char kHeadlessCrashKey[] = "headless";
-
-#if BUILDFLAG(IS_WIN)
-void OnResourceExhausted() {
-  // RegisterClassEx will fail if the session's pool of ATOMs is exhausted. This
-  // appears to happen most often when the browser is being driven by automation
-  // tools, though the underlying reason for this remains a mystery
-  // (https://crbug.com/1470483). There is nothing that Chrome can do to
-  // meaningfully run until the user restarts their session by signing out of
-  // Windows or restarting their computer.
-  LOG(ERROR) << "Your computer has run out of resources. "
-                "Sign out of Windows or restart your computer and try again.";
-  base::Process::TerminateCurrentProcessImmediately(EXIT_FAILURE);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 void InitializeResourceBundle(const base::CommandLine& command_line) {
 #if defined(HEADLESS_USE_EMBEDDED_RESOURCES)
@@ -231,12 +212,7 @@ std::optional<int> HeadlessContentMainDelegate::BasicStartupComplete() {
   }
   // The DevTools remote debugging pipe file descriptors need to be checked
   // before any other files are opened, see https://crbug.com/1423048.
-#if BUILDFLAG(IS_WIN)
-  const bool pipes_are_specified_explicitly =
-      command_line->HasSwitch(::switches::kRemoteDebuggingIoPipes);
-#else
   const bool pipes_are_specified_explicitly = false;
-#endif
   if (command_line->HasSwitch(::switches::kRemoteDebuggingPipe) &&
       !pipes_are_specified_explicitly &&
       !devtools_pipe::AreFileDescriptorsOpen()) {
@@ -272,10 +248,6 @@ std::optional<int> HeadlessContentMainDelegate::BasicStartupComplete() {
   // in content/public/common/content_switch_dependent_feature_overrides.cc
   command_line->AppendSwitch(::blink::switches::kAllowPreCommitInput);
 
-#if BUILDFLAG(IS_WIN)
-  command_line->AppendSwitch(
-      ::switches::kDisableGpuProcessForDX12InfoCollection);
-#endif
   return std::nullopt;
 }
 
@@ -283,14 +255,8 @@ void HeadlessContentMainDelegate::InitLogging(
     const base::CommandLine& command_line) {
   const std::string process_type =
       command_line.GetSwitchValueASCII(::switches::kProcessType);
-#if !BUILDFLAG(IS_WIN)
   if (!command_line.HasSwitch(::switches::kEnableLogging))
     return;
-#else
-  // Child processes in Windows are not able to initialize logging.
-  if (!process_type.empty())
-    return;
-#endif  // !BUILDFLAG(IS_WIN)
 
   logging::LoggingDestination log_mode;
   base::FilePath log_filename(FILE_PATH_LITERAL("chrome_debug.log"));
@@ -389,9 +355,7 @@ void HeadlessContentMainDelegate::InitCrashReporter(
   if (process_type != ::switches::kZygoteProcess) {
     g_headless_crash_client.Pointer()->set_crash_dumps_dir(
         command_line.GetSwitchValuePath(switches::kCrashDumpsDir));
-#if !BUILDFLAG(IS_WIN)
     crash_reporter::InitializeCrashpad(process_type.empty(), process_type);
-#endif  // !BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
     crash_reporter::SetFirstChanceExceptionHandler(
         v8::TryHandleWebAssemblyTrapPosix);
@@ -407,14 +371,8 @@ void HeadlessContentMainDelegate::InitCrashReporter(
 void HeadlessContentMainDelegate::PreSandboxStartup() {
   const base::CommandLine& command_line(
       *base::CommandLine::ForCurrentProcess());
-#if BUILDFLAG(IS_WIN)
-  // Windows always needs to initialize logging, otherwise you get a renderer
-  // crash.
-  InitLogging(command_line);
-#else
   if (command_line.HasSwitch(::switches::kEnableLogging))
     InitLogging(command_line);
-#endif  // BUILDFLAG(IS_WIN)
 
   InitCrashReporter(command_line);
 
@@ -500,24 +458,11 @@ std::optional<int> HeadlessContentMainDelegate::PreBrowserMain() {
   }
   browser_->SetOptions(std::move(browser_options));
 
-#if BUILDFLAG(IS_WIN)
-  // Register callback to handle resource exhaustion.
-  base::win::SetOnResourceExhaustedFunction(&OnResourceExhausted);
-#endif
-
 #if BUILDFLAG(IS_MAC)
   PlatformPreBrowserMain();
 #endif
   return std::nullopt;
 }
-
-#if BUILDFLAG(IS_WIN)
-bool HeadlessContentMainDelegate::ShouldHandleConsoleControlEvents() {
-  // Handle console control events so that orderly shutdown can be performed by
-  // HeadlessContentBrowserClient's override of SessionEnding.
-  return true;
-}
-#endif
 
 content::ContentClient* HeadlessContentMainDelegate::CreateContentClient() {
   return &content_client_;
@@ -556,12 +501,6 @@ std::optional<int> HeadlessContentMainDelegate::PostEarlyInitialization(
   if (base::FeatureList::IsEnabled(features::kVirtualTime)) {
     AddSwitchesForVirtualTime();
   }
-
-#if BUILDFLAG(IS_WIN)
-  // Make sure that 'uxtheme.dll' is pinned before blocking on the main thread
-  // is disallowed; see https://crbug.com/368388543#comment11.
-  base::win::IsDarkModeAvailable();
-#endif  // BUILDFLAG(IS_WIN)
 
   return std::nullopt;
 }

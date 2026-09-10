@@ -51,11 +51,7 @@ void AddDialogContent(
   // initially-focused field, the focus appears to change within the dialog
   // immediately after it appears, which interrupts introduction of the dialog
   // by the screen reader.
-#if BUILDFLAG(IS_WIN)
-  const bool initially_focus_description = true;
-#else
   const bool initially_focus_description = false;
-#endif
 
   const auto* const layout_provider = views::LayoutProvider::Get();
   views::Label* paragraph_label = nullptr;

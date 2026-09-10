@@ -414,7 +414,7 @@ void AvatarToolbarButton::MaybeShowProfileSwitchIPH() {
   state_manager_.MaybeShowProfileSwitchIPH();
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 void AvatarToolbarButton::MaybeShowSupervisedUserSignInIPH() {
   state_manager_.MaybeShowSupervisedUserSignInIPH();
 }
@@ -422,7 +422,7 @@ void AvatarToolbarButton::MaybeShowSupervisedUserSignInIPH() {
 void AvatarToolbarButton::MaybeShowSignInBenefitsIPH() {
   state_manager_.MaybeShowSignInBenefitsIPH();
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 void AvatarToolbarButton::MaybeShowExplicitBrowserSigninPreferenceRememberedIPH(
     const AccountInfo& account_info) {

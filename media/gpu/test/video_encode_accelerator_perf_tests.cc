@@ -1082,12 +1082,6 @@ int main(int argc, char** argv) {
     }
   }
 
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<base::test::ScopedFeatureList> feature_list =
-      std::make_unique<base::test::ScopedFeatureList>();
-  feature_list->InitFromCommandLine(enable_feature_str, disable_feature_str);
-#endif  // BUILDFLAG(IS_WIN)
-
 #if defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS)
   enabled_features.push_back(media::kVaapiH264SWBitrateController);
 #endif  // defined(ARCH_CPU_X86_FAMILY) && BUILDFLAG(IS_CHROMEOS)

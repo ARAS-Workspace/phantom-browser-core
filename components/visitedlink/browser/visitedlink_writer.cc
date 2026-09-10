@@ -35,13 +35,6 @@
 #include "third_party/abseil-cpp/absl/container/inlined_vector.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <io.h>
-#include <shlobj.h>
-#endif  // BUILDFLAG(IS_WIN)
-
 using content::BrowserThread;
 
 namespace visitedlink {

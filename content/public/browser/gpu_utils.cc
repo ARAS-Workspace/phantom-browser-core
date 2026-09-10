@@ -59,14 +59,6 @@ const gpu::GpuPreferences GetGpuPreferencesFromCommandLine() {
       command_line->HasSwitch(switches::kDisableAcceleratedVideoDecode);
   gpu_preferences.disable_accelerated_video_encode =
       command_line->HasSwitch(switches::kDisableAcceleratedVideoEncode);
-#if BUILDFLAG(IS_WIN)
-  gpu_preferences.enable_low_latency_dxva =
-      !command_line->HasSwitch(switches::kDisableLowLatencyDxva);
-  gpu_preferences.enable_zero_copy_dxgi_video =
-      !command_line->HasSwitch(switches::kDisableZeroCopyDxgiVideo);
-  gpu_preferences.enable_nv12_dxgi_video =
-      !command_line->HasSwitch(switches::kDisableNv12DxgiVideo);
-#endif
   gpu_preferences.disable_software_rasterizer =
       command_line->HasSwitch(switches::kDisableSoftwareRasterizer) ||
       (!features::IsSwiftShaderAllowed(command_line) &&

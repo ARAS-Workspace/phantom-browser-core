@@ -225,7 +225,7 @@ WebContents* AddRestoredTabImpl(std::unique_ptr<WebContents> web_contents,
     raw_web_contents->WasHidden();
   } else {
     const bool should_activate =
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
         // Activating a window on another space causes the system to switch to
         // that space. Since the session restore process shows and activates
         // windows itself, activating windows here should be safe to skip.

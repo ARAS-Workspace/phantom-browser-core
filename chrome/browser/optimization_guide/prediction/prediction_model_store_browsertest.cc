@@ -260,8 +260,7 @@ class PredictionModelStoreBrowserTest
 };
 
 // TODO(crbug.com/329617221): Test is flaky on Win, Linux, and Mac ASan bots.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || \
-    (BUILDFLAG(IS_MAC) && defined(ADDRESS_SANITIZER))
+#if BUILDFLAG(IS_LINUX) || (BUILDFLAG(IS_MAC) && defined(ADDRESS_SANITIZER))
 #define MAYBE_TestRegularProfile DISABLED_TestRegularProfile
 #else
 #define MAYBE_TestRegularProfile TestRegularProfile

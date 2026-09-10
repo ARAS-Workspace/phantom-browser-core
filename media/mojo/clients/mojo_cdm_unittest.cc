@@ -97,10 +97,6 @@ class MojoCdmTest : public ::testing::Test {
     EXPECT_CALL(*remote_cdm_, GetCdmContext())
         .WillRepeatedly(Return(&cdm_context_));
     EXPECT_CALL(cdm_context_, GetDecryptor()).WillRepeatedly(ReturnNull());
-#if BUILDFLAG(IS_WIN)
-    EXPECT_CALL(cdm_context_, RequiresMediaFoundationRenderer())
-        .WillRepeatedly(ReturnPointee(&requires_media_foundation_renderer_));
-#endif
 
     if (expected_result == CONNECTION_ERROR_DURING) {
       // Create() will be successful, so provide a callback that will break
@@ -397,9 +393,6 @@ class MojoCdmTest : public ::testing::Test {
   std::unique_ptr<mojo::Receiver<mojom::ContentDecryptionModule>> cdm_receiver_;
   scoped_refptr<ContentDecryptionModule> mojo_cdm_;
 
-#if BUILDFLAG(IS_WIN)
-  bool requires_media_foundation_renderer_ = false;
-#endif
 };
 
 TEST_F(MojoCdmTest, Create_Success) {
@@ -641,22 +634,5 @@ TEST_F(MojoCdmTest, NoDecryptor) {
   EXPECT_FALSE(decryptor);
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST_F(MojoCdmTest, RequiresMediaFoundationRenderer) {
-  requires_media_foundation_renderer_ = true;
-  Initialize(SUCCESS);
-  auto* cdm_context = mojo_cdm_->GetCdmContext();
-  EXPECT_TRUE(cdm_context) << "All CDMs should support CdmContext";
-  EXPECT_TRUE(cdm_context->RequiresMediaFoundationRenderer());
-}
-
-TEST_F(MojoCdmTest, NotRequireMediaFoundationRenderer) {
-  requires_media_foundation_renderer_ = false;
-  Initialize(SUCCESS);
-  auto* cdm_context = mojo_cdm_->GetCdmContext();
-  EXPECT_TRUE(cdm_context) << "All CDMs should support CdmContext";
-  EXPECT_FALSE(cdm_context->RequiresMediaFoundationRenderer());
-}
-#endif
 
 }  // namespace media

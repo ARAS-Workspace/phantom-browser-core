@@ -51,10 +51,6 @@
 #include "third_party/cros_system_api/dbus/service_constants.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "chrome/browser/devtools/devtools_window.h"
 #include "chrome/browser/ui/browser.h"
@@ -345,10 +341,6 @@ extensions::api::runtime::PlatformNaclArch GetPlatformInfoNaClArch() {
 #if defined(ARCH_CPU_X86_FAMILY)
 #if defined(ARCH_CPU_X86_64)
   return extensions::api::runtime::PlatformNaclArch::kX86_64;
-#elif BUILDFLAG(IS_WIN)
-  return base::win::OSInfo::GetInstance()->IsWowX86OnAMD64()
-             ? extensions::api::runtime::PlatformNaclArch::kX86_64
-             : extensions::api::runtime::PlatformNaclArch::kX86_32;
 #else
   return extensions::api::runtime::PlatformNaclArch::kX86_32;
 #endif

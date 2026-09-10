@@ -32,29 +32,6 @@ std::unique_ptr<PrintJobWorker> PrinterQueryOop::TransferContextToNewWorker(
   return CreatePrintJobWorkerOop(print_job);
 }
 
-#if BUILDFLAG(IS_WIN)
-void PrinterQueryOop::UpdatePrintableArea(
-    PrintSettings* print_settings,
-    OnDidUpdatePrintableAreaCallback callback) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-
-  std::string printer_name = base::UTF16ToUTF8(print_settings->device_name());
-  PRINTER_LOG(EVENT) << "Updating paper printable area via service for "
-                     << printer_name;
-
-  PrintBackendServiceManager& service_mgr =
-      PrintBackendServiceManager::GetInstance();
-
-  // Caller is required to ensure `print_settings` stays alive until `callback`
-  // runs.
-  service_mgr.GetPaperPrintableArea(
-      printer_name, print_settings->requested_media(),
-      base::BindOnce(&PrinterQueryOop::OnDidGetPaperPrintableArea,
-                     weak_factory_.GetWeakPtr(), print_settings,
-                     std::move(callback)));
-}
-#endif
-
 void PrinterQueryOop::SetClientId(
     PrintBackendServiceManager::ClientId client_id) {
   query_with_ui_client_id_ = client_id;
@@ -218,16 +195,6 @@ void PrinterQueryOop::UpdatePrintSettings(base::DictValue new_settings,
   if (print_from_system_dialog_) {
     CHECK(!print_document_client_id_.has_value());
     client_id = *query_with_ui_client_id_;
-#if BUILDFLAG(ENABLE_OOP_BASIC_PRINT_DIALOG) && BUILDFLAG(IS_WIN)
-    // `PrintingContextWin::UpdatePrintSettings()` is special because it can
-    // invoke `AskUserForSettings()` and cause a system dialog to be displayed.
-    // Running a dialog causes an exit to webpage-initiated fullscreen.
-    // http://crbug.com/41322524
-    content::WebContents* web_contents = GetWebContents();
-    if (web_contents && web_contents->IsFullscreen()) {
-      web_contents->ExitFullscreen(true);
-    }
-#endif
   } else {
     // Print the document from Print Preview.
     CHECK(!query_with_ui_client_id_.has_value());
@@ -301,22 +268,6 @@ void PrinterQueryOop::OnDidUpdatePrintSettings(
   }
   InvokeSettingsCallback(std::move(callback), result);
 }
-
-#if BUILDFLAG(IS_WIN)
-void PrinterQueryOop::OnDidGetPaperPrintableArea(
-    PrintSettings* print_settings,
-    OnDidUpdatePrintableAreaCallback callback,
-    const gfx::Rect& printable_area_um) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  if (printable_area_um.IsEmpty()) {
-    std::move(callback).Run(/*success=*/false);
-    return;
-  }
-
-  print_settings->UpdatePrinterPrintableArea(printable_area_um);
-  std::move(callback).Run(/*success=*/true);
-}
-#endif
 
 void PrinterQueryOop::SendEstablishPrintingContext(
     PrintBackendServiceManager::ClientId client_id,

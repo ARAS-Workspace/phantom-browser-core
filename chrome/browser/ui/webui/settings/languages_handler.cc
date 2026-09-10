@@ -67,11 +67,7 @@ void LanguagesHandler::HandleSetProspectiveUILanguage(
   AllowJavascript();
   CHECK_EQ(1U, args.size());
 
-#if BUILDFLAG(IS_WIN)
-  PrefService* prefs = g_browser_process->local_state();
-  const std::string& language_code = args[0].GetString();
-  prefs->SetString(language::prefs::kApplicationLocale, language_code);
-#elif BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
   // Secondary users and public session users cannot change the locale.
   user_manager::UserManager* user_manager = user_manager::UserManager::Get();
   const user_manager::User* user =

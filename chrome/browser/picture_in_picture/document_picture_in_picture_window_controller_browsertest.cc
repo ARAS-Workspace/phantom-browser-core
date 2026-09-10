@@ -532,13 +532,7 @@ IN_PROC_BROWSER_TEST_F(DocumentPictureInPictureWindowControllerBrowserTest,
   EXPECT_GE(pip_window_bounds->height(), container_bounds.height());
 }
 
-#if BUILDFLAG(IS_WIN)
-// Back to tab button (PictureInPictureBrowserFrameView) is not available
-// in Windows yet.
-#define MAYBE_FocusInitiatorWhenBackToTab DISABLED_FocusInitiatorWhenBackToTab
-#else
 #define MAYBE_FocusInitiatorWhenBackToTab FocusInitiatorWhenBackToTab
-#endif
 IN_PROC_BROWSER_TEST_F(DocumentPictureInPictureWindowControllerBrowserTest,
                        MAYBE_FocusInitiatorWhenBackToTab) {
   LoadTabAndEnterPictureInPicture(browser());

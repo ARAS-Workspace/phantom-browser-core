@@ -130,13 +130,6 @@ class CertVerifyProcFactoryImpl : public net::CertVerifyProcFactory {
     }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-    // Start initialization of TrustStoreWin on a separate thread if it hasn't
-    // been done already. We do this here instead of in the TrustStoreWin
-    // constructor to avoid any unnecessary threading in unit tests that don't
-    // use threads otherwise.
-    net::InitializeTrustStoreWinSystem();
-#endif
 #if BUILDFLAG(IS_ANDROID)
     // Start initialization of TrustStoreAndroid on a separate thread if it
     // hasn't been done already. We do this here instead of in the

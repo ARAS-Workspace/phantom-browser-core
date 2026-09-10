@@ -33,11 +33,7 @@ std::vector<std::string> GetSomeRules() {
 }
 
 base::CommandLine::StringType AsciiToNativeString(std::string ascii) {
-#if BUILDFLAG(IS_WIN)
-  return base::ASCIIToWide(ascii);
-#else
   return ascii;
-#endif
 }
 
 class RulesetConverterTest : public testing::Test {

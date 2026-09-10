@@ -226,16 +226,9 @@ TEST_P(PaintPreviewBaseServiceTest, CaptureMainFrame) {
                              .value();
             switch (GetParam()) {
               case RecordingPersistence::kFileSystem: {
-#if BUILDFLAG(IS_WIN)
-                base::FilePath received_path = base::FilePath(
-                    base::UTF8ToWide(result->proto.root_frame().file_path()));
-                base::FilePath name(
-                    base::UTF8ToWide(base::StrCat({token.ToString(), ".skp"})));
-#else
                 base::FilePath received_path =
                     base::FilePath(result->proto.root_frame().file_path());
                 base::FilePath name(base::StrCat({token.ToString(), ".skp"}));
-#endif
                 EXPECT_EQ(received_path.DirName(), path);
                 EXPECT_EQ(received_path.BaseName(), name);
               } break;

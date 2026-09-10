@@ -108,10 +108,6 @@ named_mojo_ipc_server::EndpointOptions CreateServerEndpointOptions(
   named_mojo_ipc_server::EndpointOptions options{
       server_name,
       named_mojo_ipc_server::EndpointOptions::kUseIsolatedConnection};
-#if BUILDFLAG(IS_WIN)
-  options.security_descriptor =
-      GetGlobalConstants()->NamedPipeSecurityDescriptor();
-#endif
   return options;
 }
 

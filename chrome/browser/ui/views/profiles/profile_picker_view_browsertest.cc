@@ -180,12 +180,6 @@
 #include "ui/ozone/public/ozone_platform.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-// This is needed to resolve a conflict with a Windows specific macro for
-// `GetUserName`.
-#include "base/win/winbase_shim.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "components/policy/core/common/management/management_service.h"
@@ -1303,7 +1297,7 @@ IN_PROC_BROWSER_TEST_F(ProfilePickerCreationFlowBrowserTest,
 }
 
 // TODO(crbug.com/40868761): Test is flaky on Linux and Windows.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_CreateForceSignedInProfile DISABLED_CreateForceSignedInProfile
 #else
 #define MAYBE_CreateForceSignedInProfile CreateForceSignedInProfile
@@ -3928,13 +3922,8 @@ class ProfilePickerCreationFlowEphemeralProfileBrowserTest
 };
 
 // Flaky on Windows: https://crbug.com/40196889.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PRE_Signin DISABLED_PRE_Signin
-#define MAYBE_Signin DISABLED_Signin
-#else
 #define MAYBE_PRE_Signin PRE_Signin
 #define MAYBE_Signin Signin
-#endif
 // Checks that the new profile is no longer ephemeral at the end of the flow and
 // still exists after restart.
 IN_PROC_BROWSER_TEST_P(ProfilePickerCreationFlowEphemeralProfileBrowserTest,
@@ -4000,13 +3989,8 @@ IN_PROC_BROWSER_TEST_P(ProfilePickerCreationFlowEphemeralProfileBrowserTest,
 }
 
 // Flaky on Windows: https://crbug.com/40196889.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PRE_ExitDuringSignin DISABLED_PRE_ExitDuringSignin
-#define MAYBE_ExitDuringSignin DISABLED_ExitDuringSignin
-#else
 #define MAYBE_PRE_ExitDuringSignin PRE_ExitDuringSignin
 #define MAYBE_ExitDuringSignin ExitDuringSignin
-#endif
 // Checks that the new profile is deleted on next startup if Chrome exits during
 // the signin flow.
 IN_PROC_BROWSER_TEST_P(ProfilePickerCreationFlowEphemeralProfileBrowserTest,

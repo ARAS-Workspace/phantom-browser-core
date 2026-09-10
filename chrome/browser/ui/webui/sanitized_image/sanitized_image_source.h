@@ -124,7 +124,7 @@ class SanitizedImageSource : public content::URLDataSource {
     ~RequestAttributes();
 
     GURL image_url = GURL();
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     bool static_encode = true;
 #else
     bool static_encode = false;

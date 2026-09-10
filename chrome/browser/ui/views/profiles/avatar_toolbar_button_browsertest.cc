@@ -1128,7 +1128,7 @@ class AvatarToolbarButtonReplaceSyncPromosWithSignInPromosBrowserTest
   test_type(test_suite, test_name)  // Actual test implementation starts here.
 
 // TODO(b/331746545): Check flaky test issue on windows.
-#if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_CHROMEOS)
 TEST_WITH_SIGNED_IN_FROM_PRE(
     IN_PROC_BROWSER_TEST_F,
     AvatarToolbarButtonReplaceSyncPromosWithSignInPromosBrowserTest,
@@ -1152,14 +1152,10 @@ TEST_WITH_SIGNED_IN_FROM_PRE(
   // Once the greeting and promo are not shown anymore, we expect no text.
   EXPECT_EQ(avatar_accessor.GetText(), std::u16string());
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_WIN)
+#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // TODO(b/331746545): Check flaky test issue on windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ShowNameOnSync DISABLED_ShowNameOnSync
-#else
 #define MAYBE_ShowNameOnSync ShowNameOnSync
-#endif
 IN_PROC_BROWSER_TEST_F(
     AvatarToolbarButtonReplaceSyncPromosWithSignInPromosOffBrowserTest,
     MAYBE_ShowNameOnSync) {
@@ -1527,11 +1523,7 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest, TooltipText) {
 }
 
 // TODO(b/331746545): Check flaky test issue on windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_EnableSyncWithSyncDisabled DISABLED_EnableSyncWithSyncDisabled
-#else
 #define MAYBE_EnableSyncWithSyncDisabled EnableSyncWithSyncDisabled
-#endif
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
                        MAYBE_EnableSyncWithSyncDisabled) {
   AvatarToolbarButtonInterface* avatar =
@@ -1762,13 +1754,8 @@ class AvatarToolbarButtonWithInteractiveFeaturePromoBrowserTest
 // features are not compatible (SyncPromo have a higher priority than
 // HistorySync), this is handled in the constructor.
 // TODO(crbug.com/331746545): Check the flaky test suite issue on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_AvatarToolbarButtonPromoBrowserTest \
-  DISABLED_AvatarToolbarButtonPromoBrowserTest
-#else
 #define MAYBE_AvatarToolbarButtonPromoBrowserTest \
   AvatarToolbarButtonPromoBrowserTest
-#endif
 class MAYBE_AvatarToolbarButtonPromoBrowserTest
     : public AvatarToolbarButtonWithInteractiveFeaturePromoBrowserTest,
       public testing::WithParamInterface<
@@ -2000,7 +1987,6 @@ struct HistorySyncOptinSyncManagedTypeTestCase {
 };
 
 // TODO(crbug.com/331746545): Check the flaky test issue on Windows.
-#if !BUILDFLAG(IS_WIN)
 class AvatarToolbarButtonHistorySyncOptinManagedTypeTest
     : public AvatarToolbarButtonWithInteractiveFeaturePromoBrowserTest,
       public WithParamInterface<HistorySyncOptinSyncManagedTypeTestCase> {
@@ -2057,7 +2043,6 @@ TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
 INSTANTIATE_TEST_SUITE_P(HistorySyncOptinManagedType,
                          AvatarToolbarButtonHistorySyncOptinManagedTypeTest,
                          ValuesIn(kHistorySyncOptinSyncManagedTypeTestCases));
-#endif
 
 TEST_WITH_SIGNED_IN_FROM_PRE(IN_PROC_BROWSER_TEST_P,
                              MAYBE_AvatarToolbarButtonPromoBrowserTest,
@@ -2302,13 +2287,8 @@ INSTANTIATE_TEST_SUITE_P(
                   kBatchUploadWindows10DepreciationPromo}));
 
 // TODO(crbug.com/331746545): Check the flaky test suite issue on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_AvatarToolbarButtonPromoClickBrowserTest \
-  DISABLED_AvatarToolbarButtonPromoClickBrowserTest
-#else
 #define MAYBE_AvatarToolbarButtonPromoClickBrowserTest \
   AvatarToolbarButtonPromoClickBrowserTest
-#endif
 class MAYBE_AvatarToolbarButtonPromoClickBrowserTest
     : public MAYBE_AvatarToolbarButtonPromoBrowserTest {
  protected:
@@ -2546,13 +2526,8 @@ INSTANTIATE_TEST_SUITE_P(
                   kBatchUploadWindows10DepreciationPromo}));
 
 // TODO(crbug.com/331746545): Check flaky test issue on windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_AvatarToolbarButtonSignedOutPromoBrowserTest \
-  DISABLED_AvatarToolbarButtonSignedOutPromoBrowserTest
-#else
 #define MAYBE_AvatarToolbarButtonSignedOutPromoBrowserTest \
   AvatarToolbarButtonSignedOutPromoBrowserTest
-#endif
 class MAYBE_AvatarToolbarButtonSignedOutPromoBrowserTest
     : public AvatarToolbarButtonWithInteractiveFeaturePromoBrowserTest {
  public:
@@ -2592,13 +2567,8 @@ IN_PROC_BROWSER_TEST_F(MAYBE_AvatarToolbarButtonSignedOutPromoBrowserTest,
 }
 
 // TODO(crbug.com/331746545): Check flaky test issue on windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_AvatarToolbarButtonSignedOutPromoOverriddenIdentityManagerBrowserTest \
-  DISABLED_AvatarToolbarButtonSignedOutPromoOverriddenIdentityManagerBrowserTest
-#else
 #define MAYBE_AvatarToolbarButtonSignedOutPromoOverriddenIdentityManagerBrowserTest \
   AvatarToolbarButtonSignedOutPromoOverriddenIdentityManagerBrowserTest
-#endif
 // This test setup does not load the RefreshTokens until explicitly dnoe through
 // the `LoadRefreshTokens()`.
 class
@@ -3137,17 +3107,10 @@ IN_PROC_BROWSER_TEST_F(AvatarToolbarButtonEnterpriseBadgingBrowserTest,
 }
 
 // TODO(crbug.com/331746545): Check flaky test issue on windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PRE_SignedInWithNewSessionKeepCustomWorkBadge \
-  DISABLED_PRE_SignedInWithNewSessionKeepCustomWorkBadge
-#define MAYBE_SignedInWithNewSessionKeepCustomWorkBadge \
-  DISABLED_SignedInWithNewSessionKeepCustomWorkBadge
-#else
 #define MAYBE_PRE_SignedInWithNewSessionKeepCustomWorkBadge \
   PRE_SignedInWithNewSessionKeepCustomWorkBadge
 #define MAYBE_SignedInWithNewSessionKeepCustomWorkBadge \
   SignedInWithNewSessionKeepCustomWorkBadge
-#endif
 // Tests the flow for a managed sign-in.
 IN_PROC_BROWSER_TEST_F(AvatarToolbarButtonEnterpriseBadgingBrowserTest,
                        MAYBE_PRE_SignedInWithNewSessionKeepCustomWorkBadge) {
@@ -3204,13 +3167,8 @@ IN_PROC_BROWSER_TEST_F(AvatarToolbarButtonEnterpriseBadgingBrowserTest,
 }
 
 // TODO(b/331746545): Check flaky test issue on windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SigninPendingFromExternalErrorThenReauth \
-  DISABLED_SigninPendingFromExternalErrorThenReauth
-#else
 #define MAYBE_SigninPendingFromExternalErrorThenReauth \
   SigninPendingFromExternalErrorThenReauth
-#endif
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
                        MAYBE_SigninPendingFromExternalErrorThenReauth) {
   AvatarToolbarButtonInterface* avatar =
@@ -3244,11 +3202,7 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
 }
 
 // TODO(b/331746545): Check flaky test issue on windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SigninPendingFromWebSignout DISABLED_SigninPendingFromWebSignout
-#else
 #define MAYBE_SigninPendingFromWebSignout SigninPendingFromWebSignout
-#endif
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
                        MAYBE_SigninPendingFromWebSignout) {
   AvatarToolbarButtonInterface* avatar =
@@ -3303,11 +3257,7 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
 }
 
 // TODO(b/331746545): Check flaky test issue on windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SigninPendingThenSignout DISABLED_SigninPendingThenSignout
-#else
 #define MAYBE_SigninPendingThenSignout SigninPendingThenSignout
-#endif
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
                        MAYBE_SigninPendingThenSignout) {
   AvatarToolbarButtonInterface* avatar =
@@ -3469,11 +3419,7 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest, AccessibilityLabels) {
 }
 
 // TODO(crbug.com/359995696): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PassphraseErrorSignedIn DISABLED_PassphraseErrorSignedIn
-#else
 #define MAYBE_PassphraseErrorSignedIn PassphraseErrorSignedIn
-#endif
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
                        MAYBE_PassphraseErrorSignedIn) {
   AvatarToolbarButtonInterface* avatar =
@@ -3488,11 +3434,7 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
 }
 
 // TODO(crbug.com/359995696): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PassphraseErrorSyncing DISABLED_PassphraseErrorSyncing
-#else
 #define MAYBE_PassphraseErrorSyncing PassphraseErrorSyncing
-#endif
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
                        MAYBE_PassphraseErrorSyncing) {
   AvatarToolbarButtonInterface* avatar =
@@ -3506,11 +3448,7 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
 }
 
 // TODO(crbug.com/359995696): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_UpgradeClientError DISABLED_UpgradeClientError
-#else
 #define MAYBE_UpgradeClientError UpgradeClientError
-#endif
 IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
                        MAYBE_UpgradeClientError) {
   AvatarToolbarButtonInterface* avatar =
@@ -3526,12 +3464,7 @@ IN_PROC_BROWSER_TEST_P(AvatarToolbarButtonBrowserTest,
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 // TODO(crbug.com/331746545): Check the flaky test issue on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ShowMakingChromeYoursOnSignin \
-  DISABLED_ShowMakingChromeYoursOnSignin
-#else
 #define MAYBE_ShowMakingChromeYoursOnSignin ShowMakingChromeYoursOnSignin
-#endif
 IN_PROC_BROWSER_TEST_F(
     AvatarToolbarButtonReplaceSyncPromosWithSignInPromosBrowserTest,
     MAYBE_ShowMakingChromeYoursOnSignin) {
@@ -3556,12 +3489,7 @@ IN_PROC_BROWSER_TEST_F(
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 // TODO(crbug.com/331746545): Check the flaky test issue on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ClearMakingChromeYoursOnSignout \
-  DISABLED_ClearMakingChromeYoursOnSignout
-#else
 #define MAYBE_ClearMakingChromeYoursOnSignout ClearMakingChromeYoursOnSignout
-#endif
 IN_PROC_BROWSER_TEST_F(
     AvatarToolbarButtonReplaceSyncPromosWithSignInPromosBrowserTest,
     MAYBE_ClearMakingChromeYoursOnSignout) {
@@ -3577,13 +3505,8 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // TODO(crbug.com/331746545): Check the flaky test issue on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ShowMakingChromeYoursOnSigninThenClick \
-  DISABLED_ShowMakingChromeYoursOnSigninThenClick
-#else
 #define MAYBE_ShowMakingChromeYoursOnSigninThenClick \
   ShowMakingChromeYoursOnSigninThenClick
-#endif
 IN_PROC_BROWSER_TEST_F(
     AvatarToolbarButtonReplaceSyncPromosWithSignInPromosBrowserTest,
     MAYBE_ShowMakingChromeYoursOnSigninThenClick) {
@@ -3607,13 +3530,8 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // TODO(crbug.com/331746545): Check the flaky test issue on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ShowMakingChromeYoursOnSigninBeforeBrowserWindow \
-  DISABLED_ShowMakingChromeYoursOnSigninBeforeBrowserWindow
-#else
 #define MAYBE_ShowMakingChromeYoursOnSigninBeforeBrowserWindow \
   ShowMakingChromeYoursOnSigninBeforeBrowserWindow
-#endif
 IN_PROC_BROWSER_TEST_F(
     AvatarToolbarButtonReplaceSyncPromosWithSignInPromosBrowserTest,
     MAYBE_ShowMakingChromeYoursOnSigninBeforeBrowserWindow) {
@@ -3644,13 +3562,8 @@ IN_PROC_BROWSER_TEST_F(
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 // TODO(crbug.com/331746545): Check the flaky test issue on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ShowMakingChromeYoursOnSigninAndSync \
-  DISABLED_ShowMakingChromeYoursOnSigninAndSync
-#else
 #define MAYBE_ShowMakingChromeYoursOnSigninAndSync \
   ShowMakingChromeYoursOnSigninAndSync
-#endif
 IN_PROC_BROWSER_TEST_F(
     AvatarToolbarButtonReplaceSyncPromosWithSignInPromosBrowserTest,
     MAYBE_ShowMakingChromeYoursOnSigninAndSync) {
@@ -3668,13 +3581,8 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // TODO(crbug.com/331746545): Check the flaky test issue on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_MakingChromeYoursThenExplicitState \
-  DISABLED_MakingChromeYoursThenExplicitState
-#else
 #define MAYBE_MakingChromeYoursThenExplicitState \
   MakingChromeYoursThenExplicitState
-#endif
 IN_PROC_BROWSER_TEST_F(
     AvatarToolbarButtonReplaceSyncPromosWithSignInPromosBrowserTest,
     MAYBE_MakingChromeYoursThenExplicitState) {
@@ -3701,12 +3609,7 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // TODO(crbug.com/331746545): Check the flaky test issue on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_MakingChromeYoursThenSyncError \
-  DISABLED_MakingChromeYoursThenSyncError
-#else
 #define MAYBE_MakingChromeYoursThenSyncError MakingChromeYoursThenSyncError
-#endif
 IN_PROC_BROWSER_TEST_F(
     AvatarToolbarButtonReplaceSyncPromosWithSignInPromosBrowserTest,
     MAYBE_MakingChromeYoursThenSyncError) {
@@ -3730,14 +3633,8 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // TODO(crbug.com/331746545): Check the flaky test issue on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PRE_DoesNotShowOnBrowserRestart \
-  DISABLED_PRE_DoesNotShowOnBrowserRestart
-#define MAYBE_DoesNotShowOnBrowserRestart DISABLED_DoesNotShowOnBrowserRestart
-#else
 #define MAYBE_PRE_DoesNotShowOnBrowserRestart PRE_DoesNotShowOnBrowserRestart
 #define MAYBE_DoesNotShowOnBrowserRestart DoesNotShowOnBrowserRestart
-#endif
 IN_PROC_BROWSER_TEST_F(
     AvatarToolbarButtonReplaceSyncPromosWithSignInPromosBrowserTest,
     MAYBE_PRE_DoesNotShowOnBrowserRestart) {
@@ -3769,7 +3666,7 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_TRUE(avatar_accessor.GetText().empty());
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class AvatarToolbarButtonSignInBenefitsIphBrowserTest
     : public InteractiveFeaturePromoTestMixin<
           AvatarToolbarButtonBrowserTestBase> {
@@ -4034,7 +3931,7 @@ INSTANTIATE_TEST_SUITE_P(
     All,
     AvatarToolbarButtonSignInBenefitsNewSigninIphParameterizedTest,
     testing::Bool());
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if !BUILDFLAG(IS_CHROMEOS)
 class MockPasskeyUnlockManager : public webauthn::PasskeyUnlockManager {

@@ -137,9 +137,9 @@
 #include "chrome/grit/settings_shared_resources_map.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ui/webui/settings/languages_handler.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ash/webui/eche_app_ui/eche_app_manager.h"
@@ -182,9 +182,6 @@
 #include "chrome/browser/ui/webui/settings/mac_system_settings_handler.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/install_static/install_util.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(ENABLE_VR)
 #include "device/vr/public/cpp/features.h"
@@ -232,9 +229,6 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
   AddSettingsPageUIHandler(std::make_unique<ImportDataHandler>());
   AddSettingsPageUIHandler(std::make_unique<HatsHandler>());
 
-#if BUILDFLAG(IS_WIN)
-  AddSettingsPageUIHandler(std::make_unique<LanguagesHandler>());
-#endif  // BUILDFLAG(IS_WIN)
 
   AddSettingsPageUIHandler(
       std::make_unique<MediaDevicesSelectionHandler>(profile));
@@ -416,21 +410,7 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
                           content::AreIsolatedWebAppsEnabled(profile));
 #endif
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  // System
-  html_source->AddBoolean(
-      "showFeatureNotificationsSetting",
-      base::FeatureList::IsEnabled(features::kRegisterOsUpdateHandlerWin));
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
-#if BUILDFLAG(IS_WIN)
-  html_source->AddBoolean(
-      "showProcessIsolationSetting",
-      install_static::IsSystemInstall() &&
-          (base::FeatureList::IsEnabled(features::kProcessIsolationSettings) ||
-           g_browser_process->local_state()->GetBoolean(
-               prefs::kProcessIsolationEnabled)));
-#endif  // BUILDFLAG(IS_WIN)
 
   html_source->AddBoolean(
       "enableWebAppInstallation",

@@ -104,8 +104,6 @@ DeviceInfo::DeviceType GetLocalDeviceType() {
   }
 #elif BUILDFLAG(IS_MAC)
   return DeviceInfo::DeviceType::kMac;
-#elif BUILDFLAG(IS_WIN)
-  return DeviceInfo::DeviceType::kWindows;
 #else
   return DeviceInfo::DeviceType::kOther;
 #endif
@@ -122,8 +120,6 @@ DeviceInfo::OsType GetLocalDeviceOSType() {
   return DeviceInfo::OsType::kIOS;
 #elif BUILDFLAG(IS_MAC)
   return DeviceInfo::OsType::kMac;
-#elif BUILDFLAG(IS_WIN)
-  return DeviceInfo::OsType::kWindows;
 #else
 #error Please handle your new device OS here.
 #endif

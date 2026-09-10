@@ -2472,7 +2472,7 @@ TEST_F(ExtensionServiceTest, TestInstallThemeWithExtensionsDisabled) {
                       static_cast<int>(ManifestLocation::kInternal));
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 // Flaky on these platforms. http://crbug.com/40157248
 #define MAYBE_InstallTheme DISABLED_InstallTheme
 #else
@@ -4321,7 +4321,7 @@ TEST_F(ExtensionServiceTest, PolicyInstalledExtensionsAllowlisted) {
 // logic for off-store force-installed extensions in low-trust environments
 // (non-domain-joined) is only implemented on these platforms as per the changes
 // in `standard_management_policy_provider.cc`.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // Tests that non-CWS extensions are disabled when force-installed in a non
 // domain-join environment.
 TEST_F(ExtensionServiceTest, NonCWSForceInstalledDisabledOnNonDomainJoin) {
@@ -4763,11 +4763,7 @@ TEST_F(ExtensionServiceTest, PolicyBlockedPermissionPolicyUpdate) {
 }
 
 // Flaky on windows; http://crbug.com/41067305
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ExternalExtensionAutoAcknowledgement DISABLED_ExternalExtensionAutoAcknowledgement
-#else
 #define MAYBE_ExternalExtensionAutoAcknowledgement ExternalExtensionAutoAcknowledgement
-#endif
 TEST_F(ExtensionServiceTest, MAYBE_ExternalExtensionAutoAcknowledgement) {
   InitializeEmptyExtensionService();
 
@@ -6271,17 +6267,6 @@ void ExtensionServiceTest::TestExternalProvider(MockExternalProvider* provider,
 }
 
 // Tests the external installation feature
-#if BUILDFLAG(IS_WIN)
-TEST_F(ExtensionServiceTest, ExternalInstallRegistry) {
-  // This should all work, even when normal extension installation is disabled.
-  InitializeExtensionServiceWithExtensionsDisabled();
-
-  // Now add providers. Extension system takes ownership of the objects.
-  MockExternalProvider* reg_provider =
-      AddMockExternalProvider(ManifestLocation::kExternalRegistry);
-  TestExternalProvider(reg_provider, ManifestLocation::kExternalRegistry);
-}
-#endif
 
 TEST_F(ExtensionServiceTest, ExternalInstallPref) {
   InitializeEmptyExtensionService();
@@ -7644,7 +7629,7 @@ TEST_F(ExtensionServiceTest, DisablingComponentExtensions) {
 // TSan: https://crbug.com/41193625
 // TODO(crbug.com/405391110): Enable when the install error UI exists on desktop
 // Android.
-#if BUILDFLAG(IS_WIN) || defined(THREAD_SANITIZER)
+#if defined(THREAD_SANITIZER)
 #define MAYBE_ExternalInstallMultiple DISABLED_ExternalInstallMultiple
 #else
 #define MAYBE_ExternalInstallMultiple ExternalInstallMultiple

@@ -70,11 +70,7 @@ TEST(IDUtilTest, GenerateIDFromHex) {
 TEST(IDUtilTest, GenerateIDForPath) {
   const std::string generated =
       GenerateIdForPath(base::FilePath(FILE_PATH_LITERAL("/path/to/file.ext")));
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ("jjlkojfgbeklddcpckipekckcmgcbfjn", generated);
-#else
   EXPECT_EQ("lnkgfdknojmdambfcanadbhmfjfljobb", generated);
-#endif
 }
 
 }  // namespace crx_file::id_util

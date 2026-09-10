@@ -28,9 +28,6 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
 
 namespace switches {
 
@@ -279,24 +276,6 @@ const char kAlsaOutputDevice[] = "alsa-output-device";
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
         // BUILDFLAG(IS_FREEBSD) || BUILDFLAG(IS_SOLARIS)
 
-#if BUILDFLAG(IS_WIN)
-// Use exclusive mode audio streaming for Windows Vista and higher.
-// Leads to lower latencies for audio streams which uses the
-// AudioParameters::AUDIO_PCM_LOW_LATENCY audio path.
-// See http://msdn.microsoft.com/en-us/library/windows/desktop/dd370844.aspx
-// for details.
-const char kEnableExclusiveAudio[] = "enable-exclusive-audio";
-// Use Windows WaveOut/In audio API even if Core Audio is supported.
-const char kForceWaveAudio[] = "force-wave-audio";
-// Instead of always using the hardware channel layout, check if a driver
-// supports the source channel layout.  Avoids outputting empty channels and
-// permits drivers to enable stereo to multichannel expansion.  Kept behind a
-// flag since some drivers lie about supported layouts and hang when used.  See
-// http://crbug.com/259165 for more details.
-const char kTrySupportedChannelLayouts[] = "try-supported-channel-layouts";
-// Number of buffers to use for WaveOut.
-const char kWaveOutBuffers[] = "waveout-buffers";
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(USE_CRAS)
 // Enforce system audio echo cancellation.
@@ -482,11 +461,7 @@ BASE_FEATURE(kD3D11VideoDecoderUseSharedHandle,
 
 // Runs the media service in the GPU process on a dedicated thread.
 BASE_FEATURE(kDedicatedMediaServiceThread,
-#if BUILDFLAG(IS_WIN)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
              base::FEATURE_ENABLED_BY_DEFAULT
-#endif
 );
 
 // Defer requesting persistent audio focus until the WebContents is audible.
@@ -539,11 +514,7 @@ BASE_FEATURE(kEnableTabMuting, base::FEATURE_DISABLED_BY_DEFAULT);
 // The HW secure check is OS agnostic, but this switch is currently only
 // enabled by default on Windows, and not used for other platforms.
 BASE_FEATURE(kEncryptedMediaOcclusionTracking,
-#if BUILDFLAG(IS_WIN)
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#else
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN)
 
 // Enables extended video bitstream validation for H.264 and H.265.
 BASE_FEATURE(kExtendedVideoBitstreamValidation,
@@ -620,7 +591,7 @@ BASE_FEATURE(kH264IDRKeyframeRequiresParameterSets,
 
 // Enables handling of hardware media keys for controlling media.
 BASE_FEATURE(kHardwareMediaKeyHandling,
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
              base::FEATURE_ENABLED_BY_DEFAULT
 #elif BUILDFLAG(IS_LINUX)
 #if BUILDFLAG(USE_MPRIS)
@@ -630,8 +601,7 @@ BASE_FEATURE(kHardwareMediaKeyHandling,
 #endif  // BUILDFLAG(USE_MPRIS)
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) ||
-        // BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 );
 
 // Enables hardware secure decryption if supported by hardware and CDM.
@@ -862,7 +832,7 @@ BASE_FEATURE(kPictureInPictureMuteControl, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // Allows usage of OS-level (platform) audio encoders.
 BASE_FEATURE(kPlatformAudioEncoder,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -959,7 +929,6 @@ BASE_FEATURE(kUseSequencedTaskRunnerForMediaService,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Use SequencedTaskRunner for MojoVideoEncodeAcceleratorProvider.
-#if !BUILDFLAG(IS_WIN)
 BASE_FEATURE(kUseSequencedTaskRunnerForMojoVEAProvider,
 #if BUILDFLAG(IS_APPLE)
              base::FEATURE_ENABLED_BY_DEFAULT
@@ -967,7 +936,6 @@ BASE_FEATURE(kUseSequencedTaskRunnerForMojoVEAProvider,
              base::FEATURE_DISABLED_BY_DEFAULT
 #endif
 );
-#endif  // !BUILDFLAG(IS_WIN)
 
 // Feature flag to run the MojoAudioDecoderService in a sequence different than
 // the other mojo media services. On some Android devices, MediaCodec may block
@@ -1098,15 +1066,15 @@ BASE_FEATURE(kFileDialogsBlockPictureInPicture,
 
 // Tucks picture-in-picture windows while file dialogs are open.
 BASE_FEATURE(kFileDialogsTuckPictureInPicture,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
              base::FEATURE_ENABLED_BY_DEFAULT);
 #else
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 // If enabled, users can request Media Remoting without fullscreen-in-tab.
 BASE_FEATURE(kMediaRemotingWithoutFullscreen,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -1195,11 +1163,7 @@ BASE_FEATURE(kAllowClearDolbyVisionViaMFT, base::FEATURE_DISABLED_BY_DEFAULT);
 // the support of encrypted Dolby Vision. Have no effect when
 // ENABLE_PLATFORM_ENCRYPTED_DOLBY_VISION is disabled.
 BASE_FEATURE(kPlatformEncryptedDolbyVision,
-#if BUILDFLAG(IS_WIN)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 #endif  // BUILDFLAG(ENABLE_PLATFORM_ENCRYPTED_DOLBY_VISION)
@@ -1208,10 +1172,10 @@ BASE_FEATURE(kPlatformEncryptedDolbyVision,
 // Enables HEVC hardware accelerated decoding.
 BASE_FEATURE(kPlatformHEVCDecoderSupport, base::FEATURE_ENABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
 // Enables HEVC hardware accelerated encoding for Windows, Apple, and Android.
 BASE_FEATURE(kPlatformHEVCEncoderSupport, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_APPLE)
 // Enables HEVC Main10 (10-bit) hardware accelerated encoding on macOS.
@@ -1502,7 +1466,7 @@ BASE_FEATURE(kUseSCContentSharingPicker, base::FEATURE_DISABLED_BY_DEFAULT);
 
 #endif  // BUILDFLAG(IS_MAC)
 
-#if (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN))
+#if BUILDFLAG(IS_MAC)
 // Enforces the use of system echo cancellation.
 BASE_FEATURE(kEnforceSystemEchoCancellation, base::FEATURE_DISABLED_BY_DEFAULT);
 // If `EnforceSystemEchoCancellation` is enabled and echo cancellation (AEC) is
@@ -1526,108 +1490,7 @@ const base::FeatureParam<bool> kEnforceSystemEchoCancellationAllowAgcInTandem{
 const base::FeatureParam<bool> kEnforceSystemEchoCancellationAllowNsInTandem{
     &kEnforceSystemEchoCancellation, "allow_ns_in_tandem", false};
 
-#endif  // (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN))
-
-#if BUILDFLAG(IS_WIN)
-// Enables application audio capture for getDisplayMedia (gDM) window capture in
-// Windows.
-BASE_FEATURE(kApplicationAudioCaptureWin, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables ducking of other Windows applications.
-BASE_FEATURE(kAudioDuckingWin, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables audio offload when supported by endpoints.
-BASE_FEATURE(kAudioOffload, base::FEATURE_DISABLED_BY_DEFAULT);
-// The buffer time in milliseconds for audio offload.
-const base::FeatureParam<double> kAudioOffloadBufferTimeMs{
-    &kAudioOffload, "buffer_time_ms", 50};
-
-// Controls whether hardware H264 is default enabled on Windows.
-BASE_FEATURE(kCastStreamingWinHardwareH264, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enable VP9 kSVC decoding with HW decoder for webrtc use case on Windows.
-BASE_FEATURE(kD3D11Vp9kSVCHWDecoding, base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kD3D12SharedImageEncode, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Controls whether to use D3D12 video decoder instead of D3D11 when supported.
-BASE_FEATURE(kD3D12VideoDecoder, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Controls whether to enable D3D12 video encode accelerator.
-// Owner: zhibo1.wang@intel.com
-// Expiry: When enabled by default.
-BASE_FEATURE(kD3D12VideoEncodeAccelerator, base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kD3D12VideoEncodeAcceleratorL1T3,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Controls whether to cache shared handles for D3D12 video encode accelerator.
-BASE_FEATURE(kD3D12VideoEncodeAcceleratorSharedHandleCaching,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables DirectShow GetPhotoState implementation
-// Created to act as a kill switch by disabling it, in the case of the
-// resurgence of https://crbug.com/722038
-BASE_FEATURE(kDirectShowGetPhotoState, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Requires that setServerCertificate() be called before generateRequest().
-// This feature only affects MediaFoundation OS CDMs.
-BASE_FEATURE(kHardwareSecureDecryptionRequireServerCert,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Includes Infrared cameras in the list returned for EnumerateDevices() on
-// Windows.
-BASE_FEATURE(kIncludeIRCamerasInDeviceEnumeration,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kMediaFoundationBatchRead, base::FEATURE_DISABLED_BY_DEFAULT);
-const base::FeatureParam<int> kBatchReadCount{&kMediaFoundationBatchRead,
-                                              "batch_read_count", 1};
-
-// Enables the use of MediaFoundationRenderer for clear content on supported
-// systems. This is for testing purposes, and is not intended to be enabled
-// more broadly.
-BASE_FEATURE(kMediaFoundationClearPlayback, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enables MediaFoundation based video capture with D3D11
-// For feature check of kMediaFoundationD3D11VideoCapture at runtime,
-// please use IsMediaFoundationD3D11VideoCaptureEnabled() instead.
-BASE_FEATURE(kMediaFoundationD3D11VideoCapture,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enable zero-copy based on MediaFoundation video capture with D3D11.
-BASE_FEATURE(kMediaFoundationD3D11VideoCaptureZeroCopy,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kMediaFoundationD3DVideoProcessing,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enables positioning the virtual video window and triggering Media
-// Foundation's GPU adapter selection based on the frame's screen rect.
-// This helps ensure the correct GPU adapter is used for HWDRM playback
-// on multi-GPU/multi-display systems.
-BASE_FEATURE(kMediaFoundationMultiGpuAdapterSelection,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kMediaFoundationSharedImageEncode,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enables software rate controller encoding acceleration for Windows.
-BASE_FEATURE(kMediaFoundationUseSoftwareRateCtrl,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables MediaFoundation based video capture
-BASE_FEATURE(kMediaFoundationVideoCapture, base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kMediaFoundationVideoEncodeAccelerator,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// Enables showing permission indicator in the omnibox when a site is allowed or
-// denied to to use protected content IDs to play protected content.
-BASE_FEATURE(kProtectedMediaIdentifierIndicator,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(SYSTEM_LOOPBACK_AS_AEC_REFERENCE)
 // If echo cancellation for a mic signal is requested, use system loopback
@@ -1771,10 +1634,7 @@ uint32_t GetPassthroughAudioFormats() {
 }
 
 bool IsApplicationLoopbackCaptureSupported() {
-#if BUILDFLAG(IS_WIN)
-  return base::FeatureList::IsEnabled(kApplicationAudioCaptureWin) &&
-         IsWindowsProcessLoopbackCaptureSupported();
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return base::FeatureList::IsEnabled(kApplicationAudioCaptureMac) &&
          base::FeatureList::IsEnabled(
              media::kMacCatapLoopbackAudioForScreenShare) &&
@@ -1806,12 +1666,6 @@ bool IsChromeWideEchoCancellationEnabled() {
 }
 
 bool IsDedicatedMediaServiceThreadEnabled(gl::ANGLEImplementation impl) {
-#if BUILDFLAG(IS_WIN)
-  // Only D3D11 device supports multi-threaded use.
-  if (impl != gl::ANGLEImplementation::kD3D11) {
-    return false;
-  }
-#endif
 
   return base::FeatureList::IsEnabled(kDedicatedMediaServiceThread);
 }
@@ -1842,15 +1696,13 @@ bool IsRestrictOwnAudioSupported() {
 #if BUILDFLAG(IS_MAC)
   return IsMacCatapSystemLoopbackCaptureSupported() &&
          base::FeatureList::IsEnabled(kMacCatapLoopbackAudioForScreenShare);
-#elif BUILDFLAG(IS_WIN)
-  return IsWindowsProcessLoopbackCaptureSupported();
 #else
   return false;
 #endif
 }
 
 bool IsSystemEchoCancellationEnforced() {
-#if (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN))
+#if BUILDFLAG(IS_MAC)
   return base::FeatureList::IsEnabled(kEnforceSystemEchoCancellation);
 #else
   return false;
@@ -1858,7 +1710,7 @@ bool IsSystemEchoCancellationEnforced() {
 }
 
 bool IsSystemEchoCancellationEnforcedAndAllowAgcInTandem() {
-#if (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN))
+#if BUILDFLAG(IS_MAC)
   return base::FeatureList::IsEnabled(media::kEnforceSystemEchoCancellation) &&
          media::kEnforceSystemEchoCancellationAllowAgcInTandem.Get();
 #else
@@ -1867,7 +1719,7 @@ bool IsSystemEchoCancellationEnforcedAndAllowAgcInTandem() {
 }
 
 bool IsSystemEchoCancellationEnforcedAndAllowNsInTandem() {
-#if (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN))
+#if BUILDFLAG(IS_MAC)
   return base::FeatureList::IsEnabled(media::kEnforceSystemEchoCancellation) &&
          media::kEnforceSystemEchoCancellationAllowNsInTandem.Get();
 #else
@@ -1880,10 +1732,6 @@ bool IsSystemLoopbackAsAecReferenceEnabled() {
 
 #if BUILDFLAG(IS_MAC)
   if (!IsMacCatapSystemLoopbackCaptureSupported()) {
-    return false;
-  }
-#elif BUILDFLAG(IS_WIN)
-  if (!IsWindowsProcessLoopbackCaptureSupported()) {
     return false;
   }
 #endif
@@ -1904,7 +1752,7 @@ bool IsSystemLoopbackAsAecReferenceForcedOn() {
 }
 
 bool IsSystemLoopbackCaptureSupported() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(USE_CRAS)
+#if BUILDFLAG(USE_CRAS)
   return true;
 #elif BUILDFLAG(IS_MAC)
   return (IsMacSckSystemLoopbackCaptureSupported() ||
@@ -1913,7 +1761,7 @@ bool IsSystemLoopbackCaptureSupported() {
   return true;
 #else
   return false;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(USE_CRAS)
+#endif  // BUILDFLAG(USE_CRAS)
 }
 
 bool IsVideoCaptureAcceleratedJpegDecodingEnabled() {
@@ -1969,16 +1817,6 @@ bool IsMacSckSystemLoopbackCaptureSupported() {
 
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-bool IsMediaFoundationD3D11VideoCaptureEnabled() {
-  return base::FeatureList::IsEnabled(kMediaFoundationD3D11VideoCapture);
-}
-
-bool IsWindowsProcessLoopbackCaptureSupported() {
-  return (base::win::GetVersion() >= base::win::Version::WIN11);
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(SYSTEM_LOOPBACK_AS_AEC_REFERENCE)
 base::TimeDelta GetAecAddedDelay() {

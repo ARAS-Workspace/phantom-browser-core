@@ -25,11 +25,7 @@
 #include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/winbase_shim.h"
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include <sys/mman.h>
 #endif
 
@@ -43,10 +39,7 @@ constexpr std::string_view kTestDumpNameAllowlist[] = {
     "Allowlisted/0x?/TestName", "Allowlisted/0x?"};
 
 base::span<uint8_t> Map(size_t size) {
-#if BUILDFLAG(IS_WIN)
-  void* ptr =
-      ::VirtualAlloc(nullptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   void* ptr = ::mmap(nullptr, size, PROT_READ | PROT_WRITE,
                      MAP_PRIVATE | MAP_ANON, 0, 0);
 #endif
@@ -57,9 +50,7 @@ base::span<uint8_t> Map(size_t size) {
 }
 
 void Unmap(base::span<uint8_t> span) {
-#if BUILDFLAG(IS_WIN)
-  ::VirtualFree(span.data(), 0, MEM_RELEASE);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   ::munmap(span.data(), span.size());
 #else
 #error This architecture is not (yet) supported.
@@ -510,7 +501,7 @@ TEST(ProcessMemoryDumpTest, MAYBE_CountResidentBytesInSharedMemory) {
     // sections) and Apple (which queries resident Mach VM pages), the mapped
     // span granularity includes all page-aligned pages (6.0 pages total).
     // On POSIX/Linux, exact sub-page overlap calculation returns 5.5 pages.
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE)
     ASSERT_EQ(res1.value(), kDirtyMemorySize + page_size);
 #else
     ASSERT_EQ(res1.value(), kDirtyMemorySize + page_size / 2);

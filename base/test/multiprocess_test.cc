@@ -57,9 +57,6 @@ MultiProcessTest::MultiProcessTest() = default;
 
 Process MultiProcessTest::SpawnChild(const std::string& procname) {
   LaunchOptions options;
-#if BUILDFLAG(IS_WIN)
-  options.start_hidden = true;
-#endif
   return SpawnChildWithOptions(procname, options);
 }
 

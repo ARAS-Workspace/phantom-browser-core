@@ -20,16 +20,12 @@ namespace downgrade {
 namespace {
 
 base::Version GetVersionFromFileName(const base::FilePath& path) {
-#if BUILDFLAG(IS_WIN)
-  // On Windows, for Unicode-aware applications, native pathnames are wchar_t
-  // arrays encoded in UTF-16.
-  return base::Version(base::WideToUTF8(path.BaseName().value()));
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   // On most platforms, native pathnames are char arrays, and the encoding
   // may or may not be specified.  On Mac OS X, native pathnames are encoded
   // in UTF-8.
   return base::Version(path.BaseName().value());
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 }
 
 bool IsValidSnapshotDirectory(const base::FilePath& path) {

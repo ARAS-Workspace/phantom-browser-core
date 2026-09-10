@@ -33,8 +33,6 @@
 #include "net/base/features.h"
 #include "net/cert/internal/trust_store_mac.h"
 #include "net/cert/x509_util_apple.h"
-#elif BUILDFLAG(IS_WIN)
-#include "net/cert/internal/trust_store_win.h"
 #elif BUILDFLAG(IS_ANDROID)
 #include "net/cert/internal/trust_store_android.h"
 #endif
@@ -279,34 +277,6 @@ void InitializeTrustStoreMacCache() {
       FROM_HERE,
       {base::MayBlock(), base::TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN},
       base::BindOnce(&InitializeTrustCacheForCRSOnWorkerThread));
-}
-
-#elif BUILDFLAG(IS_WIN)
-
-namespace {
-TrustStoreWin* GetGlobalTrustStoreWinForCRS() {
-  static base::NoDestructor<TrustStoreWin> static_trust_store_win;
-  return static_trust_store_win.get();
-}
-
-void InitializeTrustStoreForCRSOnWorkerThread() {
-  GetGlobalTrustStoreWinForCRS()->InitializeStores();
-}
-}  // namespace
-
-std::unique_ptr<SystemTrustStore> CreateSslSystemTrustStoreChromeRoot(
-    std::unique_ptr<TrustStoreChrome> chrome_root) {
-  return std::make_unique<SystemTrustStoreChromeWithUnOwnedSystemStore>(
-      std::move(chrome_root), GetGlobalTrustStoreWinForCRS());
-}
-
-// We do this in a separate thread as loading the Windows Cert Stores can cause
-// quite a bit of I/O. See crbug.com/1399974 for more context.
-void InitializeTrustStoreWinSystem() {
-  base::ThreadPool::PostTask(
-      FROM_HERE,
-      {base::MayBlock(), base::TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN},
-      base::BindOnce(&InitializeTrustStoreForCRSOnWorkerThread));
 }
 
 #elif BUILDFLAG(IS_ANDROID)

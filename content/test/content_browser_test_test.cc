@@ -56,8 +56,7 @@ namespace content {
 // TODO(mac): figure out why symbolization doesn't happen in the renderer.
 // http://crbug.com/521456
 // TODO(win): send PDB files for component build. http://crbug.com/521459
-#if !defined(OFFICIAL_BUILD) && !BUILDFLAG(IS_ANDROID) && \
-    !BUILDFLAG(IS_MAC) && !(defined(COMPONENT_BUILD) && BUILDFLAG(IS_WIN))
+#if !defined(OFFICIAL_BUILD) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC)
 
 namespace {
 
@@ -94,8 +93,7 @@ IN_PROC_BROWSER_TEST_F(ContentBrowserTest, MANUAL_RendererCrash) {
 
 // Non-Windows sanitizer builds do not symbolize stack traces internally, so use
 // this macro to avoid looking for symbols from the stack trace.
-#if !BUILDFLAG(IS_WIN) &&                                     \
-    (defined(ADDRESS_SANITIZER) || defined(LEAK_SANITIZER) || \
+#if (defined(ADDRESS_SANITIZER) || defined(LEAK_SANITIZER) || \
      defined(MEMORY_SANITIZER) || defined(THREAD_SANITIZER))
 #define USE_EXTERNAL_SYMBOLIZER 1
 #else
@@ -157,11 +155,7 @@ IN_PROC_BROWSER_TEST_F(ContentBrowserTest, MANUAL_BrowserCrash) {
 // Disabled on Windows crbug.com/1034784
 // TODO(crbug.com/40834746): Enable this test on Fuchsia once the test
 // expectations have been updated.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_BrowserCrashCallStack DISABLED_BrowserCrashCallStack
-#else
 #define MAYBE_BrowserCrashCallStack BrowserCrashCallStack
-#endif
 IN_PROC_BROWSER_TEST_F(ContentBrowserTest, MAYBE_BrowserCrashCallStack) {
   base::ScopedAllowBlockingForTesting allow_blocking;
 
@@ -213,9 +207,7 @@ IN_PROC_BROWSER_TEST_F(MockContentBrowserTest, DISABLED_CrashTest) {
 }
 
 // This is disabled due to flakiness: https://crbug.com/1086372
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_RunMockTests DISABLED_RunMockTests
-#elif BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
+#if BUILDFLAG(IS_LINUX) && defined(THREAD_SANITIZER)
 // This is disabled because it fails on bionic: https://crbug.com/1202220
 #define MAYBE_RunMockTests DISABLED_RunMockTests
 #else
@@ -378,12 +370,7 @@ IN_PROC_BROWSER_TEST_F(ContentBrowserTest, NonNestableTask) {
 }
 
 // TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-// TODO(crbug.com/440535492): Flaky on Win dbg.
-#define MAYBE_RunTimeoutInstalled DISABLED_RunTimeoutInstalled
-#else
 #define MAYBE_RunTimeoutInstalled RunTimeoutInstalled
-#endif
 IN_PROC_BROWSER_TEST_F(ContentBrowserTest, MAYBE_RunTimeoutInstalled) {
   // Verify that a RunLoop timeout is installed and shorter than the test
   // timeout itself.

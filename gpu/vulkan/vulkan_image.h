@@ -22,9 +22,6 @@
 #include "ui/gfx/gpu_memory_buffer_handle.h"
 #include "ui/gfx/native_pixmap.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_handle.h"
-#endif
 
 
 namespace gpu {
@@ -98,13 +95,6 @@ class COMPONENT_EXPORT(VULKAN) VulkanImage {
   }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedHandle GetMemoryHandle(
-      VkExternalMemoryHandleTypeFlagBits handle_type =
-          VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT) {
-    return memories_[0]->GetMemoryHandle(handle_type);
-  }
-#endif
 
 
   VulkanDeviceQueue* device_queue() const { return device_queue_; }

@@ -17,33 +17,6 @@ blink::mojom::RelatedApplicationPtr CreateRelatedApplicationFromPlatformAndId(
   return application;
 }
 
-#if BUILDFLAG(IS_WIN)
-FakeNativeWinAppFetcher::FakeNativeWinAppFetcher(
-    std::vector<std::string> installed_app_ids)
-    : installed_app_ids_(installed_app_ids) {}
-FakeNativeWinAppFetcher::~FakeNativeWinAppFetcher() = default;
-
-void FakeNativeWinAppFetcher::FetchAppsForUrl(
-    const GURL& url,
-    base::OnceCallback<void(std::vector<blink::mojom::RelatedApplicationPtr>)>
-        callback) {
-  std::vector<blink::mojom::RelatedApplicationPtr> related_applications;
-
-  for (const auto& id : installed_app_ids_) {
-    related_applications.push_back(
-        CreateRelatedApplicationFromPlatformAndId("windows", id));
-  }
-
-  std::move(callback).Run(std::move(related_applications));
-}
-
-std::unique_ptr<NativeWinAppFetcher> CreateFakeNativeWinAppFetcherForTesting(
-    std::vector<std::string> installed_win_app_ids_) {
-  return std::make_unique<FakeNativeWinAppFetcher>(
-      std::move(installed_win_app_ids_));
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 FakeContentBrowserClientForQueryInstalledWebApps::
     FakeContentBrowserClientForQueryInstalledWebApps(
         std::vector<std::string> installed_web_app_ids) {

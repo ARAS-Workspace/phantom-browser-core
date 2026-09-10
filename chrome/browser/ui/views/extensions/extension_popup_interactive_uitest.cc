@@ -374,7 +374,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionPopupInteractiveUiTest,
 }
 
 // TODO(crbug.com/378966968): timeout on win-rel but not reproducible locally.
-#if !BUILDFLAG(IS_WIN)
 // Tests that an extension popup does not close on deactivation when it shows
 // an web modal dialog. The webauthn dialog is used as surrogate.
 IN_PROC_BROWSER_TEST_F(ExtensionPopupInteractiveUiTest,
@@ -439,7 +438,6 @@ IN_PROC_BROWSER_TEST_F(ExtensionPopupInteractiveUiTest,
   // The extension popup should close.
   ExpectWidgetDestroy(extension_popup_widget);
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 // Tests that an extension popup is closed when a web dialog is shown as active.
 // In this test the web dialog is not initiated by the extension popup (see

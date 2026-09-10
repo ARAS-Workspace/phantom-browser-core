@@ -41,40 +41,18 @@ base::FilePath GetCrashDumpLocationInternal() {
 ShellCrashReporterClient::ShellCrashReporterClient() {}
 ShellCrashReporterClient::~ShellCrashReporterClient() {}
 
-#if BUILDFLAG(IS_WIN)
-void ShellCrashReporterClient::GetProductNameAndVersion(
-    const std::wstring& exe_path,
-    std::wstring* product_name,
-    std::wstring* version,
-    std::wstring* special_build,
-    std::wstring* channel_name) {
-  *product_name = L"content_shell";
-  *version = base::ASCIIToWide(CONTENT_SHELL_VERSION);
-  *special_build = std::wstring();
-  *channel_name = std::wstring();
-}
-#endif
-
 #if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
 base::FilePath ShellCrashReporterClient::GetReporterLogFilename() {
   return base::FilePath(FILE_PATH_LITERAL("uploads.log"));
 }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-bool ShellCrashReporterClient::GetCrashDumpLocation(std::wstring* crash_dir) {
-#else
 bool ShellCrashReporterClient::GetCrashDumpLocation(base::FilePath* crash_dir) {
-#endif
   base::FilePath crash_directory = GetCrashDumpLocationInternal();
   if (crash_directory.empty()) {
     return false;
   }
-#if BUILDFLAG(IS_WIN)
-  *crash_dir = crash_directory.value();
-#else
   *crash_dir = std::move(crash_directory);
-#endif
   return true;
 }
 

@@ -22,10 +22,6 @@
 #include "base/timer/timer.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_handle.h"
-#endif
-
 namespace base {
 
 #if BUILDFLAG(IS_ANDROID)
@@ -62,12 +58,12 @@ class BASE_EXPORT PlatformThreadMetrics {
  public:
   static std::unique_ptr<PlatformThreadMetrics> CreateForCurrentThread();
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE)
   static std::unique_ptr<PlatformThreadMetrics> CreateFromHandle(
       PlatformThreadHandle handle);
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
   static std::unique_ptr<PlatformThreadMetrics> CreateFromId(
       PlatformThreadId tid);
 #endif
@@ -111,10 +107,6 @@ class BASE_EXPORT PlatformThreadMetrics {
   explicit PlatformThreadMetrics(PlatformThreadId tid) : tid_(tid) {}
 
   PlatformThreadId tid_;
-#elif BUILDFLAG(IS_WIN)
-  explicit PlatformThreadMetrics(win::ScopedHandle&& handle);
-
-  win::ScopedHandle handle_;
 #endif
 
   // Previous measurements used to compute the CPU usage between calls to

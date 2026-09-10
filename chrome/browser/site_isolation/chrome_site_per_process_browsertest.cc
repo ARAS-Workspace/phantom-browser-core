@@ -147,13 +147,8 @@ double GetFrameDeviceScaleFactor(const content::ToRenderFrameHost& adapter) {
 }
 
 // Flaky on Windows 10. http://crbug.com/41306592
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_InterstitialLoadsWithCorrectDeviceScaleFactor \
-  DISABLED_InterstitialLoadsWithCorrectDeviceScaleFactor
-#else
 #define MAYBE_InterstitialLoadsWithCorrectDeviceScaleFactor \
   InterstitialLoadsWithCorrectDeviceScaleFactor
-#endif
 IN_PROC_BROWSER_TEST_F(SitePerProcessHighDPIExpiredCertBrowserTest,
                        MAYBE_InterstitialLoadsWithCorrectDeviceScaleFactor) {
   GURL main_url(embedded_test_server()->GetURL(

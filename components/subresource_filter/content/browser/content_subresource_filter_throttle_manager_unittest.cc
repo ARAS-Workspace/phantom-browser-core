@@ -906,11 +906,7 @@ TEST_P(ContentSubresourceFilterThrottleManagerTest, ActivationPropagation) {
 
 // Ensure activation propagates through allowlisted documents.
 // crbug.com/1010000: crashes on win
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ActivationPropagation2 DISABLED_ActivationPropagation2
-#else
 #define MAYBE_ActivationPropagation2 ActivationPropagation2
-#endif
 TEST_P(ContentSubresourceFilterThrottleManagerTest,
        MAYBE_ActivationPropagation2) {
   NavigateAndCommitMainFrame(GURL(kTestURLWithActivation));

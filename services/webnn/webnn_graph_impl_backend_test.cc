@@ -366,27 +366,21 @@ void WebNNGraphImplBackendTest::SetUp() {
       // "BuildAndComputeAddWithOnlyConstantInputs",
       "BuildAndComputeConcatWithConstants",
       "BuildAndComputeGraphWithReshapeAsLastNode",
-#if !BUILDFLAG(IS_WIN)
       "BuildAndComputeGraphWithReshapeAsIntermediateNode",
       "BuildAndComputeGraphWithSplitAndReshape",
       "BuildAndComputeGraphWithTransposeAndRelu",
       "BuildAndComputeGraphWithTransposeAndTwoOutputs",
       "BuildAndComputeGraphWithTransposeAndTwoReshape",
-#endif  // !BUILDFLAG(IS_WIN)
       "BuildAndComputeGraphWithTwoOutputs",
       "BuildAndComputeGraphWithTwoRelu",
       "BuildAndComputeGraphWithTwoReshape",
       "BuildAndComputeGraphWithTwoTranspose",
       "BuildAndComputeMultipleOperatorGemm",
       // "BuildAndComputeReluWithOnlyConstantInput",
-#if !BUILDFLAG(IS_WIN)
       "BuildAndComputeReshapeConcatAndClamp",
-#endif  // !BUILDFLAG(IS_WIN)
       "BuildAndComputeSingleOperatorClamp",
-#if !BUILDFLAG(IS_WIN)
       "BuildAndComputeSingleOperatorGruCell",
       "BuildAndComputeSingleOperatorGru",
-#endif  // !BUILDFLAG(IS_WIN)
       "BuildAndComputeSingleOperatorHardSigmoid",
       "BuildAndComputeSingleOperatorHardSwish",
       // "BuildAndComputeSingleOperatorLstmCell",
@@ -394,18 +388,14 @@ void WebNNGraphImplBackendTest::SetUp() {
       // "BuildAndComputeSingleOperatorResample2d",
       "BuildAndComputeSingleOperatorTanh",
       "BuildGemmWithReshapedConstantOperand",
-#if !BUILDFLAG(IS_WIN)
       "BuildMaxPoolingAsFirstOperator",
       "BuildMaxPoolingAsSecondOperator",
       "BuildMaxPoolingAsThirdOperator",
-#endif  // !BUILDFLAG(IS_WIN)
       "BuildMultipleConstantsAppendingInputs",
       "BuildMultipleInputsAppendingConstants",
       "BuildSingleOperatorLayerNormalization",
       "BuildOneInputAndOneConstantOperand",
-#if !BUILDFLAG(IS_WIN)
       "Conv2dIgemmPackedWeightsOverflow",
-#endif  // !BUILDFLAG(IS_WIN)
       "DestroyContextDuringBuild",
       // "FuseStandaloneActivationIntoBatchNormalization",
       // "FuseStandaloneActivationIntoConv2d",

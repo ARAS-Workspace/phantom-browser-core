@@ -186,16 +186,6 @@ class TestServer {
     }
   }
 
-#if BUILDFLAG(IS_WIN)
-  void StartWithBroker(uint32_t backlog, bool should_fail_socket_creation) {
-    socket_broker_impl_.SetConnectionFailure(should_fail_socket_creation);
-    mojo::Receiver<mojom::SocketBroker> receiver(&socket_broker_impl_);
-    factory_.BindSocketBroker(receiver.BindNewPipeAndPassRemote());
-
-    Start(backlog, should_fail_socket_creation);
-  }
-#endif
-
   // Accepts one connection. Upon successful completion, |callback| will be
   // invoked.
   void AcceptOneConnection(net::CompletionOnceCallback callback) {
@@ -276,10 +266,6 @@ class TestServer {
       std::move(read_callback_).Run();
     }
   }
-
-#if BUILDFLAG(IS_WIN)
-  TestSocketBrokerImpl socket_broker_impl_;
-#endif
 
   std::unique_ptr<net::URLRequestContext> url_request_context_;
   SocketFactory factory_;
@@ -416,18 +402,6 @@ class TCPSocketTest : public testing::Test {
   TestSocketObserver test_observer_;
   mojo::UniqueReceiverSet<mojom::TCPServerSocket> tcp_server_socket_receiver_;
 };
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(TCPSocketTest, BrokerCreateTCPServerSocketSuccess) {
-  TestServer server;
-  server.StartWithBroker(1 /*backlog*/, false /*fail_server_socket_creation*/);
-}
-
-TEST_F(TCPSocketTest, BrokerCreateTCPServerSocketFailure) {
-  TestServer server;
-  server.StartWithBroker(1 /*backlog*/, true /*fail_server_socket_creation*/);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_F(TCPSocketTest, ReadAndWrite) {
   const struct TestData {

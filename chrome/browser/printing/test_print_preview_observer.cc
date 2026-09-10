@@ -100,9 +100,6 @@ void TestPrintPreviewObserver::DidRenderPreviewPage(
 void TestPrintPreviewObserver::PreviewDocumentReady(
     content::WebContents* preview_dialog,
     base::span<const uint8_t> data) {
-#if BUILDFLAG(IS_WIN)
-  did_composite_pdf_document_ = LooksLikePdf(data);
-#endif
 
   // This runs after `DidGetPreviewPageCount()` for modifiable content, but is
   // otherwise the only notification.

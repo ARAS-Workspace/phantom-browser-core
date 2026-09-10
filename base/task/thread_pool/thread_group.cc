@@ -16,11 +16,6 @@
 #include "base/task/thread_pool/task_tracker.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/com_init_check_hook.h"
-#include "base/win/scoped_winrt_initializer.h"
-#endif
-
 namespace base::internal {
 
 namespace {
@@ -417,21 +412,6 @@ bool ThreadGroup::ShouldYield(TaskSourceSortKey sort_key) {
   // |max_allowed_sort_key_|, in which case this thread doesn't yield.
   return max_allowed_sort_key.thread_type != ThreadType::kBackground;
 }
-
-#if BUILDFLAG(IS_WIN)
-// static
-std::unique_ptr<win::ScopedWindowsThreadEnvironment>
-ThreadGroup::GetScopedWindowsThreadEnvironment(WorkerEnvironment environment) {
-  std::unique_ptr<win::ScopedWindowsThreadEnvironment> scoped_environment;
-  if (environment == WorkerEnvironment::COM_MTA) {
-    scoped_environment = std::make_unique<win::ScopedWinrtInitializer>();
-  }
-  // Continuing execution with an uninitialized apartment may lead to broken
-  // program invariants later on.
-  CHECK(!scoped_environment || scoped_environment->Succeeded());
-  return scoped_environment;
-}
-#endif
 
 // static
 bool ThreadGroup::CurrentThreadHasGroup() {

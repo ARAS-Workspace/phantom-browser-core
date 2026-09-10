@@ -23,9 +23,6 @@
 #include <mach/vm_map.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <aclapi.h>
-#endif
 
 namespace base {
 
@@ -76,17 +73,6 @@ bool CheckReadOnlySharedMemoryMachPort(mach_port_t memory_object) {
   return true;
 }
 
-#elif BUILDFLAG(IS_WIN)
-bool CheckReadOnlySharedMemoryWindowsHandle(HANDLE handle) {
-  void* memory =
-      MapViewOfFile(handle, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, kDataSize);
-  if (memory != nullptr) {
-    LOG(ERROR) << "MapViewOfFile() should have failed!";
-    UnmapViewOfFile(memory);
-    return false;
-  }
-  return true;
-}
 #endif
 
 bool CheckReadOnlyPlatformSharedMemoryRegionForTesting(
@@ -101,8 +87,6 @@ bool CheckReadOnlyPlatformSharedMemoryRegionForTesting(
 
 #if BUILDFLAG(IS_APPLE)
   return CheckReadOnlySharedMemoryMachPort(region.GetPlatformHandle());
-#elif BUILDFLAG(IS_WIN)
-  return CheckReadOnlySharedMemoryWindowsHandle(region.GetPlatformHandle());
 #elif BUILDFLAG(IS_ANDROID)
   return CheckReadOnlySharedMemoryFdPosix(region.GetPlatformHandle());
 #else

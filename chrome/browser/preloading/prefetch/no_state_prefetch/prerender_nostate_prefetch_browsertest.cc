@@ -1506,11 +1506,7 @@ IN_PROC_BROWSER_TEST_F(NoStatePrefetchBrowserTest, Loop) {
 }
 
 // Crashes on Win.  http://crbug.com/41489875
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_RendererCrash DISABLED_RendererCrash
-#else
 #define MAYBE_RendererCrash RendererCrash
-#endif
 IN_PROC_BROWSER_TEST_F(NoStatePrefetchBrowserTest, MAYBE_RendererCrash) {
   ASSERT_TRUE(ui_test_utils::NavigateToURL(current_browser(),
                                            GURL(url::kAboutBlankURL)));
@@ -1702,11 +1698,7 @@ void NoStatePrefetchBrowserTest::RunServiceWorkerInterceptTest(
 }
 
 // TODO(crbug.com/500524504): Enable the test.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ServiceWorkerIntercept DISABLED_ServiceWorkerIntercept
-#else
 #define MAYBE_ServiceWorkerIntercept ServiceWorkerIntercept
-#endif
 IN_PROC_BROWSER_TEST_F(NoStatePrefetchBrowserTest,
                        MAYBE_ServiceWorkerIntercept) {
   bool expect_two_hosts = base::FeatureList::IsEnabled(
@@ -1734,12 +1726,7 @@ class NoStatePrefetchBrowserTestWithEsbBlockV8
 };
 
 // TODO(crbug.com/500524504): Enable the test.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ServiceWorkerInterceptWithEsb \
-  DISABLED_ServiceWorkerInterceptWithEsb
-#else
 #define MAYBE_ServiceWorkerInterceptWithEsb ServiceWorkerInterceptWithEsb
-#endif
 IN_PROC_BROWSER_TEST_F(NoStatePrefetchBrowserTestWithEsbBlockV8,
                        MAYBE_ServiceWorkerInterceptWithEsb) {
   RunServiceWorkerInterceptTest(true);

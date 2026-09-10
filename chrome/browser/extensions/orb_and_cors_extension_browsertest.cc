@@ -2000,8 +2000,7 @@ IN_PROC_BROWSER_TEST_F(OrbAndCorsExtensionBrowserTest,
   }
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 // Flaky on Linux, especially under sanitizers: https://crbug.com/40127384
 // Flaky UAF on Mac under ASAN: https://crbug.com/40691871
 #define MAYBE_FromBackgroundServiceWorker_NoSniffXml \

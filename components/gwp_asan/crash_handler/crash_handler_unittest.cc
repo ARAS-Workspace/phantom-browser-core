@@ -68,15 +68,6 @@ MULTIPROCESS_TEST_MAIN(CrashpadHandler) {
   base::CommandLine* cmd_line = base::CommandLine::ForCurrentProcess();
 
   // Remove the --test-child-process argument from argv and launch crashpad.
-#if BUILDFLAG(IS_WIN)
-  std::vector<wchar_t*> argv;
-  for (auto& arg : cmd_line->argv()) {
-    if (arg.find(L"test-child-process") == std::string::npos)
-      argv.push_back(const_cast<wchar_t*>(arg.c_str()));
-  }
-
-  crashpad::ToolSupport::Wmain(argv.size(), argv.data(), HandlerMainAdaptor);
-#else
   std::vector<char*> argv;
   for (auto& arg : cmd_line->argv()) {
     if (arg.find("test-child-process") == std::string::npos)
@@ -84,7 +75,6 @@ MULTIPROCESS_TEST_MAIN(CrashpadHandler) {
   }
 
   HandlerMainAdaptor(argv.size(), argv.data());
-#endif
 
   return 0;
 }
@@ -350,9 +340,6 @@ class BaseCrashHandlerTest : public base::MultiProcessTest,
     }
 
     base::LaunchOptions options;
-#if BUILDFLAG(IS_WIN)
-    options.start_hidden = true;
-#endif  // BUILDFLAG(IS_WIN)
     base::Process process =
         base::SpawnMultiProcessTestChild("CrashingProcess", cmd_line, options);
 
@@ -485,7 +472,7 @@ class BaseCrashHandlerTest : public base::MultiProcessTest,
 
 class CrashHandlerTest : public BaseCrashHandlerTest {};
 
-#if defined(ADDRESS_SANITIZER) && (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID))
+#if defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_ANDROID)
 // ASan intercepts crashes and crashpad doesn't have a chance to see them.
 #define MAYBE_DISABLED(name) DISABLED_ ##name
 #else

@@ -220,7 +220,6 @@ class PowerMetricsReporterWithoutBatteryLevelProviderUnitTest
 
 }  // namespace
 
-#if !(BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64))
 // Windows ARM64 does not support Constant Rate TSC so
 // PerformanceMonitor.AverageCPU10.* is not recorded there.
 TEST_F(PowerMetricsReporterUnitTest,
@@ -259,7 +258,6 @@ TEST_F(PowerMetricsReporterUnitTest,
   tester.ExpectTotalCount(
       "PerformanceMonitor.AverageCPU10.UtilityProcess.Unknown", 1);
 }
-#endif
 
 TEST_F(PowerMetricsReporterWithoutBatteryLevelProviderUnitTest,
        CPUTimeRecorded) {
@@ -275,16 +273,8 @@ TEST_F(PowerMetricsReporterWithoutBatteryLevelProviderUnitTest,
 
   const char* kScenarioSuffix = ".VideoCapture";
   const std::vector<const char*> suffixes({"", kScenarioSuffix});
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-  // Windows ARM64 does not support Constant Rate TSC so
-  // PerformanceMonitor.AverageCPU10.Total is not recorded there.
-  ExpectHistogramSamples(
-      &histogram_tester_, suffixes,
-      {{"PerformanceMonitor.AverageCPU10.Total", std::nullopt}});
-#else
   ExpectHistogramSamples(&histogram_tester_, suffixes,
                          {{"PerformanceMonitor.AverageCPU10.Total", 500}});
-#endif
 }
 
 TEST_F(PowerMetricsReporterWithoutBatteryLevelProviderUnitTest,
@@ -302,17 +292,9 @@ TEST_F(PowerMetricsReporterWithoutBatteryLevelProviderUnitTest,
 
   const char* kScenarioSuffix = ".VideoCapture";
   const std::vector<const char*> suffixes({"", kScenarioSuffix});
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-  // Windows ARM64 does not support Constant Rate TSC so
-  // PerformanceMonitor.AverageCPU10.Total is not recorded there.
-  ExpectHistogramSamples(
-      &histogram_tester_, suffixes,
-      {{"PerformanceMonitor.AverageCPU10.Total", std::nullopt}});
-#else
   // Missing `cpu_usage` recorded as 0.
   ExpectHistogramSamples(&histogram_tester_, suffixes,
                          {{"PerformanceMonitor.AverageCPU10.Total", 0}});
-#endif
 }
 
 TEST_F(PowerMetricsReporterUnitTest, LongIntervalHistograms) {
@@ -329,16 +311,8 @@ TEST_F(PowerMetricsReporterUnitTest, LongIntervalHistograms) {
 
   const char* kScenarioSuffix = ".VideoCapture";
   const std::vector<const char*> suffixes({"", kScenarioSuffix});
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-  // Windows ARM64 does not support Constant Rate TSC so
-  // PerformanceMonitor.AverageCPU10.Total is not recorded there.
-  ExpectHistogramSamples(
-      &histogram_tester_, suffixes,
-      {{"PerformanceMonitor.AverageCPU10.Total", std::nullopt}});
-#else
   ExpectHistogramSamples(&histogram_tester_, suffixes,
                          {{"PerformanceMonitor.AverageCPU10.Total", 500}});
-#endif
 }
 
 TEST_F(PowerMetricsReporterUnitTest, UKMs) {

@@ -25,10 +25,7 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include <netdb.h>
 #include <netinet/in.h>
 #include <sys/socket.h>

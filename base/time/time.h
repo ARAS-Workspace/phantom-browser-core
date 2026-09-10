@@ -95,27 +95,9 @@
 #include <unistd.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <string>
-
-#include "base/win/windows_types.h"
-
-namespace ABI {
-namespace Windows {
-namespace Foundation {
-struct DateTime;
-struct TimeSpan;
-}  // namespace Foundation
-}  // namespace Windows
-}  // namespace ABI
-#endif
 
 namespace base {
 
-#if BUILDFLAG(IS_WIN)
-class CommandLine;
-class PlatformThreadHandle;
-#endif
 class TimeDelta;
 
 template <typename T>
@@ -137,14 +119,7 @@ class BASE_EXPORT TimeDelta {
  public:
   constexpr TimeDelta() = default;
 
-#if BUILDFLAG(IS_WIN)
-  static TimeDelta FromQPCValue(LONGLONG qpc_value);
-  // TODO(crbug.com/40638442): Avoid base::TimeDelta factory functions
-  // based on absolute time
-  static TimeDelta FromFileTime(FILETIME ft);
-  static TimeDelta FromWinrtDateTime(ABI::Windows::Foundation::DateTime dt);
-  static TimeDelta FromWinrtTimeSpan(ABI::Windows::Foundation::TimeSpan ts);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   static TimeDelta FromTimeSpec(const timespec& ts);
 #endif
 #if BUILDFLAG(IS_APPLE)
@@ -210,10 +185,6 @@ class BASE_EXPORT TimeDelta {
   // In addition, this function clamps the upper bound of TimeDelta values to
   // what a `time_t` can hold.
   struct timespec ToTimeSpec() const;
-#endif
-#if BUILDFLAG(IS_WIN)
-  ABI::Windows::Foundation::DateTime ToWinrtDateTime() const;
-  ABI::Windows::Foundation::TimeSpan ToWinrtTimeSpan() const;
 #endif
 
   // Returns the frequency in Hertz (cycles per second) that has a period of
@@ -499,20 +470,6 @@ class TimeBase {
   ClampedNumeric<int64_t> us_;
 };
 
-#if BUILDFLAG(IS_WIN)
-#if defined(ARCH_CPU_ARM64)
-// TSCTicksPerSecond is not supported on Windows on Arm systems because the
-// cycle-counting methods use the actual CPU cycle count, and not a consistent
-// incrementing counter.
-#else
-// Returns true if the CPU support constant rate TSC.
-[[nodiscard]] BASE_EXPORT bool HasConstantRateTSC();
-
-// Returns the frequency of the TSC in ticks per second, or 0 if it hasn't
-// been measured yet. Needs to be guarded with a call to HasConstantRateTSC().
-[[nodiscard]] BASE_EXPORT double TSCTicksPerSecond();
-#endif
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace time_internal
 
@@ -536,12 +493,6 @@ class BASE_EXPORT Time : public time_internal::TimeBase<Time> {
   static constexpr int64_t kMicrosecondsFromWindowsToUnixEpoch =
       INT64_C(11644473600000000);
 
-#if BUILDFLAG(IS_WIN)
-  // To avoid overflow in QPC to Microseconds calculations, since we multiply
-  // by kMicrosecondsPerSecond, then the QPC value should not exceed
-  // (2^63 - 1) / 1E6. If it exceeds that threshold, we divide then multiply.
-  static constexpr int64_t kQPCOverflowThreshold = INT64_C(0x8637BD05AF7);
-#endif
 
 // kExplodedMinYear and kExplodedMaxYear define the platform-specific limits
 // for values passed to FromUTCExploded() and FromLocalExploded(). Those
@@ -551,10 +502,7 @@ class BASE_EXPORT Time : public time_internal::TimeBase<Time> {
 //
 // WARNING: These are not the same limits for the inverse functionality,
 // UTCExplode() and LocalExplode(). See method comments for further details.
-#if BUILDFLAG(IS_WIN)
-  static constexpr int kExplodedMinYear = 1601;
-  static constexpr int kExplodedMaxYear = 30827;
-#elif BUILDFLAG(IS_IOS) && !__LP64__
+#if BUILDFLAG(IS_IOS) && !__LP64__
   static constexpr int kExplodedMinYear = std::numeric_limits<int>::min();
   static constexpr int kExplodedMaxYear = std::numeric_limits<int>::max();
 #elif BUILDFLAG(IS_APPLE)
@@ -718,32 +666,6 @@ class BASE_EXPORT Time : public time_internal::TimeBase<Time> {
 #endif
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  static Time FromFileTime(FILETIME ft);
-  FILETIME ToFileTime() const;
-
-  // The minimum time of a low resolution timer.  This is basically a windows
-  // constant of ~15.6ms.  While it does vary on some older OS versions, we'll
-  // treat it as static across all windows versions.
-  static const int kMinLowResolutionThresholdMs = 16;
-
-  // Enable or disable Windows high resolution timer.
-  static void EnableHighResolutionTimer(bool enable);
-
-  // Activates or deactivates the high resolution timer based on the |activate|
-  // flag.  If the HighResolutionTimer is not Enabled (see
-  // EnableHighResolutionTimer), this function will return false.  Otherwise
-  // returns true.  Each successful activate call must be paired with a
-  // subsequent deactivate call.
-  // All callers to activate the high resolution timer must eventually call
-  // this function to deactivate the high resolution timer.
-  static bool ActivateHighResolutionTimer(bool activate);
-
-  // Returns true if the high resolution timer is both enabled and activated.
-  // This is provided for testing only, and is not tracked in a thread-safe
-  // way.
-  static bool IsHighResolutionTimerInUse();
-#endif  // BUILDFLAG(IS_WIN)
 
   // Converts an exploded structure representing either the local time or UTC
   // into a Time class. Returns false on a failure when, for example, a day of
@@ -1209,24 +1131,6 @@ class BASE_EXPORT TimeTicks : public time_internal::TimeBase<TimeTicks> {
   [[nodiscard]] static bool IsConsistentAcrossProcesses();
 
 
-#if BUILDFLAG(IS_WIN)
-  // Translates an absolute QPC timestamp into a TimeTicks value. The returned
-  // value has the same origin as Now(). Do NOT attempt to use this if
-  // IsHighResolution() returns false.
-  static TimeTicks FromQPCValue(LONGLONG qpc_value);
-
-  // If this device doesn't have an invariant TSC, it may be added to the
-  // client-side trial to try to use QPC anyway. This function returns true for
-  // all devices in the trial (which is all the devices without an invariant
-  // TSC), and populates `trial_name` and `group_name` for them. `group_name`
-  // can be "Enabled" and "Control", as well as "Excluded" for devices where
-  // QueryPerformanceFrequency returns 0 (which shouldn't happen, but the
-  // assertion to validate this is new).
-  static bool GetHighResolutionTimeTicksFieldTrial(std::string* trial_name,
-                                                   std::string* group_name);
-
-  static void MaybeAddHighResolutionTimeTicksSwitch(CommandLine* command_line);
-#endif
 
 #if BUILDFLAG(IS_APPLE)
   static TimeTicks FromMachAbsoluteTime(uint64_t mach_absolute_time);
@@ -1287,10 +1191,6 @@ class BASE_EXPORT TimeTicks : public time_internal::TimeBase<TimeTicks> {
   }
 
  protected:
-#if BUILDFLAG(IS_WIN)
-  typedef DWORD (*TickFunctionType)(void);
-  static TickFunctionType SetMockTickFunction(TickFunctionType ticker);
-#endif
 
  private:
   friend class time_internal::TimeBase<TimeTicks>;
@@ -1349,8 +1249,6 @@ class BASE_EXPORT ThreadTicks : public time_internal::TimeBase<ThreadTicks> {
   [[nodiscard]] static bool IsSupported() {
 #if (defined(_POSIX_THREAD_CPUTIME) && _POSIX_THREAD_CPUTIME >= 0) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
     return true;
-#elif BUILDFLAG(IS_WIN)
-    return IsSupportedWin();
 #else
     return false;
 #endif
@@ -1359,9 +1257,6 @@ class BASE_EXPORT ThreadTicks : public time_internal::TimeBase<ThreadTicks> {
   // Waits until the initialization is completed. Needs to be guarded with a
   // call to IsSupported().
   static void WaitUntilInitialized() {
-#if BUILDFLAG(IS_WIN)
-    WaitUntilInitializedWin();
-#endif
   }
 
   // Returns thread-specific CPU-time on systems that support this feature.
@@ -1373,14 +1268,6 @@ class BASE_EXPORT ThreadTicks : public time_internal::TimeBase<ThreadTicks> {
   // absolutely needed, call WaitUntilInitialized() before this method.
   static ThreadTicks Now();
 
-#if BUILDFLAG(IS_WIN)
-  // Similar to Now() above except this returns thread-specific CPU time for an
-  // arbitrary thread. All comments for Now() method above apply apply to this
-  // method as well.
-  // TODO(crbug.com/420681350): Migrate the only use of this to
-  // PlatformThreadMetrics, to minimize the platform differences in base::Time.
-  static ThreadTicks GetForThread(const PlatformThreadHandle& thread_handle);
-#endif
 
   // Converts an integer value representing ThreadTicks to a class. This may be
   // used when deserializing a |ThreadTicks| structure, using a value known to
@@ -1402,10 +1289,6 @@ class BASE_EXPORT ThreadTicks : public time_internal::TimeBase<ThreadTicks> {
   // internal use and testing.
   constexpr explicit ThreadTicks(int64_t us) : TimeBase(us) {}
 
-#if BUILDFLAG(IS_WIN)
-  [[nodiscard]] static bool IsSupportedWin();
-  static void WaitUntilInitializedWin();
-#endif
 };
 
 // For logging use only.

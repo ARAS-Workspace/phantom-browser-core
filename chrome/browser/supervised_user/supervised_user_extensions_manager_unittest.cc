@@ -57,13 +57,13 @@ class SupervisedUserExtensionsManagerTestBase
   void CheckLocalApprovalMigrationForDesktopState(
       supervised_user::LocallyParentApprovedExtensionsMigrationState
           expected_migration_state) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     auto* prefs = profile()->GetPrefs();
     CHECK(prefs);
     EXPECT_EQ(static_cast<int>(expected_migration_state),
               prefs->GetInteger(
                   prefs::kLocallyParentApprovedExtensionsMigrationState));
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   }
 
   scoped_refptr<const extensions::Extension> MakeThemeExtension() {
@@ -210,14 +210,14 @@ TEST_F(SupervisedUserExtensionsManagerTest,
   MakeSupervisedUserExtensionsManager();
 
   bool has_local_approval_migration_run = false;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   auto expected_migration_state =
       supervised_user::LocallyParentApprovedExtensionsMigrationState::kComplete;
   has_local_approval_migration_run = true;
   EXPECT_EQ(
       static_cast<int>(expected_migration_state),
       prefs->GetInteger(prefs::kLocallyParentApprovedExtensionsMigrationState));
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   // The already approved extension should be allowed and not part of the
   // local-approved list.
@@ -248,7 +248,7 @@ TEST_F(SupervisedUserExtensionsManagerTest,
   ASSERT_TRUE(profile()->IsChild());
   base::HistogramTester histogram_tester;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Mark the migration done to avoid any interference with the one-off
   // migration.
   auto* prefs = profile()->GetPrefs();
@@ -327,7 +327,7 @@ TEST_F(SupervisedUserExtensionsManagerTest,
        GrantParentApprovalOnExtensionsWhenExtensionsToggleSetToOn) {
   ASSERT_TRUE(profile()->IsChild());
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Mark the migration done to avoid any interference with the one-off
   // migration.
   auto* prefs = profile()->GetPrefs();
@@ -389,9 +389,9 @@ TEST_F(SupervisedUserExtensionsManagerTest, RevokeLocalApproval) {
   MakeSupervisedUserExtensionsManager();
 
   bool has_local_approval_migration_run = false;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   has_local_approval_migration_run = true;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   auto* prefs = profile()->GetPrefs();
   CHECK(prefs);
@@ -441,7 +441,7 @@ class AddingSupervisionTest : public SupervisedUserExtensionsManagerTestBase,
   }
 
   void MaybeMarkLocalApprovalMigrationDone() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     if (GetInitialLocalApprovalMigrationForDesktopState() ==
         LocalApprovalMigrationForDesktopState::kExecuted) {
       auto* prefs = profile()->GetPrefs();
@@ -452,7 +452,7 @@ class AddingSupervisionTest : public SupervisedUserExtensionsManagerTestBase,
               supervised_user::LocallyParentApprovedExtensionsMigrationState::
                   kComplete));
     }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   }
 };
 
@@ -520,7 +520,7 @@ TEST_P(AddingSupervisionTest,
 INSTANTIATE_TEST_SUITE_P(
     All,
     AddingSupervisionTest,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     testing::Values(LocalApprovalMigrationForDesktopState::kExecuted,
                     LocalApprovalMigrationForDesktopState::kPending),
 #else   // ChromeOS case
@@ -528,7 +528,7 @@ INSTANTIATE_TEST_SUITE_P(
         // The test just needs to be executed once, the value of
         // LocalApprovalMigrationForDesktopState does not matter.
     testing::Values(LocalApprovalMigrationForDesktopState::kExecuted),
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     [](const auto& info) {
       return std::string(
           info.param == LocalApprovalMigrationForDesktopState::kExecuted

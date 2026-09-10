@@ -965,12 +965,7 @@ class FirstRunBackNavigationInteractiveUiTest
 };
 
 // TODO(crbug.com/366119368): Re-enable this test
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_BackNavigationDisabledOnSteps \
-  DISABLED_BackNavigationDisabledOnSteps
-#else
 #define MAYBE_BackNavigationDisabledOnSteps BackNavigationDisabledOnSteps
-#endif
 IN_PROC_BROWSER_TEST_P(FirstRunBackNavigationInteractiveUiTest,
                        MAYBE_BackNavigationDisabledOnSteps) {
   base::test::TestFuture<bool> proceed_future;
@@ -1056,11 +1051,7 @@ using FirstRunInteractiveUiTestWithSyncService =
     WithTestSyncServiceMixin<FirstRunInteractiveUiTest>;
 
 // TODO(crbug.com/366119368): Re-enable this test
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SignIn DISABLED_SignIn
-#else
 #define MAYBE_SignIn SignIn
-#endif
 // Simplified version of the Signin flow in the FRE, without the Search Engine
 // Choice and Default Browser screen showing. For the full flow, check
 // `FirstRunParameterizedInteractiveUiTest_SignInAndSync` test below.
@@ -1423,7 +1414,7 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTest, GoToSettings) {
 
 // TODO(crbug.com/366119368): Re-enable this test
 // TODO(crbug.com/525637007): Test is flaky on Linux TSan bots.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_PeekAndDeclineSignIn DISABLED_PeekAndDeclineSignIn
 #else
 #define MAYBE_PeekAndDeclineSignIn PeekAndDeclineSignIn
@@ -1507,11 +1498,7 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTest,
 }
 
 // TODO(crbug.com/366119368): Re-enable this test
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DeclineProfileManagement DISABLED_DeclineProfileManagement
-#else
 #define MAYBE_DeclineProfileManagement DeclineProfileManagement
-#endif
 IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTest,
                        MAYBE_DeclineProfileManagement) {
   base::test::TestFuture<bool> proceed_future;
@@ -1646,10 +1633,6 @@ using FirstRunParameterizedInteractiveUiTestWithSyncService =
 IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTestWithSyncService,
                        SignInAndSync) {
   bool should_skip_test = false;
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/363254870, crbug.com/366082752): Re-enable this test
-  should_skip_test = true;
-#endif  // WIN
   if (should_skip_test) {
     GTEST_SKIP() << "Test is flaky on win64";
   }
@@ -1852,10 +1835,6 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTestWithSyncService,
 IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTestWithSyncService,
                        DeclineSync) {
   bool should_skip_test = false;
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/366082752): Re-enable this test
-  should_skip_test = true;
-#endif  // WIN
   if (should_skip_test) {
     GTEST_SKIP() << "Test is flaky on win64";
   }
@@ -2072,12 +2051,7 @@ class FirstRunWithHatsInteractiveUiTest
 };
 
 // TODO(crbug.com/366082752): Re-enable this test once the issue is fixed.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DoNotLaunchHatsIfDeclineSignIn \
-  DISABLED_DoNotLaunchHatsIfDeclineSignIn
-#else
 #define MAYBE_DoNotLaunchHatsIfDeclineSignIn DoNotLaunchHatsIfDeclineSignIn
-#endif
 IN_PROC_BROWSER_TEST_P(FirstRunWithHatsInteractiveUiTest,
                        MAYBE_DoNotLaunchHatsIfDeclineSignIn) {
   ASSERT_TRUE(IsProfileNameDefault());
@@ -2147,11 +2121,7 @@ using FirstRunWithHatsInteractiveUiTestWithSyncService =
     WithTestSyncServiceMixin<FirstRunWithHatsInteractiveUiTest>;
 
 // TODO(crbug.com/366082752): Re-enable this test once the issue is fixed.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_LaunchHats DISABLED_LaunchHats
-#else
 #define MAYBE_LaunchHats LaunchHats
-#endif
 IN_PROC_BROWSER_TEST_P(FirstRunWithHatsInteractiveUiTestWithSyncService,
                        MAYBE_LaunchHats) {
   ASSERT_TRUE(IsProfileNameDefault());
@@ -2206,12 +2176,7 @@ IN_PROC_BROWSER_TEST_P(FirstRunWithHatsInteractiveUiTestWithSyncService,
 }
 
 // TODO(crbug.com/366082752): Re-enable this test once the issue is fixed.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DoNotLaunchHatsIfEnterpriseUser \
-  DISABLED_DoNotLaunchHatsIfEnterpriseUser
-#else
 #define MAYBE_DoNotLaunchHatsIfEnterpriseUser DoNotLaunchHatsIfEnterpriseUser
-#endif
 IN_PROC_BROWSER_TEST_P(FirstRunWithHatsInteractiveUiTestWithSyncService,
                        MAYBE_DoNotLaunchHatsIfEnterpriseUser) {
   ASSERT_TRUE(IsProfileNameDefault());
@@ -2299,11 +2264,7 @@ using FirstRunWithHatsAndUnrelatedFeatureSetInteractiveUiTest =
     FirstRunWithHatsInteractiveUiTestWithSyncService;
 
 // TODO(crbug.com/366082752): Re-enable this test once the issue is fixed.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DoNotLaunchHats DISABLED_DoNotLaunchHats
-#else
 #define MAYBE_DoNotLaunchHats DoNotLaunchHats
-#endif
 IN_PROC_BROWSER_TEST_P(FirstRunWithHatsAndUnrelatedFeatureSetInteractiveUiTest,
                        MAYBE_DoNotLaunchHats) {
   ASSERT_TRUE(IsProfileNameDefault());
@@ -2392,12 +2353,7 @@ class FirstRunDontSignInOnGaiaPageInteractiveUiTest
 };
 
 // TODO(crbug.com/366119368): Re-enable this test
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DeclineSignInFromNativeToolbar \
-  DISABLED_DeclineSignInFromNativeToolbar
-#else
 #define MAYBE_DeclineSignInFromNativeToolbar DeclineSignInFromNativeToolbar
-#endif
 IN_PROC_BROWSER_TEST_F(FirstRunDontSignInOnGaiaPageInteractiveUiTest,
                        MAYBE_DeclineSignInFromNativeToolbar) {
   ASSERT_TRUE(fre_service()->ShouldOpenFirstRun());
@@ -2461,11 +2417,7 @@ class FirstRunInSearchChoiceRegionInteractiveUiTest
 };
 
 // TODO(crbug.com/366119368): Re-enable this test. (FRE does not open on Win)
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SkipChoiceScreenDynamically DISABLED_SkipChoiceScreenDynamically
-#else
 #define MAYBE_SkipChoiceScreenDynamically SkipChoiceScreenDynamically
-#endif
 IN_PROC_BROWSER_TEST_P(FirstRunInSearchChoiceRegionInteractiveUiTest,
                        MAYBE_SkipChoiceScreenDynamically) {
   ASSERT_TRUE(IsProfileNameDefault());

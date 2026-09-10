@@ -23,14 +23,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <shlobj.h>
-
-#include "base/win/windows_types.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_POSIX)
 #include "base/test/scoped_locale.h"
 #endif
@@ -200,25 +192,9 @@ TEST(UpdateClientUtils, RemoveUnsecureUrls) {
 TEST(UpdateClientUtils, GetArchitecture) {
   const std::string arch = GetArchitecture();
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(arch == kArchIntel || arch == kArchAmd64 || arch == kArchArm64)
-      << arch;
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 namespace {
-#if BUILDFLAG(IS_WIN)
-base::FilePath CopyCmdExe(const base::FilePath& under_dir) {
-  static constexpr wchar_t kCmdExe[] = L"cmd.exe";
-
-  base::FilePath system_path;
-  EXPECT_TRUE(base::PathService::Get(base::DIR_SYSTEM, &system_path));
-
-  const base::FilePath cmd_exe_path = under_dir.Append(kCmdExe);
-  EXPECT_TRUE(base::CopyFile(system_path.Append(kCmdExe), cmd_exe_path));
-  return cmd_exe_path;
-}
-#endif  // BUILDFLAG(IS_WIN)
 }  // namespace
 
 TEST(UpdateClientUtils, RetryFileOperation) {
@@ -226,49 +202,9 @@ TEST(UpdateClientUtils, RetryFileOperation) {
   ASSERT_TRUE(base::CreateNewTempDirectory(
       FILE_PATH_LITERAL("Test_RetryFileOperation"), &tempdir));
 
-#if BUILDFLAG(IS_WIN)
-  // Launch a process that runs for 3 seconds.
-  ASSERT_TRUE(
-      base::LaunchProcess(
-          base::StrCat({CopyCmdExe(tempdir).value(), L" /c \"timeout 3\""}), {})
-          .IsValid());
-
-  // Trying to delete once fails, because the process is running within
-  // `tempdir`.
-  ASSERT_FALSE(RetryFileOperation(&base::DeletePathRecursively, tempdir, 1,
-                                  base::Seconds(1)));
-#endif  // BUILDFLAG(IS_WIN)
-
   // Deleting with retries works.
   ASSERT_TRUE(RetryFileOperation(&base::DeletePathRecursively, tempdir));
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST(UpdateClientUtils, CleanupDirectoriesOlderThan) {
-  base::FilePath download_dir_path;
-  ASSERT_TRUE(base::CreateNewTempDirectory(kTestDirPrefix, &download_dir_path));
-  ASSERT_TRUE(base::WriteFile(download_dir_path.Append(kTestDownloadFilename),
-                              kTestDownloadContent));
-
-  // Manipulate the creation time of the directory to be older than 3 days.
-  FILETIME creation_filetime =
-      (base::Time::NowFromSystemTime() - base::Days(5)).ToFileTime();
-  base::File download_dir(download_dir_path,
-                          base::File::FLAG_OPEN |
-                              base::File::FLAG_WIN_BACKUP_SEMANTICS |
-                              base::File::FLAG_WRITE_ATTRIBUTES);
-  ASSERT_TRUE(download_dir.IsValid());
-  ASSERT_TRUE(::SetFileTime(download_dir.GetPlatformFile(), &creation_filetime,
-                            NULL, NULL));
-  download_dir.Close();
-
-  CleanupDirectoriesOlderThan(download_dir_path.DirName(), kTestDirMatcher,
-                              base::Days(3));
-
-  EXPECT_FALSE(base::DirectoryExists(download_dir_path))
-      << "download_dir_path: " << download_dir_path;
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST(UpdateClientUtils, RetainsRecentDownloads) {
   base::FilePath download_dir_path;
@@ -277,11 +213,7 @@ TEST(UpdateClientUtils, RetainsRecentDownloads) {
                               kTestDownloadContent));
 
   base::FilePath temp_dir;
-#if BUILDFLAG(IS_WIN)
-  ASSERT_TRUE(base::GetSecureTempDirectory(&temp_dir));
-#else   // BUILDFLAG(IS_WIN)
   ASSERT_TRUE(base::GetTempDir(&temp_dir));
-#endif  // BUILDFLAG(IS_WIN)
   CleanupDirectoriesOlderThan(temp_dir, kTestDirMatcher, base::Days(3));
 
   EXPECT_TRUE(base::DirectoryExists(download_dir_path));

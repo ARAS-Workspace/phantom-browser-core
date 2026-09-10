@@ -84,15 +84,8 @@ static const struct FileUtilICUTestCases {
     {u"\u2008.(\u2007).\u3000", u"-.(\u2007).-", u"(\u2007)"},
     {u"     ", u"-   -", u"_     _"},
     {u".    ", u"-   -", u"_.    _"},
-#if BUILDFLAG(IS_WIN)
-    // '~' is only invalid on Windows, and only if the file name could possibly
-    // be an 8.3 short name.
-    {u"config~1", u"config-1", u"config 1"},
-    {u"config~1.txt", u"config-1.txt", u"config 1.txt"},
-#else
     {u"config~1", u"config~1", u"config~1"},
     {u"config~1.txt", u"config~1.txt", u"config~1.txt"},
-#endif
     // Tildes are always illegal at ends.
     {u"~config1.txt", u"-config1.txt", u"config1.txt"},
     {u"config1.txt~", u"config1.txt-", u"config1.txt"},
@@ -113,33 +106,21 @@ static const struct FileUtilICUTestCases {
     // Base name is longer than 8 characters, without a dot.
     {u"config~1txt", u"config~1txt", u"config~1txt"},
 };
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_POSIX)
 
 TEST_F(FileUtilICUTest, ReplaceIllegalCharactersInPathTest) {
   for (auto i : kIllegalCharacterCases) {
-#if BUILDFLAG(IS_WIN)
-    std::wstring bad_name = UTF16ToWide(i.bad_name);
-    ReplaceIllegalCharactersInPath(&bad_name, '-');
-    EXPECT_EQ(UTF16ToWide(i.good_name_with_dash), bad_name);
-#else
     std::string bad_name = UTF16ToUTF8(i.bad_name);
     ReplaceIllegalCharactersInPath(&bad_name, '-');
     EXPECT_EQ(UTF16ToUTF8(i.good_name_with_dash), bad_name);
-#endif
   }
 }
 
 TEST_F(FileUtilICUTest, ReplaceIllegalCharactersInPathWithIllegalEndCharTest) {
   for (auto i : kIllegalCharacterCases) {
-#if BUILDFLAG(IS_WIN)
-    std::wstring bad_name = UTF16ToWide(i.bad_name);
-    ReplaceIllegalCharactersInPath(&bad_name, ' ');
-    EXPECT_EQ(UTF16ToWide(i.good_name_with_space), bad_name);
-#else
     std::string bad_name(UTF16ToUTF8(i.bad_name));
     ReplaceIllegalCharactersInPath(&bad_name, ' ');
     EXPECT_EQ(UTF16ToUTF8(i.good_name_with_space), bad_name);
-#endif
   }
 }
 

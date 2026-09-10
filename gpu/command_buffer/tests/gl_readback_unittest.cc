@@ -157,7 +157,7 @@ static GLuint CompileShader(GLenum type, const char *data) {
 // backend. crbug.com/607283.
 // TODO(zmo): This test also fails on some android devices when the readback
 // type is HALF_FLOAT_OES. Likely it's due to a driver bug. crbug.com/607936.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_ReadPixelsFloat DISABLED_ReadPixelsFloat
 #else
 #define MAYBE_ReadPixelsFloat ReadPixelsFloat

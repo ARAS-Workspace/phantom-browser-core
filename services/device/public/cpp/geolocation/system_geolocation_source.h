@@ -70,12 +70,12 @@ class COMPONENT_EXPORT(GEOLOCATION) SystemGeolocationSource {
   virtual void StopWatchingPosition() = 0;
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE)
   // Requests system level permission to use geolocation. This may cause a
   // permission dialog to be displayed. The permission update callback is called
   // if the permission state changes.
   virtual void RequestPermission() = 0;
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_APPLE)
 };
 
 }  // namespace device

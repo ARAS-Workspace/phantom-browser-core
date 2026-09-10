@@ -10,11 +10,7 @@
 #include "base/compiler_specific.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#define TRANSLATE_KIT_EXPORT __declspec(dllexport)
-#else
 #define TRANSLATE_KIT_EXPORT __attribute__((visibility("default")))
-#endif
 
 extern "C" {
 

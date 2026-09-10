@@ -14,11 +14,7 @@ class PrintPreviewFocusTest : public WebUIMochaFocusTest {
 };
 
 // Web UI interactive tests are flaky on Win10, see https://crbug.com/41312866
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_FocusPrintButtonOnReady DISABLED_FocusPrintButtonOnReady
-#else
 #define MAYBE_FocusPrintButtonOnReady FocusPrintButtonOnReady
-#endif
 IN_PROC_BROWSER_TEST_F(PrintPreviewFocusTest, MAYBE_FocusPrintButtonOnReady) {
   RunTest("print_preview/button_strip_interactive_test.js", "mocha.run()");
 }
@@ -29,11 +25,7 @@ IN_PROC_BROWSER_TEST_F(PrintPreviewFocusTest, BlurResetsEmptyNumberInput) {
 }
 
 // Web UI interactive tests are flaky on Win10, see https://crbug.com/41312866
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_AutoFocusScalingInput DISABLED_AutoFocusScalingInput
-#else
 #define MAYBE_AutoFocusScalingInput AutoFocusScalingInput
-#endif
 IN_PROC_BROWSER_TEST_F(PrintPreviewFocusTest, MAYBE_AutoFocusScalingInput) {
   RunTest("print_preview/scaling_settings_interactive_test.js", "mocha.run()");
 }

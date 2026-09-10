@@ -98,9 +98,6 @@ void VrTabHelper::SetIsContentDisplayedInHeadset(content::WebContents* contents,
 
 /* static */
 void VrTabHelper::ExitVrPresentation() {
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_VR)
-  content::XRRuntimeManager::ExitImmersivePresentation();
-#endif
 }
 
 void VrTabHelper::SetIsContentDisplayedInHeadset(bool state) {

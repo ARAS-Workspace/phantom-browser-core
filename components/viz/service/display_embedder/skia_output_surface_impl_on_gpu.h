@@ -228,9 +228,6 @@ class SkiaOutputSurfaceImplOnGpu
   // gpu::SharedContextState::ContextLostObserver implementation:
   void OnContextLost() override;
 
-#if BUILDFLAG(IS_WIN)
-  void AddChildWindowToBrowser(gpu::SurfaceHandle child_window);
-#endif
   const gpu::gles2::FeatureInfo* GetFeatureInfo() const;
 
   void PostTaskToClientThread(base::OnceClosure closure) {

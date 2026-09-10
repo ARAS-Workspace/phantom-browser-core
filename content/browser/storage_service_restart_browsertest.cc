@@ -88,11 +88,7 @@ class StorageServiceRestartBrowserTest : public ContentBrowserTest {
 };
 
 // TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-#define MAYBE_BasicReconnect DISABLED_BasicReconnect
-#else
 #define MAYBE_BasicReconnect BasicReconnect
-#endif
 IN_PROC_BROWSER_TEST_F(StorageServiceRestartBrowserTest, MAYBE_BasicReconnect) {
   // Basic smoke test to ensure that we can force-crash the service and
   // StoragePartitionImpl will internally re-establish a working connection to

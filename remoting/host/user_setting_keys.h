@@ -10,16 +10,6 @@
 
 namespace remoting {
 
-#if BUILDFLAG(IS_WIN)
-
-// Windows settings are stored in the registry where the key and value names use
-// pascal case.
-
-constexpr UserSettingKey kWinPreviousDefaultWebBrowserProgId =
-    "PreviousDefaultBrowserProgId";
-
-#endif  // BUILDFLAG(IS_WIN)
-
 }  // namespace remoting
 
 #endif  // REMOTING_HOST_USER_SETTING_KEYS_H_

@@ -87,7 +87,6 @@ enum AcceleratorState {
 
 // Not supported on win.
 // TODO(crbug.com/40256300): Support this on win.
-#if !BUILDFLAG(IS_WIN)
 // Sends a key press and/or release message with/without modifier keys.
 // `key_event_types` is a bitmask of KeyEventType constants that indicates what
 // events are generated.
@@ -100,7 +99,6 @@ bool SendKeyEventsNotifyWhenDone(gfx::NativeWindow window,
                                  int key_event_types,
                                  base::OnceClosure task,
                                  int accelerator_state = kNoAccelerator);
-#endif  // !BUILDFLAG(IS_WIN)
 
 #if !BUILDFLAG(IS_ANDROID)
 
@@ -170,15 +168,7 @@ bool SendMouseEventsNotifyWhenDone(
 bool SendMouseClick(MouseButton type,
                     gfx::NativeWindow window_hint = gfx::NativeWindow());
 
-#if BUILDFLAG(IS_WIN)
-// Send WM_POINTER messages to generate touch events. There is no way to detect
-// when events are received by chrome, it's up to users of this API to detect
-// when events arrive. |action| is a bitmask of the TouchType constants that
-// indicate what events are generated, |num| is the number of the touch
-// pointers, |screen_x| and |screen_y| are the screen coordinates of a touch
-// pointer.
-bool SendTouchEvents(int action, int num, int screen_x, int screen_y);
-#elif BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 // Sends a TouchEvent to the window system. |action| is a bitmask of the
 // TouchType constants that indicates what events are generated, |id| identifies
 // the touch point.
@@ -200,7 +190,7 @@ bool SendTouchEventsNotifyWhenDone(int action,
 void ForceUseScreenCoordinatesOnce();
 #endif
 
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
 class UIControlsAura;
 void InstallUIControlsAura(UIControlsAura* instance);
 #endif

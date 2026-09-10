@@ -36,10 +36,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#endif
-
 using ::testing::_;
 using ::testing::AnyNumber;
 using ::testing::DoAll;
@@ -130,14 +126,12 @@ class TestDownloadFileImpl : public DownloadFileImpl {
     return base::Milliseconds(0);
   }
 
-#if !BUILDFLAG(IS_WIN)
   // On Posix, we don't encounter transient errors during renames, except
   // possibly EAGAIN, which is difficult to replicate reliably. So we resort to
   // simulating a transient error using ACCESS_DENIED instead.
   bool ShouldRetryFailedRename(DownloadInterruptReason reason) override {
     return reason == DOWNLOAD_INTERRUPT_REASON_FILE_ACCESS_DENIED;
   }
-#endif
 };
 
 class MockQuarantine : public quarantine::mojom::Quarantine {
@@ -195,9 +189,6 @@ class DownloadFileTest : public testing::Test {
   }
 
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    ASSERT_TRUE(com_initializer_.Succeeded());
-#endif
     EXPECT_CALL(*(observer_.get()), DestinationUpdate(_, _, _))
         .Times(AnyNumber())
         .WillRepeatedly(Invoke(this, &DownloadFileTest::SetUpdateDownloadInfo));
@@ -536,11 +527,6 @@ class DownloadFileTest : public testing::Test {
   }
 
  private:
-#if BUILDFLAG(IS_WIN)
-  // This must occur early in the member list to ensure COM is initialized first
-  // and uninitialized last.
-  base::win::ScopedCOMInitializer com_initializer_;
-#endif
 
  protected:
   std::unique_ptr<StrictMock<MockDownloadDestinationObserver>> observer_;
@@ -886,20 +872,11 @@ TEST_P(DownloadFileTestWithRename, MAYBE_RenameWithErrorRetry) {
   base::RunLoop succeeding_run;
   {
 // (Scope for the base::File or base::FilePermissionRestorer below.)
-#if BUILDFLAG(IS_WIN)
-    // On Windows we test with an actual transient error, a sharing violation.
-    // The rename will fail because we are holding the file open for READ. On
-    // Posix this doesn't cause a failure.
-    base::File locked_file(initial_path,
-                           base::File::FLAG_OPEN | base::File::FLAG_READ);
-    ASSERT_TRUE(locked_file.IsValid());
-#else
     // Simulate a transient failure by revoking write permission for target_dir.
     // The TestDownloadFileImpl class treats this error as transient even though
     // DownloadFileImpl itself doesn't.
     base::FilePermissionRestorer restore_permissions_for(target_dir);
     ASSERT_TRUE(base::MakeFileUnwritable(target_dir));
-#endif
 
     // The Rename() should fail here and enqueue a retry task without invoking
     // the completion callback.

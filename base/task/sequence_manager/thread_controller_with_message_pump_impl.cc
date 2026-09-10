@@ -105,12 +105,6 @@ ThreadControllerWithMessagePumpImpl::~ThreadControllerWithMessagePumpImpl() {
   // ScopedSetSequenceLocalStorageMapForCurrentThread destructor will
   // de-register the current thread as a sequence.
 
-#if BUILDFLAG(IS_WIN)
-  if (main_thread_only().in_high_res_mode) {
-    main_thread_only().in_high_res_mode = false;
-    Time::ActivateHighResolutionTimer(false);
-  }
-#endif
 }
 
 // static
@@ -326,14 +320,6 @@ void ThreadControllerWithMessagePumpImpl::BeforeWait() {
 
 MessagePump::Delegate::NextWorkInfo
 ThreadControllerWithMessagePumpImpl::DoWork() {
-#if BUILDFLAG(IS_WIN)
-  // We've been already in a wakeup here. Deactivate the high res timer of OS
-  // immediately instead of waiting for next DoIdleWork().
-  if (main_thread_only().in_high_res_mode) {
-    main_thread_only().in_high_res_mode = false;
-    Time::ActivateHighResolutionTimer(false);
-  }
-#endif
   MessagePump::Delegate::NextWorkInfo next_work_info{};
 
   work_deduplicator_.OnWorkStarted();
@@ -556,28 +542,6 @@ void ThreadControllerWithMessagePumpImpl::DoIdleWork() {
   // of the "ThreadController active" trace event emitted from
   // `run_level_tracker_.OnIdle()`.
   TRACE_EVENT0("sequence_manager", "SequenceManager::DoIdleWork");
-
-#if BUILDFLAG(IS_WIN)
-  if (!power_monitor_.IsProcessInPowerSuspendState()) {
-    // Avoid calling Time::ActivateHighResolutionTimer() between
-    // suspend/resume as the system hangs if we do (crbug.com/1074028).
-    // OnResume() will generate a task on this thread per the
-    // ThreadControllerPowerMonitor observer and DoIdleWork() will thus get
-    // another chance to set the right high-resolution-timer-state before
-    // going to sleep after resume.
-
-    const bool need_high_res_mode =
-        main_thread_only().task_source->NextWakeUpNeedsHighRes();
-    if (main_thread_only().in_high_res_mode != need_high_res_mode) {
-      // On Windows we activate the high resolution timer so that the wait
-      // _if_ triggered by the timer happens with good resolution. If we don't
-      // do this the default resolution is 15ms which might not be acceptable
-      // for some tasks.
-      main_thread_only().in_high_res_mode = need_high_res_mode;
-      Time::ActivateHighResolutionTimer(need_high_res_mode);
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   auto* recorder = base::LockMetricsRecorder::GetForCurrentThread();
   if (recorder) {

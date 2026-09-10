@@ -429,7 +429,7 @@ TEST_F(ApplyPendingManifestUpdateCommandTest,
 
   // Since MASKABLE is not supported windows and linux for trusted icons, one
   // ANY icon is required to be chosen as the trusted icon.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   blink::Manifest::ImageResource updated_any_icon;
   int icon_size_any = 128;
   updated_any_icon.src = icon_any_url;
@@ -441,7 +441,7 @@ TEST_F(ApplyPendingManifestUpdateCommandTest,
 
   // Adding the ANY icon that will be chosen as the trusted icon on windows and
   // linux.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   new_manifest->icons = {updated_icon, updated_any_icon};
   // Make icon diff larger than 10% by changing the color to RED.
   const SkBitmap updated_any_bitmaps =
@@ -503,7 +503,7 @@ TEST_F(ApplyPendingManifestUpdateCommandTest,
               bitmap.getColor(bitmap.width() / 2, bitmap.height() / 2));
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   // Verify the color of the manifest any icons
   for (const auto& [size, bitmap] : bitmaps_updated.manifest_icons.any) {
     EXPECT_EQ(kUpdatedAppIconColor,

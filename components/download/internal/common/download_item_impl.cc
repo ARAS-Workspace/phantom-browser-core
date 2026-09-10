@@ -785,15 +785,6 @@ void DownloadItemImpl::OpenDownload() {
   for (auto& observer : observers_)
     observer.OnDownloadOpened(this);
 
-#if BUILDFLAG(IS_WIN)
-  // On Windows, don't actually open the file if it has no extension, to prevent
-  // Windows from interpreting it as the command for an executable of the same
-  // name.
-  if (destination_info_.current_path.Extension().empty()) {
-    delegate_->ShowDownloadInShell(this);
-    return;
-  }
-#endif
   delegate_->OpenDownload(this);
 }
 

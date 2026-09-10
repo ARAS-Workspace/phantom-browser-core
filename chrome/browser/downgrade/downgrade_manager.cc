@@ -35,10 +35,6 @@
 #include "components/version_info/version_info_values.h"
 #include "content/public/browser/browser_thread.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/installer/util/install_util.h"
-#endif
-
 namespace downgrade {
 
 namespace {
@@ -145,14 +141,6 @@ void DeleteMovedUserData(const base::FilePath& user_data_dir,
       DeleteAllRenamedUserDirectories(parent, disk_cache_dir.BaseName());
   }
 }
-
-#if BUILDFLAG(IS_WIN)
-bool IsAdministratorDrivenDowngrade(uint16_t current_milestone) {
-  const auto downgrade_version = InstallUtil::GetDowngradeVersion();
-  return downgrade_version &&
-         downgrade_version->components()[0] > current_milestone;
-}
-#endif
 
 }  // namespace
 
@@ -299,12 +287,6 @@ DowngradeManager::Type DowngradeManager::GetDowngradeType(
   DCHECK(!user_data_dir.empty());
   DCHECK_LT(current_version, last_version);
 
-#if BUILDFLAG(IS_WIN)
-  // Move User Data aside for a clean launch if it follows an
-  // administrator-driven downgrade.
-  if (IsAdministratorDrivenDowngrade(current_version.components()[0]))
-    return Type::kAdministrativeWipe;
-#endif
     return Type::kUnsupported;
 }
 
@@ -322,13 +304,6 @@ DowngradeManager::Type DowngradeManager::GetDowngradeTypeWithSnapshot(
   // snapshot to restore.
   const auto snapshot_to_restore =
       GetSnapshotToRestore(current_version, user_data_dir);
-
-#if BUILDFLAG(IS_WIN)
-  // Move User Data aside for a clean launch if it follows an
-  // administrator-driven downgrade when no snapshot is found.
-  if (!snapshot_to_restore && IsAdministratorDrivenDowngrade(milestone))
-    return Type::kAdministrativeWipe;
-#endif
 
   const uint16_t last_milestone = last_version.components()[0];
   if (last_milestone > milestone)

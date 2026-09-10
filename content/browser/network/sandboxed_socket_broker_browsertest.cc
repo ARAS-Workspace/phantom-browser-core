@@ -52,12 +52,6 @@ class SandboxedSocketBrokerBrowserTest : public ContentBrowserTest {
     check_sandbox_ = sdk_version >= base::android::SdkVersion::SDK_VERSION_R;
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-    if (!sandbox::policy::features::IsNetworkSandboxSupported()) {
-      check_sandbox_ = false;
-    }
-#endif  // BUILDFLAG(IS_WIN)
-
     if (check_sandbox_) {
 #if !BUILDFLAG(IS_MAC)
       // Network Service Sandboxing is unconditionally enabled on these
@@ -70,28 +64,8 @@ class SandboxedSocketBrokerBrowserTest : public ContentBrowserTest {
   }
 
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    if (check_sandbox_) {
-      ASSERT_TRUE(IsOutOfProcessNetworkService());
-      ASSERT_TRUE(sandbox::policy::features::IsNetworkSandboxEnabled());
-    }
-
-    embedded_test_server_.RegisterRequestHandler(
-        base::BindRepeating(&SandboxedSocketBrokerBrowserTest::HandleRequest,
-                            base::Unretained(this)));
-
-    ASSERT_TRUE(embedded_test_server_.InitializeAndListen());
-    ContentBrowserTest::SetUp();
-#else
     GTEST_SKIP();
-#endif
   }
-
-#if BUILDFLAG(IS_WIN)
-  void SetUpOnMainThread() override {
-    embedded_test_server_.StartAcceptingConnections();
-  }
-#endif
 
   std::unique_ptr<net::test_server::HttpResponse> HandleRequest(
       const net::test_server::HttpRequest& request) {

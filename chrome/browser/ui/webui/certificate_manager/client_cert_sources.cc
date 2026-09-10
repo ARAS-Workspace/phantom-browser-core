@@ -47,15 +47,11 @@
 #include "net/ssl/client_cert_store_nss.h"
 #endif  // BUILDFLAG(USE_NSS_CERTS)
 
-#if BUILDFLAG(IS_WIN)
-#include "net/ssl/client_cert_store_win.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_MAC)
 #include "net/ssl/client_cert_store_mac.h"
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/enterprise/client_certificates/certificate_provisioning_service_factory.h"
 #include "chrome/browser/policy/chrome_browser_policy_connector.h"
@@ -139,13 +135,6 @@ class ClientCertStoreFactoryNSS : public ClientCertStoreFactory {
                             kCryptoModulePasswordClientAuth));
   }
 };
-#elif BUILDFLAG(IS_WIN)
-class ClientCertStoreFactoryWin : public ClientCertStoreFactory {
- public:
-  std::unique_ptr<net::ClientCertStore> CreateClientCertStore() override {
-    return std::make_unique<net::ClientCertStoreWin>();
-  }
-};
 #elif BUILDFLAG(IS_MAC)
 class ClientCertStoreFactoryMac : public ClientCertStoreFactory {
  public:
@@ -158,10 +147,7 @@ class ClientCertStoreFactoryMac : public ClientCertStoreFactory {
 #if !BUILDFLAG(IS_CHROMEOS) && !BUILDFLAG(IS_LINUX)
 std::unique_ptr<ClientCertStoreLoader> CreatePlatformClientCertLoader(
     Profile* profile) {
-#if BUILDFLAG(IS_WIN)
-  return std::make_unique<ClientCertStoreLoader>(
-      std::make_unique<ClientCertStoreFactoryWin>());
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return std::make_unique<ClientCertStoreLoader>(
       std::make_unique<ClientCertStoreFactoryMac>());
 #else
@@ -170,7 +156,7 @@ std::unique_ptr<ClientCertStoreLoader> CreatePlatformClientCertLoader(
 }
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class ClientCertStoreFactoryProvisioned : public ClientCertStoreFactory {
  public:
   explicit ClientCertStoreFactoryProvisioned(
@@ -1056,7 +1042,7 @@ CreatePlatformClientCertSource(
 #endif
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 std::unique_ptr<CertificateManagerPageHandler::CertSource>
 CreateProvisionedClientCertSource(Profile* profile) {
   return std::make_unique<ClientCertSource>(

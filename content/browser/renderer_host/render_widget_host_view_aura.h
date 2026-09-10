@@ -49,10 +49,6 @@
 #include "ui/gfx/selection_bound.h"
 #include "ui/wm/public/activation_delegate.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "content/browser/renderer_host/virtual_keyboard_controller_win.h"
-#include "ui/events/win/stylus_handwriting_properties_win.h"
-#endif
 
 namespace aura_extra {
 class WindowPositionInRootMonitor;
@@ -82,10 +78,6 @@ class ScopedTooltipDisabler;
 }
 
 namespace content {
-#if BUILDFLAG(IS_WIN)
-class LegacyRenderWidgetHostHWND;
-class DirectManipulationBrowserTestBase;
-#endif
 
 class DelegatedFrameHost;
 class DelegatedFrameHostClient;
@@ -98,9 +90,6 @@ class TouchSelectionControllerClientAura;
 // ShouldInputArabicIndicDigits.
 inline constexpr char16_t kArabicIndicZero = u'\u0660';
 
-#if BUILDFLAG(IS_WIN)
-CONTENT_EXPORT void ResetArabicIndicDigitInputStateForTesting();
-#endif  // BUILDFLAG(IS_WIN)
 
 // RenderWidgetHostView class hierarchy described in render_widget_host_view.h.
 class CONTENT_EXPORT RenderWidgetHostViewAura
@@ -225,15 +214,6 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
   bool HasSavedCompositorFrame() const override;
   void FocusedNodeChanged(bool is_editable_node,
                           const gfx::Rect& node_bounds_in_screen) override;
-#if BUILDFLAG(IS_WIN)
-  bool ShouldInitiateStylusWriting() override;
-  void OnStartStylusWriting() override;
-  void OnEditElementFocusedForStylusWriting(
-      blink::mojom::StylusWritingFocusResultPtr focus_result) override;
-  void StartStylusWritingFromChildHostView(
-      RenderWidgetHostViewBase* view,
-      OnFocusHandwritingTargetCallback callback) override;
-#endif  // BUILDFLAG(IS_WIN)
   void OnSynchronizedDisplayPropertiesChanged(bool rotation = false) override;
   viz::ScopedSurfaceIdAllocator DidUpdateVisualProperties(
       const cc::RenderFrameMetadata& metadata) override;
@@ -271,13 +251,6 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
   bool CanComposeInline() const override;
   gfx::Rect GetCaretBounds() const override;
   gfx::Rect GetSelectionBoundingBox() const override;
-#if BUILDFLAG(IS_WIN)
-  std::optional<gfx::Rect> GetProximateCharacterBounds(
-      const gfx::Range& range) const override;
-  std::optional<size_t> GetProximateCharacterIndexFromPoint(
-      const gfx::Point& screen_point_in_dips,
-      ui::IndexFromPointFlags flags) const override;
-#endif  // BUILDFLAG(IS_WIN)
   bool GetCompositionCharacterBounds(size_t index,
                                      gfx::Rect* rect) const override;
   bool HasCompositionText() const override;
@@ -303,7 +276,7 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
   ukm::SourceId GetClientSourceForMetrics() const override;
   bool ShouldDoLearning() override;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   bool SetCompositionFromExistingText(
       const gfx::Range& range,
       const std::vector<ui::ImeTextSpan>& ui_ime_text_spans) override;
@@ -327,18 +300,7 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
       std::optional<gfx::Rect>* control_bounds,
       std::optional<gfx::Rect>* selection_bounds) override;
 
-#if BUILDFLAG(IS_WIN)
-  // API to notify accessibility whether there is an active composition
-  // from TSF or not.
-  // It notifies the composition range, composition text and whether the
-  // composition has been committed or not.
-  void SetActiveCompositionForAccessibility(
-      const gfx::Range& range,
-      const std::u16string& active_composition_text,
-      bool is_composition_committed) override;
-#endif
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
   // Returns the editing context of the active web content.
   // This is currently used by TSF and ChromeOS to fetch the URL of the active
   // web content.
@@ -346,10 +308,6 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
   ui::TextInputClient::EditingContext GetTextEditingContext() override;
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  // Notify TSF (via text store) when URL of the frame in focus changes.
-  void NotifyOnFrameFocusChanged() override;
-#endif
 
   // Overridden from display::DisplayObserver:
   void OnDisplayMetricsChanged(const display::Display& display,
@@ -412,16 +370,6 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
   void OnLocalSurfaceIdChanged(
       const cc::RenderFrameMetadata& metadata) override {}
 
-#if BUILDFLAG(IS_WIN)
-  // Gets the HWND of the host window.
-  HWND GetHostWindowHWND() const;
-
-  // Updates the cursor clip region. Used for mouse locking.
-  void UpdateMouseLockRegion();
-
-  // Notification that the LegacyRenderWidgetHostHWND was destroyed.
-  void OnLegacyWindowDestroyed();
-#endif
 
   gfx::NativeViewAccessible GetParentNativeViewAccessible();
 
@@ -471,12 +419,6 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
     return delegated_frame_host_.get();
   }
 
-#if BUILDFLAG(IS_WIN)
-  const std::optional<ui::StylusHandwritingPropertiesWin>&
-  last_stylus_handwriting_properties() const {
-    return last_stylus_handwriting_properties_;
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   bool ShouldUseDefaultDeadlineOnResize() const;
 
@@ -519,11 +461,6 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
   friend class RenderWidgetHostViewAuraDevtoolsBrowserTest;
   friend class RenderWidgetHostViewAuraCopyRequestTest;
   friend class TestInputMethodObserver;
-#if BUILDFLAG(IS_WIN)
-  friend class AccessibilityObjectLifetimeWinBrowserTest;
-  friend class AccessibilityTreeLinkageWinBrowserTest;
-  friend class DirectManipulationBrowserTestBase;
-#endif
   FRIEND_TEST_ALL_PREFIXES(InputMethodResultAuraTest,
                            FinishImeCompositionSession);
   FRIEND_TEST_ALL_PREFIXES(PaintHoldingRenderWidgetHostViewBrowserTest,
@@ -647,12 +584,6 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
   // Update the insets for bounds change when the virtual keyboard is shown.
   void UpdateInsetsWithVirtualKeyboardEnabled();
 
-#if BUILDFLAG(IS_WIN)
-  // Creates and/or updates the legacy dummy window which corresponds to
-  // the bounds of the webcontents. It is needed for accessibility and
-  // for scrolling to work in legacy drivers for trackpoints/trackpads, etc.
-  void UpdateLegacyWin();
-#endif
 
   ui::InputMethod* GetInputMethod() const;
 
@@ -734,11 +665,6 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
 
   void SetTooltipText(const std::u16string& tooltip_text);
 
-#if BUILDFLAG(IS_WIN)
-  // Ensure that we're observing the device posture platform provider to
-  // get the display feature changes.
-  void ObserveDevicePosturePlatformProvider();
-#endif
 
   // DevicePosturePlatformProvider::Observer.
   void OnDisplayFeatureBoundsChanged(
@@ -748,23 +674,6 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
   // DisplayFeature.
   void ComputeDisplayFeature();
 
-#if BUILDFLAG(IS_WIN)
-  // Forwards `proximate_bounds` to the TextInputManager for caching.
-  void UpdateProximateCharacterBounds(
-      blink::mojom::ProximateCharacterRangeBoundsPtr proximate_bounds);
-
-  // Invoked on Shell Handwriting API request to update the element's focus
-  // based on the provided rect and the distance tolerance.
-  void OnFocusHandwritingTarget(
-      const gfx::Rect& focus_screen_rect_in_dips,
-      const gfx::Size& tolerance_screen_distance_in_dips);
-
-  void StartStylusWritingImpl(RenderWidgetHostViewBase* initiating_view,
-                              OnFocusHandwritingTargetCallback callback);
-
-  void ForwardArabicIndicCharEventWithLatencyInfo(const ui::KeyEvent& event,
-                                                  char16_t ascii_char);
-#endif  // BUILDFLAG(IS_WIN)
 
   raw_ptr<aura::Window> window_;
 
@@ -818,25 +727,6 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
   };
   CursorVisibilityState cursor_visibility_state_in_renderer_;
 
-#if BUILDFLAG(IS_WIN)
-  // Provides a dummy HWND for legacy accessibility tools and drivers.
-  raw_ptr<LegacyRenderWidgetHostHWND> legacy_render_widget_host_HWND_ = nullptr;
-
-  // Whether Windows destroyed the legacy HWND, e.g. via browser DestroyWindow.
-  // Indicates that recreating the HWND instance again would be futile.
-  bool legacy_window_destroyed_ = false;
-
-  // Contains a copy of the last context menu request parameters. Only set when
-  // we receive a request to show the context menu on a long press.
-  std::unique_ptr<ContextMenuParams> last_context_menu_params_;
-
-  // Handles the showing/hiding of the VK on Windows.
-  friend class VirtualKeyboardControllerWin;
-  std::unique_ptr<VirtualKeyboardControllerWin>
-      virtual_keyboard_controller_win_;
-
-  gfx::Point last_mouse_move_location_;
-#endif
 
   // The last selection bounds reported to the view.
   gfx::SelectionBound selection_start_;
@@ -892,16 +782,6 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
   // Display feature bounds returned by the OS.
   gfx::Rect display_feature_bounds_;
 
-#if BUILDFLAG(IS_WIN)
-  base::ScopedObservation<DevicePosturePlatformProvider,
-                          DevicePosturePlatformProvider::Observer>
-      device_posture_observation_{this};
-
-  // Stores last stylus handwriting specific details including a handwriting
-  // pointer id and a handwriting stroke id.
-  std::optional<ui::StylusHandwritingPropertiesWin>
-      last_stylus_handwriting_properties_;
-#endif  // BUILDFLAG(IS_WIN)
 
   std::optional<display::ScopedDisplayObserver> display_observer_;
 

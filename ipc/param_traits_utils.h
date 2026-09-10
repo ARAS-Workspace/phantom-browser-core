@@ -45,9 +45,6 @@
 #endif
 
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/string_util_win.h"
-#endif
 
 namespace base {
 class FilePath;
@@ -169,7 +166,8 @@ struct ParamTraits<unsigned int> {
 //   3) Android 64 bit and Fuchsia also have int64_t typedef'd to long.
 // Since we want to support Android 32<>64 bit IPC, as long as we don't have
 // these traits for 32 bit ARM then that'll catch any errors.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || (BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_64_BITS))
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
+    (BUILDFLAG(IS_ANDROID) && defined(ARCH_CPU_64_BITS))
 template <>
 struct ParamTraits<long> {
   typedef long param_type;
@@ -304,18 +302,6 @@ inline void WriteParam(base::Pickle* m, std::u16string_view sv) {
   ParamTraits<std::u16string>::Write(m, sv);
 }
 
-#if BUILDFLAG(IS_WIN)
-template <>
-struct COMPONENT_EXPORT(IPC) ParamTraits<std::wstring> {
-  typedef std::wstring param_type;
-  static void Write(base::Pickle* m, const param_type& p) {
-    m->WriteString16(base::AsStringPiece16(p));
-  }
-  static bool Read(const base::Pickle* m,
-                   base::PickleIterator* iter,
-                   param_type* r);
-};
-#endif
 
 template <>
 struct COMPONENT_EXPORT(IPC) ParamTraits<std::vector<char>> {
@@ -526,16 +512,6 @@ struct COMPONENT_EXPORT(IPC) ParamTraits<base::ScopedFD> {
 
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-template <>
-struct COMPONENT_EXPORT(IPC) ParamTraits<base::win::ScopedHandle> {
-  using param_type = base::win::ScopedHandle;
-  static void Write(base::Pickle* m, const param_type& p);
-  static bool Read(const base::Pickle* m,
-                   base::PickleIterator* iter,
-                   param_type* r);
-};
-#endif
 
 
 #if BUILDFLAG(IS_ANDROID)
@@ -638,12 +614,6 @@ struct SimilarTypeTraits<base::File::Error> {
   typedef int Type;
 };
 
-#if BUILDFLAG(IS_WIN)
-template <>
-struct SimilarTypeTraits<HWND> {
-  typedef HANDLE Type;
-};
-#endif  // BUILDFLAG(IS_WIN)
 
 template <>
 struct COMPONENT_EXPORT(IPC) ParamTraits<base::Time> {
@@ -924,25 +894,6 @@ struct COMPONENT_EXPORT(IPC) ParamTraits<Message> {
 
 // Windows ParamTraits ---------------------------------------------------------
 
-#if BUILDFLAG(IS_WIN)
-template <>
-struct COMPONENT_EXPORT(IPC) ParamTraits<HANDLE> {
-  typedef HANDLE param_type;
-  static void Write(base::Pickle* m, const param_type& p);
-  static bool Read(const base::Pickle* m,
-                   base::PickleIterator* iter,
-                   param_type* r);
-};
-
-template <>
-struct COMPONENT_EXPORT(IPC) ParamTraits<MSG> {
-  typedef MSG param_type;
-  static void Write(base::Pickle* m, const param_type& p);
-  static bool Read(const base::Pickle* m,
-                   base::PickleIterator* iter,
-                   param_type* r);
-};
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace IPC
 

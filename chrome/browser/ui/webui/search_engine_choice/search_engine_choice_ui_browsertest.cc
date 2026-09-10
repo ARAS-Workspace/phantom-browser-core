@@ -131,33 +131,6 @@ std::string ParamToTestSuffix(const ::testing::TestParamInfo<TestParam>& info) {
 
 // Permutations of supported parameters.
 const TestParam kTestParams[] = {
-#if BUILDFLAG(IS_WIN)
-    {.test_suffix = "Default"},
-    {.test_suffix = "DarkTheme", .use_dark_theme = true},
-    {.test_suffix = "RightToLeft", .use_right_to_left_language = true},
-    {.test_suffix = "MediumSize",
-     .wait_for_background_displayed = false,
-     .dialog_dimensions = gfx::Size(800, 700)},
-    {.test_suffix = "NarrowSize",
-     .wait_for_background_displayed = false,
-     .dialog_dimensions = gfx::Size(300, 900)},
-    {.test_suffix = "ShortAndNarrowSize",
-     .wait_for_background_displayed = false,
-     .dialog_dimensions = gfx::Size(500, 500)},
-    {.test_suffix = "LargerFirstEngineSnippet",
-     .first_snippet_text_larger = true},
-    {.test_suffix = "FirstEngineSelectedWithLargerSnippet",
-     .select_first_search_engine = true,
-     .first_snippet_text_larger = true},
-    {.test_suffix = "InfoDialog", .display_info_dialog = true},
-    {.test_suffix = "InfoDialogDarkTheme",
-     .use_dark_theme = true,
-     .display_info_dialog = true},
-    {.test_suffix = "Guest", .is_guest_session = true},
-    {.test_suffix = "GuestRtl",
-     .use_right_to_left_language = true,
-     .is_guest_session = true},
-#endif
     // We enable the test on platforms other than Windows with the smallest
     // height due to a small maximum window height set by the operating system.
     // The test will crash if we exceed that height.

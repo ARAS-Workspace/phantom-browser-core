@@ -34,17 +34,6 @@ extern const base::FilePath::CharType kFrameworkExecutableName[];
 extern const char kMacHelperSuffixAlerts[];
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-inline constexpr base::FilePath::CharType kBrowserResourcesDll[] =
-    FILE_PATH_LITERAL("chrome.dll");
-inline constexpr base::FilePath::CharType kElfDll[] =
-    FILE_PATH_LITERAL("chrome_elf.dll");
-inline constexpr base::FilePath::CharType kRendererDll[] =
-    FILE_PATH_LITERAL("chrome_renderer.dll");
-inline constexpr base::FilePath::CharType kStatusTrayWindowClass[] =
-    FILE_PATH_LITERAL("Chrome_StatusTrayWindow");
-#endif  // BUILDFLAG(IS_WIN)
-
 inline constexpr char kInitialProfile[] = "Default";
 inline constexpr char kMultiProfileDirPrefix[] = "Profile ";
 inline constexpr base::FilePath::CharType kGuestProfileDir[] =
@@ -135,15 +124,8 @@ inline constexpr base::FilePath::CharType kWebAppDirname[] =
 inline constexpr base::FilePath::CharType kReportingAndNelStoreFilename[] =
     FILE_PATH_LITERAL("Reporting and NEL");
 
-#if BUILDFLAG(IS_WIN)
-inline constexpr base::FilePath::CharType kJumpListIconDirname[] =
-    FILE_PATH_LITERAL("JumpListIcons");
-#endif
-
 // directory names
-#if BUILDFLAG(IS_WIN)
-inline constexpr wchar_t kUserDataDirname[] = L"User Data";
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 inline constexpr base::FilePath::CharType kOTRTempStateDirname[] =
     FILE_PATH_LITERAL("OTRTempState");
 #endif

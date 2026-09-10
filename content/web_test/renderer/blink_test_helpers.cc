@@ -69,15 +69,7 @@ WebURL RewriteWPTAbsolutePath(std::string_view utf8_url) {
     return WebURL(GURL(utf8_url));
   }
 
-#if BUILDFLAG(IS_WIN)
-  // +3 for a drive letter, :, and /.
-  static constexpr size_t kFileSchemeAndDriveLen = kFileScheme.size() + 3;
-  if (utf8_url.size() <= kFileSchemeAndDriveLen)
-    return WebURL();
-  std::string_view path = utf8_url.substr(kFileSchemeAndDriveLen);
-#else
   std::string_view path = utf8_url.substr(kFileScheme.size());
-#endif
   base::FilePath new_path = GetExternalWPTFilePath().AppendASCII(path);
   return WebURL(net::FilePathToFileURL(new_path));
 }

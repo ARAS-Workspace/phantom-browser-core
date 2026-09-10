@@ -44,11 +44,6 @@ class PrinterQuery {
       base::OnceCallback<void(std::unique_ptr<PrintSettings>,
                               mojom::ResultCode)>;
 
-#if BUILDFLAG(IS_WIN)
-  using OnDidUpdatePrintableAreaCallback =
-      base::OnceCallback<void(bool success)>;
-#endif
-
   static std::unique_ptr<PrinterQuery> Create(
       content::GlobalRenderFrameHostId rfh_id);
 
@@ -91,16 +86,6 @@ class PrinterQuery {
   // Caller has to ensure that `this` is alive until `callback` is run.
   void SetSettingsFromPOD(std::unique_ptr<PrintSettings> new_settings,
                           base::OnceClosure callback);
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  // Updates the printable area of the provided `PrintSettings` object.
-  // Caller has to ensure that `this` and `print_settings` are alive until
-  // `callback` runs.
-  // TODO(crbug.com/40260379):  Remove this if the printable areas can be made
-  // fully available from `PrintBackend::GetPrinterSemanticCapsAndDefaults()`.
-  virtual void UpdatePrintableArea(PrintSettings* print_settings,
-                                   OnDidUpdatePrintableAreaCallback callback);
 #endif
 
   // Sets the printable area in `print_settings` to be the default printable

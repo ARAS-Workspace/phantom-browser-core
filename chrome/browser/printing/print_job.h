@@ -25,10 +25,6 @@
 #include <string>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-class GURL;
-#endif
-
 namespace base {
 class Location;
 class RefCountedMemory;
@@ -40,9 +36,6 @@ class MetafilePlayer;
 class PrintJobManager;
 class PrintJobWorker;
 class PrintedDocument;
-#if BUILDFLAG(IS_WIN)
-class PrintedPage;
-#endif
 class PrinterQuery;
 class PrintSettings;
 
@@ -95,26 +88,6 @@ class PrintJob : public base::RefCountedThreadSafe<PrintJob> {
   virtual void Initialize(std::unique_ptr<PrinterQuery> query,
                           const std::u16string& name,
                           uint32_t page_count);
-
-#if BUILDFLAG(IS_WIN)
-  void StartConversionToNativeFormat(
-      scoped_refptr<base::RefCountedMemory> print_data,
-      const gfx::Size& page_size,
-      const gfx::Rect& content_area,
-      const gfx::Point& physical_offsets,
-      const GURL& url);
-
-  // Overwrites the PDF page mapping to fill in values of -1 for all indices
-  // that are not selected. This is needed when the user opens the system
-  // dialog from the link in Print Preview on Windows and then sets a selection
-  // of pages, because all PDF pages will be converted, but only the user's
-  // selected pages should be sent to the printer. See
-  // https://crbug.com/41377725.
-  void ResetPageMapping();
-
-  // Called when `page` is done printing.
-  void OnPageDone(PrintedPage* page);
-#endif
 
   // Called when the document is done printing.
   virtual void OnDocDone(int job_id, PrintedDocument* document);
@@ -204,17 +177,7 @@ class PrintJob : public base::RefCountedThreadSafe<PrintJob> {
   // it.
   void UpdatePrintedDocument(scoped_refptr<PrintedDocument> new_document);
 
-#if BUILDFLAG(IS_WIN)
-  // Virtual to support testing.
-  virtual void OnPdfPageConverted(uint32_t page_index,
-                                  float scale_factor,
-                                  std::unique_ptr<MetafilePlayer> metafile);
-#endif
-
  private:
-#if BUILDFLAG(IS_WIN)
-  FRIEND_TEST_ALL_PREFIXES(PrintJobTest, PageRangeMapping);
-#endif
 
   // Clears reference to `document_`.
   void ClearPrintedDocument();
@@ -232,33 +195,6 @@ class PrintJob : public base::RefCountedThreadSafe<PrintJob> {
   void ControlledWorkerShutdown();
 
   void HoldUntilStopIsCalled();
-
-#if BUILDFLAG(IS_WIN)
-  virtual void StartPdfToEmfConversion(
-      scoped_refptr<base::RefCountedMemory> bytes,
-      const gfx::Size& page_size,
-      const gfx::Rect& content_area,
-      const GURL& url);
-
-  virtual void StartPdfToPostScriptConversion(
-      scoped_refptr<base::RefCountedMemory> bytes,
-      const gfx::Rect& content_area,
-      const gfx::Point& physical_offsets,
-      bool ps_level2,
-      const GURL& url);
-
-  virtual void StartPdfToTextConversion(
-      scoped_refptr<base::RefCountedMemory> bytes,
-      const gfx::Size& page_size,
-      const GURL& url);
-
-  void OnPdfConversionStarted(uint32_t page_count);
-
-  // Helper method to do the work for ResetPageMapping(). Split for unit tests.
-  static std::vector<uint32_t> GetFullPageMapping(
-      const std::vector<uint32_t>& pages,
-      uint32_t total_page_count);
-#endif  // BUILDFLAG(IS_WIN)
 
   // TODO(crbug.com/484371187): Investigate if reentrancy can be removed.
   base::ObserverList<
@@ -290,13 +226,6 @@ class PrintJob : public base::RefCountedThreadSafe<PrintJob> {
   // Is Canceling? If so, try to not cause recursion if on FAILED notification,
   // the notified calls Cancel() again.
   bool is_canceling_ = false;
-
-#if BUILDFLAG(IS_WIN)
-  class PdfConversionState;
-  std::unique_ptr<PdfConversionState> pdf_conversion_state_;
-  std::vector<uint32_t> pdf_page_mapping_;
-  std::optional<bool> use_skia_;
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_CHROMEOS)
   // The component which initiated the print job.

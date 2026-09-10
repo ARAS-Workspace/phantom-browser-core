@@ -21,19 +21,8 @@
 #include "ui/views_content_client/views_content_client.h"
 #include "ui/views_content_client/views_content_client_main_parts.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/logging_win.h"
-#endif
-
 namespace ui {
 namespace {
-
-#if BUILDFLAG(IS_WIN)
-// {83FAC8EE-7A0E-4dbb-A3F6-6F500D7CAB1A}
-const GUID kViewsContentClientProviderName =
-    { 0x83fac8ee, 0x7a0e, 0x4dbb,
-        { 0xa3, 0xf6, 0x6f, 0x50, 0xd, 0x7c, 0xab, 0x1a } };
-#endif
 
 }  // namespace
 
@@ -56,9 +45,6 @@ std::optional<int> ViewsContentMainDelegate::BasicStartupComplete() {
       logging::LOG_TO_SYSTEM_DEBUG_LOG | logging::LOG_TO_STDERR;
   bool success = logging::InitLogging(settings);
   CHECK(success);
-#if BUILDFLAG(IS_WIN)
-  logging::LogEventProvider::Initialize(kViewsContentClientProviderName);
-#endif
 
   content::RegisterShellPathProvider();
 

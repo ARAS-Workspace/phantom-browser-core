@@ -16,10 +16,6 @@
 #include "url/gurl.h"
 #include "url/url_constants.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#endif
-
 namespace startup {
 
 namespace {
@@ -79,22 +75,13 @@ bool StripGoogleChromeScheme(base::FilePath::StringViewType& arg) {
 
 std::optional<GURL> ExtractGoogleChromeSchemeInnerUrl(const GURL& url) {
   const std::string& spec = url.spec();
-#if BUILDFLAG(IS_WIN)
-  std::wstring url_view_storage = base::UTF8ToWide(spec);
-  base::FilePath::StringViewType url_view = url_view_storage;
-#else
   base::FilePath::StringViewType url_view = spec;
-#endif
 
   // Use strict checking to ensure we only handle the scheme registered for this
   // browser instance (e.g. "google-chrome" for Stable). This matches
   // administrator expectations.
   if (StripGoogleChromeScheme(url_view)) {
-#if BUILDFLAG(IS_WIN)
-    return GURL(base::WideToUTF8(url_view));
-#else
     return GURL(url_view);
-#endif
   }
   return std::nullopt;
 }

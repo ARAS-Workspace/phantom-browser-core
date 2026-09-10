@@ -25,11 +25,6 @@
 #include "services/viz/privileged/mojom/viz_main.mojom.h"
 #include "ui/gfx/font_render_params.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "components/viz/service/gl/info_collection_gpu_service_impl.h"
-#include "services/viz/privileged/mojom/gl/info_collection_gpu_service.mojom.h"
-#endif
-
 namespace base {
 class PowerMonitorSource;
 class WaitableEvent;
@@ -47,9 +42,6 @@ class MojoUkmRecorder;
 }
 
 namespace viz {
-#if BUILDFLAG(IS_WIN)
-class InfoCollectionGpuServiceImpl;
-#endif
 
 class VizMainImpl : public mojom::VizMain {
  public:
@@ -136,11 +128,6 @@ class VizMainImpl : public mojom::VizMain {
       gfx::FontRenderParams::SubpixelRendering subpixel_rendering,
       float text_contrast,
       float text_gamma) override;
-#if BUILDFLAG(IS_WIN)
-  void CreateInfoCollectionGpuService(
-      mojo::PendingReceiver<mojom::InfoCollectionGpuService> pending_receiver)
-      override;
-#endif
 #if BUILDFLAG(IS_ANDROID)
   void SetHostProcessId(int32_t pid) override;
   void NotifyWorkloadIncrease() override;
@@ -187,9 +174,6 @@ class VizMainImpl : public mojom::VizMain {
 
   std::unique_ptr<gpu::GpuInit> gpu_init_;
   std::unique_ptr<GpuServiceImpl> gpu_service_;
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<InfoCollectionGpuServiceImpl> info_collection_gpu_service_;
-#endif
 
   // If the gpu service is not yet ready then we stash pending
   // FrameSinkManagerParams.

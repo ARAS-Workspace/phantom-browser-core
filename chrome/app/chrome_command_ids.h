@@ -86,14 +86,10 @@
 #define IDC_USE_SYSTEM_TITLE_BAR        34051
 #endif
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define IDC_RESTORE_WINDOW              34052
-#endif // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN)
-#define IDC_MOVE_WINDOW                 34053
-#define IDC_SIZE_WINDOW                 34054
-#endif // BUILDFLAG(IS_WIN)
 
 #define IDC_OPEN_IN_PWA_WINDOW          34055
 #define IDC_MOVE_TAB_TO_NEW_WINDOW      34056

@@ -20,10 +20,6 @@
 #include <cups/cups.h>
 #endif  // BUILDFLAG(USE_CUPS_IPP)
 
-#if BUILDFLAG(IS_WIN)
-#include "printing/mojom/print.mojom.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace printing {
 
 mojom::ColorModel ColorModeToColorModel(int color_mode) {
@@ -314,9 +310,6 @@ PrintSettings& PrintSettings::operator=(const PrintSettings& settings) {
   rasterize_pdf_ = settings.rasterize_pdf_;
   rasterize_pdf_dpi_ = settings.rasterize_pdf_dpi_;
   landscape_ = settings.landscape_;
-#if BUILDFLAG(IS_WIN)
-  printer_language_type_ = settings.printer_language_type_;
-#endif
   is_modifiable_ = settings.is_modifiable_;
   pages_per_sheet_ = settings.pages_per_sheet_;
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
@@ -344,9 +337,6 @@ bool PrintSettings::operator==(const PrintSettings& other) const {
                   color_, copies_, duplex_mode_, device_name_, requested_media_,
                   page_setup_device_units_, dpi_, scale_factor_, rasterize_pdf_,
                   rasterize_pdf_dpi_, landscape_,
-#if BUILDFLAG(IS_WIN)
-                  printer_language_type_,
-#endif
                   is_modifiable_, requested_custom_margins_in_microns_,
                   pages_per_sheet_
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
@@ -367,9 +357,6 @@ bool PrintSettings::operator==(const PrintSettings& other) const {
                   other.requested_media_, other.page_setup_device_units_,
                   other.dpi_, other.scale_factor_, other.rasterize_pdf_,
                   other.rasterize_pdf_dpi_, other.landscape_,
-#if BUILDFLAG(IS_WIN)
-                  other.printer_language_type_,
-#endif
                   other.is_modifiable_,
                   other.requested_custom_margins_in_microns_,
                   other.pages_per_sheet_
@@ -408,9 +395,6 @@ void PrintSettings::Clear() {
   rasterize_pdf_ = false;
   rasterize_pdf_dpi_ = 0;
   landscape_ = false;
-#if BUILDFLAG(IS_WIN)
-  printer_language_type_ = mojom::PrinterLanguageType::kNone;
-#endif
   is_modifiable_ = true;
   pages_per_sheet_ = 1;
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
@@ -521,33 +505,6 @@ void PrintSettings::SetPrinterPrintableArea(
   if (landscape_ && landscape_needs_flip)
     page_setup_device_units_.FlipOrientation();
 }
-
-#if BUILDFLAG(IS_WIN)
-void PrintSettings::UpdatePrinterPrintableArea(
-    const gfx::Rect& printable_area_um) {
-  // Scale the page size and printable area to device units.
-  // Blink doesn't support different dpi settings in X and Y axis. Because of
-  // this, printers with non-square pixels still scale page size and printable
-  // area using device_units_per_inch() instead of their respective dimensions
-  // in device_units_per_inch_size().
-  float scale = static_cast<float>(device_units_per_inch()) / kMicronsPerInch;
-  gfx::Rect printable_area_device_units =
-      gfx::ScaleToRoundedRect(printable_area_um, scale);
-
-  // Protect against misbehaving drivers.  We have observed some drivers return
-  // incorrect values compared to page size.  E.g., HP Business Inkjet 2300 PS.
-  gfx::Rect physical_size_rect(page_setup_device_units_.physical_size());
-  if (printable_area_device_units.IsEmpty() ||
-      !physical_size_rect.Contains(printable_area_device_units)) {
-    // Invalid printable area!  Default to paper size.
-    printable_area_device_units = physical_size_rect;
-  }
-
-  page_setup_device_units_.Init(page_setup_device_units_.physical_size(),
-                                printable_area_device_units,
-                                page_setup_device_units_.text_height());
-}
-#endif
 
 void PrintSettings::SetCustomMargins(
     const PageMargins& requested_margins_in_microns) {

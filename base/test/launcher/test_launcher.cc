@@ -75,14 +75,6 @@
 #include "base/apple/scoped_nsautorelease_pool.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/strings/string_util_win.h"
-
-// To avoid conflicts with the macro from the Windows SDK...
-#undef GetCommandLine
-#endif
 
 
 #if BUILDFLAG(IS_IOS)
@@ -356,11 +348,7 @@ CommandLine PrepareCommandLineForGTest(const CommandLine& command_line,
 
   if (switches.find(switches::kTestLauncherRetriesLeft) == switches.end()) {
     switches[switches::kTestLauncherRetriesLeft] =
-#if BUILDFLAG(IS_WIN)
-        base::NumberToWString(
-#else
         base::NumberToString(
-#endif
             retries_left);
   }
 
@@ -373,11 +361,7 @@ CommandLine PrepareCommandLineForGTest(const CommandLine& command_line,
   // does not really support removing switches well, and trying to do that
   // on a CommandLine with a wrapper is known to break.
   // TODO(phajdan.jr): Give it a try to support CommandLine removing switches.
-#if BUILDFLAG(IS_WIN)
-  new_command_line.PrependWrapper(UTF8ToWide(wrapper));
-#else
   new_command_line.PrependWrapper(wrapper);
-#endif
 
   return new_command_line;
 }
@@ -400,27 +384,6 @@ int LaunchChildTestProcessWithOptions(const CommandLine& command_line,
 
   LaunchOptions new_options(options);
 
-#if BUILDFLAG(IS_WIN)
-  DCHECK(!new_options.job_handle);
-
-  win::ScopedHandle job_handle;
-  if (flags & TestLauncher::USE_JOB_OBJECTS) {
-    job_handle.Set(CreateJobObject(NULL, NULL));
-    if (!job_handle.is_valid()) {
-      LOG(ERROR) << "Could not create JobObject.";
-      return -1;
-    }
-
-    DWORD job_flags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-
-    if (!SetJobObjectLimitFlags(job_handle.get(), job_flags)) {
-      LOG(ERROR) << "Could not SetJobObjectLimitFlags.";
-      return -1;
-    }
-
-    new_options.job_handle = job_handle.get();
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   // To prevent accidental privilege sharing to an untrusted child, processes
@@ -437,26 +400,9 @@ int LaunchChildTestProcessWithOptions(const CommandLine& command_line,
     // in the set.
     AutoLock lock(*GetLiveProcessesLock());
 
-#if BUILDFLAG(IS_WIN)
-    // Allow the handle used to capture stdio and stdout to be inherited by the
-    // child. Note that this is done under GetLiveProcessesLock() to ensure that
-    // only the desired child receives the handle.
-    if (new_options.stdout_handle) {
-      ::SetHandleInformation(new_options.stdout_handle, HANDLE_FLAG_INHERIT,
-                             HANDLE_FLAG_INHERIT);
-    }
-#endif
 
     process = LaunchProcess(command_line, new_options);
 
-#if BUILDFLAG(IS_WIN)
-    // Revoke inheritance so that the handle isn't leaked into other children.
-    // Note that this is done under GetLiveProcessesLock() to ensure that only
-    // the desired child receives the handle.
-    if (new_options.stdout_handle) {
-      ::SetHandleInformation(new_options.stdout_handle, HANDLE_FLAG_INHERIT, 0);
-    }
-#endif
 
     if (!process.IsValid()) {
       return -1;
@@ -560,9 +506,7 @@ FilePath CreateChildTempDirIfSupported(const FilePath& task_temp_dir,
 // temporary directory to |environment|.
 void SetTemporaryDirectory(const FilePath& temp_dir,
                            EnvironmentMap* environment) {
-#if BUILDFLAG(IS_WIN)
-  environment->emplace(L"TMP", temp_dir.value());
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   environment->emplace("MAC_CHROMIUM_TMPDIR", temp_dir.value());
 #elif BUILDFLAG(IS_POSIX)
   environment->emplace("TMPDIR", temp_dir.value());
@@ -590,13 +534,6 @@ ChildProcessResults DoLaunchChildTestProcess(
   if (redirect_stdio) {
     output_file = CreateAndOpenTemporaryStream(&output_filename);
     CHECK(output_file);
-#if BUILDFLAG(IS_WIN)
-    // Paint the file so that it will be deleted when all handles are closed.
-    if (!FILEToFile(output_file.get()).DeleteOnClose(true)) {
-      PLOG(WARNING) << "Failed to mark " << output_filename.AsUTF8Unsafe()
-                    << " for deletion on close";
-    }
-#endif
   }
 
   LaunchOptions options;
@@ -610,26 +547,6 @@ ChildProcessResults DoLaunchChildTestProcess(
   if (!process_temp_dir.empty()) {
     SetTemporaryDirectory(process_temp_dir, &options.environment);
   }
-#if BUILDFLAG(IS_WIN)
-
-  options.inherit_mode = test_launch_options.inherit_mode;
-  options.handles_to_inherit = test_launch_options.handles_to_inherit;
-  if (redirect_stdio) {
-    HANDLE handle =
-        reinterpret_cast<HANDLE>(_get_osfhandle(_fileno(output_file.get())));
-    CHECK_NE(INVALID_HANDLE_VALUE, handle);
-    options.stdin_handle = INVALID_HANDLE_VALUE;
-    options.stdout_handle = handle;
-    options.stderr_handle = handle;
-    // See LaunchOptions.stdout_handle comments for why this compares against
-    // FILE_TYPE_CHAR.
-    if (options.inherit_mode == base::LaunchOptions::Inherit::kSpecific &&
-        GetFileType(handle) != FILE_TYPE_CHAR) {
-      options.handles_to_inherit.push_back(handle);
-    }
-  }
-
-#else  // if !BUILDFLAG(IS_WIN)
 
   options.fds_to_remap = test_launch_options.fds_to_remap;
   if (redirect_stdio) {
@@ -644,7 +561,6 @@ ChildProcessResults DoLaunchChildTestProcess(
   options.kill_on_parent_death = true;
 #endif
 
-#endif  // !BUILDFLAG(IS_WIN)
 
   result.exit_code = LaunchChildTestProcessWithOptions(
       command_line, options, test_launch_options.flags, result_file,
@@ -660,14 +576,12 @@ ChildProcessResults DoLaunchChildTestProcess(
           result.exit_code != 0);
 
     output_file.reset();
-#if !BUILDFLAG(IS_WIN)
     // On Windows, the reset() above is enough to delete the file since it was
     // painted for such after being opened. Lesser platforms require an explicit
     // delete now.
     if (!DeleteFile(output_filename)) {
       LOG(WARNING) << "Failed to delete " << output_filename.AsUTF8Unsafe();
     }
-#endif
   }
   result.elapsed_time = TimeTicks::Now() - start_time;
   result.process_num = GetTestLauncherTracer()->RecordProcessExecution(
@@ -1732,9 +1646,6 @@ bool TestLauncher::Init(CommandLine* command_line) {
   results_tracker_.AddGlobalTag("OS_SOLARIS");
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  results_tracker_.AddGlobalTag("OS_WIN");
-#endif
 
   // CPU-related tags.
 #if defined(ARCH_CPU_32_BITS)
@@ -2207,11 +2118,7 @@ void TestLauncher::OnOutputTimeout() {
   fprintf(stdout, "Still waiting for the following processes to finish:\n");
 
   for (const auto& pair : *GetLiveProcesses()) {
-#if BUILDFLAG(IS_WIN)
-    fwprintf(stdout, L"\t%s\n", pair.second.GetCommandLineString().c_str());
-#else
     fprintf(stdout, "\t%s\n", pair.second.GetCommandLineString().c_str());
-#endif
   }
 
   fflush(stdout);
@@ -2249,19 +2156,12 @@ size_t NumParallelJobs(unsigned int cores_per_job) {
     return 1U;
   }
 
-#if BUILDFLAG(IS_WIN)
-  // Use processors in all groups (Windows splits more than 64 logical
-  // processors into groups).
-  size_t cores = base::checked_cast<size_t>(
-      ::GetActiveProcessorCount(ALL_PROCESSOR_GROUPS));
-#else
   size_t cores = base::checked_cast<size_t>(SysInfo::NumberOfProcessors());
 #if BUILDFLAG(IS_MAC)
   // This is necessary to allow tests to call SetCpuSecurityMitigationsEnabled()
   // despite NumberOfProcessors() having already been called in the process.
   SysInfo::ResetCpuSecurityMitigationsEnabledForTesting();
 #endif  // BUILDFLAG(IS_MAC)
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_IOS) && TARGET_OS_SIMULATOR
   // If we are targeting the simulator increase the number of jobs we use by 2x

@@ -105,12 +105,7 @@ class CoreIpczTest : public test::MojoTestBase {
     WriteMessageWithHandles(pipe, "", &handle_for_client, 1);
 
     details.process.struct_size = sizeof(details.process);
-#if BUILDFLAG(IS_WIN)
-    details.process.value =
-        static_cast<uint64_t>(reinterpret_cast<uintptr_t>(process.Handle()));
-#else
     details.process.value = static_cast<uint64_t>(process.Handle());
-#endif
 
     details.handle.struct_size = sizeof(details.handle);
     PlatformHandle::ToMojoPlatformHandle(

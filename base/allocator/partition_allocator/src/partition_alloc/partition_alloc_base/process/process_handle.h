@@ -12,9 +12,6 @@
 #include "partition_alloc/build_config.h"
 #include "partition_alloc/partition_alloc_base/component_export.h"
 
-#if PA_BUILDFLAG(IS_WIN)
-#include "partition_alloc/partition_alloc_base/win/windows_types.h"
-#endif
 
 
 namespace partition_alloc::internal::base {
@@ -22,14 +19,11 @@ namespace partition_alloc::internal::base {
 // ProcessHandle is a platform specific type which represents the underlying OS
 // handle to a process.
 // ProcessId is a number which identifies the process in the OS.
-#if PA_BUILDFLAG(IS_WIN)
-typedef DWORD ProcessId;
-const ProcessId kNullProcessId = 0;
-#elif PA_BUILDFLAG(IS_POSIX)
+#if PA_BUILDFLAG(IS_POSIX)
 // On POSIX, our ProcessHandle will just be the PID.
 typedef pid_t ProcessId;
 const ProcessId kNullProcessId = 0;
-#endif  // PA_BUILDFLAG(IS_WIN)
+#endif  // PA_BUILDFLAG(IS_POSIX)
 
 // Returns the id of the current process.
 // Note that on some platforms, this is not guaranteed to be unique across

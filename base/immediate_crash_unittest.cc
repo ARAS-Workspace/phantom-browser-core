@@ -85,12 +85,7 @@ enum : Instruction {
   kHlt0 = 0xd4400000,
 };
 
-#if BUILDFLAG(IS_WIN)
-
-constexpr auto kRequiredBody = std::to_array<Instruction>({kBrkF000, kBrk1});
-constexpr auto kOptionalFooter = std::array<Instruction, 0u>{};
-
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
 constexpr auto kRequiredBody = std::to_array<Instruction>({kBrk0, kHlt0});
 // Some clangs emit a BRK #1 for __builtin_unreachable(), but some do not, so

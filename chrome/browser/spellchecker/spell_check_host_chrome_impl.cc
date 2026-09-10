@@ -182,62 +182,6 @@ void SpellCheckHostChromeImpl::RequestTextCheck(
                      base::Unretained(this))));
 }
 
-#if BUILDFLAG(IS_WIN)
-void SpellCheckHostChromeImpl::InitializeDictionaries(
-    InitializeDictionariesCallback callback) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-
-  // Initialize the spellcheck service if needed. Initialization must
-  // happen on UI thread.
-  SpellcheckService* spellcheck = GetSpellcheckService();
-
-  if (!spellcheck) {  // Teardown.
-    std::move(callback).Run(/*dictionaries=*/{}, /*custom_words=*/{},
-                            /*enable=*/false);
-    return;
-  }
-
-  dictionaries_loaded_callback_ = std::move(callback);
-
-  spellcheck->InitializeDictionaries(
-      base::BindOnce(&SpellCheckHostChromeImpl::OnDictionariesInitialized,
-                     weak_factory_.GetWeakPtr()));
-}
-
-void SpellCheckHostChromeImpl::OnDictionariesInitialized() {
-  DCHECK(dictionaries_loaded_callback_);
-  SpellcheckService* spellcheck = GetSpellcheckService();
-
-  if (!spellcheck) {  // Teardown.
-    std::move(dictionaries_loaded_callback_)
-        .Run(/*dictionaries=*/{}, /*custom_words=*/{},
-             /*enable=*/false);
-    return;
-  }
-
-  const bool enable = spellcheck->IsSpellcheckEnabled();
-
-  std::vector<spellcheck::mojom::SpellCheckBDictLanguagePtr> dictionaries;
-  std::vector<std::string> custom_words;
-  if (enable) {
-    for (const auto& hunspell_dictionary :
-         spellcheck->GetHunspellDictionaries()) {
-      dictionaries.push_back(spellcheck::mojom::SpellCheckBDictLanguage::New(
-          hunspell_dictionary->GetDictionaryFile().Duplicate(),
-          hunspell_dictionary->GetLanguage()));
-    }
-
-    std::set<std::string> custom_words_set =
-        spellcheck->GetCustomDictionary()->GetWords();
-    custom_words.assign(std::make_move_iterator(custom_words_set.begin()),
-                        std::make_move_iterator(custom_words_set.end()));
-  }
-
-  std::move(dictionaries_loaded_callback_)
-      .Run(std::move(dictionaries), custom_words, enable);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 void SpellCheckHostChromeImpl::OnRequestFinished(SpellingRequest* request) {
   auto iterator = requests_.find(request);
   requests_.erase(iterator);

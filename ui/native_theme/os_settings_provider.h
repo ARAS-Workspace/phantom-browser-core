@@ -27,9 +27,6 @@ using OsSettingsProviderImpl = OsSettingsProviderAsh;
 #elif BUILDFLAG(IS_MAC)
 class OsSettingsProviderMac;
 using OsSettingsProviderImpl = OsSettingsProviderMac;
-#elif BUILDFLAG(IS_WIN)
-class OsSettingsProviderWin;
-using OsSettingsProviderImpl = OsSettingsProviderWin;
 #else
 class OsSettingsProvider;
 using OsSettingsProviderImpl = OsSettingsProvider;

@@ -35,10 +35,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <Urlmon.h>
-#endif
-
 namespace updater {
 namespace {
 
@@ -227,16 +223,4 @@ TEST_F(UpdaterDownloadTest, NetworkFetcher) {
   EXPECT_TRUE(base::PathExists(dest_));
 }
 
-#if BUILDFLAG(IS_WIN)
-// Tests that a direct download through URL moniker from a local HTTP server is
-// reasonably fast. This provides a baseline to compare the network throughput
-// of various fetchers.
-TEST_F(UpdaterDownloadTest, URLMonFetcher) {
-  EXPECT_FALSE(base::PathExists(dest_));
-  EXPECT_HRESULT_SUCCEEDED(
-      ::URLDownloadToFile(nullptr, base::UTF8ToWide(gurl_.spec()).c_str(),
-                          dest_.value().c_str(), 0, nullptr));
-  EXPECT_TRUE(base::PathExists(dest_));
-}
-#endif
 }  // namespace updater

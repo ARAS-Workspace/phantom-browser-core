@@ -114,7 +114,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, BackdropFilterBlurRect) {
   blur->SetBackdropFilterBounds(SkPath::Rect(
       SkRect::MakeWH(blur->bounds().width(), blur->bounds().height())));
 
-#if BUILDFLAG(IS_WIN) || defined(ARCH_CPU_ARM64)
+#if defined(ARCH_CPU_ARM64)
   // Windows and ARM64 have 436 pixels off by 1: crbug.com/259915
   pixel_comparator_ = std::make_unique<FuzzyPixelComparator>(
       FuzzyPixelComparator()
@@ -181,7 +181,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_BackdropFilterBlurRadius) {
   gfx::RRectF backdrop_filter_bounds(gfx::RectF(gfx::SizeF(blur->bounds())), 0);
   blur->SetBackdropFilterBounds(backdrop_filter_bounds);
 
-#if BUILDFLAG(IS_WIN) || defined(ARCH_CPU_ARM64)
+#if defined(ARCH_CPU_ARM64)
   // Windows and ARM64 have 436 pixels off by 1 or 2: crbug.com/259915
   float percentage_pixels_error = 1.09f;  // 436px / (200*200)
   pixel_comparator_ = std::make_unique<FuzzyPixelComparator>(
@@ -274,8 +274,8 @@ TEST_P(LayerTreeHostFiltersPixelTest, BackdropFilterBlurOutsets) {
   gfx::RRectF backdrop_filter_bounds(gfx::RectF(gfx::SizeF(blur->bounds())), 0);
   blur->SetBackdropFilterBounds(backdrop_filter_bounds);
 
-#if BUILDFLAG(IS_WIN) || defined(_MIPS_ARCH_LOONGSON) || defined(ARCH_CPU_ARM64)
-#if BUILDFLAG(IS_WIN) || defined(ARCH_CPU_ARM64)
+#if defined(_MIPS_ARCH_LOONGSON) || defined(ARCH_CPU_ARM64)
+#if defined(ARCH_CPU_ARM64)
   // Windows has 5.9325% pixels by at most 2: crbug.com/259922
   float percentage_pixels_error = 6.0f;
 #else
@@ -324,7 +324,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, BackdropFilterQuality_0_33) {
   // iOS has imperceptible pixel differences (max error of 1 per channel).
   pixel_comparator_ =
       std::make_unique<AlphaDiscardingFuzzyPixelOffByOneComparator>();
-#elif BUILDFLAG(IS_WIN) || defined(ARCH_CPU_ARM64)
+#elif defined(ARCH_CPU_ARM64)
   // Windows and ARM64 (non-iOS) have 436 pixels off by 1: crbug.com/259915
   pixel_comparator_ = std::make_unique<FuzzyPixelComparator>(
       FuzzyPixelComparator()
@@ -364,7 +364,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, BackdropFilterQuality_1_0) {
   // iOS has imperceptible pixel differences (max error of 1 per channel).
   pixel_comparator_ =
       std::make_unique<AlphaDiscardingFuzzyPixelOffByOneComparator>();
-#elif BUILDFLAG(IS_WIN) || defined(ARCH_CPU_ARM64)
+#elif defined(ARCH_CPU_ARM64)
   // Windows and ARM64 (non-iOS) have 436 pixels off by 1: crbug.com/259915
   pixel_comparator_ = std::make_unique<FuzzyPixelComparator>(
       FuzzyPixelComparator()
@@ -461,15 +461,9 @@ GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(
 // See skbug.com/9545
 TEST_P(LayerTreeHostBlurFiltersPixelTestGPULayerList,
        DISABLED_BackdropFilterBlurOffAxis) {
-#if BUILDFLAG(IS_WIN) || defined(ARCH_CPU_ARM64)
-#if BUILDFLAG(IS_WIN)
-  // Windows has 116 pixels off by at most 2: crbug.com/225027
-  float percentage_pixels_error = 0.3f;  // 116px / (200*200), rounded up
-  int error_allowed = 2;
-#else
+#if defined(ARCH_CPU_ARM64)
   float percentage_pixels_error = 0.25f;  // 96px / (200*200), rounded up
   int error_allowed = 1;
-#endif
   float average_error_allowed_in_bad_pixels = 1.f;
   pixel_comparator_ = std::make_unique<FuzzyPixelComparator>(
       FuzzyPixelComparator()
@@ -677,12 +671,9 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_ImageFilterScaled) {
   filter->SetBackdropFilters(filters);
   filter->ClearBackdropFilterBounds();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || defined(_MIPS_ARCH_LOONGSON) || defined(ARCH_CPU_ARM64)
-#if BUILDFLAG(IS_WIN)
-  // Windows has 153 pixels off by at most 2: crbug.com/225027
-  float percentage_pixels_error = 0.3825f;  // 153px / (200*200)
-  int error_allowed = 2;
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || \
+    defined(_MIPS_ARCH_LOONGSON) || defined(ARCH_CPU_ARM64)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
   // There's a 1 pixel error on MacOS and ChromeOS
   float percentage_pixels_error = 0.0025f;  // 1px / (200*200)
   int error_allowed = 1;
@@ -710,10 +701,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_ImageFilterScaled) {
 
 // TODO(crbug.com/40256786): currently do not pass on iOS.
 // TODO(crbug.com/401029604): Times out in arm64 windows and linux TSAN.
-#if BUILDFLAG(IS_IOS) ||                                        \
-    (defined(ARCH_CPU_ARM_FAMILY) && defined(ARCH_CPU_ARM64) && \
-     BUILDFLAG(IS_WIN)) ||                                      \
-    (defined(THREAD_SANITIZER) && BUILDFLAG(IS_LINUX))
+#if BUILDFLAG(IS_IOS) || (defined(THREAD_SANITIZER) && BUILDFLAG(IS_LINUX))
 #define MAYBE_BackdropFilterRotated DISABLED_BackdropFilterRotated
 #else
 #define MAYBE_BackdropFilterRotated BackdropFilterRotated
@@ -941,15 +929,6 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_ZoomFilter) {
   contained_zoom->SetBackdropFilterBounds(gfx::RRectF(mid_filter_bounds, 0));
   root->AddChild(contained_zoom);
 
-#if BUILDFLAG(IS_WIN)
-  // Windows has 1 pixel off by 1: crbug.com/259915
-  pixel_comparator_ = std::make_unique<FuzzyPixelComparator>(
-      FuzzyPixelComparator()
-          .DiscardAlpha()
-          .SetErrorPixelsPercentageLimit(0.00111112f)  // 1px / (300*300)
-          .SetAbsErrorLimit(1));
-#endif
-
   RunPixelTest(std::move(root),
                base::FilePath(FILE_PATH_LITERAL("zoom_filter_.png"))
                    .InsertBeforeExtensionASCII(GetRendererSuffix()));
@@ -983,18 +962,13 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_RotatedFilter) {
 
   background->AddChild(child);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 #if defined(ARCH_CPU_ARM64)
   // Windows, macOS, iOS, Fuchsia and Linux on ARM64 has some pixels difference
   // crbug.com/1029728, crbug.com/1048249, crbug.com/1128443
   float percentage_pixels_error = 1.f;
   float average_error_allowed_in_bad_pixels = 2.f;
   int error_allowed = 3;
-#elif BUILDFLAG(IS_WIN)
-  // Windows has 1 pixel off by 1: crbug.com/259915
-  float percentage_pixels_error = 0.00111112f;  // 1px / (300*300)
-  float average_error_allowed_in_bad_pixels = 1.f;
-  int error_allowed = 1;
 #else
   float percentage_pixels_error = 0.0f;  // 1px / (300*300)
   float average_error_allowed_in_bad_pixels = 0.0f;
@@ -1006,7 +980,7 @@ TEST_P(LayerTreeHostFiltersPixelTest, MAYBE_RotatedFilter) {
           .SetErrorPixelsPercentageLimit(percentage_pixels_error)
           .SetAvgAbsErrorLimit(average_error_allowed_in_bad_pixels)
           .SetAbsErrorLimit(error_allowed));
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX)
 
   RunPixelTest(background,
                base::FilePath(FILE_PATH_LITERAL("rotated_filter_.png"))
@@ -1040,9 +1014,9 @@ TEST_P(LayerTreeHostFiltersPixelTest, RotatedDropShadowFilter) {
 
   background->AddChild(child);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || \
-    defined(ARCH_CPU_ARM64) || BUILDFLAG(IS_OZONE)
-#if defined(ARCH_CPU_ARM64) && (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX))
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || defined(ARCH_CPU_ARM64) || \
+    BUILDFLAG(IS_OZONE)
+#if defined(ARCH_CPU_ARM64) && (BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX))
 
   // Windows, macOS, Fuchsia and Linux on ARM64 has some pixels difference.
   // crbug.com/1029728, crbug.com/1128443
@@ -1235,15 +1209,10 @@ TEST_P(LayerTreeHostFiltersPixelTest, BlurFilterWithClip) {
   // Force the allocation a larger textures.
   set_enlarge_texture_amount(gfx::Size(50, 50));
 
-#if BUILDFLAG(IS_WIN) || defined(ARCH_CPU_ARM64)
-#if BUILDFLAG(IS_WIN)
-  // Windows has 1880 pixels off by 1: crbug.com/259915
-  float percentage_pixels_error = 4.7f;  // 1880px / (200*200)
-#else
+#if defined(ARCH_CPU_ARM64)
   // Differences in floating point calculation on ARM means a small percentage
   // of pixels will have small differences.
   float percentage_pixels_error = 2.76f;  // 1104px / (200*200)
-#endif
   pixel_comparator_ = std::make_unique<FuzzyPixelComparator>(
       FuzzyPixelComparator()
           .DiscardAlpha()

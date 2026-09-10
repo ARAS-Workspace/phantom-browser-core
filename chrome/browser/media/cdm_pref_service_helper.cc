@@ -115,21 +115,8 @@ std::unique_ptr<CdmPrefData> FromDictValue(
     return nullptr;
   }
 
-#if BUILDFLAG(IS_WIN)
-  std::vector<base::Time> hw_secure_disabled_times;
-  const base::ListValue* hw_secure_disabled_time_values =
-      cdm_data_dict.FindList(prefs::kHardwareSecureDecryptionDisabledTimes);
-  if (!hw_secure_disabled_time_values) {
-    return nullptr;
-  }
-  hw_secure_disabled_times = ListToTimes(*hw_secure_disabled_time_values);
-
-  auto cdm_pref_data = std::make_unique<CdmPrefData>(
-      origin_id.value(), origin_id_time.value(), hw_secure_disabled_times);
-#else
   auto cdm_pref_data =
       std::make_unique<CdmPrefData>(origin_id.value(), origin_id_time.value());
-#endif  // BUILDFLAG(IS_WIN)
 
   // Client Token
   const std::string* encoded_client_token =
@@ -300,20 +287,8 @@ std::unique_ptr<CdmPrefData> CdmPrefServiceHelper::GetCdmPrefData(
   if (!cdm_pref_data) {
     ScopedDictPrefUpdate update(user_prefs, prefs::kMediaCdmOriginData);
 
-#if BUILDFLAG(IS_WIN)
-    // Initialize hardware secure decryption disabled times to match local
-    // state's hardware secure decryption disabled times. This prevents sites
-    // with no prior hardware secure playback from re-experiecing errors/crashes
-    // if there were previous errors that are recorded globally. See
-    // go/hardware-secure-per-site-fallback for details.
-    cdm_pref_data = std::make_unique<CdmPrefData>(
-        base::UnguessableToken::Create(), base::Time::Now(),
-        ListToTimes(g_browser_process->local_state()->GetList(
-            prefs::kGlobalHardwareSecureDecryptionDisabledTimes)));
-#else
     cdm_pref_data = std::make_unique<CdmPrefData>(
         base::UnguessableToken::Create(), base::Time::Now());
-#endif  // BUILDFLAG(IS_WIN)
     update->Set(serialized_cdm_origin, ToDictValue(*cdm_pref_data));
   }
 

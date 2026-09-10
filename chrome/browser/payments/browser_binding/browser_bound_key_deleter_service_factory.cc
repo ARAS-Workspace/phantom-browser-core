@@ -82,7 +82,7 @@ BrowserBoundKeyDeleterServiceFactory::BuildServiceInstanceForBrowserContext(
             GetWebPaymentsWebDataServiceForBrowserContext(
                 context, ServiceAccessType::EXPLICIT_ACCESS),
         GetBrowserBoundKeyStoreInstance());
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#elif BUILDFLAG(IS_MAC)
     service = std::make_unique<BrowserBoundKeyDeleterServiceDesktop>(
         webdata_services::WebDataServiceWrapperFactory::
             GetWebPaymentsWebDataServiceForBrowserContext(
@@ -99,7 +99,7 @@ BrowserBoundKeyDeleterServiceFactory::BuildServiceInstanceForBrowserContext(
     // BrowserBoundKeyDeleterService is only implemented on Android, Mac, and
     // Windows platforms.
     return nullptr;
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_ANDROID)
   }
 
   // This triggers a cleanup of browser bound keys at startup (and the service

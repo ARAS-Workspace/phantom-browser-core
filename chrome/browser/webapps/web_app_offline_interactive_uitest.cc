@@ -39,10 +39,6 @@
 #include "ui/gfx/codec/png_codec.h"
 #include "ui/native_theme/native_theme.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ash/public/cpp/style/dark_light_mode_controller.h"
 #endif
@@ -390,9 +386,7 @@ class WebAppOfflineDarkModeTest
   }
 
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    InProcessBrowserTest::SetUp();
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     // TODO(crbug.com/40215627): Get this test suite working.
     GTEST_SKIP();
 #else
@@ -436,13 +430,6 @@ class WebAppOfflineDarkModeTest
 #endif
 IN_PROC_BROWSER_TEST_P(WebAppOfflineDarkModeTest,
                        MAYBE_WebAppOfflineDarkModeNoServiceWorker) {
-#if BUILDFLAG(IS_WIN)
-  if (GetColorScheme() == blink::mojom::PreferredColorScheme::kLight &&
-      ui::NativeTheme::GetInstanceForNativeUi()->preferred_color_scheme() ==
-          ui::NativeTheme::PreferredColorScheme::kDark) {
-    GTEST_SKIP() << "Host is in dark mode; skipping test";
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   ASSERT_TRUE(embedded_test_server()->Start());
 
@@ -498,13 +485,6 @@ IN_PROC_BROWSER_TEST_P(WebAppOfflineDarkModeTest,
 #endif
 IN_PROC_BROWSER_TEST_P(WebAppOfflineDarkModeTest,
                        MAYBE_WebAppOfflineDarkModeEmptyServiceWorker) {
-#if BUILDFLAG(IS_WIN)
-  if (GetColorScheme() == blink::mojom::PreferredColorScheme::kLight &&
-      ui::NativeTheme::GetInstanceForNativeUi()->preferred_color_scheme() ==
-          ui::NativeTheme::PreferredColorScheme::kDark) {
-    GTEST_SKIP() << "Host is in dark mode; skipping test";
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   ASSERT_TRUE(embedded_test_server()->Start());
 

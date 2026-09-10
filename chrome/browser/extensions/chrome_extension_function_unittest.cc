@@ -73,7 +73,7 @@ class ValidationFunction : public ExtensionFunction {
 
 using ChromeExtensionFunctionUnitTest = ExtensionServiceTestBase;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_SimpleFunctionTest DISABLED_SimpleFunctionTest
 #else
 #define MAYBE_SimpleFunctionTest SimpleFunctionTest
@@ -187,11 +187,7 @@ using ChromeExtensionFunctionDeathTest = ChromeExtensionFunctionUnitTest;
 
 // Verify that destroying the extension function without responding causes a
 // DCHECK failure.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DestructionWithoutResponse DISABLED_DestructionWithoutResponse
-#else
 #define MAYBE_DestructionWithoutResponse DestructionWithoutResponse
-#endif
 TEST_F(ChromeExtensionFunctionDeathTest, MAYBE_DestructionWithoutResponse) {
   ASSERT_DEATH(
       {

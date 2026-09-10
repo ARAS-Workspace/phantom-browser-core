@@ -33,9 +33,7 @@
 #include "ui/views/widget/root_view.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/views/accessibility/view_ax_platform_node_delegate_win.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "ui/views/accessibility/view_ax_platform_node_delegate_mac.h"
 #elif BUILDFLAG(IS_LINUX)
 #include "ui/views/accessibility/view_ax_platform_node_delegate_auralinux.h"
@@ -103,8 +101,6 @@ std::unique_ptr<ViewAccessibility> ViewAccessibility::Create(View* view) {
 #if !BUILDFLAG(HAS_NATIVE_ACCESSIBILITY)
   // Cannot use std::make_unique because constructor is protected.
   return base::WrapUnique(new ViewAccessibility(view));
-#elif BUILDFLAG(IS_WIN)
-  return ViewAXPlatformNodeDelegateWin::CreatePlatformSpecific(view);
 #elif BUILDFLAG(IS_MAC)
   return ViewAXPlatformNodeDelegateMac::CreatePlatformSpecific(view);
 #elif BUILDFLAG(IS_LINUX)
@@ -1098,21 +1094,6 @@ void ViewAccessibility::OnViewAddedToWidget() {
   // name is stable.
   std::string effective_class = std::string(view_->GetClassName());
 
-#if BUILDFLAG(IS_WIN)
-  // On Windows, Narrator restricts focus to web content in Scan Mode only when
-  // the root web area’s parent has class name "Chrome_WidgetWin_1". This is a
-  // hardcoded behavior. It worked before Chromium enabled UIA by default, since
-  // the MSAA Proxy added the root web area under a window with that class name.
-  // We’re collaborating with the Narrator team to update their tab detection
-  // logic, but rollout will take time. This is a temporary mitigation. See
-  // https://crbug.com/443225250 for details.
-  if (::ui::AXPlatform::GetInstance().IsUiaProviderEnabled() &&
-      features::IsFixNarratorWebContentContainmentEnabled() &&
-      effective_class == "ContentsContainerView") {
-    effective_class = "Chrome_WidgetWin_1";
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   SetClassName(effective_class);
 }
 
@@ -1541,11 +1522,6 @@ void ViewAccessibility::SetValue(const std::string& value) {
     // elements on Windows so that UIA fires UIA_Text_TextChangedEventId.
     // On macOS and Linux, this incorrectly maps to title/name-changed
     // events rather than value-changed events.
-#if BUILDFLAG(IS_WIN)
-    if (data_.IsTextField() || ui::IsSelectElement(data_.role)) {
-      NotifyEvent(ax::mojom::Event::kTextChanged, true);
-    }
-#endif
   }
 
   NotifyDataChanged();

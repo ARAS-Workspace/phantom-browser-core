@@ -295,8 +295,6 @@ class HidConnectionProtectedReportTest : public testing::Test,
       uint16_t product_id = 0xabcd) {
 #if BUILDFLAG(IS_MAC)
     const uint64_t kTestDeviceId = 0;
-#elif BUILDFLAG(IS_WIN)
-    const wchar_t* const kTestDeviceId = L"0";
 #else
     const char* const kTestDeviceId = "0";
 #endif
@@ -315,8 +313,6 @@ class HidConnectionProtectedReportTest : public testing::Test,
       uint16_t product_id = 0xabcd) {
 #if BUILDFLAG(IS_MAC)
     const uint64_t kTestDeviceId = 0;
-#elif BUILDFLAG(IS_WIN)
-    const wchar_t* const kTestDeviceId = L"0";
 #else
     const char* const kTestDeviceId = "0";
 #endif

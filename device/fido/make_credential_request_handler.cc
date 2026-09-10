@@ -29,12 +29,6 @@
 #include "device/fido/public/fido_transport_protocol.h"
 #include "device/fido/public/fido_types.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "device/fido/win/authenticator.h"
-#include "device/fido/win/type_conversions.h"
-#include "third_party/microsoft_webauthn/src/webauthn.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "device/fido/cros/authenticator.h"
 #endif
@@ -105,10 +99,6 @@ MakeCredentialStatus IsCandidateAuthenticatorPostTouch(
   if (options.large_blob_support == LargeBlobSupport::kRequired &&
       (!auth_options.large_blob_type ||
        !request.resident_key_required
-#if BUILDFLAG(IS_WIN)
-       // Windows only supports large blobs for cross-platform credentials.
-       || request.authenticator_attachment == AuthenticatorAttachment::kPlatform
-#endif
        )) {
     return MakeCredentialStatus::kAuthenticatorMissingLargeBlob;
   }
@@ -726,32 +716,6 @@ void MakeCredentialRequestHandler::HandleResponse(
     return;
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (authenticator->GetType() == AuthenticatorType::kWinNative) {
-    state_ = State::kFinished;
-    if (status != MakeCredentialStatus::kSuccess) {
-      std::move(completion_callback_).Run(status, std::nullopt, authenticator);
-      return;
-    }
-    if (!response ||
-        !ResponseValid(*authenticator, *request, *response, options_)) {
-      FIDO_LOG(ERROR)
-          << "Failing make credential request due to bad response from "
-          << authenticator->GetDisplayName();
-      std::move(completion_callback_)
-          .Run(MakeCredentialStatus::kAuthenticatorResponseInvalid,
-               std::nullopt, authenticator);
-      return;
-    }
-    CancelActiveAuthenticators(authenticator->GetId());
-    ReportMakeCredentialResponseTransport(response->transport_used);
-    response->attestation_should_be_filtered = suppress_attestation_;
-    std::move(completion_callback_)
-        .Run(status, std::move(*response), authenticator);
-    return;
-  }
-#endif
-
   // If we requested UV from an authenticator without uvToken support, UV
   // failed, and the authenticator supports PIN, fall back to that.
   if (request->user_verification != UserVerificationRequirement::kDiscouraged &&
@@ -968,10 +932,6 @@ void MakeCredentialRequestHandler::SpecializeRequestForAuthenticator(
       // storage space for another credential, and we can obtain UV via client
       // PIN or an internal modality.
       request->resident_key_required =
-#if BUILDFLAG(IS_WIN)
-          // Windows does not yet support rk=preferred.
-          authenticator->GetType() != AuthenticatorType::kWinNative &&
-#endif
           auth_options.supports_resident_key &&
           !authenticator->DiscoverableCredentialStorageFull() &&
           (observer()->SupportsPIN() ||

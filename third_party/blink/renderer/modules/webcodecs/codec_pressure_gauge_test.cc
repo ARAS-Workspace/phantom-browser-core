@@ -55,11 +55,7 @@ TEST_P(CodecPressureGaugeTest, GaugeIsSharedForDecodersEncoders) {
       &CodecPressureGauge::GetInstance(ReclaimableCodec::CodecType::kDecoder) ==
       &CodecPressureGauge::GetInstance(ReclaimableCodec::CodecType::kEncoder);
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_FALSE(gauge_is_shared);
-#else
   EXPECT_TRUE(gauge_is_shared);
-#endif
 }
 
 TEST_P(CodecPressureGaugeTest, RegisterUnregisterCallbacks) {

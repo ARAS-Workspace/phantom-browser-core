@@ -36,20 +36,6 @@
 #include "chrome/services/readaloud/read_aloud_playback_controller.h"  // nogncheck
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/services/system_signals/win/win_system_signals_service.h"
-#include "chrome/services/util_win/processor_metrics.h"
-#include "chrome/services/util_win/public/mojom/util_read_icon.mojom.h"
-#include "chrome/services/util_win/public/mojom/util_win.mojom.h"
-#include "chrome/services/util_win/util_read_icon.h"
-#include "chrome/services/util_win/util_win_impl.h"
-#include "components/device_signals/core/common/mojom/system_signals.mojom.h"  // nogncheck
-#include "components/services/quarantine/public/mojom/quarantine.mojom.h"  // nogncheck
-#include "components/services/quarantine/quarantine_impl.h"  // nogncheck
-#include "services/proxy_resolver/public/mojom/proxy_resolver.mojom.h"
-#include "services/proxy_resolver_win/windows_system_proxy_resolver_impl.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_MAC)
 #include "chrome/services/mac_notifications/mac_notification_provider_impl.h"
 #include "chrome/services/system_signals/mac/mac_system_signals_service.h"
@@ -97,8 +83,7 @@
 #include "components/media_gallery_util/public/mojom/media_parser.mojom.h"
 #endif
 
-#if BUILDFLAG(ENABLE_PRINT_PREVIEW) || \
-    (BUILDFLAG(ENABLE_PRINTING) && BUILDFLAG(IS_WIN))
+#if BUILDFLAG(ENABLE_PRINT_PREVIEW)
 #include "chrome/services/printing/printing_service.h"
 #include "chrome/services/printing/public/mojom/printing_service.mojom.h"  // nogncheck
 #endif
@@ -176,34 +161,6 @@ auto ContentBookmarkParser(
       std::move(receiver));
 }
 
-#if BUILDFLAG(IS_WIN)
-auto RunProcessorMetrics(
-    mojo::PendingReceiver<chrome::mojom::ProcessorMetrics> receiver) {
-  return std::make_unique<ProcessorMetricsImpl>(std::move(receiver));
-}
-
-auto RunQuarantineService(
-    mojo::PendingReceiver<quarantine::mojom::Quarantine> receiver) {
-  return std::make_unique<quarantine::QuarantineImpl>(std::move(receiver));
-}
-
-auto RunWindowsUtility(mojo::PendingReceiver<chrome::mojom::UtilWin> receiver) {
-  return std::make_unique<UtilWinImpl>(std::move(receiver));
-}
-
-auto RunWindowsIconReader(
-    mojo::PendingReceiver<chrome::mojom::UtilReadIcon> receiver) {
-  return std::make_unique<UtilReadIcon>(std::move(receiver));
-}
-
-auto RunWindowsSystemProxyResolver(
-    mojo::PendingReceiver<proxy_resolver::mojom::SystemProxyResolver>
-        receiver) {
-  return std::make_unique<proxy_resolver_win::WindowsSystemProxyResolverImpl>(
-      std::move(receiver));
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_MAC)
 auto RunMacNotificationService(
     mojo::PendingReceiver<mac_notifications::mojom::MacNotificationProvider>
@@ -220,22 +177,19 @@ auto RunMacSystemProxyResolver(
 }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 auto RunSystemSignalsService(
     mojo::PendingReceiver<device_signals::mojom::SystemSignalsService>
         receiver) {
-#if BUILDFLAG(IS_WIN)
-  return std::make_unique<system_signals::WinSystemSignalsService>(
-      std::move(receiver));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return std::make_unique<system_signals::MacSystemSignalsService>(
       std::move(receiver));
 #else
   return std::make_unique<system_signals::LinuxSystemSignalsService>(
       std::move(receiver));
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 auto RunOakSessionService(
     mojo::PendingReceiver<private_ai::mojom::OakSession> receiver) {
@@ -329,8 +283,7 @@ auto RunPdfService(mojo::PendingReceiver<pdf::mojom::PdfService> receiver) {
 }
 #endif
 
-#if BUILDFLAG(ENABLE_PRINT_PREVIEW) || \
-    (BUILDFLAG(ENABLE_PRINTING) && BUILDFLAG(IS_WIN))
+#if BUILDFLAG(ENABLE_PRINT_PREVIEW)
 auto RunPrintingService(
     mojo::PendingReceiver<printing::mojom::PrintingService> receiver) {
   return std::make_unique<printing::PrintingService>(std::move(receiver));
@@ -474,10 +427,6 @@ RunReadAloudPlaybackControllerFactory(
 void RegisterElevatedMainThreadServices(mojo::ServiceFactory& services) {
   // NOTE: This ServiceFactory is only used in utility processes which are run
   // with elevated system privileges.
-#if BUILDFLAG(ENABLE_EXTENSIONS) && BUILDFLAG(IS_WIN)
-  // On non-Windows, this service runs in a regular utility process.
-  services.Add(RunRemovableStorageWriter);
-#endif
 }
 
 void RegisterMainThreadServices(mojo::ServiceFactory& services) {
@@ -507,16 +456,9 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
   services.Add(RunSpeechRecognitionService);
 #endif  // !BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
 
-#if BUILDFLAG(IS_WIN)
-  services.Add(RunProcessorMetrics);
-  services.Add(RunQuarantineService);
-  services.Add(RunWindowsUtility);
-  services.Add(RunWindowsIconReader);
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   services.Add(RunSystemSignalsService);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(IS_MAC)
   services.Add(RunMacNotificationService);
@@ -528,7 +470,7 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
   services.Add(RunFileUtil);
 #endif
 
-#if BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_WIN)
+#if BUILDFLAG(ENABLE_EXTENSIONS)
   // On Windows, this service runs in an elevated utility process.
   services.Add(RunRemovableStorageWriter);
 #endif
@@ -541,8 +483,7 @@ void RegisterMainThreadServices(mojo::ServiceFactory& services) {
   services.Add(RunPdfService);
 #endif
 
-#if BUILDFLAG(ENABLE_PRINT_PREVIEW) || \
-    (BUILDFLAG(ENABLE_PRINTING) && BUILDFLAG(IS_WIN))
+#if BUILDFLAG(ENABLE_PRINT_PREVIEW)
   services.Add(RunPrintingService);
 #endif
 
@@ -584,9 +525,6 @@ void RegisterIOThreadServices(mojo::ServiceFactory& services) {
 #if !BUILDFLAG(IS_ANDROID)
   services.Add(RunProxyResolver);
 #endif
-#if BUILDFLAG(IS_WIN)
-  services.Add(RunWindowsSystemProxyResolver);
-#endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_MAC)
   services.Add(RunMacSystemProxyResolver);
 #endif  // BUILDFLAG(IS_MAC)

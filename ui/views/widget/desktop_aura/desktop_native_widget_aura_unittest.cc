@@ -42,14 +42,6 @@
 #include "ui/views/widget/widget.h"
 #include "ui/views/window/dialog_delegate.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "ui/base/view_prop.h"
-#include "ui/base/win/window_event_target.h"
-#include "ui/views/win/hwnd_util.h"
-#include "ui/wm/core/window_properties.h"
-#endif
 
 namespace views::test {
 
@@ -128,19 +120,6 @@ TEST_F(DesktopNativeWidgetAuraTest, NativeViewNoActivate) {
                          ->GetFocusedWindow());
 }
 
-#if BUILDFLAG(IS_WIN)
-// Verifies that if the DesktopWindowTreeHost is already shown, the native view
-// still reports not visible as we haven't shown the content window.
-TEST_F(DesktopNativeWidgetAuraTest, WidgetNotVisibleOnlyWindowTreeHostShown) {
-  Widget widget;
-  Widget::InitParams init_params = CreateParams(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  widget.Init(std::move(init_params));
-  ShowWindow(widget.GetNativeView()->GetHost()->GetAcceleratedWidget(),
-             SW_SHOWNORMAL);
-  EXPECT_FALSE(widget.IsVisible());
-}
-#endif
 
 #if BUILDFLAG(IS_CHROMEOS)
 // TODO(crbug.com/40607034): investigate fixing and enabling on Chrome OS.
@@ -167,13 +146,6 @@ TEST_F(DesktopNativeWidgetAuraTest, MAYBE_GlobalCursorState) {
   aura::client::CursorClient* cursor_client_b = aura::client::GetCursorClient(
       widget_b.GetNativeView()->GetHost()->window());
 
-#if BUILDFLAG(IS_WIN)
-  // The cursor might be considered invisible after initialization on some
-  // machines (e.g. mouse-less) as |CursorClient|s read the cursor visibility
-  // from OS info. So force the cursor to be visible here.
-  cursor_client_a->UpdateSystemCursorVisibilityForTest(true);
-  cursor_client_b->UpdateSystemCursorVisibilityForTest(true);
-#endif
 
   // Verify the cursor can be locked using one client and unlocked using
   // another.
@@ -864,118 +836,6 @@ TEST_F(DesktopNativeWidgetAuraTest, MAYBE_WindowMouseModalityTest) {
   top_level_widget.CloseNow();
 }
 
-#if BUILDFLAG(IS_WIN)
-// Tests whether we can activate the top level widget when a modal dialog is
-// active.
-TEST_F(DesktopNativeWidgetAuraTest, WindowModalityActivationTest) {
-  TestDesktopWidgetDelegate widget_delegate;
-  widget_delegate.InitWidget(CreateParams(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW));
-
-  Widget* top_level_widget = widget_delegate.GetWidget();
-  top_level_widget->Show();
-  EXPECT_TRUE(top_level_widget->IsVisible());
-
-  HWND win32_window = views::HWNDForWidget(top_level_widget);
-  EXPECT_TRUE(::IsWindow(win32_window));
-
-  // We should be able to activate the window even if the WidgetDelegate
-  // says no, when a modal dialog is active.
-  widget_delegate.SetCanActivate(false);
-
-  auto dialog_delegate =
-      std::make_unique<DialogDelegateView>(DialogDelegateView::CreatePassKey());
-  dialog_delegate->SetModalType(ui::mojom::ModalType::kWindow);
-
-  Widget* modal_dialog_widget = views::DialogDelegate::CreateDialogWidget(
-      dialog_delegate.release(), nullptr, top_level_widget->GetNativeView());
-  modal_dialog_widget->SetBounds(gfx::Rect(100, 100, 200, 200));
-  modal_dialog_widget->Show();
-  EXPECT_TRUE(modal_dialog_widget->IsVisible());
-
-  LRESULT activate_result = ::SendMessage(
-      win32_window, WM_MOUSEACTIVATE, reinterpret_cast<WPARAM>(win32_window),
-      MAKELPARAM(WM_LBUTTONDOWN, HTCLIENT));
-  EXPECT_EQ(activate_result, MA_ACTIVATE);
-
-  modal_dialog_widget->CloseNow();
-}
-
-// This test validates that sending WM_CHAR/WM_SYSCHAR/WM_SYSDEADCHAR
-// messages via the WindowEventTarget interface implemented by the
-// HWNDMessageHandler class does not cause a crash due to an unprocessed
-// event
-TEST_F(DesktopNativeWidgetAuraTest,
-       CharMessagesAsKeyboardMessagesDoesNotCrash) {
-  Widget widget;
-  Widget::InitParams params = CreateParams(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  widget.Init(std::move(params));
-  widget.Show();
-
-  ui::WindowEventTarget* target =
-      reinterpret_cast<ui::WindowEventTarget*>(ui::ViewProp::GetValue(
-          widget.GetNativeWindow()->GetHost()->GetAcceleratedWidget(),
-          ui::WindowEventTarget::kWin32InputEventTarget));
-  ASSERT_NE(nullptr, target);
-  bool handled = false;
-  target->HandleKeyboardMessage(WM_CHAR, 0, 0, &handled);
-  target->HandleKeyboardMessage(WM_SYSCHAR, 0, 0, &handled);
-  target->HandleKeyboardMessage(WM_SYSDEADCHAR, 0, 0, &handled);
-  widget.CloseNow();
-}
-
-TEST_F(DesktopNativeWidgetAuraTest,
-       ExcludeFromScreenCaptureInheritedFromParent) {
-  Widget parent_widget;
-  Widget::InitParams parent_params = CreateParams(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  parent_widget.Init(std::move(parent_params));
-  parent_widget.SetExcludeFromScreenCapture(true);
-
-  Widget child_widget;
-  Widget::InitParams child_params = CreateParams(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  child_params.parent = parent_widget.GetNativeView();
-  // Ensure we use DesktopNativeWidgetAura.
-  child_params.native_widget = new DesktopNativeWidgetAura(&child_widget);
-  child_widget.Init(std::move(child_params));
-
-  EXPECT_TRUE(child_widget.GetNativeView()->GetProperty(
-      wm::kExcludeFromScreenCaptureKey));
-}
-
-TEST_F(DesktopNativeWidgetAuraTest, ExcludeFromScreenCaptureFromInitParams) {
-  Widget widget;
-  Widget::InitParams params = CreateParams(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  params.init_properties_container.SetProperty(wm::kExcludeFromScreenCaptureKey,
-                                               true);
-  widget.Init(std::move(params));
-
-  EXPECT_TRUE(
-      widget.GetNativeView()->GetProperty(wm::kExcludeFromScreenCaptureKey));
-}
-
-TEST_F(DesktopNativeWidgetAuraTest,
-       SetExcludeFromScreenCaptureUpdatesProperty) {
-  Widget widget;
-  Widget::InitParams params = CreateParams(
-      Widget::InitParams::CLIENT_OWNS_WIDGET, Widget::InitParams::TYPE_WINDOW);
-  widget.Init(std::move(params));
-
-  internal::NativeWidgetPrivate* native_widget = widget.native_widget_private();
-
-  native_widget->SetExcludeFromScreenCapture(true);
-  EXPECT_TRUE(
-      widget.GetNativeView()->GetProperty(wm::kExcludeFromScreenCaptureKey));
-
-  native_widget->SetExcludeFromScreenCapture(false);
-  EXPECT_FALSE(
-      widget.GetNativeView()->GetProperty(wm::kExcludeFromScreenCaptureKey));
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 // Tests that reparenting a destkop widget to another desktop widget does not
 // crash.

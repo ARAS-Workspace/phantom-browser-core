@@ -26,15 +26,6 @@
 #include "sandbox/mac/seatbelt.h"
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-#include "base/check_op.h"
-#include "base/process/process_info.h"
-#include "sandbox/policy/win/sandbox_win.h"
-#include "sandbox/win/src/sandbox.h"
-#include "sandbox/win/src/sandbox_factory.h"
-#include "sandbox/win/src/target_services.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace sandbox {
 namespace policy {
 
@@ -46,36 +37,6 @@ bool Sandbox::Initialize(sandbox::mojom::Sandbox sandbox_type,
       sandbox_type, std::move(hook), options);
 }
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_WIN)
-bool Sandbox::Initialize(sandbox::mojom::Sandbox sandbox_type,
-                         SandboxInterfaceInfo* sandbox_info) {
-  BrokerServices* broker_services = sandbox_info->broker_services;
-  if (broker_services) {
-    const base::CommandLine& command_line =
-        *base::CommandLine::ForCurrentProcess();
-    if (!SandboxWin::InitBrokerServices(broker_services))
-      return false;
-
-    // Only pre-create alternate desktop if there will be sandboxed processes in
-    // the future.
-    if (!command_line.HasSwitch(switches::kNoSandbox)) {
-      // IMPORTANT: This piece of code needs to run as early as possible in the
-      // process because it will initialize the sandbox broker, which requires
-      // the process to swap its window station. During this time all the UI
-      // will be broken. This has to run before threads and windows are created.
-      ResultCode result = broker_services->CreateAlternateDesktop(
-          Desktop::kAlternateWinstation);
-      // This failure is usually caused by third-party software or by the host
-      // system exhausting its desktop heap.
-      CHECK(result == SBOX_ALL_OK);
-    }
-    return true;
-  }
-  return IsUnsandboxedSandboxType(sandbox_type) ||
-         SandboxWin::InitTargetServices(sandbox_info->target_services);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // static
 bool Sandbox::IsProcessSandboxed() {
@@ -117,17 +78,6 @@ bool Sandbox::IsProcessSandboxed() {
   // Process launching on iOS is only supported via BrowserEngineKit which
   // will automatically sandbox processes.
   return !is_browser;
-#elif BUILDFLAG(IS_WIN)
-#if !defined(COMPONENT_BUILD)
-  // Target services is not available in the component build.
-  auto* target_services = sandbox::SandboxFactory::GetTargetServices();
-  if (!target_services || !target_services->GetState()->InitCompleted()) {
-    return false;
-  }
-#endif  // !defined(COMPONENT_BUILD)
-  const auto integrity_level = base::GetCurrentProcessIntegrityLevel();
-  return integrity_level != base::INTEGRITY_UNKNOWN &&
-         integrity_level < base::MEDIUM_INTEGRITY;
 #else
   return false;
 #endif

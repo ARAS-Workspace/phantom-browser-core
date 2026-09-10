@@ -26,14 +26,6 @@
 #include "chrome/updater/updater_scope.h"
 #include "chrome/updater/util/util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <shlobj.h>
-
-#include "chrome/updater/util/win_util.h"
-#include "chrome/updater/win/task_scheduler.h"
-#include "chrome/updater/win/win_constants.h"
-#endif
-
 namespace updater {
 
 CheckUpdaterHealthTask::CheckUpdaterHealthTask(UpdaterScope scope)
@@ -48,59 +40,6 @@ void CheckUpdaterHealthTask::CheckAndRecordUpdaterHealth(
     return;
   }
 
-#if BUILDFLAG(IS_WIN)
-  // System service metrics.
-  if (IsSystemInstall(scope_)) {
-    for (const bool is_internal_service : {false, true}) {
-      const std::wstring service_name =
-          GetServiceName(is_internal_service, version);
-      const std::string_view uma_suffix =
-          is_internal_service ? "Internal" : "SxS";
-      base::UmaHistogramBoolean(
-          base::StrCat(
-              {"GoogleUpdate.UpdaterHealth.ServicePresent.", uma_suffix}),
-          IsServicePresent(service_name));
-      base::UmaHistogramBoolean(
-          base::StrCat(
-              {"GoogleUpdate.UpdaterHealth.ServiceEnabled.", uma_suffix}),
-          IsServiceEnabled(service_name));
-    }
-  }
-
-  if (IsSystemInstall(scope_) && !::IsUserAnAdmin()) {
-    // When run at medium integrity, the task scheduler interfaces do not
-    // enumerate the system `updater` tasks, or in general, any tasks installed
-    // by an administrator. Since reliable metrics cannot be gathered on the
-    // scheduled tasks under these conditions, metrics are not recorded for
-    // this scenario.
-    return;
-  }
-
-  // Scheduled task metrics.
-  scoped_refptr<TaskScheduler> task_scheduler =
-      TaskScheduler::CreateInstance(scope_);
-  if (!task_scheduler) {
-    // Cannot get metrics without a TaskScheduler instance.
-    return;
-  }
-  const std::wstring task_name =
-      task_scheduler->FindFirstTaskName(GetTaskNamePrefix(scope_, version));
-
-  // Count the number of tasks for the product.
-  size_t number_of_tasks = 0;
-  task_scheduler->ForEachTaskWithPrefix(
-      base::UTF8ToWide(PRODUCT_FULLNAME_STRING),
-      [&](const std::wstring& task_name) { ++number_of_tasks; });
-
-  base::UmaHistogramBoolean("GoogleUpdate.UpdaterHealth.ScheduledTaskPresent",
-                            !task_name.empty());
-  if (!task_name.empty()) {
-    base::UmaHistogramBoolean("GoogleUpdate.UpdaterHealth.ScheduledTaskEnabled",
-                              task_scheduler->IsTaskEnabled(task_name));
-  }
-  base::UmaHistogramCounts100("GoogleUpdate.UpdaterHealth.ScheduledTaskCount",
-                              number_of_tasks);
-#endif
 }
 
 void CheckUpdaterHealthTask::Run(base::OnceClosure callback) {

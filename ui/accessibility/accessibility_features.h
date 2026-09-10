@@ -155,39 +155,6 @@ AX_BASE_EXPORT BASE_DECLARE_FEATURE(
     kEnableCollectAccessibilityHeuristicInCanvasUkm);
 AX_BASE_EXPORT bool IsCollectAccessibilityHeuristicInCanvasUkmEnabled();
 
-#if BUILDFLAG(IS_WIN)
-// This is a killswitch. Controls whether
-// HWNDMessageHandler::GetParentOfAXFragmentRoot returns nullptr (legacy) or
-// delegates to GetParentNativeViewAccessible().
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kAccessibilityWinAXFragmentRootParent);
-AX_BASE_EXPORT bool IsAccessibilityWinAXFragmentRootParentEnabled();
-
-// When enabled, modify the exposed UIA accessibility tree to match Narrator's
-// expectations. This fixes a bug keeping Narrator's cursor contained within
-// the web content.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kFixNarratorWebContentContainment);
-AX_BASE_EXPORT bool IsFixNarratorWebContentContainmentEnabled();
-
-// Use Chrome-specific accessibility COM API.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kIChromeAccessible);
-AX_BASE_EXPORT bool IsIChromeAccessibleEnabled();
-
-// Enables calls to UiaDisconnectProvider when destroying a AXFragmentRootWin's
-// HWND.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kUiaDisconnectRootProviders);
-
-// Optimizes event firing by only emitting events when at least one listener is
-// subscribed. Killswitch to turn it off in case this work has negative
-// side-effects on assistive technologies.
-// TODO(https://crbug.com/402375302): Remove in M155.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kUiaEventOptimization);
-
-// Enables MathML support in Windows UI Automation (UIA) implementation by
-// adding a custom property for exposing mathematical content to assistive
-// technologies.
-AX_BASE_EXPORT BASE_DECLARE_FEATURE(kUiaMathMlSupport);
-AX_BASE_EXPORT bool IsUiaMathMlSupportEnabled();
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_CHROMEOS)
 // TODO(accessibility): Should this be moved to ash_features.cc?
@@ -429,12 +396,12 @@ AX_BASE_EXPORT BASE_DECLARE_FEATURE(kMacAccessibilityTextOperation);
 AX_BASE_EXPORT bool IsMacAccessibilityTextOperationEnabled();
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // Disable the wasm tts engine component to use dev version local extension
 // files.
 AX_BASE_EXPORT BASE_DECLARE_FEATURE(kWasmTtsEngineAutoInstallDisabled);
 AX_BASE_EXPORT bool IsWasmTtsEngineAutoInstallDisabled();
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 }  // namespace features
 

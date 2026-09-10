@@ -615,13 +615,6 @@ void VideoResourceUpdater::AppendQuad(
                            uv_bottom_right, SkColors::kTransparent,
                            nearest_neighbor, false, protected_video_type,
                            /*is_tex_coords_normalized=*/false);
-#if BUILDFLAG(IS_WIN)
-      // Windows uses DComp surfaces to e.g. hold MediaFoundation videos, which
-      // must be promoted to overlay to be composited correctly.
-      if (frame->metadata().dcomp_surface) {
-        texture_quad->overlay_priority_hint = viz::OverlayPriority::kRequired;
-      }
-#endif
       texture_quad->is_video_frame = true;
       resource_provider_->ValidateResource(texture_quad->resource_id);
       break;
@@ -850,7 +843,7 @@ VideoFrameExternalResource VideoResourceUpdater::CreateForHardwareFrame(
       video_frame->metadata().in_surface_view;
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
   transfer_resource.wants_promotion_hint =
       video_frame->metadata().wants_promotion_hint;
 #endif

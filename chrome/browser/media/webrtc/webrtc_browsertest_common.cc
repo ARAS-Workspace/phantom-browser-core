@@ -72,12 +72,7 @@ base::FilePath GetReferenceFilesDir() {
 base::FilePath GetToolForPlatform(const std::string& tool_name) {
   base::FilePath tools_dir =
       GetReferenceFilesDir().Append(FILE_PATH_LITERAL("tools"));
-#if BUILDFLAG(IS_WIN)
-  return tools_dir
-      .Append(FILE_PATH_LITERAL("win"))
-      .AppendASCII(tool_name)
-      .AddExtension(FILE_PATH_LITERAL("exe"));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return tools_dir.Append(FILE_PATH_LITERAL("mac")).AppendASCII(tool_name);
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   return tools_dir.Append(FILE_PATH_LITERAL("linux")).AppendASCII(tool_name);

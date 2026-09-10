@@ -35,7 +35,7 @@ class VIZ_HOST_EXPORT HostDisplayClient : public mojom::DisplayClient {
       scoped_refptr<base::SingleThreadTaskRunner> task_runner);
 
  protected:
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE)
   gfx::AcceleratedWidget widget() const { return widget_; }
 #endif
 
@@ -44,12 +44,6 @@ class VIZ_HOST_EXPORT HostDisplayClient : public mojom::DisplayClient {
 #if BUILDFLAG(IS_APPLE)
   void OnDisplayReceivedCALayerParams(
       gfx::CALayerParams ca_layer_params) override;
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  void CreateLayeredWindowUpdater(
-      mojo::PendingReceiver<mojom::LayeredWindowUpdater> receiver) override;
-  void AddChildWindowToBrowser(gpu::SurfaceHandle child_window) override;
 #endif
 
 #if BUILDFLAG(IS_LINUX) && BUILDFLAG(SUPPORTS_OZONE_X11)
@@ -61,13 +55,10 @@ class VIZ_HOST_EXPORT HostDisplayClient : public mojom::DisplayClient {
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
   mojo::Receiver<mojom::DisplayClient> receiver_{this};
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE)
   gfx::AcceleratedWidget widget_;
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<LayeredWindowUpdaterImpl> layered_window_updater_;
-#endif
 };
 
 }  // namespace viz

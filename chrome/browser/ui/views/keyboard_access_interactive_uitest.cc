@@ -183,13 +183,6 @@ class KeyboardAccessTest : public InProcessBrowserTest {
     waiter.Wait();
   }
 
-#if BUILDFLAG(IS_WIN)
-  // Opens the system menu on Windows with the Alt Space combination and selects
-  // the New Tab option from the menu.
-  void TestSystemMenuWithKeyboard();
-  void TestSystemMenuReopenClosedTabWithKeyboard();
-#endif
-
   // Uses the keyboard to select the app menu i.e. with the F10 key.
   // It verifies that the menu when dismissed by sending the ESC key it does
   // not display twice.
@@ -271,122 +264,6 @@ void KeyboardAccessTest::TestMenuKeyboardAccess(bool alternate_key_sequence,
   ASSERT_EQ(1, browser()->tab_strip_model()->active_index());
 }
 
-#if BUILDFLAG(IS_WIN)
-
-// This CBT hook is set for the duration of the TestSystemMenuWithKeyboard test
-LRESULT CALLBACK SystemMenuTestCBTHook(int n_code,
-                                       WPARAM w_param,
-                                       LPARAM l_param) {
-  // Look for the system menu window getting created or becoming visible and
-  // then select the New Tab option from the menu.
-  if (n_code == HCBT_ACTIVATE || n_code == HCBT_CREATEWND) {
-    wchar_t class_name[MAX_PATH] = {};
-    GetClassName(reinterpret_cast<HWND>(w_param), class_name,
-                 std::size(class_name));
-    if (base::EqualsCaseInsensitiveASCII(class_name, "#32768")) {
-      // Select the New Tab option and then send the enter key to execute it.
-      ::PostMessage(reinterpret_cast<HWND>(w_param), WM_CHAR, 'T', 0);
-      ::PostMessage(reinterpret_cast<HWND>(w_param), WM_KEYDOWN, VK_RETURN, 0);
-      ::PostMessage(reinterpret_cast<HWND>(w_param), WM_KEYUP, VK_RETURN, 0);
-    }
-  }
-  return ::CallNextHookEx(0, n_code, w_param, l_param);
-}
-
-void KeyboardAccessTest::TestSystemMenuWithKeyboard() {
-  // Navigate to a page in the first tab, which makes sure that focus is
-  // set to the browser window.
-  ASSERT_TRUE(
-      ui_test_utils::NavigateToURL(browser(), GURL("chrome://version/")));
-
-  ASSERT_TRUE(ui_test_utils::BringBrowserWindowToFront(browser()));
-
-  ui_test_utils::TabAddedWaiter tab_add(browser());
-  // Sending the Alt space keys to the browser will bring up the system menu
-  // which runs a model loop. We set a CBT hook to look for the menu and send
-  // keystrokes to it.
-  HHOOK cbt_hook = ::SetWindowsHookEx(WH_CBT, SystemMenuTestCBTHook, NULL,
-                                      ::GetCurrentThreadId());
-  ASSERT_TRUE(cbt_hook);
-
-  bool ret = ui_test_utils::SendKeyPressSync(browser(), ui::VKEY_SPACE, false,
-                                             false, true, false);
-  EXPECT_TRUE(ret);
-
-  if (ret) {
-    // Wait for the new tab to appear.
-    tab_add.Wait();
-    // Make sure that the new tab index is 1.
-    EXPECT_EQ(1, browser()->tab_strip_model()->active_index());
-  }
-  ::UnhookWindowsHookEx(cbt_hook);
-}
-
-// This CBT hook is set for the duration of the
-// TestSystemMenuReopenClosedTabWithKeyboard test
-LRESULT CALLBACK SystemMenuReopenClosedTabTestCBTHook(int n_code,
-                                                      WPARAM w_param,
-                                                      LPARAM l_param) {
-  // Look for the system menu window getting created or becoming visible and
-  // then select the New Tab option from the menu.
-  if (n_code == HCBT_ACTIVATE || n_code == HCBT_CREATEWND) {
-    wchar_t class_name[MAX_PATH] = {};
-    GetClassName(reinterpret_cast<HWND>(w_param), class_name,
-                 std::size(class_name));
-    if (base::EqualsCaseInsensitiveASCII(class_name, "#32768")) {
-      // Send 'E' for the Reopen closed tab option.
-      ::PostMessage(reinterpret_cast<HWND>(w_param), WM_CHAR, 'E', 0);
-    }
-  }
-  return ::CallNextHookEx(0, n_code, w_param, l_param);
-}
-
-void KeyboardAccessTest::TestSystemMenuReopenClosedTabWithKeyboard() {
-  // Navigate to a page in the first tab, which makes sure that focus is
-  // set to the browser window.
-  ASSERT_TRUE(
-      ui_test_utils::NavigateToURL(browser(), GURL("chrome://version/")));
-
-  ui_test_utils::NavigateToURLWithDisposition(
-      browser(), GURL("chrome://version/"),
-      WindowOpenDisposition::NEW_FOREGROUND_TAB,
-      ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
-
-  ASSERT_EQ(1, browser()->tab_strip_model()->active_index());
-  content::WebContents* tab_to_close =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  content::WebContentsDestroyedWatcher destroyed_watcher(tab_to_close);
-  browser()->tab_strip_model()->CloseSelectedTabs();
-  destroyed_watcher.Wait();
-  ASSERT_EQ(1, browser()->tab_strip_model()->count());
-  ASSERT_EQ(0, browser()->tab_strip_model()->active_index());
-
-  ASSERT_TRUE(ui_test_utils::BringBrowserWindowToFront(browser()));
-
-  ui_test_utils::TabAddedWaiter tab_add(browser());
-  // Sending the Alt space keys to the browser will bring up the system menu
-  // which runs a model loop. We set a CBT hook to look for the menu and send
-  // keystrokes to it.
-  HHOOK cbt_hook =
-      ::SetWindowsHookEx(WH_CBT, SystemMenuReopenClosedTabTestCBTHook, NULL,
-                         ::GetCurrentThreadId());
-  ASSERT_TRUE(cbt_hook);
-
-  bool ret = ui_test_utils::SendKeyPressSync(browser(), ui::VKEY_SPACE, false,
-                                             false, true, false);
-  EXPECT_TRUE(ret);
-
-  if (ret) {
-    // Wait for the new tab to appear.
-    tab_add.Wait();
-    // Make sure that the new tab index is 1.
-    EXPECT_EQ(1, browser()->tab_strip_model()->active_index());
-  }
-
-  ::UnhookWindowsHookEx(cbt_hook);
-}
-#endif
-
 void KeyboardAccessTest::TestMenuKeyboardAccessAndDismiss() {
   ASSERT_TRUE(
       ui_test_utils::NavigateToURL(browser(), GURL("chrome://version/")));
@@ -445,34 +322,13 @@ IN_PROC_BROWSER_TEST_F(KeyboardAccessTest, MAYBE_TestAltMenuKeyboardAccess) {
 }
 
 // If this flakes, use http://crbug.com/40474299.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TestShiftAltMenuKeyboardAccess \
-  DISABLED_TestShiftAltMenuKeyboardAccess
-#else
 #define MAYBE_TestShiftAltMenuKeyboardAccess TestShiftAltMenuKeyboardAccess
-#endif
 IN_PROC_BROWSER_TEST_F(KeyboardAccessTest,
                        MAYBE_TestShiftAltMenuKeyboardAccess) {
   TestMenuKeyboardAccess(true, true, false);
 }
 
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(KeyboardAccessTest,
-                       DISABLED_TestAltMenuKeyboardAccessFocusOmnibox) {
-  TestMenuKeyboardAccess(true, false, true);
-}
-
-IN_PROC_BROWSER_TEST_F(KeyboardAccessTest, TestSystemMenuWithKeyboard) {
-  TestSystemMenuWithKeyboard();
-}
-
-IN_PROC_BROWSER_TEST_F(KeyboardAccessTest,
-                       TestSystemMenuReopenClosedTabWithKeyboard) {
-  TestSystemMenuReopenClosedTabWithKeyboard();
-}
-#endif
-
-#if !BUILDFLAG(IS_WIN) && defined(USE_AURA)
+#if defined(USE_AURA)
 IN_PROC_BROWSER_TEST_F(KeyboardAccessTest, TestMenuKeyboardOpenDismiss) {
   TestMenuKeyboardAccessAndDismiss();
 }
@@ -513,103 +369,5 @@ IN_PROC_BROWSER_TEST_F(KeyboardAccessTest, ReserveKeyboardAccelerators) {
 #endif
   ASSERT_EQ(0, browser()->tab_strip_model()->active_index());
 }
-
-#if BUILDFLAG(IS_WIN)  // These keys are Windows-only.
-IN_PROC_BROWSER_TEST_F(KeyboardAccessTest, BackForwardKeys) {
-  // Navigate to create some history.
-  ASSERT_TRUE(
-      ui_test_utils::NavigateToURL(browser(), GURL("chrome://version/")));
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GURL("chrome://about/")));
-
-  std::u16string before_back;
-  ASSERT_TRUE(ui_test_utils::GetCurrentTabTitle(browser(), &before_back));
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  // Navigate back.
-  {
-    content::TestNavigationObserver navigation_observer(web_contents, 1);
-    ASSERT_TRUE(ui_test_utils::SendKeyPressSync(
-        browser(), ui::VKEY_BROWSER_BACK, false, false, false, false));
-    navigation_observer.Wait();
-
-    std::u16string after_back;
-    ASSERT_TRUE(ui_test_utils::GetCurrentTabTitle(browser(), &after_back));
-
-    EXPECT_NE(before_back, after_back);
-  }
-
-  // And then forward.
-  {
-    content::TestNavigationObserver navigation_observer(web_contents, 1);
-    ASSERT_TRUE(ui_test_utils::SendKeyPressSync(
-        browser(), ui::VKEY_BROWSER_FORWARD, false, false, false, false));
-    navigation_observer.Wait();
-
-    std::u16string after_forward;
-    ASSERT_TRUE(ui_test_utils::GetCurrentTabTitle(browser(), &after_forward));
-
-    EXPECT_EQ(before_back, after_forward);
-  }
-}
-#endif
-
-#if BUILDFLAG(IS_WIN)
-class KeyboardAccessSimplificationKombuchaTest : public InteractiveBrowserTest {
- public:
-  KeyboardAccessSimplificationKombuchaTest() {
-    scoped_feature_list_.InitAndEnableFeature(features::kMenuSimplification);
-  }
-  ~KeyboardAccessSimplificationKombuchaTest() override = default;
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(KeyboardAccessSimplificationKombuchaTest,
-                       TestSystemMenuWithKeyboard) {
-  RunTestSequence(
-      Do([this]() {
-        ASSERT_TRUE(
-            ui_test_utils::NavigateToURL(browser(), GURL("chrome://version/")));
-      }),
-      SendKeyPress(kBrowserViewElementId, ui::KeyboardCode::VKEY_SPACE,
-                   ui::EF_ALT_DOWN),
-      WaitForShow(kSystemMenuNewTabElementId),
-      SelectMenuItem(kSystemMenuNewTabElementId),
-      CheckResult([this]() { return browser()->tab_strip_model()->count(); },
-                  2),
-      CheckResult(
-          [this]() { return browser()->tab_strip_model()->active_index(); },
-          1));
-}
-
-IN_PROC_BROWSER_TEST_F(KeyboardAccessSimplificationKombuchaTest,
-                       TestSystemMenuReopenClosedTabWithKeyboard) {
-  RunTestSequence(
-      Do([this]() {
-        ASSERT_TRUE(
-            ui_test_utils::NavigateToURL(browser(), GURL("chrome://version/")));
-        ui_test_utils::NavigateToURLWithDisposition(
-            browser(), GURL("chrome://version/"),
-            WindowOpenDisposition::NEW_FOREGROUND_TAB,
-            ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
-        ASSERT_EQ(1, browser()->tab_strip_model()->active_index());
-        browser()->tab_strip_model()->CloseSelectedTabs();
-        ASSERT_EQ(1, browser()->tab_strip_model()->count());
-        ASSERT_EQ(0, browser()->tab_strip_model()->active_index());
-      }),
-      SendKeyPress(kBrowserViewElementId, ui::KeyboardCode::VKEY_SPACE,
-                   ui::EF_ALT_DOWN),
-      WaitForShow(kSystemMenuRestoreTabElementId),
-      SelectMenuItem(kSystemMenuRestoreTabElementId),
-      CheckResult([this]() { return browser()->tab_strip_model()->count(); },
-                  2),
-      CheckResult(
-          [this]() { return browser()->tab_strip_model()->active_index(); },
-          1));
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace

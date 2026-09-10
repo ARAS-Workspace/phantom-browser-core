@@ -20,7 +20,7 @@
 #include "ui/views/widget/widget_delegate.h"
 #include "ui/views/widget/widget_observer.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 
 #include "ui/display/screen.h"
 #endif
@@ -204,7 +204,7 @@ class DesktopWidgetTestInteractive : public DesktopWidgetTest {
   // DesktopWidgetTest
   void SetUp() override;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
   void TearDown() override;
   std::unique_ptr<display::Screen> screen_;
 #endif

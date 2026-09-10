@@ -18,12 +18,12 @@ BASE_FEATURE(kParallelDownloading,
 #endif
 );
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 BASE_FEATURE(kBackoffInDownloading, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif
 
 bool IsBackoffInDownloadingEnabled() {
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_MAC)
   return false;
 #else
   return base::FeatureList::IsEnabled(kBackoffInDownloading);

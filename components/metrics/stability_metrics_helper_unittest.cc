@@ -183,9 +183,6 @@ TEST_F(StabilityMetricsHelperTest, RendererAbnormalTerminationCount) {
            base::TERMINATION_STATUS_LAUNCH_FAILED,
            base::TERMINATION_STATUS_OOM,
            base::TERMINATION_STATUS_EVICTED_FOR_MEMORY,
-#if BUILDFLAG(IS_WIN)
-           base::TERMINATION_STATUS_INTEGRITY_FAILURE,
-#endif
        }) {
 #if BUILDFLAG(ENABLE_EXTENSIONS)
     {

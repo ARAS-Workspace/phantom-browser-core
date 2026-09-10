@@ -73,10 +73,6 @@
 #include "third_party/blink/renderer/platform/wtf/wtf.h"
 #include "ui/gfx/font_list.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "third_party/skia/include/ports/SkTypeface_win.h"
-#endif
-
 namespace blink {
 
 const char kColorEmojiLocale[] = "und-Zsye";
@@ -90,12 +86,7 @@ extern const char kNotoColorEmojiCompat[] = "Noto Color Emoji Compat";
 float FontCache::device_scale_factor_ = 1.0;
 #endif
 
-#if BUILDFLAG(IS_WIN)
-bool FontCache::antialiased_text_enabled_ = false;
-bool FontCache::lcd_text_enabled_ = false;
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 WebFontPrewarmer* FontCache::prewarmer_ = nullptr;
 
 // static

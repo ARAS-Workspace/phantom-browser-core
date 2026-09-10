@@ -284,7 +284,7 @@ IN_PROC_BROWSER_TEST_F(CustomizeChromeInteractiveTest,
             WaitForStateChange(kLocalNewTabElementId, ntp_has_background)));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class CustomizeChromeEnterpriseInteractiveTest
     : public CustomizeChromeInteractiveTest {
  public:
@@ -398,4 +398,4 @@ IN_PROC_BROWSER_TEST_F(CustomizeChromeEnterpriseInteractiveTest,
       // Check that the footer section does not exist.
       EnsureNotPresent(kLocalCustomizeChromeElementId, kFooterSection));
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

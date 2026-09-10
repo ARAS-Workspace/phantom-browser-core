@@ -220,7 +220,7 @@ TEST_F(CloudPolicyCoreTest, RefreshSoon) {
 
 // Based64 string is used on desktop when reading policy cache from Google
 // Update.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 TEST_F(CloudPolicyCoreTest, DmProtocolBase64Constants) {
   std::string encoded =

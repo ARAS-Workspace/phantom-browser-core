@@ -295,20 +295,6 @@ void VizMainImpl::SetRenderParams(
       text_contrast, text_gamma);
 }
 
-#if BUILDFLAG(IS_WIN)
-void VizMainImpl::CreateInfoCollectionGpuService(
-    mojo::PendingReceiver<mojom::InfoCollectionGpuService> pending_receiver) {
-  DCHECK(gpu_thread_task_runner_->BelongsToCurrentThread());
-  DCHECK(!info_collection_gpu_service_);
-  DCHECK(gpu_init_->device_perf_info().has_value());
-
-  info_collection_gpu_service_ = std::make_unique<InfoCollectionGpuServiceImpl>(
-      gpu_thread_task_runner_, io_task_runner(),
-      gpu_init_->device_perf_info().value(), gpu_init_->gpu_info().active_gpu(),
-      std::move(pending_receiver));
-}
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 void VizMainImpl::SetHostProcessId(int32_t pid) {
   if (gpu_service_)

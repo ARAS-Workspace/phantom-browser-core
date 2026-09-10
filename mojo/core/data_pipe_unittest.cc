@@ -65,7 +65,7 @@ base::TimeDelta EpsilonDeadline() {
 // Currently, |tiny_timeout()| is usually 100 ms (possibly scaled under ASAN,
 // etc.). Based on this, set it to (usually be) 30 ms on Windows and 20 ms
 // elsewhere.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   const int64_t deadline = (tiny_timeout * 3) / 10;
 #else
   const int64_t deadline = (tiny_timeout * 2) / 10;

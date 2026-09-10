@@ -19,12 +19,6 @@
 #include <mach-o/dyld.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/strings/sys_string_conversions.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
 #include <sys/mman.h>
 #include <sys/utsname.h>
@@ -167,8 +161,6 @@ TEST(OSMetricsTest, GivesNonZeroResults) {
   EXPECT_TRUE(dump.platform_private_footprint);
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   EXPECT_GT(dump.platform_private_footprint->rss_anon_bytes, 0u);
-#elif BUILDFLAG(IS_WIN)
-  EXPECT_GT(dump.platform_private_footprint->private_bytes, 0u);
 #elif BUILDFLAG(IS_APPLE)
   EXPECT_GT(dump.platform_private_footprint->internal_bytes, 0u);
 #endif
@@ -352,57 +344,6 @@ TEST(OSMetricsTest, PssDisabled) {
 
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
         // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_WIN)
-void DummyFunction() {}
-
-TEST(OSMetricsTest, TestWinModuleReading) {
-  auto maps = OSMetrics::GetProcessMemoryMaps(base::kNullProcessHandle);
-
-  wchar_t module_name[MAX_PATH];
-  DWORD result = GetModuleFileName(nullptr, module_name, MAX_PATH);
-  ASSERT_TRUE(result);
-  std::string executable_name = base::SysWideToNativeMB(module_name);
-
-  HMODULE module_containing_dummy = nullptr;
-  uintptr_t dummy_function_address =
-      reinterpret_cast<uintptr_t>(&DummyFunction);
-  result = GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
-                             reinterpret_cast<LPCWSTR>(dummy_function_address),
-                             &module_containing_dummy);
-  ASSERT_TRUE(result);
-  result = GetModuleFileName(nullptr, module_name, MAX_PATH);
-  ASSERT_TRUE(result);
-  std::string module_containing_dummy_name =
-      base::SysWideToNativeMB(module_name);
-
-  bool found_executable = false;
-  bool found_region_with_dummy = false;
-  for (const mojom::VmRegionPtr& region : maps) {
-    // We add a region just for byte_stats_proportional_resident which
-    // is empty other than that one stat.
-    if (region->byte_stats_proportional_resident > 0) {
-      EXPECT_EQ(0u, region->start_address);
-      EXPECT_EQ(0u, region->size_in_bytes);
-      continue;
-    }
-    EXPECT_NE(0u, region->start_address);
-    EXPECT_NE(0u, region->size_in_bytes);
-
-    if (region->mapped_file.find(executable_name) != std::string::npos)
-      found_executable = true;
-
-    if (dummy_function_address >= region->start_address &&
-        dummy_function_address <
-            region->start_address + region->size_in_bytes) {
-      found_region_with_dummy = true;
-      EXPECT_EQ(module_containing_dummy_name, region->mapped_file);
-    }
-  }
-  EXPECT_TRUE(found_executable);
-  EXPECT_TRUE(found_region_with_dummy);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
 namespace {

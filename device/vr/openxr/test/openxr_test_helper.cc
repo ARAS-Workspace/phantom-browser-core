@@ -69,10 +69,7 @@ const std::vector<const char*>& OpenXrTestHelper::GetSupportedExtensions() {
       XR_MSFT_SECONDARY_VIEW_CONFIGURATION_EXTENSION_NAME,
       XR_EXT_HAND_TRACKING_EXTENSION_NAME,
       XR_KHR_VISIBILITY_MASK_EXTENSION_NAME,
-#if BUILDFLAG(IS_WIN)
-      XR_KHR_D3D11_ENABLE_EXTENSION_NAME,
-      XR_EXT_WIN32_APPCONTAINER_COMPATIBLE_EXTENSION_NAME,
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
       XR_KHR_ANDROID_CREATE_INSTANCE_EXTENSION_NAME,
       XR_KHR_OPENGL_ES_ENABLE_EXTENSION_NAME,
       // For layers.
@@ -132,11 +129,7 @@ void OpenXrTestHelper::Reset() {
 
   system_id_ = 0;
   frame_begin_ = false;
-#if BUILDFLAG(IS_WIN)
-  d3d_device_ = nullptr;
-  textures_arr_.clear();
-  acquired_swapchain_texture_ = 0;
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   opengl_es_textures_arrays_.clear();
   acquired_swapchain_textures_.clear();
 #endif
@@ -206,35 +199,13 @@ OpenXrTestHelper::GetTestHook() {
 }
 
 void OpenXrTestHelper::OnPresentedFrame(const XrFrameEndInfo* frame_end_info) {
-#if BUILDFLAG(IS_WIN)
-  DCHECK_NE(textures_arr_.size(), 0ull);
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   DCHECK_NE(opengl_es_textures_arrays_.size(), 0ull);
 #endif
 
   std::vector<device::ViewData> submitted_views;
   std::vector<device::LayerData> submitted_layers;
-#if BUILDFLAG(IS_WIN)
-  uint32_t current_x = 0;
-  for (XrViewConfigurationType view_config_type : view_configs_enabled_) {
-    const device::OpenXrViewConfiguration& view_config =
-        GetViewConfigInfo(view_config_type);
-    if (view_config.Active()) {
-      const std::vector<device::OpenXrViewProperties>& view_properties =
-          view_config.Properties();
-      for (uint32_t i = 0; i < view_properties.size(); i++) {
-        const device::OpenXrViewProperties& properties = view_properties[i];
-        device::ViewData& data = submitted_views.emplace_back();
-        data.viewport =
-            gfx::Rect(current_x, 0, properties.Width(), properties.Height());
-        data.eye = GetEyeForIndex(i, view_properties.size());
-
-        CopyTextureDataIntoFrameData(current_x, data);
-        current_x += properties.Width();
-      }
-    }
-  }
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // SAFETY: Test-only implementation of a C-Style API that thus has to
   // provide arrays as a pointer and a size. The sole callers are our own
   // product/test code.
@@ -306,51 +277,7 @@ void OpenXrTestHelper::OnPresentedFrame(const XrFrameEndInfo* frame_end_info) {
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-void OpenXrTestHelper::CopyTextureDataIntoFrameData(uint32_t x_start,
-                                                    device::ViewData& data) {
-  DCHECK(d3d_device_);
-  DCHECK_NE(textures_arr_.size(), 0ull);
-  Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
-  d3d_device_->GetImmediateContext(&context);
-
-  // We copy a 1x1 pixel region from the submitted texture to a staging texture
-  // so we can map it to CPU memory and read back the pixel color.
-  auto desc = CD3D11_TEXTURE2D_DESC();
-  desc.ArraySize = 1;
-  desc.Width = 1;
-  desc.Height = 1;
-  desc.MipLevels = 1;
-  desc.SampleDesc.Count = 1;
-  desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-  desc.Usage = D3D11_USAGE_STAGING;
-  desc.BindFlags = 0;
-  desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-
-  Microsoft::WRL::ComPtr<ID3D11Texture2D> texture_destination;
-  HRESULT hr =
-      d3d_device_->CreateTexture2D(&desc, nullptr, &texture_destination);
-  DCHECK_EQ(hr, S_OK);
-
-  // Copy the single pixel at (x_start, 0) into our 1x1 staging texture.
-  D3D11_BOX box{x_start, 0, 0, x_start + 1, 1, 1};
-  context->CopySubresourceRegion(
-      texture_destination.Get(), 0, 0, 0, 0,
-      textures_arr_[acquired_swapchain_texture_].Get(), 0, &box);
-
-  D3D11_MAPPED_SUBRESOURCE map_data = {};
-  hr = context->Map(texture_destination.Get(), 0, D3D11_MAP_READ, 0, &map_data);
-  DCHECK_EQ(hr, S_OK) << " hex value: " << std::hex << hr;
-
-  // SAFETY: ID3D11DeviceContext::Map guarantees map_data.pData points to
-  // memory for the 1x1 DXGI_FORMAT_R8G8B8A8_UNORM texture (4 bytes).
-  auto mapped_pixels = UNSAFE_BUFFERS(
-      base::span(static_cast<const uint8_t*>(map_data.pData), 4u));
-  data.color = GetFirstColor(mapped_pixels);
-
-  context->Unmap(texture_destination.Get(), 0);
-}
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 void OpenXrTestHelper::CopyTextureDataIntoFrameData(XrSwapchain swapchain,
                                                     uint32_t x_start,
                                                     device::ViewData& data) {
@@ -868,9 +795,6 @@ void OpenXrTestHelper::AddDimensions(
 }
 
 void OpenXrTestHelper::ReinitializeTextures() {
-#if BUILDFLAG(IS_WIN)
-  DCHECK(d3d_device_);
-#endif
 
   uint32_t total_width = 0;
   uint32_t total_height = 0;
@@ -895,34 +819,9 @@ void OpenXrTestHelper::ReinitializeTextures() {
     }
   }
 
-#if BUILDFLAG(IS_WIN)
-  CreateTextures(total_width, total_height);
-#endif
 }
 
-#if BUILDFLAG(IS_WIN)
-void OpenXrTestHelper::CreateTextures(uint32_t width, uint32_t height) {
-  DCHECK(d3d_device_);
-  textures_arr_.clear();
-
-  D3D11_TEXTURE2D_DESC desc{};
-  desc.Width = width;
-  desc.Height = height;
-  desc.MipLevels = 1;
-  desc.ArraySize = 1;
-  desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-  desc.SampleDesc.Count = 1;
-  desc.Usage = D3D11_USAGE_DEFAULT;
-  desc.BindFlags = D3D11_BIND_RENDER_TARGET;
-
-  for (uint32_t i = 0; i < kMinSwapchainBuffering; i++) {
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
-    HRESULT hr = d3d_device_->CreateTexture2D(&desc, nullptr, &texture);
-    DCHECK_EQ(hr, S_OK) << " hex value:" << std::hex << hr;
-
-    textures_arr_.push_back(texture);
-  }
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 void OpenXrTestHelper::CreateTextures(XrSwapchain swapchain) {
   DCHECK(swapchains_.contains(swapchain));
 
@@ -963,19 +862,7 @@ void OpenXrTestHelper::CreateTextures(XrSwapchain swapchain) {
 #endif
 }
 
-#if BUILDFLAG(IS_WIN)
-void OpenXrTestHelper::SetD3DDevice(ID3D11Device* d3d_device) {
-  DCHECK_EQ(d3d_device_, nullptr);
-  DCHECK_NE(d3d_device, nullptr);
-  d3d_device_ = d3d_device;
-
-  // The device is set when the session is created. However, the view
-  // configurations to enable are not specified until a session begins, so we
-  // should use the default primary dimensions to create the textures. The width
-  // is multiplied by 2 because WebXR uses a single double wide texture.
-  CreateTextures(kPrimaryViewDimension * 2, kPrimaryViewDimension);
-}
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 void OpenXrTestHelper::SetOpenGLESInfo(EGLDisplay display, EGLContext context) {
   // We don't seem to need to use these, but let's verify that we're passed in
   // a valid display/context.
@@ -1198,12 +1085,7 @@ XrResult OpenXrTestHelper::PollEvent(XrEventDataBuffer* event_data) {
   return XR_EVENT_UNAVAILABLE;
 }
 
-#if BUILDFLAG(IS_WIN)
-const std::vector<Microsoft::WRL::ComPtr<ID3D11Texture2D>>&
-OpenXrTestHelper::GetSwapchainTextures() const {
-  return textures_arr_;
-}
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 const std::vector<uint32_t>& OpenXrTestHelper::GetSwapchainTextureIDs(
     XrSwapchain swapchain) {
   if (!opengl_es_textures_arrays_.contains(swapchain)) {
@@ -1214,16 +1096,10 @@ const std::vector<uint32_t>& OpenXrTestHelper::GetSwapchainTextureIDs(
 #endif
 
 uint32_t OpenXrTestHelper::NextSwapchainImageIndex(XrSwapchain swapchain) {
-#if BUILDFLAG(IS_WIN)
-  acquired_swapchain_texture_ =
-      (acquired_swapchain_texture_ + 1) % textures_arr_.size();
-  return acquired_swapchain_texture_;
-#else
   acquired_swapchain_textures_[swapchain] =
       (acquired_swapchain_textures_[swapchain] + 1) %
       opengl_es_textures_arrays_[swapchain].size();
   return acquired_swapchain_textures_[swapchain];
-#endif
 }
 
 XrTime OpenXrTestHelper::NextPredictedDisplayTime() {

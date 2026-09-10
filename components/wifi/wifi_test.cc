@@ -28,8 +28,6 @@
 
 #if BUILDFLAG(IS_APPLE)
 #include "base/apple/scoped_nsautorelease_pool.h"
-#elif BUILDFLAG(IS_WIN)
-#include <windows.h>
 #endif
 
 namespace wifi {
@@ -120,17 +118,8 @@ bool WiFiTest::ParseCommandLine(int argc, const char* argv[]) {
       parsed_command_line.GetSwitchValueASCII("security");
 
   if (parsed_command_line.GetArgs().size() == 1) {
-#if BUILDFLAG(IS_WIN)
-    network_guid = base::WideToASCII(parsed_command_line.GetArgs()[0]);
-#else
     network_guid = parsed_command_line.GetArgs()[0];
-#endif
   }
-
-#if BUILDFLAG(IS_WIN)
-  if (parsed_command_line.HasSwitch("debug"))
-    MessageBoxA(nullptr, __FUNCTION__, "Debug Me!", MB_OK);
-#endif
 
   base::SingleThreadTaskExecutor executor(base::MessagePumpType::IO);
 

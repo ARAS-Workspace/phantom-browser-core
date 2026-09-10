@@ -24,13 +24,6 @@ COMPONENT_EXPORT(PRINTING_BASE) BASE_DECLARE_FEATURE(kCupsIppPrintingBackend);
 COMPONENT_EXPORT(PRINTING_BASE) BASE_DECLARE_FEATURE(kLinuxXdgPrintPortal);
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN)
-COMPONENT_EXPORT(PRINTING_BASE)
-BASE_DECLARE_FEATURE(kPrintWithPostScriptType42Fonts);
-COMPONENT_EXPORT(PRINTING_BASE)
-BASE_DECLARE_FEATURE(kPrintWithReducedRasterization);
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(ENABLE_OOP_PRINTING)
 COMPONENT_EXPORT(PRINTING_BASE) BASE_DECLARE_FEATURE(kEnableOopPrintDrivers);
 COMPONENT_EXPORT(PRINTING_BASE)
@@ -39,10 +32,6 @@ COMPONENT_EXPORT(PRINTING_BASE)
 extern const base::FeatureParam<bool> kEnableOopPrintDriversJobPrint;
 COMPONENT_EXPORT(PRINTING_BASE)
 extern const base::FeatureParam<bool> kEnableOopPrintDriversSandbox;
-#if BUILDFLAG(IS_WIN)
-COMPONENT_EXPORT(PRINTING_BASE)
-extern const base::FeatureParam<bool> kEnableOopPrintDriversSingleProcess;
-#endif
 #endif  // BUILDFLAG(ENABLE_OOP_PRINTING)
 
 }  // namespace printing::features

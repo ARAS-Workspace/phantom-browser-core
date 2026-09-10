@@ -22,10 +22,10 @@ class BasePlatformDelegate : public PlatformDelegate {
   FilePathMap<bool> AreExecutablesRunning(
       const FilePathSet& file_paths) override;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   std::optional<ProductMetadata> GetProductMetadata(
       const base::FilePath& file_path) override;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
  protected:
   BasePlatformDelegate();

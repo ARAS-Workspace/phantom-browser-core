@@ -321,8 +321,6 @@ class WebRtcDesktopCaptureBrowserTest : public WebRtcTestBase {
 #define MAYBE_TabCaptureProvidesMinFps DISABLED_TabCaptureProvidesMinFps
 #elif defined(MEMORY_SANITIZER)
 #define MAYBE_TabCaptureProvidesMinFps DISABLED_TabCaptureProvidesMinFps
-#elif BUILDFLAG(IS_WIN)
-#define MAYBE_TabCaptureProvidesMinFps DISABLED_TabCaptureProvidesMinFps
 #else
 #define MAYBE_TabCaptureProvidesMinFps TabCaptureProvidesMinFps
 #endif

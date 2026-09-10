@@ -146,15 +146,7 @@ class CrossOriginFileDataSourceWrapper : public CrossOriginDataSource {
   bool Initialize(const base::FilePath& file_path) {
     std::string path_utf8 = file_path.AsUTF8Unsafe();
     std::string url_str = "file://";
-#if BUILDFLAG(IS_WIN)
-    std::replace(path_utf8.begin(), path_utf8.end(), '\\', '/');
-    if (path_utf8.size() > 0 && path_utf8[0] != '/') {
-      url_str += "/";
-    }
     url_str += path_utf8;
-#else
-    url_str += path_utf8;
-#endif
     url_ = GURL(url_str);
     return file_data_source_.Initialize(file_path);
   }
@@ -175,13 +167,7 @@ class TestDataSourceFactory : public CrossOriginDataSource::Factory {
     auto file_data_source =
         std::make_unique<CrossOriginFileDataSourceWrapper>();
     base::FilePath file_path(
-#if BUILDFLAG(IS_WIN)
-        // Windows file paths can't start with '/' the way unix file paths can,
-        // So we have to strip the leading one which comes from GetContent().
-        base::UTF8ToWide(uri.GetContent().erase(0, 1))
-#else
         uri.GetContent()
-#endif
     );
     CHECK(file_data_source->Initialize(file_path))
         << "Is " << file_path.value() << " missing?";

@@ -141,10 +141,6 @@ blink::WebMouseEvent CreateRightClickWebMouseEventAtPosition(
 }
 
 std::string GetPlatformTextExpectation(std::string expectation) {
-#if BUILDFLAG(IS_WIN)
-  base::ReplaceSubstringsAfterOffset(&expectation, /*start_offset=*/0, "\n",
-                                     "\r\n");
-#endif
   return expectation;
 }
 
@@ -3089,13 +3085,13 @@ INSTANTIATE_TEST_SUITE_P(All, PDFiumEngineInkTest, testing::Bool());
 
 class PDFiumEngineInkTextSelectionTest : public PDFiumEngineInkTest {
  public:
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   static constexpr PdfRect kGoodbyeWorldExpectedRectPage0{20.0f, 96.656f,
                                                           136.496f, 111.648f};
 #else
   static constexpr PdfRect kGoodbyeWorldExpectedRectPage0{20.0f, 96.592f,
                                                           136.496f, 111.792f};
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
   static constexpr gfx::PointF kNonTextPositionPage0{5.0f, 5.0f};
 
   PDFiumEngineInkTextSelectionTest()
@@ -3145,11 +3141,11 @@ TEST_P(PDFiumEngineInkTextSelectionTest, ExtendSelectionByPoint) {
   EXPECT_TRUE(engine->ExtendSelectionByPoint(kHelloWorldEndPosition));
 
   EXPECT_EQ("Goodb", engine->GetSelectedText());
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   constexpr PdfRect kExpectedRect{20.0f, 99.824f, 68.032f, 111.648f};
 #else
   constexpr PdfRect kExpectedRect{20.0f, 99.712f, 68.032f, 111.792f};
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
   EXPECT_THAT(engine->GetSelectionRectMap(),
               ElementsAre(Pair(0, ElementsAre(kExpectedRect))));
 }
@@ -3167,11 +3163,11 @@ TEST_P(PDFiumEngineInkTextSelectionTest, ExtendSelectionByPointMultiPage) {
   EXPECT_EQ(GetPlatformTextExpectation(kExpectedText),
             engine->GetSelectedText());
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   constexpr PdfRect kExpectedRectPage1{20.0f, 48.008f, 52.664f, 58.328f};
 #else
   constexpr PdfRect kExpectedRectPage1{20.0f, 48.32f, 52.664f, 58.196f};
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
   EXPECT_THAT(engine->GetSelectionRectMap(),
               ElementsAre(Pair(0, ElementsAre(kGoodbyeWorldExpectedRectPage0)),
                           Pair(1, ElementsAre(kExpectedRectPage1))));
@@ -3194,11 +3190,11 @@ TEST_P(PDFiumEngineInkTextSelectionTest, OnTextOrLinkAreaClickWithDoubleClick) {
   engine->OnTextOrLinkAreaClick(kHelloWorldStartPosition, /*click_count=*/2);
 
   EXPECT_EQ("Goodbye", engine->GetSelectedText());
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   constexpr PdfRect kExpectedRect{20.0f, 96.656f, 84.928f, 111.648f};
 #else
   constexpr PdfRect kExpectedRect{20.0f, 96.592f, 84.928f, 111.792f};
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
   EXPECT_THAT(engine->GetSelectionRectMap(),
               ElementsAre(Pair(0, ElementsAre(kExpectedRect))));
 }
@@ -3974,9 +3970,7 @@ TEST_P(PDFiumEngineInkDrawTextTest, RotatedTextbox90Degrees) {
   EXPECT_FLOAT_EQ(matrix.b, -1.0f);
   EXPECT_FLOAT_EQ(matrix.c, 1.0f);
   EXPECT_FLOAT_EQ(matrix.d, 0.0f);
-#if BUILDFLAG(IS_WIN)
-  constexpr float kExpectedE = 74.407501f;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   constexpr float kExpectedE = 76.724998f;
 #else
   constexpr float kExpectedE = 75.540001f;
@@ -4029,9 +4023,7 @@ TEST_P(PDFiumEngineInkDrawTextTest, RotatedTextbox180Degrees) {
   EXPECT_FLOAT_EQ(matrix.c, 0.0f);
   EXPECT_FLOAT_EQ(matrix.d, -1.0f);
   EXPECT_FLOAT_EQ(matrix.e, 82.5f);
-#if BUILDFLAG(IS_WIN)
-  constexpr float kExpectedF = 170.5925f;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   constexpr float kExpectedF = 168.27499f;
 #else
   constexpr float kExpectedF = 169.46001f;
@@ -4082,9 +4074,7 @@ TEST_P(PDFiumEngineInkDrawTextTest, RotatedTextbox270Degrees) {
   EXPECT_FLOAT_EQ(matrix.b, 1.0f);
   EXPECT_FLOAT_EQ(matrix.c, -1.0f);
   EXPECT_FLOAT_EQ(matrix.d, 0.0f);
-#if BUILDFLAG(IS_WIN)
-  constexpr float kExpectedE = 23.092501f;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   constexpr float kExpectedE = 20.775002f;
 #else
   constexpr float kExpectedE = 21.96f;
@@ -4145,9 +4135,7 @@ TEST_P(PDFiumEngineInkDrawTextTest, DrawTextRotatedViewport90) {
   EXPECT_FLOAT_EQ(matrix.c, 0.0f);
   EXPECT_FLOAT_EQ(matrix.d, 1.0f);
   EXPECT_FLOAT_EQ(matrix.e, 7.5f);
-#if BUILDFLAG(IS_WIN)
-  constexpr float kExpectedF = 176.9075f;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   constexpr float kExpectedF = 179.22501f;
 #else
   constexpr float kExpectedF = 178.03999f;
@@ -4201,9 +4189,7 @@ TEST_P(PDFiumEngineInkDrawTextTest, DrawTextRotatedViewport180) {
   EXPECT_FLOAT_EQ(matrix.c, 0.0f);
   EXPECT_FLOAT_EQ(matrix.d, 1.0f);
   EXPECT_FLOAT_EQ(matrix.e, 7.5f);
-#if BUILDFLAG(IS_WIN)
-  constexpr float kExpectedF = 176.9075f;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   constexpr float kExpectedF = 179.22501f;
 #else
   constexpr float kExpectedF = 178.03999f;
@@ -4259,9 +4245,7 @@ TEST_P(PDFiumEngineInkDrawTextTest, DrawTextRotatedViewport270) {
   EXPECT_FLOAT_EQ(matrix.c, 0.0f);
   EXPECT_FLOAT_EQ(matrix.d, 1.0f);
   EXPECT_FLOAT_EQ(matrix.e, 22.5f);
-#if BUILDFLAG(IS_WIN)
-  constexpr float kExpectedF = 169.4075f;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   constexpr float kExpectedF = 171.72501f;
 #else
   constexpr float kExpectedF = 170.54001f;
@@ -4316,9 +4300,7 @@ TEST_P(PDFiumEngineInkDrawTextTest, RotatedViewport180RotatedTextbox270) {
   EXPECT_FLOAT_EQ(matrix.b, 1.0f);
   EXPECT_FLOAT_EQ(matrix.c, -1.0f);
   EXPECT_FLOAT_EQ(matrix.d, 0.0f);
-#if BUILDFLAG(IS_WIN)
-  constexpr float kExpectedE = 15.5925f;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   constexpr float kExpectedE = 13.275f;
 #else
   constexpr float kExpectedE = 14.46f;
@@ -4370,9 +4352,7 @@ TEST_P(PDFiumEngineInkDrawTextTest,
     EXPECT_FLOAT_EQ(matrix.c, 0.0f);
     EXPECT_FLOAT_EQ(matrix.d, 1.0f);
     EXPECT_FLOAT_EQ(matrix.e, 7.5f);
-#if BUILDFLAG(IS_WIN)
-    constexpr float kExpectedF = 176.9075f;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     constexpr float kExpectedF = 179.22501f;
 #else
     constexpr float kExpectedF = 178.04f;
@@ -4409,9 +4389,7 @@ TEST_P(PDFiumEngineInkDrawTextTest,
     EXPECT_FLOAT_EQ(matrix.c, 0.0f);
     EXPECT_FLOAT_EQ(matrix.d, -1.0f);
     EXPECT_FLOAT_EQ(matrix.e, 78.75f);
-#if BUILDFLAG(IS_WIN)
-    constexpr float kExpectedF = 196.8425f;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     constexpr float kExpectedF = 194.52499f;
 #else
     constexpr float kExpectedF = 195.71f;
@@ -4906,9 +4884,7 @@ TEST_P(PDFiumEngineInkDrawTextTest, UpdateTextActiveAndInvalidate) {
 
   // Set the text as inactive. This should invalidate the area for the text.
   // The font metrics differ slightly depending on platform.
-#if BUILDFLAG(IS_WIN)
-  static constexpr gfx::Rect kTextInvalidationRect(25, 25, 27, 11);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   static constexpr gfx::Rect kTextInvalidationRect(25, 22, 27, 11);
 #else
   static constexpr gfx::Rect kTextInvalidationRect(25, 24, 30, 10);

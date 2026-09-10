@@ -145,7 +145,7 @@ void RunExternalProtocolDialogWithDelegate(
     return;
   }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   // If the Shell does not have a registered name for the protocol,
   // attempting to invoke the protocol will fail.
   if (program_name.empty()) {

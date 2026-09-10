@@ -1655,9 +1655,6 @@ class MODULES_EXPORT AXObject : public GarbageCollected<AXObject> {
   void SerializeHTMLTagAndClass(ui::AXNodeData* node_data) const;
   void SerializeHTMLId(ui::AXNodeData* node_data) const;
   void SerializeInlineTextBox(ui::AXNodeData* node_data) const;
-#if BUILDFLAG(IS_WIN)
-  void SerializeJAWSNonStandardHTMLAttributes(ui::AXNodeData* node_data) const;
-#endif
   void SerializeLangAttribute(ui::AXNodeData* node_data) const;
   void SerializeLineAttributes(ui::AXNodeData* node_data) const;
   void SerializeListAttributes(ui::AXNodeData* node_data) const;

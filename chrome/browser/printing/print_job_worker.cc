@@ -34,11 +34,6 @@
 #include "printing/printing_utils.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/threading/thread_restrictions.h"
-#include "printing/printed_page_win.h"
-#endif
-
 using content::BrowserThread;
 
 namespace printing {
@@ -166,12 +161,6 @@ void PrintJobWorker::OnNewPage() {
     return;
   }
 
-#if BUILDFLAG(IS_WIN)
-  // Using the Windows GDI print API.
-  if (!OnNewPageHelperGdi()) {
-    return;
-  }
-#else
   if (!document_->HasDocument()) {
     PostWaitForPage();
     return;
@@ -179,41 +168,10 @@ void PrintJobWorker::OnNewPage() {
   if (!SpoolDocument()) {
     return;
   }
-#endif  // BUILDFLAG(IS_WIN)
 
   OnDocumentDone();
   // Don't touch `this` anymore since the instance could be destroyed.
 }
-
-#if BUILDFLAG(IS_WIN)
-bool PrintJobWorker::OnNewPageHelperGdi() {
-  if (page_number_ == PageNumber::npos()) {
-    // Find first page to print.
-    int page_count = document_->page_count();
-    if (!page_count) {
-      // We still don't know how many pages the document contains.
-      return false;
-    }
-    // We have enough information to initialize `page_number_`.
-    page_number_.Init(document_->settings().ranges(), page_count);
-  }
-
-  while (true) {
-    scoped_refptr<PrintedPage> page = document_->GetPage(page_number_.ToUint());
-    if (!page) {
-      PostWaitForPage();
-      return false;
-    }
-    // The page is there, print it.
-    if (!SpoolPage(page.get()))
-      return false;
-    ++page_number_;
-    if (page_number_ == PageNumber::npos())
-      break;
-  }
-  return true;
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 void PrintJobWorker::Cancel() {
   // This is the only function that can be called from any thread.
@@ -282,27 +240,6 @@ void PrintJobWorker::FinishDocumentDone(int job_id) {
   // Makes sure the variables are reinitialized.
   document_ = nullptr;
 }
-
-#if BUILDFLAG(IS_WIN)
-bool PrintJobWorker::SpoolPage(PrintedPage* page) {
-  DCHECK(task_runner_->RunsTasksInCurrentSequence());
-  DCHECK_NE(page_number_, PageNumber::npos());
-
-  // Actual printing.
-  if (document_->RenderPrintedPage(*page, printing_context_.get()) !=
-      mojom::ResultCode::kSuccess) {
-    OnFailure();
-    return false;
-  }
-
-  // Signal everyone that the page is printed.
-  DCHECK(print_job_);
-  print_job_->PostTask(FROM_HERE,
-                       base::BindOnce(&PrintJob::OnPageDone, print_job_,
-                                      base::RetainedRef(page)));
-  return true;
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 bool PrintJobWorker::SpoolDocument() {
   DCHECK(task_runner_->RunsTasksInCurrentSequence());

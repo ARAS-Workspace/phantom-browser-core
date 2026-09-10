@@ -416,11 +416,7 @@ TEST(FileEnumerator, InvalidDirectory) {
   EXPECT_TRUE(path.empty());
 
   // Slightly different outcomes between Windows and POSIX.
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(File::Error::FILE_ERROR_FAILED, enumerator.GetError());
-#else
   EXPECT_EQ(File::Error::FILE_ERROR_NOT_A_DIRECTORY, enumerator.GetError());
-#endif
 }
 
 #if BUILDFLAG(IS_POSIX)
@@ -674,13 +670,6 @@ TEST(FileEnumerator, VirtualDocumentPath) {
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-// Windows has a bug in their handling of ".."; they always report the file
-// modification time of the current directory, not the parent directory. This is
-// a bug in Windows, not us -- you can see it with the "dir" command (notice
-// that the time of . and .. always match). Skip this test.
-// https://crbug.com/1119546
-#else
 // Tests that FileEnumerator::GetInfo() returns the correct info for the ..
 // directory.
 TEST(FileEnumerator, GetInfoDotDot) {
@@ -732,7 +721,6 @@ TEST(FileEnumerator, GetInfoDotDot) {
         << "File " << file.path.value() << " was not returned";
   }
 }
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST(FileEnumerator, OnlyName) {
   ScopedTempDir temp_dir;

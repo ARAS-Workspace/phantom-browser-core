@@ -81,13 +81,11 @@ const AcceleratorMapping kAcceleratorMap[] = {
     {ui::VKEY_9, ui::EF_ALT_DOWN, IDC_SELECT_LAST_TAB},
     {ui::VKEY_NUMPAD9, ui::EF_ALT_DOWN, IDC_SELECT_LAST_TAB},
 #endif  // BUILDFLAG(IS_LINUX)
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
     {ui::VKEY_NEXT, ui::EF_CONTROL_DOWN | ui::EF_SHIFT_DOWN, IDC_MOVE_TAB_NEXT},
     {ui::VKEY_PRIOR, ui::EF_CONTROL_DOWN | ui::EF_SHIFT_DOWN,
      IDC_MOVE_TAB_PREVIOUS},
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
-    // Control modifier is rarely used on Mac, so we allow it only in several
-    // specific cases.
+#endif  // BUILDFLAG(IS_LINUX)
     {ui::VKEY_TAB, ui::EF_CONTROL_DOWN, IDC_CYCLE_TO_NEXT_TAB},
     {ui::VKEY_NEXT, ui::EF_CONTROL_DOWN, IDC_SELECT_NEXT_TAB},
     {ui::VKEY_TAB, ui::EF_SHIFT_DOWN | ui::EF_CONTROL_DOWN,
@@ -321,7 +319,7 @@ std::vector<AcceleratorMapping> GetAcceleratorList() {
                          std::begin(kDevToolsAcceleratorMap),
                          std::end(kDevToolsAcceleratorMap));
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
     accelerators->emplace_back(AcceleratorMapping(
         {ui::VKEY_N, ui::EF_SHIFT_DOWN | ui::EF_ALT_DOWN, IDC_NEW_SPLIT_TAB}));
 #elif BUILDFLAG(IS_CHROMEOS)
@@ -334,13 +332,6 @@ std::vector<AcceleratorMapping> GetAcceleratorList() {
     // Doing this check here and not at the bottom since
     // kUIDebugAcceleratorMap contains Ctrl+Alt keys but we don't enable those
     // for the public.
-#if DCHECK_IS_ON() && BUILDFLAG(IS_WIN)
-    constexpr int kCtrlAlt = ui::EF_CONTROL_DOWN | ui::EF_ALT_DOWN;
-    for (auto& mapping : *accelerators) {
-      DCHECK((mapping.modifiers & kCtrlAlt) != kCtrlAlt)
-          << "Accelerators with Ctrl+Alt are reserved by Windows.";
-    }
-#endif
 
     if (base::FeatureList::IsEnabled(features::kUIDebugTools)) {
       accelerators->insert(accelerators->begin(),

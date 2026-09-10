@@ -135,9 +135,7 @@ PlatformAndFormFactorFromProto(
 }
 
 std::optional<DeviceStatisticsTracker::Platform> GetLocalPlatform() {
-#if BUILDFLAG(IS_WIN)
-  return DeviceStatisticsTracker::Platform::kWindows;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return DeviceStatisticsTracker::Platform::kMac;
 #elif BUILDFLAG(IS_LINUX)
   return DeviceStatisticsTracker::Platform::kLinux;

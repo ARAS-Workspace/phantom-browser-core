@@ -865,13 +865,8 @@ class SplitCacheComputeHttpCacheSize {
 // resources accessed after the resource is loaded from the blink cache is the
 // same as before that.
 // TODO(crbug.com/40164302): Test is flaky on Win.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_NotifyExternalCacheHitCheckSubframeBit \
-  DISABLED_NotifyExternalCacheHitCheckSubframeBit
-#else
 #define MAYBE_NotifyExternalCacheHitCheckSubframeBit \
   NotifyExternalCacheHitCheckSubframeBit
-#endif
 IN_PROC_BROWSER_TEST_F(SplitCacheEnabledContentBrowserTest,
                        MAYBE_NotifyExternalCacheHitCheckSubframeBit) {
   ResourceLoadObserver observer(shell());

@@ -113,8 +113,6 @@ GetLocalPhysicalDeviceType() {
   return trusted_vault_pb::PhysicalDeviceMetadata::DEVICE_TYPE_IOS;
 #elif BUILDFLAG(IS_MAC)
   return trusted_vault_pb::PhysicalDeviceMetadata::DEVICE_TYPE_MAC_OS;
-#elif BUILDFLAG(IS_WIN)
-  return trusted_vault_pb::PhysicalDeviceMetadata::DEVICE_TYPE_WINDOWS;
 #else
 #error Please handle your new device OS here.
 #endif

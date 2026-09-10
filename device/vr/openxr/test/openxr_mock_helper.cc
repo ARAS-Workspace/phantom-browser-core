@@ -45,15 +45,7 @@ bool InitializeOpenXrMockTrampoline() {
   base::ScopedAllowBlockingForTesting allow_blocking;
 
   base::FilePath library_path;
-#if BUILDFLAG(IS_WIN)
-  base::FilePath exe_dir;
-  if (!base::PathService::Get(base::DIR_EXE, &exe_dir)) {
-    LOG(ERROR) << "Failed to get DIR_EXE path for OpenXR mock trampoline";
-    return false;
-  }
-  library_path =
-      exe_dir.AppendASCII("mock_vr_clients/bin/openxr/openxrruntime.dll");
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   std::string json_contents;
   if (base::ReadFileToString(
           base::FilePath("/product/etc/openxr/1/active_runtime.json"),

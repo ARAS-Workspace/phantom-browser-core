@@ -160,11 +160,6 @@ int MaskExpectedImportState(int expected_import_state) {
       run_loop.QuitClosure());
   run_loop.Run();
   int source_profile_count = importer_list->count();
-#if BUILDFLAG(IS_WIN)
-  // On Windows, the importer's DetectIEProfiles() will always add to the count.
-  // Internet Explorer always exists and always has something to import.
-  EXPECT_GT(source_profile_count, 0);
-#endif
   if (source_profile_count == 0)
     return expected_import_state & ~AUTO_IMPORT_PROFILE_IMPORTED;
   return expected_import_state;
@@ -374,38 +369,6 @@ IN_PROC_BROWSER_TEST_P(FirstRunMasterPrefsVariationsSeedTest, Test) {
 // platform where master prefs is used to deliver first run variations. The
 // tests do not pass on other platforms due to the provisional client id logic
 // in metrics_state_manager.cc. See the comment there for details.
-
-#if BUILDFLAG(IS_WIN)
-
-// The trial and groups encoded in the above seed.
-constexpr char kTrialName[] = "UMA-Uniformity-Trial-10-Percent";
-constexpr const char* kTrialGroups[] = {
-    "default",  "group_01", "group_02", "group_03", "group_04",
-    "group_05", "group_06", "group_07", "group_08", "group_09"};
-
-IN_PROC_BROWSER_TEST_P(FirstRunMasterPrefsVariationsSeedTest, PRE_SecondRun) {
-  // Check that the trial from the seed exists and is in one of the expected
-  // states. Persist the state so that we can verify its randomization persists
-  // in FirstRunMasterPrefsVariationsSeedTest.SecondRun.
-  const std::string group_name = base::FieldTrialList::FindFullName(kTrialName);
-  ASSERT_TRUE(std::ranges::contains(kTrialGroups, group_name)) << group_name;
-  // Ensure trial is active (not disabled).
-  ASSERT_TRUE(base::FieldTrialList::IsTrialActive(kTrialName));
-  WriteTrialGroupToTestFile(group_name);
-}
-
-IN_PROC_BROWSER_TEST_P(FirstRunMasterPrefsVariationsSeedTest, SecondRun) {
-  // This test runs after PRE_SecondRun and verifies that the trial state on
-  // the second run matches what was seen in the PRE_ test.
-  const std::string group_name = base::FieldTrialList::FindFullName(kTrialName);
-  ASSERT_TRUE(std::ranges::contains(kTrialGroups, group_name)) << group_name;
-  // Ensure trial is active (not disabled).
-  ASSERT_TRUE(base::FieldTrialList::IsTrialActive(kTrialName));
-  // Read the trial group name that was saved by PRE_ForceTrials from the
-  // corresponding test file.
-  EXPECT_EQ(group_name, ReadTrialGroupFromTestFile());
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 INSTANTIATE_TEST_SUITE_P(FirstRunMasterPrefsVariationsSeedTests,
                          FirstRunMasterPrefsVariationsSeedTest,

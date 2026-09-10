@@ -901,7 +901,7 @@ IN_PROC_BROWSER_TEST_F(PointerLockBrowserTest, DISABLED_UnadjustedMovement) {
 
 #if defined(USE_AURA)
 // TODO(crbug.com/40635377): Remove failure test when fully implemented
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_ChangeUnadjustedMovementFailure \
   DISABLED_ChangeUnadjustedMovementFailure
 #else
@@ -954,49 +954,5 @@ IN_PROC_BROWSER_TEST_F(PointerLockBrowserTest,
 #endif
 
 #if defined(USE_AURA)
-#if BUILDFLAG(IS_WIN)
-// Tests that a subsequent request to RequestPointerLock with different
-// options inside a Child view gets piped to the proper places and updates
-// the option(this option is only supported on Windows).
-// This was prompted by this bug: https://crbug.com/1062702
-IN_PROC_BROWSER_TEST_F(PointerLockBrowserTest,
-                       ChangeUnadjustedMovementSuccess) {
-  GURL main_url(embedded_test_server()->GetURL(
-      "a.com", "/cross_site_iframe_factory.html?a(b)"));
-  EXPECT_TRUE(NavigateToURL(shell(), main_url));
-
-  FrameTreeNode* root = web_contents()->GetPrimaryFrameTree().root();
-  FrameTreeNode* child = root->child_at(0);
-  RenderWidgetHostViewBase* child_view = static_cast<RenderWidgetHostViewBase*>(
-      child->current_frame_host()->GetView());
-
-  WaitForHitTestData(child->current_frame_host());
-
-  // Request a pointer lock on the child frame's body and wait for the promise
-  // to resolve.
-  EXPECT_EQ(true, PointerLockHelper::RequestPointerLockOnBody(child));
-  // Child frame should have been granted pointer lock.
-  EXPECT_EQ(true, PointerLockHelper::IsPointerLockOnBody(child));
-
-  EXPECT_TRUE(child_view->IsPointerLocked());
-  EXPECT_FALSE(root->current_frame_host()
-                   ->GetView()
-                   ->GetIsPointerLockedUnadjustedMovementForTesting());
-  EXPECT_EQ(child_view->host(), web_contents()->GetPointerLockWidget());
-
-  // Request to change pointer lock options and wait for return.
-  EXPECT_EQ(
-      base::Value(),
-      EvalJs(child,
-             "document.body.requestPointerLock({unadjustedMovement:true})"));
-
-  // The new changed lock should now be in place.
-  EXPECT_TRUE(child_view->IsPointerLocked());
-  EXPECT_TRUE(root->current_frame_host()
-                  ->GetView()
-                  ->GetIsPointerLockedUnadjustedMovementForTesting());
-  EXPECT_EQ(child_view->host(), web_contents()->GetPointerLockWidget());
-}
-#endif  // WIN_OS
 #endif  // USE_AURA
 }  // namespace content

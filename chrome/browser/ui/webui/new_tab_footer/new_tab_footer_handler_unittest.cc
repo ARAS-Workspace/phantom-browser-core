@@ -33,7 +33,7 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/theme_provider.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/enterprise/browser_management/management_identity.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
@@ -48,7 +48,7 @@
 #include "ui/gfx/image/image_skia_rep_default.h"
 #include "ui/gfx/image/image_unittest_util.h"
 #include "ui/gfx/paint_vector_icon.h"
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 using testing::_;
 using ::testing::SaveArg;
@@ -332,7 +332,7 @@ TEST_F(NewTabFooterHandlerExtensionTest, OpenUrlInCurrentTab_InvalidUrl) {
   handler().OpenUrlInCurrentTab(kInvalidUrl);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 class NewTabFooterHandlerEnterpriseTest : public testing::Test {
  public:
   void SetUp() override {
@@ -754,4 +754,4 @@ TEST_F(NewTabFooterHandlerEnterpriseTest,
   ntp_custom_background_service_observer_->OnCustomBackgroundImageUpdated();
   document_.FlushForTesting();
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

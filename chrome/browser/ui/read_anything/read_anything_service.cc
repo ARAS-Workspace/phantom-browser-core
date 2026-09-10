@@ -195,13 +195,8 @@ void ReadAnythingService::RecordEngineVersion(
     const base::FilePath& engine_version) {
 // Per FilePath documentation, Windows uses std::wstring, so string
 // so string manipulations must be handled slightly differently.
-#if BUILDFLAG(IS_WIN)
-  using path_string_t = std::wstring;
-  constexpr auto delimiter = L'.';
-#else
   using path_string_t = std::string;
   constexpr auto delimiter = '.';
-#endif
 
   path_string_t file = engine_version.value();
 

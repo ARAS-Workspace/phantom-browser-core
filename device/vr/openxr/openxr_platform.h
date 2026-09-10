@@ -16,9 +16,7 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <d3d11.h>
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #include <EGL/egl.h>
 #include <jni.h>
 #endif

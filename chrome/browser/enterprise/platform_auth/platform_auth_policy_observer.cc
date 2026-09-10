@@ -51,7 +51,7 @@ PlatformAuthPolicyObserver::~PlatformAuthPolicyObserver() = default;
 // static
 void PlatformAuthPolicyObserver::RegisterPrefs(
     PrefRegistrySimple* pref_registry) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   pref_registry->RegisterIntegerPref(GetPrefName(), 0);
 #elif BUILDFLAG(IS_MAC)
   pref_registry->RegisterIntegerPref(GetPrefName(), 1);
@@ -68,9 +68,7 @@ void PlatformAuthPolicyObserver::RegisterPrefs(
 
 // static
 const char* PlatformAuthPolicyObserver::GetPrefName() {
-#if BUILDFLAG(IS_WIN)
-  return prefs::kCloudApAuthEnabled;
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return prefs::kExtensibleEnterpriseSSOEnabled;
 #elif BUILDFLAG(IS_ANDROID)
   return prefs::kAndroidEntraSSOEnabled;

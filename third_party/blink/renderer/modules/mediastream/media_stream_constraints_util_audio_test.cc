@@ -2170,14 +2170,7 @@ TEST_P(MediaStreamConstraintsUtilAudioTest, LatencyConstraint) {
   // media::AudioLatency::GetExactBufferSize().
   CheckLocalMediaStreamAudioSourceLatency(variable_latency_device_, 0.001, 128);
   CheckLocalMediaStreamAudioSourceLatency(variable_latency_device_, 0.011, 512);
-#if BUILDFLAG(IS_WIN)
-  // Windows only uses exactly the minimum or else multiples of the
-  // hardware_buffer_size (512 for the variable_latency_device_).
-  CheckLocalMediaStreamAudioSourceLatency(variable_latency_device_, 0.020,
-                                          1024);
-#else
   CheckLocalMediaStreamAudioSourceLatency(variable_latency_device_, 0.020, 896);
-#endif
   CheckLocalMediaStreamAudioSourceLatency(variable_latency_device_, 0.2, 4096);
 }
 

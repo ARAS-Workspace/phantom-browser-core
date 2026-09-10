@@ -216,8 +216,6 @@ std::vector<AXApiType::Type> AXInspectTestHelper::TreeTestPasses() {
   return {AXApiType::kBlink};
 #elif !BUILDFLAG(HAS_PLATFORM_ACCESSIBILITY_SUPPORT)
   return {AXApiType::kBlink};
-#elif BUILDFLAG(IS_WIN)
-  return {AXApiType::kBlink, AXApiType::kWinIA2, AXApiType::kWinUIA};
 #elif BUILDFLAG(IS_MAC)
   return {AXApiType::kBlink, AXApiType::kMac};
 #elif BUILDFLAG(IS_ANDROID)
@@ -233,8 +231,6 @@ std::vector<AXApiType::Type> AXInspectTestHelper::EventTestPasses() {
   if (is_atk_version_supported())
     return {AXApiType::kLinux};
   return {};
-#elif BUILDFLAG(IS_WIN)
-  return {AXApiType::kWinIA2, AXApiType::kWinUIA};
 #elif BUILDFLAG(IS_MAC)
   return {AXApiType::kMac};
 #else

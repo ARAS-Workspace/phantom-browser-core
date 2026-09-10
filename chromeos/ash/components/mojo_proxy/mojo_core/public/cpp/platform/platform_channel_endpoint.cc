@@ -24,10 +24,6 @@
 #elif BUILDFLAG(IS_POSIX)
 #include "base/files/scoped_file.h"
 #include "base/posix/global_descriptors.h"
-#elif BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/scoped_handle.h"
 #endif
 
 namespace mojo_legacy {
@@ -87,11 +83,7 @@ void PlatformChannelEndpoint::PrepareToPass(HandlePassingInfo& info,
 void PlatformChannelEndpoint::PrepareToPass(HandlePassingInfo& info,
                                             std::string& value) {
   DCHECK(is_valid());
-#if BUILDFLAG(IS_WIN)
-  info.push_back(platform_handle().GetHandle().Get());
-  value =
-      base::NumberToString(HandleToLong(platform_handle().GetHandle().Get()));
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   int fd = platform_handle().GetFD().get();
   int mapped_fd = kAndroidClientHandleDescriptor + info.size();
   info.emplace_back(fd, mapped_fd);
@@ -136,9 +128,7 @@ void PlatformChannelEndpoint::PrepareToPass(base::LaunchOptions& options,
 std::string PlatformChannelEndpoint::PrepareToPass(
     base::LaunchOptions& options) {
   std::string value;
-#if BUILDFLAG(IS_WIN)
-  PrepareToPass(options.handles_to_inherit, value);
-#elif BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
+#if BUILDFLAG(MOJO_LEGACY_USE_APPLE_CHANNEL)
   PrepareToPass(options.mach_ports_for_rendezvous, value);
 #elif BUILDFLAG(IS_POSIX)
   PrepareToPass(options.fds_to_remap, value);
@@ -155,15 +145,7 @@ void PlatformChannelEndpoint::ProcessLaunchAttempted() {
 // static
 PlatformChannelEndpoint PlatformChannelEndpoint::RecoverFromString(
     std::string_view value) {
-#if BUILDFLAG(IS_WIN)
-  int handle_value = 0;
-  if (value.empty() || !base::StringToInt(value, &handle_value)) {
-    DLOG(ERROR) << "Invalid PlatformChannel endpoint string.";
-    return PlatformChannelEndpoint();
-  }
-  return PlatformChannelEndpoint(
-      PlatformHandle(base::win::ScopedHandle(LongToHandle(handle_value))));
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   base::GlobalDescriptors::Key key = -1;
   if (value.empty() || !base::StringToUint(value, &key)) {
     DLOG(ERROR) << "Invalid PlatformChannel endpoint string.";

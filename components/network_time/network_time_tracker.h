@@ -45,13 +45,8 @@ class SharedURLLoaderFactory;
 namespace network_time {
 
 // Clock resolution is platform dependent.
-#if BUILDFLAG(IS_WIN)
-inline constexpr int64_t kTicksResolutionMs =
-    base::Time::kMinLowResolutionThresholdMs;
-#else
 // Assume 1ms for non-windows platforms.
 inline constexpr int64_t kTicksResolutionMs = 1;
-#endif
 
 // Feature that enables network time service querying.
 BASE_DECLARE_FEATURE(kNetworkTimeServiceQuerying);

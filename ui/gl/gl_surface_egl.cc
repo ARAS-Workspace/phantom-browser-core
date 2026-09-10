@@ -329,12 +329,6 @@ NativeViewGLSurfaceEGL::NativeViewGLSurfaceEGL(
     : GLSurfaceEGL(display),
       window_(window),
       vsync_provider_external_(std::move(vsync_provider)) {
-#if BUILDFLAG(IS_WIN)
-  RECT windowRect;
-  if (GetClientRect(window_, &windowRect)) {
-    size_ = gfx::Rect(windowRect).size();
-  }
-#endif
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 

@@ -123,11 +123,7 @@ class ConditionalCacheCountingHelperBrowserTest : public InProcessBrowserTest {
 // Tests that ConditionalCacheCountingHelper only counts those cache entries
 // that match the condition.
 // TODO(crbug.com/40816226): The test is flaky on Win.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_Count DISABLED_Count
-#else
 #define MAYBE_Count Count
-#endif
 IN_PROC_BROWSER_TEST_F(ConditionalCacheCountingHelperBrowserTest, MAYBE_Count) {
   // Create 5 entries.
   std::set<std::string> keys1 = {"1", "2", "3", "4", "5"};

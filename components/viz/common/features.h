@@ -29,11 +29,7 @@ VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kBufferQueuePerRenderPass);
 // the underlying issue is investigated (whether it's test-only or not). Using a
 // constexpr rather than a feature to prevent accidental enablement on Windows.
 inline constexpr bool kAllowVizBufferQueueDiscardOnVisibilityChange =
-#if BUILDFLAG(IS_WIN)
-    false;
-#else
     true;
-#endif
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(
     kVizBufferQueueDiscardOnVisibilityChange);
 
@@ -50,22 +46,10 @@ VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kDrawQuadSplitLimit);
 enum class DelegatedCompositingMode {
   // Enable delegated compositing.
   kFull,
-#if BUILDFLAG(IS_WIN)
-  // Enable partially delegated compositing. In this mode, the web contents will
-  // be forced into its own render pass instead of merging into the root pass.
-  // This effectively makes it so only the browser UI quads get delegated
-  // compositing.
-  kLimitToUi,
-#endif
 };
 extern const VIZ_COMMON_EXPORT base::FeatureParam<DelegatedCompositingMode>
     kDelegatedCompositingModeParam;
 
-#if BUILDFLAG(IS_WIN)
-VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kDCompSurfacesForDelegatedInk);
-VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kRemoveRedirectionBitmap);
-VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kBufferQueue);
-#endif
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(kUseDrmBlackFullscreenOptimization);
 #if BUILDFLAG(IS_ANDROID)
 VIZ_COMMON_EXPORT BASE_DECLARE_FEATURE(
@@ -178,9 +162,6 @@ VIZ_COMMON_EXPORT bool IsDelegatedCompositingEnabled();
 VIZ_COMMON_EXPORT bool IsVizDirectCompositorThreadIpcNonRootEnabled();
 VIZ_COMMON_EXPORT bool IsVizDirectCompositorThreadIpcFrameSinkManagerEnabled();
 VIZ_COMMON_EXPORT bool IsVizWithIoMessagePumpEnabled();
-#if BUILDFLAG(IS_WIN)
-VIZ_COMMON_EXPORT bool ShouldRemoveRedirectionBitmap();
-#endif
 VIZ_COMMON_EXPORT bool IsUsingVizFrameSubmissionForWebView();
 VIZ_COMMON_EXPORT bool IsUsingPreferredIntervalForVideo();
 VIZ_COMMON_EXPORT bool ShouldWebRtcLogCapturePipeline();

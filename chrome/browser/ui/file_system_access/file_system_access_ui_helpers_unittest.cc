@@ -48,9 +48,6 @@ static const struct UnaryTestData cases[] = {
     {FILE_PATH_LITERAL("[:"), u"[:"},
     {FILE_PATH_LITERAL("`:"), u"`:"},
     {FILE_PATH_LITERAL("{:"), u"{:"},
-#if BUILDFLAG(IS_WIN)
-    {FILE_PATH_LITERAL("\u0143:"), u"\u0143:"},
-#endif  // BUILDFLAG(IS_WIN)
 #if defined(FILE_PATH_USES_DRIVE_LETTERS)
     {FILE_PATH_LITERAL("c:"), u"c:"},
     {FILE_PATH_LITERAL("C:"), u"C:"},

@@ -1622,7 +1622,7 @@ AXNode::GetExtraMacNodes() const {
   return &table_info->extra_mac_nodes;
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 AXNode* AXNode::GetExtraAnnouncementNode(
     ax::mojom::AriaNotificationPriority priority_property) const {
   if (!tree_->extra_announcement_nodes()) {
@@ -1637,7 +1637,7 @@ AXNode* AXNode::GetExtraAnnouncementNode(
   }
   NOTREACHED();
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX)
 
 bool AXNode::IsGenerated() const {
   bool is_generated_node = id() < 0 && id() > kInitialEmptyDocumentRootNodeID;
@@ -1650,7 +1650,7 @@ bool AXNode::IsGenerated() const {
       GetRole() == ax::mojom::Role::kColumn ||
       GetRole() == ax::mojom::Role::kTableHeaderContainer;
   DCHECK_EQ(is_generated_node, is_extra_mac_node_role);
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#elif BUILDFLAG(IS_LINUX)
   // On Linux and Windows, generated nodes are always children of the root, but
   // not necessarily the root tree.
   if (GetParent() && GetParent()->GetManager()) {
@@ -2390,16 +2390,6 @@ bool AXNode::IsLeaf() const {
   int child_count = GetUnignoredChildCountCrossingTreeBoundary();
   if (!child_count)
     return true;
-
-#if BUILDFLAG(IS_WIN)
-  // On Windows, we want to hide the subtree of a collapsed <select> element.
-  // Otherwise, ATs are always going to announce its options whether it's
-  // collapsed or expanded. In the AXTree, this element corresponds to a node
-  // with role ax::mojom::Role::kComboBoxSelect that is the parent of a node
-  // with // role ax::mojom::Role::kMenuListPopup.
-  if (IsCollapsedMenuListSelect())
-    return true;
-#endif  // BUILDFLAG(IS_WIN)
 
   // These types of objects may have children that we use as internal
   // implementation details, but we want to expose them as leaves to platform

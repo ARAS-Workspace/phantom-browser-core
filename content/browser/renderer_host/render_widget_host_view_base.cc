@@ -60,10 +60,6 @@
 #include "ui/ozone/public/ozone_platform.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "content/browser/renderer_host/input/stylus_handwriting_controller_win.h"
-#endif
-
 namespace content {
 
 void RenderWidgetHostViewBase::OnUnconfirmedTapConvertedToTap() {}
@@ -78,19 +74,6 @@ RenderWidgetHostViewBase::RenderWidgetHostViewBase(RenderWidgetHost* host)
 RenderWidgetHostViewBase::~RenderWidgetHostViewBase() {
   CHECK(!keyboard_locked_);
   CHECK(!IsPointerLocked());
-#if BUILDFLAG(IS_WIN)
-  if (StylusHandwritingControllerWin::IsHandwritingAPIAvailable()) {
-    StylusHandwritingControllerWin::GetInstance()->OnHandwritingViewDestroyed(
-        this);
-  }
-#endif  // BUILDFLAG(IS_WIN)
-  // We call this here to guarantee that observers are notified before we go
-  // away. However, some subclasses may wish to call this earlier in their
-  // shutdown process, e.g. to force removal from
-  // RenderWidgetHostInputEventRouter's surface map before relinquishing a
-  // host pointer. There is no harm in calling NotifyObserversAboutShutdown()
-  // twice, as the observers are required to de-register on the first call, and
-  // so the second call does nothing.
   NotifyObserversAboutShutdown();
   // If we have a live reference to |text_input_manager_|, we should unregister
   // so that the |text_input_manager_| will free its state.

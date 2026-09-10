@@ -18,9 +18,6 @@ class ShaderTranslatorTest : public testing::Test {
 
  protected:
   void SetUp() override {
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-    GTEST_SKIP() << "Angle doesn't support OpenGL on Windows";
-#else
     ShBuiltInResources resources;
     sh::InitBuiltInResources(&resources);
     resources.MaxExpressionComplexity = 32;
@@ -35,7 +32,6 @@ class ShaderTranslatorTest : public testing::Test {
     ASSERT_TRUE(fragment_translator_->Init(GL_FRAGMENT_SHADER, SH_GLES2_SPEC,
                                            &resources, SH_ESSL_OUTPUT, {},
                                            false));
-#endif  //  BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
   }
   void TearDown() override {
     vertex_translator_ = nullptr;
@@ -53,9 +49,6 @@ class ES3ShaderTranslatorTest : public testing::Test {
 
  protected:
   void SetUp() override {
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-    GTEST_SKIP() << "Angle doesn't support OpenGL on Windows";
-#else
     ShBuiltInResources resources;
     sh::InitBuiltInResources(&resources);
     resources.MaxExpressionComplexity = 32;
@@ -70,7 +63,6 @@ class ES3ShaderTranslatorTest : public testing::Test {
     ASSERT_TRUE(fragment_translator_->Init(GL_FRAGMENT_SHADER, SH_GLES3_SPEC,
                                            &resources, SH_ESSL_OUTPUT, {},
                                            false));
-#endif  //  BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
   }
   void TearDown() override {
     vertex_translator_ = nullptr;
@@ -443,11 +435,6 @@ TEST_F(ShaderTranslatorTest, OptionsString) {
 class ShaderTranslatorOutputVersionTest
     : public testing::TestWithParam<testing::tuple<const char*, const char*>> {
  public:
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-  void SetUp() override {
-    GTEST_SKIP() << "Angle doesn't support OpenGL on Windows";
-  }
-#endif
 };
 
 TEST_P(ShaderTranslatorOutputVersionTest, HasCorrectOutputGLSLVersion) {

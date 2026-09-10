@@ -125,8 +125,6 @@ RTLookupRequest::OSType GetRTLookupRequestOSType() {
   return RTLookupRequest::OS_TYPE_LINUX;
 #elif BUILDFLAG(IS_MAC)
   return RTLookupRequest::OS_TYPE_MAC;
-#elif BUILDFLAG(IS_WIN)
-  return RTLookupRequest::OS_TYPE_WINDOWS;
 #else
   return RTLookupRequest::OS_TYPE_UNSPECIFIED;
 #endif

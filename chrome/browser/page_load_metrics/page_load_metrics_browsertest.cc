@@ -1016,7 +1016,7 @@ IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest, NoPaintForEmptyDocument) {
 }
 
 // TODO(crbug.com/41472183): Flaky on Win and Linux.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_NoPaintForEmptyDocumentInChildFrame \
   DISABLED_NoPaintForEmptyDocumentInChildFrame
 #else
@@ -1100,11 +1100,7 @@ IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest, PaintInMultipleChildFrames) {
 }
 
 // TODO(crbug.com/334416161): Re-enable this test on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PaintInMainAndChildFrame DISABLED_PaintInMainAndChildFrame
-#else
 #define MAYBE_PaintInMainAndChildFrame PaintInMainAndChildFrame
-#endif
 IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest,
                        MAYBE_PaintInMainAndChildFrame) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -1298,11 +1294,7 @@ IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest, DocumentWriteBlock) {
 }
 
 // TODO(crbug.com/334416161): Re-enable this test on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DocumentWriteReload DISABLED_DocumentWriteReload
-#else
 #define MAYBE_DocumentWriteReload DocumentWriteReload
-#endif
 IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest, MAYBE_DocumentWriteReload) {
   ASSERT_TRUE(embedded_test_server()->Start());
 
@@ -2412,11 +2404,7 @@ IN_PROC_BROWSER_TEST_F(PageLoadMetricsResourceLoadBrowserTest,
 }
 
 // TODO(crbug.com/334416161): Re-enable this test on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_InputEventsForClick DISABLED_InputEventsForClick
-#else
 #define MAYBE_InputEventsForClick InputEventsForClick
-#endif
 IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest, MAYBE_InputEventsForClick) {
   embedded_test_server()->ServeFilesFromSourceDirectory("content/test/data");
   content::SetupCrossSiteRedirector(embedded_test_server());
@@ -2818,11 +2806,7 @@ IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest, InputEventsForOmniboxMatch) {
 }
 
 // TODO(crbug.com/334416161): Re-enable this test on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_InputEventsForJavaScriptHref DISABLED_InputEventsForJavaScriptHref
-#else
 #define MAYBE_InputEventsForJavaScriptHref InputEventsForJavaScriptHref
-#endif
 IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest,
                        MAYBE_InputEventsForJavaScriptHref) {
   embedded_test_server()->ServeFilesFromSourceDirectory("content/test/data");
@@ -3534,8 +3518,7 @@ INSTANTIATE_TEST_SUITE_P(
                        blink::kChromeUIProcessInternalsURL}));
 
 // Test is flaky. https://crbug.com/40202043
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 #define MAYBE_PageLCPAnimatedImage DISABLED_PageLCPAnimatedImage
 #else
 #define MAYBE_PageLCPAnimatedImage PageLCPAnimatedImage
@@ -3617,11 +3600,7 @@ IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest, SameOriginNavigation) {
 }
 
 // TODO(crbug.com/334416161): Re-enable this test on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CrossOriginNavigation DISABLED_CrossOriginNavigation
-#else
 #define MAYBE_CrossOriginNavigation CrossOriginNavigation
-#endif
 IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTest,
                        MAYBE_CrossOriginNavigation) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -3671,13 +3650,8 @@ class PageLoadMetricsBrowserTestWithFencedFrames
 };
 
 // TODO(crbug.com/334416161): Re-enable this test on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PageLoadPrivacySandboxAdsFencedFramesMetrics \
-  DISABLED_PageLoadPrivacySandboxAdsFencedFramesMetrics
-#else
 #define MAYBE_PageLoadPrivacySandboxAdsFencedFramesMetrics \
   PageLoadPrivacySandboxAdsFencedFramesMetrics
-#endif
 IN_PROC_BROWSER_TEST_F(PageLoadMetricsBrowserTestWithFencedFrames,
                        MAYBE_PageLoadPrivacySandboxAdsFencedFramesMetrics) {
   ASSERT_TRUE(https_server().Start());

@@ -41,13 +41,6 @@
 #include "content/public/common/content_features.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/aura/test/aura_test_utils.h"
-#include "ui/aura/window.h"
-#include "ui/aura/window_tree_host.h"
-#include "ui/base/ui_base_features.h"
-#endif
-
 namespace content {
 namespace {
 
@@ -376,56 +369,6 @@ IN_PROC_BROWSER_TEST_F(WebContentsVideoCaptureDeviceBrowserTest,
   WaitForFrameWithColor(SK_ColorGREEN);
 }
 
-#if BUILDFLAG(IS_WIN)
-class WebContentsVideoCaptureDeviceBrowserTestAura
-    : public WebContentsVideoCaptureDeviceBrowserTest {
- public:
-  // WebContentsVideoCaptureDeviceBrowserTest:
-  void SetUp() override {
-    scoped_feature_list_.InitAndEnableFeatureWithParameters(
-        features::kApplyNativeOcclusionToCompositor,
-        {{features::kApplyNativeOcclusionToCompositorType.name,
-          features::kApplyNativeOcclusionToCompositorTypeRelease}});
-
-    WebContentsVideoCaptureDeviceBrowserTest::SetUp();
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-// Verifies capture still works if the WindowTreeHost is occluded.
-// TODO(crbug.com/372481179): Failing on win-asan.
-#if defined(ADDRESS_SANITIZER) && BUILDFLAG(IS_WIN)
-#define MAYBE_CapturesWhenOccluded DISABLED_CapturesWhenOccluded
-#else
-#define MAYBE_CapturesWhenOccluded CapturesWhenOccluded
-#endif
-IN_PROC_BROWSER_TEST_F(WebContentsVideoCaptureDeviceBrowserTestAura,
-                       MAYBE_CapturesWhenOccluded) {
-  aura::WindowTreeHost* window_tree_host = shell()->window()->GetHost();
-  aura::test::DisableNativeWindowOcclusionTracking(window_tree_host);
-  NavigateToInitialDocument();
-  AllocateAndStartAndWaitForFirstFrame();
-  EXPECT_TRUE(shell()->web_contents()->IsBeingCaptured());
-
-  // Make a content change in the first page and wait for capture to reflect
-  // that.
-  ChangePageContentColor(SK_ColorRED);
-  WaitForFrameWithColor(SK_ColorRED);
-
-  // Simulate the WindowTreeHost being occluded.
-  window_tree_host->SetNativeWindowOcclusionState(
-      aura::Window::OcclusionState::OCCLUDED, {});
-
-  EXPECT_TRUE(shell()->web_contents()->IsBeingCaptured());
-
-  // Make a change and ensure it was captured.
-  ChangePageContentColor(SK_ColorGREEN);
-  WaitForFrameWithColor(SK_ColorGREEN);
-}
-#endif
-
 // Tests that capture is re-targetted when a renderer crash is followed by a
 // reload. Regression test for http://crbug.com/916332.
 // TODO(crbug.com/40947039): Fails with MSAN. Determine if enabling the test for
@@ -433,8 +376,7 @@ IN_PROC_BROWSER_TEST_F(WebContentsVideoCaptureDeviceBrowserTestAura,
 // TODO(crbug.com/328658521): It is also flaky on macOS.
 // TODO(crbug.com/372481179): Failing on win-asan.
 // TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
-#if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_MAC) || \
-    (BUILDFLAG(IS_WIN) && (defined(ADDRESS_SANITIZER) || !defined(NDEBUG)))
+#if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_MAC)
 #define MAYBE_RecoversAfterRendererCrash DISABLED_RecoversAfterRendererCrash
 #else
 #define MAYBE_RecoversAfterRendererCrash RecoversAfterRendererCrash
@@ -563,19 +505,6 @@ class WebContentsVideoCaptureDeviceBrowserTestP
 
   void SetUpCommandLine(base::CommandLine* command_line) override {
     WebContentsVideoCaptureDeviceBrowserTest::SetUpCommandLine(command_line);
-#if BUILDFLAG(IS_WIN)
-    if (!IsSoftwareCompositingTest()) {
-      // In order to test the NV12 code-path, we need to use hardware GPU in the
-      // tests as the product code checks whether hardware when deciding whether
-      // NV12 is used.
-      // NOTE: Pre-existing comment in `ContentCaptureDeviceBrowserTestBase`
-      // suggested that this can cause the tests to take 12+ seconds just to
-      // spin up a render process on debug builds. It can also cause test
-      // failures in MSAN builds, or exacerbate OOM situations on highly-loaded
-      // machines.
-      command_line->AppendSwitch(switches::kUseGpuInTests);
-    }
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
     // Disable RenderDocument temporarily while we figure out why the test
@@ -618,7 +547,7 @@ INSTANTIATE_TEST_SUITE_P(
                         true /* page contains a cross-site iframe */),
         testing::Values(media::VideoPixelFormat::PIXEL_FORMAT_I420)),
     &WebContentsVideoCaptureDeviceBrowserTestP::GetDescription);
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#elif BUILDFLAG(IS_MAC)
 // On MacOS, there is a newly added support for NV12-in-GMB. It relies on GPU
 // acceleration, but has a feature detection built-in if the format is
 // specified as media::VideoPixelFormat::PIXEL_FORMAT_UNKNOWN.
@@ -661,8 +590,7 @@ INSTANTIATE_TEST_SUITE_P(
 // TODO(crbug.com/540031290): Also flaky on Win ASAN.
 #if defined(MEMORY_SANITIZER) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
     (BUILDFLAG(IS_CHROMEOS) && defined(ADDRESS_SANITIZER)) ||                \
-    (BUILDFLAG(IS_CHROMEOS) && !defined(NDEBUG)) ||                          \
-    (BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER))
+    (BUILDFLAG(IS_CHROMEOS) && !defined(NDEBUG))
 #define MAYBE_CapturesContentChanges DISABLED_CapturesContentChanges
 #else
 #define MAYBE_CapturesContentChanges CapturesContentChanges

@@ -68,10 +68,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://default-browser-modal",
 #endif
 
-#if BUILDFLAG(IS_WIN)
-      "chrome://default-browser",
-#endif
-
       "chrome://debug-webuis-disabled",
       "chrome://device-log",
       "chrome://download-internals",
@@ -127,7 +123,7 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://omnibox",
       "chrome://on-device-internals",
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       "chrome://on-device-translation-internals",
 #endif
 
@@ -189,7 +185,7 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
       "chrome://webxr-internals",
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
       "chrome://whats-new",
 #endif
 
@@ -264,9 +260,6 @@ base::span<const std::string_view> GetChromeUrlsForTest() {
 #if !BUILDFLAG(IS_MAC)
       // TODO(crbug.com/40772380): this test is flaky on mac.
       "chrome://bluetooth-internals",
-#endif
-#if BUILDFLAG(IS_WIN)
-      "chrome://conflicts",
 #endif
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
       "chrome://signin-dice-web-intercept.top-chrome/?debug",

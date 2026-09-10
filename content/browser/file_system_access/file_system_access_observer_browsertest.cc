@@ -60,53 +60,16 @@ enum class CreateSymbolicLinkResult {
   kSucceeded,
 };
 
-#if BUILDFLAG(IS_WIN)
-CreateSymbolicLinkResult CreateWinSymbolicLink(const base::FilePath& target,
-                                               const base::FilePath& symlink,
-                                               bool is_directory = false) {
-  // Creating symbolic links on Windows requires Administrator privileges.
-  // However, recent versions of Windows introduced the
-  // SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE flag, which allows the
-  // creation of symbolic links by processes with lower privileges, provided
-  // that Developer Mode is enabled.
-  //
-  // On older versions of Windows where the
-  // SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE flag does not exist, the OS
-  // will return the error code ERROR_INVALID_PARAMETER when attempting to
-  // create a symbolic link without sufficient privileges.
-  if (base::win::GetVersion() < base::win::Version::WIN10_RS3) {
-    return CreateSymbolicLinkResult::kUnsupported;
-  }
-
-  DWORD flags = is_directory ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0;
-
-  if (!::CreateSymbolicLink(
-          symlink.value().c_str(), target.value().c_str(),
-          flags | SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE)) {
-    // SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE works only if Developer
-    // Mode is enabled.
-    if (::GetLastError() == ERROR_PRIVILEGE_NOT_HELD) {
-      return CreateSymbolicLinkResult::kUnsupported;
-    }
-    return CreateSymbolicLinkResult::kFailed;
-  }
-
-  return CreateSymbolicLinkResult::kSucceeded;
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 CreateSymbolicLinkResult CreateSymbolicLinkForTesting(
     const base::FilePath& target,
     const base::FilePath& symlink) {
   // base::ScopedAllowBlockingForTesting allow_blocking;
-#if BUILDFLAG(IS_WIN)
-  return CreateWinSymbolicLink(target, symlink);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   if (!base::CreateSymbolicLink(target, symlink)) {
     return CreateSymbolicLinkResult::kFailed;
   }
   return CreateSymbolicLinkResult::kSucceeded;
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 }
 
 std::optional<base::FilePath> CreateSymlinkToBePicked(
@@ -232,11 +195,7 @@ std::optional<base::FilePath> CreateSymlinkToBePicked(
 class FileSystemAccessObserverBrowserTestBase : public ContentBrowserTest {
  public:
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    ASSERT_TRUE(temp_dir_.CreateUniqueTempDir());
-    // Convert path to long format to avoid mixing long and 8.3 formats in test.
-    ASSERT_TRUE(temp_dir_.Set(base::MakeLongFilePath(temp_dir_.Take())));
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     // Temporary files in Mac are created under /var/, which is a symlink that
     // resolves to /private/var/. Set `temp_dir_` directly to the resolved file
     // path, given that the expected FSEvents event paths are reported as

@@ -86,7 +86,7 @@ std::optional<std::string> GetDeviceManagerIdentity() {
       g_browser_process->platform_part()->browser_policy_connector_ash();
   return connector->GetEnterpriseDomainManager();
 #else
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(
           features::kEnterpriseManagementDisclaimerUsesCustomLabel)) {
     std::string custom_management_label =
@@ -98,11 +98,7 @@ std::optional<std::string> GetDeviceManagerIdentity() {
       return custom_management_label;
     }
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  // The device is managed as
-  // `policy::ManagementServiceFactory::GetForPlatform()->IsManaged()` returned
-  // true. `policy::GetManagedBy` might return `std::nullopt` if
-  // `policy::CloudPolicyStore` hasn't fully initialized yet.
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   return policy::GetManagedBy(g_browser_process->browser_policy_connector()
                                   ->machine_level_user_cloud_policy_manager())
       .value_or(std::string());
@@ -116,7 +112,7 @@ std::optional<std::string> GetAccountManagerIdentity(Profile* profile) {
     return std::nullopt;
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(
           features::kEnterpriseManagementDisclaimerUsesCustomLabel)) {
     std::string custom_management_label =

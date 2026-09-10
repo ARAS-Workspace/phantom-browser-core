@@ -28,11 +28,7 @@ namespace audio {
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-#define NumberToStringType base::NumberToWString
-#else
 #define NumberToStringType base::NumberToString
-#endif
 
 const base::FilePath::CharType kBaseFileName[] =
     FILE_PATH_LITERAL("debug_recording");

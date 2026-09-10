@@ -6,7 +6,7 @@
 
 #include "build/build_config.h"
 
-static_assert(BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC));
+static_assert(BUILDFLAG(IS_MAC));
 
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/profiles/profile.h"

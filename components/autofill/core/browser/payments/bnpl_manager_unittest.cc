@@ -426,8 +426,7 @@ class BnplManagerTest : public Test,
 };
 
 // BNPL is currently only available for desktop platforms.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Tests that the initial state for a BNPL flow is set when
 // BnplManager::OnUserDecisionToUseBnpl() is triggered.
 TEST_F(BnplManagerTest, OnUserDecisionToUseBnpl_SetsInitialState) {
@@ -2515,8 +2514,7 @@ TEST_F(
       .OnRedirectUrlFetched(PaymentsAutofillClient::PaymentsRpcResult::kSuccess,
                             response);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 #if !BUILDFLAG(IS_IOS)
 
@@ -3515,8 +3513,7 @@ TEST_F(BnplManagerTest,
 }
 #endif  // !BUILDFLAG(IS_IOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 class BnplManagerPayLaterTabTest : public BnplManagerTest {
  public:
   BnplManagerPayLaterTabTest() {
@@ -3957,8 +3954,7 @@ TEST_F(BnplManagerPayLaterTabTest,
       final_checkout_amount);
   EXPECT_FALSE(test_api(*bnpl_manager_).HasSeenAmountExtractionAiTerms());
 }
-#endif  // #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
 TEST_F(BnplManagerTest, OnUserDecisionToUseSavedCards_AndroidStrategy) {

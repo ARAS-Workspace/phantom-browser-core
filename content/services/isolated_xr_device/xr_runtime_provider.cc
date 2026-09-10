@@ -14,13 +14,6 @@
 #include "device/vr/buildflags/buildflags.h"
 #include "device/vr/public/cpp/features.h"
 
-#if BUILDFLAG(ENABLE_OPENXR) && BUILDFLAG(IS_WIN)
-#include "content/public/common/gpu_stream_constants.h"
-#include "device/vr/openxr/openxr_device.h"
-#include "device/vr/openxr/windows/openxr_platform_helper_windows.h"
-#include "services/viz/public/cpp/gpu/context_provider_command_buffer.h"
-#endif
-
 enum class IsolatedXRRuntimeProvider::RuntimeStatus {
   kEnable,
   kDisable,
@@ -98,15 +91,6 @@ void IsolatedXRRuntimeProvider::PollForDeviceChanges() {
   // 'preferred_device_enabled' being unused, thus [[maybe_unused]].
   [[maybe_unused]] bool preferred_device_enabled = false;
 
-#if BUILDFLAG(ENABLE_OPENXR) && BUILDFLAG(IS_WIN)
-  if (!preferred_device_enabled && IsOpenXrHardwareAvailable()) {
-    SetOpenXrRuntimeStatus(RuntimeStatus::kEnable);
-    preferred_device_enabled = true;
-  } else {
-    SetOpenXrRuntimeStatus(RuntimeStatus::kDisable);
-  }
-#endif
-
   // Schedule this function to run again later.
   base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
       FROM_HERE,
@@ -121,17 +105,6 @@ void IsolatedXRRuntimeProvider::SetupPollingForDeviceChanges() {
       base::CommandLine::ForCurrentProcess();
   // If none of the following runtimes are enabled, we'll get an error for
   // 'command_line' being unused, thus [[maybe_unused]].
-
-#if BUILDFLAG(ENABLE_OPENXR) && BUILDFLAG(IS_WIN)
-  if (IsEnabled(command_line, device::features::kOpenXR,
-                switches::kWebXrRuntimeOpenXr)) {
-    openxr_platform_helper_ =
-        std::make_unique<device::OpenXrPlatformHelperWindows>();
-    should_check_openxr_ = openxr_platform_helper_->EnsureInitialized() &&
-                           openxr_platform_helper_->IsApiAvailable();
-    any_runtimes_available |= should_check_openxr_;
-  }
-#endif
 
   // Begin polling for devices
   if (any_runtimes_available) {
@@ -148,61 +121,6 @@ void IsolatedXRRuntimeProvider::RequestDevices(
   client_->OnDevicesEnumerated();
 }
 
-#if BUILDFLAG(ENABLE_OPENXR) && BUILDFLAG(IS_WIN)
-bool IsolatedXRRuntimeProvider::IsOpenXrHardwareAvailable() {
-  return should_check_openxr_ && openxr_platform_helper_->IsHardwareAvailable();
-}
-
-void IsolatedXRRuntimeProvider::SetOpenXrRuntimeStatus(RuntimeStatus status) {
-  auto factory_async = base::BindRepeating(
-      &IsolatedXRRuntimeProvider::CreateContextProviderAsync,
-      weak_ptr_factory_.GetWeakPtr());
-  SetRuntimeStatus(client_.get(), status,
-                   base::BindOnce(
-                       [](VizContextProviderFactoryAsync factory_async,
-                          device::OpenXrPlatformHelper* platform_helper) {
-                         return std::make_unique<device::OpenXrDevice>(
-                             std::move(factory_async), platform_helper);
-                       },
-                       std::move(factory_async), openxr_platform_helper_.get()),
-                   &openxr_device_);
-}
-
-// A repeating callback to CreateContextProviderAsync is created in
-// SetOpenXrRuntimeStatus and passed to OpenXrDevice. OpenXrRenderLoop posts a
-// task with this callback onto the main thread's task runner while it is
-// running on the render loop thread's task runner. The context provider and its
-// supporting object, viz::Gpu, are required to be created on the main thread's
-// task runner. The RenderLoop is expected to use BindPostTask to ensure that
-// the VizContextProviderCallback sends the ContextProvider to the appropriate
-// thread.
-void IsolatedXRRuntimeProvider::CreateContextProviderAsync(
-    VizContextProviderCallback viz_context_provider_callback) {
-  // viz_gpu_ must be kept alive so long as there are outstanding context
-  // providers attached to it, otherwise the GPU process channel gets closed out
-  // from under it.
-  if (!viz_gpu_ || !viz_gpu_->GetGpuChannel() ||
-      viz_gpu_->GetGpuChannel()->IsLost()) {
-    mojo::PendingRemote<viz::mojom::Gpu> remote_gpu;
-    device_service_host_->BindGpu(remote_gpu.InitWithNewPipeAndPassReceiver());
-
-    viz_gpu_ = viz::Gpu::Create(std::move(remote_gpu), io_task_runner_);
-
-    scoped_refptr<gpu::GpuChannelHost> gpu_channel_host =
-        viz_gpu_->EstablishGpuChannelSync();
-  }
-
-  scoped_refptr<viz::ContextProvider> context_provider =
-      viz::ContextProviderCommandBuffer::CreateForGL(
-          viz_gpu_->GetGpuChannel(), content::kGpuStreamIdDefault,
-          content::kGpuStreamPriorityUI, GURL("chrome://gpu/XrRuntime"),
-          viz::command_buffer_metrics::ContextType::XR_COMPOSITING);
-
-  std::move(viz_context_provider_callback).Run(context_provider);
-}
-
-#endif  // BUILDFLAG(ENABLE_OPENXR) && BUILDFLAG(IS_WIN)
-
 IsolatedXRRuntimeProvider::IsolatedXRRuntimeProvider(
     mojo::PendingRemote<device::mojom::XRDeviceServiceHost> device_service_host,
     scoped_refptr<base::SingleThreadTaskRunner> io_task_runner)
@@ -210,9 +128,4 @@ IsolatedXRRuntimeProvider::IsolatedXRRuntimeProvider(
       io_task_runner_(std::move(io_task_runner)) {}
 
 IsolatedXRRuntimeProvider::~IsolatedXRRuntimeProvider() {
-#if BUILDFLAG(ENABLE_OPENXR) && BUILDFLAG(IS_WIN)
-  // Ensure that the OpenXrPlatformHelper outlives the OpenXrDevice
-  openxr_device_.reset();
-  openxr_platform_helper_.reset();
-#endif
 }

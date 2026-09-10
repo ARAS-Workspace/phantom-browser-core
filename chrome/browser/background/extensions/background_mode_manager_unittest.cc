@@ -59,10 +59,6 @@
 #include "components/user_manager/user_manager_impl.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/startup/startup_launch_manager.h"
-#endif
-
 using auto_launch_util::StartupLaunchMode;
 using extensions::mojom::ManifestLocation;
 using testing::_;
@@ -119,19 +115,6 @@ class TestStatusIcon : public StatusIcon {
                       const message_center::NotifierId& notifier_id) override {}
   void UpdatePlatformContextMenu(StatusIconMenuModel* menu) override {}
 };
-
-#if BUILDFLAG(IS_WIN)
-class TestStartupLaunchManager : public StartupLaunchManager {
- public:
-  explicit TestStartupLaunchManager(BrowserProcess* browser_process)
-      : StartupLaunchManager(browser_process) {
-    CommitLaunchOnStartupState();
-  }
-
-  MOCK_METHOD1(UpdateLaunchOnStartup,
-               void(std::optional<StartupLaunchMode> startup_mode));
-};
-#endif
 
 void AssertBackgroundModeActive(const TestBackgroundModeManager& manager) {
   EXPECT_TRUE(KeepAliveRegistry::GetInstance()->IsKeepingAlive());
@@ -227,19 +210,6 @@ class BackgroundModeManagerTest : public testing::Test {
             raw_ptr<policy::ConfigurationPolicyProvider, VectorExperimental>>{
             &policy_provider_});
 
-#if BUILDFLAG(IS_WIN)
-    // Explicitly disable foreground launches.
-    g_browser_process->local_state()->SetBoolean(
-        prefs::kForegroundLaunchOnLogin, false);
-
-    startup_launch_manager_override_ =
-        GlobalFeatures::GetUserDataFactoryForTesting().AddOverrideForTesting(
-            base::BindRepeating([](BrowserProcess& browser_process) {
-              return std::make_unique<TestStartupLaunchManager>(
-                  &browser_process);
-            }));
-#endif  // BUILDFLAG(IS_WIN)
-
     // Initialize StartupLaunchManager in GlobalFeatures.
     profile_manager_ =
         TestingBrowserProcess::GetGlobal()->SetUpGlobalFeaturesForTesting(
@@ -257,28 +227,10 @@ class BackgroundModeManagerTest : public testing::Test {
     TestingBrowserProcess::GetGlobal()->TearDownGlobalFeaturesForTesting();
   }
 
-#if BUILDFLAG(IS_WIN)
-  TestStartupLaunchManager* startup_launch_manager() {
-    return static_cast<TestStartupLaunchManager*>(
-        StartupLaunchManager::From(g_browser_process));
-  }
-#endif
-
   void ExpectStartupRegistration(bool launch_enabled, int count = 1) {
-#if BUILDFLAG(IS_WIN)
-    std::optional<StartupLaunchMode> launch_mode;
-    if (launch_enabled) {
-      launch_mode = StartupLaunchMode::kBackground;
-    }
-    EXPECT_CALL(*startup_launch_manager(), UpdateLaunchOnStartup(launch_mode))
-        .Times(count);
-#endif
   }
 
   void VerifyAndClearStartupRegistrationExpectations() {
-#if BUILDFLAG(IS_WIN)
-    Mock::VerifyAndClearExpectations(startup_launch_manager());
-#endif
   }
 
  protected:
@@ -304,15 +256,6 @@ class BackgroundModeManagerWithExtensionsTest : public testing::Test {
   void SetUp() override {
     command_line_ =
         std::make_unique<base::CommandLine>(base::CommandLine::NO_PROGRAM);
-
-#if BUILDFLAG(IS_WIN)
-    startup_launch_manager_override_ =
-        GlobalFeatures::GetUserDataFactoryForTesting().AddOverrideForTesting(
-            base::BindRepeating([](BrowserProcess& browser_process) {
-              return std::make_unique<TestStartupLaunchManager>(
-                  &browser_process);
-            }));
-#endif
 
     profile_manager_ =
         TestingBrowserProcess::GetGlobal()->SetUpGlobalFeaturesForTesting(
@@ -359,28 +302,10 @@ class BackgroundModeManagerWithExtensionsTest : public testing::Test {
     browser_shutdown::SetTryingToQuit(false);
   }
 
-#if BUILDFLAG(IS_WIN)
-  TestStartupLaunchManager* startup_launch_manager() {
-    return static_cast<TestStartupLaunchManager*>(
-        StartupLaunchManager::From(g_browser_process));
-  }
-#endif
-
   void ExpectStartupRegistration(bool launch_enabled) {
-#if BUILDFLAG(IS_WIN)
-    std::optional<StartupLaunchMode> launch_mode;
-    if (launch_enabled) {
-      launch_mode = StartupLaunchMode::kBackground;
-    }
-    EXPECT_CALL(*startup_launch_manager(), UpdateLaunchOnStartup(launch_mode))
-        .Times(1);
-#endif
   }
 
   void VerifyAndClearStartupRegistrationExpectations() {
-#if BUILDFLAG(IS_WIN)
-    Mock::VerifyAndClearExpectations(startup_launch_manager());
-#endif
   }
 
  protected:

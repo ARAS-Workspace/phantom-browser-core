@@ -38,24 +38,12 @@
 #include "content/public/browser/web_contents.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/install_static/install_util.h"
-#include "chrome/installer/util/shell_util.h"
-#include "ui/views/win/hwnd_util.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace pdf::infobar {
 namespace {
 
 // Returns true if `browser` supports being set as default and is a normal,
 // non-incognito, non-guest browser.
 bool IsAppropriateForInfoBar(BrowserWindowInterface* browser) {
-#if BUILDFLAG(IS_WIN)
-  // On Windows, some install modes don't support being set as default.
-  if (!install_static::SupportsSetAsDefaultBrowser()) {
-    return false;
-  }
-#endif  // BUILDFLAG(IS_WIN)
   if (browser->GetType() != BrowserWindowInterface::TYPE_NORMAL) {
     return false;
   }
@@ -68,57 +56,6 @@ bool IsAppropriateForInfoBar(BrowserWindowInterface* browser) {
 
 }  // namespace
 
-#if BUILDFLAG(IS_WIN)
-// static
-void PdfInfoBarController::RecordSettingsResult(
-    ShellUtil::ShowSystemUIResult result) {
-  auto record_settings_result = base::BindOnce(
-      [](ShellUtil::ShowSystemUIResult result) {
-        switch (result) {
-          case ShellUtil::ShowSystemUIResult::kNotShown: {
-            PdfInfoBarController::RecordSettingsResultHistogram(
-                PdfInfoBarSettingsResult::kNotShown);
-            break;
-          }
-          case ShellUtil::ShowSystemUIResult::kError: {
-            PdfInfoBarController::RecordSettingsResultHistogram(
-                PdfInfoBarSettingsResult::kError);
-            break;
-          }
-          case ShellUtil::ShowSystemUIResult::kSuccess: {
-            PdfInfoBarController::RecordSettingsResultHistogram(
-                shell_integration::IsDefaultHandlerForFileExtension(".pdf")
-                    ? PdfInfoBarSettingsResult::kSuccess
-                    : PdfInfoBarSettingsResult::kSuccessNoChange);
-            break;
-          }
-          case ShellUtil::ShowSystemUIResult::kFallback: {
-            PdfInfoBarController::RecordSettingsResultHistogram(
-                shell_integration::IsDefaultHandlerForFileExtension(".pdf")
-                    ? PdfInfoBarSettingsResult::kFallback
-                    : PdfInfoBarSettingsResult::kFallbackNoChange);
-          }
-        }
-      },
-      result);
-
-  // Check whether Chrome has been set as default after a short delay, to wait
-  // for the user to interact with the settings UI (while the "Select a default
-  // app for .pdf files" pop-up only returns after it closes, the fallback
-  // "Default apps" page returns right after opening).
-  base::ThreadPool::PostDelayedTask(
-      FROM_HERE,
-      {base::MayBlock(), base::TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN},
-      std::move(record_settings_result), base::Seconds(30));
-}
-
-// static
-void PdfInfoBarController::RecordSettingsResultHistogram(
-    PdfInfoBarSettingsResult result) {
-  base::UmaHistogramEnumeration("PDF.InfoBar.SettingsResult", result);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 // static
 void PdfInfoBarController::RecordUserInteractionHistogram(
     PdfInfoBarUserInteraction interaction) {
@@ -130,19 +67,6 @@ void PdfInfoBarController::SetAsDefaultPdfHandler(
     content::WebContents* web_contents) {
 #if BUILDFLAG(IS_MAC)
   shell_integration::SetAsDefaultHandlerForUTType("com.adobe.pdf");
-#elif BUILDFLAG(IS_WIN)
-  if (!web_contents) {
-    return;
-  }
-  auto* window = web_contents->GetTopLevelNativeWindow();
-  base::ThreadPool::PostTaskAndReplyWithResult(
-      FROM_HERE,
-      {base::MayBlock(), base::TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN},
-      base::BindOnce(&ShellUtil::ShowSetDefaultForFileExtensionSystemUI,
-                     base::PathService::CheckedGet(base::FILE_EXE),
-                     base::wcstring_view(L".pdf"),
-                     views::HWNDForNativeWindow(window)),
-      base::BindOnce(&PdfInfoBarController::RecordSettingsResult));
 #else
 #error PdfInfoBarController/Delegate should only be used on Windows or MacOS
 #endif
@@ -286,9 +210,6 @@ void PdfInfoBarController::MaybeShowInfoBar() {
 #if BUILDFLAG(IS_MAC)
   auto is_default_pdf_viewer_callback = base::BindOnce(
       &shell_integration::IsDefaultHandlerForUTType, "com.adobe.pdf");
-#elif BUILDFLAG(IS_WIN)
-  auto is_default_pdf_viewer_callback = base::BindOnce(
-      &shell_integration::IsDefaultHandlerForFileExtension, ".pdf");
 #else
 #error PdfInfoBarController should only be created on Windows or MacOS
 #endif

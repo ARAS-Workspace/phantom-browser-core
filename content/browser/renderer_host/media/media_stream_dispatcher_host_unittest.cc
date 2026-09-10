@@ -338,7 +338,7 @@ class MediaStreamDispatcherHostTest : public RenderViewHostTestHarness {
  public:
   MediaStreamDispatcherHostTest()
       : RenderViewHostTestHarness(
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
             base::test::TaskEnvironment::MainThreadType::UI),
 #else
             base::test::TaskEnvironment::MainThreadType::IO),

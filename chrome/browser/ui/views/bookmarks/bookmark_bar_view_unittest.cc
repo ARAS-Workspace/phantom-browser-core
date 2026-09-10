@@ -327,13 +327,8 @@ TEST_F(BookmarkBarViewTest, OverflowVisibility) {
 // Verifies buttons get added correctly when BookmarkBarView is created after
 // the model and the model has nodes.
 // TODO(crbug.com/375364962): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ButtonsDynamicallyAddedAfterModelHasNodes \
-  DISABLED_ButtonsDynamicallyAddedAfterModelHasNodes
-#else
 #define MAYBE_ButtonsDynamicallyAddedAfterModelHasNodes \
   ButtonsDynamicallyAddedAfterModelHasNodes
-#endif
 TEST_F(BookmarkBarViewTest, MAYBE_ButtonsDynamicallyAddedAfterModelHasNodes) {
   AddNodesToBookmarkBarFromModelString("a b c d e f ");
   EXPECT_EQ(0u, test_helper_->GetBookmarkButtonCount());
@@ -682,7 +677,7 @@ TEST_F(BookmarkBarViewTest, ManagedShowAppsShortcutInBookmarksBar) {
 // Verifies the SavedTabGroupBar's page navigator is set when the
 // bookmarkbarview's page navigator is set.
 // TODO(crbug.com/375364962): Flaky on Windows & Linux.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_PageNavigatorSet DISABLED_PageNavigatorSet
 #else
 #define MAYBE_PageNavigatorSet PageNavigatorSet
@@ -844,7 +839,7 @@ TEST_F(BookmarkBarViewInWidgetTest,
 }
 
 // TODO(crbug.com/375364962): Flaky on Windows & Linux.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_AccessibleRoleDescription DISABLED_AccessibleRoleDescription
 #else
 #define MAYBE_AccessibleRoleDescription AccessibleRoleDescription

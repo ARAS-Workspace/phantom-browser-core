@@ -21,10 +21,6 @@
 #include "ui/gfx/geometry/point_f.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/base/dragdrop/os_exchange_data_provider_win.h"
-#endif
-
 namespace drag_and_drop_test_utils {
 
 namespace {
@@ -73,19 +69,6 @@ bool DragAndDropSimulator::SimulateDragEnter(
   os_exchange_data_->SetFilenames(file_infos);
   return SimulateDragEnter(location, std::move(os_exchange_data_));
 }
-
-#if BUILDFLAG(IS_WIN)
-bool DragAndDropSimulator::SimulateDragEnter(
-    const gfx::Point& location,
-    const std::vector<std::pair<base::FilePath, base::span<const uint8_t>>>&
-        filenames_and_contents,
-    DWORD tymed) {
-  os_exchange_data_ = std::make_unique<ui::OSExchangeData>();
-  os_exchange_data_->provider().SetVirtualFileContentsForTesting(
-      filenames_and_contents, tymed);
-  return SimulateDragEnter(location, std::move(os_exchange_data_));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 bool DragAndDropSimulator::SimulateOmniboxDragEnter(aura::Window* omnibox,
                                                     const gfx::Point& location,

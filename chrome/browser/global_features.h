@@ -25,7 +25,7 @@ class GlobalBrowserCollection;
 namespace system_permission_settings {
 class PlatformHandle;
 }  // namespace system_permission_settings
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 namespace whats_new {
 class WhatsNewRegistry;
 }  // namespace whats_new
@@ -67,10 +67,6 @@ class ProfileLaunchObserver;
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 class GlassFrameService;
-
-#if BUILDFLAG(IS_WIN)
-class StartupLaunchManager;
-#endif
 
 #if BUILDFLAG(ENABLE_DEVICE_BOUND_SESSIONS)
 namespace unexportable_keys {
@@ -150,7 +146,7 @@ class GlobalFeatures {
   system_permissions_platform_handle() {
     return system_permissions_platform_handle_.get();
   }
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   whats_new::WhatsNewRegistry* whats_new_registry() {
     return whats_new_registry_.get();
   }
@@ -182,13 +178,6 @@ class GlobalFeatures {
   ApplicationLocaleStorage* application_locale_storage() {
     return application_locale_storage_.get();
   }
-
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  installer_downloader::InstallerDownloaderController*
-  installer_downloader_controller() {
-    return installer_downloader_controller_.get();
-  }
-#endif
 
   optimization_guide::OptimizationGuideGlobalFeature*
   optimization_guide_global_feature() {
@@ -232,7 +221,7 @@ class GlobalFeatures {
 
   virtual std::unique_ptr<system_permission_settings::PlatformHandle>
   CreateSystemPermissionsPlatformHandle();
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   virtual std::unique_ptr<whats_new::WhatsNewRegistry> CreateWhatsNewRegistry();
 #endif
   virtual std::unique_ptr<GlobalBrowserCollection>
@@ -248,7 +237,7 @@ class GlobalFeatures {
 
   std::unique_ptr<system_permission_settings::PlatformHandle>
       system_permissions_platform_handle_;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   std::unique_ptr<whats_new::WhatsNewRegistry> whats_new_registry_;
 
   std::unique_ptr<default_browser::DefaultBrowserManager>
@@ -267,11 +256,6 @@ class GlobalFeatures {
 
   std::unique_ptr<ApplicationLocaleStorage> application_locale_storage_;
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  std::unique_ptr<installer_downloader::InstallerDownloaderController>
-      installer_downloader_controller_;
-#endif
-
   std::unique_ptr<optimization_guide::OptimizationGuideGlobalFeature>
       optimization_guide_global_feature_;
 
@@ -288,10 +272,6 @@ class GlobalFeatures {
 #if !BUILDFLAG(IS_ANDROID)
   std::unique_ptr<infobars::BrowserInfoBarManager> browser_infobar_manager_;
 #endif
-
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<StartupLaunchManager> startup_launch_manager_;
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_DEVICE_BOUND_SESSIONS)
   std::unique_ptr<

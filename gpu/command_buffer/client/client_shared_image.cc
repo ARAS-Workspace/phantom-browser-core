@@ -51,10 +51,6 @@
 #include "ui/ozone/public/ozone_platform.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "gpu/command_buffer/client/internal/mappable_buffer_dxgi.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "gpu/command_buffer/client/internal/mappable_buffer_ahb.h"
 #endif
@@ -267,21 +263,6 @@ ClientSharedImage::CreateMappableBufferFromHandle(
       return MappableBufferNativePixmap::CreateFromHandle(
           client_native_pixmap_factory.get(), std::move(handle), size, format,
           usage);
-    }
-#endif
-#if BUILDFLAG(IS_WIN)
-    case gfx::DXGI_SHARED_HANDLE: {
-      // DXGI handles require GPU roundtrip for mapping, so they will wait
-      // for event to trigger in async callback.
-      // So the copy callback must execute in internal thread otherwise there
-      // will be a deadlock: the waiting thread would be used to process the
-      // callback reply.
-      auto wrapped_callback = base::BindRepeating(
-          &ClientSharedImage::RunOnTaskRunner, base::Unretained(this),
-          copy_native_buffer_to_shmem_callback);
-      return MappableBufferDXGI::CreateFromHandle(
-          std::move(handle), size, format, std::move(wrapped_callback),
-          std::move(pool));
     }
 #endif
 #if BUILDFLAG(IS_ANDROID)
@@ -789,13 +770,6 @@ ClientSharedImage::BeginGLAccessForCopySharedImage(InterfaceBase* gl_interface,
                                                    bool readonly) {
   return BeginRasterAccess(gl_interface, sync_token, readonly);
 }
-
-#if BUILDFLAG(IS_WIN)
-void ClientSharedImage::SetUsePreMappedMemory(bool use_premapped_memory) {
-  CHECK(mappable_buffer_);
-  mappable_buffer_->SetUsePreMappedMemory(use_premapped_memory);
-}
-#endif
 
 // static
 scoped_refptr<ClientSharedImage> ClientSharedImage::CreateForTesting() {

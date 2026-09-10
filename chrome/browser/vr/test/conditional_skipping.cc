@@ -11,23 +11,10 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "device/vr/windows/d3d11_device_helpers.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace vr {
 
 std::string CheckDirectX_11_1() {
-#if BUILDFLAG(IS_WIN)
-  int32_t adapter_index;
-  GetD3D11_1AdapterIndex(&adapter_index);
-  if (adapter_index == -1) {
-    return "DirectX 11.1 required, but no suitable device found";
-  }
-  return "";
-#else
   return "DirectX 11.1 required, but not on Windows";
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 std::string CheckXrRequirements(

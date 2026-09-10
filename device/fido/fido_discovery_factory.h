@@ -117,13 +117,6 @@ class COMPONENT_EXPORT(DEVICE_FIDO) FidoDiscoveryFactory {
   }
 #endif  // BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-  // Instantiates a FidoDiscovery for the native Windows WebAuthn API where
-  // available. Returns nullptr otherwise.
-  virtual std::unique_ptr<FidoDiscoveryBase>
-  MaybeCreateWinWebAuthnApiDiscovery();
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_CHROMEOS)
   // Sets a callback to generate an identifier when making DBUS requests to
   // u2fd.

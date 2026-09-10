@@ -55,11 +55,6 @@
 #include "base/android/apk_info.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/current_module.h"
-#endif
 
 #if BUILDFLAG(IS_LINUX)
 #include "base/environment.h"
@@ -434,9 +429,6 @@ void MetricsLog::RecordCoreSystemProfile(
   hardware->set_system_ram_mb(
       base::SysInfo::AmountOfTotalPhysicalMemory().InMiB());
   hardware->set_hardware_class(base::SysInfo::HardwareModelName());
-#if BUILDFLAG(IS_WIN)
-  hardware->set_dll_base(reinterpret_cast<uint64_t>(CURRENT_MODULE()));
-#endif
 
   metrics::SystemProfileProto::OS* os = system_profile->mutable_os();
   os->set_name(GetOperatingSystemName());

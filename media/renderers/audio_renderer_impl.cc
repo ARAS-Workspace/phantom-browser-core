@@ -514,12 +514,6 @@ void AudioRendererImpl::OnDeviceInfoReceived(
   // 'expecting_config_changes_' to true to use 'hw_channel_layout'.
   // Refer to
   // https://learn.microsoft.com/en-us/windows/win32/medfound/dolby-audio-decoder
-#if BUILDFLAG(ENABLE_PLATFORM_AC3_EAC3_AUDIO) && BUILDFLAG(IS_WIN)
-  if (current_decoder_config_.codec() == AudioCodec::kAC3 ||
-      current_decoder_config_.codec() == AudioCodec::kEAC3) {
-    expecting_config_changes_ = true;
-  }
-#endif  // BUILDFLAG(ENABLE_PLATFORM_AC3_EAC3_AUDIO) && BUILDFLAG(IS_WIN)
 
   bool use_stream_params =
       !expecting_config_changes_ || !hw_params.IsValid() ||
@@ -607,11 +601,6 @@ void AudioRendererImpl::OnDeviceInfoReceived(
     }
 
     bool try_supported_channel_layouts = false;
-#if BUILDFLAG(IS_WIN)
-    try_supported_channel_layouts =
-        base::CommandLine::ForCurrentProcess()->HasSwitch(
-            switches::kTrySupportedChannelLayouts);
-#endif
 
     // We don't know how to up-mix for DISCRETE layouts (fancy multichannel
     // hardware with non-standard speaker arrangement). Instead, pretend the

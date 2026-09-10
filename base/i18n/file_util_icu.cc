@@ -43,55 +43,11 @@ class IllegalCharacters {
     return !!illegal_at_ends_.contains(ucs4);
   }
 
-#if BUILDFLAG(IS_WIN)
-  bool IsDisallowedShortNameCharacter(UChar32 ucs4) const {
-    return !!illegal_in_short_filenames_.contains(ucs4);
-  }
-
-  bool IsDisallowedIfMayBeShortName(UChar32 ucs4) const {
-    return !!required_to_be_a_short_filename_.contains(ucs4);
-  }
-
-  template <typename StringT>
-  bool HasValidDotPositionForShortName(const StringT& s) const {
-    auto first_dot = s.find_first_of('.');
-    // Short names are not required to have a "." period character...
-    if (first_dot == std::string::npos) {
-      return s.size() <= 8;
-    }
-    // ...but they must not contain more than one "." period character...
-    if (first_dot != s.find_last_of('.')) {
-      return false;
-    }
-    // ... and must contain a basename of 1-8 characters, optionally with one
-    // "." period character followed by an extension no more than 3 characters
-    // in length.
-    return first_dot > 0 && first_dot <= 8 && first_dot + 4 >= s.size();
-  }
-
-  // Returns whether `s` could possibly be in the 8.3 name format AND contains a
-  // '~' character, which may interact poorly with short filenames on VFAT. See
-  // https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-cifs/09c2ccc8-4aaf-439f-9b4e-13b3fe85a4cf.
-  bool CouldBeInvalidShortName(const std::u16string& s) const {
-    if (s.size() > 12 ||
-        !required_to_be_a_short_filename_.containsSome(icu::UnicodeString(
-            /*isTerminated=*/false, s.c_str(), s.size())) ||
-        !illegal_in_short_filenames_.containsNone(
-            icu::UnicodeString(/*isTerminated=*/false, s.c_str(), s.size()))) {
-      return false;
-    }
-    return HasValidDotPositionForShortName<std::u16string>(s);
-  }
-#endif
-
   bool IsAllowedName(const std::u16string& s) const {
     return s.empty() || (!!illegal_anywhere_.containsNone(icu::UnicodeString(
                              /*isTerminated=*/false, s.c_str(), s.size())) &&
                          !illegal_at_ends_.contains(*s.begin()) &&
                          !illegal_at_ends_.contains(*s.rbegin())
-#if BUILDFLAG(IS_WIN)
-                         && !CouldBeInvalidShortName(s)
-#endif
                         );
   }
 
@@ -107,14 +63,12 @@ class IllegalCharacters {
   // Set of characters considered invalid at either end of a filename.
   icu::UnicodeSet illegal_at_ends_;
 
-  // #if BUILDFLAG(IS_WIN)
   // Set of characters which are guaranteed to exist if the filename is to be of
   // the problematic VFAT 8.3 short filename format.
   icu::UnicodeSet required_to_be_a_short_filename_;
   // Set of characters which are not allowed in VFAT 8.3 short filenames. If
   // any of these characters are present, the file cannot be a short filename.
   icu::UnicodeSet illegal_in_short_filenames_;
-  // #endif
 };
 
 IllegalCharacters::IllegalCharacters() {
@@ -147,17 +101,6 @@ IllegalCharacters::IllegalCharacters() {
   DCHECK(U_SUCCESS(status));
   illegal_at_ends_.freeze();
 
-#if BUILDFLAG(IS_WIN)
-  required_to_be_a_short_filename_ =
-      icu::UnicodeSet(UNICODE_STRING_SIMPLE("[[~]]"), status);
-  DCHECK(U_SUCCESS(status));
-  required_to_be_a_short_filename_.freeze();
-
-  illegal_in_short_filenames_ = icu::UnicodeSet(
-      UNICODE_STRING_SIMPLE("[[:WSpace:][\"\\/[]:+|<>=;?,*]]"), status);
-  DCHECK(U_SUCCESS(status));
-  illegal_in_short_filenames_.freeze();
-#endif
 }
 
 // Returns the code point at position |cursor| in |file_name|, and increments
@@ -165,11 +108,7 @@ IllegalCharacters::IllegalCharacters() {
 UChar32 GetNextCodePoint(const FilePath::StringType* const file_name,
                          int& cursor) {
   UChar32 code_point;
-#if BUILDFLAG(IS_WIN)
-  // Windows uses UTF-16 encoding for filenames.
-  UNSAFE_TODO(U16_NEXT(file_name->data(), cursor,
-                       static_cast<int>(file_name->length()), code_point));
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   // Mac and Chrome OS use UTF-8 encoding for filenames.
   // Linux doesn't actually define file system encoding. Try to parse as
   // UTF-8.
@@ -194,12 +133,6 @@ void ReplaceIllegalCharactersInPath(FilePath::StringType* file_name,
   DCHECK(!(illegal->IsDisallowedEverywhere(replace_char)));
   const bool is_replace_char_illegal_at_ends =
       illegal->IsDisallowedLeadingOrTrailing(replace_char);
-#if BUILDFLAG(IS_WIN)
-  bool could_be_short_name =
-      file_name->size() <= 12 &&
-      illegal->HasValidDotPositionForShortName<FilePath::StringType>(
-          *file_name);
-#endif
   // Keep track of the earliest and latest legal begin/end characters and file-
   // extension separator encountered, -1 if none yet.
   int unreplaced_legal_range_begin = -1;
@@ -210,16 +143,6 @@ void ReplaceIllegalCharactersInPath(FilePath::StringType* file_name,
 
   int cursor = 0;  // The ICU macros expect an int.
 
-#if BUILDFLAG(IS_WIN)
-  // Loop through the file name, looking for any characters which are invalid in
-  // an 8.3 short file name. If any of these characters exist, it's not an 8.3
-  // file name and we don't need to replace the '~' character.
-  while (could_be_short_name && cursor < static_cast<int>(file_name->size())) {
-    const UChar32 code_point = GetNextCodePoint(file_name, cursor);
-    could_be_short_name = !illegal->IsDisallowedShortNameCharacter(code_point);
-  }
-#endif
-
   cursor = 0;
   while (cursor < static_cast<int>(file_name->size())) {
     int char_begin = cursor;
@@ -229,10 +152,6 @@ void ReplaceIllegalCharactersInPath(FilePath::StringType* file_name,
         illegal->IsDisallowedLeadingOrTrailing(code_point);
 
     if (illegal->IsDisallowedEverywhere(code_point) ||
-#if BUILDFLAG(IS_WIN)
-        (could_be_short_name &&
-         illegal->IsDisallowedIfMayBeShortName(code_point)) ||
-#endif
         ((char_begin == 0 || cursor == static_cast<int>(file_name->length())) &&
          is_illegal_at_ends && !is_replace_char_illegal_at_ends)) {
       file_name->replace(char_begin, cursor - char_begin, 1, replace_char);
@@ -293,11 +212,7 @@ bool LocaleAwareCompareFilenames(const FilePath& a, const FilePath& b) {
   // Make it case-sensitive.
   collator->setStrength(icu::Collator::TERTIARY);
 
-#if BUILDFLAG(IS_WIN)
-  return CompareString16WithCollator(*collator, AsStringPiece16(a.value()),
-                                     AsStringPiece16(b.value())) == UCOL_LESS;
-
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   // On linux, the file system encoding is not defined. We assume
   // SysNativeMBToWide takes care of it.
   return CompareString16WithCollator(

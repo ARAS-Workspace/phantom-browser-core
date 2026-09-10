@@ -333,11 +333,7 @@ IN_PROC_BROWSER_TEST_F(NavigationEntryRemoverTest, RecentTabDeletion) {
 }
 
 // TODO(crbug.com/40283363): flaky on windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_RecentTabWindowDeletion DISABLED_RecentTabWindowDeletion
-#else
 #define MAYBE_RecentTabWindowDeletion RecentTabWindowDeletion
-#endif
 IN_PROC_BROWSER_TEST_F(NavigationEntryRemoverTest,
                        MAYBE_RecentTabWindowDeletion) {
   // Create a new browser with three tabs and close it.

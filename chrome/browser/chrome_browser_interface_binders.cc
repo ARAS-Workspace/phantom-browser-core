@@ -88,8 +88,7 @@
 #include "third_party/blink/public/mojom/unhandled_tap_notifier/unhandled_tap_notifier.mojom.h"
 #endif  // BUILDFLAG(ENABLE_UNHANDLED_TAP)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/screen_ai/screen_ai_service_router.h"
 #include "chrome/browser/screen_ai/screen_ai_service_router_factory.h"
 #include "chrome/browser/web_applications/sub_apps/sub_apps_service_impl.h"
@@ -117,9 +116,8 @@
 #include "third_party/blink/public/mojom/set_shape/set_shape.mojom.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #include "chrome/browser/webshare/share_service_impl.h"
 #include "chrome/common/chrome_features.h"
 #endif
@@ -135,14 +133,6 @@
 #include "media/mojo/mojom/renderer_extensions.mojom.h"
 #include "media/mojo/mojom/speech_recognition.mojom.h"  // nogncheck
 #endif  // BUILDFLAG(ENABLE_SPEECH_SERVICE)
-
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/media/media_foundation_service_monitor.h"
-#include "content/public/browser/security_principal.h"
-#include "content/public/browser/site_instance.h"
-#include "media/mojo/mojom/media_foundation_preferences.mojom.h"
-#include "media/mojo/services/media_foundation_preferences.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(ENABLE_BROWSER_SPEECH_SERVICE)
 #include "chrome/browser/speech/speech_recognition_service_factory.h"
@@ -355,17 +345,6 @@ void BindSpeechRecognitionRecognizerClientHandler(
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-void BindMediaFoundationRendererNotifierHandler(
-    content::RenderFrameHost* frame_host,
-    mojo::PendingReceiver<media::mojom::MediaFoundationRendererNotifier>
-        receiver) {
-  if (captions::IsLiveCaptionFeatureSupported()) {
-    captions::LiveCaptionUnavailabilityNotifier::Create(frame_host,
-                                                        std::move(receiver));
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 #endif  // BUILDFLAG(ENABLE_SPEECH_SERVICE)
 
 void BindOnDeviceSpeechRecognitionHandler(
@@ -376,22 +355,7 @@ void BindOnDeviceSpeechRecognitionHandler(
       ->Bind(std::move(receiver));
 }
 
-#if BUILDFLAG(IS_WIN)
-void BindMediaFoundationPreferences(
-    content::RenderFrameHost* frame_host,
-    mojo::PendingReceiver<media::mojom::MediaFoundationPreferences> receiver) {
-  MediaFoundationPreferencesImpl::Create(
-      frame_host->GetSiteInstance()
-          ->GetSecurityPrincipal()
-          .GetDeprecatedSiteURL(),
-      base::BindRepeating(&MediaFoundationServiceMonitor::
-                              IsHardwareSecureDecryptionAllowedForSite),
-      std::move(receiver));
-}
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 void BindScreenAIAnnotator(
     content::RenderFrameHost* frame_host,
     mojo::PendingReceiver<screen_ai::mojom::ScreenAIAnnotator> receiver) {
@@ -547,7 +511,7 @@ void PopulateChromeFrameBinders(
   map->Add<blink::mojom::SetShapeService>(&ash::SetShapeServiceImpl::Create);
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
   map->Add<blink::mojom::ShareService>(&ShareServiceImpl::Create);
 #endif
 #if BUILDFLAG(IS_ANDROID)
@@ -566,14 +530,9 @@ void PopulateChromeFrameBinders(
       &BindSpeechRecognitionClientBrowserInterfaceHandler);
   map->Add<media::mojom::SpeechRecognitionRecognizerClient>(
       &BindSpeechRecognitionRecognizerClientHandler);
-#if BUILDFLAG(IS_WIN)
-  map->Add<media::mojom::MediaFoundationRendererNotifier>(
-      &BindMediaFoundationRendererNotifierHandler);
-#endif
 #endif  // BUILDFLAG(ENABLE_SPEECH_SERVICE)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   if (base::FeatureList::IsEnabled(blink::features::kSubApps) &&
       !render_frame_host->GetParentOrOuterDocument()) {
     // The service binder will reject non-primary main frames, but we still need
@@ -587,11 +546,6 @@ void PopulateChromeFrameBinders(
 
   map->Add<screen_ai::mojom::Screen2xMainContentExtractor>(
       &BindScreen2xMainContentExtractor);
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  map->Add<media::mojom::MediaFoundationPreferences>(
-      &BindMediaFoundationPreferences);
 #endif
 
 #if BUILDFLAG(ENABLE_PDF)

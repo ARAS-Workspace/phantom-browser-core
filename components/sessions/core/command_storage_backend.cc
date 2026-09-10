@@ -70,9 +70,6 @@ const SessionCommand::id_type kInitialStateMarkerCommandId = 255;
 base::FilePath::StringType TimestampToString(const base::Time time) {
 #if BUILDFLAG(IS_POSIX)
   return base::NumberToString(time.ToDeltaSinceWindowsEpoch().InMicroseconds());
-#elif BUILDFLAG(IS_WIN)
-  return base::NumberToWString(
-      time.ToDeltaSinceWindowsEpoch().InMicroseconds());
 #endif
 }
 

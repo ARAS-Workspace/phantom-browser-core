@@ -65,22 +65,6 @@
 #include "ui/ozone/public/surface_factory_ozone.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "gpu/config/gpu_driver_bug_workarounds.h"
-#include "services/on_device_model/ml_internal_buildflags.h"
-#include "ui/gl/dc_surface_solid_color_pool.h"
-#include "ui/gl/direct_composition_support.h"
-#include "ui/gl/gl_angle_util_win.h"
-#include "ui/gl/gl_surface_egl.h"
-
-#if BUILDFLAG(SKIA_USE_DAWN)
-#include "gpu/ipc/service/dawn_texture_solid_color_pool.h"
-#endif
-
-#if BUILDFLAG(ENABLE_ML_INTERNAL)
-#include "services/webnn/public/mojom/features.mojom-features.h"  // nogncheck
-#endif
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 #include "ui/gfx/android/android_surface_control_compat.h"
@@ -133,39 +117,11 @@ void InitializeDawnProcs() {
 
 void InitializePlatformOverlaySettings(GPUInfo* gpu_info,
                                        const GpuFeatureInfo& gpu_feature_info) {
-#if BUILDFLAG(IS_WIN)
-  // This has to be called after a context is created, active GPU is identified,
-  // and GPU driver bug workarounds are computed again. Otherwise the workaround
-  // `disable_direct_composition_video_overlays` may not be correctly applied.
-  // Also, this has to be called after falling back to SwiftShader decision is
-  // finalized because this function depends on GL is ANGLE's GLES or not.
-  gl::DirectCompositionOverlayWorkarounds workarounds = {
-      .disable_sw_video_overlays = gpu_feature_info.IsWorkaroundEnabled(
-          DISABLE_DIRECT_COMPOSITION_SW_VIDEO_OVERLAYS),
-      .disable_decode_swap_chain =
-          gpu_feature_info.IsWorkaroundEnabled(DISABLE_DECODE_SWAP_CHAIN),
-      .enable_bgra8_overlays_with_yuv_overlay_support =
-          gpu_feature_info.IsWorkaroundEnabled(
-              gpu::ENABLE_BGRA8_OVERLAYS_WITH_YUV_OVERLAY_SUPPORT),
-      .force_nv12_overlay_support =
-          gpu_feature_info.IsWorkaroundEnabled(gpu::FORCE_NV12_OVERLAY_SUPPORT),
-      .force_rgb10a2_overlay_support = gpu_feature_info.IsWorkaroundEnabled(
-          gpu::FORCE_RGB10A2_OVERLAY_SUPPORT),
-      .check_ycbcr_studio_g22_left_p709_for_nv12_support =
-          gpu_feature_info.IsWorkaroundEnabled(
-              gpu::CHECK_YCBCR_STUDIO_G22_LEFT_P709_FOR_NV12_SUPPORT),
-      .disable_dcomp_texture =
-          gpu_feature_info.IsWorkaroundEnabled(gpu::DISABLE_DCOMP_TEXTURE),
-  };
-  SetDirectCompositionOverlayWorkarounds(workarounds);
-
-  DCHECK(gpu_info);
-  CollectHardwareOverlayInfo(&gpu_info->overlay_info);
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   if (gpu_info->gpu.vendor_string.find("Qualcomm") != std::string::npos) {
     gfx::SurfaceControl::EnableQualcommUBWC();
   }
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_ANDROID)
 }
 
 #if !BUILDFLAG(IS_ANDROID)
@@ -257,14 +213,7 @@ bool MatchGLInfo(const std::string& field, const std::string& patterns) {
 }
 #endif  // BUILDFLAG(ENABLE_VULKAN)
 
-#if BUILDFLAG(IS_WIN)
-uint64_t CHROME_LUID_to_uint64_t(const CHROME_LUID& luid) {
-  uint64_t id64 = static_cast<uint32_t>(luid.HighPart);
-  return (id64 << 32) | (luid.LowPart & 0xFFFFFFFF);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 const GPUInfo::GPUDevice* GetDefaultGPU(
     const GPUInfo& gpu_info,
     const GpuFeatureInfo& gpu_feature_info) {
@@ -298,17 +247,6 @@ void SetupGLDisplayManagerEGL(const GPUInfo& gpu_info,
       gpu_info.GetGpuByPreference(gl::GpuPreference::kHighPerformance);
   const GPUInfo::GPUDevice* gpu_low_power =
       gpu_info.GetGpuByPreference(gl::GpuPreference::kLowPower);
-#if BUILDFLAG(IS_WIN)
-  // On Windows the default GPU may not be the low power GPU.
-  const GPUInfo::GPUDevice* gpu_default =
-      GetDefaultGPU(gpu_info, gpu_feature_info);
-  uint64_t system_device_id_high_perf =
-      gpu_high_perf ? CHROME_LUID_to_uint64_t(gpu_high_perf->luid) : 0;
-  uint64_t system_device_id_low_power =
-      gpu_low_power ? CHROME_LUID_to_uint64_t(gpu_low_power->luid) : 0;
-  uint64_t system_device_id_default =
-      CHROME_LUID_to_uint64_t(gpu_default->luid);
-#else  // IS_MAC
   const GPUInfo::GPUDevice* gpu_default =
       gpu_low_power ? gpu_low_power : GetDefaultGPU(gpu_info, gpu_feature_info);
   uint64_t system_device_id_high_perf =
@@ -316,7 +254,6 @@ void SetupGLDisplayManagerEGL(const GPUInfo& gpu_info,
   uint64_t system_device_id_low_power =
       gpu_low_power ? gpu_low_power->system_device_id : 0;
   uint64_t system_device_id_default = gpu_default->system_device_id;
-#endif  // BUILDFLAG(IS_WIN)
 
   if (gpu_info.GpuCount() <= 1) {
     gl::SetGpuPreferenceEGL(gl::GpuPreference::kDefault,
@@ -405,7 +342,7 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
   gpu_feature_info_ = ComputeGpuFeatureInfo(gpu_info_, gpu_preferences_,
                                             command_line, &needs_more_info);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   SetupGLDisplayManagerEGL(gpu_info_, gpu_feature_info_);
 #endif  // IS_WIN || IS_MAC
 #endif  // !BUILDFLAG(IS_ANDROID)
@@ -643,79 +580,6 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
           kGpuFeatureStatusEnabled &&
       features::IsSkiaGraphitePrecompilationEnabled(command_line);
 
-#if BUILDFLAG(IS_WIN)
-  {
-    if (gpu_preferences_.gr_context_type == GrContextType::kGraphiteDawn &&
-        features::SkiaGraphiteDawnBackendValidation()) {
-      // Enable ANGLE debug layer for Graphite backend validation, sharing the
-      // D3D11 device between ANGLE and Dawn. Requires GL reinit.
-      gl::init::ShutdownGL(gl_display, true);
-      gl::GLDisplayEGL::EnableANGLEDebugLayer();
-      gl_display = gl::init::InitializeGLNoExtensionsOneOff(
-          /*init_bindings=*/true, gl::GpuPreference::kDefault);
-      if (!gl_display) {
-        VLOG(1) << "gl::init::InitializeGLNoExtensionsOneOff failed "
-                   "after enabling ANGLE debug layer";
-        return false;
-      }
-    }
-
-    // On Windows, MITIGATION_FORCE_MS_SIGNED_BINS is used which disallows
-    // loading any .dll that is not signed by Microsoft. Preload the SwiftShader
-    // .dll so it may be accessed later. This is needed for WebGPU to
-    // initialize a software fallback adapter. Also do the same for DXC,
-    // which WebGPU may use on D3D12 devices.
-    // Don't handle errors as failure here is non-fatal. Loading either DLL
-    // again at a later point will fail as well.
-    PauseGpuWatchdog(watchdog_thread_.get());
-
-    base::FilePath module_path;
-    if (base::PathService::Get(base::DIR_MODULE, &module_path)) {
-      // Preload vk_swiftshader.dll when SwiftShader may be needed:
-      // - IsSwiftShaderAllowed() covers ANGLE/GL flags like
-      //   --enable-unsafe-swiftshader and --use-angle=swiftshader.
-      // - use_webgpu_adapter covers --use-webgpu-adapter=swiftshader for
-      //   WebGPU fallback adapter selection.
-      // - DefaultForceFallbackAdapter() covers Graphite/Dawn using
-      //   SwiftShader via --skia-graphite-dawn-backend=swiftshader.
-      if (features::IsSwiftShaderAllowed(command_line) ||
-          gpu_preferences_.use_webgpu_adapter ==
-              WebGPUAdapterName::kSwiftShader ||
-          DawnContextProvider::DefaultForceFallbackAdapter()) {
-        TRACE_EVENT("gpu,startup", "Load vk_swiftshader.dll");
-        base::LoadNativeLibrary(module_path.Append(L"vk_swiftshader.dll"),
-                                nullptr);
-      }
-
-#if defined(DAWN_USE_BUILT_DXC)
-      // TODO(crbug.com/40075751): Preload dxil.dll to avoid loader lock issues
-      // since dxcompiler.dll loads dxil.dll from DllMain.
-      {
-        TRACE_EVENT("gpu,startup", "Load dxil.dll");
-        base::LoadNativeLibrary(module_path.Append(L"dxil.dll"), nullptr);
-      }
-      {
-        TRACE_EVENT("gpu,startup", "Load dxcompiler.dll");
-        base::LoadNativeLibrary(module_path.Append(L"dxcompiler.dll"), nullptr);
-      }
-#endif  // defined(DAWN_USE_BUILT_DXC)
-
-#if BUILDFLAG(ENABLE_ML_INTERNAL)
-      if (base::FeatureList::IsEnabled(
-              webnn::mojom::features::kWebMachineLearningNeuralNetwork)) {
-        // Ensure that optimization_guide_internal.dll is loaded before the
-        // sandbox is initialized as this provides a GPU delegate used as a
-        // fallback when Windows ML is not available.
-        TRACE_EVENT("gpu,startup", "Load optimization_guide_internal.dll");
-        base::LoadNativeLibrary(
-            module_path.Append(L"optimization_guide_internal.dll"), nullptr);
-      }
-#endif
-    }
-
-    ResumeGpuWatchdog(watchdog_thread_.get());
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
 
 #if BUILDFLAG(USE_WEBGPU_ON_VULKAN_VIA_GL_INTEROP)
@@ -925,37 +789,6 @@ bool GpuInit::InitializeAndStartSandbox(base::CommandLine* command_line,
     }
   }
 
-#if BUILDFLAG(IS_WIN)
-  {
-    Microsoft::WRL::ComPtr<ID3D11Device> d3d11_device;
-    Microsoft::WRL::ComPtr<ID3D12CommandQueue> d3d12_command_queue;
-    gl::SolidColorPoolFactory solid_color_factory;
-    if (dawn_context_provider_) {
-      d3d11_device = dawn_context_provider_->GetD3D11Device();
-      d3d12_command_queue = dawn_context_provider_->GetD3D12CommandQueue();
-#if BUILDFLAG(SKIA_USE_DAWN)
-      // When Skia is on Graphite-D3D12, use Dawn (the same `wgpu::Device`
-      // and `ID3D12CommandQueue` Skia is using) to fill solid-color
-      // overlays.
-      if (d3d12_command_queue &&
-          base::FeatureList::IsEnabled(features::kDCompOnD3D12)) {
-        solid_color_factory = CreateDawnTextureSolidColorPoolFactory(
-            dawn_context_provider_->GetDevice(), d3d12_command_queue);
-      }
-#endif  // BUILDFLAG(SKIA_USE_DAWN)
-    } else {
-      d3d11_device = gl::QueryD3D11DeviceObjectFromANGLE();
-    }
-    if (!solid_color_factory) {
-      // Use DComp surfaces if Dawn or DComp Textures are not available.
-      solid_color_factory =
-          gl::CreateDCSurfaceSolidColorPoolFactory(d3d11_device);
-    }
-    gl::InitializeDirectComposition(std::move(d3d11_device),
-                                    std::move(d3d12_command_queue),
-                                    std::move(solid_color_factory));
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   InitializePlatformOverlaySettings(&gpu_info_, gpu_feature_info_);
 
@@ -1238,10 +1071,6 @@ void GpuInit::RecordUMA() {
 
   UMA_HISTOGRAM_ENUMERATION("GPU.GLImplementation", gl::GetGLImplementation());
 
-#if BUILDFLAG(IS_WIN)
-  UMA_HISTOGRAM_BOOLEAN("GPU.DirectComposition.Supported",
-                        gl::DirectCompositionSupported());
-#endif
 
   UMA_HISTOGRAM_BOOLEAN("GPU.Sandboxed", gpu_info_.sandboxed);
   // Record the Skia backend type on GPU initialization.

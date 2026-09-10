@@ -34,13 +34,6 @@ class VulkanCXXTest : public testing::Test {
     } else {
       path = base::FilePath("libvulkan.so.1");
     }
-#elif BUILDFLAG(IS_WIN)
-    if (use_swiftshader_) {
-      EXPECT_TRUE(base::PathService::Get(base::DIR_MODULE, &path));
-      path = path.Append(L"vk_swiftshader.dll");
-    } else {
-      path = base::FilePath(L"vulkan-1.dll");
-    }
 #else
 #error "Not supported platform"
 #endif

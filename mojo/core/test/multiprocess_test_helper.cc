@@ -103,13 +103,6 @@ ScopedMessagePipeHandle MultiprocessTestHelper::StartChildWithExtraSwitch(
   base::CommandLine command_line(
       base::GetMultiProcessTestChildBaseCommandLine().GetProgram());
 
-#if BUILDFLAG(IS_WIN)
-  // Some mojo unit tests launch child processes and send invalid handles to
-  // them which would usually cause a STATUS_INVALID_HANDLE (0xC0000008) to be
-  // raised, so this disables that for child test processes only.
-  command_line.AppendSwitch(::switches::kDisableStrictHandleCheckingForTesting);
-#endif  // BUILDFLAG(IS_WIN)
-
   std::set<std::string> uninherited_args;
   uninherited_args.insert("mojo-platform-channel-handle");
   uninherited_args.insert(switches::kTestChildProcess);
@@ -153,8 +146,6 @@ ScopedMessagePipeHandle MultiprocessTestHelper::StartChildWithExtraSwitch(
       server_name =
           temp_dir.AppendASCII(base::NumberToString(base::RandUint64()))
               .value();
-#elif BUILDFLAG(IS_WIN)
-      server_name = base::NumberToWString(base::RandUint64());
 #else
 #error "Platform not yet supported."
 #endif
@@ -172,10 +163,6 @@ ScopedMessagePipeHandle MultiprocessTestHelper::StartChildWithExtraSwitch(
       command_line.AppendSwitch(switch_string);
     }
   }
-
-#if BUILDFLAG(IS_WIN)
-  options.start_hidden = true;
-#endif
 
   // NOTE: In the case of named pipes, it's important that the server handle be
   // created before the child process is launched; otherwise the server binding
@@ -226,7 +213,7 @@ ScopedMessagePipeHandle MultiprocessTestHelper::StartChildWithExtraSwitch(
       if (local_channel_endpoint.is_valid()) {
         pipe = isolated_connection_->Connect(std::move(local_channel_endpoint));
       } else {
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_POSIX)
         DCHECK(server_endpoint.is_valid());
         pipe = isolated_connection_->Connect(std::move(server_endpoint));
 #else

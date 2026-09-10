@@ -215,7 +215,7 @@ void WebUIAvatarToolbarButton::MaybeShowProfileSwitchIPH() {
   }
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 void WebUIAvatarToolbarButton::MaybeShowSupervisedUserSignInIPH() {
   if (state_manager_ && delegate_->GetView()->GetWidget()) {
     state_manager_->MaybeShowSupervisedUserSignInIPH();
@@ -227,7 +227,7 @@ void WebUIAvatarToolbarButton::MaybeShowSignInBenefitsIPH() {
     state_manager_->MaybeShowSignInBenefitsIPH();
   }
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 void WebUIAvatarToolbarButton::ClearActiveStateForTesting() {
   CHECK(state_manager_);

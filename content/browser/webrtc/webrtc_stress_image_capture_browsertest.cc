@@ -28,9 +28,6 @@ static const char kImageCaptureStressHtmlFile[] =
 
 enum class TargetVideoCaptureImplementation {
   DEFAULT,
-#if BUILDFLAG(IS_WIN)
-  WIN_MEDIA_FOUNDATION
-#endif
 };
 
 }  // namespace
@@ -42,13 +39,6 @@ class WebRtcImageCaptureStressBrowserTest
   WebRtcImageCaptureStressBrowserTest() {
     std::vector<base::test::FeatureRef> features_to_enable;
     std::vector<base::test::FeatureRef> features_to_disable;
-#if BUILDFLAG(IS_WIN)
-    if (GetParam() == TargetVideoCaptureImplementation::WIN_MEDIA_FOUNDATION) {
-      features_to_enable.push_back(media::kMediaFoundationVideoCapture);
-    } else {
-      features_to_disable.push_back(media::kMediaFoundationVideoCapture);
-    }
-#endif
     scoped_feature_list_.InitWithFeatures(features_to_enable,
                                           features_to_disable);
   }
@@ -97,7 +87,8 @@ class WebRtcImageCaptureStressBrowserTest
 // API has already been implemented.
 // Note, these tests must be run sequentially, since multiple parallel test runs
 // competing for a single physical webcam typically causes failures.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || \
+    BUILDFLAG(IS_ANDROID)
 
 IN_PROC_BROWSER_TEST_P(WebRtcImageCaptureStressBrowserTest,
                        MANUAL_Take10Photos) {
@@ -107,9 +98,6 @@ IN_PROC_BROWSER_TEST_P(WebRtcImageCaptureStressBrowserTest,
 const TargetVideoCaptureImplementation
     kTargetVideoCaptureImplementationsForRealWebcam[] = {
         TargetVideoCaptureImplementation::DEFAULT,
-#if BUILDFLAG(IS_WIN)
-        TargetVideoCaptureImplementation::WIN_MEDIA_FOUNDATION
-#endif
 };
 
 INSTANTIATE_TEST_SUITE_P(

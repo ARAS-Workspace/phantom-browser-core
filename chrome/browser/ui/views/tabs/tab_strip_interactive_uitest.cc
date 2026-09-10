@@ -186,13 +186,13 @@ IN_PROC_BROWSER_TEST_F(TestNewTabButtonContextMenu,
   EXPECT_TRUE(browser_view->IsInSplitView());
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_NewTabButtonNewTabInGroupDisabledWhenNoOpenGroups \
   DISABLED_NewTabButtonNewTabInGroupDisabledWhenNoOpenGroups
 #else
 #define MAYBE_NewTabButtonNewTabInGroupDisabledWhenNoOpenGroups \
   NewTabButtonNewTabInGroupDisabledWhenNoOpenGroups
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 IN_PROC_BROWSER_TEST_F(
     TestNewTabButtonContextMenu,
     MAYBE_NewTabButtonNewTabInGroupDisabledWhenNoOpenGroups) {

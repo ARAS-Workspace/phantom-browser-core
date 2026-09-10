@@ -36,8 +36,6 @@
 #include <signal.h>
 #elif BUILDFLAG(IS_APPLE)
 #include <mach/exception_types.h>
-#elif BUILDFLAG(IS_WIN)
-#include <windows.h>
 #endif
 
 #if BUILDFLAG(IS_IOS)
@@ -116,14 +114,6 @@ crashpad::VMAddress CrashAnalyzer::GetAccessAddress(
 #elif BUILDFLAG(IS_APPLE)
   if (exception.Exception() == EXC_BAD_ACCESS)
     return exception.ExceptionAddress();
-#elif BUILDFLAG(IS_WIN)
-  if (exception.Exception() == EXCEPTION_ACCESS_VIOLATION) {
-    const std::vector<uint64_t>& codes = exception.Codes();
-    if (codes.size() < 2)
-      DLOG(FATAL) << "Exception array is too small! " << codes.size();
-    else
-      return codes[1];
-  }
 #else
 #error "Unknown platform"
 #endif
@@ -323,10 +313,8 @@ bool CrashAnalyzer::AnalyzeLightweightDetectorCrash(
       // https://opensource.apple.com/source/xnu/xnu-1699.24.8/osfmk/i386/trap.c
       exception->Exception() == EXC_BAD_ACCESS &&
       exception->ExceptionInfo() == EXC_I386_GPFLT
-#elif BUILDFLAG(IS_WIN)
-      // Verified experimentally.
-      GetAccessAddress(*exception) == std::numeric_limits<uint64_t>::max()
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
+        // BUILDFLAG(IS_ANDROID)
   ) {
     auto& context = *exception->Context()->x86_64;
     candidate_addresses = {context.rax, context.rbx, context.rcx, context.rdx,

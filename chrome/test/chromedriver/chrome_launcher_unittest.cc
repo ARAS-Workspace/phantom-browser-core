@@ -281,17 +281,3 @@ TEST(DesktopLauncher, RemoveOldDevToolsActivePortFile_Success) {
   ASSERT_FALSE(base::PathExists(temp_file));
   ASSERT_TRUE(base::PathExists(temp_dir.GetPath()));
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST(DesktopLauncher, RemoveOldDevToolsActivePortFile_Failure) {
-  base::ScopedTempDir temp_dir;
-  ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
-  base::FilePath temp_file =
-      temp_dir.GetPath().Append(FILE_PATH_LITERAL("DevToolsActivePort"));
-  FILE* fd = base::OpenFile(temp_file, "w");
-  ASSERT_FALSE(
-      internal::RemoveOldDevToolsActivePortFile(temp_dir.GetPath()).IsOk());
-  ASSERT_TRUE(base::PathExists(temp_file));
-  base::CloseFile(fd);
-}
-#endif

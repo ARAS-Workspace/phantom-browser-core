@@ -164,11 +164,7 @@ TEST_F(ImageSanitizerTest, NoImagesProvided) {
 
 TEST_F(ImageSanitizerTest, InvalidPathAbsolute) {
   base::FilePath normal_path(FILE_PATH_LITERAL("hello.png"));
-#if BUILDFLAG(IS_WIN)
-  base::FilePath absolute_path(FILE_PATH_LITERAL("c:\\Windows\\win32"));
-#else
   base::FilePath absolute_path(FILE_PATH_LITERAL("/usr/bin/root"));
-#endif
   CreateAndStartSanitizer({normal_path, absolute_path});
   WaitForSanitizationDone();
   EXPECT_EQ(client()->last_reported_status(),

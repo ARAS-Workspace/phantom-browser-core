@@ -138,7 +138,7 @@ TEST_F(IsClientInSampleTest, UsesPostFREFixFeatureWhenPrefSet) {
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 TEST_F(IsClientInSampleTest, IsClientInSampleForCrashesTest) {
   {
     base::test::ScopedFeatureList feature_list;
@@ -179,4 +179,4 @@ TEST_F(IsClientInSampleTest, IsClientInSampleForCrashesTest) {
   }
 #endif  // BUILDFLAG(IS_ANDROID)
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)

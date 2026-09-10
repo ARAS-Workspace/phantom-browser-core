@@ -5744,9 +5744,6 @@ class SiteSettingsHandlerSerialTest
     persistent_port_ = device::mojom::SerialPortInfo::New();
     persistent_port_->token = base::UnguessableToken::Create();
     persistent_port_->display_name = "persistent-device";
-#if BUILDFLAG(IS_WIN)
-    persistent_port_->device_instance_id = "1";
-#else
     persistent_port_->has_vendor_id = true;
     persistent_port_->vendor_id = 6353;
     persistent_port_->has_product_id = true;
@@ -5755,7 +5752,6 @@ class SiteSettingsHandlerSerialTest
 #if BUILDFLAG(IS_MAC)
     persistent_port_->usb_driver_name = "AppleUSBCDC";
 #endif
-#endif  // BUILDFLAG(IS_WIN)
     serial_port_manager_.AddPort(persistent_port_.Clone());
   }
 
@@ -5763,9 +5759,6 @@ class SiteSettingsHandlerSerialTest
     ephemeral_port_ = device::mojom::SerialPortInfo::New();
     ephemeral_port_->token = base::UnguessableToken::Create();
     ephemeral_port_->display_name = "ephemeral-device";
-#if BUILDFLAG(IS_WIN)
-    ephemeral_port_->device_instance_id = "2";
-#else
     ephemeral_port_->has_vendor_id = true;
     ephemeral_port_->vendor_id = 6354;
     ephemeral_port_->has_product_id = true;
@@ -5773,7 +5766,6 @@ class SiteSettingsHandlerSerialTest
 #if BUILDFLAG(IS_MAC)
     ephemeral_port_->usb_driver_name = "AppleUSBCDC";
 #endif
-#endif  // BUILDFLAG(IS_WIN)
     serial_port_manager_.AddPort(ephemeral_port_.Clone());
   }
 
@@ -5781,9 +5773,6 @@ class SiteSettingsHandlerSerialTest
     user_granted_port_ = device::mojom::SerialPortInfo::New();
     user_granted_port_->token = base::UnguessableToken::Create();
     user_granted_port_->display_name = "user-granted-device";
-#if BUILDFLAG(IS_WIN)
-    user_granted_port_->device_instance_id = "3";
-#else
     user_granted_port_->has_vendor_id = true;
     user_granted_port_->vendor_id = 6355;
     user_granted_port_->has_product_id = true;
@@ -5792,7 +5781,6 @@ class SiteSettingsHandlerSerialTest
 #if BUILDFLAG(IS_MAC)
     user_granted_port_->usb_driver_name = "AppleUSBCDC";
 #endif
-#endif  // BUILDFLAG(IS_WIN)
     serial_port_manager_.AddPort(user_granted_port_.Clone());
   }
 
@@ -5800,9 +5788,6 @@ class SiteSettingsHandlerSerialTest
     off_the_record_port_ = device::mojom::SerialPortInfo::New();
     off_the_record_port_->token = base::UnguessableToken::Create();
     off_the_record_port_->display_name = "off-the-record-device";
-#if BUILDFLAG(IS_WIN)
-    off_the_record_port_->device_instance_id = "4";
-#else
     off_the_record_port_->has_vendor_id = true;
     off_the_record_port_->vendor_id = 6353;
     off_the_record_port_->has_product_id = true;
@@ -5811,7 +5796,6 @@ class SiteSettingsHandlerSerialTest
 #if BUILDFLAG(IS_MAC)
     off_the_record_port_->usb_driver_name = "AppleUSBCDC";
 #endif
-#endif  // BUILDFLAG(IS_WIN)
     serial_port_manager_.AddPort(off_the_record_port_.Clone());
   }
 
@@ -6263,45 +6247,6 @@ TEST_F(SiteSettingsHandlerTest, HandleClearSiteGroupDataAndCookies) {
   EXPECT_EQ(0U, storage_and_cookie_list.size());
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST_F(SiteSettingsHandlerTest, ClearSiteSpecificMediaLicenses) {
-  SetupModel();
-  PrefService* user_prefs = profile()->GetPrefs();
-
-  // In the beginning, there should be nothing stored in the origin data.
-  ASSERT_EQ(0u, user_prefs->GetDict(prefs::kMediaCdmOriginData).size());
-
-  auto entry_google = base::DictValue().Set(
-      "https://www.google.com/",
-      base::UnguessableTokenToValue(base::UnguessableToken::Create()));
-
-  base::DictValue entry_example;
-  entry_example.Set(
-      "https://www.example.com/",
-      base::UnguessableTokenToValue(base::UnguessableToken::Create()));
-
-  {
-    ScopedDictPrefUpdate update(user_prefs, prefs::kMediaCdmOriginData);
-
-    base::DictValue& dict = update.Get();
-    dict.Set("https://www.google.com/", std::move(entry_google));
-    dict.Set("https://www.example.com/", std::move(entry_example));
-  }
-  // The code above adds origin data for both google and example.com
-  EXPECT_EQ(2u, user_prefs->GetDict(prefs::kMediaCdmOriginData).size());
-
-  base::ListValue args;
-  args = base::ListValue();
-  args.Append("https://www.google.com/");
-  handler()->HandleClearUnpartitionedUsage(args);
-
-  // The code clears the origin data for just google.com, so there should still
-  // be the origin data for example.com left.
-  EXPECT_EQ(1u, user_prefs->GetDict(prefs::kMediaCdmOriginData).size());
-  EXPECT_TRUE(user_prefs->GetDict(prefs::kMediaCdmOriginData)
-                  .contains("https://www.example.com/"));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_F(SiteSettingsHandlerTest, ClearClientHints) {
   // Confirm that when the user clears unpartitioned storage, or the eTLD+1

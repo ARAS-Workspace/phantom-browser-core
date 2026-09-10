@@ -74,13 +74,8 @@ const base::FilePath::CharType METADATA_NAME[] = FILE_PATH_LITERAL("META");
 
 // Forbidden file/folder names
 const base::FilePath::StringType kInvalidFilePrefix = FILE_PATH_LITERAL("..");
-#if BUILDFLAG(IS_WIN)
-const base::FilePath::StringViewType kInvalidDirectoryPath =
-    FILE_PATH_LITERAL("o:\\some\\inaccessible\\dir");
-#else
 const base::FilePath::StringViewType kInvalidDirectoryPath =
     FILE_PATH_LITERAL("////////////");
-#endif
 
 // Ensure files as specified by the parameters are deleted. Take the same
 // parameters as base::FileEnumerator().

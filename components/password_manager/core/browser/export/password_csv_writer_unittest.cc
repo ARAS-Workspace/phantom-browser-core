@@ -18,11 +18,7 @@
 
 using testing::ElementsAre;
 
-#if BUILDFLAG(IS_WIN)
-const std::string kLineEnding = "\r\n";
-#else
 const std::string kLineEnding = "\n";
-#endif
 
 namespace password_manager {
 

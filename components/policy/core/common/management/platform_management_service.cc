@@ -8,8 +8,6 @@
 #include "build/build_config.h"
 #if BUILDFLAG(IS_MAC)
 #include "components/policy/core/common/management/platform_management_status_provider_mac.h"
-#elif BUILDFLAG(IS_WIN)
-#include "components/policy/core/common/management/platform_management_status_provider_win.h"
 #elif BUILDFLAG(IS_IOS)
 #include "components/policy/core/common/management/platform_management_status_provider_ios.h"
 #elif BUILDFLAG(IS_ANDROID)
@@ -22,15 +20,10 @@ namespace {
 std::vector<std::unique_ptr<ManagementStatusProvider>>
 GetPlatformManagementSatusProviders() {
   std::vector<std::unique_ptr<ManagementStatusProvider>> providers;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   providers.push_back(std::make_unique<DomainEnrollmentStatusProvider>());
   providers.push_back(
       std::make_unique<EnterpriseMDMManagementStatusProvider>());
-#endif
-#if BUILDFLAG(IS_WIN)
-  providers.push_back(std::make_unique<AzureActiveDirectoryStatusProvider>());
-  providers.push_back(
-      std::make_unique<AzureActiveDirectoryDeviceStatusProvider>());
 #endif
 #if BUILDFLAG(IS_IOS)
   providers.push_back(std::make_unique<DeviceManagementStatusProvider>());

@@ -31,10 +31,6 @@
 #include "ui/views/view.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/views/win/hwnd_util.h"
-#endif
-
 namespace views {
 
 // Tracks all virtual ax views.
@@ -506,11 +502,6 @@ ui::AXPlatformNodeId AXVirtualView::GetUniqueId() const {
 // Virtual views need to implement this function in order for accessibility
 // events to be routed correctly.
 gfx::AcceleratedWidget AXVirtualView::GetTargetForNativeAccessibilityEvent() {
-#if BUILDFLAG(IS_WIN)
-  if (GetOwnerView()) {
-    return HWNDForView(GetOwnerView());
-  }
-#endif
   return gfx::kNullAcceleratedWidget;
 }
 

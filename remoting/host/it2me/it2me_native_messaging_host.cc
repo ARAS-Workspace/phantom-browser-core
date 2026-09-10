@@ -48,24 +48,11 @@
 #include "remoting/signaling/ftl_support_host_device_id_provider.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/command_line.h"
-#include "base/files/file_path.h"
-#include "remoting/host/elevated_native_messaging_host.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace remoting {
 
 using protocol::ErrorCode;
 
 namespace {
-
-#if BUILDFLAG(IS_WIN)
-const base::FilePath::CharType kBaseHostBinaryName[] =
-    FILE_PATH_LITERAL("remote_assistance_host.exe");
-const base::FilePath::CharType kElevatedHostBinaryName[] =
-    FILE_PATH_LITERAL("remote_assistance_host_uiaccess.exe");
-#endif  // BUILDFLAG(IS_WIN)
 
 // Helper functions to run |callback| asynchronously on the correct thread
 // using |task_runner|.
@@ -244,21 +231,7 @@ void It2MeNativeMessagingHost::ProcessConnect(base::DictValue message,
     return;
   }
 
-#if BUILDFLAG(IS_WIN)
-  // Requests that the support host is launched with UiAccess on Windows.
-  // This value, in conjuction with the platform policy, is used to determine
-  // if an elevated host should be used.
-  bool use_elevated_host = message.FindBool(kUseElevatedHost).value_or(false);
-
-  if (!is_process_elevated_) {
-    auto allow_elevation_policy = GetAllowElevatedHostPolicyValue();
-    // Honor the platform policy value if it is set, otherwise use the value
-    // provided through the native messaging host.
-    use_elevated_host_ = allow_elevation_policy.value_or(use_elevated_host);
-  }
-#else
   CHECK(!is_process_elevated_) << "Unexpected value for this platform";
-#endif
 
   if (use_elevated_host_) {
     // Attempt to pass the current message to the elevated process.  This method
@@ -568,17 +541,6 @@ void It2MeNativeMessagingHost::OnPolicyUpdate(base::DictValue policies) {
 std::optional<bool>
 It2MeNativeMessagingHost::GetAllowElevatedHostPolicyValue() {
   DCHECK(policy_received_);
-#if BUILDFLAG(IS_WIN)
-  base::DictValue platform_policies = policy_watcher_->GetPlatformPolicies();
-  auto* platform_policy_value = platform_policies.FindByDottedPath(
-      policy::key::kRemoteAccessHostAllowUiAccessForRemoteAssistance);
-  if (platform_policy_value) {
-    // Use the platform policy value.
-    bool value = platform_policy_value->GetBool();
-    LOG(INFO) << "Allow UiAccess for remote support policy value: " << value;
-    return value;
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   return std::nullopt;
 }
@@ -628,42 +590,8 @@ std::string It2MeNativeMessagingHost::ExtractAccessToken(
   return *access_token;
 }
 
-#if BUILDFLAG(IS_WIN)
-
-bool It2MeNativeMessagingHost::DelegateToElevatedHost(base::DictValue message) {
-  DCHECK(task_runner()->BelongsToCurrentThread());
-  DCHECK(use_elevated_host_);
-
-  if (!elevated_host_) {
-    base::FilePath binary_path =
-        base::CommandLine::ForCurrentProcess()->GetProgram();
-    CHECK(binary_path.BaseName() == base::FilePath(kBaseHostBinaryName));
-
-    // The new process runs at an elevated level due to being granted uiAccess.
-    // |parent_window_handle| can be used to position dialog windows but is not
-    // currently used.
-    elevated_host_ = std::make_unique<ElevatedNativeMessagingHost>(
-        binary_path.DirName().Append(kElevatedHostBinaryName),
-        /*parent_window_handle=*/0,
-        /*elevate_process=*/false,
-        /*host_timeout=*/base::TimeDelta(), client_);
-  }
-
-  if (elevated_host_->EnsureElevatedHostCreated() ==
-      PROCESS_LAUNCH_RESULT_SUCCESS) {
-    elevated_host_->SendMessage(message);
-    return true;
-  }
-
-  return false;
-}
-
-#else  // !BUILDFLAG(IS_WIN)
-
 bool It2MeNativeMessagingHost::DelegateToElevatedHost(base::DictValue message) {
   NOTREACHED();
 }
-
-#endif  // !BUILDFLAG(IS_WIN)
 
 }  // namespace remoting

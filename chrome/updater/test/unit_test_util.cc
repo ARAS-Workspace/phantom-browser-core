@@ -55,15 +55,6 @@
 #include "chrome/updater/util/util.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <shlobj.h>
-
-#include "base/win/scoped_handle.h"
-#include "chrome/test/base/process_inspector_win.h"
-#include "chrome/updater/util/win_util.h"
-#include "chrome/updater/win/test/test_executables.h"
-#endif
-
 namespace updater::test {
 
 namespace {
@@ -203,14 +194,6 @@ bool KillProcesses(const base::FilePath::StringType& executable_name,
 
     const bool process_terminated = process.Terminate(exit_code, true);
 
-#if BUILDFLAG(IS_WIN)
-    PLOG_IF(ERROR, !process_terminated &&
-                       !::TerminateProcess(process.Handle(),
-                                           static_cast<UINT>(exit_code)))
-        << "::TerminateProcess failed: " << executable_name << ": "
-        << entry.pid();
-#endif  // BUILDFLAG(IS_WIN)
-
     result &= process_terminated;
   }
   return result;
@@ -284,104 +267,6 @@ void InitLoggingForUnitTest(const base::FilePath& log_base_path) {
       listeners.Release(listeners.default_result_printer())));
 }
 
-#if BUILDFLAG(IS_WIN)
-namespace {
-constexpr wchar_t kProcmonPath[] = L"C:\\tools\\Procmon.exe";
-}  // namespace
-
-base::FilePath StartProcmonLogging() {
-  if (!::IsUserAnAdmin()) {
-    LOG(WARNING) << __func__
-                 << ": user is not an admin, skipping procmon logging";
-    return {};
-  }
-
-  if (!base::PathExists(base::FilePath(kProcmonPath))) {
-    LOG(WARNING) << __func__
-                 << ": procmon missing, skipping logging: " << kProcmonPath;
-    return {};
-  }
-
-  base::FilePath dest_dir = GetLogDestinationDir();
-  if (dest_dir.empty() || !base::PathExists(dest_dir)) {
-    LOG(ERROR) << __func__ << ": failed to get log destination dir";
-    return {};
-  }
-
-  dest_dir = dest_dir.AppendUTF8(GetTestName());
-  if (!base::CreateDirectory(dest_dir)) {
-    LOG(ERROR) << __func__
-               << ": failed to create log destination dir: " << dest_dir;
-    return {};
-  }
-
-  const base::FilePath pmc_path(GetTestFilePath("ProcmonConfiguration.pmc"));
-  CHECK(base::PathExists(pmc_path));
-
-  base::Time::Exploded exploded;
-  base::Time::Now().LocalExplode(&exploded);
-  const base::FilePath pml_file(dest_dir.AppendASCII(base::StringPrintf(
-      "%02d%02d%02d-%02d%02d%02d.PML", exploded.year % 100, exploded.month,
-      exploded.day_of_month, exploded.hour, exploded.minute, exploded.second)));
-
-  const std::wstring& cmdline = base::StrCat(
-      {kProcmonPath, L" /AcceptEula /LoadConfig ",
-       base::CommandLine::QuoteForCommandLineToArgvW(pmc_path.value()),
-       L" /BackingFile ",
-       base::CommandLine::QuoteForCommandLineToArgvW(pml_file.value()),
-       L" /Quiet /externalcapture"});
-  base::LaunchOptions options;
-  options.start_hidden = true;
-  VLOG(1) << __func__ << ": running: " << cmdline;
-  const base::Process process = base::LaunchProcess(cmdline, options);
-
-  if (!process.IsValid()) {
-    LOG(ERROR) << __func__ << ": failed to run: " << cmdline;
-    return {};
-  }
-
-  // Gives time for the procmon process to start logging. Without a sleep,
-  // `procmon` is unable to fully initialize the logging, and subsequently when
-  // `procmon /Terminate` is called to terminate the logging `procmon`, it
-  // causes the PML log file to corrupt.
-  base::PlatformThread::Sleep(base::Seconds(3));
-
-  return pml_file;
-}
-
-void StopProcmonLogging(const base::FilePath& pml_file) {
-  if (!::IsUserAnAdmin() || !base::PathExists(base::FilePath(kProcmonPath)) ||
-      !pml_file.MatchesFinalExtension(L".PML")) {
-    return;
-  }
-
-  for (const std::wstring& cmdline :
-       {base::StrCat({kProcmonPath, L" /Terminate"})}) {
-    base::LaunchOptions options;
-    options.start_hidden = true;
-    options.wait = true;
-    VLOG(1) << __func__ << ": running: " << cmdline;
-    const base::Process process = base::LaunchProcess(cmdline, options);
-    LOG_IF(ERROR, !process.IsValid())
-        << __func__ << ": failed to run: " << cmdline;
-  }
-
-  // Make a copy of the PML file in case the original gets deleted.
-  if (!base::CopyFile(pml_file, pml_file.ReplaceExtension(L".PML.BAK"))) {
-    LOG(ERROR) << __func__ << ": failed to backup pml file";
-  }
-}
-
-EventHolder CreateWaitableEventForTest() {
-  NamedObjectAttributes attr = GetNamedObjectAttributes(
-      base::NumberToWString(::GetCurrentProcessId()).c_str(),
-      GetUpdaterScopeForTesting());
-  return {base::WaitableEvent(base::win::ScopedHandle(
-              ::CreateEvent(&attr.sa, FALSE, FALSE, attr.name.c_str()))),
-          attr.name};
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 const base::ProcessIterator::ProcessEntries FindProcesses(
     const base::FilePath::StringType& executable_name,
     const base::ProcessFilter* filter) {
@@ -402,14 +287,6 @@ std::string PrintProcesses(const base::FilePath::StringType& executable_name,
                             ? base::TimeFormatHTTP(process.CreationTime())
                             : "n/a";
                }(entry.pid());
-#if BUILDFLAG(IS_WIN)
-    message << ", cmdline=" << [](base::ProcessId pid) {
-      std::unique_ptr<ProcessInspector> process_inspector =
-          ProcessInspector::Create(base::Process::OpenWithAccess(
-              pid, PROCESS_ALL_ACCESS | PROCESS_VM_READ));
-      return process_inspector ? process_inspector->command_line() : L"n/a";
-    }(entry.pid());
-#endif
     message << std::endl;
   }
   message << demarcation << std::endl;
@@ -459,13 +336,6 @@ void SetupFakeUpdaterVersion(UpdaterScope scope,
 void SetupMockUpdater(const base::FilePath& mock_updater_path) {
   const base::FilePath updater_dir(mock_updater_path.DirName());
 
-#if BUILDFLAG(IS_WIN)
-  // A valid executable is needed for Windows.
-  const base::FilePath test_executable(
-      GetTestProcessCommandLine(GetUpdaterScopeForTesting(),
-                                test::GetTestName())
-          .GetProgram());
-#else
   // Create an empty temporary file.
   base::ScopedTempDir temp_dir;
   ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
@@ -474,7 +344,6 @@ void SetupMockUpdater(const base::FilePath& mock_updater_path) {
   base::File file(test_executable,
                   base::File::FLAG_CREATE | base::File::FLAG_WRITE);
   ASSERT_TRUE(file.IsValid());
-#endif
 
   for (const base::FilePath& dir :
        {updater_dir, updater_dir.Append(FILE_PATH_LITERAL("1.2.3.4")),

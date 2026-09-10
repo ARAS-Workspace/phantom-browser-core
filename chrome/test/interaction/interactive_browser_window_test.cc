@@ -447,7 +447,7 @@ InteractiveBrowserWindowTestApi::WaitForWebContentsPainted(
   wait_step.SetMustBeVisibleAtStart(false);
   wait_step.AddDescriptionPrefix("WaitForWebContentsPainted()");
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   const bool requires_workaround = true;
 #else
   const bool requires_workaround = false;

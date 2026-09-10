@@ -11,32 +11,12 @@
 #include "content/public/common/content_switches.h"
 #include "ui/compositor/compositor_switches.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/dark_mode_support.h"
-#include "base/win/win_util.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 int main(int argc, char** argv) {
   base::CommandLine::Init(argc, argv);
   size_t parallel_jobs = base::NumParallelJobs(/*cores_per_job=*/2);
   if (parallel_jobs == 0U) {
     return 1;
   }
-
-#if BUILDFLAG(IS_WIN)
-  // Many tests validate code that requires user32.dll to be loaded. Loading it,
-  // however, cannot be done on the main thread loop because it is a blocking
-  // call, and all the test code runs on the main thread loop. Instead, just
-  // load and pin the module early on in startup before the blocking becomes an
-  // issue.
-  base::win::PinUser32();
-
-  base::win::EnableHighDPISupport();
-
-  // Like user32.dll above, some tests require uxtheme.dll to be loaded. This
-  // call will ensure uxtheme.dll is pinned early on startup.
-  base::win::IsDarkModeAvailable();
-#endif  // BUILDFLAG(IS_WIN)
 
   base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
 
@@ -46,13 +26,6 @@ int main(int argc, char** argv) {
     // Since the test is interactive, the invoker will want to have pixel output
     // to actually see the result.
     command_line->AppendSwitch(switches::kEnablePixelOutputInTests);
-#if BUILDFLAG(IS_WIN)
-    // Under Windows, dialogs (but not the browser window) created in the
-    // spawned browser_test process are invisible for some unknown reason.
-    // Pass in --disable-gpu to resolve this for now. See
-    // http://crbug.com/40504416.
-    command_line->AppendSwitch(switches::kDisableGpu);
-#endif  // BUILDFLAG(IS_WIN)
   }
 
   ChromeTestSuiteRunner runner;

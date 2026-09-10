@@ -15,7 +15,7 @@
 // the class is declared for all branded builds but only linked on these
 // platforms.
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
+    (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
 #define GEIC_SUPPORTS_CHANNEL_OVERRIDE 1
 #else
 #define GEIC_SUPPORTS_CHANNEL_OVERRIDE 0

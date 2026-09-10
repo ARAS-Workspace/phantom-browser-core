@@ -2163,7 +2163,7 @@ class IsolateIcelandFrameTreeBrowserTest : public ContentBrowserTest {
 
 // Regression test for https://crbug.com/644966
 // TODO(crbug.com/432164517): The test is flaky on all platforms.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_ProcessSwitchForIsolatedBlob DISABLED_ProcessSwitchForIsolatedBlob
 #else
 #define MAYBE_ProcessSwitchForIsolatedBlob ProcessSwitchForIsolatedBlob

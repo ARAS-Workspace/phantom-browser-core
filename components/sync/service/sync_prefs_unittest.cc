@@ -1150,7 +1150,7 @@ TEST_F(SyncPrefsMigrationTest, MigratesPreferencesNotOptedIn) {
   prefs.MaybeMigratePrefsForSyncToSigninPart1(
       SyncPrefs::SyncAccountState::kSignedInWithoutSyncConsent, gaia_id_);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // After migration, Preferences should still be enabled (by default).
   EXPECT_TRUE(prefs.GetSelectedTypesForAccount(gaia_id_).Has(
       UserSelectableType::kPreferences));
@@ -1259,7 +1259,7 @@ TEST_F(SyncPrefsMigrationTest, MigratesBookmarksNotOptedIn) {
     prefs.MaybeMigratePrefsForSyncToSigninPart1(
         SyncPrefs::SyncAccountState::kSignedInWithoutSyncConsent, gaia_id_);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     // After the migration, the types should be enabled.
     EXPECT_TRUE(prefs.GetSelectedTypesForAccount(gaia_id_).Has(
         UserSelectableType::kBookmarks));

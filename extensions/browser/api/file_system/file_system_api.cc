@@ -145,11 +145,7 @@ bool GetFileTypesFromAcceptOption(
 
   if (accept_option.extensions) {
     for (const auto& item : *accept_option.extensions) {
-#if BUILDFLAG(IS_WIN)
-      extension_set.insert(base::UTF8ToWide(item));
-#else
       extension_set.insert(item);
-#endif
     }
   }
 
@@ -171,11 +167,6 @@ constexpr char kLastChooseEntryDirectory[] = "last_choose_file_directory";
 
 constexpr auto kGraylistedPaths = std::to_array<int>({
     base::DIR_HOME,
-#if BUILDFLAG(IS_WIN)
-    base::DIR_PROGRAM_FILES,
-    base::DIR_PROGRAM_FILESX86,
-    base::DIR_WINDOWS,
-#endif
 });
 
 using FileInfoOptCallback =

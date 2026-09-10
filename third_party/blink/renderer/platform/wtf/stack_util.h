@@ -30,10 +30,6 @@ WTF_EXPORT extern uintptr_t g_main_thread_underestimated_stack_size;
 
 WTF_EXPORT void InitializeMainThreadStackEstimate();
 
-#if BUILDFLAG(IS_WIN) && defined(COMPILER_MSVC)
-size_t ThreadStackSize();
-#endif
-
 }  // namespace internal
 
 // Returns true if the function is not called on the main thread. May return

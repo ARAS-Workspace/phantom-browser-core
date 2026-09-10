@@ -285,7 +285,7 @@ IN_PROC_BROWSER_TEST_F(SettingsOverriddenDialogBrowserTest,
 
 // The chrome_settings_overrides API that allows extensions to override the
 // default search provider is only available on Windows and Mac.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
 // Class to test the older non-explicit dialog. Delete this if the new dialog
 // launches. Note that the new dialog is tested via interactive UI tests, not
@@ -317,7 +317,7 @@ IN_PROC_BROWSER_TEST_F(SearchOverriddenLegacyDialogBrowserTest,
   ShowAndVerifyUi();
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Functional Browser Tests

@@ -681,20 +681,6 @@
   E_CPONLY(kColorNativeTabForegroundInactiveFrameInactive) \
   E_CPONLY(kColorNativeTextfieldBorderUnfocused)\
   E_CPONLY(kColorNativeToolbarBackground)
-#elif BUILDFLAG(IS_WIN)
-#define PLATFORM_SPECIFIC_COLOR_IDS \
-  E_CPONLY(kColorNativeBtnFace) \
-  E_CPONLY(kColorNativeBtnHighlight) \
-  E_CPONLY(kColorNativeBtnShadow) \
-  E_CPONLY(kColorNativeBtnText) \
-  E_CPONLY(kColorNativeGrayText) \
-  E_CPONLY(kColorNativeHighlight) \
-  E_CPONLY(kColorNativeHighlightText) \
-  E_CPONLY(kColorNativeHotlight) \
-  E_CPONLY(kColorNativeMenuHilight) \
-  E_CPONLY(kColorNativeScrollbar) \
-  E_CPONLY(kColorNativeWindow) \
-  E_CPONLY(kColorNativeWindowText)
 #else
 #define PLATFORM_SPECIFIC_COLOR_IDS
 #endif

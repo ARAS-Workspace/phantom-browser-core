@@ -25,11 +25,6 @@
 #include "services/preferences/tracked/features.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/enterprise_util.h"
-#include "base/memory/scoped_refptr.h"
-#endif
-
 namespace {
 class PrefHashCalculatorEncryptedTest : public testing::Test {
  protected:
@@ -125,29 +120,6 @@ TEST(PrefHashCalculatorTest, TestCurrentAlgorithm) {
       calc1.Calculate("pref_path", static_cast<const base::Value*>(nullptr))
           .empty());
 }
-
-#if BUILDFLAG(IS_WIN)
-class PrefHashCalculatorEnterpriseTest : public testing::Test {
- protected:
-  PrefHashCalculatorEnterpriseTest() : calculator_("seed", "deviceid") {}
-
-  PrefHashCalculator calculator_;
-  std::optional<base::AutoReset<bool>> is_enterprise_device_for_testing_;
-};
-
-TEST_F(PrefHashCalculatorEnterpriseTest, EnterpriseDevice) {
-  base::Value string_value_1("string value 1");
-  base::Value string_value_2("string value 2");
-
-  is_enterprise_device_for_testing_ =
-      base::SetIsEnterpriseDeviceForTesting(true);
-  ASSERT_EQ(PrefHashCalculator::VALID,
-            calculator_.Validate(
-                "pref_path", &string_value_1,
-                calculator_.Calculate("pref_path", &string_value_2)));
-  is_enterprise_device_for_testing_.reset();
-}
-#endif
 
 // Tests the output against a known value to catch unexpected algorithm changes.
 // The test hashes below must NEVER be updated, the serialization algorithm used
@@ -383,70 +355,3 @@ TEST_F(PrefHashCalculatorEncryptedTest, EncryptedHashValuesAreStable) {
 
   EXPECT_EQ(base::as_byte_span(*decrypted_hash), kExpectedHash);
 }
-
-#if BUILDFLAG(IS_WIN)
-class PrefHashCalculatorEncryptedWeakHashFeatureTest
-    : public PrefHashCalculatorEncryptedTest,
-      public ::testing::WithParamInterface<bool> {
- public:
-  PrefHashCalculatorEncryptedWeakHashFeatureTest() {
-    feature_list_.InitWithFeatureState(tracked::kRejectWeakCiphertext,
-                                       GetParam());
-  }
-
- private:
-  base::test::ScopedFeatureList feature_list_;
-};
-
-TEST_P(PrefHashCalculatorEncryptedWeakHashFeatureTest, WeakHash) {
-  std::optional<std::string> encrypted_hash;
-  base::Value value_int(555);
-
-  {
-    std::vector<std::pair<size_t, std::unique_ptr<os_crypt_async::KeyProvider>>>
-        providers;
-    providers.emplace_back(/*precedence=*/5u,
-                           std::make_unique<TestKeyProvider>("v10"));
-    os_crypt_async::OSCryptAsync os_crypt(std::move(providers));
-
-    base::test::TestFuture<scoped_refptr<os_crypt_async::Encryptor>> future;
-    os_crypt.GetInstance(future.GetCallback());
-    const auto encryptor = future.Take();
-
-    // This encrypted hash is now encrypted with v10 key.
-    encrypted_hash = calculator_.CalculateEncryptedHash("p.dict", &value_int,
-                                                        encryptor.get());
-    const auto validation_result = calculator_.ValidateEncrypted(
-        "p.dict", &value_int, *encrypted_hash, encryptor.get());
-    EXPECT_EQ(validation_result, PrefHashCalculator::VALID_ENCRYPTED);
-  }
-
-  EXPECT_TRUE(encrypted_hash.has_value());
-  {
-    std::vector<std::pair<size_t, std::unique_ptr<os_crypt_async::KeyProvider>>>
-        providers;
-    // v10 key is available for decryption.
-    providers.emplace_back(/*precedence=*/5u,
-                           std::make_unique<TestKeyProvider>("v10"));
-    // v20 key is higher precedence, and preferred for encryption.
-    providers.emplace_back(/*precedence=*/10u,
-                           std::make_unique<TestKeyProvider>("v20"));
-    os_crypt_async::OSCryptAsync os_crypt(std::move(providers));
-
-    base::test::TestFuture<scoped_refptr<os_crypt_async::Encryptor>> future;
-    os_crypt.GetInstance(future.GetCallback());
-    const auto encryptor = future.Take();
-
-    const auto validation_result = calculator_.ValidateEncrypted(
-        "p.dict", &value_int, *encrypted_hash, encryptor.get());
-    EXPECT_EQ(validation_result, GetParam()
-                                     ? PrefHashCalculator::WEAK_HASH_ENCRYPTED
-                                     : PrefHashCalculator::VALID_ENCRYPTED);
-  }
-}
-
-INSTANTIATE_TEST_SUITE_P(,
-                         PrefHashCalculatorEncryptedWeakHashFeatureTest,
-                         testing::Bool());
-
-#endif  // BUILDFLAG(IS_WIN)

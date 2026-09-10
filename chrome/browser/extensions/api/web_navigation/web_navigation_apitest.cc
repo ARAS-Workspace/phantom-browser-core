@@ -517,11 +517,7 @@ IN_PROC_BROWSER_TEST_F(WebNavigationApiPrerenderTestWithServiceWorker,
 // TODO(crbug.com/371432404): Fix for desktop Android. Times out.
 // TODO(crbug.com/40791797):
 // WebNavigationApiTest.Download test is flaky.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_Download DISABLED_Download
-#else
 #define MAYBE_Download Download
-#endif
 IN_PROC_BROWSER_TEST_F(WebNavigationApiTest, MAYBE_Download) {
   ASSERT_TRUE(StartEmbeddedTestServer());
   content::DownloadManager* download_manager = profile()->GetDownloadManager();

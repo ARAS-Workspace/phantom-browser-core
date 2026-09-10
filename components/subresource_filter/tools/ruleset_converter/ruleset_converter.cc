@@ -84,12 +84,7 @@ bool RulesetConverter::Convert() {
 
 bool RulesetConverter::SetInputFiles(
     const base::CommandLine::StringType& comma_separated_paths) {
-#if BUILDFLAG(IS_WIN)
-  std::wstring separatorw = L",";
-  std::wstring_view separator(separatorw);
-#else
   std::string_view separator(",");
-#endif
   for (const auto& piece : base::SplitStringPiece(
            comma_separated_paths, separator, base::TRIM_WHITESPACE,
            base::SPLIT_WANT_NONEMPTY)) {

@@ -8,9 +8,7 @@
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/install_static/test/scoped_install_details.h"
-#elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
 #include "base/test/nix/scoped_chrome_version_extra_override.h"
 #endif
 
@@ -31,7 +29,7 @@ class ScopedChannelOverride {
     kStable,
     kBeta,
     kDev,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     kCanary,
 #endif
   };
@@ -40,9 +38,7 @@ class ScopedChannelOverride {
   ~ScopedChannelOverride();
 
  private:
-#if BUILDFLAG(IS_WIN)
-  install_static::ScopedInstallDetails scoped_install_details_;
-#elif BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
   base::test::ScopedChromeVersionExtraOverride scoped_channel_override_;
 #endif
 };

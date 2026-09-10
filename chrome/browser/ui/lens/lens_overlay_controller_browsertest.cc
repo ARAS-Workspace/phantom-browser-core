@@ -5026,13 +5026,8 @@ IN_PROC_BROWSER_TEST_F(LensOverlayControllerBrowserTest,
 }
 
 // TODO(crbug.com/422501416): Re-enable this test on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_OverlayInBackgroundClosesIfRendererExits \
-  DISABLED_OverlayInBackgroundClosesIfRendererExits
-#else
 #define MAYBE_OverlayInBackgroundClosesIfRendererExits \
   OverlayInBackgroundClosesIfRendererExits
-#endif
 IN_PROC_BROWSER_TEST_F(LensOverlayControllerBrowserTest,
                        MAYBE_OverlayInBackgroundClosesIfRendererExits) {
   WaitForPaint();
@@ -6067,11 +6062,7 @@ IN_PROC_BROWSER_TEST_P(LensOverlayControllerBrowserPDFContextualizationTest,
 }
 
 // TODO(crbug.com/423881729): Flaky on Win ASAN
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_Histograms DISABLED_Histograms
-#else
 #define MAYBE_Histograms Histograms
-#endif
 IN_PROC_BROWSER_TEST_P(LensOverlayControllerBrowserPDFContextualizationTest,
                        MAYBE_Histograms) {
   ukm::TestAutoSetUkmRecorder test_ukm_recorder;
@@ -7626,13 +7617,8 @@ IN_PROC_BROWSER_TEST_F(LensOverlayControllerBrowserTest,
 // instead the side panel logic. Therefore, this test should be moved to a side
 // panel browsertest file.
 // TODO(crbug.com/439622878): Test is flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_IssueTextSearchRequest_SuppressesContextualization \
-  DISABLED_IssueTextSearchRequest_SuppressesContextualization
-#else
 #define MAYBE_IssueTextSearchRequest_SuppressesContextualization \
   IssueTextSearchRequest_SuppressesContextualization
-#endif
 IN_PROC_BROWSER_TEST_F(
     LensOverlayControllerBrowserTest,
     MAYBE_IssueTextSearchRequest_SuppressesContextualization) {
@@ -8336,11 +8322,7 @@ IN_PROC_BROWSER_TEST_F(LensOverlayControllerInnerTextAndApc,
 }
 
 // TODO(crbug.com/422479353): This test seems to be too slow on Windows ASAN.
-#if BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER)
-#define MAYBE_PageContentTypeHistograms DISABLED_PageContentTypeHistograms
-#else
 #define MAYBE_PageContentTypeHistograms PageContentTypeHistograms
-#endif
 IN_PROC_BROWSER_TEST_F(LensOverlayControllerInnerTextAndApc,
                        MAYBE_PageContentTypeHistograms) {
   ukm::TestAutoSetUkmRecorder test_ukm_recorder;

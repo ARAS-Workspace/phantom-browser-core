@@ -41,11 +41,7 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/abseil-cpp/absl/strings/str_format.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/test/test_reg_util_win.h"
-#include "chrome/updater/util/win_util.h"
-#include "chrome/updater/win/win_constants.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/updater/util/mac_util.h"
 #endif
 
@@ -53,11 +49,7 @@ namespace updater {
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-constexpr char kGlobalPolicyKey[] = "";
-#else
 constexpr char kGlobalPolicyKey[] = "global";
-#endif
 
 using ::testing::ElementsAre;
 using ::testing::Optional;
@@ -988,10 +980,6 @@ class PolicyManagersTest : public ::testing::Test {
   void SetUp() override {
     ASSERT_NO_FATAL_FAILURE(DeleteOverridesFile());
 
-#if BUILDFLAG(IS_WIN)
-    ASSERT_NO_FATAL_FAILURE(
-        registry_overrides_.OverrideRegistry(HKEY_LOCAL_MACHINE));
-#endif
   }
 
   void TearDown() override { ASSERT_NO_FATAL_FAILURE(DeleteOverridesFile()); }
@@ -1065,10 +1053,6 @@ class PolicyManagersTest : public ::testing::Test {
   const std::optional<base::FilePath> overrides_file_path_ =
       GetOverrideFilePath(GetUpdaterScopeForTesting());
 
-#if BUILDFLAG(IS_WIN)
-  registry_util::RegistryOverrideManager registry_overrides_;
-  base::test::TaskEnvironment environment_;
-#endif
 };
 
 TEST_F(PolicyManagersTest, NullExternalConstants) {

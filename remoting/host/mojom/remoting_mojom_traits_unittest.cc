@@ -50,9 +50,6 @@ namespace {
 struct DesktopCaptureOptionsParams {
   bool use_update_notifications;
   bool detect_updated_region;
-#if BUILDFLAG(IS_WIN)
-  bool allow_directx_capturer;
-#endif
 };
 
 class DesktopCaptureOptionsTest
@@ -63,9 +60,6 @@ TEST_P(DesktopCaptureOptionsTest, RoundTrip) {
   webrtc::DesktopCaptureOptions input;
   input.set_use_update_notifications(params.use_update_notifications);
   input.set_detect_updated_region(params.detect_updated_region);
-#if BUILDFLAG(IS_WIN)
-  input.set_allow_directx_capturer(params.allow_directx_capturer);
-#endif
 
   webrtc::DesktopCaptureOptions output;
   ASSERT_TRUE(mojo::test::SerializeAndDeserialize<mojom::DesktopCaptureOptions>(
@@ -74,29 +68,15 @@ TEST_P(DesktopCaptureOptionsTest, RoundTrip) {
   EXPECT_EQ(input.use_update_notifications(),
             output.use_update_notifications());
   EXPECT_EQ(input.detect_updated_region(), output.detect_updated_region());
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(input.allow_directx_capturer(), output.allow_directx_capturer());
-#endif
 }
 
 INSTANTIATE_TEST_SUITE_P(RemotingMojomTraitsTest,
                          DesktopCaptureOptionsTest,
                          testing::Values(
-#if BUILDFLAG(IS_WIN)
-                             DesktopCaptureOptionsParams{false, false, false},
-                             DesktopCaptureOptionsParams{false, false, true},
-                             DesktopCaptureOptionsParams{false, true, false},
-                             DesktopCaptureOptionsParams{false, true, true},
-                             DesktopCaptureOptionsParams{true, false, false},
-                             DesktopCaptureOptionsParams{true, false, true},
-                             DesktopCaptureOptionsParams{true, true, false},
-                             DesktopCaptureOptionsParams{true, true, true}
-#else
                              DesktopCaptureOptionsParams{false, false},
                              DesktopCaptureOptionsParams{false, true},
                              DesktopCaptureOptionsParams{true, false},
                              DesktopCaptureOptionsParams{true, true}
-#endif
                              ));
 
 struct DesktopEnvironmentOptionsParams {
@@ -497,34 +477,6 @@ TEST(RemotingMojomTraitsTest, KeyBehavior) {
             output.actions().at(0).character());
 }
 
-#if BUILDFLAG(IS_WIN)
-TEST(RemotingMojomTraitsTest, FileChooserResult) {
-  {
-    base::FilePath path(FILE_PATH_LITERAL("C:\\test\\file.txt"));
-    protocol::FileTransferResult<base::FilePath> input;
-    input.EmplaceSuccess(path);
-
-    protocol::FileTransferResult<base::FilePath> output;
-    ASSERT_TRUE(mojo::test::SerializeAndDeserialize<mojom::FileChooserResult>(
-        input, output));
-    EXPECT_TRUE(output.is_success());
-    EXPECT_EQ(path, output.success());
-  }
-  {
-    protocol::FileTransfer_Error error;
-    error.set_type(protocol::FileTransfer_Error::IO_ERROR);
-    protocol::FileTransferResult<base::FilePath> input;
-    input.EmplaceError(error);
-
-    protocol::FileTransferResult<base::FilePath> output;
-    ASSERT_TRUE(mojo::test::SerializeAndDeserialize<mojom::FileChooserResult>(
-        input, output));
-    EXPECT_TRUE(output.is_error());
-    EXPECT_EQ(error.type(), output.error().type());
-  }
-}
-#endif
-
 TEST(RemotingMojomTraitsTest, ScreenResolution) {
   ScreenResolution input(webrtc::DesktopSize(1920, 1080),
                          webrtc::DesktopVector(96, 96));
@@ -880,9 +832,6 @@ TEST(RemotingMojomTraitsTest, SessionOptionsRoundTrip) {
   input.capture_video_on_dedicated_thread = false;
 #if BUILDFLAG(IS_MAC)
   input.enable_sck_capturer = true;
-#endif
-#if BUILDFLAG(IS_WIN)
-  input.allow_dxgi_capturer = false;
 #endif
   input.disable_udp = true;
   input.vp9_encoder_speed = 8;

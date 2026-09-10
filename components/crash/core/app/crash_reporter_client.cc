@@ -9,13 +9,8 @@
 
 // On Windows don't use FilePath and logging.h.
 // http://crbug.com/604923
-#if !BUILDFLAG(IS_WIN)
 #include "base/check.h"
 #include "base/files/file_path.h"
-#else
-#include <assert.h>
-#define DCHECK assert
-#endif
 
 namespace crash_reporter {
 
@@ -44,30 +39,12 @@ CrashReporterClient* GetCrashReporterClient() {
 CrashReporterClient::CrashReporterClient() = default;
 CrashReporterClient::~CrashReporterClient() = default;
 
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_ANDROID)
+#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
 void CrashReporterClient::SetCrashReporterClientIdFromGUID(
     const std::string& client_guid) {}
 #endif
 
-#if BUILDFLAG(IS_WIN)
-bool CrashReporterClient::GetAlternativeCrashDumpLocation(
-    std::wstring* crash_dir) {
-  return false;
-}
-
-void CrashReporterClient::GetProductNameAndVersion(const std::wstring& exe_path,
-                                                   std::wstring* product_name,
-                                                   std::wstring* version,
-                                                   std::wstring* special_build,
-                                                   std::wstring* channel_name) {
-}
-
-std::wstring CrashReporterClient::GetWerRuntimeExceptionModule() {
-  return std::wstring();
-}
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN) || (BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC))
+#if BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_MAC)
 bool CrashReporterClient::GetShouldDumpLargerDumps() {
   return false;
 }
@@ -84,19 +61,11 @@ bool CrashReporterClient::HandleCrashDump(const char* crashdump_filename,
 }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-bool CrashReporterClient::GetCrashDumpLocation(std::wstring* crash_dir) {
-#else
 bool CrashReporterClient::GetCrashDumpLocation(base::FilePath* crash_dir) {
-#endif
   return false;
 }
 
-#if BUILDFLAG(IS_WIN)
-bool CrashReporterClient::GetCrashMetricsLocation(std::wstring* crash_dir) {
-#else
 bool CrashReporterClient::GetCrashMetricsLocation(base::FilePath* crash_dir) {
-#endif
   return false;
 }
 

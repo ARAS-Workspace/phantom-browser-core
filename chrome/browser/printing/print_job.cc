@@ -27,24 +27,6 @@
 #include "printing/mojom/print.mojom.h"
 #include "printing/printed_document.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <optional>
-
-#include "base/command_line.h"
-#include "base/strings/utf_string_conversions.h"
-#include "chrome/browser/pdf/pdf_pref_names.h"
-#include "chrome/browser/printing/pdf_to_emf_converter.h"
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/common/chrome_features.h"
-#include "chrome/common/pref_names.h"
-#include "components/prefs/pref_service.h"
-#include "printing/backend/win_helper.h"
-#include "printing/page_number.h"
-#include "printing/pdf_render_settings.h"
-#include "printing/printed_page_win.h"
-#include "printing/printing_features.h"
-#include "url/gurl.h"
-#endif
 
 
 namespace printing {
@@ -56,118 +38,9 @@ void HoldRefCallback(scoped_refptr<PrintJob> job, base::OnceClosure callback) {
   std::move(callback).Run();
 }
 
-#if BUILDFLAG(IS_WIN)
-// Those must be kept in sync with the values defined in policy_templates.json.
-enum class PrintPostScriptMode {
-  // Do normal PostScript generation. Text is always rendered with Type 3 fonts.
-  // Default value when policy not set.
-  kDefault = 0,
-  // Text is rendered with Type 42 fonts if possible.
-  kType42 = 1,
-  kMaxValue = kType42,
-};
-
-// Those must be kept in sync with the values defined in policy_templates.json.
-enum class PrintRasterizationMode {
-  // Do full page rasterization if necessary. Default value when policy not set.
-  kFull = 0,
-  // Avoid rasterization if possible.
-  kFast = 1,
-  kMaxValue = kFast,
-};
-
-bool PrintWithPostScriptType42Fonts(PrefService* prefs) {
-  // Managed preference takes precedence over user preference and field trials.
-  if (prefs && prefs->IsManagedPreference(prefs::kPrintPostScriptMode)) {
-    int value = prefs->GetInteger(prefs::kPrintPostScriptMode);
-    return value == static_cast<int>(PrintPostScriptMode::kType42);
-  }
-
-  return base::FeatureList::IsEnabled(
-      features::kPrintWithPostScriptType42Fonts);
-}
-
-bool PrintWithReducedRasterization(PrefService* prefs) {
-  // Managed preference takes precedence over user preference and field trials.
-  if (prefs && prefs->IsManagedPreference(prefs::kPrintRasterizationMode)) {
-    int value = prefs->GetInteger(prefs::kPrintRasterizationMode);
-    return value == static_cast<int>(PrintRasterizationMode::kFast);
-  }
-
-  return base::FeatureList::IsEnabled(features::kPrintWithReducedRasterization);
-}
-
-PrefService* GetPrefsForWebContents(content::WebContents* web_contents) {
-  // TODO(thestig): Figure out why crbug.com/40692772 occurred, which is likely
-  // because `web_contents` was null. As a result, this section has many more
-  // pointer checks to avoid crashing.
-  content::BrowserContext* context =
-      web_contents ? web_contents->GetBrowserContext() : nullptr;
-  return context ? Profile::FromBrowserContext(context)->GetPrefs() : nullptr;
-}
-
-content::WebContents* GetWebContents(content::GlobalRenderFrameHostId rfh_id) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  auto* rfh = content::RenderFrameHost::FromID(rfh_id);
-  return rfh ? content::WebContents::FromRenderFrameHost(rfh) : nullptr;
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace
 
-#if BUILDFLAG(IS_WIN)
-class PrintJob::PdfConversionState {
- public:
-  PdfConversionState(const gfx::Size& page_size,
-                     const gfx::Rect& content_area,
-                     const std::optional<bool>& use_skia,
-                     const GURL& url)
-      : page_size_(page_size),
-        content_area_(content_area),
-        use_skia_(use_skia),
-        url_(url) {}
-
-  void Start(scoped_refptr<base::RefCountedMemory> data,
-             const PdfRenderSettings& conversion_settings,
-             PdfConverter::StartCallback start_callback) {
-    converter_ = PdfConverter::StartPdfConverter(
-        data, conversion_settings, use_skia_, url_, std::move(start_callback));
-  }
-
-  void GetMorePages(PdfConverter::GetPageCallback get_page_callback) {
-    const int kMaxNumberOfTempFilesPerDocument = 3;
-    while (pages_in_progress_ < kMaxNumberOfTempFilesPerDocument &&
-           current_page_index_ < page_count_) {
-      ++pages_in_progress_;
-      converter_->GetPage(current_page_index_++, get_page_callback);
-    }
-  }
-
-  void OnPageProcessed(PdfConverter::GetPageCallback get_page_callback) {
-    --pages_in_progress_;
-    GetMorePages(get_page_callback);
-    // Release converter if we don't need this any more.
-    if (!pages_in_progress_ && current_page_index_ >= page_count_) {
-      converter_.reset();
-    }
-  }
-
-  void set_page_count(uint32_t page_count) { page_count_ = page_count; }
-  const gfx::Size& page_size() const { return page_size_; }
-  const gfx::Rect& content_area() const { return content_area_; }
-
- private:
-  uint32_t page_count_ = 0;
-  uint32_t current_page_index_ = 0;
-  int pages_in_progress_ = 0;
-  const gfx::Size page_size_;
-  const gfx::Rect content_area_;
-  const std::optional<bool> use_skia_;
-  const GURL url_;
-  std::unique_ptr<PdfConverter> converter_;
-};
-#endif  // BUILDFLAG(IS_WIN)
 
 PrintJob::PrintJob(PrintJobManager* print_job_manager)
     : print_job_manager_(print_job_manager) {
@@ -202,13 +75,6 @@ void PrintJob::Initialize(std::unique_ptr<PrinterQuery> query,
   rfh_id_ = query->rfh_id();
   std::unique_ptr<PrintSettings> settings = query->ExtractSettings();
 
-#if BUILDFLAG(IS_WIN)
-  pdf_page_mapping_ = PageNumber::GetPages(settings->ranges(), page_count);
-  PrefService* prefs = GetPrefsForWebContents(GetWebContents(rfh_id_));
-  if (prefs && prefs->IsManagedPreference(prefs::kPdfUseSkiaRendererEnabled)) {
-    use_skia_ = prefs->GetBoolean(prefs::kPdfUseSkiaRendererEnabled);
-  }
-#endif
 
   auto new_doc = base::MakeRefCounted<PrintedDocument>(std::move(settings),
                                                        name, query->cookie());
@@ -216,57 +82,6 @@ void PrintJob::Initialize(std::unique_ptr<PrinterQuery> query,
   UpdatePrintedDocument(new_doc);
 }
 
-#if BUILDFLAG(IS_WIN)
-// static
-std::vector<uint32_t> PrintJob::GetFullPageMapping(
-    const std::vector<uint32_t>& pages,
-    uint32_t total_page_count) {
-  std::vector<uint32_t> mapping(total_page_count, kInvalidPageIndex);
-  for (uint32_t page_index : pages) {
-    // Make sure the page is in range.
-    if (page_index < total_page_count) {
-      mapping[page_index] = page_index;
-    }
-  }
-  return mapping;
-}
-
-void PrintJob::StartConversionToNativeFormat(
-    scoped_refptr<base::RefCountedMemory> print_data,
-    const gfx::Size& page_size,
-    const gfx::Rect& content_area,
-    const gfx::Point& physical_offsets,
-    const GURL& url) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-
-  if (PrintedDocument::HasDebugDumpPath())
-    document()->DebugDumpData(print_data.get(), FILE_PATH_LITERAL(".pdf"));
-
-  const PrintSettings& settings = document()->settings();
-  if (settings.printer_language_is_textonly()) {
-    StartPdfToTextConversion(print_data, page_size, url);
-  } else if (settings.printer_language_is_ps2() ||
-             settings.printer_language_is_ps3()) {
-    StartPdfToPostScriptConversion(print_data, content_area, physical_offsets,
-                                   settings.printer_language_is_ps2(), url);
-  } else {
-    StartPdfToEmfConversion(print_data, page_size, content_area, url);
-  }
-
-  // Indicate that the PDF is fully rendered and we no longer need the renderer
-  // and web contents, so the print job does not need to be cancelled if they
-  // die. This is needed on Windows because the `PrintedDocument` will not be
-  // considered complete until PDF conversion finishes.
-  document()->SetConvertingPdf();
-}
-
-void PrintJob::ResetPageMapping() {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-
-  pdf_page_mapping_ =
-      GetFullPageMapping(pdf_page_mapping_, document_->page_count());
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 void PrintJob::StartPrinting() {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
@@ -275,16 +90,7 @@ void PrintJob::StartPrinting() {
     NOTREACHED();
   }
 
-#if BUILDFLAG(IS_WIN)
-  // Do not collect duration metric if the print job will need to invoke a
-  // "Save Print Output As" dialog that waits on a user to select a filename.
-  const std::string printer_name =
-      base::UTF16ToUTF8(document_->settings().device_name());
-  const bool capture_printing_time =
-      !DoesDriverDisplayFileDialogForPrinting(printer_name);
-#else
   constexpr bool capture_printing_time = true;
-#endif
   if (capture_printing_time) {
     printing_start_time_ = base::TimeTicks::Now();
   }
@@ -394,125 +200,6 @@ const std::string& PrintJob::source_id() const {
 }
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-void PrintJob::StartPdfToEmfConversion(
-    scoped_refptr<base::RefCountedMemory> bytes,
-    const gfx::Size& page_size,
-    const gfx::Rect& content_area,
-    const GURL& url) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  DCHECK(!pdf_conversion_state_);
-  pdf_conversion_state_ = std::make_unique<PdfConversionState>(
-      page_size, content_area, use_skia_, url);
-
-  const PrintSettings& settings = document()->settings();
-
-  PrefService* prefs = GetPrefsForWebContents(GetWebContents(rfh_id_));
-  bool print_with_reduced_rasterization = PrintWithReducedRasterization(prefs);
-
-  using RenderMode = PdfRenderSettings::Mode;
-  RenderMode mode = print_with_reduced_rasterization
-                        ? RenderMode::EMF_WITH_REDUCED_RASTERIZATION
-                        : RenderMode::NORMAL;
-
-  PdfRenderSettings render_settings(
-      content_area, gfx::Point(0, 0), settings.dpi_size(),
-      /*autorotate=*/true, settings.color() == mojom::ColorModel::kColor, mode);
-  pdf_conversion_state_->Start(
-      bytes, render_settings,
-      base::BindOnce(&PrintJob::OnPdfConversionStarted, this));
-}
-
-void PrintJob::OnPdfConversionStarted(uint32_t page_count) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-
-  if (page_count <= 0) {
-    // Be sure to live long enough.
-    scoped_refptr<PrintJob> handle(this);
-    pdf_conversion_state_.reset();
-    Cancel();
-    return;
-  }
-  pdf_conversion_state_->set_page_count(page_count);
-  pdf_conversion_state_->GetMorePages(
-      base::BindRepeating(&PrintJob::OnPdfPageConverted, this));
-}
-
-void PrintJob::OnPdfPageConverted(uint32_t page_index,
-                                  float scale_factor,
-                                  std::unique_ptr<MetafilePlayer> metafile) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  DCHECK(pdf_conversion_state_);
-  if (!document_ || !metafile || page_index == kInvalidPageIndex ||
-      page_index >= pdf_page_mapping_.size()) {
-    // Be sure to live long enough.
-    scoped_refptr<PrintJob> handle(this);
-    pdf_conversion_state_.reset();
-    Cancel();
-    return;
-  }
-
-  // Add the page to the document if it is one of the pages requested by the
-  // user. If it is not, ignore it.
-  if (pdf_page_mapping_[page_index] != kInvalidPageIndex) {
-    // Update the rendered document. It will send notifications to the listener.
-    document_->SetPage(pdf_page_mapping_[page_index], std::move(metafile),
-                       scale_factor, pdf_conversion_state_->page_size(),
-                       pdf_conversion_state_->content_area());
-  }
-
-  pdf_conversion_state_->GetMorePages(
-      base::BindRepeating(&PrintJob::OnPdfPageConverted, this));
-}
-
-void PrintJob::StartPdfToTextConversion(
-    scoped_refptr<base::RefCountedMemory> bytes,
-    const gfx::Size& page_size,
-    const GURL& url) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  DCHECK(!pdf_conversion_state_);
-  pdf_conversion_state_ = std::make_unique<PdfConversionState>(
-      gfx::Size(), gfx::Rect(), use_skia_, url);
-  gfx::Rect page_area = gfx::Rect(0, 0, page_size.width(), page_size.height());
-  const PrintSettings& settings = document()->settings();
-  PdfRenderSettings render_settings(
-      page_area, gfx::Point(0, 0), settings.dpi_size(),
-      /*autorotate=*/true,
-      /*use_color=*/true, PdfRenderSettings::Mode::TEXTONLY);
-  pdf_conversion_state_->Start(
-      bytes, render_settings,
-      base::BindOnce(&PrintJob::OnPdfConversionStarted, this));
-}
-
-void PrintJob::StartPdfToPostScriptConversion(
-    scoped_refptr<base::RefCountedMemory> bytes,
-    const gfx::Rect& content_area,
-    const gfx::Point& physical_offsets,
-    bool ps_level2,
-    const GURL& url) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  DCHECK(!pdf_conversion_state_);
-  pdf_conversion_state_ = std::make_unique<PdfConversionState>(
-      gfx::Size(), gfx::Rect(), use_skia_, url);
-  const PrintSettings& settings = document()->settings();
-
-  PdfRenderSettings::Mode mode;
-  if (ps_level2) {
-    mode = PdfRenderSettings::Mode::POSTSCRIPT_LEVEL2;
-  } else {
-    PrefService* prefs = GetPrefsForWebContents(GetWebContents(rfh_id_));
-    mode = PrintWithPostScriptType42Fonts(prefs)
-               ? PdfRenderSettings::Mode::POSTSCRIPT_LEVEL3_WITH_TYPE42_FONTS
-               : PdfRenderSettings::Mode::POSTSCRIPT_LEVEL3;
-  }
-  PdfRenderSettings render_settings(
-      content_area, physical_offsets, settings.dpi_size(),
-      /*autorotate=*/true, settings.color() == mojom::ColorModel::kColor, mode);
-  pdf_conversion_state_->Start(
-      bytes, render_settings,
-      base::BindOnce(&PrintJob::OnPdfConversionStarted, this));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 void PrintJob::UpdatePrintedDocument(
     scoped_refptr<PrintedDocument> new_document) {
@@ -547,16 +234,6 @@ void PrintJob::SyncPrintedDocumentToWorker() {
                                     base::RetainedRef(document_))));
 }
 
-#if BUILDFLAG(IS_WIN)
-void PrintJob::OnPageDone(PrintedPage* page) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-  if (pdf_conversion_state_) {
-    pdf_conversion_state_->OnPageProcessed(
-        base::BindRepeating(&PrintJob::OnPdfPageConverted, this));
-  }
-  document_->RemovePage(page);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 void PrintJob::OnFailed() {
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
@@ -613,27 +290,6 @@ void PrintJob::ControlledWorkerShutdown() {
 
   // The deadlock this code works around is specific to window messaging on
   // Windows, so we aren't likely to need it on any other platforms.
-#if BUILDFLAG(IS_WIN)
-  // We could easily get into a deadlock case if worker_->Stop() is used; the
-  // printer driver created a window as a child of the browser window. By
-  // canceling the job, the printer driver initiated dialog box is destroyed,
-  // which sends a blocking message to its parent window. If the browser window
-  // thread is not processing messages, a deadlock occurs.
-  //
-  // This function ensures that the dialog box will be destroyed in a timely
-  // manner by the mere fact that the thread will terminate. So the potential
-  // deadlock is eliminated.
-  worker_->StopSoon();
-
-  // Delay shutdown until the worker terminates.  We want this code path
-  // to wait on the thread to quit before continuing.
-  if (worker_->IsRunning()) {
-    content::GetUIThreadTaskRunner({})->PostDelayedTask(
-        FROM_HERE, base::BindOnce(&PrintJob::ControlledWorkerShutdown, this),
-        base::Milliseconds(100));
-    return;
-  }
-#endif
 
   // Now make sure the thread object is cleaned up. Do this on a worker
   // thread because it may block.

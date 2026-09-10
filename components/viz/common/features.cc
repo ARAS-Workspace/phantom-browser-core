@@ -27,9 +27,6 @@
 #include "base/android/device_info.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 namespace features {
 
@@ -87,43 +84,15 @@ BASE_FEATURE(kDrawQuadSplitLimit, base::FEATURE_DISABLED_BY_DEFAULT);
 constexpr base::FeatureParam<DelegatedCompositingMode>::Option
     kDelegatedCompositingModeOption[] = {
         {DelegatedCompositingMode::kFull, "full"},
-#if BUILDFLAG(IS_WIN)
-        {DelegatedCompositingMode::kLimitToUi, "limit_to_ui"},
-#endif
 };
 const base::FeatureParam<DelegatedCompositingMode>
     kDelegatedCompositingModeParam = {
         &kDelegatedCompositing,
         "mode",
-#if BUILDFLAG(IS_WIN)
-        // TODO(crbug.com/324460866): Windows does not fully support full
-        // delegated compositing.
-        DelegatedCompositingMode::kLimitToUi,
-#else
         DelegatedCompositingMode::kFull,
-#endif
         &kDelegatedCompositingModeOption,
 };
 
-#if BUILDFLAG(IS_WIN)
-// If enabled, the overlay processor will force the use of dcomp surfaces as the
-// render pass backing while delegated ink is being employed. This will avoid
-// the need for finding what surface to synchronize ink updates with by making
-// all surfaces synchronize with dcomp commit
-BASE_FEATURE(kDCompSurfacesForDelegatedInk, base::FEATURE_ENABLED_BY_DEFAULT);
-
-// If enabled, Chromium will utilize DXGI SwapChains and DComp visuals as the
-// software output device rather than GDI bit block transfer to the redirection
-// bitmap. Additionally, the redirection bitmap will be removed and replaced
-// with the native acrylic background effect on Win11. Since the browser window
-// appears before the GPU process is able to draw content into it, the acrylic
-// effect gives the user feedback that a window is present and content is
-// coming. Without the acrylic effect a transparent window will appear with a 1
-// pixel border that eats all mouse clicks; not a good user experience. Further,
-// the acylic effect will appear in uncovered regions of the window when the
-// user resizes the window.
-BASE_FEATURE(kRemoveRedirectionBitmap, base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 // Submit CompositorFrame from SynchronousLayerTreeFrameSink directly to viz in
 // WebView.
@@ -278,11 +247,7 @@ const base::FeatureParam<base::TimeDelta>
 // preferred on Windows, to avoid flicker when entering/leaving overlays
 // (https://crbug.com/40285630) but otherwise is undesirable behavior
 // (https://crbug.com/40266959 and https://crbug.com/486121442).
-#if BUILDFLAG(IS_WIN)
-BASE_FEATURE(kUseDisplaySDRMaxLuminanceNits, base::FEATURE_ENABLED_BY_DEFAULT);
-#else
 BASE_FEATURE(kUseDisplaySDRMaxLuminanceNits, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 // On mac, when the RenderWidgetHostViewMac is hidden, also hide the
 // DelegatedFrameHost. Among other things, it unlocks the compositor frames,
@@ -371,11 +336,6 @@ BASE_FEATURE(kRpdqFilterLookupOptimizations, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kBypassOutdatedSurfaceActivation,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_WIN)
-// Use BufferQueue for the primary plane instead of a DXGI swap chain or DComp
-// surface.
-BASE_FEATURE(kBufferQueue, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 int DrawQuadSplitLimit() {
   constexpr int kDefaultDrawQuadSplitLimit = 5;
@@ -459,39 +419,6 @@ bool IsCrosContentAdjustedRefreshRateEnabled() {
 }
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-bool ShouldRemoveRedirectionBitmap() {
-  // Limit to Win11 because there are a high number of D3D9 users on Win10;
-  // which requires the redirection bitmap. 22H2 is specified because it is the
-  // lowest version supporting DWM system backdrop.
-  if (base::win::GetVersion() < base::win::Version::WIN11_22H2) {
-    return false;
-  }
-
-  const auto* command_line = base::CommandLine::ForCurrentProcess();
-
-  // If direct composition is disabled say for testing, we will use an ANGLE
-  // EGLSurface which uses a BitBlt swap chain that needs a redirection surface.
-  if (command_line->HasSwitch(switches::kDisableDirectComposition)) {
-    return false;
-  }
-
-  // When using swiftshader for testing, we will also use an ANGLE EGLSurface.
-  if (command_line->HasSwitch(switches::kOverrideUseSoftwareGLForTests)) {
-    return false;
-  }
-
-  // Some users set ANGLE backend to OpenGL via chrome://flags and in
-  // that case too we would also use an ANGLE EGLSurface.
-  const std::string angle_backend =
-      command_line->GetSwitchValueASCII(switches::kUseANGLE);
-  if (angle_backend == gl::kANGLEImplementationOpenGLName) {
-    return false;
-  }
-
-  return base::FeatureList::IsEnabled(kRemoveRedirectionBitmap);
-}
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 bool ShouldUseAdpfForSoc(std::string_view soc_allowlist,

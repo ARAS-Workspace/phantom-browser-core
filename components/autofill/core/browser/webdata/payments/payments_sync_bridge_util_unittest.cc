@@ -1334,8 +1334,7 @@ TEST_F(PaymentsSyncBridgeUtilTest,
 }
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Tests that PopulateWalletTypesFromSyncData populates PaymentInstruments for
 // linked BNPL issuers.
 TEST_F(PaymentsSyncBridgeUtilTest,
@@ -1438,8 +1437,7 @@ TEST_F(PaymentsSyncBridgeUtilTest,
 
   ASSERT_EQ(0u, payment_instruments.size());
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 struct WalletCardTypeMapping {
   sync_pb::WalletMaskedCreditCard_WalletCardType wallet_card_type;
@@ -1674,8 +1672,7 @@ TEST_F(
   EXPECT_TRUE(AreAnyItemsDifferent(creation_options_1, creation_options_2));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Tests that `IsPaymentInstrumentCreationOptionSupported()` returns true if
 // the BNPL syncing experiment flag is enabled.
 TEST_F(PaymentsSyncBridgeUtilTest,
@@ -1697,8 +1694,7 @@ TEST_F(PaymentsSyncBridgeUtilTest,
 
   EXPECT_FALSE(IsPaymentInstrumentCreationOptionSupported());
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
 struct PaymentInstrumentCreationOptionSupportTestCase {

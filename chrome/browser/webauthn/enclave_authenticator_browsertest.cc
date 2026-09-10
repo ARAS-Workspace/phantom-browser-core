@@ -109,11 +109,6 @@
 #include "third_party/blink/public/common/features.h"
 #include "ui/base/l10n/l10n_util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "device/fido/win/fake_webauthn_api.h"
-#include "device/fido/win/util.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/test/test_future.h"
 #include "chrome/browser/webauthn/chrome_authenticator_request_delegate_mac.h"
@@ -2885,12 +2880,7 @@ IN_PROC_BROWSER_TEST_F(EnclaveAuthenticatorBrowserTest, BiometricsInPWA) {
 
 // Without a Windows-on-ARM device we've been unable to debug why these
 // tests fail in that that context.
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-#define MAYBE_NoGpmForCrossPlatformAttachment \
-  DISABLED_NoGpmForCrossPlatformAttachment
-#else
 #define MAYBE_NoGpmForCrossPlatformAttachment NoGpmForCrossPlatformAttachment
-#endif
 IN_PROC_BROWSER_TEST_F(EnclaveAuthenticatorBrowserTest,
                        MAYBE_NoGpmForCrossPlatformAttachment) {
   content::WebContents* web_contents =
@@ -2907,13 +2897,8 @@ IN_PROC_BROWSER_TEST_F(EnclaveAuthenticatorBrowserTest,
   EXPECT_FALSE(request_delegate()->enclave_controller_for_testing());
 }
 
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-#define MAYBE_NoGpmCreationIfPasswordManagerDisabled \
-  DISABLED_NoGpmCreationIfPasswordManagerDisabled
-#else
 #define MAYBE_NoGpmCreationIfPasswordManagerDisabled \
   NoGpmCreationIfPasswordManagerDisabled
-#endif
 IN_PROC_BROWSER_TEST_F(EnclaveAuthenticatorBrowserTest,
                        MAYBE_NoGpmCreationIfPasswordManagerDisabled) {
   EnableUVKeySupport();
@@ -2937,13 +2922,8 @@ IN_PROC_BROWSER_TEST_F(EnclaveAuthenticatorBrowserTest,
   EXPECT_TRUE(dialog_model()->gpm_create_available_but_disabled_by_policy);
 }
 
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-#define MAYBE_NoGpmCreationIfPasswordManagerPasskeysDisabled \
-  DISABLED_NoGpmCreationIfPasswordManagerPasskeysDisabled
-#else
 #define MAYBE_NoGpmCreationIfPasswordManagerPasskeysDisabled \
   NoGpmCreationIfPasswordManagerPasskeysDisabled
-#endif
 IN_PROC_BROWSER_TEST_F(EnclaveAuthenticatorBrowserTest,
                        MAYBE_NoGpmCreationIfPasswordManagerPasskeysDisabled) {
   EnableUVKeySupport();
@@ -4020,7 +4000,7 @@ IN_PROC_BROWSER_TEST_F(EnclaveAuthenticatorBrowserTest,
   EXPECT_EQ(script_result, "\"webauthn: uv=false\"");
 
   // On Linux biometrics is not available so the test is done.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   SetBiometricsEnabled(true);
   content::ExecuteScriptAsync(web_contents, kGetAssertionUvPreferred);
   delegate_observer()->WaitForUI();
@@ -4305,99 +4285,6 @@ IN_PROC_BROWSER_TEST_F(EnclaveAuthenticatorBrowserTest, SelectDeletedPasskey) {
   dialog_model()->OnGPMPinEntered(u"123456");
   model_observer()->WaitForStep();
 }
-
-#if BUILDFLAG(IS_WIN)
-// UV key creation deferral only happens on Windows.
-// See https://crbug.com/416664004.
-IN_PROC_BROWSER_TEST_F(EnclaveAuthenticatorBrowserTest,
-                       SimultaneousRequestsWithDeferredUVKey) {
-  EnableUVKeySupport(true);
-  SetTrustedVaultEmpty();
-
-  content::WebContents* web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-  content::DOMMessageQueue message_queue(web_contents);
-  content::ExecuteScriptAsync(web_contents, kMakeCredentialUvRequired);
-  delegate_observer()->WaitForUI();
-
-  model_observer()->SetStepToObserve(
-      AuthenticatorRequestDialogModel::Step::kGPMCreatePasskey);
-  model_observer()->WaitForStep();
-  EXPECT_EQ(request_delegate()
-                ->enclave_controller_for_testing()
-                ->account_state_for_testing(),
-            GPMEnclaveController::AccountState::kEmpty);
-  dialog_model()->OnGPMCreationConfirmed();
-  EXPECT_EQ(dialog_model()->step(),
-            AuthenticatorRequestDialogModel::Step::kGPMCreatePin);
-  dialog_model()->OnGPMPinEntered(u"123456");
-
-  std::string script_result;
-  ASSERT_TRUE(message_queue.WaitForMessage(&script_result));
-  EXPECT_EQ(script_result, "\"webauthn: uv=true\"");
-
-  // The EnclaveManager should be in a state where UV key creation is pending.
-  ASSERT_TRUE(enclave_manager()
-                  .local_state_for_testing()
-                  .mutable_users()
-                  ->begin()
-                  ->second.deferred_uv_key_creation());
-
-  content::ExecuteScriptAsync(web_contents, kGetAssertionUvRequired);
-  delegate_observer()->WaitForUI();
-  model_observer()->SetStepToObserve(
-      AuthenticatorRequestDialogModel::Step::kSelectPriorityMechanism);
-  model_observer()->WaitForStep();
-
-  // Wrap the enclave request invocation callback so that it can be delayed.
-  base::test::TestFuture<std::unique_ptr<device::enclave::CredentialRequest>>
-      enclave_request_future;
-  auto original_enclave_request_callback =
-      request_delegate()
-          ->enclave_controller_for_testing()
-          ->enclave_request_callback_for_testing();
-  request_delegate()
-      ->enclave_controller_for_testing()
-      ->enclave_request_callback_for_testing() = base::BindRepeating(
-      [](base::RepeatingCallback<void(
-             std::unique_ptr<device::enclave::CredentialRequest>)>
-             future_callback,
-         std::unique_ptr<device::enclave::CredentialRequest> request) {
-        future_callback.Run(std::move(request));
-      },
-      enclave_request_future.GetRepeatingCallback());
-
-  dialog_model()->OnUserConfirmedPriorityMechanism();
-
-  EXPECT_TRUE(enclave_request_future.Wait());
-
-  // A second WebContents attempts a transaction while the first is pending.
-  ui_test_utils::NavigateToURLWithDisposition(
-      browser(), https_server_.GetURL("www.example.com", "/title1.html"),
-      WindowOpenDisposition::NEW_FOREGROUND_TAB,
-      ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
-  content::WebContents* second_web_contents =
-      browser()->tab_strip_model()->GetActiveWebContents();
-
-  content::DOMMessageQueue second_message_queue(second_web_contents);
-  content::ExecuteScriptAsync(second_web_contents, kGetAssertionUvRequired);
-
-  // NB: We no longer have access to the original request_delegate() or
-  // dialog_model().
-  delegate_observer()->WaitForUI();
-  model_observer_->WaitForStart();
-  dialog_model()->OnUserConfirmedPriorityMechanism();
-
-  // Resume the first request.
-  original_enclave_request_callback.Run(enclave_request_future.Take());
-
-  ASSERT_TRUE(message_queue.WaitForMessage(&script_result));
-  EXPECT_EQ(script_result, "\"webauthn: OK\"");
-
-  ASSERT_TRUE(second_message_queue.WaitForMessage(&script_result));
-  EXPECT_EQ(script_result, "\"webauthn: OK\"");
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 class EnclaveAuthenticatorConditionalCreateBrowserTest
     : public EnclaveAuthenticatorBrowserTest,

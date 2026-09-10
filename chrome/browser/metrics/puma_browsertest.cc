@@ -204,9 +204,6 @@ IN_PROC_BROWSER_TEST_F(PumaBrowserTest, VerifyRcCoarseSystemProfile) {
   // Verify platform.
 #if BUILDFLAG(IS_LINUX)
   EXPECT_EQ(rc_profile.platform(), ::private_metrics::Platform::PLATFORM_LINUX);
-#elif BUILDFLAG(IS_WIN)
-  EXPECT_EQ(rc_profile.platform(),
-            ::private_metrics::Platform::PLATFORM_WINDOWS);
 #elif BUILDFLAG(IS_MAC)
   EXPECT_EQ(rc_profile.platform(), ::private_metrics::Platform::PLATFORM_MACOS);
 #elif BUILDFLAG(IS_ANDROID)

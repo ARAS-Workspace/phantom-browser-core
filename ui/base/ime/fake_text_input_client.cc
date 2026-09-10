@@ -140,19 +140,6 @@ gfx::Rect FakeTextInputClient::GetSelectionBoundingBox() const {
   return {};
 }
 
-#if BUILDFLAG(IS_WIN)
-std::optional<gfx::Rect> FakeTextInputClient::GetProximateCharacterBounds(
-    const gfx::Range& range) const {
-  return std::nullopt;
-}
-
-std::optional<size_t> FakeTextInputClient::GetProximateCharacterIndexFromPoint(
-    const gfx::Point& screen_point_in_dips,
-    IndexFromPointFlags flags) const {
-  return std::nullopt;
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 bool FakeTextInputClient::GetCompositionCharacterBounds(size_t index,
                                                         gfx::Rect* rect) const {
   return false;
@@ -227,7 +214,7 @@ bool FakeTextInputClient::ShouldDoLearning() {
   return should_do_learning_;
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 bool FakeTextInputClient::SetCompositionFromExistingText(
     const gfx::Range& range,
     const std::vector<ui::ImeTextSpan>& ui_ime_text_spans) {
@@ -259,18 +246,11 @@ void FakeTextInputClient::GetActiveTextInputControlLayoutBounds(
     std::optional<gfx::Rect>* control_bounds,
     std::optional<gfx::Rect>* selection_bounds) {}
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 ui::TextInputClient::EditingContext
 FakeTextInputClient::GetTextEditingContext() {
   return EditingContext{.page_url = url_};
 }
-#endif
-
-#if BUILDFLAG(IS_WIN)
-void FakeTextInputClient::SetActiveCompositionForAccessibility(
-    const gfx::Range& range,
-    const std::u16string& active_composition_text,
-    bool is_composition_committed) {}
 #endif
 
 }  // namespace ui

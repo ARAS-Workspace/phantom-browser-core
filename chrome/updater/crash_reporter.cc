@@ -59,12 +59,7 @@ std::vector<std::string> MakeCrashHandlerArgs(UpdaterScope updater_scope) {
 
   // The first element in the command line arguments is the program name,
   // which must be skipped.
-#if BUILDFLAG(IS_WIN)
-  return base::ToVector(base::span(command_line.argv()).subspan(1u),
-                        [](const auto& arg) { return base::WideToUTF8(arg); });
-#else
   return base::ToVector(base::span(command_line.argv()).subspan(1u));
-#endif
 }
 
 }  // namespace

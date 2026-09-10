@@ -165,11 +165,6 @@ class COMPONENT_EXPORT(PRINTING_SETTINGS) PrintSettings {
   void SetPrinterPrintableArea(const gfx::Size& physical_size_device_units,
                                const gfx::Rect& printable_area_device_units,
                                bool landscape_needs_flip);
-#if BUILDFLAG(IS_WIN)
-  // Update the printer printable area for the current media using the
-  // provided area in microns.
-  void UpdatePrinterPrintableArea(const gfx::Rect& printable_area_um);
-#endif
   const PageSetup& page_setup_device_units() const {
     return page_setup_device_units_;
   }
@@ -266,29 +261,6 @@ class COMPONENT_EXPORT(PRINTING_SETTINGS) PrintSettings {
     duplex_mode_ = duplex_mode;
   }
   mojom::DuplexMode duplex_mode() const { return duplex_mode_; }
-
-#if BUILDFLAG(IS_WIN)
-  void set_printer_language_type(mojom::PrinterLanguageType type) {
-    printer_language_type_ = type;
-  }
-  mojom::PrinterLanguageType printer_language_type() const {
-    return printer_language_type_;
-  }
-  bool printer_language_is_textonly() const {
-    return printer_language_type_ == mojom::PrinterLanguageType::kTextOnly;
-  }
-  bool printer_language_is_xps() const {
-    return printer_language_type_ == mojom::PrinterLanguageType::kXps;
-  }
-  bool printer_language_is_ps2() const {
-    return printer_language_type_ ==
-           mojom::PrinterLanguageType::kPostscriptLevel2;
-  }
-  bool printer_language_is_ps3() const {
-    return printer_language_type_ ==
-           mojom::PrinterLanguageType::kPostscriptLevel3;
-  }
-#endif
 
   void set_is_modifiable(bool is_modifiable) { is_modifiable_ = is_modifiable; }
   bool is_modifiable() const { return is_modifiable_; }
@@ -445,10 +417,6 @@ class COMPONENT_EXPORT(PRINTING_SETTINGS) PrintSettings {
 
   // Is the orientation landscape or portrait.
   bool landscape_;
-
-#if BUILDFLAG(IS_WIN)
-  mojom::PrinterLanguageType printer_language_type_;
-#endif
 
   bool is_modifiable_;
 

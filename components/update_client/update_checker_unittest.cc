@@ -357,18 +357,6 @@ TEST_P(UpdateCheckerTest, UpdateCheckSuccess) {
   ASSERT_TRUE(app->FindIntByDottedPath("ping.r").has_value());
   EXPECT_EQ(-2, app->FindIntByDottedPath("ping.r").value());
 
-#if BUILDFLAG(IS_WIN)
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  const auto* updater = request->FindDict("updater");
-  ASSERT_TRUE(updater);
-  ASSERT_TRUE(updater->FindString("name"));
-  EXPECT_EQ("Omaha", *updater->FindString("name"));
-  EXPECT_TRUE(updater->FindBool("autoupdatecheckenabled"));
-  EXPECT_TRUE(updater->FindBool("ismachine"));
-  EXPECT_TRUE(updater->FindInt("updatepolicy"));
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-#endif  // IS_WIN
-
   // Check the arguments of the callback after parsing.
   EXPECT_EQ(ErrorCategory::kNone, error_category_);
   EXPECT_EQ(0, error_);

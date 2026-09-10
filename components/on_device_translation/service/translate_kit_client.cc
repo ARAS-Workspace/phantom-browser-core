@@ -36,12 +36,6 @@ void LogLoadTranslateKitResult(LoadTranslateKitResult result,
                                const base::NativeLibraryLoadError* error) {
   base::UmaHistogramEnumeration("AI.Translation.LoadTranslateKitResult",
                                 result);
-#if BUILDFLAG(IS_WIN)
-  if (result == LoadTranslateKitResult::kInvalidBinary) {
-    base::UmaHistogramSparse("AI.Translation.LoadTranslateKitErrorCode",
-                             error->code);
-  }
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 // This method is used to receive the result from TranslatorTranslate() method.
@@ -82,9 +76,6 @@ void ParseFilePath(const char* file_name,
   std::string path(file_name, file_name_size);
   // The TranslateKit only use ASCII paths.
   CHECK(base::IsStringASCII(path));
-#if BUILDFLAG(IS_WIN)
-  base::ReplaceChars(path, "/", "\\", &path);
-#endif  // BUILDFLAG(IS_WIN)
   base::FilePath virtual_path = base::FilePath::FromASCII(path);
   // The TranslateKit doesn't use '..'.
   CHECK(!virtual_path.ReferencesParent());
@@ -92,15 +83,9 @@ void ParseFilePath(const char* file_name,
   CHECK(virtual_path.IsAbsolute());
   const std::vector<base::FilePath::StringType> components =
       virtual_path.GetComponents();
-#if BUILDFLAG(IS_WIN)
-  // Windows:  "X:\0\bar"  ->  [ "X:", "\\", "0", "bar" ]
-  //                                         ^^^ : component_idx = 2
-  size_t component_idx = 2;
-#else
   // Posix:  "/0/bar"  ->  [ "/", "0", "bar" ]
   //                              ^^^ : component_idx = 1
   size_t component_idx = 1;
-#endif  // BUILDFLAG(IS_WIN)
   CHECK_GT(components.size(), component_idx + 1);
   CHECK(base::StringToUint(components[component_idx], &package_index));
   ++component_idx;
@@ -240,11 +225,7 @@ void TranslateKitClient::SetConfig(
     // On Windows, set the package path to a fake drive letter 'X:' to avoid
     // the file path validation in the TranslateKit.
     const std::string package_path =
-#if BUILDFLAG(IS_WIN)
-        base::StrCat({"X:\\", base::NumberToString(index++)});
-#else
         base::StrCat({"/", base::NumberToString(index++)});
-#endif  // BUILDFLAG(IS_WIN)
     auto* new_package = config_proto.add_packages();
     new_package->set_language1(package->language1);
     new_package->set_language2(package->language2);

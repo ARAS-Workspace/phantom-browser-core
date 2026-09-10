@@ -314,8 +314,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxContextMenuControllerBrowserTest,
 
 // TODO(crbug.com/460910010): Flaky, especially on ASAN/LSAN bots and certain
 // Windows bots.
-#if defined(ADDRESS_SANITIZER) || defined(LEAK_SANITIZER) || \
-    BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if defined(ADDRESS_SANITIZER) || defined(LEAK_SANITIZER) || BUILDFLAG(IS_MAC)
 #define MAYBE_ExecuteCommand DISABLED_ExecuteCommand
 #else
 #define MAYBE_ExecuteCommand ExecuteCommand
@@ -1776,8 +1775,7 @@ IN_PROC_BROWSER_TEST_F(OmniboxContextMenuControllerBrowserTest,
 }
 
 // TODO(crbug.com/530351886): Times out flakily on Linux, Win, Mac and ChromeOS.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_VerifyTabEnablementWhenMaxInputsReached \
   DISABLED_VerifyTabEnablementWhenMaxInputsReached
 #else

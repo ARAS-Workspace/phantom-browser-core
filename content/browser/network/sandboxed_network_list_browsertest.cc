@@ -75,16 +75,6 @@ class SandboxedNetworkListBrowserTest : public ContentBrowserTest {
     }
 #endif  // !BUILDFLAG(IS_MAC)
 
-#if BUILDFLAG(IS_WIN)
-    if (lpac_enabled) {
-      enabled_features.push_back(
-          sandbox::policy::features::kWinSboxNetworkServiceSandboxIsLPAC);
-    } else {
-      disabled_features.push_back(
-          sandbox::policy::features::kWinSboxNetworkServiceSandboxIsLPAC);
-    }
-#endif  // BUILDFLAG(IS_WIN)
-
     scoped_features_.InitWithFeatures(enabled_features, disabled_features);
   }
 

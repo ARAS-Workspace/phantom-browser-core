@@ -132,10 +132,6 @@
 #include "content/shell/browser/bluetooth/shell_bluetooth_delegate_impl_client.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "media/mojo/mojom/media_foundation_preferences.mojom.h"
-#include "media/mojo/services/media_foundation_preferences.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 namespace content {
 
@@ -212,19 +208,6 @@ void BindNetworkHintsHandler(
                                                        std::move(receiver));
 }
 
-#if BUILDFLAG(IS_WIN)
-void BindMediaFoundationPreferences(
-    content::RenderFrameHost* frame_host,
-    mojo::PendingReceiver<media::mojom::MediaFoundationPreferences> receiver) {
-  // Passing in a NullCallback since we don't have MediaFoundationServiceMonitor
-  // in content.
-  MediaFoundationPreferencesImpl::Create(frame_host->GetSiteInstance()
-                                             ->GetSecurityPrincipal()
-                                             .GetDeprecatedSiteURL(),
-                                         base::NullCallback(),
-                                         std::move(receiver));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 base::flat_set<url::Origin> GetIsolatedContextOriginSetFromFlag() {
   std::string cmdline_origins(
@@ -630,10 +613,6 @@ void ShellContentBrowserClient::RegisterBrowserInterfaceBindersForFrame(
   map->Add<network_hints::mojom::NetworkHintsHandler>(&BindNetworkHintsHandler);
   map->Add<content::rust_test::mojom::RustTestService>(
       base::BindRepeating(&BindRustTestServiceReceiver));
-#if BUILDFLAG(IS_WIN)
-  map->Add<media::mojom::MediaFoundationPreferences>(
-      &BindMediaFoundationPreferences);
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 void ShellContentBrowserClient::
@@ -696,11 +675,7 @@ base::DictValue ShellContentBrowserClient::GetNetLogConstants() {
   client_constants.Set("name", "content_shell");
   base::CommandLine::StringType command_line =
       base::CommandLine::ForCurrentProcess()->GetCommandLineString();
-#if BUILDFLAG(IS_WIN)
-  client_constants.Set("command_line", base::WideToUTF8(command_line));
-#else
   client_constants.Set("command_line", command_line);
-#endif
   base::DictValue constants;
   constants.Set("clientInfo", std::move(client_constants));
   return constants;

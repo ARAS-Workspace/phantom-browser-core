@@ -13,17 +13,10 @@
 #include "components/policy/proto/device_management_backend.pb.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace policy {
 
 TEST(ClientDataDelegateDesktopTest,
      FillRegisterBrowserRequest_BrowserDeviceIdentifier) {
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedCOMInitializer com_initializer;
-#endif  // BUILDFLAG(IS_WIN)
 
   base::test::TaskEnvironment task_environment;
 

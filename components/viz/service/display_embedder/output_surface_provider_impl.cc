@@ -32,10 +32,6 @@
 #include "gpu/ipc/common/surface_handle.h"
 #include "ui/base/ui_base_switches.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "components/viz/service/display_embedder/software_output_device_win.h"
-#endif
-
 #if BUILDFLAG(IS_APPLE)
 #include "components/viz/service/display_embedder/software_output_device_mac.h"
 #endif
@@ -143,15 +139,7 @@ OutputSurfaceProviderImpl::CreateSoftwareOutputDeviceForPlatform(
   if (headless_)
     return std::make_unique<SoftwareOutputDevice>();
 
-#if BUILDFLAG(IS_WIN)
-  HWND child_hwnd;
-  auto device = CreateSoftwareOutputDeviceWin(
-      surface_handle, &output_device_backing_, display_client, child_hwnd);
-  if (child_hwnd) {
-    display_client->AddChildWindowToBrowser(child_hwnd);
-  }
-  return device;
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   return std::make_unique<SoftwareOutputDeviceMac>(task_runner_);
 #elif BUILDFLAG(IS_ANDROID)
   // Android does not do software compositing, so we can't get here.

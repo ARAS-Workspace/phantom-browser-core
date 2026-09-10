@@ -266,13 +266,6 @@ void IsolateOriginsForTesting(
     WebContents* web_contents,
     std::vector<url::Origin> origins_to_isolate);
 
-#if BUILDFLAG(IS_WIN)
-
-void SetMockCursorPositionForTesting(WebContents* web_contents,
-                                     const gfx::Point& position);
-
-#endif  // BUILDFLAG(IS_WIN)
-
 }  // namespace content
 
 #endif  // CONTENT_PUBLIC_TEST_CONTENT_BROWSER_TEST_UTILS_H_

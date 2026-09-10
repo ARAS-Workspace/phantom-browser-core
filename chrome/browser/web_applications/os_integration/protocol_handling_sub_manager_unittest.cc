@@ -334,17 +334,6 @@ TEST_F(ProtocolHandlingExecuteTest, UpdateHandlers) {
                 testing::ElementsAre(protocol_handler_approved.protocol));
 #endif
     if (AreProtocolsRegisteredWithOs()) {
-#if BUILDFLAG(IS_WIN)
-      ASSERT_THAT(
-          OsIntegrationTestOverrideImpl::Get()->protocol_scheme_registrations(),
-          testing::ElementsAre(
-              std::make_tuple(
-                  app_id, std::vector({protocol_handler_approved.protocol,
-                                       protocol_handler_disapproved.protocol})),
-              std::make_tuple(app_id, std::vector<std::string>()),
-              std::make_tuple(
-                  app_id, std::vector({protocol_handler_approved.protocol}))));
-#else
       ASSERT_THAT(
           OsIntegrationTestOverrideImpl::Get()->protocol_scheme_registrations(),
           testing::ElementsAre(
@@ -353,7 +342,6 @@ TEST_F(ProtocolHandlingExecuteTest, UpdateHandlers) {
                                        protocol_handler_disapproved.protocol})),
               std::make_tuple(
                   app_id, std::vector({protocol_handler_approved.protocol}))));
-#endif  // BUILDFLAG(IS_WIN)
     }
 }
 

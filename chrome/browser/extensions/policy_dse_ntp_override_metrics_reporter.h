@@ -6,7 +6,7 @@
 #define CHROME_BROWSER_EXTENSIONS_POLICY_DSE_NTP_OVERRIDE_METRICS_REPORTER_H_
 #include "build/build_config.h"
 
-static_assert(BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC));
+static_assert(BUILDFLAG(IS_MAC));
 
 class Profile;
 

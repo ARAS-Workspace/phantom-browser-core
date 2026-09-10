@@ -16,50 +16,7 @@
 #include "chrome/browser/printing/print_backend_service_manager.h"
 #include "printing/backend/test_print_backend.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <memory>
-
-#include "base/run_loop.h"
-#include "base/test/bind.h"
-#include "content/public/browser/browser_thread.h"
-#include "mojo/public/cpp/bindings/pending_receiver.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace printing {
-
-#if BUILDFLAG(IS_WIN)
-struct RenderPrintedPageData {
-  RenderPrintedPageData(
-      int32_t document_cookie,
-      uint32_t page_index,
-      mojom::MetafileDataType page_data_type,
-      base::ReadOnlySharedMemoryRegion serialized_page,
-      const gfx::Size& page_size,
-      const gfx::Rect& page_content_rect,
-      float shrink_factor,
-      mojom::PrintBackendService::RenderPrintedPageCallback callback)
-      : document_cookie(document_cookie),
-        page_index(page_index),
-        page_data_type(page_data_type),
-        serialized_page(std::move(serialized_page)),
-        page_size(page_size),
-        page_content_rect(page_content_rect),
-        shrink_factor(shrink_factor),
-        callback(std::move(callback)) {}
-  RenderPrintedPageData(const RenderPrintedPageData&) = delete;
-  RenderPrintedPageData& operator=(const RenderPrintedPageData&) = delete;
-  ~RenderPrintedPageData() = default;
-
-  int32_t document_cookie;
-  uint32_t page_index;
-  mojom::MetafileDataType page_data_type;
-  base::ReadOnlySharedMemoryRegion serialized_page;
-  gfx::Size page_size;
-  gfx::Rect page_content_rect;
-  float shrink_factor;
-  mojom::PrintBackendService::RenderPrintedPageCallback callback;
-};
-#endif
 
 PrintBackendServiceTestImpl::PrintBackendServiceTestImpl(
     mojo::PendingReceiver<mojom::PrintBackendService> receiver,
@@ -146,51 +103,6 @@ void PrintBackendServiceTestImpl::UpdatePrintSettings(
       context_id, std::move(job_settings), std::move(callback));
 }
 
-#if BUILDFLAG(IS_WIN)
-void PrintBackendServiceTestImpl::RenderPrintedPage(
-    int32_t document_cookie,
-    uint32_t page_index,
-    mojom::MetafileDataType page_data_type,
-    base::ReadOnlySharedMemoryRegion serialized_page,
-    const gfx::Size& page_size,
-    const gfx::Rect& page_content_rect,
-    float shrink_factor,
-    mojom::PrintBackendService::RenderPrintedPageCallback callback) {
-  if (terminate_receiver_) {
-    TerminateConnection();
-    return;
-  }
-
-  // Page index is zero-based whereas page number is one-based.
-  uint32_t page_number = page_index + 1;
-  if (page_number < rendering_delayed_until_page_number_) {
-    DVLOG(2) << "Adding page " << page_number << " to delayed rendering queue";
-    delayed_rendering_pages_.push(std::make_unique<RenderPrintedPageData>(
-        document_cookie, page_index, page_data_type, std::move(serialized_page),
-        page_size, page_content_rect, shrink_factor, std::move(callback)));
-    return;
-  }
-
-  // Any previously delayed pages should now be rendered, before carrying on
-  // with the page for this call.
-  while (!delayed_rendering_pages_.empty()) {
-    RenderPrintedPageData* page_data = delayed_rendering_pages_.front().get();
-    DVLOG(2) << "Rendering deferred page " << (page_data->page_index + 1);
-    PrintBackendServiceImpl::RenderPrintedPage(
-        page_data->document_cookie, page_data->page_index,
-        page_data->page_data_type, std::move(page_data->serialized_page),
-        page_data->page_size, page_data->page_content_rect,
-        page_data->shrink_factor, std::move(page_data->callback));
-    delayed_rendering_pages_.pop();
-  }
-
-  DVLOG(2) << "Rendering page " << page_number;
-  PrintBackendServiceImpl::RenderPrintedPage(
-      document_cookie, page_index, page_data_type, std::move(serialized_page),
-      page_size, page_content_rect, shrink_factor, std::move(callback));
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 void PrintBackendServiceTestImpl::TerminateConnection() {
   DLOG(ERROR) << "Terminating print backend service test connection";
   receiver_.reset();
@@ -221,57 +133,5 @@ PrintBackendServiceTestImpl::LaunchForTesting(
 
   return service;
 }
-
-#if BUILDFLAG(IS_WIN)
-// static
-std::unique_ptr<PrintBackendServiceTestImpl>
-PrintBackendServiceTestImpl::LaunchForTestingWithServiceThread(
-    mojo::Remote<mojom::PrintBackendService>& remote,
-    scoped_refptr<TestPrintBackend> backend,
-    bool sandboxed,
-    scoped_refptr<base::SingleThreadTaskRunner> service_task_runner) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
-
-  std::unique_ptr<PrintBackendServiceTestImpl> service;
-
-  base::RunLoop run_loop;
-  service_task_runner->PostTaskAndReplyWithResult(
-      FROM_HERE,
-      base::BindOnce(&PrintBackendServiceTestImpl::CreateServiceOnServiceThread,
-                     remote.BindNewPipeAndPassReceiver(), sandboxed, backend),
-      base::BindLambdaForTesting(
-          [&](std::unique_ptr<PrintBackendServiceTestImpl> result_service) {
-            service = std::move(result_service);
-            run_loop.Quit();
-          }));
-  run_loop.Run();
-
-  // Register this test version of print backend service to be used instead of
-  // launching instances out-of-process on-demand.
-  if (sandboxed) {
-    PrintBackendServiceManager::GetInstance().SetServiceForTesting(&remote);
-  } else {
-    PrintBackendServiceManager::GetInstance().SetServiceForFallbackTesting(
-        &remote);
-  }
-
-  return service;
-}
-
-// static
-std::unique_ptr<PrintBackendServiceTestImpl>
-PrintBackendServiceTestImpl::CreateServiceOnServiceThread(
-    mojo::PendingReceiver<mojom::PrintBackendService> receiver,
-    bool is_sandboxed,
-    scoped_refptr<TestPrintBackend> backend) {
-  // Private ctor.
-  auto service = base::WrapUnique(new PrintBackendServiceTestImpl(
-      std::move(receiver), is_sandboxed, std::move(backend)));
-  service->Init(/*locale=*/std::string());
-
-  return service;
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace printing

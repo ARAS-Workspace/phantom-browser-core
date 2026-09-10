@@ -46,10 +46,6 @@
 #endif
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/base/win/scoped_ole_initializer.h"
-#endif
-
 class GURL;
 class GaiaId;
 
@@ -326,10 +322,6 @@ class BrowserWithTestWindowTest : public testing::Test, public ProfileObserver {
 
   // The existence of this object enables tests via RenderViewHostTester.
   std::unique_ptr<content::RenderViewHostTestEnabler> rvh_test_enabler_;
-
-#if BUILDFLAG(IS_WIN)
-  ui::ScopedOleInitializer ole_initializer_;
-#endif
 
   // The type of browser to create (tabbed or popup).
   const Browser::Type browser_type_;

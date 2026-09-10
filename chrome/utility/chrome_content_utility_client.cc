@@ -31,11 +31,6 @@
 #include "chromeos/ash/components/mojo_service_manager/connection.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include "sandbox/policy/mojom/sandbox.mojom.h"
-#include "sandbox/policy/sandbox_type.h"
-#endif
-
 ChromeContentUtilityClient::ChromeContentUtilityClient() {
   base::ThreadGroupProfiler::SetClient(
       std::make_unique<ChromeThreadGroupProfilerClient>());
@@ -47,12 +42,6 @@ ChromeContentUtilityClient::~ChromeContentUtilityClient() = default;
 
 void ChromeContentUtilityClient::ExposeInterfacesToBrowser(
     mojo::BinderMap* binders) {
-#if BUILDFLAG(IS_WIN)
-  auto& cmd_line = *base::CommandLine::ForCurrentProcess();
-  auto sandbox_type = sandbox::policy::SandboxTypeFromCommandLine(cmd_line);
-  utility_process_running_elevated_ =
-      sandbox_type == sandbox::mojom::Sandbox::kNoSandboxAndElevatedPrivileges;
-#endif
 }
 
 void ChromeContentUtilityClient::UtilityThreadStarted() {

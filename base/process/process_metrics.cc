@@ -65,9 +65,6 @@ SystemMetrics SystemMetrics::Sample() {
   GetSwapInfo(&system_metrics.swap_info_);
   GetGraphicsMemoryInfo(&system_metrics.gpu_memory_info_);
 #endif
-#if BUILDFLAG(IS_WIN)
-  GetSystemPerformanceInfo(&system_metrics.performance_);
-#endif
   return system_metrics;
 }
 

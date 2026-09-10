@@ -87,10 +87,6 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "content/browser/gpu/chromeos/video_capture_dependencies.h"
 #include "media/capture/video/chromeos/camera_hal_dispatcher_impl.h"
@@ -1611,12 +1607,6 @@ MediaStreamManager::MediaStreamManager(
     // For all platforms other than MacOS start a new thread.
     video_capture_thread_.emplace("VideoCaptureThread");
     base::Thread::Options thread_options;
-#if BUILDFLAG(IS_WIN)
-    // Use an STA Video Capture Thread to try to avoid crashes on enumeration
-    // of buggy third party Direct Show modules, http://crbug.com/428958.
-    video_capture_thread_->init_com_with_mta(false);
-    thread_options.message_pump_type = base::MessagePumpType::UI;
-#endif
     CHECK(video_capture_thread_->StartWithOptions(std::move(thread_options)));
     device_task_runner = video_capture_thread_->task_runner();
 #endif
@@ -1641,7 +1631,7 @@ MediaStreamManager::MediaStreamManager(
   }
   InitializeMaybeAsync(std::move(video_capture_provider));
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   if (base::FeatureList::IsEnabled(kReleaseVideoSourceProviderIfNotInUse)) {
     video_capture_hosts_.set_disconnect_handler(base::BindRepeating(
         &MediaStreamManager::OnVideoCaptureHostConnectionError,
@@ -4515,7 +4505,7 @@ void MediaStreamManager::RegisterVideoCaptureHost(
     mojo::PendingReceiver<media::mojom::VideoCaptureHost> receiver) {
   DCHECK_CURRENTLY_ON(BrowserThread::IO);
   video_capture_hosts_.Add(std::move(host), std::move(receiver));
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   if (base::FeatureList::IsEnabled(kReleaseVideoSourceProviderIfNotInUse)) {
     media_devices_manager_->UpdateVideoCaptureHostsEmptyState(
         video_capture_hosts_.empty());
@@ -4838,7 +4828,7 @@ std::unique_ptr<MediaStreamUIProxy> MediaStreamManager::MakeFakeUIProxy(
   return fake_ui;
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 void MediaStreamManager::OnVideoCaptureHostConnectionError() {
   DCHECK_CURRENTLY_ON(BrowserThread::IO);
   media_devices_manager_->UpdateVideoCaptureHostsEmptyState(

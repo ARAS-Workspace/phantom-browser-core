@@ -38,10 +38,6 @@
 #include "ui/gfx/delegated_ink_point.h"
 #include "ui/touch_selection/touch_selection_controller.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace {
 
 // In mouse lock mode, we need to prevent the (invisible) cursor from hitting
@@ -53,23 +49,6 @@ namespace {
 // of the border area, in percentage of the corresponding dimension.
 const int kMouseLockBorderPercentage = 15;
 
-#if BUILDFLAG(IS_WIN)
-// A callback function for EnumThreadWindows to enumerate and dismiss
-// any owned popup windows.
-BOOL CALLBACK DismissOwnedPopups(HWND window, LPARAM arg) {
-  const HWND toplevel_hwnd = reinterpret_cast<HWND>(arg);
-
-  if (::IsWindowVisible(window)) {
-    const HWND owner = ::GetWindow(window, GW_OWNER);
-    if (toplevel_hwnd == owner) {
-      ::PostMessageW(window, WM_CANCELMODE, 0, 0);
-    }
-  }
-
-  return TRUE;
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 bool IsFractionalScaleFactor(float scale_factor) {
   return (scale_factor - static_cast<int>(scale_factor)) > 0;
 }
@@ -77,11 +56,7 @@ bool IsFractionalScaleFactor(float scale_factor) {
 // We don't mark these as handled so that they're sent back to the
 // DefWindowProc so it can generate WM_APPCOMMAND as necessary.
 bool ShouldGenerateAppCommand(const ui::MouseEvent* event) {
-#if BUILDFLAG(IS_WIN)
-  return (event->native_event().message == WM_NCXBUTTONUP);
-#else
   return false;
-#endif
 }
 
 // Reset unchanged touch points to StateStationary for touchmove and
@@ -287,21 +262,6 @@ void RenderWidgetHostViewEventHandler::HandleMouseWheelEvent(
   CHECK_EQ(event->type(), ui::EventType::kMousewheel,
            base::NotFatalUntil::M152);
 
-#if BUILDFLAG(IS_WIN)
-  if (!mouse_locked_) {
-    // We get mouse wheel/scroll messages even if we are not in the foreground.
-    // So here we check if we have any owned popup windows in the foreground and
-    // dismiss them.
-    aura::WindowTreeHost* host = window_->GetHost();
-    if (host) {
-      HWND parent = host->GetAcceleratedWidget();
-      HWND toplevel_hwnd = ::GetAncestor(parent, GA_ROOT);
-      EnumThreadWindows(GetCurrentThreadId(), DismissOwnedPopups,
-                        reinterpret_cast<LPARAM>(toplevel_hwnd));
-    }
-  }
-#endif
-
   blink::WebMouseWheelEvent mouse_wheel_event =
       ui::MakeWebMouseWheelEvent(*event->AsMouseWheelEvent());
 
@@ -430,12 +390,10 @@ void RenderWidgetHostViewEventHandler::OnScrollEvent(ui::ScrollEvent* event) {
   }
 
   if (event->type() == ui::EventType::kScroll) {
-#if !BUILDFLAG(IS_WIN)
     // TODO(ananta)
     // Investigate if this is true for Windows 8 Metro ASH as well.
     if (event->finger_count() != 2)
       return;
-#endif
     blink::WebMouseWheelEvent mouse_wheel_event =
         ui::MakeWebMouseWheelEvent(*event);
     mouse_wheel_phase_handler_.AddPhaseIfNeededAndScheduleEndEvent(
@@ -631,7 +589,7 @@ bool RenderWidgetHostViewEventHandler::CanRendererHandleEvent(
   if (event->type() == ui::EventType::kMouseExited) {
     if (mouse_locked || selection_popup)
       return false;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
     // Don't forward the mouse leave message which is received when the context
     // menu is displayed by the page. This confuses the page and causes state
     // changes.
@@ -641,32 +599,6 @@ bool RenderWidgetHostViewEventHandler::CanRendererHandleEvent(
     return true;
   }
 
-#if BUILDFLAG(IS_WIN)
-  // Renderer cannot handle WM_XBUTTON or NC events.
-  switch (event->native_event().message) {
-    case WM_XBUTTONDOWN:
-    case WM_XBUTTONUP:
-    case WM_XBUTTONDBLCLK:
-      return true;
-    case WM_NCMOUSELEAVE:
-    case WM_NCMOUSEMOVE:
-    case WM_NCLBUTTONDOWN:
-    case WM_NCLBUTTONUP:
-    case WM_NCLBUTTONDBLCLK:
-    case WM_NCRBUTTONDOWN:
-    case WM_NCRBUTTONUP:
-    case WM_NCRBUTTONDBLCLK:
-    case WM_NCMBUTTONDOWN:
-    case WM_NCMBUTTONUP:
-    case WM_NCMBUTTONDBLCLK:
-    case WM_NCXBUTTONDOWN:
-    case WM_NCXBUTTONUP:
-    case WM_NCXBUTTONDBLCLK:
-      return false;
-    default:
-      break;
-  }
-#endif
   return true;
 }
 
@@ -838,27 +770,6 @@ void RenderWidgetHostViewEventHandler::MoveCursorToCenter(
   gfx::Point center(gfx::Rect(window_->bounds().size()).CenterPoint());
   gfx::Point center_in_screen(window_->GetBoundsInScreen().CenterPoint());
   window_->MoveCursorTo(center);
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/40547981): This is a workaround for a bug from Windows
-  // update 16299, and should be remove once the bug is fixed in OS. Send a
-  // synthesized event to update the blink side states.
-  global_mouse_position_ = gfx::PointF(center_in_screen);
-  if (event) {
-    blink::WebMouseEvent mouse_event = ui::MakeWebMouseEvent(*event);
-    mouse_event.SetType(blink::WebMouseEvent::Type::kMouseMove);
-    mouse_event.SetModifiers(
-        mouse_event.GetModifiers() |
-        blink::WebInputEvent::Modifiers::kRelativeMotionEvent);
-    mouse_event.SetPositionInScreen(gfx::PointF(center_in_screen));
-    if (ShouldRouteEvents()) {
-      host_->delegate()->GetInputEventRouter()->RouteMouseEvent(
-          host_view_, &mouse_event, ui::LatencyInfo());
-    } else {
-      ProcessMouseEvent(mouse_event, ui::LatencyInfo());
-    }
-    return;
-  }
-#endif
   synthetic_move_position_ = center_in_screen;
 }
 
@@ -899,10 +810,6 @@ bool RenderWidgetHostViewEventHandler::ShouldMoveToCenter(
     gfx::PointF mouse_screen_position) {
   // Do not need to move to center in unadjusted movement mode as
   // the movement value are directly from OS.
-#if BUILDFLAG(IS_WIN)
-  if (mouse_locked_unadjusted_movement_)
-    return false;
-#endif
 
   if (window_->GetHost()->SupportsMouseLock())
     return false;

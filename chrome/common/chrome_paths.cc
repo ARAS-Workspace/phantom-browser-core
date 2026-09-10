@@ -35,10 +35,6 @@
 #include "components/policy/core/common/policy_paths.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/registry.h"
-#endif
-
 #if BUILDFLAG(ENABLE_WIDEVINE)
 #include "third_party/widevine/cdm/widevine_cdm_common.h"  // nogncheck
 #endif
@@ -175,7 +171,7 @@ bool PathProvider(int key, base::FilePath* result) {
       }
       break;
     case chrome::DIR_DEFAULT_DOWNLOADS_SAFE:
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
       if (!GetUserDownloadsDirectorySafe(&cur)) {
         return false;
       }
@@ -223,7 +219,7 @@ bool PathProvider(int key, base::FilePath* result) {
         return false;
       }
 #endif
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
       cur = cur.Append(FILE_PATH_LITERAL("Crashpad"));
 #else
       cur = cur.Append(FILE_PATH_LITERAL("Crash Reports"));
@@ -243,23 +239,6 @@ bool PathProvider(int key, base::FilePath* result) {
       cur = cur.Append(FILE_PATH_LITERAL("Local Traces"));
       create_dir = true;
       break;
-#if BUILDFLAG(IS_WIN)
-    case chrome::DIR_WATCHER_DATA:
-      // The watcher data is always stored relative to the default user data
-      // directory.  This allows the watcher to be initialized before
-      // command-line options have been parsed.
-      if (!GetDefaultUserDataDirectory(&cur)) {
-        return false;
-      }
-      cur = cur.Append(FILE_PATH_LITERAL("Diagnostics"));
-      break;
-    case chrome::DIR_ROAMING_USER_DATA:
-      if (!GetDefaultRoamingUserDataDirectory(&cur)) {
-        return false;
-      }
-      create_dir = true;
-      break;
-#endif
     case chrome::DIR_RESOURCES:
 #if BUILDFLAG(IS_MAC)
       cur = base::apple::FrameworkBundlePath();
@@ -272,19 +251,11 @@ bool PathProvider(int key, base::FilePath* result) {
 #endif
       break;
     case chrome::DIR_APP_DICTIONARIES:
-#if !BUILDFLAG(IS_WIN)
       // On most platforms, we can't write into the directory where
       // binaries are stored, so keep dictionaries in the user data dir.
       if (!base::PathService::Get(chrome::DIR_USER_DATA, &cur)) {
         return false;
       }
-#else
-      // TODO(crbug.com/40840089): Migrate Windows to use `DIR_USER_DATA` like
-      // other platforms.
-      if (!base::PathService::Get(base::DIR_EXE, &cur)) {
-        return false;
-      }
-#endif
       cur = cur.Append(FILE_PATH_LITERAL("Dictionaries"));
       create_dir = true;
       break;

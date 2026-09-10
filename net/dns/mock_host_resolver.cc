@@ -64,10 +64,6 @@
 #include "net/url_request/url_request_context.h"
 #include "url/scheme_host_port.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "net/base/winsock_init.h"
-#endif
-
 namespace net {
 
 namespace {

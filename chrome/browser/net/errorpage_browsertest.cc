@@ -609,11 +609,7 @@ IN_PROC_BROWSER_TEST_F(DNSErrorPageTest, IFrameDNSError) {
 }
 
 // This test fails regularly on win_rel trybots. See crbug.com/40769902
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_IFrameDNSError_GoBack DISABLED_IFrameDNSError_GoBack
-#else
 #define MAYBE_IFrameDNSError_GoBack IFrameDNSError_GoBack
-#endif
 // Test that a DNS error occurring in an iframe does not result in an
 // additional session history entry.
 IN_PROC_BROWSER_TEST_F(DNSErrorPageTest, MAYBE_IFrameDNSError_GoBack) {
@@ -627,7 +623,7 @@ IN_PROC_BROWSER_TEST_F(DNSErrorPageTest, MAYBE_IFrameDNSError_GoBack) {
 // This test fails regularly on win_rel trybots. See crbug.com/40769902
 //
 // This fails on linux_aura bringup: http://crbug.com/40295645
-#if BUILDFLAG(IS_WIN) || (BUILDFLAG(IS_LINUX) && defined(USE_AURA))
+#if BUILDFLAG(IS_LINUX) && defined(USE_AURA)
 #define MAYBE_IFrameDNSError_GoBackAndForward DISABLED_IFrameDNSError_GoBackAndForward
 #else
 #define MAYBE_IFrameDNSError_GoBackAndForward IFrameDNSError_GoBackAndForward

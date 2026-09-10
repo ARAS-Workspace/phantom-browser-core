@@ -11,12 +11,6 @@
 #include <unistd.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <winsock2.h>
-
-#include "net/base/winsock_init.h"
-#endif
-
 namespace net {
 
 NetworkInterface::NetworkInterface()
@@ -47,9 +41,6 @@ NetworkInterface::~NetworkInterface() = default;
 ScopedWifiOptions::~ScopedWifiOptions() = default;
 
 std::string GetHostName() {
-#if BUILDFLAG(IS_WIN)
-  EnsureWinsockInit();
-#endif
 
   // Host names are limited to 255 bytes.
   char buffer[256];

@@ -81,11 +81,6 @@ void StartBrowserThreadPool() {
       base::RecommendedMaxNumberOfThreadsInThreadGroup(
           min, kThreadPoolMax, kThreadPoolCoresMultiplier, kThreadPoolOffset)};
 
-#if BUILDFLAG(IS_WIN)
-  thread_pool_init_params.common_thread_pool_environment = base::
-      ThreadPoolInstance::InitParams::CommonThreadPoolEnvironment::COM_MTA;
-#endif
-
   // If a renderer lives in the browser process, adjust the number of
   // threads in the foreground pool.
   if (base::CommandLine::ForCurrentProcess()->HasSwitch(

@@ -18,10 +18,6 @@
 #include "ui/display/screen.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/display/win/screen_win.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace content {
 
 FlingScheduler::FlingScheduler(RenderWidgetHostImpl* host) : host_(host) {
@@ -76,12 +72,8 @@ bool FlingScheduler::ShouldUseMobileFlingCurve() {
 
 gfx::Vector2dF FlingScheduler::GetPixelsPerInch(
     const gfx::PointF& position_in_screen) {
-#if BUILDFLAG(IS_WIN)
-  return display::win::GetScreenWin()->GetPixelsPerInch(position_in_screen);
-#else
   return gfx::Vector2dF(input::kDefaultPixelsPerInch,
                         input::kDefaultPixelsPerInch);
-#endif
 }
 
 void FlingScheduler::ProgressFlingOnBeginFrameIfneeded(

@@ -12,36 +12,13 @@ namespace spellcheck {
 
 #if BUILDFLAG(ENABLE_SPELLCHECK)
 
-#if BUILDFLAG(IS_WIN)
-namespace {
-// The browser spell checker may be disabled in tests.
-bool g_browser_spell_checker_enabled = true;
-}  // namespace
-#endif  // BUILDFLAG(IS_WIN)
-
 bool UseBrowserSpellChecker() {
 #if !BUILDFLAG(USE_BROWSER_SPELLCHECKER)
   return false;
-#elif BUILDFLAG(IS_WIN)
-  return g_browser_spell_checker_enabled;
 #else
   return true;
 #endif
 }
-
-#if BUILDFLAG(IS_WIN)
-ScopedDisableBrowserSpellCheckerForTesting::
-    ScopedDisableBrowserSpellCheckerForTesting()
-    : previous_value_(g_browser_spell_checker_enabled) {
-  g_browser_spell_checker_enabled = false;
-}
-
-ScopedDisableBrowserSpellCheckerForTesting::
-    ~ScopedDisableBrowserSpellCheckerForTesting() {
-  g_browser_spell_checker_enabled = previous_value_;
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
 bool IsAndroidSpellCheckFeatureEnabled() {

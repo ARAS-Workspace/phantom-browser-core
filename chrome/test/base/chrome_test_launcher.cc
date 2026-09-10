@@ -64,17 +64,7 @@
 #include "chrome/app/chrome_crash_reporter_client.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <Shlobj.h>
-#include "base/debug/handle_hooks_win.h"
-#include "base/win/registry.h"
-#include "base/win/scoped_com_initializer.h"
-#include "chrome/app/chrome_crash_reporter_client_win.h"
-#include "chrome/install_static/install_util.h"
-#include "chrome/installer/util/firewall_manager_win.h"
-#endif
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/first_run/scoped_relaunch_chrome_browser_override.h"
 #include "chrome/browser/upgrade_detector/installed_version_poller.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -99,7 +89,7 @@ int ChromeTestSuiteRunner::RunTestSuiteInternal(ChromeTestSuite* test_suite) {
   // Android browser tests run child processes as threads instead.
   content::ContentTestSuiteBase::RegisterInProcessThreads();
 #endif
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   InstalledVersionPoller::ScopedDisableForTesting disable_polling(
       InstalledVersionPoller::MakeScopedDisableForTesting());
 #endif
@@ -110,38 +100,6 @@ int ChromeTestSuiteRunner::RunTestSuite(int argc, char** argv) {
   ChromeTestSuite test_suite(argc, argv);
   return RunTestSuiteInternal(&test_suite);
 }
-
-#if BUILDFLAG(IS_WIN)
-
-// A helper class that adds Windows firewall rules for the duration of the test.
-class ChromeTestLauncherDelegate::ScopedFirewallRules {
- public:
-  ScopedFirewallRules() {
-    CHECK(com_initializer_.Succeeded());
-    base::FilePath exe_path;
-    CHECK(base::PathService::Get(base::FILE_EXE, &exe_path));
-    firewall_manager_ = installer::FirewallManager::Create(exe_path);
-    CHECK(firewall_manager_);
-    rules_added_ = firewall_manager_->AddFirewallRules();
-    LOG_IF(WARNING, !rules_added_)
-        << "Failed to add Windows firewall rules -- Windows firewall dialogs "
-           "may appear.";
-  }
-  ScopedFirewallRules(const ScopedFirewallRules&) = delete;
-  ScopedFirewallRules& operator=(const ScopedFirewallRules&) = delete;
-
-  ~ScopedFirewallRules() {
-    if (rules_added_)
-      firewall_manager_->RemoveFirewallRules();
-  }
-
- private:
-  base::win::ScopedCOMInitializer com_initializer_;
-  std::unique_ptr<installer::FirewallManager> firewall_manager_;
-  bool rules_added_ = false;
-};
-
-#endif  // BUILDFLAG(IS_WIN)
 
 namespace {
 
@@ -259,13 +217,6 @@ std::optional<int> ChromeTestChromeMainDelegate::PostEarlyInitialization(
   return result;
 }
 
-#if BUILDFLAG(IS_WIN)
-bool ChromeTestChromeMainDelegate::ShouldHandleConsoleControlEvents() {
-  // Allow Ctrl-C and friends to terminate the test processes forthwith.
-  return false;
-}
-#endif
-
 void ChromeTestChromeMainDelegate::CreateThreadPool(std::string_view name) {
   // The ThreadGroupProfiler client must be set before thread pool is
   // created (below).
@@ -300,38 +251,9 @@ ChromeTestLauncherDelegate::CreateContentMainDelegate() {
 #endif
 
 void ChromeTestLauncherDelegate::PreSharding() {
-#if BUILDFLAG(IS_WIN)
-  // Pre-test cleanup for registry state keyed off the profile dir (which can
-  // proliferate with the use of uniquely named scoped_dirs):
-  // https://crbug.com/40520015. This needs to be here in order not to be racy
-  // with any tests that will access that state.
-  base::win::RegKey distrubution_key;
-  LONG result = distrubution_key.Open(HKEY_CURRENT_USER,
-                                      install_static::GetRegistryPath().c_str(),
-                                      KEY_SET_VALUE);
-
-  if (result != ERROR_SUCCESS) {
-    LOG_IF(ERROR, result != ERROR_FILE_NOT_FOUND)
-        << "Failed to open distribution key for cleanup: " << result;
-    return;
-  }
-
-  result = distrubution_key.DeleteKey(L"PreferenceMACs");
-  LOG_IF(ERROR, result != ERROR_SUCCESS && result != ERROR_FILE_NOT_FOUND)
-      << "Failed to cleanup PreferenceMACs: " << result;
-
-  // Add firewall rules for the test binary so that Windows doesn't show a
-  // firewall dialog during the test run. Silently do nothing if not running as
-  // an admin, to avoid error messages.
-  if (IsUserAnAdmin())
-    firewall_rules_ = std::make_unique<ScopedFirewallRules>();
-#endif
 }
 
 void ChromeTestLauncherDelegate::OnDoneRunningTests() {
-#if BUILDFLAG(IS_WIN)
-  firewall_rules_.reset();
-#endif
 }
 
 int LaunchChromeTests(size_t parallel_jobs,
@@ -350,14 +272,6 @@ int LaunchChromeTests(size_t parallel_jobs,
   base::apple::SetOverrideFrameworkBundlePath(path);
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  // Create a primordial InstallDetails instance for the test.
-  install_static::ScopedInstallDetails install_details;
-
-  // Install handle hooks for tests only.
-  base::debug::HandleHooks::PatchLoadedModules();
-#endif  // BUILDFLAG(IS_WIN)
-
   // PoissonAllocationSampler's TLS slots need to be set up before
   // MainThreadStackSamplingProfiler, which can allocate TLS slots of its own.
   // On some platforms pthreads can malloc internally to access higher-numbered
@@ -369,12 +283,6 @@ int LaunchChromeTests(size_t parallel_jobs,
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
   ChromeCrashReporterClient::Create();
-#elif BUILDFLAG(IS_WIN)
-  // We leak this pointer intentionally. The crash client needs to outlive
-  // all other code.
-  ChromeCrashReporterClient* crash_client = new ChromeCrashReporterClient();
-  ANNOTATE_LEAKING_OBJECT_PTR(crash_client);
-  crash_reporter::SetCrashReporterClient(crash_client);
 #endif
 
   // Setup a working test environment for the network service in case it's used.
@@ -383,7 +291,7 @@ int LaunchChromeTests(size_t parallel_jobs,
   std::unique_ptr<content::NetworkServiceTestHelper>
       network_service_test_helper = content::NetworkServiceTestHelper::Create();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Cause a test failure for any test that triggers an unexpected relaunch.
   // Tests that fail here should likely be restructured to put the "before
   // relaunch" code into a PRE_ test with its own
@@ -395,16 +303,6 @@ int LaunchChromeTests(size_t parallel_jobs,
         return false;
       }));
 #endif
-
-#if BUILDFLAG(IS_WIN)
-  SetCanPinToTaskbarDelegate(([]() {
-    ADD_FAILURE()
-        << "Attempting to pint shortcut to taskbar in test."
-        << " Use web_app::OsIntegrationManager::ScopedSuppressForTesting or "
-        << "other mechanism to not pin to taskbar.";
-    return false;
-  }));
-#endif  // BUILDFLAG(IS_WIN)
 
   // This is needed because when running the browser test in multi-process
   // mode, the FuzzTest initialization code will not get called in the child

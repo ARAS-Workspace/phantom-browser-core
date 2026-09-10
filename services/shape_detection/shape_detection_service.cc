@@ -22,15 +22,13 @@
 #elif BUILDFLAG(IS_ANDROID)
 // No C++ code, barcode detection comes from Java.
 #elif BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN))
+    (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS))
 #include "services/shape_detection/barcode_detection_provider_chrome.h"
 #else
 #include "services/shape_detection/barcode_detection_provider_impl.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "services/shape_detection/face_detection_provider_win.h"
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "services/shape_detection/face_detection_provider_mac.h"
 #elif BUILDFLAG(IS_ANDROID)
 // No C++ code, face detection comes from Java.
@@ -56,7 +54,7 @@ void ShapeDetectionService::BindBarcodeDetectionProvider(
 #elif BUILDFLAG(IS_MAC)
   BarcodeDetectionProviderMac::Create(std::move(receiver));
 #elif BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX))
+    (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX))
   BarcodeDetectionProviderChrome::Create(std::move(receiver));
 #else
   BarcodeDetectionProviderImpl::Create(std::move(receiver));
@@ -71,8 +69,6 @@ void ShapeDetectionService::BindFaceDetectionProvider(
       receiver.PassPipe().release().value());
 #elif BUILDFLAG(IS_MAC)
   FaceDetectionProviderMac::Create(std::move(receiver));
-#elif BUILDFLAG(IS_WIN)
-  FaceDetectionProviderWin::Create(std::move(receiver));
 #else
   FaceDetectionProviderImpl::Create(std::move(receiver));
 #endif

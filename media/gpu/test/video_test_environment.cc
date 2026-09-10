@@ -87,17 +87,8 @@ base::FilePath VideoTestEnvironment::GetTestOutputFilePath() const {
       ::testing::UnitTest::GetInstance()->current_test_info();
   base::FilePath::StringType test_name;
   base::FilePath::StringType test_suite_name;
-#if BUILDFLAG(IS_WIN)
-  test_name =
-      base::FilePath::FromASCII(base::StringPrintf("%s", test_info->name()))
-          .value();
-  test_suite_name = base::FilePath::FromASCII(
-                        base::StringPrintf("%s", test_info->test_suite_name()))
-                        .value();
-#else
   test_name = test_info->name();
   test_suite_name = test_info->test_suite_name();
-#endif  // BUILDFLAG(IS_WIN)
   return base::FilePath(test_suite_name).Append(test_name);
 }
 

@@ -340,19 +340,6 @@ void GPU::RequestAdapterImpl(
 
   DCHECK_NE(dawn_control_client_, nullptr);
 
-#if BUILDFLAG(IS_WIN)
-  // TODO(crbug.com/369219127): Chrome always uses the same GPU adapter that's
-  // been allocated for other Chrome workloads on Windows, which for laptops is
-  // generally the integrated graphics card, due to the power usage aspect (ie:
-  // power saving).
-  if (options->hasPowerPreference()) {
-    AddConsoleWarning(
-        execution_context,
-        "The powerPreference option is currently ignored when calling "
-        "requestAdapter() on Windows. See https://crbug.com/369219127");
-  }
-#endif
-
   wgpu::RequestAdapterOptions dawn_options =
       AsDawnType(options, execution_context);
 

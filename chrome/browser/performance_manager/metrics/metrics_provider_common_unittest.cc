@@ -40,12 +40,7 @@ TEST_F(PerformanceManagerMetricsProviderCommonTest, A11yModeOff) {
       "PerformanceManager.Experimental.HasAccessibilityModeFlag", false, 1);
 }
 
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-// TODO(crbug.com/534240517): Fix this test on Win ARM64.
-#define MAYBE_A11yModeOn DISABLED_A11yModeOn
-#else
 #define MAYBE_A11yModeOn A11yModeOn
-#endif
 TEST_F(PerformanceManagerMetricsProviderCommonTest, MAYBE_A11yModeOn) {
   content::ScopedAccessibilityModeOverride scoped_setter(
       ui::AXMode::kWebContents);

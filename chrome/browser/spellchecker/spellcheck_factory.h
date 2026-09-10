@@ -40,12 +40,6 @@ class SpellcheckServiceFactory : public ProfileKeyedServiceFactory {
   bool ServiceIsNULLWhileTesting() const override;
 
   FRIEND_TEST_ALL_PREFIXES(SpellcheckServiceBrowserTest, DeleteCorruptedBDICT);
-#if BUILDFLAG(IS_WIN)
-  FRIEND_TEST_ALL_PREFIXES(SpellcheckServiceWindowsHybridBrowserTest,
-                           WindowsHybridSpellcheck);
-  FRIEND_TEST_ALL_PREFIXES(SpellcheckServiceWindowsHybridBrowserTestDelayInit,
-                           WindowsHybridSpellcheckDelayInit);
-#endif  // BUILDFLAG(IS_WIN)
 };
 
 #endif  // CHROME_BROWSER_SPELLCHECKER_SPELLCHECK_FACTORY_H_

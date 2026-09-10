@@ -230,10 +230,7 @@ TEST(CommandTest, ExtensionCommandParsingFallback) {
                base::UTF16ToASCII(command.description()).c_str());
   EXPECT_STREQ(command_name.c_str(), command.command_name().c_str());
 
-#if BUILDFLAG(IS_WIN)
-  ui::Accelerator accelerator(ui::VKEY_W,
-                              ui::EF_SHIFT_DOWN | ui::EF_CONTROL_DOWN);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   ui::Accelerator accelerator(ui::VKEY_M,
                               ui::EF_SHIFT_DOWN | ui::EF_COMMAND_DOWN);
 #elif BUILDFLAG(IS_CHROMEOS)
@@ -281,11 +278,7 @@ TEST(CommandTest, ExtensionCommandParsingFallback) {
 
   // Now add only a valid platform that we are not running on to make sure devs
   // are notified of errors on other platforms.
-#if BUILDFLAG(IS_WIN)
-  key_dict.Set("mac", "Ctrl+Shift+M");
-#else
   key_dict.Set("windows", "Ctrl+Shift+W");
-#endif
   EXPECT_FALSE(command.Parse(input, command_name, 0, &error));
 
   // Make sure Mac specific keys are not processed on other platforms.

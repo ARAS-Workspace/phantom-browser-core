@@ -66,13 +66,6 @@
 #include "ui/gfx/image/image_skia.h"
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/shell_integration_win.h"
-#include "ui/base/win/shell.h"
-#include "ui/views/win/hwnd_util.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace task_manager {
 namespace {
 
@@ -144,18 +137,6 @@ task_manager::TaskManagerTableModel* TaskManagerView::Show(
   g_task_manager_view->GetDialogClientView()->SetBackgroundColor(
       kColorTaskManagerBackground);
   g_task_manager_view->InitAlwaysOnTopState();
-
-#if BUILDFLAG(IS_WIN)
-  // Set the app id for the task manager to the app id of its parent browser. If
-  // no parent is specified, the app id will default to that of the initial
-  // process.
-  if (browser) {
-    ui::win::SetAppIdForWindow(
-        shell_integration::win::GetAppUserModelIdForBrowser(
-            browser->GetProfile()->GetPath()),
-        views::HWNDForWidget(g_task_manager_view->GetWidget()));
-  }
-#endif
 
   g_task_manager_view->SelectTaskOfActiveTab(browser);
   g_task_manager_view->GetWidget()->Show();
@@ -243,11 +224,6 @@ bool TaskManagerView::AcceleratorPressed(const ui::Accelerator& accelerator) {
     case ui::EF_CONTROL_DOWN | ui::EF_SHIFT_DOWN:
       CHECK_EQ(ui::VKEY_W, accelerator.key_code());
       break;
-#if BUILDFLAG(IS_WIN)
-    case ui::EF_ALT_DOWN:
-      CHECK_EQ(ui::VKEY_F4, accelerator.key_code());
-      break;
-#endif
     default:
       NOTREACHED();
   }
@@ -670,9 +646,6 @@ void TaskManagerView::Init() {
   AddAccelerator(ui::Accelerator(ui::VKEY_W, ui::EF_CONTROL_DOWN));
   AddAccelerator(
       ui::Accelerator(ui::VKEY_W, ui::EF_CONTROL_DOWN | ui::EF_SHIFT_DOWN));
-#if BUILDFLAG(IS_WIN)
-  AddAccelerator(ui::Accelerator(ui::VKEY_F4, ui::EF_ALT_DOWN));
-#endif
 }
 
 void TaskManagerView::InitAlwaysOnTopState() {

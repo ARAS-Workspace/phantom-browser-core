@@ -21,38 +21,28 @@
 #include "mojo/public/cpp/system/message_pipe.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/scoped_handle.h"
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #include "base/apple/scoped_mach_port.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#define SIMPLE_PLATFORM_HANDLE_TYPE MOJO_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #define SIMPLE_PLATFORM_HANDLE_TYPE MOJO_PLATFORM_HANDLE_TYPE_FILE_DESCRIPTOR
 #endif
 
 #if BUILDFLAG(IS_APPLE)
 #define SHARED_BUFFER_PLATFORM_HANDLE_TYPE MOJO_PLATFORM_HANDLE_TYPE_MACH_PORT
-#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
+#elif BUILDFLAG(IS_POSIX)
 #define SHARED_BUFFER_PLATFORM_HANDLE_TYPE SIMPLE_PLATFORM_HANDLE_TYPE
 #endif
 
 uint64_t PlatformHandleValueFromPlatformFile(base::PlatformFile file) {
-#if BUILDFLAG(IS_WIN)
-  return reinterpret_cast<uint64_t>(file);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   return static_cast<uint64_t>(file);
 #endif
 }
 
 base::PlatformFile PlatformFileFromPlatformHandleValue(uint64_t value) {
-#if BUILDFLAG(IS_WIN)
-  return reinterpret_cast<base::PlatformFile>(value);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   return static_cast<base::PlatformFile>(value);
 #endif
 }
@@ -141,10 +131,7 @@ TEST_F(PlatformWrapperTest, MAYBE_WrapPlatformSharedMemoryRegion) {
     MojoPlatformHandle os_buffer;
     os_buffer.struct_size = sizeof(MojoPlatformHandle);
     os_buffer.type = SHARED_BUFFER_PLATFORM_HANDLE_TYPE;
-#if BUILDFLAG(IS_WIN)
-    os_buffer.value = reinterpret_cast<uint64_t>(
-        platform_region.PassPlatformHandle().release());
-#elif BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID)
     os_buffer.value =
         static_cast<uint64_t>(platform_region.PassPlatformHandle().release());
 #elif BUILDFLAG(IS_POSIX)
@@ -202,11 +189,7 @@ DEFINE_TEST_CLIENT_TEST_WITH_PIPE(ReadPlatformSharedBuffer,
   std::optional<base::UnguessableToken> guid =
       base::UnguessableToken::Deserialize(mojo_guid.high, mojo_guid.low);
   ASSERT_TRUE(guid.has_value());
-#if BUILDFLAG(IS_WIN)
-  ASSERT_EQ(MOJO_PLATFORM_HANDLE_TYPE_WINDOWS_HANDLE, os_buffer.type);
-  auto platform_handle =
-      base::win::ScopedHandle(reinterpret_cast<HANDLE>(os_buffer.value));
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   ASSERT_EQ(MOJO_PLATFORM_HANDLE_TYPE_MACH_PORT, os_buffer.type);
   auto platform_handle = base::apple::ScopedMachSendRight(
       static_cast<mach_port_t>(os_buffer.value));

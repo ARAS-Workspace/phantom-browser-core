@@ -23,10 +23,6 @@
 #include "gpu/config/gpu_util.h"
 #include "third_party/re2/src/re2/re2.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 namespace gpu {
 namespace {
 
@@ -373,29 +369,12 @@ bool GpuControlList::More::Contains(const GPUInfo& gpu_info) const {
       !pixel_shader_version.Contains(gpu_info.pixel_shader_version)) {
     return false;
   }
-#if BUILDFLAG(IS_WIN)
-  if (d3d11_feature_level.IsSpecified()) {
-    std::string feature_level_string =
-        D3DFeatureLevelToNumberString(gpu_info.d3d11_feature_level);
-    if (!d3d11_feature_level.Contains(feature_level_string)) {
-      return false;
-    }
-  }
-#endif
   switch (hardware_overlay) {
     case kDontCare:
       break;
     case kSupported:
-#if BUILDFLAG(IS_WIN)
-      if (!gpu_info.overlay_info.supports_overlays)
-        return false;
-#endif  // BUILDFLAG(IS_WIN)
       break;
     case kUnsupported:
-#if BUILDFLAG(IS_WIN)
-      if (gpu_info.overlay_info.supports_overlays)
-        return false;
-#endif  // BUILDFLAG(IS_WIN)
       break;
   }
   if ((subpixel_font_rendering == kUnsupported &&
@@ -496,17 +475,17 @@ bool GpuControlList::Conditions::Contains(OsType target_os_type,
       } else {
         for (size_t ii = 0; !found && ii < devices.size(); ++ii) {
           uint32_t device_id = devices[ii].device_id;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
           uint32_t revision = devices[ii].revision;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_CHROMEOS)
           for (auto& candidate : candidates) {
             if (vendor_id != candidate.vendor_id ||
                 device_id != candidate.device_id)
               continue;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
             if (revision && revision != candidate.revision)
               continue;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_CHROMEOS)
             found = true;
             break;
           }
@@ -700,15 +679,7 @@ std::set<int32_t> GpuControlList::MakeDecision(
     os = GetOsType();
   std::string processed_os_version(os_version);
   if (processed_os_version.empty()) {
-#if BUILDFLAG(IS_WIN)
-    base::win::OSInfo::VersionNumber version_number =
-        base::win::OSInfo::GetInstance()->version_number();
-    processed_os_version = base::StringPrintf(
-        "%d.%d.%d.%d", version_number.major, version_number.minor,
-        version_number.build, version_number.patch);
-#else
     processed_os_version = base::SysInfo::OperatingSystemVersion();
-#endif
   }
   // Get rid of the non numbers because later processing expects a valid
   // version string in the format of "a.b.c".
@@ -831,8 +802,6 @@ uint32_t GpuControlList::max_entry_id() const {
 GpuControlList::OsType GpuControlList::GetOsType() {
 #if BUILDFLAG(IS_CHROMEOS)
   return kOsChromeOS;
-#elif BUILDFLAG(IS_WIN)
-  return kOsWin;
 #elif BUILDFLAG(IS_ANDROID)
   return kOsAndroid;
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_OPENBSD)

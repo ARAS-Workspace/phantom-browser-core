@@ -880,7 +880,6 @@ class DevToolsSharedDictionaryFeatureDisabledBrowserTest
 
 // Can't cause the dictionary load failure by deletaing the disk cache directory
 // on Windows.
-#if !BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_F(SharedDictionaryDevToolsBrowserTest,
                        UseErrorDictionaryLoadFailure) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -900,7 +899,6 @@ IN_PROC_BROWSER_TEST_F(SharedDictionaryDevToolsBrowserTest,
                               "/shared_dictionary/path/compressed.data"))));
   WaitForSharedDictionaryIssueAdded("UseErrorDictionaryLoadFailure");
 }
-#endif  // !BUILDFLAG(IS_WIN)
 
 IN_PROC_BROWSER_TEST_F(SharedDictionaryDevToolsBrowserTest,
                        UseErrorMatchingDictionaryNotUsed) {

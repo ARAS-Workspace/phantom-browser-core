@@ -16,10 +16,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "testing/multiprocess_func_list.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <shlobj.h>
-#endif
-
 namespace base::shared_memory {
 namespace {
 
@@ -84,12 +80,6 @@ TEST_P(SharedMemorySwitchTest, PassViaSwitch) {
   const bool read_only = std::get<0>(GetParam());
   const bool elevated = std::get<1>(GetParam());
 
-#if BUILDFLAG(IS_WIN)
-  if (elevated && !::IsUserAnAdmin()) {
-    GTEST_SKIP() << "This test must be run by an admin user";
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   SCOPED_TRACE(
       base::StringPrintf("read_only=%d; elevated=%d", read_only, elevated));
 
@@ -109,10 +99,6 @@ TEST_P(SharedMemorySwitchTest, PassViaSwitch) {
   LaunchOptions launch_options;
 
   // On windows, check both the elevated and non-elevated launches.
-#if BUILDFLAG(IS_WIN)
-  launch_options.start_hidden = true;
-  launch_options.elevated = elevated;
-#endif
 
   // Update the launch parameters.
   SharedMemorySwitch shared_memory_switch(

@@ -67,9 +67,6 @@ class IwaKeyDistributionComponentInstallBrowserTest
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 // TODO(crbug.com/393102554): Remove this after launch.
-#if BUILDFLAG(IS_WIN)
-  base::test::ScopedFeatureList features_{features::kIsolatedWebApps};
-#endif  // BUILDFLAG(IS_WIN)
 };
 
 IN_PROC_BROWSER_TEST_F(

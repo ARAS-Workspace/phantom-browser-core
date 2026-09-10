@@ -753,14 +753,6 @@ NetworkContext::NetworkContext(
         receiver_to_bind.Bind(std::move(receiver));
       },
       receiver_);
-#if BUILDFLAG(IS_WIN) && DCHECK_IS_ON()
-  if (params_->file_paths) {
-    DCHECK(params_->win_permissions_set)
-        << "Permissions not set on files. Network context should be created "
-           "using CreateNetworkContextInNetworkService rather than directly on "
-           "the network service.";
-  }
-#endif  // BUILDFLAG(IS_WIN) && DCHECK_IS_ON()
 
 #if BUILDFLAG(IS_DIRECTORY_TRANSFER_REQUIRED)
   if (params_->file_paths) {
@@ -848,12 +840,6 @@ NetworkContext::NetworkContext(
 
   socket_factory_ = std::make_unique<SocketFactory>(
       url_request_context_->net_log(), url_request_context_);
-#if BUILDFLAG(IS_WIN)
-  if (params_->socket_brokers) {
-    socket_factory_->BindSocketBroker(
-        std::move(params_->socket_brokers->server));
-  }
-#endif
   resource_scheduler_ = std::make_unique<ResourceScheduler>();
 
   if (params_->http_auth_static_network_context_params) {
@@ -2983,12 +2969,12 @@ URLRequestContextOwner NetworkContext::MakeURLRequestContext(
         std::move(params_->proxy_resolver_factory));
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (params_->system_proxy_resolver) {
     builder.SetMojoSystemProxyResolver(
         std::move(params_->system_proxy_resolver));
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_CHROMEOS)
   if (params_->dhcp_wpad_url_client) {
@@ -3261,14 +3247,6 @@ URLRequestContextOwner NetworkContext::MakeURLRequestContext(
         command_line->GetSwitchValueASCII(switches::kHostRules));
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (params_->socket_brokers) {
-    builder.set_client_socket_factory(
-        std::make_unique<BrokeredClientSocketFactory>(
-            std::move(params_->socket_brokers->client)));
-  }
-#endif
-
   require_network_anonymization_key_ =
       params_->require_network_anonymization_key;
 
@@ -3414,12 +3392,7 @@ NetworkContext::MakeSessionCleanupCookieStore() const {
     }
   }
 
-#if BUILDFLAG(IS_WIN)
-  const bool enable_exclusive_access =
-      network_service()->exclusive_cookie_database_locking();
-#else
   const bool enable_exclusive_access = false;
-#endif  // BUILDFLAG(IS_WIN)
 
   scoped_refptr<net::SQLitePersistentCookieStore> sqlite_store(
       new net::SQLitePersistentCookieStore(

@@ -167,7 +167,7 @@ class WebGPUMailboxTextureTest
       params.push_back(o);
 
       // Note: Only windows & Mac have Graphite supported for now.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
       o.use_skia_graphite = true;
       params.push_back(o);
 #endif

@@ -13,20 +13,10 @@
 #include "ui/accelerated_widget_mac/ca_layer_frame_sink.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <utility>
-
-#include "components/viz/common/display/use_layered_window.h"
-#include "components/viz/host/layered_window_updater_impl.h"
-#include "ui/base/win/internal_constants.h"
-#endif
-
 namespace viz {
 
 HostDisplayClient::HostDisplayClient(gfx::AcceleratedWidget widget) {
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE)
   widget_ = widget;
 #endif
 }
@@ -47,23 +37,6 @@ void HostDisplayClient::OnDisplayReceivedCALayerParams(
     ca_layer_frame_sink->UpdateCALayerTree(std::move(ca_layer_params));
   else
     DLOG(WARNING) << "Received frame for non-existent widget.";
-}
-#endif
-
-#if BUILDFLAG(IS_WIN)
-void HostDisplayClient::CreateLayeredWindowUpdater(
-    mojo::PendingReceiver<mojom::LayeredWindowUpdater> receiver) {
-  if (!NeedsToUseLayerWindow(widget_)) {
-    DLOG(ERROR) << "HWND shouldn't be using a layered window";
-    return;
-  }
-
-  layered_window_updater_ =
-      std::make_unique<LayeredWindowUpdaterImpl>(widget_, std::move(receiver));
-}
-void HostDisplayClient::AddChildWindowToBrowser(
-    gpu::SurfaceHandle child_window) {
-  NOTREACHED();
 }
 #endif
 

@@ -25,16 +25,6 @@
 #include "services/network/public/cpp/transferable_directory.h"
 #include "sql/database.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/security_util.h"
-#include "base/win/sid.h"
-#include "content/browser/network_service_instance_impl.h"
-#include "content/common/features.h"
-#include "sandbox/policy/features.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace content {
 
 namespace {
@@ -48,24 +38,10 @@ const base::FilePath::CharType kCheckpointFileName[] =
 // A platform specific set of parameters that is used when granting the sandbox
 // access to the network context data.
 struct SandboxParameters {
-#if BUILDFLAG(IS_WIN)
-  std::wstring lpac_capability_name;
-#if DCHECK_IS_ON()
-  bool sandbox_enabled;
-#endif  // DCHECK_IS_ON()
-#endif  // BUILDFLAG(IS_WIN)
 };
 
 SandboxParameters GetSandboxParameters() {
   SandboxParameters sandbox_params = {};
-#if BUILDFLAG(IS_WIN)
-  sandbox_params.lpac_capability_name =
-      GetContentClient()->browser()->GetLPACCapabilityNameForNetworkService();
-#if DCHECK_IS_ON()
-  sandbox_params.sandbox_enabled =
-      GetContentClient()->browser()->ShouldSandboxNetworkService();
-#endif  // DCHECK_IS_ON()
-#endif  // BUILDFLAG(IS_WIN)
   return sandbox_params;
 }
 
@@ -239,45 +215,12 @@ bool MaybeGrantAccessToDataPath(const SandboxParameters& sandbox_params,
     return false;
   }
 
-#if BUILDFLAG(IS_WIN)
-  // On platforms that don't support the LPAC sandbox, do nothing.
-  if (!sandbox::policy::features::IsNetworkSandboxSupported()) {
-    return true;
-  }
-  DCHECK(!sandbox_params.lpac_capability_name.empty());
-  auto ac_sids = base::win::Sid::FromNamedCapabilityVector(
-      {sandbox_params.lpac_capability_name});
-
-  static constexpr DWORD kAccessMask =
-      GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE | DELETE;
-  static constexpr DWORD kInheritance =
-      CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE;
-
-  // For cache dir only, ACL the parent above the "Cache_Data" directory to
-  // ensure that rename/delete operations can take place correctly.
-  base::FilePath directory_to_acl = directory->path();
-
-  if (directory_to_acl.BaseName() == base::FilePath(kCacheDataDirectoryName)) {
-    directory_to_acl = directory_to_acl.DirName();
-  }
-  // If LPAC capability already has access to the directory then avoid
-  // granting access again. This is a performance optimization.
-  if (HasAccessToPath(directory_to_acl, ac_sids, kAccessMask, kInheritance)) {
-    return true;
-  }
-
-  // Grant recursive access to directory. This also means new files in the
-  // directory will inherit the ACE.
-  return base::win::GrantAccessToPath(directory_to_acl, ac_sids, kAccessMask,
-                                      kInheritance, /*recursive=*/true);
-#else
   if (directory->IsOpenForTransferRequired()) {
     directory->OpenForTransfer();
     return true;
   }
 
   return true;
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 // Logs the system error code to UMA. The name of the histogram will be
@@ -314,9 +257,6 @@ bool MaybeGrantAccessToDataPath(const SandboxParameters& sandbox_params,
 // ```
 void LogSystemErrorCode(std::string_view histogram_base_name) {
   std::string_view suffix = ".Posix";
-  if constexpr (BUILDFLAG(IS_WIN)) {
-    suffix = ".Windows";
-  }
   base::UmaHistogramSparse(base::StrCat({histogram_base_name, suffix}),
                            logging::GetLastSystemErrorCode());
 }
@@ -372,11 +312,6 @@ SandboxGrantResult MaybeGrantSandboxAccessToNetworkContextData(
     const SandboxParameters& sandbox_params,
     network::mojom::NetworkContextParams* params) {
   DCHECK(!BrowserThread::CurrentlyOn(BrowserThread::UI));
-#if BUILDFLAG(IS_WIN)
-#if DCHECK_IS_ON()
-  params->win_permissions_set = true;
-#endif
-#endif  // BUILDFLAG(IS_WIN)
 
   // No file paths (e.g. in-memory context) so nothing to do.
   if (!params->file_paths) {
@@ -440,11 +375,6 @@ SandboxGrantResult MaybeGrantSandboxAccessToNetworkContextData(
   }
 
   if (!params->file_paths->unsandboxed_data_path.has_value()) {
-#if BUILDFLAG(IS_WIN) && DCHECK_IS_ON()
-    // On Windows, if network sandbox is enabled then there a migration must
-    // happen, so a `unsandboxed_data_path` must be specified.
-    DCHECK(!sandbox_params.sandbox_enabled);
-#endif
     // Trigger migration should never be requested if `unsandboxed_data_path` is
     // not set.
     DCHECK(!params->file_paths->trigger_migration);
@@ -479,12 +409,6 @@ SandboxGrantResult MaybeGrantSandboxAccessToNetworkContextData(
 
   // Case 1. above where nothing is done.
   if (!params->file_paths->trigger_migration && !migration_already_happened) {
-#if BUILDFLAG(IS_WIN) && DCHECK_IS_ON()
-    // On Windows, if network sandbox is enabled then there a migration must
-    // happen, so `trigger_migration` must be true, or a migration must have
-    // already happened.
-    DCHECK(!sandbox_params.sandbox_enabled);
-#endif
     return SandboxGrantResult::kNoMigrationRequested;
   }
 

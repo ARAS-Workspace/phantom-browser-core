@@ -74,9 +74,6 @@ class ChromeMainDelegate : public content::ContentMainDelegate {
   bool ShouldCreateFeatureList(InvokedIn invoked_in) override;
   bool ShouldInitializeMojo(InvokedIn invoked_in) override;
   void CreateThreadPool(std::string_view name) override;
-#if BUILDFLAG(IS_WIN)
-  bool ShouldHandleConsoleControlEvents() override;
-#endif
 
   content::ContentClient* CreateContentClient() override;
   content::ContentBrowserClient* CreateContentBrowserClient() override;

@@ -44,12 +44,6 @@
 #include "sandbox/linux/services/namespace_sandbox.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/windows_version.h"
-#endif
-
 namespace service_manager {
 
 // Thread-safe owner of state related to a service process. This facilitates
@@ -197,32 +191,7 @@ base::ProcessId ServiceProcessLauncher::ProcessState::LaunchInBackground(
     mojo::OutgoingInvitation invitation) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   base::LaunchOptions options;
-#if BUILDFLAG(IS_WIN)
-  options.handles_to_inherit = handle_passing_info;
-  options.stdin_handle = INVALID_HANDLE_VALUE;
-  options.stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-  options.stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
-  // Always inherit stdout/stderr as a pair.
-  if (!options.stdout_handle || !options.stdin_handle)
-    options.stdin_handle = options.stdout_handle = nullptr;
-
-  // Pseudo handles are used when stdout and stderr redirect to the console. In
-  // that case, they're automatically inherited by child processes. See
-  // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682075.aspx
-  // Trying to add them to the list of handles to inherit causes CreateProcess
-  // to fail. When this process is launched from Python then a real handle is
-  // used. In that case, we do want to add it to the list of handles that is
-  // inherited.
-  if (options.stdout_handle &&
-      GetFileType(options.stdout_handle) != FILE_TYPE_CHAR) {
-    options.handles_to_inherit.push_back(options.stdout_handle);
-  }
-  if (options.stderr_handle &&
-      GetFileType(options.stderr_handle) != FILE_TYPE_CHAR &&
-      options.stdout_handle != options.stderr_handle) {
-    options.handles_to_inherit.push_back(options.stderr_handle);
-  }
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   const base::FileHandleMappingVector fd_mapping{
       {STDIN_FILENO, STDIN_FILENO},
       {STDOUT_FILENO, STDOUT_FILENO},

@@ -133,24 +133,11 @@ bool SendKeyPressToWindowSync(const gfx::NativeWindow window,
                               ui_controls::KeyEventType wait_for) {
   CHECK(wait_for == ui_controls::KeyEventType::kKeyPress ||
         wait_for == ui_controls::KeyEventType::kKeyRelease);
-#if BUILDFLAG(IS_WIN)
-  DCHECK(key != ui::VKEY_ESCAPE || !control)
-      << "'ctrl + esc' opens start menu on Windows. Start menu on windows "
-         "2012 is a full-screen always on top window. It breaks all "
-         "interactive tests.";
-#endif
 
   base::RunLoop run_loop(base::RunLoop::Type::kNestableTasksAllowed);
   bool result = ui_controls::SendKeyPressNotifyWhenDone(
       window, key, control, shift, alt, command, run_loop.QuitClosure(),
       wait_for);
-#if BUILDFLAG(IS_WIN)
-  if (!result && ui_test_utils::ShowAndFocusNativeWindow(window)) {
-    result = ui_controls::SendKeyPressNotifyWhenDone(
-        window, key, control, shift, alt, command, run_loop.QuitClosure(),
-        wait_for);
-  }
-#endif
   if (!result) {
     LOG(ERROR) << "ui_controls::SendKeyPressNotifyWhenDone failed";
     return false;

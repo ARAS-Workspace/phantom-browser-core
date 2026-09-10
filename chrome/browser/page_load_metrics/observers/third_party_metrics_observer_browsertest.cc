@@ -215,13 +215,8 @@ IN_PROC_BROWSER_TEST_F(ThirdPartyMetricsObserverBrowserTest,
 }
 
 // TODO(crbug.com/334416161): Re-enble this test.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_ThreeThirdPartyFrames_ThreeTimingsRecorded \
-  DISABLED_ThreeThirdPartyFrames_ThreeTimingsRecorded
-#else
 #define MAYBE_ThreeThirdPartyFrames_ThreeTimingsRecorded \
   ThreeThirdPartyFrames_ThreeTimingsRecorded
-#endif
 IN_PROC_BROWSER_TEST_F(ThirdPartyMetricsObserverBrowserTest,
                        MAYBE_ThreeThirdPartyFrames_ThreeTimingsRecorded) {
   base::HistogramTester histogram_tester;

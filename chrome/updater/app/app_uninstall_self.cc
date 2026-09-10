@@ -18,9 +18,7 @@
 #include "chrome/updater/lock.h"
 #include "chrome/updater/util/util.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/updater/win/setup/uninstall.h"
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include "chrome/updater/posix/setup.h"
 #endif
 

@@ -50,10 +50,6 @@
 #include "components/viz/service/frame_sinks/external_begin_frame_source_mac.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "components/viz/service/frame_sinks/external_begin_frame_source_win.h"
-#endif
-
 namespace viz {
 
 namespace {
@@ -205,18 +201,7 @@ RootCompositorFrameSinkImpl::Create(
               std::make_unique<DelayBasedTimeSource>(
                   base::SingleThreadTaskRunner::GetCurrentDefault().get()));
     } else {
-#if BUILDFLAG(IS_WIN)
-      // ExternalBeginFrameSourceWin also uses the D3D11 device used by dcomp.
-      if (output_surface->capabilities().dc_support_level !=
-          OutputSurface::DCSupportLevel::kNone) {
-        // Vsync updates are required to update the FrameIntervalDecider with
-        // supported refresh rates.
-        wants_vsync_updates = true;
-        external_begin_frame_source =
-            std::make_unique<ExternalBeginFrameSourceWin>(
-                restart_id, base::SingleThreadTaskRunner::GetCurrentDefault());
-      }
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
       // ExternalBeginFrameSourceMac is utilized for both CVDisplayLink
       // instances (originating in the GPU process) and CADisplayLink instances
       // (originating in the Browser process).
@@ -953,13 +938,7 @@ void RootCompositorFrameSinkImpl::DisplayDidCompleteSwapWithSize(
 
 void RootCompositorFrameSinkImpl::DisplayAddChildWindowToBrowser(
     gpu::SurfaceHandle child_window) {
-#if BUILDFLAG(IS_WIN)
-  if (display_client_) {
-    display_client_->AddChildWindowToBrowser(child_window);
-  }
-#else
   NOTREACHED();
-#endif
 }
 
 void RootCompositorFrameSinkImpl::SetWideColorEnabled(bool enabled) {

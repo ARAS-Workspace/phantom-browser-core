@@ -124,12 +124,6 @@ class CONTENT_EXPORT RenderWidgetHostViewChildFrame
                              uint32_t janky_frames) override;
 #endif
   RenderWidgetHostViewBase* GetRootView() override;
-#if BUILDFLAG(IS_WIN)
-  bool ShouldInitiateStylusWriting() override;
-  void OnStartStylusWriting() override;
-  void OnEditElementFocusedForStylusWriting(
-      blink::mojom::StylusWritingFocusResultPtr focus_result) override;
-#endif  // BUILDFLAG(IS_WIN)
   gfx::Size GetCompositorViewportPixelSize() override;
   void InitAsPopup(RenderWidgetHostView* parent_host_view,
                    const gfx::Rect& bounds,
@@ -389,15 +383,6 @@ class CONTENT_EXPORT RenderWidgetHostViewChildFrame
   // will typically not notice and will not transmit a full complement of
   // properties.
   bool initial_properties_sent_ = false;
-
-#if BUILDFLAG(IS_WIN)
-  // Callback registered with the root view for handling the TSF
-  // FocusHandwritingTarget response. Converts the screen rect to child frame
-  // local coordinates and forwards to this view's host.
-  void OnFocusHandwritingTarget(
-      const gfx::Rect& focus_screen_rect_in_dips,
-      const gfx::Size& tolerance_screen_distance_in_dips);
-#endif  // BUILDFLAG(IS_WIN)
 
   // A queue for `IntrinsicSizingInfo` sent from the child renderer before the
   // frame connector is set.

@@ -4,10 +4,6 @@
 
 #include "media/gpu/gpu_video_encode_accelerator_factory.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "third_party/microsoft_dxheaders/src/include/directx/d3d12video.h"
-// Windows SDK headers should be included after DirectX headers.
-#endif
 
 #include <utility>
 #include <vector>
@@ -37,11 +33,6 @@
 #endif
 #if BUILDFLAG(IS_MAC)
 #include "media/gpu/mac/vt_video_encode_accelerator_mac.h"
-#endif
-#if BUILDFLAG(IS_WIN)
-#include "media/gpu/windows/d3d12_helpers.h"
-#include "media/gpu/windows/d3d12_video_encode_accelerator.h"
-#include "media/gpu/windows/media_foundation_video_encode_accelerator_win.h"
 #endif
 #if BUILDFLAG(USE_V4L2_CODEC)
 #include "media/gpu/v4l2/v4l2_video_encode_accelerator.h"
@@ -93,62 +84,6 @@ std::unique_ptr<VideoEncodeAccelerator> CreateVTVEA() {
 }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-std::unique_ptr<VideoEncodeAccelerator> CreateMediaFoundationVEA(
-    const gpu::GpuPreferences& gpu_preferences,
-    const gpu::GpuDriverBugWorkarounds& gpu_workarounds,
-    const gpu::GPUInfo::GPUDevice& gpu_device) {
-  if (!base::FeatureList::IsEnabled(kMediaFoundationVideoEncodeAccelerator)) {
-    return nullptr;
-  }
-  return base::WrapUnique<VideoEncodeAccelerator>(
-      new MediaFoundationVideoEncodeAccelerator(
-          gpu_preferences, gpu_workarounds, gpu_device.luid));
-}
-
-Microsoft::WRL::ComPtr<IDXGIAdapter> GetDxgiAdapterByLuid(CHROME_LUID luid) {
-  Microsoft::WRL::ComPtr<IDXGIFactory4> dxgi_factory4;
-  if (FAILED(::CreateDXGIFactory1(IID_PPV_ARGS(&dxgi_factory4)))) {
-    LOG(ERROR) << "Failed to create DXGI factory";
-    return nullptr;
-  }
-  Microsoft::WRL::ComPtr<IDXGIAdapter> adapter;
-  if (FAILED(dxgi_factory4->EnumAdapterByLuid(
-          {.LowPart = luid.LowPart, .HighPart = luid.HighPart},
-          IID_PPV_ARGS(&adapter)))) {
-    LOG(ERROR) << "Failed to enum adapter by LUID";
-    return nullptr;
-  }
-  return adapter;
-}
-
-std::unique_ptr<VideoEncodeAccelerator> CreateD3D12VEA(
-    const gpu::GpuDriverBugWorkarounds& gpu_workarounds,
-    const gpu::GPUInfo::GPUDevice& gpu_device) {
-  if (gpu_workarounds.disable_d3d12_video_encoder) {
-    return nullptr;
-  }
-  if (!base::FeatureList::IsEnabled(kD3D12VideoEncodeAccelerator)) {
-    return nullptr;
-  }
-  // TODO(crbug.com/40275246): Consider use secondary adapter in case the
-  // default one does not support the desired codec but others do.
-  Microsoft::WRL::ComPtr<IDXGIAdapter> adapter =
-      GetDxgiAdapterByLuid(gpu_device.luid);
-  if (!adapter) {
-    LOG(ERROR) << "Failed to get an adapter by LUID";
-    return nullptr;
-  }
-  ComD3D12Device d3d12_device = CreateD3D12Device(adapter.Get());
-  if (!d3d12_device) {
-    LOG(ERROR) << "Failed to create D3D12 device";
-    return nullptr;
-  }
-  return base::WrapUnique<VideoEncodeAccelerator>(
-      new D3D12VideoEncodeAccelerator(std::move(d3d12_device),
-                                      gpu_workarounds));
-}
-#endif
 
 
 using VEAFactoryFunction =
@@ -183,12 +118,6 @@ std::vector<VEAFactoryFunction> CreateVEAFactoryFunctions(
 #endif
 #if BUILDFLAG(IS_MAC)
   funcs.push_back(base::BindRepeating(&CreateVTVEA));
-#endif
-#if BUILDFLAG(IS_WIN)
-  funcs.push_back(
-      base::BindRepeating(&CreateD3D12VEA, gpu_workarounds, gpu_device));
-  funcs.push_back(base::BindRepeating(
-      &CreateMediaFoundationVEA, gpu_preferences, gpu_workarounds, gpu_device));
 #endif
   return funcs;
 }

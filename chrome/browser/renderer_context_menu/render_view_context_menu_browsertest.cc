@@ -3213,7 +3213,7 @@ IN_PROC_BROWSER_TEST_F(LensOverlayBrowserTest,
 }
 
 // https://crbug.com/40064516
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_ImageSearchContextMenuOpensImageSearchForKeyboard \
   DISABLED_ImageSearchContextMenuOpensImageSearchForKeyboard
 #else

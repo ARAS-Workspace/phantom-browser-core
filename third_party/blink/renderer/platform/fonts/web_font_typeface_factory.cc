@@ -13,11 +13,7 @@
 #include "third_party/skia/include/core/SkTypeface.h"
 #include "third_party/skia/include/ports/SkTypeface_fontations.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "third_party/blink/renderer/platform/fonts/win/dwrite_font_format_support.h"
-#endif
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #include "third_party/skia/include/ports/SkFontMgr_empty.h"
 #endif
 
@@ -29,15 +25,11 @@ namespace blink {
 namespace {
 
 bool IsWin() {
-#if BUILDFLAG(IS_WIN)
-  return true;
-#else
   return false;
-#endif
 }
 
 bool IsFreeTypeSystemRasterizer() {
-#if !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_APPLE)
+#if !BUILDFLAG(IS_APPLE)
   return true;
 #else
   return false;
@@ -45,20 +37,17 @@ bool IsFreeTypeSystemRasterizer() {
 }
 
 sk_sp<SkTypeface> MakeTypefaceDefaultFontMgr(sk_sp<SkData> data) {
-#if BUILDFLAG(IS_WIN)
-  return skia::DefaultFontMgr()->makeFromData(data, 0);
-#endif
 
 #if BUILDFLAG(IS_APPLE)
   return skia::DefaultFontMgr()->makeFromData(data, 0);
 #endif
 
-#if !(BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE))
+#if !BUILDFLAG(IS_APPLE)
   return SkTypeface_Make_Fontations(data, SkFontArguments());
 #endif
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 sk_sp<SkTypeface> MakeTypefaceFallback(sk_sp<SkData> data) {
   return SkTypeface_Make_Fontations(data, SkFontArguments());
 }
@@ -71,15 +60,7 @@ sk_sp<SkTypeface> MakeTypefaceFontations(sk_sp<SkData> data) {
 sk_sp<SkTypeface> MakeVariationsTypeface(
     sk_sp<SkData> data,
     const WebFontTypefaceFactory::FontInstantiator& instantiator) {
-#if BUILDFLAG(IS_WIN)
-  if (DWriteVersionSupportsVariations()) {
-    return instantiator.make_system(data);
-  } else {
-    return instantiator.make_fallback(data);
-  }
-#else
   return instantiator.make_system(data);
-#endif
 }
 
 sk_sp<SkTypeface> MakeSbixTypeface(
@@ -109,11 +90,6 @@ sk_sp<SkTypeface> MakeColrV0Typeface(
 sk_sp<SkTypeface> MakeColrV0VariationsTypeface(
     sk_sp<SkData> data,
     const WebFontTypefaceFactory::FontInstantiator& instantiator) {
-#if BUILDFLAG(IS_WIN)
-  if (DWriteVersionSupportsVariations()) {
-    return instantiator.make_system(data);
-  }
-#endif
   return instantiator.make_fontations(data);
 }
 
@@ -131,7 +107,7 @@ bool WebFontTypefaceFactory::CreateTypeface(sk_sp<SkData> data,
   const FontInstantiator instantiator = {
       MakeTypefaceDefaultFontMgr,
       MakeTypefaceFontations,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
       MakeTypefaceFallback,
 #endif
   };

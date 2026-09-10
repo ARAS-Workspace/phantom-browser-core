@@ -424,12 +424,7 @@ IN_PROC_BROWSER_TEST_F(TabRestoreTest, DISABLED_BasicRestoreFromClosedWindow) {
   EXPECT_EQ(url1_, web_contents->GetURL());
 }
 
-#if BUILDFLAG(IS_WIN)
-// Flakily times out: http://crbug.com/40960786
-#define MAYBE_DontLoadRestoredTab DISABLED_DontLoadRestoredTab
-#else
 #define MAYBE_DontLoadRestoredTab DontLoadRestoredTab
-#endif
 
 // Restore a tab then make sure it doesn't restore again.
 IN_PROC_BROWSER_TEST_F(TabRestoreTest, MAYBE_DontLoadRestoredTab) {
@@ -1145,13 +1140,8 @@ IN_PROC_BROWSER_TEST_F(TabRestoreTest, RestoreWithExistingSiteInstance) {
 }
 
 // See crbug.com/40321364
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_RestoreCrossSiteWithExistingSiteInstance \
-  DISABLED_RestoreCrossSiteWithExistingSiteInstance
-#else
 #define MAYBE_RestoreCrossSiteWithExistingSiteInstance \
   RestoreCrossSiteWithExistingSiteInstance
-#endif
 
 // Tests that the SiteInstances used for entries in a restored tab's history
 // are given appropriate max page IDs, even if the renderer for the entry
@@ -1281,8 +1271,7 @@ IN_PROC_BROWSER_TEST_F(TabRestoreTest, RestoreWindow_ActiveTabIndex) {
 
 // https://crbug.com/40568506: Timeout flakiness on Mac10.13 Tests (dbg) and
 // PASS/FAIL flakiness on Linux Chromium OS ASan LSan Tests (1) bot.
-#if defined(ADDRESS_SANITIZER) || defined(MEMORY_SANITIZER) || \
-    (!defined(NDEBUG) && !BUILDFLAG(IS_WIN))
+#if defined(ADDRESS_SANITIZER) || defined(MEMORY_SANITIZER) || !defined(NDEBUG)
 #define MAYBE_RestoreTabWithSpecialURL DISABLED_RestoreTabWithSpecialURL
 #else
 #define MAYBE_RestoreTabWithSpecialURL RestoreTabWithSpecialURL
@@ -1314,8 +1303,7 @@ IN_PROC_BROWSER_TEST_F(TabRestoreTest, MAYBE_RestoreTabWithSpecialURL) {
 // https://crbug.com/41287668: Flakiness on linux_chromium_asan_rel_ng bot.
 // https://crbug.com/40568506: Timeout flakiness on Mac10.13 Tests (dbg) bots.
 // Also fails on Linux Tests (dbg).
-#if defined(ADDRESS_SANITIZER) || defined(MEMORY_SANITIZER) || \
-    (!defined(NDEBUG) && !BUILDFLAG(IS_WIN))
+#if defined(ADDRESS_SANITIZER) || defined(MEMORY_SANITIZER) || !defined(NDEBUG)
 #define MAYBE_RestoreTabWithSpecialURLOnBack DISABLED_RestoreTabWithSpecialURLOnBack
 #else
 #define MAYBE_RestoreTabWithSpecialURLOnBack RestoreTabWithSpecialURLOnBack
@@ -1558,7 +1546,7 @@ IN_PROC_BROWSER_TEST_F(TabRestoreTest,
 }
 
 // Test is flaky on Win and Mac. crbug.com/40786215, crbug.com/330838232.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_TabsFromRestoredWindowsAreLoadedGradually \
   DISABLED_TabsFromRestoredWindowsAreLoadedGradually
 #else

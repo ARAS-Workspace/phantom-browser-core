@@ -32,9 +32,9 @@ class FakeSystemGeolocationSource : public SystemGeolocationSource {
   void FakePositionErrorForTesting(const mojom::GeopositionError& error);
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE)
   void RequestPermission() override {}
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_APPLE)
 
  private:
   LocationSystemPermissionStatus status_ =

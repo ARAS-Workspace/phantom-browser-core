@@ -890,7 +890,7 @@ IN_PROC_BROWSER_TEST_F(ExtensionContextMenuLazyTest, EventPage) {
 
 // Flaky on Mac and Windows. https://crbug.com/40112041
 // Not relevant on Android, which only supports service worker.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_IncognitoSplitContextMenuCount \
   DISABLED_IncognitoSplitContextMenuCount
 #else

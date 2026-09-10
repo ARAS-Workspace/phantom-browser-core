@@ -683,10 +683,8 @@ TEST_F(WindowTest, MoveCursorToWithTransformRootWindow) {
   transform.Scale(2.0, 5.0);
   host()->SetRootTransform(transform);
   host()->MoveCursorToLocationInDIP(gfx::Point(10, 10));
-#if !BUILDFLAG(IS_WIN)
   // TODO(yoshiki): fix this to build on Windows. See crbug.com/133413.OD
   EXPECT_EQ("50,120", QueryLatestMousePositionRequestInHost(host()).ToString());
-#endif
   EXPECT_EQ("10,10", display::Screen::Get()->GetCursorScreenPoint().ToString());
 }
 
@@ -767,10 +765,8 @@ TEST_F(WindowTest, MoveCursorToWithComplexTransform) {
 
   w1111->MoveCursorTo(gfx::Point(10, 10));
 
-#if !BUILDFLAG(IS_WIN)
   // TODO(yoshiki): fix this to build on Windows. See crbug.com/133413.
   EXPECT_EQ("169,80", QueryLatestMousePositionRequestInHost(host()).ToString());
-#endif
   EXPECT_EQ("20,53", display::Screen::Get()->GetCursorScreenPoint().ToString());
 }
 

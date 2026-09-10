@@ -30,7 +30,7 @@ class VIEWS_EXPORT PlatformStyle {
 
   // Whether the ok button is in the leading position (left in LTR) in a
   // typical Cancel/OK button group.
-  static constexpr bool kIsOkButtonLeading = BUILDFLAG(IS_WIN);
+  static constexpr bool kIsOkButtonLeading = false;
 
   // Whether the default button for a dialog can be the Cancel button.
   static constexpr bool kDialogDefaultButtonCanBeCancel = !BUILDFLAG(IS_MAC);
@@ -94,10 +94,7 @@ class VIEWS_EXPORT PlatformStyle {
       View::FocusBehavior::ALWAYS;
 #endif
 
-  // On Windows, the first menu item is automatically selected when a menu
-  // is opened with the keyboard.
-  static constexpr bool kAutoSelectFirstMenuItemFromKeyboard =
-      BUILDFLAG(IS_WIN);
+  static constexpr bool kAutoSelectFirstMenuItemFromKeyboard = false;
 
   // Creates the default scrollbar for the given orientation.
   static std::unique_ptr<ScrollBar> CreateScrollBar(

@@ -25,11 +25,7 @@ scoped_refptr<base::SingleThreadTaskRunner> GetIOThreadTaskRunner() {
 
 LockThreadAffinity::LockThreadAffinity(int cpu_number)
     : affinity_set_ok_(false) {
-#if BUILDFLAG(IS_WIN)
-  const DWORD_PTR thread_mask = static_cast<DWORD_PTR>(1) << cpu_number;
-  old_affinity_ = SetThreadAffinityMask(GetCurrentThread(), thread_mask);
-  affinity_set_ok_ = old_affinity_ != 0;
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   cpu_set_t cpuset;
   UNSAFE_TODO(CPU_ZERO(&cpuset));
   UNSAFE_TODO(CPU_SET(cpu_number, &cpuset));
@@ -46,10 +42,7 @@ LockThreadAffinity::LockThreadAffinity(int cpu_number)
 LockThreadAffinity::~LockThreadAffinity() {
   if (!affinity_set_ok_)
     return;
-#if BUILDFLAG(IS_WIN)
-  auto set_result = SetThreadAffinityMask(GetCurrentThread(), old_affinity_);
-  DCHECK_NE(0u, set_result);
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   auto set_result = sched_setaffinity(0, sizeof(old_cpuset_), &old_cpuset_);
   DCHECK_EQ(0, set_result);
 #endif

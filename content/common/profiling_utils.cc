@@ -45,11 +45,7 @@ base::FilePath GetProfileFileDirectory() {
   std::unique_ptr<base::Environment> env(base::Environment::Create());
   std::optional<std::string> prof_template = env->GetVar("LLVM_PROFILE_FILE");
   if (prof_template.has_value()) {
-#if BUILDFLAG(IS_WIN)
-    path = base::FilePath(base::UTF8ToWide(*prof_template)).DirName();
-#else
     path = base::FilePath(*prof_template).DirName();
-#endif
   }
 #endif
 
@@ -75,11 +71,7 @@ base::File OpenProfilingFile() {
   int pool_index = base::RandIntInclusive(0, 3);
   std::string filename = base::StrCat(
       {"child_pool-", base::NumberToString(pool_index), ".profraw"});
-#if BUILDFLAG(IS_WIN)
-  path = path.Append(base::UTF8ToWide(filename));
-#else
   path = path.Append(filename);
-#endif
   uint32_t flags = base::File::FLAG_OPEN_ALWAYS | base::File::FLAG_READ |
                    base::File::FLAG_WRITE;
 

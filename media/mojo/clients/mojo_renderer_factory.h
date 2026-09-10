@@ -49,14 +49,6 @@ class MojoRendererFactory final : public RendererFactory {
       RequestOverlayInfoCB request_overlay_info_cb,
       const gfx::ColorSpace& target_color_space) final;
 
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<MojoRenderer> CreateMediaFoundationRenderer(
-      mojo::PendingRemote<mojom::MediaLog> media_log_remote,
-      mojo::PendingReceiver<mojom::MediaFoundationRendererExtension>
-          renderer_extension_receiver,
-      const scoped_refptr<base::SequencedTaskRunner>& media_task_runner,
-      VideoRendererSink* video_renderer_sink);
-#endif  // BUILDFLAG(IS_WIN)
 
 
 #if BUILDFLAG(IS_ANDROID)

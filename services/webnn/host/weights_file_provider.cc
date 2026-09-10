@@ -71,11 +71,7 @@ base::File CreateTemporaryFile() {
     // On POSIX platforms we can just call unlink(2) immediately and the file
     // will be deleted when the FD is closed but on Windows instead set this
     // up explicitly.
-#if BUILDFLAG(IS_WIN)
-    weights_file.DeleteOnClose(true);
-#else
     base::DeleteFile(path);
-#endif
   }
   return weights_file;
 }
@@ -110,16 +106,8 @@ WeightsFileResult CreateTemporaryFileWithPath() {
   //   * `base::DeleteFile` can mark the path for deletion while either
   //     handle is still open.
   base::FilePath path;
-#if BUILDFLAG(IS_WIN)
-  base::File weights_file = base::CreateAndOpenTemporaryFileInDirWithFlags(
-      temp_dir, &path,
-      base::File::FLAG_READ | base::File::FLAG_WRITE |
-          base::File::FLAG_WIN_SHARE_DELETE | base::File::FLAG_WIN_TEMPORARY |
-          base::File::FLAG_WIN_NO_EXECUTE);
-#else
   base::File weights_file =
       base::CreateAndOpenTemporaryFileInDir(temp_dir, &path);
-#endif
   if (!weights_file.IsValid()) {
     return {};
   }

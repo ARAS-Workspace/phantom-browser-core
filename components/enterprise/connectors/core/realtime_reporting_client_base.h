@@ -117,7 +117,7 @@ class RealtimeReportingClientBase : public KeyedService,
   // on Windows/Mac/Linux platforms. Regardless of collecting device signals or
   // not, this method is expected to call `UploadSecurityEvent()` in the
   // end.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   virtual void MaybeCollectDeviceSignalsAndReportEvent(
       ::chrome::cros::reporting::proto::Event event,

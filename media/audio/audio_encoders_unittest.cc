@@ -29,12 +29,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/opus/src/include/opus.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#include "media/gpu/windows/mf_audio_encoder.h"
-#define HAS_AAC_ENCODER 1
-#endif  // IS_WIN
-
 #if BUILDFLAG(IS_MAC) && BUILDFLAG(USE_PROPRIETARY_CODECS)
 #include "media/filters/mac/audio_toolbox_audio_encoder.h"
 #define HAS_AAC_ENCODER 1
@@ -142,24 +136,7 @@ class AudioEncodersTest : public ::testing::TestWithParam<TestAudioParams> {
       frames_per_buffer_ = AudioTimestampHelper::TimeToFrames(
           buffer_duration_, options_.sample_rate);
     } else if (options_.codec == AudioCodec::kAAC) {
-#if BUILDFLAG(IS_WIN) && HAS_AAC_ENCODER
-      if ((base::win::OSInfo::GetInstance()->version() ==
-               base::win::Version::WIN11_22H2 ||
-           base::win::OSInfo::GetInstance()->version() ==
-               base::win::Version::WIN11_23H2) &&
-          base::win::OSInfo::GetInstance()->version_number().patch < 4112) {
-        GTEST_SKIP() << "https://crbug.com/325249353: AAC encoder requires "
-                        "a fix in Win11 patch 4112.";
-        // GTEST_SKIP() returns.
-      }
-      EXPECT_TRUE(com_initializer_.Succeeded());
-      ASSERT_TRUE(base::SequencedTaskRunner::HasCurrentDefault());
-      encoder_ = std::make_unique<MFAudioEncoder>(
-          base::SequencedTaskRunner::GetCurrentDefault());
-      frames_per_buffer_ = kAacFramesPerBuffer;
-      buffer_duration_ = AudioTimestampHelper::FramesToTime(
-          frames_per_buffer_, options_.sample_rate);
-#elif HAS_AAC_ENCODER && BUILDFLAG(IS_MAC)
+#if HAS_AAC_ENCODER && BUILDFLAG(IS_MAC)
       encoder_ = std::make_unique<AudioToolboxAudioEncoder>();
       frames_per_buffer_ = kAacFramesPerBuffer;
       buffer_duration_ = AudioTimestampHelper::FramesToTime(
@@ -320,10 +297,6 @@ class AudioEncodersTest : public ::testing::TestWithParam<TestAudioParams> {
   }
 
   base::test::TaskEnvironment task_environment_;
-
-#if BUILDFLAG(IS_WIN)
-  ::base::win::ScopedCOMInitializer com_initializer_;
-#endif  // BUILDFLAG(IS_WIN)
 
   // The input params as initialized from the test's parameter.
   AudioEncoder::Options options_;
@@ -997,19 +970,6 @@ class AACAudioEncoderTest : public AudioEncodersTest {
   int decoder_output_callback_count = 0;
 #endif  // BUILDFLAG(ENABLE_FFMPEG) && BUILDFLAG(USE_PROPRIETARY_CODECS)
 };
-
-#if BUILDFLAG(IS_WIN)
-// `MFAudioEncoder` requires `kMinSamplesForOutput` before `Flush` can be called
-// successfully.
-TEST_P(AACAudioEncoderTest, FlushWithTooLittleInput) {
-  InitializeEncoder(base::DoNothing());
-  ProduceAudioAndEncode();
-
-  FlushAndVerifyStatus(EncoderStatus::Codes::kEncoderFailedFlush);
-
-  ValidateDoneCallbacksRun();
-}
-#endif
 
 #if BUILDFLAG(ENABLE_FFMPEG) && BUILDFLAG(USE_PROPRIETARY_CODECS)
 TEST_P(AACAudioEncoderTest, FullCycleEncodeDecode) {

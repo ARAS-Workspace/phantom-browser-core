@@ -83,11 +83,6 @@ struct OpenXrExtensionMethods {
   // Visibility Mask
   OPENXR_DECLARE_FN(xrGetVisibilityMaskKHR);
 
-#if BUILDFLAG(IS_WIN)
-  // Time
-  OPENXR_DECLARE_FN(xrConvertWin32PerformanceCounterToTimeKHR);
-#endif
-
   // While these extensions don't need to be gated to a particular platform,
   // since the API is still under development we'll try to limit the scope for
   // the time being.

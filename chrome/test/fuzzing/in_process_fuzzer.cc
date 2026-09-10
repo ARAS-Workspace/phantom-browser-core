@@ -23,10 +23,6 @@
 #include "partition_alloc/buildflags.h"
 #include "third_party/blink/public/web/web_testing_support.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/sys_string_conversions.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 // This is provided within libfuzzer, and documented, but is not its headers.
 extern "C" int LLVMFuzzerRunDriver(int* argc,
                                    char*** argv,
@@ -316,18 +312,8 @@ int main(int argc, char** argv) {
   // We are the outermost process, let's run the fuzzer.
   std::unique_ptr<InProcessFuzzer> fuzzer =
       g_in_process_fuzzer_factory->CreateInProcessFuzzer();
-#if BUILDFLAG(IS_WIN)
-  // Convert std::wstring (Windows command lines) to std::string
-  // (as needed by libfuzzer).
-  std::vector<std::string> libfuzzer_arguments;
-  auto wide_argv = base::CommandLine::ForCurrentProcess()->argv();
-  for (auto arg : wide_argv) {
-    libfuzzer_arguments.push_back(base::SysWideToUTF8(arg));
-  }
-#else
   std::vector<std::string> libfuzzer_arguments =
       base::CommandLine::ForCurrentProcess()->argv();
-#endif  // BUILDFLAG(IS_WIN)
   base::CommandLine::StringType executable_name =
       base::CommandLine::ForCurrentProcess()->argv().at(0);
   base::CommandLine::StringVector chromium_arguments =

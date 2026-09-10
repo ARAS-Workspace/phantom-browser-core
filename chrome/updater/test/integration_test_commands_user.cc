@@ -350,79 +350,6 @@ class IntegrationTestCommandsUser : public IntegrationTestCommands {
     updater::test::InstallApp(updater_scope_, app_id, version);
   }
 
-#if BUILDFLAG(IS_WIN)
-  void ExpectInterfacesRegistered() const override {
-    updater::test::ExpectInterfacesRegistered(updater_scope_);
-  }
-
-  void ExpectMarshalInterfaceSucceeds() const override {
-    updater::test::ExpectMarshalInterfaceSucceeds(updater_scope_);
-  }
-
-  void ExpectLegacyUpdate3WebSucceeds(
-      const std::string& app_id,
-      AppBundleWebCreateMode app_bundle_web_create_mode,
-      int expected_final_state,
-      int expected_error_code,
-      bool cancel_when_downloading) const override {
-    updater::test::ExpectLegacyUpdate3WebSucceeds(
-        updater_scope_, app_id, app_bundle_web_create_mode,
-        expected_final_state, expected_error_code, cancel_when_downloading);
-  }
-
-  void ExpectLegacyProcessLauncherSucceeds() const override {
-    updater::test::ExpectLegacyProcessLauncherSucceeds(updater_scope_);
-  }
-
-  void ExpectProcessLauncherLaunchCmdLineSucceeds() const override {
-    updater::test::ExpectProcessLauncherLaunchCmdLineSucceeds(updater_scope_);
-  }
-
-  void ExpectLegacyAppCommandWebSucceeds(
-      const std::string& app_id,
-      const std::string& command_id,
-      const base::ListValue& parameters,
-      int expected_exit_code) const override {
-    updater::test::ExpectLegacyAppCommandWebSucceeds(
-        updater_scope_, app_id, command_id, parameters, expected_exit_code);
-  }
-
-  void ExpectLegacyPolicyStatusSucceeds(
-      const base::Version& updater_version) const override {
-    updater::test::ExpectLegacyPolicyStatusSucceeds(updater_scope_,
-                                                    updater_version);
-  }
-
-  void LegacyInstallApp(const std::string& app_id,
-                        const base::Version& version) const override {
-    updater::test::LegacyInstallApp(updater_scope_, app_id, version);
-  }
-
-  void RunUninstallCmdLine() const override {
-    updater::test::RunUninstallCmdLine(updater_scope_);
-  }
-
-  void RunHandoff(const std::string& app_id) const override {
-    updater::test::RunHandoff(updater_scope_, app_id);
-  }
-
-  void InstallScheduledTask(bool run_elevated,
-                            const std::string& task_name,
-                            bool use_task_subfolders) const override {
-    ADD_FAILURE() << "This test function is only called for the system scope";
-  }
-  void IsScheduledTaskRegistered(bool run_elevated,
-                                 const std::string& task_name,
-                                 bool use_task_subfolders) const override {
-    ADD_FAILURE() << "This test function is only called for the system scope";
-  }
-  void DeleteScheduledTask(bool run_elevated,
-                           const std::string& task_name,
-                           bool use_task_subfolders) const override {
-    ADD_FAILURE() << "This test function is only called for the system scope";
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   void InstallAppViaService(
       const std::string& app_id,
       const base::DictValue& expected_final_values) const override {
@@ -460,12 +387,6 @@ class IntegrationTestCommandsUser : public IntegrationTestCommands {
   void SetupFakeLegacyUpdater() const override {
     updater::test::SetupFakeLegacyUpdater(updater_scope_);
   }
-
-#if BUILDFLAG(IS_WIN)
-  void RunFakeLegacyUpdater() const override {
-    updater::test::RunFakeLegacyUpdater(updater_scope_);
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
   void PrivilegedHelperInstall() const override {

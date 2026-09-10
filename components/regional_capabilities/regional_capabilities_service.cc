@@ -420,7 +420,7 @@ bool RegionalCapabilitiesService::IsInAnySearchEngineChoiceScreenRegion(
       .choice_screen_eligibility_config.has_value();
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 // static
 bool RegionalCapabilitiesService::IsInAnySearchEngineChoiceScreenRegion(
     Client& client) {
@@ -429,7 +429,7 @@ bool RegionalCapabilitiesService::IsInAnySearchEngineChoiceScreenRegion(
   return GetSettingsForProgram(CountryIdToProgram(country_id_result.country_id))
       .choice_screen_eligibility_config.has_value();
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 RegionalCapabilitiesService::LocationCompatibility
 RegionalCapabilitiesService::IsChoiceScreenCompatibleWithCurrentLocation() {

@@ -76,8 +76,6 @@ class GraphiteSharedContextTest : public testing::TestWithParam<bool> {
     wgpu::RequestAdapterOptions options = {};
 #if BUILDFLAG(IS_APPLE)
     options.backendType = wgpu::BackendType::Metal;
-#elif BUILDFLAG(IS_WIN)
-    options.backendType = wgpu::BackendType::D3D11;
 #else
     // Android, ChromeOS, Fuchsia, Linux all use Vulkan.
     options.backendType = wgpu::BackendType::Vulkan;

@@ -28,7 +28,7 @@ policy::PolicyErrorPath CreateNewPath(
   return path;
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 bool UnaffiliatedPolicyAllowed(const policy::PolicyMap& policies) {
   const base::Value* enable_for_all_users_value =
       policies.GetValue(policy::key::kEnableProxyOverrideRulesForAllUsers,
@@ -39,7 +39,7 @@ bool UnaffiliatedPolicyAllowed(const policy::PolicyMap& policies) {
 
   return enable_for_all_users_value->GetInt() == 1;
 }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 }  // namespace
 
@@ -49,7 +49,7 @@ ProxyOverrideRulesPolicyHandler::ProxyOverrideRulesPolicyHandler(
           policy::key::kProxyOverrideRules,
           schema.GetKnownProperty(policy::key::kProxyOverrideRules),
           policy::SchemaOnErrorStrategy::SCHEMA_ALLOW_UNKNOWN)
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
       ,
       enabled_for_all_users_handler_(
           policy::key::kEnableProxyOverrideRulesForAllUsers,
@@ -57,7 +57,7 @@ ProxyOverrideRulesPolicyHandler::ProxyOverrideRulesPolicyHandler(
           /*min=*/0,
           /*max=*/1,
           /*clamp*/ false)
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 {
 }
 
@@ -66,19 +66,19 @@ ProxyOverrideRulesPolicyHandler::~ProxyOverrideRulesPolicyHandler() = default;
 bool ProxyOverrideRulesPolicyHandler::CheckPolicySettings(
     const policy::PolicyMap& policies,
     policy::PolicyErrorMap* errors) {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // This code should run to set errors for
   // `kEnableProxyOverrideRulesForAllUsers`, but the regular proxy override
   // rules policy might still be valid so we ignore the returned boolean.
   enabled_for_all_users_handler_.CheckPolicySettings(policies, errors);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
   if (!policy::SchemaValidatingPolicyHandler::CheckPolicySettings(policies,
                                                                   errors)) {
     return false;
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   const policy::PolicyMap::Entry* proxy_override_rules_policy =
       policies.Get(policy_name());
   if (proxy_override_rules_policy &&
@@ -89,7 +89,7 @@ bool ProxyOverrideRulesPolicyHandler::CheckPolicySettings(
     errors->AddError(policy_name(), IDS_POLICY_UNAFFILIATED_USER_ERROR);
     return false;
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
   const base::Value* value =
       policies.GetValue(policy_name(), base::Value::Type::LIST);
@@ -129,10 +129,10 @@ void ProxyOverrideRulesPolicyHandler::ApplyPolicySettings(
   prefs->SetValue(proxy_config::prefs::kProxyOverrideRules,
                   policy_value->Clone());
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   prefs->SetInteger(proxy_config::prefs::kProxyOverrideRulesScope,
                     policy->scope);
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 }
 
 bool ProxyOverrideRulesPolicyHandler::CheckRule(

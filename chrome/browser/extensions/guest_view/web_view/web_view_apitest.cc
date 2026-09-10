@@ -770,11 +770,7 @@ IN_PROC_BROWSER_TEST_F(WebViewAPITest, TestCanGoBack) {
 }
 
 // Crashes on Win only.  http://crbug.com/41367054
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TestLoadStartLoadRedirect DISABLED_TestLoadStartLoadRedirect
-#else
 #define MAYBE_TestLoadStartLoadRedirect TestLoadStartLoadRedirect
-#endif
 IN_PROC_BROWSER_TEST_F(WebViewAPITest, MAYBE_TestLoadStartLoadRedirect) {
   std::string app_location = "web_view/apitest";
   StartTestServer(app_location);
@@ -898,12 +894,7 @@ IN_PROC_BROWSER_TEST_F(WebViewAPITest, TestRemoveWebviewAfterNavigation) {
   RunTest("testRemoveWebviewAfterNavigation", "web_view/apitest");
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TestResizeWebviewResizesContent \
-  DISABLED_TestResizeWebviewResizesContent
-#else
 #define MAYBE_TestResizeWebviewResizesContent TestResizeWebviewResizesContent
-#endif
 IN_PROC_BROWSER_TEST_F(WebViewAPITest, MAYBE_TestResizeWebviewResizesContent) {
   RunTest("testResizeWebviewResizesContent", "web_view/apitest");
 }
@@ -921,11 +912,7 @@ IN_PROC_BROWSER_TEST_F(WebViewAPITest, TestWebRequestAPI) {
 }
 
 // Crashes on Win only.  http://crbug.com/41367054
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TestWebRequestAPIWithHeaders DISABLED_TestWebRequestAPIWithHeaders
-#else
 #define MAYBE_TestWebRequestAPIWithHeaders TestWebRequestAPIWithHeaders
-#endif
 IN_PROC_BROWSER_TEST_F(WebViewAPITest, MAYBE_TestWebRequestAPIWithHeaders) {
   std::string app_location = "web_view/apitest";
   StartTestServer(app_location);

@@ -57,7 +57,7 @@ TEST_F(PinInfoBarPrefsTest, InfoBarShownRecentlyOrMaxTimes) {
 
 TEST_F(PinInfoBarPrefsTest, InfoBarShownRecentlyOrMaxTimesMaxReached) {
   int max_count = kPinInfoBarMaxPromptCount;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (base::FeatureList::IsEnabled(features::kSeparateDefaultAndPinPrompt)) {
     max_count = features::kSeparateDefaultAndPinPromptPinMaxCount.Get();
   }

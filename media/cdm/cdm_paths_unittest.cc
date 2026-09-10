@@ -22,8 +22,6 @@ namespace {
 const char kComponentPlatform[] =
 #if BUILDFLAG(IS_MAC)
     "mac";
-#elif BUILDFLAG(IS_WIN)
-    "win";
 #elif BUILDFLAG(IS_CHROMEOS)
     "cros";
 #elif BUILDFLAG(IS_LINUX)
@@ -65,10 +63,6 @@ TEST(CdmPathsTest, Expected) {
   // the special path used by Chrome's component updater.
   std::string expected_path = base::StringPrintf(
       "SomeCdm/_platform_specific/%s_%s", kComponentPlatform, kComponentArch);
-
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(base::ReplaceChars(expected_path, "/", "\\", &expected_path));
-#endif
 
   EXPECT_EQ(base::FilePath::FromUTF8Unsafe(expected_path),
             GetPlatformSpecificDirectory("SomeCdm"));

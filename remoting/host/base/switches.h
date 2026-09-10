@@ -52,15 +52,6 @@ extern const char kEnableWtmpdb[];
 extern const char kEnableCorpMessaging[];
 
 // Values for kEvaluateCapabilitySwitchName.
-#if BUILDFLAG(IS_WIN)
-// Executes EvaluateD3D() function.
-extern const char kEvaluateD3D[];
-// Executes Evaluate3dDisplayMode() function.
-extern const char kEvaluate3dDisplayMode[];
-// Used in combination with |kProcessTypeUrlForwarderConfigurator| to set up
-// the URL forwarder on Windows.
-extern const char kSetUpUrlForwarderSwitchName[];
-#endif
 
 // Used to pass the HWND for the parent process to a child process.
 extern const char kParentWindowSwitchName[];

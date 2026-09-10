@@ -98,14 +98,6 @@
 #include "media/remoting/renderer_controller.h"       // nogncheck
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "content/renderer/media/win/dcomp_texture_wrapper_impl.h"
-#include "gpu/config/gpu_driver_bug_workarounds.h"
-#include "media/base/win/mf_feature_checks.h"
-#include "media/cdm/win/media_foundation_cdm.h"
-#include "media/mojo/clients/win/media_foundation_renderer_client_factory.h"
-#include "media/mojo/mojom/speech_recognition_service.mojom.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 namespace {
 
@@ -552,55 +544,6 @@ MediaFactory::CreateRendererFactorySelector(
       RendererType::kCourier, std::move(courier_factory), is_remoting_cb);
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  // Enable Media Foundation for Clear if it is supported & there are no GPU
-  // workarounds enabled.
-  bool use_mf_for_clear = false;
-  if (media::SupportMediaFoundationClearPlayback()) {
-    if (auto gpu_channel_host = render_thread->EstablishGpuChannelSync()) {
-      use_mf_for_clear =
-          !gpu_channel_host->gpu_feature_info().IsWorkaroundEnabled(
-              gpu::DISABLE_MEDIA_FOUNDATION_CLEAR_PLAYBACK);
-    }
-  }
-
-  // Only use MediaFoundationRenderer when MediaFoundationCdm is available or
-  // MediaFoundation for Clear is supported.
-  if (media::MediaFoundationCdm::IsAvailable() || use_mf_for_clear) {
-    auto dcomp_texture_creation_cb =
-        base::BindRepeating(&DCOMPTextureWrapperImpl::Create,
-                            render_thread->GetDCOMPTextureFactory(),
-                            render_thread->GetMediaSequencedTaskRunner());
-
-    mojo::Remote<media::mojom::MediaFoundationRendererNotifier>
-        media_foundation_renderer_notifier;
-    GetInterfaceBroker().GetInterface(
-        media_foundation_renderer_notifier.BindNewPipeAndPassReceiver());
-
-    factory_selector->AddFactory(
-        RendererType::kMediaFoundation,
-        std::make_unique<media::MediaFoundationRendererClientFactory>(
-            media_log, std::move(dcomp_texture_creation_cb),
-            CreateMojoRendererFactory(),
-            std::move(media_foundation_renderer_notifier)));
-
-    if (use_mf_for_clear && !is_base_renderer_factory_set) {
-      // We want to use Media Foundation even for non-explicit Media Foundation
-      // clients (e.g. Media Foundation for Clear), register Media Foundation
-      // Renderer Factory as the base factory.
-      factory_selector->SetBaseRendererType(RendererType::kMediaFoundation);
-      is_base_renderer_factory_set = true;
-
-      // There are cases which Media Foundation may not support which will
-      // require us to fallback to the renderer impl so we add the renderer
-      // impl factory here to allow that fallback.
-      auto renderer_impl_factory = CreateRendererImplFactory(
-          player_id, media_log, decoder_factory, render_thread, render_frame_);
-      factory_selector->AddFactory(RendererType::kRendererImpl,
-                                   std::move(renderer_impl_factory));
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   if (!is_base_renderer_factory_set) {
     // TODO(crbug.com/1265448): These sorts of checks shouldn't be necessary if

@@ -828,11 +828,9 @@ class DesktopMediaPickerViewsPerTypeAndAudioTest
   ~DesktopMediaPickerViewsPerTypeAndAudioTest() override = default;
 
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    feature_list_.InitAndEnableFeature(media::kApplicationAudioCaptureWin);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     feature_list_.InitAndEnableFeature(media::kApplicationAudioCaptureMac);
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
     DesktopMediaPickerViewsTestBase::SetUp();
   }
 
@@ -1011,7 +1009,7 @@ TEST_F(DesktopMediaPickerViewsSystemAudioTest,
                     : IDS_DESKTOP_MEDIA_PICKER_AUDIO_SHARE_HINT_TAB));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // Verifies the conditions that make the media picker audio checkbox enabled for
 // each type of pane (Tab, Window, Screen) when application audio capture is
 // available/unavailable. Also checks that the checkbox string is correct for
@@ -1031,15 +1029,11 @@ class DesktopMediaPickerViewsApplicationAudioTest
 
   void SetUp() override {
     if (ShouldEnableApplicationAudioCapture()) {
-#if BUILDFLAG(IS_WIN)
-      feature_list_.InitAndEnableFeature(media::kApplicationAudioCaptureWin);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
       feature_list_.InitAndEnableFeature(media::kApplicationAudioCaptureMac);
 #endif
     } else {
-#if BUILDFLAG(IS_WIN)
-      feature_list_.InitAndDisableFeature(media::kApplicationAudioCaptureWin);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
       feature_list_.InitAndDisableFeature(media::kApplicationAudioCaptureMac);
 #endif
     }
@@ -1175,7 +1169,7 @@ TEST_P(DesktopMediaPickerViewsApplicationAudioTest, AudioCheckbox) {
   test_api_.SelectTabForSourceType(DesktopMediaList::Type::kWebContents);
   EXPECT_EQ(test_api_.HasAudioShareControl(), RequestAudio());
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 // Creates a single pane DesktopMediaPickerImpl that only has a tab list.
 class DesktopMediaPickerViewsSingleTabPaneTest

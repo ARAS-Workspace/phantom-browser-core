@@ -159,13 +159,6 @@ class FakeInterfaceFactory : public media::mojom::InterfaceFactory {
                             media::CreateCdmStatus::kCdmNotSupported);
   }
 
-#if BUILDFLAG(IS_WIN)
-  void CreateMediaFoundationRenderer(
-      mojo::PendingRemote<media::mojom::MediaLog> media_log_remote,
-      mojo::PendingReceiver<media::mojom::Renderer> receiver,
-      mojo::PendingReceiver<media::mojom::MediaFoundationRendererExtension>
-          renderer_extension_receiver) override {}
-#endif  // BUILDFLAG(IS_WIN)
  private:
   media::MojoCdmServiceContext cdm_service_context_;
   FakeMojoMediaClient mojo_media_client_;

@@ -590,10 +590,6 @@ void ProfilePolicyConnector::Init(
 #endif
 
   std::vector<std::unique_ptr<PolicyMigrator>> migrators;
-#if BUILDFLAG(IS_WIN)
-  migrators.push_back(
-      std::make_unique<browser_switcher::BrowserSwitcherPolicyMigrator>());
-#endif
 
 #if BUILDFLAG(IS_CHROMEOS)
   ConfigurationPolicyProvider* user_policy_delegate_candidate =

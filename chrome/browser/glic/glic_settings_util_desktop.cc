@@ -107,9 +107,7 @@ void OpenPasswordManagerSettingsPage(Profile* profile) {
 }
 
 std::string_view GetPlatformHelpSuffix() {
-#if BUILDFLAG(IS_WIN)
-  return "_win";
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   return "_mac";
 #elif BUILDFLAG(IS_CHROMEOS)
   return "_chromeos";

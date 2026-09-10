@@ -100,11 +100,6 @@
 #if BUILDFLAG(IS_POSIX)
 #include "base/files/scoped_file.h"
 #endif
-#if BUILDFLAG(IS_WIN)
-#include <io.h>
-
-#include "base/time/time.h"
-#endif
 // Function provided by libclang_rt.profile-*.a, declared and documented at:
 // https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/profile/InstrProfiling.h
 extern "C" void __llvm_profile_set_file_object(FILE* File, int EnableMerge);
@@ -238,19 +233,7 @@ mojo::IncomingInvitation InitializeMojoIPCChannel() {
   mojo::PlatformChannelEndpoint endpoint;
   MojoAcceptInvitationFlags flags =
       MOJO_ACCEPT_INVITATION_FLAG_LEAK_TRANSPORT_ENDPOINT;
-#if BUILDFLAG(IS_WIN)
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          mojo::PlatformChannel::kHandleSwitch)) {
-    endpoint = mojo::PlatformChannel::RecoverPassedEndpointFromCommandLine(
-        *base::CommandLine::ForCurrentProcess());
-  } else {
-    // If this process is elevated, it will have a pipe path passed on the
-    // command line.
-    endpoint = mojo::NamedPlatformChannel::ConnectToServer(
-        *base::CommandLine::ForCurrentProcess());
-    flags |= MOJO_ACCEPT_INVITATION_FLAG_ELEVATED;
-  }
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 #if BUILDFLAG(IS_IOS_TVOS)
   endpoint = mojo::PlatformChannel::RecoverPassedEndpointFromCommandLine(
       *base::CommandLine::ForCurrentProcess());
@@ -421,11 +404,6 @@ class ChildThreadImpl::IOThreadState
 #else
     // Let |fd| close file descriptor.
 #endif
-#elif BUILDFLAG(IS_WIN)
-    HANDLE handle = file.TakePlatformFile();
-    int fd = _open_osfhandle((intptr_t)handle, 0);
-    FILE* f = _fdopen(fd, "r+b");
-    __llvm_profile_set_file_object(f, 1);
 #else
 #error Unsupported architecture for profiling.
 #endif
@@ -816,22 +794,6 @@ void ChildThreadImpl::OnChannelError() {
   if (!IsInBrowserProcess())
     quit_closure_.Run();
 }
-
-#if BUILDFLAG(IS_WIN)
-void ChildThreadImpl::PreCacheFont(const LOGFONT& log_font) {
-  GetFontCacheWin()->PreCacheFont(log_font);
-}
-
-void ChildThreadImpl::ReleaseCachedFonts() {
-  GetFontCacheWin()->ReleaseCachedFonts();
-}
-
-const mojo::Remote<mojom::FontCacheWin>& ChildThreadImpl::GetFontCacheWin() {
-  if (!font_cache_win_)
-    BindHostReceiver(font_cache_win_.BindNewPipeAndPassReceiver());
-  return font_cache_win_;
-}
-#endif
 
 void ChildThreadImpl::RecordAction(const base::UserMetricsAction& action) {
   NOTREACHED();

@@ -45,7 +45,7 @@ namespace blink {
 
 struct IcuConverterWrapper;
 
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_ANDROID)
 WTF_EXPORT base::PlatformThreadId CurrentThread();
 #else
 // On Android gettid(3) uses a faster TLS model than thread_local.
@@ -53,7 +53,7 @@ WTF_EXPORT base::PlatformThreadId CurrentThread();
 inline base::PlatformThreadId CurrentThread() {
   return base::PlatformThread::CurrentId();
 }
-#endif  // !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_WIN)
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if DCHECK_IS_ON()
 WTF_EXPORT bool IsBeforeThreadCreated();
@@ -77,18 +77,10 @@ class WTF_EXPORT Threading {
   // Must be called on the main thread before any callers to wtfThreadData().
   static void Initialize();
 
-#if BUILDFLAG(IS_WIN) && defined(COMPILER_MSVC)
-  static size_t ThreadStackSize();
-#endif
-
  private:
   std::unique_ptr<IcuConverterWrapper> cached_converter_icu_;
 
   base::PlatformThreadId thread_id_;
-
-#if BUILDFLAG(IS_WIN) && defined(COMPILER_MSVC)
-  size_t thread_stack_size_ = 0u;
-#endif
 
   static ThreadSpecific<Threading>* static_data_;
   friend Threading& WtfThreading();

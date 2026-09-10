@@ -20,12 +20,6 @@
 #include "base/tracing_buildflags.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <vector>
-
-#include "base/memory/raw_ptr_exclusion.h"
-#endif
-
 namespace logging {
 class ScopedLogAssertHandler;
 }
@@ -47,9 +41,6 @@ class TestSuite {
   typedef bool (*TestMatch)(const testing::TestInfo&);
 
   TestSuite(int argc, char** argv);
-#if BUILDFLAG(IS_WIN)
-  TestSuite(int argc, wchar_t** argv);
-#endif  // BUILDFLAG(IS_WIN)
 
   TestSuite(const TestSuite&) = delete;
   TestSuite& operator=(const TestSuite&) = delete;
@@ -111,12 +102,6 @@ class TestSuite {
   bool check_for_thread_and_process_priority_ = true;
   bool is_initialized_ = false;
   int argc_;
-#if BUILDFLAG(IS_WIN)
-  // We need argv_as_pointers_.data() to have type char**, so we can't use
-  // raw_ptr here.
-  RAW_PTR_EXCLUSION std::vector<char*> argv_as_pointers_;
-  std::vector<std::string> argv_as_strings_;
-#endif
   raw_ptr<char*> argv_;
 };
 

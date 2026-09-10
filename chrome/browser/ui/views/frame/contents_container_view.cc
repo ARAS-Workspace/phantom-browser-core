@@ -47,10 +47,6 @@
 #include "ui/views/view_class_properties.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/views/widget/native_widget_aura.h"
-#endif
-
 namespace {
 constexpr int kSplitViewContentPadding = 4;
 constexpr int kNewTabFooterSeparatorHeight = 1;

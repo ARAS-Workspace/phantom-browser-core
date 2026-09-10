@@ -140,12 +140,7 @@ IN_PROC_BROWSER_TEST_F(PageLifecycleStateManagerBrowserTest, SetVisibility) {
 }
 
 // TODO(crbug.com/40786254): Test is flaky on Win
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CrossProcessIframeHiddenAnFrozen \
-  DISABLED_CrossProcessIframeHiddenAnFrozen
-#else
 #define MAYBE_CrossProcessIframeHiddenAnFrozen CrossProcessIframeHiddenAnFrozen
-#endif
 IN_PROC_BROWSER_TEST_F(PageLifecycleStateManagerBrowserTest,
                        MAYBE_CrossProcessIframeHiddenAnFrozen) {
   EXPECT_TRUE(embedded_test_server()->Start());

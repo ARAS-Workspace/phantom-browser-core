@@ -107,9 +107,6 @@ TEST_F(FilePathTest, DirName) {
       {FPL("\xB3:"), FPL(".")},
       {FPL("\xC5:"), FPL(".")},
       {FPL("/aa/../bb/cc"), FPL("/aa/../bb")},
-#if BUILDFLAG(IS_WIN)
-      {FPL("\x0143:"), FPL(".")},
-#endif  // BUILDFLAG(IS_WIN)
 #if defined(FILE_PATH_USES_DRIVE_LETTERS)
       {FPL("c:"), FPL("c:")},
       {FPL("C:"), FPL("C:")},
@@ -198,9 +195,6 @@ TEST_F(FilePathTest, BaseName) {
       {FPL("{:"), FPL("{:")},
       {FPL("\xB3:"), FPL("\xB3:")},
       {FPL("\xC5:"), FPL("\xC5:")},
-#if BUILDFLAG(IS_WIN)
-      {FPL("\x0143:"), FPL("\x0143:")},
-#endif  // BUILDFLAG(IS_WIN)
 #if defined(FILE_PATH_USES_DRIVE_LETTERS)
       {FPL("c:"), FPL("")},
       {FPL("C:"), FPL("")},
@@ -338,9 +332,7 @@ TEST_F(FilePathTest, Append) {
 
     // TODO(erikkay): It would be nice to have a unicode test append value to
     // handle the case when AppendASCII is passed UTF8
-#if BUILDFLAG(IS_WIN)
-    std::string ascii = WideToUTF8(leaf);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
     std::string ascii = leaf;
 #endif
     observed_str = root.AppendASCII(ascii);
@@ -370,11 +362,7 @@ TEST_P(FilePathUTF8Test, Test) {
   FilePath observed_path = root.Append(FilePath(leaf));
   EXPECT_EQ(FilePath::StringType(testcase()), observed_path.value());
 
-#if BUILDFLAG(IS_WIN)
-  std::string utf8 = WideToUTF8(leaf);
-#else
   std::string utf8 = leaf;
-#endif
   EXPECT_DCHECK_DEATH({ observed_str = root.AppendASCII(utf8); });
   EXPECT_DCHECK_DEATH(
       { observed_str = root.InsertBeforeExtensionASCII(utf8); });
@@ -1268,7 +1256,7 @@ TEST_F(FilePathTest, MatchesExtension) {
 #endif  // FILE_PATH_USES_DRIVE_LETTERS
       {{FPL("/bar/foo.txt.dll"), FPL(".txt")}, false},
       {{FPL("/bar/foo.txt"), FPL(".txt")}, true},
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
       // Umlauts A, O, U: direct comparison, and upper case vs. lower case
       {{FPL("foo.\u00E4\u00F6\u00FC"), FPL(".\u00E4\u00F6\u00FC")}, true},
       {{FPL("foo.\u00C4\u00D6\u00DC"), FPL(".\u00E4\u00F6\u00FC")}, true},
@@ -1317,7 +1305,7 @@ TEST_F(FilePathTest, MatchesFinalExtension) {
 #endif  // FILE_PATH_USES_DRIVE_LETTERS
       {{FPL("/bar/foo.txt.dll"), FPL(".txt")}, false},
       {{FPL("/bar/foo.txt"), FPL(".txt")}, true},
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
       // Umlauts A, O, U: direct comparison, and upper case vs. lower case
       {{FPL("foo.\u00E4\u00F6\u00FC"), FPL(".\u00E4\u00F6\u00FC")}, true},
       {{FPL("foo.\u00C4\u00D6\u00DC"), FPL(".\u00E4\u00F6\u00FC")}, true},
@@ -1364,7 +1352,7 @@ TEST_F(FilePathTest, CompareIgnoreCase) {
       {{FPL("\u00DF"), FPL("\u1E9E")}, -1},
       {{FPL("SS"), FPL("\u00DF")}, -1},
       {{FPL("SS"), FPL("\u1E9E")}, -1},
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
       // Umlauts A, O, U: direct comparison, and upper case vs. lower case
       {{FPL("\u00E4\u00F6\u00FC"), FPL("\u00E4\u00F6\u00FC")}, 0},
       {{FPL("\u00C4\u00D6\u00DC"), FPL("\u00E4\u00F6\u00FC")}, 0},
@@ -1426,15 +1414,9 @@ TEST_F(FilePathTest, ReferencesParent) {
   const auto cases = std::to_array<UnaryBooleanTestData>({
     { FPL("."),        false },
     { FPL(".."),       true },
-#if BUILDFLAG(IS_WIN)
-    { FPL(".. "),      true },
-    { FPL(" .."),      true },
-    { FPL("..."),      true },
-#else
     { FPL(".. "),      false },
     { FPL(" .."),      false },
     { FPL("..."),      false },
-#endif
     { FPL("a.."),      false },
     { FPL("..a"),      false },
     { FPL("../"),      true },

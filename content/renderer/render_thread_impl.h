@@ -105,10 +105,6 @@ class RenderThreadObserver;
 class RendererBlinkPlatformImpl;
 class VariationsRenderThreadObserver;
 
-#if BUILDFLAG(IS_WIN)
-class DCOMPTextureFactory;
-#endif
-
 // The RenderThreadImpl class represents the main thread, where `blink::WebView`
 // instances live.  Most of the communication occurs in the form of mojo IPC
 // messages, however there is still some legacy IPC messages.  They are
@@ -235,10 +231,6 @@ class CONTENT_EXPORT RenderThreadImpl
   blink::URLLoaderThrottleProvider* url_loader_throttle_provider() const {
     return url_loader_throttle_provider_.get();
   }
-
-#if BUILDFLAG(IS_WIN)
-  scoped_refptr<DCOMPTextureFactory> GetDCOMPTextureFactory();
-#endif
 
   blink::WebVideoCaptureImplManager* video_capture_impl_manager() const {
     return vc_manager_.get();
@@ -514,10 +506,6 @@ class CONTENT_EXPORT RenderThreadImpl
 
   // Thread to run the VideoFrameCompositor on.
   std::unique_ptr<base::Thread> video_frame_compositor_thread_;
-
-#if BUILDFLAG(IS_WIN)
-  scoped_refptr<DCOMPTextureFactory> dcomp_texture_factory_;
-#endif
 
   scoped_refptr<viz::ContextProviderCommandBuffer> shared_main_thread_contexts_;
 

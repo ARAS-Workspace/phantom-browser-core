@@ -39,13 +39,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "testing/platform_test.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/com_init_util.h"
-#include "base/win/scoped_bstr.h"
-#include "base/win/scoped_com_initializer.h"
-#include "base/win/scoped_variant.h"
-#include "base/win/wmi.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
 #include "base/system/sys_info_internal.h"
@@ -164,8 +157,7 @@ TEST_F(SysInfoTest, AmountOfDiskSpace) {
   EXPECT_GE(disk_space.total, disk_space.available) << tmp_path;
 }
 
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 TEST_F(SysInfoTest, OperatingSystemVersion) {
   std::string version = SysInfo::OperatingSystemVersion();
@@ -255,7 +247,8 @@ TEST_F(SysInfoTest, GetHardwareInfo) {
   EXPECT_TRUE(IsStringUTF8(hardware_info->manufacturer));
   EXPECT_TRUE(IsStringUTF8(hardware_info->model));
   bool empty_result_expected =
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || \
+    BUILDFLAG(IS_CHROMEOS)
       false;
 #else
       true;
@@ -280,61 +273,6 @@ TEST_F(SysInfoTest, GetAndroidBuildFingerprint) {
 }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-TEST_F(SysInfoTest, GetHardwareInfoWMIMatchRegistry) {
-  base::win::ScopedCOMInitializer com_initializer;
-  test::TaskEnvironment task_environment;
-  std::optional<SysInfo::HardwareInfo> hardware_info;
-
-  auto callback = base::BindOnce(
-      [](std::optional<SysInfo::HardwareInfo>* target_info,
-         SysInfo::HardwareInfo info) { *target_info = std::move(info); },
-      &hardware_info);
-  SysInfo::GetHardwareInfo(std::move(callback));
-  task_environment.RunUntilIdle();
-
-  ASSERT_TRUE(hardware_info.has_value());
-
-  Microsoft::WRL::ComPtr<IWbemServices> wmi_services;
-  EXPECT_TRUE(base::win::CreateLocalWmiConnection(true, &wmi_services));
-
-  static constexpr wchar_t query_computer_system[] =
-      L"SELECT Manufacturer,Model FROM Win32_ComputerSystem";
-
-  Microsoft::WRL::ComPtr<IEnumWbemClassObject> enumerator_computer_system;
-  HRESULT hr = wmi_services->ExecQuery(
-      base::win::ScopedBstr(L"WQL").Get(),
-      base::win::ScopedBstr(query_computer_system).Get(),
-      WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr,
-      &enumerator_computer_system);
-  EXPECT_FALSE(FAILED(hr) || !enumerator_computer_system.Get());
-
-  Microsoft::WRL::ComPtr<IWbemClassObject> class_object;
-  ULONG items_returned = 0;
-  hr = enumerator_computer_system->Next(WBEM_INFINITE, 1, &class_object,
-                                        &items_returned);
-  EXPECT_FALSE(FAILED(hr) || !items_returned);
-
-  base::win::ScopedVariant manufacturerVar;
-  std::wstring manufacturer;
-  hr = class_object->Get(L"Manufacturer", 0, manufacturerVar.Receive(), nullptr,
-                         nullptr);
-  if (SUCCEEDED(hr) && manufacturerVar.type() == VT_BSTR) {
-    manufacturer.assign(V_BSTR(manufacturerVar.ptr()),
-                        ::SysStringLen(V_BSTR(manufacturerVar.ptr())));
-  }
-  base::win::ScopedVariant modelVar;
-  std::wstring model;
-  hr = class_object->Get(L"Model", 0, modelVar.Receive(), nullptr, nullptr);
-  if (SUCCEEDED(hr) && modelVar.type() == VT_BSTR) {
-    model.assign(V_BSTR(modelVar.ptr()),
-                 ::SysStringLen(V_BSTR(modelVar.ptr())));
-  }
-
-  EXPECT_TRUE(hardware_info->manufacturer == base::SysWideToUTF8(manufacturer));
-  EXPECT_TRUE(hardware_info->model == base::SysWideToUTF8(model));
-}
-#endif
 
 #if BUILDFLAG(IS_CHROMEOS)
 

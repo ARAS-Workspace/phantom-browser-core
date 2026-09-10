@@ -39,10 +39,6 @@
 #include "services/network/public/mojom/network_service.mojom.h"
 #include "services/network/public/mojom/url_response_head.mojom.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "sandbox/policy/features.h"
-#endif
-
 namespace {
 
 constexpr char kCookieName[] = "Name";
@@ -202,39 +198,6 @@ INSTANTIATE_TEST_SUITE_P(,
                            return info.param ? "InProcess" : "OutOfProcess";
                          });
 
-#if BUILDFLAG(IS_WIN)
-class ChromeNetworkServiceBrowserCookieLockTest : public InProcessBrowserTest {
- public:
-  void SetUpOnMainThread() override {
-    host_resolver()->AddRule("*", "127.0.0.1");
-    ASSERT_TRUE(embedded_test_server()->Start());
-  }
-};
-
-// This test verifies that the cookie store cannot be opened once sqlite has an
-// exclusive lock on the file.
-IN_PROC_BROWSER_TEST_F(ChromeNetworkServiceBrowserCookieLockTest,
-                       CookiesAreLocked) {
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(
-      browser(), embedded_test_server()->GetURL("/title1.html")));
-  base::FilePath cookie_filename = browser()
-                                       ->GetProfile()
-                                       ->GetPath()
-                                       .Append(chrome::kNetworkDataDirname)
-                                       .Append(chrome::kCookieFilename);
-  {
-    base::ScopedAllowBlockingForTesting allow_blocking;
-
-    ASSERT_TRUE(base::PathExists(cookie_filename));
-    base::File cookie_file(
-        cookie_filename,
-        base::File::Flags::FLAG_OPEN_ALWAYS | base::File::Flags::FLAG_READ);
-    EXPECT_FALSE(cookie_file.IsValid());
-  }
-}
-
-#endif  // BUILDFLAG(IS_WIN)
-
 // See `NetworkServiceBrowserTest` for content's version of tests. This test
 // merely tests that chrome's feature is wired up correctly to the migration
 // code that exists in content.
@@ -244,14 +207,6 @@ class ChromeNetworkServiceMigrationBrowserTest : public InProcessBrowserTest {
 
   void SetUp() override {
     std::vector<base::test::FeatureRef> disabled_features, enabled_features;
-#if BUILDFLAG(IS_WIN)
-    // On Windows, the Network Sandbox requires that data migration be enabled
-    // to function correctly. Thus, in order to correctly test the case when
-    // network data migration is not happening, the network sandbox must also be
-    // disabled.
-    disabled_features.push_back(
-        sandbox::policy::features::kNetworkServiceSandbox);
-#endif
     // For PRE_PRE, disable migration. For PRE_ enable it, and then disable it
     // again.
     if (GetTestPreCount() == 2 || GetTestPreCount() == 0)

@@ -22,7 +22,7 @@
 #include "extensions/browser/updater/extension_downloader.h"
 #include "extensions/buildflags/buildflags.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/extensions/management/management_util.h"
 #include "extensions/browser/blocklist_extension_prefs.h"
 #endif
@@ -45,7 +45,7 @@ namespace {
 // Timeout to report UMA if not all force-installed extension were loaded.
 constexpr base::TimeDelta kInstallationTimeout = base::Minutes(5);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // Returns whether the management environment for the profile is low-trust.
 bool IsLowTrustEnvironment(Profile* profile) {
   switch (GetHigherManagementAuthorityTrustworthiness(profile)) {
@@ -57,7 +57,7 @@ bool IsLowTrustEnvironment(Profile* profile) {
       return false;
   }
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(IS_CHROMEOS)
 // Contains information about the current user.
@@ -478,7 +478,7 @@ void ForceInstalledMetrics::ReportDisableReason(
                            smallest_disable_reason);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 void ForceInstalledMetrics::ReportGreylistedStateByTrustLevel(
     const ExtensionId& extension_id,
     bool is_low_trust_environment) {
@@ -496,7 +496,7 @@ void ForceInstalledMetrics::ReportGreylistedStateByTrustLevel(
         registry_->enabled_extensions().Contains(extension_id));
   }
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
 void ForceInstalledMetrics::ReportMetricsOnExtensionsReady() {
   for (const auto& extension : tracker_->extensions()) {
@@ -506,7 +506,7 @@ void ForceInstalledMetrics::ReportMetricsOnExtensionsReady() {
   base::UmaHistogramLongTimes("Extensions.ForceInstalledReadyTime",
                               base::Time::Now() - start_time_);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   base::UmaHistogramEnumeration(
       "Extensions.ForceInstalledManagementAuthorityTrustworthiness",
       GetHigherManagementAuthorityTrustworthiness(profile_));
@@ -517,13 +517,13 @@ void ForceInstalledMetrics::ReportMetrics() {
   base::UmaHistogramCounts100("Extensions.ForceInstalledTotalCandidateCount",
                               tracker_->extensions().size());
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   const bool is_low_trust_environment = IsLowTrustEnvironment(profile_);
   for (const auto& extension : tracker_->extensions()) {
     ReportGreylistedStateByTrustLevel(extension.first,
                                       is_low_trust_environment);
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 
   std::set<ExtensionId> missing_forced_extensions;
   InstallStageTracker* install_stage_tracker =

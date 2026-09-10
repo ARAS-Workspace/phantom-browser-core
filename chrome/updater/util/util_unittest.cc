@@ -28,13 +28,6 @@
 #include "base/version.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <shlobj.h>
-
-#include "base/base_paths_win.h"
-#endif
 #include "chrome/updater/branded_constants.h"
 #include "chrome/updater/constants.h"
 #include "chrome/updater/tag.h"
@@ -250,37 +243,6 @@ TEST(Util, ToSignedIntegral) {
   EXPECT_EQ(ToSignedIntegral(uint64_t{0x8000000000000000}), -1);
 }
 
-#if BUILDFLAG(IS_WIN)
-class UtilTaskNameTest : public ::testing::TestWithParam<std::string> {
- protected:
-  base::Version version() const { return base::Version(GetParam()); }
-};
-
-INSTANTIATE_TEST_SUITE_P(UtilTaskNameTestCases,
-                         UtilTaskNameTest,
-                         ::testing::Values(kUpdaterVersion,
-                                           "1.2.3.4",
-                                           "199.28537.11717"));
-
-TEST_P(UtilTaskNameTest, GetTaskNamePrefix) {
-  EXPECT_EQ(
-      GetTaskNamePrefix(GetUpdaterScopeForTesting(), version()),
-      base::StrCat(
-          {base::UTF8ToWide(PRODUCT_FULLNAME_STRING), L"Task",
-           IsSystemInstall(GetUpdaterScopeForTesting()) ? L"System" : L"User",
-           base::UTF8ToWide(version().GetString())}));
-}
-
-TEST_P(UtilTaskNameTest, GetTaskDisplayName) {
-  EXPECT_EQ(
-      GetTaskDisplayName(GetUpdaterScopeForTesting(), version()),
-      base::StrCat(
-          {base::UTF8ToWide(PRODUCT_FULLNAME_STRING), L" Task ",
-           IsSystemInstall(GetUpdaterScopeForTesting()) ? L"System " : L"User ",
-           base::UTF8ToWide(version().GetString())}));
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 TEST(Util, GetFilesWithPredicate) {
   EXPECT_TRUE(GetFilesWithPredicate({}, [](const base::FilePath&) {
                 return true;
@@ -367,20 +329,9 @@ TEST(Util, GetUpdaterTempDir) {
   std::optional<base::FilePath> temp_dir = GetUpdaterTempDir();
   ASSERT_TRUE(temp_dir);
 
-#if BUILDFLAG(IS_WIN)
-  base::FilePath expected_parent;
-  if (::IsUserAnAdmin()) {
-    ASSERT_TRUE(
-        base::PathService::Get(base::DIR_SYSTEM_TEMP, &expected_parent));
-  } else {
-    ASSERT_TRUE(base::GetTempDir(&expected_parent));
-  }
-  EXPECT_EQ(*temp_dir, expected_parent);
-#else
   base::FilePath expected_parent;
   ASSERT_TRUE(base::GetTempDir(&expected_parent));
   EXPECT_EQ(*temp_dir, expected_parent);
-#endif
 }
 
 }  // namespace updater

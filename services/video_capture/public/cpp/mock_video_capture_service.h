@@ -44,9 +44,6 @@ class MockVideoCaptureService
                void(mojo::PendingReceiver<
                     video_capture::mojom::VideoSourceProvider> receiver));
 
-#if BUILDFLAG(IS_WIN)
-  MOCK_METHOD1(OnGpuInfoUpdate, void(const CHROME_LUID&));
-#endif
 };
 
 }  // namespace video_capture

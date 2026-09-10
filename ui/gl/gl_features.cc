@@ -12,10 +12,6 @@
 #include "build/build_config.h"
 #include "ui/gl/gl_switches.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/mac/mac_util.h"
 #endif
@@ -111,54 +107,12 @@ BASE_FEATURE(kDefaultPassthroughCommandDecoder,
              base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(ENABLE_VALIDATING_COMMAND_DECODER)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
 // Controls whether the GPU process falls back to software if GLES3 is not
 // supported.
 BASE_FEATURE(kFallbackToSWIfGLES3NotSupported,
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
-
-#if BUILDFLAG(IS_WIN)
-// If true, VsyncThreadWin will use the compositor clock
-// to determine the vsync interval.
-BASE_FEATURE(kUseCompositorClockVSyncInterval,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-bool UseCompositorClockVSyncInterval() {
-  return base::win::GetVersion() >= base::win::Version::WIN11_24H2 &&
-         base::FeatureList::IsEnabled(
-             features::kUseCompositorClockVSyncInterval);
-}
-
-// Enables DirectComposition textures backed by D3D12 resources.
-// When this feature is enabled, the GPU pipeline may create and present DComp-
-// backed surfaces using the D3D12 path and leverage Dawn’s D3D12 device. This
-// allows unified resource sharing and fences between Dawn (WebGPU), Skia
-// Graphite, and DComp when the system supports D3D12.
-//
-// Important notes:
-// - Keyed-mutex resources are not compatible with the D3D12 unwrap path and
-//   will continue using D3D11.
-// - WebGL will continue to use the D3D11 runtime backed by D3D11 drivers with
-//   ANGLE's D3D11 device.
-// - Certain SharedImage functionality such as copies to staging
-//   textures rely on the D3D11 DDI. These code paths will use
-//   D3D11on12 when this feature is enabled.
-//
-// This feature requires SkiaGraphite with a dawn-d3d12 backend, BufferQueue to
-// be enabled, and either DelegatedCompositing to be disabled or in full
-// mode. As there is currently no support for D3D12 swapchains or DComp
-// surfaces, BufferQueue is required to manage presentation. BufferQueue is not
-// supported on Windows with partial delegated compositing, so in that mode this
-// feature will not work.
-//
-// Example command line to enable this feature:
-// --enable-features=SkiaGraphite,BufferQueue,DCompOnD3D12 AND
-// --disable-features=DelegatedCompositing or
-// --enable-features=DelegatedCompositing:mode/full AND
-// --skia-graphite-backend=dawn-d3d12
-BASE_FEATURE(kDCompOnD3D12, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_ANDROID)
 // Enables 2-pixel even boundary alignment for YUV SurfaceControl overlays.
@@ -274,11 +228,11 @@ void GetANGLEFeaturesFromCommandLineAndFinch(
 }
 
 bool ShouldFallbackToSWIfGLES3NotSupported() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
   return base::FeatureList::IsEnabled(kFallbackToSWIfGLES3NotSupported);
-#else   // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#else
   return true;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 #if BUILDFLAG(ENABLE_SWIFTSHADER)
@@ -337,20 +291,9 @@ bool IsSwiftShaderAllowed(const base::CommandLine* command_line) {
          IsSwiftShaderAllowedByFeature();
 }
 
-#if BUILDFLAG(IS_WIN)
-BASE_FEATURE(kAllowD3D11WarpFallback, base::FEATURE_ENABLED_BY_DEFAULT);
-
-bool IsWARPAllowed(const base::CommandLine* command_line) {
-  if (command_line->HasSwitch(switches::kDisableD3D11Warp)) {
-    return false;
-  }
-  return base::FeatureList::IsEnabled(kAllowD3D11WarpFallback);
-}
-#else
 bool IsWARPAllowed(const base::CommandLine*) {
   return false;
 }
-#endif
 
 bool IsAnySoftwareGLAllowed(const base::CommandLine* command_line) {
   return IsWARPAllowed(command_line) || IsSwiftShaderAllowed(command_line);

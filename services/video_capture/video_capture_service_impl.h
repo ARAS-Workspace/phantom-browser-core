@@ -32,10 +32,6 @@
 #include "media/device_monitors/device_monitor_mac.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "media/device_monitors/system_message_window_win.h"
-#endif
-
 namespace video_capture {
 
 class VirtualDeviceEnabledDeviceFactory;
@@ -65,9 +61,6 @@ class VideoCaptureServiceImpl : public mojom::VideoCaptureService {
       mojo::PendingReceiver<mojom::VideoSourceProvider> receiver) override;
   void BindControlsForTesting(
       mojo::PendingReceiver<mojom::TestingControls> receiver) override;
-#if BUILDFLAG(IS_WIN)
-  void OnGpuInfoUpdate(const CHROME_LUID& luid) override;
-#endif
 #if BUILDFLAG(ENABLE_GPU_CHANNEL_MEDIA_CAPTURE)
   void SetVizGpu(std::unique_ptr<viz::Gpu> viz_gpu);
   using GpuChannelHostBinder =
@@ -91,10 +84,6 @@ class VideoCaptureServiceImpl : public mojom::VideoCaptureService {
 
 #if BUILDFLAG(IS_MAC)
   std::unique_ptr<media::DeviceMonitorMac> video_capture_device_monitor_mac_;
-#endif
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<media::SystemMessageWindowWin>
-      video_capture_system_message_window_win_;
 #endif
 
   mojo::Receiver<mojom::VideoCaptureService> receiver_;

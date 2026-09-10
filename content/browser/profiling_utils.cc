@@ -23,10 +23,6 @@
 #include "content/public/common/content_switches.h"
 #include "content/public/common/profiling_utils.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "sandbox/policy/mojom/sandbox.mojom-shared.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -72,15 +68,6 @@ void AskAllChildrenToDumpProfilingData(base::OnceClosure callback) {
   // Ask all the other child processes to dump their profiling data
   for (content::BrowserChildProcessHostIterator browser_child_iter;
        !browser_child_iter.Done(); ++browser_child_iter) {
-#if BUILDFLAG(IS_WIN)
-    // On Windows, elevated processes are never passed the profiling data file
-    // so cannot dump their data.
-    CHECK(browser_child_iter.GetData().sandbox_type.has_value());
-    if (browser_child_iter.GetData().sandbox_type ==
-        sandbox::mojom::Sandbox::kNoSandboxAndElevatedPrivileges) {
-      continue;
-    }
-#endif
     browser_child_iter.GetHost()->DumpProfilingData(base::BindOnce(
         [](scoped_refptr<RefCountedScopedClosureRunner>) {}, closure_runner));
   }

@@ -70,16 +70,6 @@
 #include "ui/gfx/platform_font_skia.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/threading/scoped_blocking_call.h"
-#include "ui/display/win/dpi.h"
-
-// To avoid conflicts with the macro from the Windows SDK...
-#undef LoadBitmap
-#endif
-
 namespace ui {
 
 namespace {
@@ -102,11 +92,7 @@ base::FilePath GetResourcesPakFilePath(const std::string& pak_name) {
     return path.AppendASCII(pak_name);
 
   // Return just the name of the pak file.
-#if BUILDFLAG(IS_WIN)
-  return base::FilePath(base::ASCIIToWide(pak_name));
-#else
   return base::FilePath(pak_name);
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 SkBitmap CreateEmptyBitmap() {
@@ -404,47 +390,7 @@ bool ResourceBundle::LocaleDataPakExists(const base::i18n::LanguageTag& locale,
   if (path.empty()) {
     return false;
   }
-#if BUILDFLAG(IS_WIN)
-  // https://crbug.com/40688225: Chrome sometimes fails to find standard .pak
-  // files. One theory is that this happens shortly after an update because
-  // scanners (e.g., A/V) are busy checking Chrome's files. Record the last
-  // found and the last not found pak file in crash keys to reveal what was
-  // searched for and/or found when there is a failure to load resources.
-  DWORD attributes;
-  {
-    base::ScopedBlockingCall scoped_blocking_call(
-        FROM_HERE, base::BlockingType::MAY_BLOCK);
-    attributes = ::GetFileAttributes(path.value().c_str());
-  }
-  if (attributes != INVALID_FILE_ATTRIBUTES) {
-    static auto* const found_path_key = base::debug::AllocateCrashKeyString(
-        "LocaleDataPakExists-found_path", base::debug::CrashKeySize::Size256);
-    base::debug::SetCrashKeyString(found_path_key, path.AsUTF8Unsafe());
-    static auto* const found_attrs_key = base::debug::AllocateCrashKeyString(
-        "LocaleDataPakExists-found_attrs", base::debug::CrashKeySize::Size32);
-    base::debug::SetCrashKeyString(found_attrs_key,
-                                   base::NumberToString(attributes));
-    // Report that the file exists as long as it isn't a directory.
-    return (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
-  }
-
-  // ERROR_FILE_NOT_FOUND means that path.BaseName() does not exist.
-  // PATH_NOT_FOUND means that path.DirName() does not exist.
-  // ERROR_ACCESS_DENIED could mean that the file has been marked for deletion.
-  // ERROR_FILE_CORRUPT has been known to happen, and is surely unrecoverable.
-  // Treat these and all other errors as if the file does not exist.
-  const auto error = ::GetLastError();
-  static auto* const not_found_path_key = base::debug::AllocateCrashKeyString(
-      "LocaleDataPakExists-not_found_path", base::debug::CrashKeySize::Size256);
-  base::debug::SetCrashKeyString(not_found_path_key, path.AsUTF8Unsafe());
-  static auto* const not_found_error_key = base::debug::AllocateCrashKeyString(
-      "LocaleDataPakExists-not_found_error", base::debug::CrashKeySize::Size32);
-  base::debug::SetCrashKeyString(not_found_error_key,
-                                 base::NumberToString(error));
-  return false;
-#else
   return base::PathExists(path);
-#endif
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
@@ -1003,7 +949,7 @@ void ResourceBundle::ReloadFonts() {
 }
 
 ResourceScaleFactor ResourceBundle::GetMaxResourceScaleFactor() const {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   return max_scale_factor_;
 #else
   return GetMaxSupportedResourceScaleFactor();
@@ -1161,10 +1107,6 @@ gfx::ImageSkia ResourceBundle::CreateImageSkia(int resource_id) {
 
 #if BUILDFLAG(IS_CHROMEOS)
   const ResourceScaleFactor scale_factor_to_load = GetMaxResourceScaleFactor();
-#elif BUILDFLAG(IS_WIN)
-  const ResourceScaleFactor scale_factor_to_load =
-      display::win::GetDPIScale() > 1.25 ? GetMaxResourceScaleFactor()
-                                         : ui::k100Percent;
 #else
   const ResourceScaleFactor scale_factor_to_load = ui::k100Percent;
 #endif

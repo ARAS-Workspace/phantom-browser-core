@@ -139,11 +139,7 @@ IN_PROC_BROWSER_TEST_F(DesktopMediaPickerViewsBrowserTest, InvokeUi_tabs) {
 
 // Show the getDisplayMedia picker UI with a very long title that should wrap.
 // TODO(crbug.com/491087314): Fix flaky test.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_InvokeUi_LongTitle DISABLED_InvokeUi_LongTitle
-#else
 #define MAYBE_InvokeUi_LongTitle InvokeUi_LongTitle
-#endif
 IN_PROC_BROWSER_TEST_F(DesktopMediaPickerViewsBrowserTest,
                        MAYBE_InvokeUi_LongTitle) {
   set_baseline("7638461");

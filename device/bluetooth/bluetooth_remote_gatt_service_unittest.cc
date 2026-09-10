@@ -14,8 +14,6 @@
 #include "device/bluetooth/test/bluetooth_test_android.h"
 #elif BUILDFLAG(IS_APPLE)
 #include "device/bluetooth/test/bluetooth_test_mac.h"
-#elif BUILDFLAG(IS_WIN)
-#include "device/bluetooth/test/bluetooth_test_win.h"
 #elif defined(USE_CAST_BLUETOOTH_ADAPTER)
 #include "device/bluetooth/test/bluetooth_test_cast.h"
 #elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
@@ -25,24 +23,12 @@
 namespace device {
 
 class BluetoothRemoteGattServiceTest :
-#if BUILDFLAG(IS_WIN)
-    public BluetoothTestWinrt {
-#else
     public BluetoothTest {
-#endif
  public:
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    BluetoothTestWinrt::SetUp();
-#else
     BluetoothTest::SetUp();
-#endif
   }
 };
-
-#if BUILDFLAG(IS_WIN)
-using BluetoothRemoteGattServiceTestWinrt = BluetoothRemoteGattServiceTest;
-#endif
 
 // Android is excluded because it fires a single discovery event per device.
 #if BUILDFLAG(IS_APPLE)
@@ -50,11 +36,7 @@ using BluetoothRemoteGattServiceTestWinrt = BluetoothRemoteGattServiceTest;
 #else
 #define MAYBE_IsDiscoveryComplete DISABLED_IsDiscoveryComplete
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattServiceTestWinrt, IsDiscoveryComplete) {
-#else
 TEST_F(BluetoothRemoteGattServiceTest, MAYBE_IsDiscoveryComplete) {
-#endif
   InitWithFakeAdapter();
   StartLowEnergyDiscoverySession();
   BluetoothDevice* device = SimulateLowEnergyDevice(1);
@@ -75,11 +57,7 @@ TEST_F(BluetoothRemoteGattServiceTest, MAYBE_IsDiscoveryComplete) {
 #else
 #define MAYBE_GetIdentifier DISABLED_GetIdentifier
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattServiceTestWinrt, GetIdentifier) {
-#else
 TEST_F(BluetoothRemoteGattServiceTest, MAYBE_GetIdentifier) {
-#endif
   InitWithFakeAdapter();
   StartLowEnergyDiscoverySession();
   // 2 devices to verify unique IDs across them.
@@ -122,11 +100,7 @@ TEST_F(BluetoothRemoteGattServiceTest, MAYBE_GetIdentifier) {
 #else
 #define MAYBE_GetUUID DISABLED_GetUUID
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattServiceTestWinrt, GetUUID) {
-#else
 TEST_F(BluetoothRemoteGattServiceTest, MAYBE_GetUUID) {
-#endif
   InitWithFakeAdapter();
   StartLowEnergyDiscoverySession();
   BluetoothDevice* device = SimulateLowEnergyDevice(3);
@@ -153,11 +127,7 @@ TEST_F(BluetoothRemoteGattServiceTest, MAYBE_GetUUID) {
 #else
 #define MAYBE_GetCharacteristics_FindNone DISABLED_GetCharacteristics_FindNone
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattServiceTestWinrt, GetCharacteristics_FindNone) {
-#else
 TEST_F(BluetoothRemoteGattServiceTest, MAYBE_GetCharacteristics_FindNone) {
-#endif
   InitWithFakeAdapter();
   StartLowEnergyDiscoverySession();
   BluetoothDevice* device = SimulateLowEnergyDevice(3);
@@ -182,13 +152,8 @@ TEST_F(BluetoothRemoteGattServiceTest, MAYBE_GetCharacteristics_FindNone) {
 #define MAYBE_GetCharacteristics_and_GetCharacteristic \
   DISABLED_GetCharacteristics_and_GetCharacteristic
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattServiceTestWinrt,
-       GetCharacteristics_and_GetCharacteristic) {
-#else
 TEST_F(BluetoothRemoteGattServiceTest,
        MAYBE_GetCharacteristics_and_GetCharacteristic) {
-#endif
   InitWithFakeAdapter();
   StartLowEnergyDiscoverySession();
   BluetoothDevice* device = SimulateLowEnergyDevice(3);
@@ -241,11 +206,7 @@ TEST_F(BluetoothRemoteGattServiceTest,
 #else
 #define MAYBE_GetCharacteristicsByUUID DISABLED_GetCharacteristicsByUUID
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattServiceTestWinrt, GetCharacteristicsByUUID) {
-#else
 TEST_F(BluetoothRemoteGattServiceTest, MAYBE_GetCharacteristicsByUUID) {
-#endif
   InitWithFakeAdapter();
   StartLowEnergyDiscoverySession();
   BluetoothDevice* device = SimulateLowEnergyDevice(3);
@@ -368,11 +329,7 @@ TEST_F(BluetoothRemoteGattServiceTest,
 #else
 #define MAYBE_SimulateGattServiceRemove DISABLED_SimulateGattServiceRemove
 #endif
-#if BUILDFLAG(IS_WIN)
-TEST_P(BluetoothRemoteGattServiceTestWinrt, SimulateGattServiceRemove) {
-#else
 TEST_F(BluetoothRemoteGattServiceTest, MAYBE_SimulateGattServiceRemove) {
-#endif
   InitWithFakeAdapter();
   StartLowEnergyDiscoverySession();
   BluetoothDevice* device = SimulateLowEnergyDevice(3);
@@ -560,11 +517,5 @@ TEST_F(BluetoothRemoteGattServiceTest, ExtraDidDiscoverCharacteristicsCall) {
   EXPECT_EQ(2, observer.device_changed_count());
 }
 #endif  // BUILDFLAG(IS_APPLE)
-
-#if BUILDFLAG(IS_WIN)
-INSTANTIATE_TEST_SUITE_P(All,
-                         BluetoothRemoteGattServiceTestWinrt,
-                         ::testing::ValuesIn(kBluetoothTestWinrtParam));
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace device

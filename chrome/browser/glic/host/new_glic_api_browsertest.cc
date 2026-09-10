@@ -463,7 +463,7 @@ class NewGlicApiTestWithNewTabDaisyChain : public NewGlicApiTest {
 class NewGlicApiMultiProfileTest : public NewGlicApiTest {
  public:
   BrowserWindowInterface* CreateBrowserWithNewProfile() {
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
     ProfileManager* profile_manager = g_browser_process->profile_manager();
     base::FilePath new_path =
         profile_manager->GenerateNextProfileDirectoryPath();
@@ -1120,7 +1120,7 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest,
   ContinueJsTest();
 }
 // TODO(b/548051210): Flaky on Android and Linux due to debounce timing.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_testSingleFocusedTabUpdatesOnTabEvents \
   testSingleFocusedTabUpdatesOnTabEvents
 #else
@@ -3252,7 +3252,7 @@ IN_PROC_BROWSER_TEST_P(
 // TODO(harringtond): Flaky on windows.
 // TODO(b/508340871): Re-enable on Android. Failing because something pops up
 // and suppresses the bottom sheet.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 #define MAYBE_testInvocationSource DISABLED_testInvocationSource
 #else
 #define MAYBE_testInvocationSource testInvocationSource
@@ -3503,7 +3503,7 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest,
 
 IN_PROC_BROWSER_TEST_P(NewGlicApiMultiProfileTest,
                        testPageMetadataCrossProfile) {
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_MAC)
   GTEST_SKIP() << "Multi-profile tests only supported on Desktop";
 #endif
   ASSERT_OK(OpenGlicForActiveTab());
@@ -3518,7 +3518,7 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiMultiProfileTest,
 }
 
 IN_PROC_BROWSER_TEST_P(NewGlicApiMultiProfileTest, testTabDataCrossProfile) {
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_MAC)
   GTEST_SKIP() << "Multi-profile tests only supported on Desktop";
 #endif
   ASSERT_OK(OpenGlicForActiveTab());
@@ -3533,7 +3533,7 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiMultiProfileTest, testTabDataCrossProfile) {
 }
 
 IN_PROC_BROWSER_TEST_P(NewGlicApiMultiProfileTest, testTabFaviconCrossProfile) {
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_MAC)
   GTEST_SKIP() << "Multi-profile tests only supported on Desktop";
 #endif
   ASSERT_OK(OpenGlicForActiveTab());
@@ -3548,7 +3548,7 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiMultiProfileTest, testTabFaviconCrossProfile) {
 }
 
 IN_PROC_BROWSER_TEST_P(NewGlicApiMultiProfileTest, testGetContextCrossProfile) {
-#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_MAC)
+#if !BUILDFLAG(IS_LINUX) && !BUILDFLAG(IS_MAC)
   GTEST_SKIP() << "Multi-profile tests only supported on Desktop";
 #endif
   ASSERT_OK(OpenGlicForActiveTab());
@@ -3621,12 +3621,8 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testGetPageMetadataUpdates) {
 }
 
 // TODO(crbug.com/449764057): Flakes/fails on all platforms except windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_testGetPageMetadataOnNavigation testGetPageMetadataOnNavigation
-#else
 #define MAYBE_testGetPageMetadataOnNavigation \
   DISABLED_testGetPageMetadataOnNavigation
-#endif
 IN_PROC_BROWSER_TEST_P(NewGlicApiTest, MAYBE_testGetPageMetadataOnNavigation) {
   ASSERT_TRUE(content::NavigateToURL(
       GetTabListInterface()->GetActiveTab()->GetContents(),
@@ -3831,13 +3827,8 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testRegisterConversationWithEmptyId) {
 }
 
 // TODO(b/548051765): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_testCallingApiWhileHiddenRecordsMetrics \
-  DISABLED_testCallingApiWhileHiddenRecordsMetrics
-#else
 #define MAYBE_testCallingApiWhileHiddenRecordsMetrics \
   testCallingApiWhileHiddenRecordsMetrics
-#endif
 IN_PROC_BROWSER_TEST_P(NewGlicApiTest,
                        MAYBE_testCallingApiWhileHiddenRecordsMetrics) {
   ASSERT_OK(OpenGlicForActiveTab());

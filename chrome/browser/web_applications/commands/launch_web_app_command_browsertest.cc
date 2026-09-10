@@ -58,12 +58,7 @@ using ::testing::WithArg;
 namespace web_app {
 
 namespace {
-#if BUILDFLAG(IS_WIN)
-const base::FilePath::CharType kCurrentDirectory[] =
-    FILE_PATH_LITERAL("\\path");
-#else
 const base::FilePath::CharType kCurrentDirectory[] = FILE_PATH_LITERAL("/path");
-#endif  // BUILDFLAG(IS_WIN)
 
 class LaunchWebAppWithFirstRunServiceBrowserTest
     : public WebAppBrowserTestBase,

@@ -26,16 +26,6 @@ BASE_FEATURE(kCupsIppPrintingBackend, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kLinuxXdgPrintPortal, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN)
-// When using PostScript level 3 printing, render text with Type 42 fonts if
-// possible.
-BASE_FEATURE(kPrintWithPostScriptType42Fonts,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// When using GDI printing, avoid rasterization if possible.
-BASE_FEATURE(kPrintWithReducedRasterization, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(ENABLE_OOP_PRINTING)
 // Enables printing interactions with the operating system to be performed
 // out-of-process.
@@ -56,10 +46,6 @@ const base::FeatureParam<bool> kEnableOopPrintDriversJobPrint{
 const base::FeatureParam<bool> kEnableOopPrintDriversSandbox{
     &kEnableOopPrintDrivers, "Sandbox", false};
 
-#if BUILDFLAG(IS_WIN)
-const base::FeatureParam<bool> kEnableOopPrintDriversSingleProcess{
-    &kEnableOopPrintDrivers, "SingleProcess", true};
-#endif
 #endif  // BUILDFLAG(ENABLE_OOP_PRINTING)
 
 }  // namespace printing::features

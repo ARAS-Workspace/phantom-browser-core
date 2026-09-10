@@ -61,7 +61,7 @@ struct BLINK_COMMON_EXPORT WebPreferences {
   int minimum_font_size = 0;
   int minimum_logical_font_size = 6;
   std::string default_encoding = "ISO-8859-1";
-  bool context_menu_on_mouse_up = BUILDFLAG(IS_WIN);
+  bool context_menu_on_mouse_up = false;
   bool javascript_enabled = true;
   bool web_security_enabled = true;
   bool loads_images_automatically = true;
@@ -147,8 +147,6 @@ struct BLINK_COMMON_EXPORT WebPreferences {
   blink::mojom::EditingBehavior editing_behavior =
 #if BUILDFLAG(IS_APPLE)
       mojom::EditingBehavior::kEditingMacBehavior;
-#elif BUILDFLAG(IS_WIN)
-      mojom::EditingBehavior::kEditingWindowsBehavior;
 #elif BUILDFLAG(IS_ANDROID)
       mojom::EditingBehavior::kEditingAndroidBehavior;
 #elif BUILDFLAG(IS_CHROMEOS)

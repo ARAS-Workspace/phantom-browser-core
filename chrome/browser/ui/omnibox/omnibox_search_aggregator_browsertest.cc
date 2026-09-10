@@ -572,7 +572,6 @@ class OmniboxSearchAggregatorHTTPErrorTest
       search_aggregator_query_response_;
 };
 
-// TODO(crbug.com/421836646): Flaky on `BUILDFLAG(IS_WIN)`
 // TODO(crbug.com/425120649): Flaky.
 IN_PROC_BROWSER_TEST_P(OmniboxSearchAggregatorHTTPErrorTest,
                        DISABLED_HTTPErrorResponse) {

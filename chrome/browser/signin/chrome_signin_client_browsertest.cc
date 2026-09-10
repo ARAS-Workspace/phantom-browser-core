@@ -34,7 +34,7 @@ using testing::Not;
 using testing::Pair;
 using testing::UnorderedElementsAre;
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class ChromeSigninClientHatsSurveyBrowserTest : public InProcessBrowserTest {
  public:
   ChromeSigninClientHatsSurveyBrowserTest() {
@@ -170,4 +170,4 @@ IN_PROC_BROWSER_TEST_F(ChromeSigninClientHatsSurveyBrowserTest,
   signin::WaitForRefreshTokensLoaded(identity_manager);
 }
 
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)

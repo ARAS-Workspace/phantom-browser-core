@@ -38,11 +38,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "device/fido/win/fake_webauthn_api.h"
-#include "device/fido/win/webauthn_api.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 using ::testing::_;
 
 namespace device {
@@ -686,54 +681,5 @@ TEST_F(FidoRequestHandlerTest, TestWithMultiplePlatformAuthenticators) {
   EXPECT_TRUE(std::get<0>(future().Get()));
   discovery_ = nullptr;
 }
-
-#if BUILDFLAG(IS_WIN)
-
-TEST_F(FidoRequestHandlerTest, TransportAvailabilityOfWindowsAuthenticator) {
-  static const struct {
-    bool api_available = false;
-    bool is_uvpaa = false;
-  } kTestCases[] = {
-      /* clang-format off */
-      /* api_available is_uvpaa */
-      {true,           true},
-      {true,           false},
-      {false,          false},
-      /* clang-format on */
-  };
-  FakeWinWebAuthnApi api;
-  device::WinWebAuthnApi::ScopedOverride win_webauthn_api_override(&api);
-  for (const auto& test_case : kTestCases) {
-    SCOPED_TRACE(::testing::Message()
-                 << "api_available=" << test_case.api_available);
-    SCOPED_TRACE(::testing::Message() << "is_uvpaa=" << test_case.is_uvpaa);
-    api.set_available(test_case.api_available);
-    api.set_is_uvpaa(test_case.is_uvpaa);
-
-    TestObserver observer;
-    ForgeNextHidDiscovery();
-    fake_discovery_factory_.set_discover_win_webauthn_api_authenticator(true);
-    EmptyRequestHandler request_handler(
-        {FidoTransportProtocol::kUsbHumanInterfaceDevice},
-        &fake_discovery_factory_);
-    request_handler.SetObserver(&observer);
-
-    // If the windows API is not enabled, the request is dispatched to the USB
-    // discovery. Simulate a success to fill the transport availability info.
-    if (!test_case.api_available) {
-      discovery()->WaitForCallToStartAndSimulateSuccess();
-    }
-
-    auto transport_availability_info =
-        observer.WaitForTransportAvailabilityInfo();
-    EXPECT_EQ(transport_availability_info.available_transports.empty(),
-              test_case.api_available);
-    EXPECT_EQ(transport_availability_info.has_win_native_api_authenticator,
-              test_case.api_available);
-    EXPECT_EQ(transport_availability_info.win_is_uvpaa, test_case.is_uvpaa);
-    discovery_ = nullptr;
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace device

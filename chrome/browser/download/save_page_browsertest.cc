@@ -440,10 +440,6 @@ IN_PROC_BROWSER_TEST_F(SavePageBrowserTest, SaveFileURL) {
   EXPECT_TRUE(base::PathExists(full_file_name));
   EXPECT_FALSE(base::PathExists(dir));
   EXPECT_TRUE(base::ContentsEqual(GetTestDirFile("text.txt"), full_file_name));
-#if BUILDFLAG(IS_WIN)
-  // Local file URL will not be quarantined.
-  EXPECT_FALSE(quarantine::IsFileQuarantined(full_file_name, GURL(), GURL()));
-#endif
 }
 
 IN_PROC_BROWSER_TEST_F(SavePageBrowserTest,
@@ -736,33 +732,6 @@ IN_PROC_BROWSER_TEST_F(SavePageBrowserTest, RemoveFromList) {
 // This tests that a webpage with the title "test.exe" is saved as
 // "test.exe.htm".
 // We probably don't care to handle this on Linux or Mac.
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(SavePageBrowserTest, CleanFilenameFromPageTitle) {
-  base::FilePath download_dir =
-      DownloadPrefs::FromDownloadManager(GetDownloadManager())->
-          DownloadPath();
-  base::FilePath full_file_name =
-      download_dir.AppendASCII(std::string("test.exe") + kAppendedExtension);
-  base::FilePath dir = download_dir.AppendASCII("test.exe_files");
-
-  base::ScopedAllowBlockingForTesting allow_blocking;
-  EXPECT_FALSE(base::PathExists(full_file_name));
-  GURL url = embedded_test_server()->GetURL("/save_page/c.htm");
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-
-  SavePackageFilePicker::SetShouldPromptUser(false);
-  base::RunLoop run_loop;
-  content::SavePackageFinishedObserver observer(
-      browser()->GetProfile()->GetDownloadManager(), run_loop.QuitClosure());
-  chrome::SavePage(browser());
-  run_loop.Run();
-
-  EXPECT_TRUE(base::PathExists(full_file_name));
-
-  EXPECT_TRUE(base::DieFileDie(full_file_name, false));
-  EXPECT_TRUE(base::DieFileDie(dir, true));
-}
-#endif
 
 // Tests that the SecurityLevel histograms are logged for save page downloads.
 IN_PROC_BROWSER_TEST_F(SavePageBrowserTest, SecurityLevelHistogram) {
@@ -777,11 +746,7 @@ IN_PROC_BROWSER_TEST_F(SavePageBrowserTest, SecurityLevelHistogram) {
 
 // Tests that a page can be saved as MHTML.
 // Flaky on Windows, crbug.com/40671774
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SavePageAsMHTML DISABLED_SavePageAsMHTML
-#else
 #define MAYBE_SavePageAsMHTML SavePageAsMHTML
-#endif
 IN_PROC_BROWSER_TEST_F(SavePageBrowserTest, MAYBE_SavePageAsMHTML) {
   static const int64_t kFileSizeMin = 2758;
   GURL url = NavigateToMockURL("b");
@@ -872,11 +837,7 @@ IN_PROC_BROWSER_TEST_F(SavePageBrowserTest,
 }
 
 // Flaky on Windows: https://crbug.com/40789916.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SavePageBrowserTest_NonMHTML DISABLED_SavePageBrowserTest_NonMHTML
-#else
 #define MAYBE_SavePageBrowserTest_NonMHTML SavePageBrowserTest_NonMHTML
-#endif
 IN_PROC_BROWSER_TEST_F(SavePageBrowserTest,
                        MAYBE_SavePageBrowserTest_NonMHTML) {
   SavePackageFilePicker::SetShouldPromptUser(false);
@@ -988,27 +949,6 @@ IN_PROC_BROWSER_TEST_F(SavePageBrowserTest, SaveUnauthorizedResource) {
   // canary for detecting whether a website can access restricted resources).
   EXPECT_FALSE(base::PathExists(dir.AppendASCII("should-not-save.jpg")));
 }
-
-#if BUILDFLAG(IS_WIN)
-// Save a file and confirm that the file is correctly quarantined.
-// TODO(https://crbug.com/502209268): Test has started failing on win11-arm64,
-// likely after an OS update, because the file does not report as quarantined.
-IN_PROC_BROWSER_TEST_F(SavePageBrowserTest, DISABLED_SaveURLQuarantine) {
-  GURL url = embedded_test_server()->GetURL("/save_page/text.txt");
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), url));
-
-  base::FilePath full_file_name, dir;
-  SaveCurrentTab(url, content::SAVE_PAGE_TYPE_AS_ONLY_HTML, "test", 1, &dir,
-                 &full_file_name);
-  ASSERT_FALSE(HasFailure());
-
-  base::ScopedAllowBlockingForTesting allow_blocking;
-  EXPECT_TRUE(base::PathExists(full_file_name));
-  EXPECT_FALSE(base::PathExists(dir));
-  EXPECT_TRUE(base::ContentsEqual(GetTestDirFile("text.txt"), full_file_name));
-  EXPECT_TRUE(quarantine::IsFileQuarantined(full_file_name, url, GURL()));
-}
-#endif
 
 // Test suite that allows testing --site-per-process against cross-site frames.
 // See http://dev.chromium.org/developers/design-documents/site-isolation.
@@ -1569,7 +1509,7 @@ IN_PROC_BROWSER_TEST_P(SavePageOriginalVsSavedComparisonTest, BrokenImage) {
 
 // Test for saving a page with a cross-site <object> element.
 // Disabled on Windows due to flakiness. crbug.com/40684650.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_CrossSiteObject DISABLED_CrossSiteObject
 #else
 #define MAYBE_CrossSiteObject CrossSiteObject

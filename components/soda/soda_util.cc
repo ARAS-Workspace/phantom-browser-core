@@ -19,10 +19,6 @@
 #include "base/feature_list.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 #if BUILDFLAG(IS_LINUX) && defined(ARCH_CPU_X86_FAMILY)
 #include "base/cpu.h"
 #endif
@@ -53,12 +49,6 @@ bool IsSupportedLinux() {
 }
 #endif  // BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN)
-bool IsSupportedWin() {
-  return true;
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 }  // namespace
 
 bool IsOnDeviceSpeechRecognitionSupported() {
@@ -69,8 +59,6 @@ bool IsOnDeviceSpeechRecognitionSupported() {
   return IsSupportedChromeOS();
 #elif BUILDFLAG(IS_LINUX)
   return IsSupportedLinux();
-#elif BUILDFLAG(IS_WIN)
-  return IsSupportedWin();
 #else
   return true;
 #endif

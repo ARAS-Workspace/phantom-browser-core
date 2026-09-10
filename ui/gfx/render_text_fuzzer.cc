@@ -28,9 +28,7 @@
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-const char kFontDescription[] = "Segoe UI, 13px";
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 const char kFontDescription[] = "serif, 13px";
 #else
 const char kFontDescription[] = "sans, 13px";

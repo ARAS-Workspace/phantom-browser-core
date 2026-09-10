@@ -921,7 +921,7 @@ class NoGPUCaptureScreenshotTest : public CaptureScreenshotTest {
 // Regression test for https://crbug.com/1137291.
 // Flaky on Linux.  http://crbug.com/1301176
 // TODO(crbug.com/396301195): Failing on Win 10 Tests x64 dbg bot.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #define MAYBE_LargeScreenshot DISABLED_LargeScreenshot
 #else
 #define MAYBE_LargeScreenshot LargeScreenshot
@@ -1781,12 +1781,7 @@ IN_PROC_BROWSER_TEST_F(FlattenedDevToolsProtocolTest,
 }
 
 // TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-#define MAYBE_PageCrashClearsPendingCommands \
-  DISABLED_PageCrashClearsPendingCommands
-#else
 #define MAYBE_PageCrashClearsPendingCommands PageCrashClearsPendingCommands
-#endif
 IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest,
                        MAYBE_PageCrashClearsPendingCommands) {
   ASSERT_TRUE(embedded_test_server()->Start());
@@ -2027,12 +2022,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest, CrossSiteCrash) {
 }
 
 // TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-#define MAYBE_InspectorTargetCrashedNavigate \
-  DISABLED_InspectorTargetCrashedNavigate
-#else
 #define MAYBE_InspectorTargetCrashedNavigate InspectorTargetCrashedNavigate
-#endif
 IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest,
                        MAYBE_InspectorTargetCrashedNavigate) {
   set_agent_host_can_close();
@@ -2055,11 +2045,7 @@ IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest,
 }
 
 // TODO(crbug.com/440535492): Flaky on Win dbg. Re-enable this test.
-#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
-#define MAYBE_TargetGetTargetsAfterCrash DISABLED_TargetGetTargetsAfterCrash
-#else
 #define MAYBE_TargetGetTargetsAfterCrash TargetGetTargetsAfterCrash
-#endif
 IN_PROC_BROWSER_TEST_F(DevToolsProtocolTest, MAYBE_TargetGetTargetsAfterCrash) {
   set_agent_host_can_close();
   ASSERT_TRUE(embedded_test_server()->Start());

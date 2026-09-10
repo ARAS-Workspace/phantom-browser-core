@@ -62,15 +62,6 @@ struct PlaceholderAvatarIconParams {
       visibility_against_background;
 };
 
-#if BUILDFLAG(IS_WIN)
-// The avatar badge size needs to be half of the shortcut icon size because
-// the Windows taskbar icon is 32x32 and the avatar icon overlay is 16x16. So to
-// get the shortcut avatar badge and the avatar icon overlay to match up, we
-// need to preserve those ratios when creating the shortcut icon.
-inline constexpr int kShortcutIconSizeWin = 48;
-inline constexpr int kProfileAvatarBadgeSizeWin = kShortcutIconSizeWin / 2;
-#endif  // BUILDFLAG(IS_WIN)
-
 // Avatar access.
 extern const base::FilePath::CharType kGAIAPictureFileName[];
 extern const base::FilePath::CharType kHighResAvatarFolderName[];
@@ -178,12 +169,6 @@ gfx::Image GetPlaceholderAvatarIconWithColors(
 // Gets the resource ID of the default avatar icon at |index|.
 int GetDefaultAvatarIconResourceIDAtIndex(size_t index);
 
-#if BUILDFLAG(IS_WIN)
-// Gets the resource ID of the 2x sized version of the old profile avatar icon
-// at |index|.
-int GetOldDefaultAvatar2xIconResourceIDAtIndex(size_t index);
-#endif  // BUILDFLAG(IS_WIN)
-
 // Gets the resource filename of the default avatar icon at |index|.
 const char* GetDefaultAvatarIconFileNameAtIndex(size_t index);
 
@@ -243,20 +228,6 @@ base::ListValue GetIconsAndLabelsForProfileAvatarSelector(
 // Set the default profile avatar icon index to |avatar_icon_index| for a
 // specific |profile|.
 void SetDefaultProfileAvatarIndex(Profile* profile, size_t avatar_icon_index);
-
-#if BUILDFLAG(IS_WIN)
-// Get the 2x avatar image for a ProfileAttributesEntry.
-SkBitmap GetWin2xAvatarImage(ProfileAttributesEntry* entry);
-
-// Returns a bitmap with a couple of columns shaved off so it is more square,
-// so that when resized to a square aspect ratio it looks pretty.
-SkBitmap GetWin2xAvatarIconAsSquare(const SkBitmap& source_bitmap);
-
-// Badges |app_icon_bitmap| with |avatar_bitmap| at the bottom right corner and
-// returns the resulting SkBitmap.
-SkBitmap GetBadgedWinIconBitmapForAvatar(const SkBitmap& app_icon_bitmap,
-                                         const SkBitmap& avatar_bitmap);
-#endif  // BUILDFLAG(IS_WIN)
 
 // Adds a background color to an image. Only useful if the image is partially
 // transparent.

@@ -93,7 +93,7 @@ bool Clipboard::IsSupportedClipboardBuffer(ClipboardBuffer buffer) {
     ui::Clipboard* clipboard = ui::Clipboard::GetForCurrentThread();
     CHECK(clipboard);
     return clipboard->IsSelectionBufferAvailable();
-#elif !BUILDFLAG(IS_WIN) && !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_CHROMEOS)
+#elif !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_CHROMEOS)
     return true;
 #else
     return false;

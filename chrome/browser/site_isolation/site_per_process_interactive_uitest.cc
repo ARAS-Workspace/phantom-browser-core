@@ -749,7 +749,7 @@ IN_PROC_BROWSER_TEST_P(SitePerProcessInteractiveFencedFrameBrowserTest,
   EXPECT_EQ("\"child3-focused-input1\"", press_tab_and_wait_for_message(false));
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 // Ensures that renderers know to advance focus to sibling frames and parent
 // frames in the presence of mouse click initiated focus changes.
 // Verifies against regression of https://crbug.com/40511146
@@ -1628,14 +1628,13 @@ class SitePerProcessInteractivePDFTest
 // This test loads a PDF inside an OOPIF and then verifies that context menu
 // shows up at the correct position.
 // TODO(crbug.com/40897346, crbug.com/327338993): Fix flaky test.
-#if BUILDFLAG(IS_WIN) || (BUILDFLAG(IS_LINUX) && defined(ADDRESS_SANITIZER))
+#if BUILDFLAG(IS_LINUX) && defined(ADDRESS_SANITIZER)
 #define MAYBE_ContextMenuPositionForEmbeddedPDFInCrossOriginFrame \
   DISABLED_ContextMenuPositionForEmbeddedPDFInCrossOriginFrame
 #else
 #define MAYBE_ContextMenuPositionForEmbeddedPDFInCrossOriginFrame \
   ContextMenuPositionForEmbeddedPDFInCrossOriginFrame
-#endif  // BUILDFLAG(IS_WIN) || (BUILDFLAG(IS_LINUX) &&
-        // defined(ADDRESS_SANITIZER))
+#endif  // BUILDFLAG(IS_LINUX) && defined(ADDRESS_SANITIZER)
 IN_PROC_BROWSER_TEST_P(
     SitePerProcessInteractivePDFTest,
     MAYBE_ContextMenuPositionForEmbeddedPDFInCrossOriginFrame) {
@@ -1994,9 +1993,8 @@ IN_PROC_BROWSER_TEST_F(SitePerProcessInteractiveBrowserTest,
 // Flaky on ChromeOS debug and ASAN builds. https://crbug.com/40840456
 // Flaky on Linux https://crbug.com/40847510.
 // Flaky on Win https://crbug.com/40848559.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || \
-    (BUILDFLAG(IS_CHROMEOS) &&                  \
-     (!defined(NDEBUG) || defined(ADDRESS_SANITIZER)))
+#if BUILDFLAG(IS_LINUX) || (BUILDFLAG(IS_CHROMEOS) && \
+                            (!defined(NDEBUG) || defined(ADDRESS_SANITIZER)))
 #define MAYBE_PopupWindowFocus DISABLED_PopupWindowFocus
 #else
 #define MAYBE_PopupWindowFocus PopupWindowFocus

@@ -395,11 +395,7 @@ void ConvertBGRAtoRGB(const unsigned char* bgra, int pixel_width,
 #ifdef PNG_TEXT_SUPPORTED
 
 inline char* strdup(const char* str) {
-#if BUILDFLAG(IS_WIN)
-  return _strdup(str);
-#else
   return ::strdup(str);
-#endif
 }
 
 class CommentWriter {

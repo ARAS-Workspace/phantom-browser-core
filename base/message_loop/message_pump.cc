@@ -76,17 +76,7 @@ class IOWatcherForCurrentIOThread : public IOWatcher {
   IOWatcherForCurrentIOThread() : thread_(CurrentIOThread::Get()) {}
 
   // IOWatcher:
-#if BUILDFLAG(IS_WIN)
-  bool RegisterIOHandlerImpl(HANDLE file,
-                             MessagePumpForIO::IOHandler* handler) override {
-    return thread_.RegisterIOHandler(file, handler);
-  }
-
-  bool RegisterJobObjectImpl(HANDLE job,
-                             MessagePumpForIO::IOHandler* handler) override {
-    return thread_.RegisterJobObject(job, handler);
-  }
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   std::unique_ptr<FdWatch> WatchFileDescriptorImpl(
       int fd,
       FdWatchDuration duration,
@@ -245,28 +235,12 @@ TimeTicks MessagePump::AdjustDelayedRunTime(TimeTicks earliest_time,
                                             TimeTicks latest_time) {
   const TimeDelta leeway = GetLeewayForCurrentThread();
 
-#if BUILDFLAG(IS_WIN)
-  // On Windows, we can rely on the low-res clock if we want the wakeup within
-  // kMinLowResolutionThresholdMs (16ms).
-  if (GetAlignWakeUpsEnabled() &&
-      leeway > Milliseconds(Time::kMinLowResolutionThresholdMs)) {
-    TimeTicks aligned_run_time =
-        earliest_time.SnappedToNextTick(TimeTicks(), leeway);
-    return std::min(aligned_run_time, latest_time);
-  }
-  // We need to return `earliest_time` to honor the above dependency on the
-  // low-res clock. Note: If this wakeup has a DelayPolicy::kPrecise, then
-  // `earliest_time == run_time` and we're thus fine returning `earliest_time`
-  // even though `run_time` is semantically what we want...
-  return earliest_time;
-#else
   if (GetAlignWakeUpsEnabled()) {
     TimeTicks aligned_run_time =
         earliest_time.SnappedToNextTick(TimeTicks(), leeway);
     return std::min(aligned_run_time, latest_time);
   }
   return run_time;
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 IOWatcher* MessagePump::GetIOWatcher() {

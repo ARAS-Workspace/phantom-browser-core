@@ -15,14 +15,9 @@
 #include "build/blink_buildflags.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_handle.h"
-#endif
-
-
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS)
 #include "base/feature_list.h"
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_APPLE)
 #include "base/process/port_provider_mac.h"
@@ -85,11 +80,6 @@ class BASE_EXPORT Process {
   // address space and duplicate handles).
   static Process OpenWithExtraPrivileges(ProcessId pid);
 
-#if BUILDFLAG(IS_WIN)
-  // Returns a Process for the given |pid|, using some |desired_access|.
-  // See ::OpenProcess documentation for valid |desired_access|.
-  static Process OpenWithAccess(ProcessId pid, DWORD desired_access);
-#endif
 
   // Returns true if changing the priority of processes through `SetPriority()`
   // is possible.
@@ -135,11 +125,6 @@ class BASE_EXPORT Process {
   // (and maybe Fuchsia?), because the ProcessHandle will keep the zombie
   // process information available until itself has been released. But on Posix,
   // the OS may reuse the ProcessId.
-#if BUILDFLAG(IS_WIN)
-  bool IsRunning() const {
-    return !WaitForExitWithTimeout(base::TimeDelta(), nullptr);
-  }
-#endif
 
   // Terminates the process with extreme prejudice. The given |exit_code| will
   // be the exit code of the process. If |wait| is true, this method will wait
@@ -148,20 +133,6 @@ class BASE_EXPORT Process {
   // NOTE: |exit_code| is only used on OS_WIN.
   bool Terminate(int exit_code, bool wait) const;
 
-#if BUILDFLAG(IS_WIN)
-  enum class WaitExitStatus {
-    PROCESS_EXITED,
-    STOP_EVENT_SIGNALED,
-    FAILED,
-  };
-
-  // Waits for the process to exit, or the specified |stop_event_handle| to be
-  // set. Returns value indicating which event was set. The given |exit_code|
-  // will be the exit code of the process.
-  WaitExitStatus WaitForExitOrEvent(
-      const base::win::ScopedHandle& stop_event_handle,
-      int* exit_code) const;
-#endif  // BUILDFLAG(IS_WIN)
 
   // Waits for the process to exit. Returns true on success.
   // On POSIX, if the process has been signaled then |exit_code| is set to -1.
@@ -306,15 +277,8 @@ class BASE_EXPORT Process {
                                   base::TimeDelta timeout) const;
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  win::ScopedHandle process_;
-#else
   ProcessHandle process_;
-#endif
 
-#if BUILDFLAG(IS_WIN)
-  bool is_current_process_;
-#endif
 
 #if BUILDFLAG(IS_IOS) && BUILDFLAG(USE_BLINK) && TARGET_OS_SIMULATOR
   // A flag indicating that this is a "content process". iOS does not support

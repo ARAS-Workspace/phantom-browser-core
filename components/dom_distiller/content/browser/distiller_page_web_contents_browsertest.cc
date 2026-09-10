@@ -160,11 +160,7 @@ class TestDistillerPageWebContents : public DistillerPageWebContents {
   bool new_web_contents_created_;
 };
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_BasicDistillationWorks DISABLED_BasicDistillationWorks
-#else
 #define MAYBE_BasicDistillationWorks BasicDistillationWorks
-#endif
 IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
                        MAYBE_BasicDistillationWorks) {
   DistillerPageWebContents distiller_page(
@@ -186,11 +182,7 @@ IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
   EXPECT_EQ("", distiller_result_->pagination_info().prev_page());
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_HandlesRelativeLinks DISABLED_HandlesRelativeLinks
-#else
 #define MAYBE_HandlesRelativeLinks HandlesRelativeLinks
-#endif
 IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
                        MAYBE_HandlesRelativeLinks) {
   DistillerPageWebContents distiller_page(
@@ -210,11 +202,7 @@ IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
               HasSubstr("href=\"http://www.google.com/absolutelink.html\""));
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_HandlesRelativeImages DISABLED_HandlesRelativeImages
-#else
 #define MAYBE_HandlesRelativeImages HandlesRelativeImages
-#endif
 IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
                        MAYBE_HandlesRelativeImages) {
   DistillerPageWebContents distiller_page(
@@ -234,11 +222,7 @@ IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
               HasSubstr("src=\"http://www.google.com/absoluteimage.png\""));
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_HandlesRelativeVideos DISABLED_HandlesRelativeVideos
-#else
 #define MAYBE_HandlesRelativeVideos HandlesRelativeVideos
-#endif
 IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
                        MAYBE_HandlesRelativeVideos) {
   DistillerPageWebContents distiller_page(
@@ -258,11 +242,7 @@ IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
               HasSubstr("src=\"http://www.google.com/absolute_video.ogg\""));
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_VisibilityDetection DISABLED_VisibilityDetection
-#else
 #define MAYBE_VisibilityDetection VisibilityDetection
-#endif
 IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
                        MAYBE_VisibilityDetection) {
   DistillerPageWebContents distiller_page(
@@ -291,12 +271,7 @@ IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DistillerContentsIgnoreRedirects \
-  DISABLED_DistillerContentsIgnoreRedirects
-#else
 #define MAYBE_DistillerContentsIgnoreRedirects DistillerContentsIgnoreRedirects
-#endif
 IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
                        MAYBE_DistillerContentsIgnoreRedirects) {
   GURL article_url(embedded_test_server()->GetURL(kSimpleArticlePath));
@@ -318,12 +293,7 @@ IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
   EXPECT_EQ("", distiller_result_->title());
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_UsingCurrentWebContentsWrongUrl \
-  DISABLED_UsingCurrentWebContentsWrongUrl
-#else
 #define MAYBE_UsingCurrentWebContentsWrongUrl UsingCurrentWebContentsWrongUrl
-#endif
 IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
                        MAYBE_UsingCurrentWebContentsWrongUrl) {
   std::string url("/bogus");
@@ -333,13 +303,8 @@ IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
                                wait_for_document_loaded);
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_UsingCurrentWebContentsNotFinishedLoadingYet \
-  DISABLED_UsingCurrentWebContentsNotFinishedLoadingYet
-#else
 #define MAYBE_UsingCurrentWebContentsNotFinishedLoadingYet \
   UsingCurrentWebContentsNotFinishedLoadingYet
-#endif
 IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
                        MAYBE_UsingCurrentWebContentsNotFinishedLoadingYet) {
   std::string url(kSimpleArticlePath);
@@ -349,13 +314,8 @@ IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
                                wait_for_document_loaded);
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_UsingCurrentWebContentsReadyForDistillation \
-  DISABLED_UsingCurrentWebContentsReadyForDistillation
-#else
 #define MAYBE_UsingCurrentWebContentsReadyForDistillation \
   UsingCurrentWebContentsReadyForDistillation
-#endif
 IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
                        MAYBE_UsingCurrentWebContentsReadyForDistillation) {
   std::string url(kSimpleArticlePath);
@@ -397,13 +357,8 @@ void DistillerPageWebContentsTest::RunUseCurrentWebContentsTest(
   EXPECT_EQ("Test Page Title", distiller_result_->title());
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_PageDestroyedBeforeFinishDistillation \
-  DISABLED_PageDestroyedBeforeFinishDistillation
-#else
 #define MAYBE_PageDestroyedBeforeFinishDistillation \
   PageDestroyedBeforeFinishDistillation
-#endif
 IN_PROC_BROWSER_TEST_F(DistillerPageWebContentsTest,
                        MAYBE_PageDestroyedBeforeFinishDistillation) {
   content::WebContents* current_web_contents = shell()->web_contents();

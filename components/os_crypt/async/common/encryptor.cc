@@ -23,12 +23,6 @@
 #include "mojo/public/cpp/bindings/default_construct_tag.h"
 #include "third_party/abseil-cpp/absl/cleanup/cleanup.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <dpapi.h>
-#endif
-
 namespace os_crypt_async {
 
 namespace {
@@ -47,17 +41,7 @@ Encryptor::Key::Key(base::span<const uint8_t> key,
                     bool encrypted)
     : algorithm_(algorithm),
       key_(key.begin(), key.end())
-#if BUILDFLAG(IS_WIN)
-      ,
-      encrypted_(encrypted)
-#endif
 {
-#if BUILDFLAG(IS_WIN)
-  if (!encrypted_) {
-    encrypted_ = ::CryptProtectMemory(std::data(key_), std::size(key_),
-                                      CRYPTPROTECTMEMORY_SAME_PROCESS);
-  }
-#endif
   CHECK(algorithm_.has_value());
 
   switch (*algorithm_) {
@@ -82,11 +66,7 @@ Encryptor::Key& Encryptor::Key::operator=(Key&& other) = default;
 Encryptor::Key::~Key() = default;
 
 Encryptor::Key Encryptor::Key::Clone() const {
-#if BUILDFLAG(IS_WIN)
-  Encryptor::Key key(key_, *algorithm_, encrypted_);
-#else
   Encryptor::Key key(key_, *algorithm_, /*encrypted=*/false);
-#endif
   return key;
 }
 
@@ -106,20 +86,6 @@ std::vector<uint8_t> Encryptor::Key::Encrypt(
   switch (*algorithm_) {
     case mojom::Algorithm::kAES256GCM: {
       base::span<const uint8_t> key(key_);
-#if BUILDFLAG(IS_WIN)
-      // Copy. This makes it thread safe.
-      std::vector<uint8_t> decrypted_key(key_);
-      absl::Cleanup zero_memory = [&decrypted_key] {
-        ::SecureZeroMemory(decrypted_key.data(), decrypted_key.size());
-      };
-
-      if (encrypted_) {
-        ::CryptUnprotectMemory(std::data(decrypted_key),
-                               std::size(decrypted_key),
-                               CRYPTPROTECTMEMORY_SAME_PROCESS);
-        key = base::span<const uint8_t>(decrypted_key);
-      }
-#endif  // BUILDFLAG(IS_WIN)
 
       DCHECK_EQ(kNonceLength,
                 crypto::aead::NonceSizeFor(crypto::aead::AES_256_GCM));
@@ -152,19 +118,6 @@ std::optional<std::vector<uint8_t>> Encryptor::Key::Decrypt(
         return std::nullopt;
       }
       base::span<const uint8_t> key(key_);
-#if BUILDFLAG(IS_WIN)
-      // Copy. This makes it thread safe.
-      std::vector<uint8_t> decrypted_key(key_);
-      absl::Cleanup zero_memory = [&decrypted_key] {
-        ::SecureZeroMemory(decrypted_key.data(), decrypted_key.size());
-      };
-      if (encrypted_) {
-        ::CryptUnprotectMemory(std::data(decrypted_key),
-                               std::size(decrypted_key),
-                               CRYPTPROTECTMEMORY_SAME_PROCESS);
-        key = base::span<const uint8_t>(decrypted_key);
-      }
-#endif  // BUILDFLAG(IS_WIN)
 
       // The nonce is at the start of the ciphertext and must be removed.
       auto nonce = ciphertext.first(kNonceLength);

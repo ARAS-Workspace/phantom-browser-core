@@ -99,10 +99,6 @@
 #include "ui/gl/progress_reporter.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "components/viz/service/display/dc_layer_overlay.h"
-#include "components/viz/service/display_embedder/skia_output_device_dcomp.h"
-#endif
 
 #if BUILDFLAG(ENABLE_VULKAN)
 #include "components/viz/service/display_embedder/skia_output_device_vulkan.h"
@@ -128,7 +124,7 @@
 #include "components/viz/service/display_embedder/skia_output_device_x11.h"
 #endif
 
-#if BUILDFLAG(SKIA_USE_DAWN) && (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID))
+#if BUILDFLAG(SKIA_USE_DAWN) && BUILDFLAG(IS_ANDROID)
 #include "components/viz/service/display_embedder/skia_output_device_dawn.h"
 #endif
 
@@ -2012,21 +2008,12 @@ bool SkiaOutputSurfaceImplOnGpu::InitializeForGL() {
 
     if (MakeCurrent(/*need_framebuffer=*/true)) {
       if (presenter_) {
-#if !BUILDFLAG(IS_WIN)
         output_device_ = std::make_unique<SkiaOutputDeviceBufferQueue>(
             std::make_unique<OutputPresenterGL>(std::move(presenter),
                                                 dependency_),
             dependency_, shared_image_representation_factory_.get(),
             shared_gpu_deps_->memory_tracker(),
             GetDidSwapBuffersCompleteCallback(), GetReleaseOverlaysCallback());
-#else   // !BUILDFLAG(IS_WIN)
-        AddChildWindowToBrowser(presenter_->GetWindow());
-        output_device_ = std::make_unique<SkiaOutputDeviceDComp>(
-            shared_image_representation_factory_.get(), context_state_.get(),
-            std::move(presenter), feature_info_->workarounds(),
-            shared_gpu_deps_->memory_tracker(),
-            GetDidSwapBuffersCompleteCallback());
-#endif  // BUILDFLAG(IS_WIN)
       } else {
         if (dependency_->NeedsSupportForExternalStencil()) {
           output_device_ = std::make_unique<SkiaOutputDeviceWebView>(
@@ -2055,9 +2042,7 @@ bool SkiaOutputSurfaceImplOnGpu::InitializeForGL() {
   } else if (gl_surface_) {
     // OnScreen GLSurfaces are never Surfaceless except on windows where a bit
     // of work needed to make it use Presenter.
-#if !BUILDFLAG(IS_WIN)
     DCHECK(!gl_surface_->IsSurfaceless());
-#endif
   } else {
     // If there is no gl_surface there must be presenter.
     DCHECK(presenter_);
@@ -2086,7 +2071,6 @@ bool SkiaOutputSurfaceImplOnGpu::InitializeForVulkan() {
   }
 #endif
 
-#if !BUILDFLAG(IS_WIN)
   std::unique_ptr<OutputPresenter> output_presenter;
   scoped_refptr<gl::Presenter> presenter = dependency_->CreatePresenter();
   presenter_ = presenter.get();
@@ -2102,7 +2086,6 @@ bool SkiaOutputSurfaceImplOnGpu::InitializeForVulkan() {
         GetReleaseOverlaysCallback());
     return true;
   }
-#endif  // !BUILDFLAG(IS_WIN)
 
   std::unique_ptr<SkiaOutputDeviceVulkan> output_device;
   if (!gpu_preferences_.disable_vulkan_surface) {
@@ -2130,12 +2113,6 @@ bool SkiaOutputSurfaceImplOnGpu::InitializeForVulkan() {
     return false;
   }
 
-#if BUILDFLAG(IS_WIN)
-  gpu::SurfaceHandle child_window = output_device->GetChildSurfaceHandle();
-  if (child_window != gpu::kNullSurfaceHandle) {
-    AddChildWindowToBrowser(child_window);
-  }
-#endif  // BUILDFLAG(IS_WIN)
   output_device_ = std::move(output_device);
   return true;
 }
@@ -2167,32 +2144,6 @@ bool SkiaOutputSurfaceImplOnGpu::InitializeForDawn() {
     return !!output_device_;
   }
   NOTREACHED();
-
-#elif BUILDFLAG(IS_WIN)
-  scoped_refptr<gl::Presenter> presenter = dependency_->CreatePresenter();
-  presenter_ = presenter.get();
-  if (presenter_) {
-    AddChildWindowToBrowser(presenter_->GetWindow());
-    output_device_ = std::make_unique<SkiaOutputDeviceDComp>(
-        shared_image_representation_factory_.get(), context_state_.get(),
-        std::move(presenter), feature_info_->workarounds(),
-        shared_gpu_deps_->memory_tracker(),
-        GetDidSwapBuffersCompleteCallback());
-  } else {
-    auto output_device = SkiaOutputDeviceDawn::Create(
-        context_state_, gfx::SurfaceOrigin::kTopLeft,
-        dependency_->GetSurfaceHandle(), shared_gpu_deps_->memory_tracker(),
-        GetDidSwapBuffersCompleteCallback());
-    if (!output_device) {
-      return false;
-    }
-    gpu::SurfaceHandle child_handle = output_device->GetChildSurfaceHandle();
-    if (child_handle != gpu::kNullSurfaceHandle) {
-      AddChildWindowToBrowser(child_handle);
-    }
-    output_device_ = std::move(output_device);
-  }
-  return true;
 
 #elif BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS)
   scoped_refptr<gl::Presenter> presenter = dependency_->CreatePresenter();
@@ -2235,12 +2186,10 @@ bool SkiaOutputSurfaceImplOnGpu::MakeCurrent(bool need_framebuffer) {
   // Windows still uses gl_surface for DComp presentation. Once that's switched
   // over to presenter, these DCHECKs will be actual on all platforms and code
   // can be simplified.
-#if !BUILDFLAG(IS_WIN)
   if (gl_surface_) {
     DCHECK(context_state_->GrContextIsGL());
     DCHECK(!gl_surface_->IsSurfaceless() || gl_surface_->IsOffscreen());
   }
-#endif
 
   // If GL is not being used or GLSurface is not surfaceless, we can ignore
   // making current the GLSurface for better performance.
@@ -2294,12 +2243,6 @@ void SkiaOutputSurfaceImplOnGpu::SwapBuffersInternal(
     if (presenter_) {
       presenter_->SetChoreographerVsyncIdForNextFrame(
           frame->choreographer_vsync_id);
-#if BUILDFLAG(IS_WIN)
-      if (frame->delegated_ink_metadata) {
-        presenter_->SetDelegatedInkTrailStartPoint(
-            std::move(frame->delegated_ink_metadata));
-      }
-#endif
     }
   }
 
@@ -2442,13 +2385,6 @@ bool SkiaOutputSurfaceImplOnGpu::PresentFrame(OutputSurfaceFrame frame) {
   return true;
 }
 
-#if BUILDFLAG(IS_WIN)
-void SkiaOutputSurfaceImplOnGpu::AddChildWindowToBrowser(
-    gpu::SurfaceHandle child_window) {
-  PostTaskToClientThread(
-      base::BindOnce(add_child_window_to_browser_callback_, child_window));
-}
-#endif
 
 const gpu::gles2::FeatureInfo* SkiaOutputSurfaceImplOnGpu::GetFeatureInfo()
     const {
@@ -2561,12 +2497,6 @@ void SkiaOutputSurfaceImplOnGpu::PreserveChildSurfaceControls() {
 void SkiaOutputSurfaceImplOnGpu::InitDelegatedInkPointRendererReceiver(
     mojo::PendingReceiver<gfx::mojom::DelegatedInkPointRenderer>
         pending_receiver) {
-#if BUILDFLAG(IS_WIN)
-  if (presenter_) {
-    presenter_->InitDelegatedInkPointRendererReceiver(
-        std::move(pending_receiver));
-  }
-#endif
 }
 
 const scoped_refptr<AsyncReadResultLock>

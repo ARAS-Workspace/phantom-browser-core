@@ -152,21 +152,13 @@ double TaskManagerImpl::GetPlatformIndependentCPUUsage(TaskId task_id) const {
 }
 
 base::Time TaskManagerImpl::GetStartTime(TaskId task_id) const {
-#if BUILDFLAG(IS_WIN)
-  return GetTaskGroupByTaskId(task_id)->start_time();
-#else
   NOTIMPLEMENTED();
   return base::Time();
-#endif
 }
 
 base::TimeDelta TaskManagerImpl::GetCpuTime(TaskId task_id) const {
-#if BUILDFLAG(IS_WIN)
-  return GetTaskGroupByTaskId(task_id)->cpu_time();
-#else
   NOTIMPLEMENTED();
   return base::TimeDelta();
-#endif
 }
 
 std::optional<base::ByteSize> TaskManagerImpl::GetMemoryFootprintUsage(
@@ -198,37 +190,21 @@ int TaskManagerImpl::GetIdleWakeupsPerSecond(TaskId task_id) const {
 }
 
 int TaskManagerImpl::GetHardFaultsPerSecond(TaskId task_id) const {
-#if BUILDFLAG(IS_WIN)
-  return GetTaskGroupByTaskId(task_id)->hard_faults_per_second();
-#else
   return -1;
-#endif
 }
 
 void TaskManagerImpl::GetGDIHandles(TaskId task_id,
                                     int64_t* current,
                                     int64_t* peak) const {
-#if BUILDFLAG(IS_WIN)
-  const TaskGroup* task_group = GetTaskGroupByTaskId(task_id);
-  *current = task_group->gdi_current_handles();
-  *peak = task_group->gdi_peak_handles();
-#else
   *current = -1;
   *peak = -1;
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 void TaskManagerImpl::GetUSERHandles(TaskId task_id,
                                      int64_t* current,
                                      int64_t* peak) const {
-#if BUILDFLAG(IS_WIN)
-  const TaskGroup* task_group = GetTaskGroupByTaskId(task_id);
-  *current = task_group->user_current_handles();
-  *peak = task_group->user_peak_handles();
-#else
   *current = -1;
   *peak = -1;
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 int TaskManagerImpl::GetOpenFdCount(TaskId task_id) const {

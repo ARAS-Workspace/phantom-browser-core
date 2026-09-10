@@ -720,11 +720,7 @@ IN_PROC_BROWSER_TEST_P(DeclarativeContentApiTestWithContextType,
 }
 
 // TODO(crbug.com/41189874): Flaky on Windows release builds.
-#if BUILDFLAG(IS_WIN) && defined(NDEBUG)
-#define MAYBE_PRE_RulesPersistence DISABLED_PRE_RulesPersistence
-#else
 #define MAYBE_PRE_RulesPersistence PRE_RulesPersistence
-#endif
 // Sets up rules matching http://test1/ in a normal and incognito browser.
 IN_PROC_BROWSER_TEST_P(DeclarativeContentApiTestWithContextType,
                        MAYBE_PRE_RulesPersistence) {
@@ -745,11 +741,7 @@ IN_PROC_BROWSER_TEST_P(DeclarativeContentApiTestWithContextType,
 }
 
 // TODO(crbug.com/41189874): Flaky on Windows release builds.
-#if BUILDFLAG(IS_WIN) && defined(NDEBUG)
-#define MAYBE_RulesPersistence DISABLED_RulesPersistence
-#else
 #define MAYBE_RulesPersistence RulesPersistence
-#endif
 // Reloads the extension from PRE_RulesPersistence and checks that the rules
 // continue to work as expected after being persisted and reloaded.
 IN_PROC_BROWSER_TEST_P(DeclarativeContentApiTestWithContextType,

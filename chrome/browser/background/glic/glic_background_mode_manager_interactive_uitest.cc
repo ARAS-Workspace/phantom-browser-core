@@ -45,26 +45,9 @@
 #include "chromeos/constants/chromeos_features.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/startup/startup_launch_manager.h"
-#endif
-
 using auto_launch_util::StartupLaunchMode;
 
 namespace {
-#if BUILDFLAG(IS_WIN)
-class TestStartupLaunchManager : public StartupLaunchManager {
- public:
-  explicit TestStartupLaunchManager(BrowserProcess* browser_process)
-      : StartupLaunchManager(browser_process) {
-    // Release lock acquired during launch manager construction.
-    CommitLaunchOnStartupState();
-  }
-
-  MOCK_METHOD1(UpdateLaunchOnStartup,
-               void(std::optional<StartupLaunchMode> startup_mode));
-};
-#endif
 }  // namespace
 
 namespace glic {
@@ -72,14 +55,6 @@ namespace glic {
 class GlicBackgroundModeManagerUiTest : public test::InteractiveGlicTest {
  public:
   void SetUpInProcessBrowserTestFixture() override {
-#if BUILDFLAG(IS_WIN)
-    scoped_override_ =
-        GlobalFeatures::GetUserDataFactoryForTesting().AddOverrideForTesting(
-            base::BindRepeating([](BrowserProcess& browser_process) {
-              return std::make_unique<TestStartupLaunchManager>(
-                  &browser_process);
-            }));
-#endif
     feature_list_.InitWithFeatures({features::kGlicCaptureRegion}, {});
   }
 
@@ -231,29 +206,6 @@ IN_PROC_BROWSER_TEST_F(GlicBackgroundModeManagerUiTest,
                 GlicBackgroundModeManager::HotkeyIndex::kPanelKey)));
   EXPECT_TRUE(global_accelerator_listener->IsShortcutHandlingSuspended());
 }
-
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_F(GlicBackgroundModeManagerUiTest, LaunchOnStartup) {
-  auto* launch_manager = static_cast<TestStartupLaunchManager*>(
-      StartupLaunchManager::From(g_browser_process));
-
-  // Disable foreground launch explicitly.
-  g_browser_process->local_state()->SetBoolean(
-      ::prefs::kForegroundLaunchOnLogin, false);
-
-  EXPECT_CALL(*launch_manager,
-              UpdateLaunchOnStartup({StartupLaunchMode::kBackground}))
-      .Times(testing::Exactly(1));
-  g_browser_process->local_state()->SetBoolean(prefs::kGlicLauncherEnabled,
-                                               true);
-  testing::Mock::VerifyAndClearExpectations(launch_manager);
-  EXPECT_CALL(*launch_manager, UpdateLaunchOnStartup({std::nullopt}))
-      .Times(testing::Exactly(1));
-  g_browser_process->local_state()->SetBoolean(prefs::kGlicLauncherEnabled,
-                                               false);
-  testing::Mock::VerifyAndClearExpectations(launch_manager);
-}
-#endif
 
 // Test that hotkey is logged when pressed.
 IN_PROC_BROWSER_TEST_F(GlicBackgroundModeManagerUiTest, HotkeyPressed) {

@@ -88,8 +88,7 @@ void AccountCapabilitiesTestMutator::set_can_sign_in_to_chrome(bool value) {
 }
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_IOS)
 void AccountCapabilitiesTestMutator::set_can_submit_feedback(bool value) {
   capabilities_->capabilities_map_[kCanSubmitFeedbackInChromeCapabilityName] =
       value;

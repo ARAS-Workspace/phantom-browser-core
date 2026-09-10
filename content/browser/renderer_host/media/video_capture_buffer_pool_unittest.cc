@@ -32,15 +32,6 @@
 #include "ui/gfx/mac/io_surface.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <dxgi1_2.h>
-#include <mfapi.h>
-
-#include "base/win/scoped_handle.h"
-#include "media/base/win/dxgi_device_manager.h"
-#include "ui/gfx/gpu_memory_buffer_handle.h"
-#endif
-
 namespace content {
 
 namespace {
@@ -64,7 +55,7 @@ static constexpr media::VideoCaptureBufferType kVideoCaptureBufferTypes[] = {
 
 static constexpr int kTestBufferPoolSize = 3;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 static constexpr gfx::Size kDefaultTextureSize = gfx::Size(1080, 720);
 static constexpr int kInvalidId = -1;
 static constexpr media::VideoPixelFormat kDefaultPixelFormat =
@@ -107,20 +98,8 @@ class VideoCaptureBufferPoolTest
   };
 
   VideoCaptureBufferPoolTest() : expected_dropped_id_(0) {
-#if BUILDFLAG(IS_WIN)
-    auto dxgi_device_manager =
-        media::DXGIDeviceManager::Create(CHROME_LUID{0, 0});
-    DCHECK(dxgi_device_manager);
-    d3d11_device_ = dxgi_device_manager->GetDevice().Get();
-    DCHECK(d3d11_device_);
-    pool_ = base::MakeRefCounted<media::VideoCaptureBufferPoolImpl>(
-        GetBufferType(), kTestBufferPoolSize,
-        std::make_unique<media::VideoCaptureBufferTrackerFactoryImpl>(
-            std::move(dxgi_device_manager)));
-#else
     pool_ = base::MakeRefCounted<media::VideoCaptureBufferPoolImpl>(
         media::VideoCaptureBufferType::kSharedMemory, kTestBufferPoolSize);
-#endif
   }
 
   void ExpectDroppedId(int expected_dropped_id) {
@@ -154,9 +133,6 @@ class VideoCaptureBufferPoolTest
     return std::get<1>(GetParam());
   }
 
-#if BUILDFLAG(IS_WIN)
-  raw_ptr<ID3D11Device> d3d11_device_ = nullptr;
-#endif
   base::test::SingleThreadTaskEnvironment task_environment_;
   int expected_dropped_id_;
   scoped_refptr<media::VideoCaptureBufferPool> pool_;
@@ -374,127 +350,6 @@ TEST_P(VideoCaptureBufferPoolTest, InvalidateBuffers) {
   EXPECT_TRUE(buffer_id_to_drop == id1 || buffer_id_to_drop == id2 ||
               buffer_id_to_drop == id3);
 }
-
-#if BUILDFLAG(IS_WIN)
-namespace {
-
-gfx::GpuMemoryBufferHandle CreateHandle(ID3D11Device* d3d11_device) {
-  EXPECT_TRUE(d3d11_device != nullptr);
-
-  D3D11_TEXTURE2D_DESC desc = {};
-  desc.Width = kDefaultTextureSize.width();
-  desc.Height = kDefaultTextureSize.height();
-  desc.MipLevels = 1;
-  desc.ArraySize = 1;
-  desc.Format = DXGI_FORMAT_NV12;
-  desc.Usage = D3D11_USAGE_DEFAULT;
-  desc.SampleDesc.Count = 1;
-  desc.BindFlags = 0;
-  desc.MiscFlags =
-      D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
-
-  ID3D11Texture2D* texture = nullptr;
-  HRESULT hr = d3d11_device->CreateTexture2D(&desc, nullptr, &texture);
-  EXPECT_HRESULT_SUCCEEDED(hr);
-
-  Microsoft::WRL::ComPtr<IDXGIResource1> dxgi_resource;
-  hr = texture->QueryInterface(IID_PPV_ARGS(&dxgi_resource));
-  EXPECT_HRESULT_SUCCEEDED(hr);
-
-  HANDLE texture_handle;
-  hr = dxgi_resource->CreateSharedHandle(
-      nullptr, DXGI_SHARED_RESOURCE_READ | DXGI_SHARED_RESOURCE_WRITE, nullptr,
-      &texture_handle);
-  EXPECT_HRESULT_SUCCEEDED(hr);
-
-  return gfx::GpuMemoryBufferHandle(
-      gfx::DXGIHandle(base::win::ScopedHandle(texture_handle)));
-}
-
-}  // namespace
-
-TEST_P(VideoCaptureBufferPoolTest, BufferPoolExternalWin) {
-  auto handle0 = CreateHandle(d3d11_device_);
-  auto handle1 = CreateHandle(d3d11_device_);
-  auto handle2 = CreateHandle(d3d11_device_);
-  int buffer_id_to_drop;
-  int buffer_id0 = kInvalidId;
-  EXPECT_EQ(pool_->ReserveIdForExternalBuffer(
-                media::CapturedExternalVideoBuffer(
-                    std::move(handle0), kDefaultFormat, kDefaultColorSpace),
-                kDefaultTextureSize, &buffer_id_to_drop, &buffer_id0),
-            media::VideoCaptureDevice::Client::ReserveResult::kSucceeded);
-  EXPECT_NE(buffer_id0, kInvalidId);
-  EXPECT_EQ(buffer_id_to_drop, kInvalidId);
-  pool_->HoldForConsumers(buffer_id0, 1);
-  pool_->RelinquishProducerReservation(buffer_id0);
-  // We should get a new buffer for handle1.
-  int buffer_id1 = kInvalidId;
-  EXPECT_EQ(pool_->ReserveIdForExternalBuffer(
-                media::CapturedExternalVideoBuffer(
-                    std::move(handle1), kDefaultFormat, kDefaultColorSpace),
-                kDefaultTextureSize, &buffer_id_to_drop, &buffer_id1),
-            media::VideoCaptureDevice::Client::ReserveResult::kSucceeded);
-  EXPECT_NE(buffer_id1, kInvalidId);
-  EXPECT_EQ(buffer_id_to_drop, kInvalidId);
-  pool_->HoldForConsumers(buffer_id1, 1);
-  pool_->RelinquishProducerReservation(buffer_id1);
-  pool_->RelinquishConsumerHold(buffer_id1, 1);
-  // We should reuse handle1's buffer.
-  int buffer_id1_reuse = kInvalidId;
-
-  EXPECT_EQ(pool_->ReserveIdForExternalBuffer(
-                media::CapturedExternalVideoBuffer(
-                    pool_->GetGpuMemoryBufferHandle(buffer_id1), kDefaultFormat,
-                    kDefaultColorSpace),
-                kDefaultTextureSize, &buffer_id_to_drop, &buffer_id1_reuse),
-            media::VideoCaptureDevice::Client::ReserveResult::kSucceeded);
-  EXPECT_EQ(buffer_id1, buffer_id1_reuse);
-  EXPECT_EQ(buffer_id_to_drop, kInvalidId);
-  pool_->HoldForConsumers(buffer_id1_reuse, 1);
-  pool_->RelinquishProducerReservation(buffer_id1_reuse);
-  // If we leave buffer_id1 held for a consumer, then we create a new buffer id
-  // for it.
-  int buffer_id1_new = kInvalidId;
-  EXPECT_EQ(pool_->ReserveIdForExternalBuffer(
-                media::CapturedExternalVideoBuffer(
-                    pool_->GetGpuMemoryBufferHandle(buffer_id1), kDefaultFormat,
-                    kDefaultColorSpace),
-                kDefaultTextureSize, &buffer_id_to_drop, &buffer_id1_new),
-            media::VideoCaptureDevice::Client::ReserveResult::kSucceeded);
-  EXPECT_NE(buffer_id1, buffer_id1_new);
-  EXPECT_EQ(buffer_id_to_drop, kInvalidId);
-  pool_->HoldForConsumers(buffer_id1_new, 1);
-  pool_->RelinquishProducerReservation(buffer_id1_new);
-  pool_->RelinquishConsumerHold(buffer_id1_new, 1);
-  // We have now reached kTestBufferPoolSize buffers. So our next allocation
-  // will return the LRU buffer, which is buffer_id1_new.
-  pool_->RelinquishConsumerHold(buffer_id1_reuse, 1);
-  int buffer_id2 = kInvalidId;
-  EXPECT_EQ(pool_->ReserveIdForExternalBuffer(
-                media::CapturedExternalVideoBuffer(
-                    std::move(handle2), kDefaultFormat, kDefaultColorSpace),
-                kDefaultTextureSize, &buffer_id_to_drop, &buffer_id2),
-            media::VideoCaptureDevice::Client::ReserveResult::kSucceeded);
-  EXPECT_NE(buffer_id0, buffer_id2);
-  EXPECT_NE(buffer_id1, buffer_id2);
-  EXPECT_NE(buffer_id1_new, buffer_id2);
-  EXPECT_EQ(buffer_id_to_drop, buffer_id1_new);
-  EXPECT_NE(buffer_id2, kInvalidId);
-  // Finally, let's reuse handle0.
-  pool_->RelinquishConsumerHold(buffer_id0, 1);
-  int buffer_id0_reuse = kInvalidId;
-  EXPECT_EQ(pool_->ReserveIdForExternalBuffer(
-                media::CapturedExternalVideoBuffer(
-                    pool_->GetGpuMemoryBufferHandle(buffer_id0), kDefaultFormat,
-                    kDefaultColorSpace),
-                kDefaultTextureSize, &buffer_id_to_drop, &buffer_id0_reuse),
-            media::VideoCaptureDevice::Client::ReserveResult::kSucceeded);
-  EXPECT_EQ(buffer_id0, buffer_id0_reuse);
-  EXPECT_EQ(buffer_id_to_drop, kInvalidId);
-}
-
-#endif
 
 #if BUILDFLAG(IS_MAC)
 namespace {

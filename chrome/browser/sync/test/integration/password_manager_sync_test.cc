@@ -248,11 +248,11 @@ class PasswordManagerSyncTest : public SyncTest {
   }
 
   void SignIn(SyncTestAccount account = SyncTestAccount::kDefaultAccount) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     auto enable_disclaimer_on_primary_account_change_resetter =
         enterprise_util::DisableAutomaticManagementDisclaimerUntilReset(
             GetProfile(0));
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
     ASSERT_TRUE(GetClient(0)->SignInNoWaitForCompletion(account));
     ASSERT_TRUE(GetClient(0)->AwaitSyncTransportActive());

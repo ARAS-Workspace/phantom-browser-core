@@ -7,17 +7,9 @@
 #include "build/build_config.h"
 #include "printing/buildflags/buildflags.h"
 
-#if BUILDFLAG(ENABLE_PRINT_PREVIEW) && BUILDFLAG(IS_WIN)
-#include "chrome/common/printing/printer_capabilities.h"
-#include "printing/backend/win_helper.h"
-#endif
-
 namespace printing {
 
 void InitializeProcessForPrinting() {
-#if BUILDFLAG(ENABLE_PRINT_PREVIEW) && BUILDFLAG(IS_WIN)
-  SetGetDisplayNameFunction(&GetUserFriendlyName);
-#endif
 }
 
 }  // namespace printing

@@ -14,18 +14,6 @@
 namespace features {
 
 
-#if BUILDFLAG(IS_WIN)
-// When enabled, instruct WGC to draw a border around the captured
-// window or screen.
-BASE_FEATURE(kWebRtcWgcRequireBorder, base::FEATURE_DISABLED_BY_DEFAULT);
-
-// When enabled, DesktopCapturer will provide a texture handle in DesktopFrame
-// instead of mapping texture data, if the WGC capturer is available and
-// enabled. In this mode, textures are not mapped by default to reduce memory
-// copies. Clients should process texture in the same sequence as desktop
-// capturer.
-BASE_FEATURE(kWebRtcAllowWgcUsingTexture, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 // TODO(crbug.com/40872787): Deactivate the flag gradually before deleting it.
 // When disabled, any WebRTC Audio Processing Module input volume recommendation
@@ -61,11 +49,7 @@ BASE_FEATURE(kWebRtcH265L1T3, base::FEATURE_DISABLED_BY_DEFAULT);
 // When enabled, allows AV1 HW encoding to be used for WebRTC streams, if the
 // platform accelerator supports encoding of AV1.
 BASE_FEATURE(kWebRtcAV1HWEncode,
-#if BUILDFLAG(IS_WIN)
-             base::FEATURE_DISABLED_BY_DEFAULT
-#else
              base::FEATURE_ENABLED_BY_DEFAULT
-#endif  // BUILDFLAG(IS_WIN)
 );
 
 // When enabled, neural residual echo estimation (ML-REE) is initialized on a

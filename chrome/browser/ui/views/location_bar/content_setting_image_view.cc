@@ -66,9 +66,6 @@ std::optional<ViewID> GetViewID(
 #if BUILDFLAG(IS_CHROMEOS)
     case ImageType::kSmartCard:
 #endif
-#if BUILDFLAG(IS_WIN)
-    case ImageType::kProtectedMediaIdentifier:
-#endif
       return std::nullopt;
   }
   NOTREACHED();

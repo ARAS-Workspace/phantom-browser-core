@@ -41,18 +41,13 @@
 #include "components/enterprise/browser/controller/fake_browser_dm_token_storage.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "base/notreached.h"
 #include "chrome/browser/enterprise/profile_management/profile_management_features.h"
 #include "chrome/browser/enterprise/signin/enterprise_signin_prefs.h"
 #include "components/device_signals/core/browser/signals_types.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-// Windows headers (e.g. winbase.h) define ReportEvent as a macro to
-// ReportEventW, which conflicts with the method name.
-#undef ReportEvent
-#endif
 
 using testing::_;
 
@@ -62,7 +57,7 @@ namespace {
 
 using Event = ::chrome::cros::reporting::proto::Event;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 using SecurityAgent = ::chrome::cros::reporting::proto::SecurityAgent;
 
@@ -143,7 +138,7 @@ google::protobuf::RepeatedPtrField<SecurityAgent> GetSecurityAgents(
   }
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class RealtimeReportingClientTestBase : public testing::Test {
  public:
   RealtimeReportingClientTestBase()
@@ -196,7 +191,7 @@ class RealtimeReportingClientTestBase : public testing::Test {
 };
 }  // namespace
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class RealtimeReportingClientOidcTest : public RealtimeReportingClientTestBase {
  public:
   RealtimeReportingClientOidcTest() {
@@ -213,7 +208,7 @@ class RealtimeReportingClientOidcTest : public RealtimeReportingClientTestBase {
  protected:
   base::test::ScopedFeatureList scoped_feature_list_;
 };
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 class RealtimeReportingClientUmaTest
     : public RealtimeReportingClientTestBase,
@@ -400,8 +395,7 @@ TEST_F(RealtimeReportingClientTestBase,
             EnterpriseReportingEventType::kUnknownEvent);
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 TEST_F(RealtimeReportingClientOidcTest, Username) {
   RealtimeReportingClient client(profile_);

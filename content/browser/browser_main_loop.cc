@@ -206,14 +206,6 @@
 #include "ui/accelerated_widget_mac/window_resize_helper_mac.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <commctrl.h>
-#include <shellapi.h>
-
-#include "net/base/winsock_init.h"
-#endif
 
 #if BUILDFLAG(IS_CHROMEOS)
 #include "device/bluetooth/bluetooth_adapter_factory.h"
@@ -224,9 +216,7 @@
 #include <glib-object.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "media/device_monitors/system_message_window_win.h"
-#elif (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_UDEV)
+#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_UDEV)
 #include "media/device_monitors/device_monitor_udev.h"
 #endif
 
@@ -361,7 +351,8 @@ CreateMemoryPressureMonitor(const base::CommandLine& command_line) {
 
   std::unique_ptr<memory_pressure::MultiSourceMemoryPressureMonitor> monitor;
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
+    BUILDFLAG(IS_ANDROID)
   monitor =
       std::make_unique<memory_pressure::MultiSourceMemoryPressureMonitor>();
 #endif
@@ -573,9 +564,6 @@ int BrowserMainLoop::EarlyInitialization() {
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) ||
         // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-  net::EnsureWinsockInit();
-#endif
 
 #if BUILDFLAG(USE_NSS_CERTS)
   // We want to be sure to init NSPR on the main thread.
@@ -1252,9 +1240,6 @@ void BrowserMainLoop::ShutdownThreadsAndCleanUp() {
 // On windows, the monitor needs to be destroyed on the same thread
 // as they were created. On Linux, the monitor will be deleted when IO thread
 // goes away.
-#if BUILDFLAG(IS_WIN)
-  system_message_window_.reset();
-#endif
 
   if (BrowserGpuChannelHostFactory::instance())
     BrowserGpuChannelHostFactory::instance()->CloseChannel();
@@ -1433,12 +1418,7 @@ void BrowserMainLoop::PostCreateThreadsImpl() {
 #endif
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (!base::FeatureList::IsEnabled(
-          video_capture::features::kWinCameraMonitoringInVideoCaptureService)) {
-    system_message_window_ = std::make_unique<media::SystemMessageWindowWin>();
-  }
-#elif (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_UDEV)
+#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(USE_UDEV)
   device_monitor_linux_ = std::make_unique<media::DeviceMonitorLinux>();
 #endif
 
@@ -1476,10 +1456,6 @@ void BrowserMainLoop::PostCreateThreadsImpl() {
   std::vector<base::PlatformThreadId> allowed_clipboard_threads;
   // The current thread is the UI thread.
   allowed_clipboard_threads.push_back(base::PlatformThread::CurrentId());
-#if BUILDFLAG(IS_WIN)
-  // On Windows, clipboard is also used on the IO thread.
-  allowed_clipboard_threads.push_back(io_thread_->GetThreadId());
-#endif
   ui::Clipboard::SetAllowedThreads(allowed_clipboard_threads);
 
   // Post a task to launch the GPU process if appropriate. Note that if we
@@ -1543,13 +1519,6 @@ bool BrowserMainLoop::InitializeToolkit() {
   // (Need to add InitializeToolkit stage to BrowserParts).
   // See also GTK setup in EarlyInitialization, above, and associated comments.
 
-#if BUILDFLAG(IS_WIN)
-  INITCOMMONCONTROLSEX config;
-  config.dwSize = sizeof(config);
-  config.dwICC = ICC_WIN95_CLASSES;
-  if (!InitCommonControlsEx(&config))
-    PLOG(FATAL);
-#endif
 
 #if defined(USE_AURA)
   // Env creates the compositor. Aura widgets need the compositor to be created

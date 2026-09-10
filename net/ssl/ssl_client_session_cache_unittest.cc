@@ -450,7 +450,7 @@ TEST_F(SSLClientSessionCacheTest, LookupExpirationCheck) {
 // TODO(crbug.com/483018445): Check the kSuppressMemoryMonitor feature flag
 // instead of buildflags once the feature is exposed publicly or moved to base.
 // Currently, it is internal to components/memory_pressure.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_TestFlushOnMemoryNotifications \
   DISABLED_TestFlushOnMemoryNotifications
 #else
@@ -511,7 +511,7 @@ TEST_F(SSLClientSessionCacheTest, MAYBE_TestFlushOnMemoryNotifications) {
 // TODO(crbug.com/483018445): Check the kSuppressMemoryMonitor feature flag
 // instead of buildflags once the feature is exposed publicly or moved to base.
 // Currently, it is internal to components/memory_pressure.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #define MAYBE_MemoryPressure DISABLED_MemoryPressure
 #else
 #define MAYBE_MemoryPressure MemoryPressure

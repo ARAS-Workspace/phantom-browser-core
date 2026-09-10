@@ -41,9 +41,7 @@ namespace {
 
 const char kCapability_ServiceManager[] = "service_manager:service_manager";
 
-#if BUILDFLAG(IS_WIN)
-const char kServiceExecutableExtension[] = ".service.exe";
-#elif !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_IOS)
 const char kServiceExecutableExtension[] = ".service";
 #endif
 

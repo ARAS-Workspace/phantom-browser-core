@@ -33,13 +33,8 @@ base::FilePath GetDefaultFilepathForPasswordFile(
     const base::FilePath::StringType& default_extension) {
   base::FilePath default_path;
   base::PathService::Get(chrome::DIR_USER_DOCUMENTS, &default_path);
-#if BUILDFLAG(IS_WIN)
-  std::wstring file_name = base::UTF8ToWide(
-      l10n_util::GetStringUTF8(IDS_PASSWORD_MANAGER_DEFAULT_EXPORT_FILENAME));
-#else
   std::string file_name =
       l10n_util::GetStringUTF8(IDS_PASSWORD_MANAGER_DEFAULT_EXPORT_FILENAME);
-#endif
   return default_path.Append(file_name).AddExtension(default_extension);
 }
 

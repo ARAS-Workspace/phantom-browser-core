@@ -25,10 +25,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace {
 
 #if BUILDFLAG(IS_POSIX)
@@ -37,19 +33,9 @@ int ReadFromPipeNoBestEffort(base::PlatformFile file_in,
                              int size) {
   return HANDLE_EINTR(read(file_in, buffer, size));
 }
-#elif BUILDFLAG(IS_WIN)
-int ReadFromPipeNoBestEffort(base::PlatformFile file_in,
-                             char* buffer,
-                             int size) {
-  unsigned long received = 0;
-  if (!::ReadFile(file_in, buffer, size, &received, nullptr)) {
-    return (GetLastError() == ERROR_BROKEN_PIPE) ? 0 : -1;
-  }
-  return static_cast<int>(received);
-}
 #endif
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_POSIX)
 std::vector<uint8_t> ReadFromPipe(base::PlatformFile file_out, size_t size) {
   std::vector<uint8_t> buffer(size);
   size_t offset = 0;
@@ -72,18 +58,9 @@ int WriteToPipeNoBestEffort(base::PlatformFile file_out,
                             base::span<const char> buffer) {
   return HANDLE_EINTR(write(file_out, buffer.data(), buffer.size()));
 }
-#elif BUILDFLAG(IS_WIN)
-int WriteToPipeNoBestEffort(base::PlatformFile file_out,
-                            base::span<const char> buffer) {
-  unsigned long written = 0;
-  if (!::WriteFile(file_out, buffer.data(), buffer.size(), &written, nullptr)) {
-    return -1;
-  }
-  return static_cast<int>(written);
-}
 #endif
 
-#if BUILDFLAG(IS_POSIX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_POSIX)
 int WriteToPipe(base::PlatformFile file_out, base::span<const char> buffer) {
   size_t offset = 0;
   int rv = 0;
@@ -108,38 +85,7 @@ class PipeConnectionTest : public testing::Test {
 
   Timeout long_timeout() const { return Timeout(long_timeout_); }
 
-#if BUILDFLAG(IS_WIN)
-  bool CreatePipeConnection(std::unique_ptr<PipeConnection>* connection,
-                            base::ScopedPlatformFile* read_pipe,
-                            base::ScopedPlatformFile* write_pipe) {
-    base::ScopedPlatformFile parent_to_child_read_file;
-    base::ScopedPlatformFile parent_to_child_write_file;
-    base::ScopedPlatformFile child_to_parent_read_file;
-    base::ScopedPlatformFile child_to_parent_write_file;
-    HANDLE parent_to_child_read_handle;
-    HANDLE parent_to_child_write_handle;
-    HANDLE child_to_parent_read_handle;
-    HANDLE child_to_parent_write_handle;
-    if (!CreatePipe(&parent_to_child_read_handle, &parent_to_child_write_handle,
-                    nullptr, 0)) {
-      return false;
-    }
-    parent_to_child_read_file.Set(parent_to_child_read_handle);
-    parent_to_child_write_file.Set(parent_to_child_write_handle);
-    if (!CreatePipe(&child_to_parent_read_handle, &child_to_parent_write_handle,
-                    nullptr, 0)) {
-      return false;
-    }
-    child_to_parent_read_file.Set(child_to_parent_read_handle);
-    child_to_parent_write_file.Set(child_to_parent_write_handle);
-    *connection =
-        std::make_unique<PipeConnection>(std::move(child_to_parent_read_file),
-                                         std::move(parent_to_child_write_file));
-    *read_pipe = std::move(parent_to_child_read_file);
-    *write_pipe = std::move(child_to_parent_write_file);
-    return true;
-  }
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   bool CreatePipeConnection(std::unique_ptr<PipeConnection>* connection,
                             base::ScopedPlatformFile* read_pipe,
                             base::ScopedPlatformFile* write_pipe) {

@@ -22,10 +22,6 @@
 #include "ui/events/platform/platform_event_observer.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/message_loop/message_pump_win.h"
-#endif
-
 namespace content {
 namespace responsiveness {
 
@@ -45,8 +41,6 @@ class CONTENT_EXPORT BrowserUINativeEventObserver
     : public NativeEventProcessorObserver
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
     : public ui::PlatformEventObserver
-#elif BUILDFLAG(IS_WIN)
-    : public base::MessagePumpForUI::NativeEventObserver
 #endif
 {
  public:
@@ -77,7 +71,7 @@ class CONTENT_EXPORT BrowserUINativeEventObserver
   void WillProcessEvent(const ui::PlatformEvent& event) override;
   void DidProcessEvent(const ui::PlatformEvent& event) override;
   void PlatformEventSourceDestroying() override;
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#elif BUILDFLAG(IS_MAC)
   // base::MessagePumpForUI::NativeEventObserver overrides (Win) or
   // NativeEventProcessorObserver overrides (Mac):
   void WillRunNativeEvent(uintptr_t identifier) override;

@@ -22,10 +22,6 @@
 #include "third_party/blink/public/platform/web_runtime_features.h"
 #include "third_party/blink/public/web/blink.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/display/win/dpi.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/test/mock_chrome_application_mac.h"
 #endif
@@ -60,10 +56,6 @@ void BlinkTestEnvironment::SetUp() {
 
 #if BUILDFLAG(IS_MAC)
   mock_cr_app::RegisterMockCrApp();
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  display::win::SetDefaultDeviceScaleFactor(1.0f);
 #endif
 
   content_initializer_.emplace();

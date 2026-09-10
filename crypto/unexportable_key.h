@@ -20,14 +20,6 @@
 #import <Security/Security.h>
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_types.h"
-
-// NCRYPT_KEY_HANDLE is defined in <ncrypt.h>, but including it here would pull
-// in Windows headers. We use an alias instead.
-using NCRYPT_KEY_HANDLE = ULONG_PTR;
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace crypto {
 
 class StatefulKey;
@@ -82,11 +74,6 @@ class CRYPTO_EXPORT UnexportableSigningKey {
   virtual SecKeyRef GetSecKeyRef() const = 0;
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_WIN)
-  // Returns the underlying NCrypt key handle owned by the current instance.
-  virtual NCRYPT_KEY_HANDLE GetNCryptKeyHandle() const = 0;
-#endif  // BUILDFLAG(IS_WIN)
-
   // Typesafe downcast to `StatefulKey`. Returns nullptr if the key is not
   // stateful.
   virtual const StatefulKey* AsStatefulKey() const LIFETIME_BOUND;
@@ -98,12 +85,6 @@ class CRYPTO_EXPORT UnexportableSigningKey {
   virtual std::optional<std::vector<uint8_t>> SignSlowly(
       base::span<const uint8_t> data) = 0;
 
-#if BUILDFLAG(IS_WIN)
-  // Will verify whether the key can be used to sign TLS 1.3 payloads as
-  // required by the spec. Specifically, it will verify whether RSA keys
-  // support the RSA-PSS algorithm with the expected salt lengths.
-  virtual bool SupportsTls13() = 0;
-#endif  // BUILDFLAG(IS_WIN)
 };
 
 // An attestation/certification statement proving the binding of an

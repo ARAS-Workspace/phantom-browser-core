@@ -64,10 +64,6 @@
 #include "third_party/blink/public/web/web_select_element.h"
 #include "third_party/blink/public/web/web_view.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "third_party/blink/public/web/win/web_font_rendering.h"
-#endif
-
 namespace autofill::form_util {
 namespace {
 
@@ -3149,13 +3145,6 @@ class FormFillAndPreviewTest
     test::AutofillRendererTest::SetUp();
     form_cache_.emplace(&autofill_agent());
 
-#if BUILDFLAG(IS_WIN)
-    // Autofill uses the system font to render suggestion previews. On
-    // Windows an extra step is required to ensure that the system font is
-    // configured.
-    blink::WebFontRendering::SetMenuFontMetrics(WebString::FromAscii("Arial"),
-                                                12);
-#endif
   }
 
   void TearDown() override {
@@ -4763,12 +4752,6 @@ class FormDataConversionTest : public test::AutofillRendererTest {
     test::AutofillRendererTest::SetUp();
     form_cache_.emplace(&autofill_agent());
 
-#if BUILDFLAG(IS_WIN)
-    // Autofill uses the system font to render suggestion previews. On Windows
-    // an extra step is required to ensure that the system font is configured.
-    blink::WebFontRendering::SetMenuFontMetrics(
-        blink::WebString::FromAscii("Arial"), 12);
-#endif
   }
 
   void TearDown() override {
@@ -5514,12 +5497,6 @@ class FormFieldConversionTest : public test::AutofillRendererTest {
     test::AutofillRendererTest::SetUp();
     form_cache_.emplace(&autofill_agent());
 
-#if BUILDFLAG(IS_WIN)
-    // Autofill uses the system font to render suggestion previews. On Windows
-    // an extra step is required to ensure that the system font is configured.
-    blink::WebFontRendering::SetMenuFontMetrics(
-        blink::WebString::FromAscii("Arial"), 12);
-#endif
   }
 
   void TearDown() override {
@@ -6123,12 +6100,6 @@ class FormAutofillWithConstraintsTest : public test::AutofillRendererTest {
     test::AutofillRendererTest::SetUp();
     form_cache_.emplace(&autofill_agent());
 
-#if BUILDFLAG(IS_WIN)
-    // Autofill uses the system font to render suggestion previews. On Windows
-    // an extra step is required to ensure that the system font is configured.
-    blink::WebFontRendering::SetMenuFontMetrics(
-        blink::WebString::FromAscii("Arial"), 12);
-#endif
   }
 
   void TearDown() override {

@@ -7,8 +7,7 @@
 #include "base/functional/callback.h"
 #include "base/memory/raw_ptr.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
 #include "chrome/browser/ui/toasts/toast_controller.h"
 #endif
 
@@ -24,22 +23,19 @@ class SecuritySettingsBundlePrefChangeHandler {
   virtual ~SecuritySettingsBundlePrefChangeHandler();
   virtual void MaybeShowEnhancedBundleSettingChangeNotification();
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
   void SetToastControllerForTesting(ToastController* controller);
 #endif
 
  private:
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
   ToastController* GetToastController();
 #endif
 
   // Member variable to store the Profile*.
   raw_ptr<Profile> profile_ = nullptr;
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC)
   raw_ptr<ToastController> toast_controller_for_testing_ = nullptr;
 #endif
 };

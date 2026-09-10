@@ -11,10 +11,6 @@
 #include "third_party/blink/renderer/platform/font_family_names.h"
 #include "third_party/blink/renderer/platform/testing/unit_test_helpers.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "third_party/blink/public/web/win/web_font_rendering.h"
-#endif
-
 namespace blink {
 
 class CSSFontFamilyWebKitPrefixTest : public SimTest {
@@ -49,12 +45,6 @@ class CSSFontFamilyWebKitPrefixTest : public SimTest {
   void SetUp() override {
     SimTest::SetUp();
     m_standard_font = GetGenericGenericFontFamilySettings().Standard();
-#if BUILDFLAG(IS_WIN)
-    // An extra step is required to ensure that the system font is configured.
-    // TODO(crbug.com/969622): Remove this.
-    blink::WebFontRendering::SetMenuFontMetrics(
-        blink::WebString::FromAscii("Arial"), 12);
-#endif
   }
 
   void TearDown() override {

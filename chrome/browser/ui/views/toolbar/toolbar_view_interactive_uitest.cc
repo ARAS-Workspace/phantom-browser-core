@@ -535,11 +535,7 @@ IN_PROC_BROWSER_TEST_P(ToolbarViewTest,
 // The back button is just one example for which the menu identifier is defined.
 //
 // TODO: crbug.com/494279213 - Re-enable this test on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_BackButtonMenu DISABLED_BackButtonMenu
-#else
 #define MAYBE_BackButtonMenu BackButtonMenu
-#endif
 IN_PROC_BROWSER_TEST_P(ToolbarViewTest, MAYBE_BackButtonMenu) {
   // TODO(crbug.com/470038385): Support WebUI back button in this test.
   if (features::IsWebUIBackForwardButtonEnabled()) {

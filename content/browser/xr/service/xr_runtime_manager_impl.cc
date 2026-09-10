@@ -418,40 +418,9 @@ void XRRuntimeManagerImpl::MakeXrCompatible() {
   }
 
   if (!IsInitializedOnCompatibleAdapter(runtime)) {
-#if BUILDFLAG(IS_WIN)
-    std::optional<CHROME_LUID> luid = runtime->GetLuid();
-    // IsInitializedOnCompatibleAdapter should have returned true if the
-    // runtime doesn't specify a LUID.
-    DCHECK(luid && (luid->HighPart != 0 || luid->LowPart != 0));
-
-    // Set the XR compatible adapter LUID in GpuDataManager.
-    // GpuDataManagerImpl::AppendGpuCommandLine passes this to the GPU process.
-    content::GpuDataManagerImpl::GetInstance()->SetUseAdapterLuid(*luid);
-
-    // Store the current GPU so we can revert back once XR is no longer needed.
-    // If default_gpu_ is nonzero, we have already previously stored the
-    // default GPU and should not overwrite it.
-    if (default_gpu_.LowPart == 0 && default_gpu_.HighPart == 0) {
-      default_gpu_ = content::GpuDataManager::GetInstance()
-                         ->GetGPUInfo()
-                         .active_gpu()
-                         .luid;
-    }
-    xr_compatible_restarted_gpu_ = true;
-
-    // Get notified when the new GPU process sends back its GPUInfo. This
-    // indicates that the GPU process has finished initializing and the GPUInfo
-    // contains the LUID of the active adapter.
-    content::GpuDataManager::GetInstance()->AddObserver(this);
-
-    content::KillGpuProcess();
-
-    return;
-#else
     // MakeXrCompatible is not yet supported on other platforms so
     // IsInitializedOnCompatibleAdapter should have returned true.
     NOTREACHED();
-#endif
   }
 
   for (VRServiceImpl* service : services_)
@@ -461,15 +430,6 @@ void XRRuntimeManagerImpl::MakeXrCompatible() {
 
 bool XRRuntimeManagerImpl::IsInitializedOnCompatibleAdapter(
     BrowserXRRuntimeImpl* runtime) {
-#if BUILDFLAG(IS_WIN)
-  std::optional<CHROME_LUID> luid = runtime->GetLuid();
-  if (luid && (luid->HighPart != 0 || luid->LowPart != 0)) {
-    CHROME_LUID active_luid =
-        content::GpuDataManager::GetInstance()->GetGPUInfo().active_gpu().luid;
-    return active_luid.HighPart == luid->HighPart &&
-           active_luid.LowPart == luid->LowPart;
-  }
-#endif
 
   return true;
 }
@@ -514,27 +474,12 @@ XRRuntimeManagerImpl::~XRRuntimeManagerImpl() {
   // If a GPU adapter LUID was specified for the GPU process, clear it so
   // subsequent GPU processes initialize on the default GPU.
   if (xr_compatible_restarted_gpu_) {
-#if BUILDFLAG(IS_WIN)
-    content::GpuDataManagerImpl::GetInstance()->ClearUseAdapterLuid();
-#endif
 
     // Ensure this object is no longer registered as a GpuDataManager observer,
     // which may happen if MakeXrCompatible is called and the page is navigated
     // before the GPU process restarts.
     content::GpuDataManager::GetInstance()->RemoveObserver(this);
 
-#if BUILDFLAG(IS_WIN)
-    // If we changed the GPU, revert it back to the default GPU. This is
-    // separate from xr_compatible_restarted_gpu_ because the GPU process may
-    // not have been successfully initialized using the specified GPU and is
-    // still on the default adapter.
-    CHROME_LUID active_gpu =
-        content::GpuDataManager::GetInstance()->GetGPUInfo().active_gpu().luid;
-    if (active_gpu.LowPart != default_gpu_.LowPart ||
-        active_gpu.HighPart != default_gpu_.HighPart) {
-      content::KillGpuProcess();
-    }
-#endif
   }
 }
 

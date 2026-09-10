@@ -15,9 +15,6 @@
 #include "ui/ozone/public/ozone_platform.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/display/win/dpi.h"
-#endif
 
 #if BUILDFLAG(IS_APPLE)
 // gn check complains on other platforms, because //gpu/ipc/service:service
@@ -44,9 +41,6 @@ void CompositorTestSuite::Initialize() {
   OzonePlatform::InitializeForUI(params);
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  display::win::SetDefaultDeviceScaleFactor(1.0f);
-#endif
 
 }
 

@@ -10,7 +10,7 @@
 #include "build/build_config.h"
 #include "ui/gfx/native_ui_types.h"
 
-#if !BUILDFLAG(IS_WIN) && !defined(USE_AURA)
+#if !defined(USE_AURA)
 #error view_prop.h is only for windows and aura builds.
 #endif
 

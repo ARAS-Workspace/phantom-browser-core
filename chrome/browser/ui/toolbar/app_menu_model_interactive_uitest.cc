@@ -708,7 +708,7 @@ IN_PROC_BROWSER_TEST_F(AppMenuModelInteractiveTest, TravelNavigation) {
                                1);
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 class SupervisedUserAppMenuModelInteractiveTest
     : public AppMenuModelInteractiveTest {
  public:
@@ -781,4 +781,4 @@ IN_PROC_BROWSER_TEST_F(SupervisedUserAppMenuModelInteractiveTest,
                   EnsureNotPresent(AppMenuModel::kProfileOpenGuestItem));
 }
 
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)

@@ -181,15 +181,9 @@ DataPack::~DataPack() {
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-inline DWORD GetLastErrorOrErrno() {
-  return ::GetLastError();
-}
-#else
 inline int GetLastErrorOrErrno() {
   return errno;
 }
-#endif
 
 // Opens `path`, retrying after a short delay at most three extra times (four
 // attempts in total) if the file cannot be opened due to it being in use.

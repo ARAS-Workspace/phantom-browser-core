@@ -13,14 +13,6 @@
 #include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <process.h>
-// Ignore warnings about ptr->int conversions that we use when
-// storing ints into ThreadLocalStorage.
-#pragma warning(disable : 4311 4312)
-#endif
 
 namespace base {
 

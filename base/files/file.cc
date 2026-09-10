@@ -85,9 +85,7 @@ File& File::operator=(File&& other) {
 
 void File::Initialize(const FilePath& path, uint32_t flags) {
   if (path.ReferencesParent()) {
-#if BUILDFLAG(IS_WIN)
-    ::SetLastError(ERROR_ACCESS_DENIED);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
     errno = EACCES;
 #else
 #error Unsupported platform

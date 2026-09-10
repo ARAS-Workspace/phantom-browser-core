@@ -43,9 +43,7 @@ constexpr char kProcessUptimeKey[] = "ptime";
 constexpr char kMinidumpFileKey[] = "upload_file_minidump";
 constexpr char kMinidumpFileName[] = "dump";
 
-#if BUILDFLAG(IS_WIN)
-constexpr char kProductNameValue[] = "Chromoting";
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
 constexpr char kProductNameValue[] = "Chromoting_Linux";
 #elif BUILDFLAG(IS_MAC)
 constexpr char kProductNameValue[] = "Chromoting_Mac";

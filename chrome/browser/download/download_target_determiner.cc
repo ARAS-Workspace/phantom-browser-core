@@ -63,10 +63,6 @@
 #include "content/public/common/webplugininfo.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/shell_dialogs/select_file_utils_win.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ash/policy/dlp/dlp_files_controller_ash.h"
 #include "chrome/browser/chromeos/policy/dlp/dlp_file_destination.h"
@@ -120,52 +116,6 @@ void GenerateSafeFileName(base::FilePath* new_path,
     net::GenerateSafeFileName(mime_type, true /*ignore_extension*/, new_path);
   }
 }
-
-#if BUILDFLAG(IS_WIN)
-// Iteratively sanitizes a download filename for Windows by removing environment
-// variables and trimming trailing dots and spaces. This mimics the behavior of
-// the Windows "Save As" dialog to ensure extension checks are accurate.
-// See crbug.com/41486690 and crbug.com/486079015 for more context.
-std::wstring SanitizeDownloadFileName(std::wstring_view initial_name) {
-  std::wstring current_name(initial_name);
-
-  const auto trim_trailing_dots_and_whitespace = [](std::wstring_view s) {
-    while (!s.empty() &&
-           (s.back() == L'.' || base::IsUnicodeWhitespace(s.back()))) {
-      s.remove_suffix(1);
-    }
-    return s;
-  };
-
-  while (true) {
-    std::wstring next_name =
-        ui::RemoveEnvVarFromFileName<wchar_t>(current_name, L"%");
-
-    const base::FilePath next_path(next_name);
-    const std::wstring extension = next_path.Extension();
-
-    std::wstring_view current_basename = next_path.value();
-    CHECK_LE(extension.length(), current_basename.length());
-    current_basename.remove_suffix(extension.length());
-
-    // Iteratively trim trailing dots and spaces from the basename since
-    // the Windows Save As dialog natively strips trailing spaces and dots
-    // from the basename before saving. We must simulate this to check the
-    // true final extension.
-    current_basename = trim_trailing_dots_and_whitespace(current_basename);
-
-    next_name = std::wstring(current_basename) + extension;
-
-    // Then, trim trailing dots and whitespace from the entire filename again.
-    next_name.resize(trim_trailing_dots_and_whitespace(next_name).length());
-
-    if (next_name.length() == current_name.length()) {
-      return current_name;
-    }
-    current_name = std::move(next_name);
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace
 
@@ -646,24 +596,6 @@ DownloadTargetDeterminer::DoRequestConfirmation() {
     // If there is a non-neutral confirmation reason, prompt the user.
     if (confirmation_reason_ != DownloadConfirmationReason::NONE) {
       base::FilePath sanitized_path = virtual_path_;
-#if BUILDFLAG(IS_WIN)
-      // Windows prompt dialog will resolve all env variables in the file name,
-      // which may generate unexpected results. Remove env variables from the
-      // file name first.
-      std::wstring sanitized_name =
-          SanitizeDownloadFileName(virtual_path_.BaseName().value());
-
-      if (sanitized_name.empty()) {
-        sanitized_name = base::UTF8ToWide(
-            l10n_util::GetStringUTF8(IDS_DEFAULT_DOWNLOAD_FILENAME));
-      }
-      sanitized_path =
-          virtual_path_.DirName().Append(base::FilePath(sanitized_name));
-      const base::FilePath::StringType post_sanitize_ext =
-          base::FilePath(sanitized_name).Extension();
-      GenerateSafeFileName(&sanitized_path, post_sanitize_ext,
-                           download_->GetMimeType());
-#endif  // BUILDFLAG(IS_WIN)
       delegate_->RequestConfirmation(
           download_, sanitized_path, confirmation_reason_,
           base::BindRepeating(

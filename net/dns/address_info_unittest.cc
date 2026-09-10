@@ -200,20 +200,6 @@ TEST(AddressInfoTest, Failure) {
   EXPECT_NE(os_error, 0);
 }
 
-#if BUILDFLAG(IS_WIN)
-// Note: this test is descriptive, not prescriptive.
-TEST(AddressInfoTest, FailureWin) {
-  auto getter = std::make_unique<MockAddrInfoGetter>();
-  auto [ai, err, os_error] = AddressInfo::Get(
-      "failure.com", *MakeHints(ADDRESS_FAMILY_IPV4, HOST_RESOLVER_CANONNAME),
-      std::move(getter));
-
-  EXPECT_FALSE(ai);
-  EXPECT_EQ(err, ERR_NAME_RESOLUTION_FAILED);
-  EXPECT_NE(os_error, 0);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_ANDROID)
 // Note: this test is descriptive, not prescriptive.
 TEST(AddressInfoTest, FailureAndroid) {

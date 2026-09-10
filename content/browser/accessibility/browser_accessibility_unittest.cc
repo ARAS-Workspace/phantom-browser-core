@@ -42,7 +42,7 @@ ui::BrowserAccessibilityManager* CreateBrowserAccessibilityManager(
 }
 
 gfx::AcceleratedWidget MakeAcceleratedWidget(uintptr_t value) {
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
   return reinterpret_cast<gfx::AcceleratedWidget>(value);
 #else
   return static_cast<gfx::AcceleratedWidget>(value);
@@ -674,7 +674,7 @@ TEST_F(BrowserAccessibilityTest,
           ui::AXClippingBehavior::kUnclipped));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#if BUILDFLAG(USE_ATK)
 TEST_F(BrowserAccessibilityTest, PlatformChildIterator) {
   // (i) => node is ignored
   // Parent Tree
@@ -859,7 +859,7 @@ TEST_F(BrowserAccessibilityTest, PlatformChildIterator) {
   }
   ASSERT_EQ(platform_iterator, platform_iterator2);
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(USE_ATK)
+#endif  // BUILDFLAG(USE_ATK)
 
 TEST_F(BrowserAccessibilityTest, GetInnerTextRangeBoundsRect) {
   ui::AXNodeData root;

@@ -190,11 +190,7 @@ bool Benchmark::ParseArgs(const base::CommandLine* command_line) {
        ++iter) {
     const std::string& s = iter->first;
     std::string value;
-#if BUILDFLAG(IS_WIN)
-    value = base::WideToUTF8(iter->second);
-#else
     value = iter->second;
-#endif
     if (s == "source") {
       source_.FromString(value);
     } else if (s == "destination") {

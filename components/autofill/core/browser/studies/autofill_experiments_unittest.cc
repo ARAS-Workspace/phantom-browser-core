@@ -325,7 +325,7 @@ TEST_F(AutofillExperimentsTest, ShouldShowIbanOnSettingsPage_FeatureEnabled) {
 TEST_F(
     AutofillExperimentsTest,
     IsDeviceAuthAvailable_FeatureEnabledAndAuthenticationAvailableForMacAndWin) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   ON_CALL(*mock_device_authenticator_, CanAuthenticateWithBiometricOrScreenLock)
       .WillByDefault(Return(true));
 

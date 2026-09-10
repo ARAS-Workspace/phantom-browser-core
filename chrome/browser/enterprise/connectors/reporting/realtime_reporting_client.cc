@@ -49,11 +49,7 @@
 #include "components/policy/core/common/cloud/reporting_job_configuration_base.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#endif
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/enterprise/signals/signals_aggregator_factory.h"
 #include "chrome/browser/enterprise/signin/enterprise_signin_prefs.h"
 #include "components/device_signals/core/browser/signals_aggregator.h"
@@ -62,7 +58,7 @@
 
 namespace enterprise_connectors {
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 using Event = ::chrome::cros::reporting::proto::Event;
 #endif
 
@@ -143,9 +139,7 @@ RealtimeReportingClient::GetReportingSettings() {
   return service->GetReportingSettings();
 }
 
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 void AddCrowdstrikeSignalsToEvent(
     Event& event,
@@ -234,7 +228,7 @@ void AddCrowdstrikeSignalsToEvent(
   }
 }
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 void RealtimeReportingClient::SetProfileUserNameForTesting(
     std::string username) {
@@ -248,12 +242,12 @@ std::string RealtimeReportingClient::GetProfileUserName() {
   username_ =
       identity_manager_ ? GetProfileEmail(identity_manager_) : std::string();
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (username_.empty()) {
     username_ = Profile::FromBrowserContext(context_)->GetPrefs()->GetString(
         enterprise_signin::prefs::kProfileUserEmail);
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   return username_;
 }
@@ -305,7 +299,7 @@ std::string RealtimeReportingClient::GetBrowserClientId() {
   return client_id;
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 void RealtimeReportingClient::MaybeCollectDeviceSignalsAndReportEvent(
     Event event,
     policy::CloudPolicyClient* client,

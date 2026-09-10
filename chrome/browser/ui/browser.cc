@@ -171,15 +171,6 @@
 #include "ui/gfx/text_utils.h"
 #include "url/scheme_host_port.h"
 
-#if BUILDFLAG(IS_WIN)
-// windows.h must be included before shellapi.h
-#include <windows.h>
-
-#include <shellapi.h>
-
-#include "chrome/browser/ui/view_ids.h"
-#include "ui/base/win/shell.h"
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ash/constants/ash_features.h"

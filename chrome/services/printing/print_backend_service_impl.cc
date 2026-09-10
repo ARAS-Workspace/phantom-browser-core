@@ -59,15 +59,6 @@
 #include "ui/linux/linux_ui_factory.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#include "printing/emf_win.h"
-#include "printing/printed_page_win.h"
-#include "ui/gfx/geometry/rect.h"
-#include "ui/gfx/geometry/size.h"
-#include "ui/gfx/native_ui_types.h"
-#endif
-
 namespace printing {
 
 namespace {
@@ -94,12 +85,6 @@ scoped_refptr<base::SequencedTaskRunner> GetPrintingTaskRunner() {
 #if BUILDFLAG(USE_CUPS)
   // CUPS is thread safe, so a task runner can be allocated for each job.
   return base::ThreadPool::CreateSequencedTaskRunner(kTraits);
-#elif BUILDFLAG(IS_WIN)
-  // For Windows, we want a single threaded task runner shared for all print
-  // jobs in the process because Windows printer drivers are oftentimes not
-  // thread-safe.  This protects against multiple print jobs to the same device
-  // from running in the driver at the same time.
-  return base::ThreadPool::CreateSingleThreadTaskRunner(kTraits);
 #else
   // Be conservative for unsupported platforms, use a single threaded runner
   // so that concurrent print jobs are not in driver code at the same time.
@@ -112,12 +97,6 @@ std::unique_ptr<Metafile> CreateMetafile(mojom::MetafileDataType data_type) {
   switch (data_type) {
     case mojom::MetafileDataType::kPDF:
       return std::make_unique<MetafileSkia>();
-#if BUILDFLAG(IS_WIN)
-    case mojom::MetafileDataType::kEMF:
-      return std::make_unique<Emf>();
-    case mojom::MetafileDataType::kPostScriptEmf:
-      return std::make_unique<PostScriptMetaFile>();
-#endif
   }
 }
 
@@ -175,15 +154,6 @@ class DocumentContainer {
 
   // Helper functions that runs on a task runner.
   PrintBackendServiceImpl::StartPrintingResult StartPrintingReadyDocument();
-#if BUILDFLAG(IS_WIN)
-  mojom::ResultCode DoRenderPrintedPage(
-      uint32_t page_index,
-      mojom::MetafileDataType page_data_type,
-      base::ReadOnlySharedMemoryRegion serialized_page,
-      gfx::Size page_size,
-      gfx::Rect page_content_rect,
-      float shrink_factor);
-#endif
   mojom::ResultCode DoRenderPrintedDocument(
       uint32_t page_count,
       mojom::MetafileDataType data_type,
@@ -220,42 +190,6 @@ DocumentContainer::StartPrintingReadyDocument() {
 
   return printing_result;
 }
-
-#if BUILDFLAG(IS_WIN)
-mojom::ResultCode DocumentContainer::DoRenderPrintedPage(
-    uint32_t page_index,
-    mojom::MetafileDataType page_data_type,
-    base::ReadOnlySharedMemoryRegion serialized_page,
-    gfx::Size page_size,
-    gfx::Rect page_content_rect,
-    float shrink_factor) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-  DVLOG(1) << "Render printed page " << page_index << " for document "
-           << document_->cookie();
-
-  std::optional<RenderData> render_data =
-      PrepareRenderData(document_->cookie(), page_data_type, serialized_page);
-  if (!render_data) {
-    DLOG(ERROR) << "Failure preparing render data for document "
-                << document_->cookie();
-    context_->Cancel();
-    return mojom::ResultCode::kFailed;
-  }
-
-  document_->SetPage(page_index, std::move(render_data->metafile),
-                     shrink_factor, page_size, page_content_rect);
-
-  mojom::ResultCode result = document_->RenderPrintedPage(
-      *document_->GetPage(page_index), context_.get());
-  if (result != mojom::ResultCode::kSuccess) {
-    DLOG(ERROR) << "Failure rendering page " << page_index << " of document "
-                << document_->cookie() << ", error: " << result;
-    context_->Cancel();
-  }
-  return result;
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 mojom::ResultCode DocumentContainer::DoRenderPrintedDocument(
     uint32_t page_count,
@@ -402,12 +336,7 @@ std::string PrintBackendServiceImpl::PrintingContextDelegate::GetAppLocale() {
 #if BUILDFLAG(ENABLE_OOP_BASIC_PRINT_DIALOG)
 void PrintBackendServiceImpl::PrintingContextDelegate::SetParentWindow(
     uint32_t parent_window_id) {
-#if BUILDFLAG(IS_WIN)
-  parent_native_view_ = reinterpret_cast<gfx::NativeView>(
-      base::win::Uint32ToHandle(parent_window_id));
-#else
   NOTREACHED();
-#endif
 }
 #endif
 
@@ -555,22 +484,6 @@ void PrintBackendServiceImpl::FetchCapabilities(
       mojom::PrinterCapsAndInfo::New(std::move(printer_info), std::move(caps));
   std::move(callback).Run(base::ok(std::move(caps_and_info)));
 }
-
-#if BUILDFLAG(IS_WIN)
-void PrintBackendServiceImpl::GetPaperPrintableArea(
-    const std::string& printer_name,
-    const PrintSettings::RequestedMedia& media,
-    mojom::PrintBackendService::GetPaperPrintableAreaCallback callback) {
-  CHECK(print_backend_);
-  crash_keys_ = std::make_unique<crash_keys::ScopedPrinterInfo>(
-      printer_name, print_backend_->GetPrinterDriverInfo(printer_name));
-
-  std::optional<gfx::Rect> printable_area_um =
-      print_backend_->GetPaperPrintableArea(printer_name, media.vendor_id,
-                                            media.size_microns);
-  std::move(callback).Run(printable_area_um.value_or(gfx::Rect()));
-}
-#endif
 
 void PrintBackendServiceImpl::EstablishPrintingContext(uint32_t context_id
 #if BUILDFLAG(ENABLE_OOP_BASIC_PRINT_DIALOG)
@@ -736,27 +649,6 @@ void PrintBackendServiceImpl::StartPrinting(
           &PrintBackendServiceImpl::OnDidStartPrintingReadyDocument,
           base::Unretained(this), std::ref(document_helper)));
 }
-
-#if BUILDFLAG(IS_WIN)
-void PrintBackendServiceImpl::RenderPrintedPage(
-    int32_t document_cookie,
-    uint32_t page_index,
-    mojom::MetafileDataType page_data_type,
-    base::ReadOnlySharedMemoryRegion serialized_page,
-    const gfx::Size& page_size,
-    const gfx::Rect& page_content_rect,
-    float shrink_factor,
-    mojom::PrintBackendService::RenderPrintedPageCallback callback) {
-  DocumentHelper* document_helper = GetDocumentHelper(document_cookie);
-  DCHECK(document_helper);
-
-  document_helper->document_container()
-      .AsyncCall(&DocumentContainer::DoRenderPrintedPage)
-      .WithArgs(page_index, page_data_type, std::move(serialized_page),
-                page_size, page_content_rect, shrink_factor)
-      .Then(std::move(callback));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 void PrintBackendServiceImpl::RenderPrintedDocument(
     int32_t document_cookie,

@@ -142,7 +142,7 @@ TEST_F(StandardManagementPolicyProviderTest,
 // extensions force-installed in low-trust environments.
 TEST_F(StandardManagementPolicyProviderTest,
        GreylistedForceInstalledExtensionsInLowTrustEnvironment) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   base::test::ScopedFeatureList feature_list(
       kDisableForceInstalledExtensionsInLowTrustEnviromentWhenGreylisted);
   bool expected = true;

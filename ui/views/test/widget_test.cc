@@ -21,8 +21,6 @@
 #if BUILDFLAG(IS_LINUX)
 
 #include "ui/views/test/test_desktop_screen_ozone.h"
-#elif BUILDFLAG(IS_WIN)
-#include "ui/views/widget/desktop_aura/desktop_screen_win.h"
 #endif
 
 namespace views::test {
@@ -169,13 +167,11 @@ void DesktopWidgetTestInteractive::SetUp() {
   SetUpForInteractiveTests();
 #if BUILDFLAG(IS_LINUX)
   screen_ = views::test::TestDesktopScreenOzone::Create();
-#elif BUILDFLAG(IS_WIN)
-  screen_ = std::make_unique<views::DesktopScreenWin>();
 #endif
   DesktopWidgetTest::SetUp();
 }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 void DesktopWidgetTestInteractive::TearDown() {
   DesktopWidgetTest::TearDown();
   screen_.reset();

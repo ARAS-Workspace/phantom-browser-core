@@ -80,12 +80,6 @@ class VIEWS_EXPORT FrameView : public View, public ViewTargeterDelegate {
   // when needed.
   virtual bool IsWindowTitleVisible() const;
 
-#if BUILDFLAG(IS_WIN)
-  // Returns the point in screen physical coordinates at which the system menu
-  // should be opened.
-  virtual gfx::Point GetSystemMenuScreenPixelLocation() const;
-#endif
-
   // This function must ask the ClientView to do a hittest.  We don't do this in
   // the parent NonClientView because that makes it more difficult to calculate
   // hittests for regions that are partially obscured by the ClientView, e.g.
@@ -131,12 +125,6 @@ class VIEWS_EXPORT FrameView : public View, public ViewTargeterDelegate {
   HitTestCallback non_client_hit_test_callback_;
 
  private:
-#if BUILDFLAG(IS_WIN)
-  // Returns the y coordinate, in local coordinates, at which the system menu
-  // should be opened.  Since this is in DIP, it does not include the 1 px
-  // offset into the caption area; the caller will take care of this.
-  virtual int GetSystemMenuY() const;
-#endif
 };
 
 BEGIN_VIEW_BUILDER(VIEWS_EXPORT, FrameView, View)

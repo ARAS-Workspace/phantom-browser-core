@@ -184,17 +184,6 @@ void ChromeBrowserMainExtraPartsPerformanceManager::CreatePoliciesAndDecorators(
       discard_eligibility_policy->GetWeakPtr();
   graph->PassToGraph(std::move(discard_eligibility_policy));
 
-#if BUILDFLAG(IS_WIN)
-  // TerminationTargetPolicy is incompatible with --single-process mode.
-  if (base::FeatureList::IsEnabled(
-          performance_manager::features::kTerminationTargetPolicy) &&
-      !base::CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kSingleProcess)) {
-    graph->PassToGraph(
-        std::make_unique<performance_manager::TerminationTargetPolicy>());
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_ANDROID)
   const bool need_page_discarding_helper =
       base::FeatureList::IsEnabled(features::kWebContentsDiscard);

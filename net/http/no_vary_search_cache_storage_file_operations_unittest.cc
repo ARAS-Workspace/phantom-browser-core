@@ -18,10 +18,6 @@
 // Needed for the #if below it.
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>  // For SetFileAttributes
-#endif                // BUILDFLAG(IS_WIN)
-
 #include "base/containers/to_vector.h"
 #include "base/files/file.h"
 #include "base/files/file_path.h"
@@ -82,19 +78,13 @@ std::vector<uint8_t> InterestingData() {
 }
 
 constexpr bool CanMakeFileUnwritable() {
-  return BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX);
+  return BUILDFLAG(IS_POSIX);
 }
 
 void MakeFileUnwritable(const base::FilePath& path) {
 #if BUILDFLAG(IS_POSIX)
   ASSERT_TRUE(
       base::SetPosixFilePermissions(path, base::FILE_PERMISSION_READ_BY_USER));
-#elif BUILDFLAG(IS_WIN)
-  // It's not safe to assume the current attributes.
-  DWORD attrs = ::GetFileAttributes(path.value().c_str());
-  ASSERT_NE(INVALID_FILE_ATTRIBUTES, attrs);
-  ASSERT_TRUE(::SetFileAttributes(path.value().c_str(),
-                                  attrs | FILE_ATTRIBUTE_READONLY));
 #else
   NOTREACHED();
 #endif  // BUILDFLAG(IS_POSIX)
@@ -419,29 +409,7 @@ class [[nodiscard]] ScopedUnmovablePath : public ScopedUnmovablePathBase {
   }
 };
 
-#elif BUILDFLAG(IS_WIN)
-
-class [[nodiscard]] ScopedUnmovablePath : public ScopedUnmovablePathBase {
- public:
-  using enum base::File::Flags;
-
-  static constexpr bool kSupported = true;
-
-  // An open file is not movable on Windows.
-  explicit ScopedUnmovablePath(const base::FilePath& path)
-      : ScopedUnmovablePathBase(path),
-        handle_(path,
-                FLAG_CREATE_ALWAYS | FLAG_WRITE | FLAG_WIN_EXCLUSIVE_WRITE) {}
-
-  // This closes the handle, enabling the file to be deleted by the base class
-  // destructor.
-  ~ScopedUnmovablePath() = default;
-
- private:
-  base::File handle_;
-};
-
-#else  // !BUILDFLAG(IS_POSIX) && !BUILDFLAG(IS_WIN)
+#else
 
 // Currently this isn't supported on Fuchsia.
 class [[nodiscard]] ScopedUnmovablePath : public ScopedUnmovablePathBase {
@@ -677,11 +645,7 @@ TEST_F(FileOperationsPostInitTest, AtomicSaveRenameRace) {
   while (base::TimeTicks::Now() <= start_time + kMaxRacingTime) {
     auto result = operations()->AtomicSave(kFilename, many_writes);
     if (atomic_flag.IsSet()) {
-#if BUILDFLAG(IS_WIN)
-      EXPECT_THAT(result, ErrorIs(base::File::FILE_ERROR_IN_USE));
-#else
       EXPECT_THAT(result, HasValue());
-#endif  // BUILDFLAG(IS_WIN)
       break;
     }
   }

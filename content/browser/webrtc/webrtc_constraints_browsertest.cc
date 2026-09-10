@@ -14,10 +14,6 @@
 #include "content/shell/browser/shell.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 namespace {
 
 static const char kGetUserMediaAndStop[] = "getUserMediaAndStop";

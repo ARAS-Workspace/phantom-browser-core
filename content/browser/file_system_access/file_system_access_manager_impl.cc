@@ -2320,14 +2320,10 @@ bool FileSystemAccessManagerImpl::IsSafePathComponent(
   }
 
   std::u16string component16;
-#if BUILDFLAG(IS_WIN)
-  component16.assign(component.value().begin(), component.value().end());
-#else
   std::string component8 = component.AsUTF8Unsafe();
   if (!base::UTF8ToUTF16(component8.c_str(), component8.size(), &component16)) {
     return false;
   }
-#endif
 
   // The names of files in sandboxed file systems are obfuscated before they end
   // up on disk (if they ever end up on disk). We don't need to worry about

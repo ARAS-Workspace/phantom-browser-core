@@ -56,22 +56,10 @@
 #include <sys/wait.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "sandbox/win/src/sandbox_types.h"
-#endif
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-
-void VerifyRendererExitCodeIsSignal(
-    const base::HistogramTester& histogram_tester,
-    int signal) {
-  histogram_tester.ExpectUniqueSample(
-      "CrashExitCodes.Renderer", std::abs(static_cast<int32_t>(signal)), 1);
-}
-
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 // Check CrashExitCodes.Renderer histogram for a single bucket entry and then
 // verify that the bucket entry contains a signal and the signal is |signal|.
@@ -186,7 +174,7 @@ IN_PROC_BROWSER_TEST_F(MetricsServiceBrowserTest, CloseRenderersNormally) {
 // either of these tests start to fail then changes likely need to be made
 // elsewhere in crash processing, metrics analysis, and dashboards. Please
 // consult Stability Team before disabling.
-#if defined(ADDRESS_SANITIZER) || BUILDFLAG(IS_WIN)
+#if defined(ADDRESS_SANITIZER)
 #define MAYBE_CrashRenderers DISABLED_CrashRenderers
 #define MAYBE_CheckCrashRenderers DISABLED_CheckCrashRenderers
 #else
@@ -206,11 +194,7 @@ IN_PROC_BROWSER_TEST_F(MetricsServiceBrowserTest, MAYBE_CrashRenderers) {
   histogram_tester.ExpectBucketCount(
       "Stability.Counts2", metrics::StabilityEventType::kRendererCrash, 1);
 
-#if BUILDFLAG(IS_WIN)
-  // Consult Stability Team before changing this test as it's recorded to
-  // histograms and used for stability measurement.
-  VerifyRendererExitCodeIsSignal(histogram_tester, STATUS_ACCESS_VIOLATION);
-#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   VerifyRendererExitCodeIsSignal(histogram_tester, SIGSEGV);
 #endif
 }
@@ -218,28 +202,6 @@ IN_PROC_BROWSER_TEST_F(MetricsServiceBrowserTest, MAYBE_CrashRenderers) {
 // Test is disabled on Windows AMR64 because
 // TerminateWithHeapCorruption() isn't expected to work there.
 // See: https://crbug.com/40119520
-#if BUILDFLAG(IS_WIN)
-// TODO(crbug.com/380550755): Unfortuntely, it's flaky on non-arm64.
-// Previously, this was turned off only if defined(ARCH_CPU_ARM64).
-IN_PROC_BROWSER_TEST_F(MetricsServiceBrowserTest,
-                       DISABLED_HeapCorruptionInRenderer) {
-  base::HistogramTester histogram_tester;
-
-  OpenTabsAndNavigateToCrashyUrl(blink::kChromeUIHeapCorruptionCrashURL);
-
-  // Verify that the expected stability metrics were recorded.
-  // The three tabs from OpenTabs() and the one tab to open chrome://crash/.
-  histogram_tester.ExpectBucketCount("Stability.Counts2",
-                                     metrics::StabilityEventType::kPageLoad, 3);
-  histogram_tester.ExpectBucketCount(
-      "Stability.Counts2", metrics::StabilityEventType::kRendererCrash, 1);
-
-  histogram_tester.ExpectUniqueSample(
-      "CrashExitCodes.Renderer",
-      std::abs(static_cast<int32_t>(STATUS_HEAP_CORRUPTION)), 1);
-  LOG(INFO) << histogram_tester.GetAllHistogramsRecorded();
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 IN_PROC_BROWSER_TEST_F(MetricsServiceBrowserTest, MAYBE_CheckCrashRenderers) {
   base::HistogramTester histogram_tester;
@@ -254,11 +216,7 @@ IN_PROC_BROWSER_TEST_F(MetricsServiceBrowserTest, MAYBE_CheckCrashRenderers) {
   histogram_tester.ExpectBucketCount(
       "Stability.Counts2", metrics::StabilityEventType::kRendererCrash, 1);
 
-#if BUILDFLAG(IS_WIN)
-  // Consult Stability Team before changing this test as it's recorded to
-  // histograms and used for stability measurement.
-  VerifyRendererExitCodeIsSignal(histogram_tester, STATUS_BREAKPOINT);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   VerifyRendererExitCodeIsSignal(histogram_tester, SIGTRAP);
 #elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #if defined(ARCH_CPU_ARM64)
@@ -286,46 +244,6 @@ IN_PROC_BROWSER_TEST_F(MetricsServiceBrowserTest, CrashRenderersInRust) {
 }
 
 // OOM code only works on Windows.
-#if BUILDFLAG(IS_WIN) && !defined(ADDRESS_SANITIZER)
-IN_PROC_BROWSER_TEST_F(MetricsServiceBrowserTest, OOMRenderers) {
-  // Disable stack traces during this test since DbgHelp is unreliable in
-  // low-memory conditions (see crbug.com/41302062).
-  base::CommandLine::ForCurrentProcess()->AppendSwitch(
-      switches::kDisableInProcessStackTraces);
-
-  base::HistogramTester histogram_tester;
-
-  OpenTabsAndNavigateToCrashyUrl(blink::kChromeUIMemoryExhaustURL);
-
-  // Verify that the expected stability metrics were recorded.
-  // The three tabs from OpenTabs() and the one tab to open
-  // chrome://memory-exhaust/.
-  histogram_tester.ExpectBucketCount("Stability.Counts2",
-                                     metrics::StabilityEventType::kPageLoad, 3);
-  histogram_tester.ExpectBucketCount(
-      "Stability.Counts2", metrics::StabilityEventType::kRendererCrash, 1);
-
-// On 64-bit, the Job object should terminate the renderer on an OOM. However,
-// if the system is low on memory already, then the allocator might just return
-// a normal OOM before hitting the Job limit.
-// Note: Exit codes are recorded after being passed through std::abs see
-// MapCrashExitCodeForHistogram.
-#if defined(ARCH_CPU_64_BITS)
-  const base::Bucket expected_possible_exit_codes[] = {
-      base::Bucket(
-          std::abs(static_cast<int32_t>(sandbox::SBOX_FATAL_MEMORY_EXCEEDED)),
-          1),
-      base::Bucket(std::abs(static_cast<int32_t>(base::win::kOomExceptionCode)),
-                   1)};
-#else
-  const base::Bucket expected_possible_exit_codes[] = {base::Bucket(
-      std::abs(static_cast<int32_t>(base::win::kOomExceptionCode)), 1)};
-#endif
-
-  EXPECT_THAT(histogram_tester.GetAllSamples("CrashExitCodes.Renderer"),
-              ::testing::IsSubsetOf(expected_possible_exit_codes));
-}
-#endif  // BUILDFLAG(IS_WIN) && !defined(ADDRESS_SANITIZER)
 
 // Base class for testing if browser-metrics files get removed or not.
 // The code under tests is run before any actual test methods so the test

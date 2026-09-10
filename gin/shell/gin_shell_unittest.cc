@@ -13,11 +13,7 @@
 base::FilePath GinShellPath() {
   base::FilePath dir;
   base::PathService::Get(base::DIR_EXE, &dir);
-#if BUILDFLAG(IS_WIN)
-  return dir.AppendASCII("gin_shell.exe");
-#else
   return dir.AppendASCII("gin_shell");
-#endif
 }
 
 base::FilePath HelloWorldPath() {

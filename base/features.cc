@@ -36,9 +36,6 @@
 #include "base/android/input_hint_checker.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/task/sequence_manager/thread_controller_power_monitor.h"
-#endif
 
 namespace base::features {
 
@@ -212,22 +209,6 @@ BASE_FEATURE(kUseTerminationStatusMemoryExhaustion, FEATURE_ENABLED_BY_DEFAULT);
 // content.
 BASE_FEATURE(kUtfConversionAsciiFastPath, FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_WIN)
-// When enabled, use ABOVE_NORMAL_PRIORITY_CLASS for Priority::kUserBlocking on
-// Windows.
-BASE_FEATURE(kUserBlockingAboveNormalPriority, FEATURE_DISABLED_BY_DEFAULT);
-
-// When enabled, retries CreateFileMapping on a commit limit failure (OOM).
-// If retrying fails, the function returns failure as usual and reports the
-// last error code.
-BASE_FEATURE(kRetryCreateFileMappingOnCommitLimit, FEATURE_DISABLED_BY_DEFAULT);
-
-
-// Prevents base::DeletePathRecursively on Windows from traversing NTFS reparse
-// points (such as directory junctions). This protects against TOCTOU
-// vulnerabilities and prevents deleting files outside the target directory.
-BASE_FEATURE(kPreventReparsePointTraversal, FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_POSIX)
 // If enabled, threads acquiring a base::Lock will try to acquire it in user
@@ -283,10 +264,6 @@ void Init() {
   android::InputHintChecker::InitializeFeatures();
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  sequence_manager::internal::ThreadControllerPowerMonitor::
-      InitializeFeatures();
-#endif
 }
 
 }  // namespace base::features

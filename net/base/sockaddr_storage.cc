@@ -11,9 +11,7 @@
 #include "base/containers/span.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <winsock2.h>
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include <sys/socket.h>
 #endif
 

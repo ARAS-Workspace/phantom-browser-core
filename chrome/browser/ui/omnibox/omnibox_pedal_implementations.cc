@@ -1892,10 +1892,6 @@ const gfx::VectorIcon& GetSharingHubVectorIcon() {
   return features::IsRoundedIconsEnabled()
              ? omnibox::kIosShareIcon
              : omnibox::kShareMacChromeRefreshOldIcon;
-#elif BUILDFLAG(IS_WIN)
-  return features::IsRoundedIconsEnabled()
-             ? omnibox::kShareWindowsIcon
-             : omnibox::kShareWinChromeRefreshOldIcon;
 #elif BUILDFLAG(IS_LINUX)
   return features::IsRoundedIconsEnabled()
              ? omnibox::kSendIcon

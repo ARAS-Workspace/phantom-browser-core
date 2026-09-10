@@ -31,13 +31,7 @@
 #include "base/android/scoped_java_ref.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_handle.h"
-#include "base/win/windows_types.h"
-#include "sandbox/win/src/sandbox_types.h"
-#else
 #include "content/public/browser/posix_file_descriptor_info.h"
-#endif
 
 #if BUILDFLAG(IS_MAC)
 #include "sandbox/mac/seatbelt_exec.h"
@@ -183,13 +177,6 @@ class ChildProcessLauncherHelper
       bool* is_synchronous_launch,
       int* launch_result);
 
-#if BUILDFLAG(IS_WIN)
-  // This is the callback target that handles the result from
-  // StartSandboxedProcess().
-  void FinishStartSandboxedProcessOnLauncherThread(base::Process process,
-                                                   DWORD last_error,
-                                                   int launch_result);
-#endif
 
   // Called right after the process has been launched, whether it was created
   // successfully or not. If the process launch is asynchronous, the process may
@@ -200,16 +187,10 @@ class ChildProcessLauncherHelper
 
   // Called once the process has been created, successfully or not.
   void PostLaunchOnLauncherThread(ChildProcessLauncherHelper::Process process,
-#if BUILDFLAG(IS_WIN)
-                                  DWORD last_error,
-#endif
                                   int launch_result);
 
   // Posted by PostLaunchOnLauncherThread onto the client thread.
   void PostLaunchOnClientThread(ChildProcessLauncherHelper::Process process,
-#if BUILDFLAG(IS_WIN)
-                                DWORD last_error,
-#endif
                                 int error_code);
 
   // See ChildProcessLauncher::GetChildTerminationInfo for more info.
@@ -341,10 +322,6 @@ class ChildProcessLauncherHelper
 #endif
 
 
-#if BUILDFLAG(IS_WIN)
-  // Only valid if the host process has logging enabled.
-  base::win::ScopedHandle log_handle_;
-#endif
 
 #if BUILDFLAG(IS_IOS)
   std::unique_ptr<base::ScopedTempDir> scoped_temp_dir_;

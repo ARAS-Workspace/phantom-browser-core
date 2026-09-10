@@ -57,15 +57,6 @@
 //  `BindState<>` -- Stores the curried parameters, and is the main entry point
 //                   into the `Bind()` system.
 
-#if BUILDFLAG(IS_WIN)
-namespace Microsoft {
-namespace WRL {
-template <typename>
-class ComPtr;
-}  // namespace WRL
-}  // namespace Microsoft
-#endif
-
 namespace base {
 
 template <typename T>
@@ -678,22 +669,6 @@ template <typename R, typename... Args, typename... BoundArgs>
 struct DecayedFunctorTraits<R (*)(Args...) noexcept, BoundArgs...>
     : DecayedFunctorTraits<R (*)(Args...), BoundArgs...> {};
 
-#if BUILDFLAG(IS_WIN) && !defined(ARCH_CPU_64_BITS)
-
-// `__stdcall` and `__fastcall` functions.
-#define BIND_INTERNAL_DECAYED_FUNCTOR_TRAITS_WITH_CONV_AND_QUALS(conv, quals) \
-  template <typename R, typename... Args, typename... BoundArgs>              \
-  struct DecayedFunctorTraits<R(conv*)(Args...) quals, BoundArgs...>          \
-      : DecayedFunctorTraits<R (*)(Args...) quals, BoundArgs...> {}
-
-BIND_INTERNAL_DECAYED_FUNCTOR_TRAITS_WITH_CONV_AND_QUALS(__stdcall, );
-BIND_INTERNAL_DECAYED_FUNCTOR_TRAITS_WITH_CONV_AND_QUALS(__stdcall, noexcept);
-BIND_INTERNAL_DECAYED_FUNCTOR_TRAITS_WITH_CONV_AND_QUALS(__fastcall, );
-BIND_INTERNAL_DECAYED_FUNCTOR_TRAITS_WITH_CONV_AND_QUALS(__fastcall, noexcept);
-
-#undef BIND_INTERNAL_DECAYED_FUNCTOR_TRAITS_WITH_CONV_AND_QUALS
-#endif  // BUILDFLAG(IS_WIN) && !defined(ARCH_CPU_64_BITS)
-
 #if __OBJC__ && HAS_FEATURE(objc_arc)
 
 // Objective-C blocks. Blocks can be bound as the compiler will ensure their
@@ -763,26 +738,6 @@ BIND_INTERNAL_DECAYED_FUNCTOR_TRAITS_WITH_CONST_AND_QUALS(, noexcept);
 BIND_INTERNAL_DECAYED_FUNCTOR_TRAITS_WITH_CONST_AND_QUALS(const, noexcept);
 
 #undef BIND_INTERNAL_DECAYED_FUNCTOR_TRAITS_WITH_CONST_AND_QUALS
-
-#if BUILDFLAG(IS_WIN) && !defined(ARCH_CPU_64_BITS)
-
-// `__stdcall` methods.
-#define BIND_INTERNAL_DECAYED_FUNCTOR_TRAITS_STDCALL_WITH_QUALS(quals)  \
-  template <typename R, typename Receiver, typename... Args,            \
-            typename... BoundArgs>                                      \
-  struct DecayedFunctorTraits<R (__stdcall Receiver::*)(Args...) quals, \
-                              BoundArgs...>                             \
-      : public DecayedFunctorTraits<R (Receiver::*)(Args...) quals,     \
-                                    BoundArgs...> {}
-
-BIND_INTERNAL_DECAYED_FUNCTOR_TRAITS_STDCALL_WITH_QUALS();
-BIND_INTERNAL_DECAYED_FUNCTOR_TRAITS_STDCALL_WITH_QUALS(const);
-BIND_INTERNAL_DECAYED_FUNCTOR_TRAITS_STDCALL_WITH_QUALS(noexcept);
-BIND_INTERNAL_DECAYED_FUNCTOR_TRAITS_STDCALL_WITH_QUALS(const noexcept);
-
-#undef BIND_INTERNAL_DECAYED_FUNCTOR_TRAITS_STDCALL_WITH_QUALS
-
-#endif  // BUILDFLAG(IS_WIN) && !defined(ARCH_CPU_64_BITS)
 
 // `IgnoreResult`s.
 template <typename T, typename... BoundArgs>
@@ -1963,13 +1918,6 @@ template <typename T>
 struct BindUnwrapTraits<internal::PassedWrapper<T>> {
   static T Unwrap(const internal::PassedWrapper<T>& o) { return o.Take(); }
 };
-
-#if BUILDFLAG(IS_WIN)
-template <typename T>
-struct BindUnwrapTraits<Microsoft::WRL::ComPtr<T>> {
-  static T* Unwrap(const Microsoft::WRL::ComPtr<T>& ptr) { return ptr.Get(); }
-};
-#endif
 
 // `CallbackCancellationTraits` allows customization of `Callback`'s
 // cancellation semantics. By default, callbacks are not cancellable. A

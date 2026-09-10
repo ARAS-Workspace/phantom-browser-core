@@ -37,7 +37,7 @@ DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kWebContentsId);
 using DeepQuery = WebContentsInteractionTestUtil::DeepQuery;
 
 const DeepQuery& GetSearchEngineChoiceActionButton() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(switches::kFirstRunDesktopRefresh) &&
       base::FeatureList::IsEnabled(
           switches::kFirstRunDesktopChoiceScreenRefresh)) {
@@ -45,14 +45,14 @@ const DeepQuery& GetSearchEngineChoiceActionButton() {
         {"search-engine-choice-app-refresh", "#actionButton"});
     return *kQuery;
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   static const base::NoDestructor<DeepQuery> kQuery(
       {"search-engine-choice-app", "#actionButton"});
   return *kQuery;
 }
 
 const DeepQuery& GetSearchEngineChoiceLearnMoreLink() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(switches::kFirstRunDesktopRefresh) &&
       base::FeatureList::IsEnabled(
           switches::kFirstRunDesktopChoiceScreenRefresh)) {
@@ -60,14 +60,14 @@ const DeepQuery& GetSearchEngineChoiceLearnMoreLink() {
         {"search-engine-choice-app-refresh", "#infoLink"});
     return *kQuery;
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   static const base::NoDestructor<DeepQuery> kQuery(
       {"search-engine-choice-app", "#infoLink"});
   return *kQuery;
 }
 
 const DeepQuery& GetSearchEngineChoiceLearnMoreDialogCloseButton() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(switches::kFirstRunDesktopRefresh) &&
       base::FeatureList::IsEnabled(
           switches::kFirstRunDesktopChoiceScreenRefresh)) {
@@ -75,14 +75,14 @@ const DeepQuery& GetSearchEngineChoiceLearnMoreDialogCloseButton() {
         {"search-engine-choice-app-refresh", "#infoDialogButton"});
     return *kQuery;
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   static const base::NoDestructor<DeepQuery> kQuery(
       {"search-engine-choice-app", "#infoDialogButton"});
   return *kQuery;
 }
 
 const DeepQuery& GetSearchEngineChoiceRadioButton() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   if (base::FeatureList::IsEnabled(switches::kFirstRunDesktopRefresh) &&
       base::FeatureList::IsEnabled(
           switches::kFirstRunDesktopChoiceScreenRefresh)) {
@@ -90,7 +90,7 @@ const DeepQuery& GetSearchEngineChoiceRadioButton() {
         {"search-engine-choice-app-refresh", "cr-radio-button"});
     return *kQuery;
   }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   static const base::NoDestructor<DeepQuery> kQuery(
       {"search-engine-choice-app", "cr-radio-button"});
   return *kQuery;

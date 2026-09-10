@@ -58,13 +58,7 @@
 #include "base/files/file_descriptor_watcher_posix.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/scoped_handle.h"
-#else
 #include <unistd.h>
-#endif
 
 namespace {
 
@@ -211,12 +205,6 @@ class NativeMessagingTest : public ::testing::Test,
 // Read a single message from a local file.
 TEST_F(NativeMessagingTest, SingleSendMessageRead) {
   base::FilePath temp_output_file = temp_dir_.GetPath().AppendASCII("output");
-#if BUILDFLAG(IS_WIN)
-  base::FilePath temp_input_file = CreateTempFileWithMessage(kTestMessage);
-  ASSERT_FALSE(temp_input_file.empty());
-  std::unique_ptr<NativeProcessLauncher> launcher =
-      FakeLauncher::Create(temp_input_file, temp_output_file);
-#else   // BUILDFLAG(IS_WIN)
   base::PlatformFile pipe_handles[2];
   ASSERT_EQ(0, pipe(pipe_handles));
   base::File read_file(pipe_handles[0]);
@@ -226,7 +214,6 @@ TEST_F(NativeMessagingTest, SingleSendMessageRead) {
   base::File write_file(pipe_handles[1]);
   std::unique_ptr<NativeProcessLauncher> launcher =
       FakeLauncher::CreateWithPipeInput(std::move(read_file), temp_output_file);
-#endif  // BUILDFLAG(IS_WIN)
   native_message_host_ = NativeMessageProcessHost::CreateWithLauncher(
       ScopedTestNativeMessagingHost::kExtensionId, "empty_app.py",
       std::move(launcher));
@@ -246,31 +233,10 @@ TEST_F(NativeMessagingTest, SingleSendMessageWrite) {
   base::FilePath temp_output_file = temp_dir_.GetPath().AppendASCII("output");
 
   base::File read_file;
-#if BUILDFLAG(IS_WIN)
-  std::wstring pipe_name = base::ASCIIToWide(base::StringPrintf(
-      "\\\\.\\pipe\\chrome.nativeMessaging.out.%llx", base::RandUint64()));
-  base::File write_handle =
-      base::File(base::ScopedPlatformFile(CreateNamedPipeW(
-                     pipe_name.c_str(),
-                     PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED |
-                         FILE_FLAG_FIRST_PIPE_INSTANCE,
-                     PIPE_TYPE_BYTE, 1, 0, 0, 5000, nullptr)),
-                 true /* async */);
-  ASSERT_TRUE(write_handle.IsValid());
-  base::File read_handle =
-      base::File(base::ScopedPlatformFile(CreateFileW(
-                     pipe_name.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING,
-                     FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, nullptr)),
-                 true /* async */);
-  ASSERT_TRUE(read_handle.IsValid());
-
-  read_file = std::move(read_handle);
-#else   // BUILDFLAG(IS_WIN)
   base::PlatformFile pipe_handles[2];
   ASSERT_EQ(0, pipe(pipe_handles));
   read_file = base::File(pipe_handles[0]);
   base::File write_file(pipe_handles[1]);
-#endif  // !BUILDFLAG(IS_WIN)
 
   std::unique_ptr<NativeProcessLauncher> launcher =
       FakeLauncher::CreateWithPipeInput(std::move(read_file), temp_output_file);
@@ -387,11 +353,7 @@ TEST_F(NativeMessagingTest, ReconnectArgs) {
   args.reserve(args_value->size());
   for (auto& arg : *args_value) {
     ASSERT_TRUE(arg.is_string());
-#if BUILDFLAG(IS_WIN)
-    args.push_back(base::UTF8ToWide(arg.GetString()));
-#else
     args.push_back(arg.GetString());
-#endif
   }
   base::CommandLine cmd_line(args);
   base::FilePath exe_path;
@@ -513,12 +475,6 @@ TEST_F(NativeMessagingTest, DisallowUserLevel) {
 TEST_F(NativeMessagingTest, LogMessageSize) {
   base::HistogramTester histogram_tester;
   base::FilePath temp_output_file = temp_dir_.GetPath().AppendASCII("output");
-#if BUILDFLAG(IS_WIN)
-  base::FilePath temp_input_file = CreateTempFileWithMessage(kTestMessage);
-  ASSERT_FALSE(temp_input_file.empty());
-  std::unique_ptr<NativeProcessLauncher> launcher =
-      FakeLauncher::Create(temp_input_file, temp_output_file);
-#else
   base::PlatformFile pipe_handles[2];
   ASSERT_EQ(0, pipe(pipe_handles));
   base::File read_file(pipe_handles[0]);
@@ -528,7 +484,6 @@ TEST_F(NativeMessagingTest, LogMessageSize) {
   base::File write_file(pipe_handles[1]);
   std::unique_ptr<NativeProcessLauncher> launcher =
       FakeLauncher::CreateWithPipeInput(std::move(read_file), temp_output_file);
-#endif
   // Set up native_message_host_ with FakeLauncher which mocks a native host
   // application echoing back kTestMessage over pipe input.
   native_message_host_ = NativeMessageProcessHost::CreateWithLauncher(

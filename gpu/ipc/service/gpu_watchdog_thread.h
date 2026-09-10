@@ -69,12 +69,6 @@ enum class GpuWatchdogTimeoutEvent {
   kMaxValue = kNoKillForGpuProgressDuringCrashDumping,
 };
 
-#if BUILDFLAG(IS_WIN)
-// If the actual time the watched GPU thread spent doing actual work is less
-// than the watchdog timeout, the GPU thread can continue running through
-// OnGPUWatchdogTimeout for at most 4 times before the gpu thread is killed.
-constexpr int kMaxCountOfMoreGpuThreadTimeAllowed = 3;
-#endif
 constexpr int kMaxExtraCyclesBeforeKill = 0;
 
 // If the scheduled timeout function is delayed by more than
@@ -183,9 +177,6 @@ class GPU_IPC_SERVICE_EXPORT GpuWatchdogThread
   void OnWatchdogTimeout();
   bool SlowWatchdogThread();
   bool WatchedThreadNeedsMoreThreadTime(bool no_gpu_hang_detected);
-#if BUILDFLAG(IS_WIN)
-  base::ThreadTicks GetWatchedThreadTime();
-#endif
 
   // Do not change the function name. It is used for [GPU HANG] crash reports.
   void DeliberatelyTerminateToRecoverFromHang();
@@ -197,13 +188,6 @@ class GPU_IPC_SERVICE_EXPORT GpuWatchdogThread
   // Histogram recorded in OnWatchdogTimeout()
   // Records "GPU.WatchdogThread.Timeout"
   void GpuWatchdogTimeoutHistogram(GpuWatchdogTimeoutEvent timeout_event);
-
-#if BUILDFLAG(IS_WIN)
-  // Histograms recorded for WatchedThreadNeedsMoreThreadTime() function.
-  void WatchedThreadNeedsMoreThreadTimeHistogram(
-      bool no_gpu_hang_detected,
-      bool start_of_more_thread_time);
-#endif
 
   // Used for metrics. It's 1 minute after the event.
   bool WithinOneMinFromPowerResumed();
@@ -254,27 +238,6 @@ class GPU_IPC_SERVICE_EXPORT GpuWatchdogThread
 
   // The wall-clock time the next OnWatchdogTimeout() will be called.
   base::Time next_on_watchdog_timeout_time_;
-
-#if BUILDFLAG(IS_WIN)
-  base::ThreadTicks last_on_watchdog_timeout_thread_ticks_;
-
-  // The difference between the timeout and the actual time the watched thread
-  // spent doing actual work.
-  base::TimeDelta remaining_watched_thread_ticks_;
-
-  // The Windows thread hanndle of the watched GPU main thread.
-  // RAW_PTR_EXCLUSION: This field holds windows handles
-  RAW_PTR_EXCLUSION void* watched_thread_handle_ = nullptr;
-
-  // After GPU hang detected, how many times has the GPU thread been allowed to
-  // continue due to not enough thread time.
-  int count_of_more_gpu_thread_time_allowed_ = 0;
-
-  // After detecting GPU hang and continuing running through
-  // OnGpuWatchdogTimeout for the max cycles, the GPU main thread still cannot
-  // get the full thread time.
-  bool less_than_full_thread_time_after_capped_ = false;
-#endif
 
 #if BUILDFLAG(IS_LINUX)
   struct Deleter {

@@ -253,13 +253,8 @@ bool CheckVulkanCompatibilities(
 // Android uses AHB and SyncFD for interop. They are imported into GL with other
 // API.
 #if !BUILDFLAG(IS_ANDROID)
-#if BUILDFLAG(IS_WIN)
-  constexpr char kMemoryObjectExtension[] = "GL_EXT_memory_object_win32";
-  constexpr char kSemaphoreExtension[] = "GL_EXT_semaphore_win32";
-#else
   constexpr char kMemoryObjectExtension[] = "GL_EXT_memory_object_fd";
   constexpr char kSemaphoreExtension[] = "GL_EXT_semaphore_fd";
-#endif
 
   // If Chrome and ANGLE share the same VkQueue, they can share vulkan
   // resource without those extensions.
@@ -438,9 +433,7 @@ bool IsVkExternalSemaphoreHandleTypeSupported(
     VulkanDeviceQueue* device_queue,
     VkExternalSemaphoreHandleTypeFlagBits handle_type) {
   if (!gfx::HasExtension(device_queue->enabled_extensions(),
-#if BUILDFLAG(IS_WIN)
-                         VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
                          VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME
 #endif
                          )) {

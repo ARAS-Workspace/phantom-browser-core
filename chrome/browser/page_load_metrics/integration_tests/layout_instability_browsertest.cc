@@ -354,13 +354,8 @@ IN_PROC_BROWSER_TEST_F(LayoutInstabilityTest,
 }
 
 // TODO(crbug.com/40940689): Disable this test on Win10
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_CumulativeLayoutShift_hadRecentInput \
-  DISABLED_CumulativeLayoutShift_hadRecentInput
-#else
 #define MAYBE_CumulativeLayoutShift_hadRecentInput \
   CumulativeLayoutShift_hadRecentInput
-#endif
 IN_PROC_BROWSER_TEST_F(LayoutInstabilityTest,
                        MAYBE_CumulativeLayoutShift_hadRecentInput) {
   auto waiter = std::make_unique<page_load_metrics::PageLoadMetricsTestWaiter>(

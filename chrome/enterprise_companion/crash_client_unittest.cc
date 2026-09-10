@@ -27,11 +27,7 @@
 namespace enterprise_companion {
 
 namespace {
-#if BUILDFLAG(IS_WIN)
-constexpr wchar_t kCrashExe[] = L"test_crashpad_embedder.exe";
-#else
 constexpr char kCrashExe[] = "test_crashpad_embedder";
-#endif
 
 constexpr char kCrashDatabaseSwitch[] = "crash-database-path";
 }  // namespace

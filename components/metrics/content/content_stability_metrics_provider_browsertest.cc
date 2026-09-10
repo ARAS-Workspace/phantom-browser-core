@@ -29,23 +29,13 @@
 #include "content/public/test/test_service.mojom.h"
 #include "sandbox/policy/mojom/sandbox.mojom.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "sandbox/win/src/sandbox_types.h"
-#endif
-
 namespace content {
 
 template <>
 sandbox::mojom::Sandbox GetServiceSandboxType<content::mojom::TestService>() {
   // On Windows, the sandbox does not like having a different binary name
   // 'non_existent_path' from the browser process, so set no sandbox here.
-#if BUILDFLAG(IS_WIN)
-  return sandbox::mojom::Sandbox::kNoSandbox;
-#else
   return sandbox::mojom::Sandbox::kService;
-#endif
 }
 
 }  // namespace content
@@ -113,22 +103,12 @@ IN_PROC_BROWSER_TEST_F(ContentStabilityProviderBrowserTest,
   histogram_tester.ExpectUniqueSample(
       "ChildProcess.LaunchFailed.UtilityProcessHash",
       variations::HashName(content::mojom::TestService::Name_), 1);
-#if BUILDFLAG(IS_WIN)
-  int expected_error_code =
-      sandbox::SBOX_ERROR_CANNOT_LAUNCH_UNSANDBOXED_PROCESS;
-#else
   int expected_error_code =
       1003;  // content::LaunchResultCode::LAUNCH_RESULT_FAILURE.
-#endif
   histogram_tester.ExpectUniqueSample(
       "ChildProcess.LaunchFailed.UtilityProcessErrorCode", expected_error_code,
       1);
 
-#if BUILDFLAG(IS_WIN)
-  // Last Error is only recorded on Windows.
-  histogram_tester.ExpectUniqueSample("ChildProcess.LaunchFailed.WinLastError",
-                                      DWORD{ERROR_FILE_NOT_FOUND}, 1);
-#endif
 }
 
 // Class to execute a closure after we observer a renderer process launch or
@@ -183,12 +163,8 @@ IN_PROC_BROWSER_TEST_F(ContentStabilityProviderBrowserTest,
   histogram_tester.ExpectUniqueSample(
       "BrowserRenderProcessHost.ChildLaunchFailures",
       1 /* CoarseRendererType::kRenderer */, 1);
-#if BUILDFLAG(IS_WIN)
-  int expected_error_code = sandbox::SBOX_ERROR_CREATE_PROCESS;
-#else
   int expected_error_code =
       1003;  // content::LaunchResultCode::LAUNCH_RESULT_FAILURE.
-#endif
   histogram_tester.ExpectUniqueSample(
       "BrowserRenderProcessHost.ChildLaunchFailureCodes", expected_error_code,
       1);

@@ -69,7 +69,7 @@ HEADLESS_COMPOSITOR_TEST(CompositorImageAnimation,
                          "virtual-time/compositor-image-animation-test.js")
 
 // Flaky on all platforms. TODO(crbug.com/41471823): Re-enable.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_CompositorCssAnimation DISABLED_CompositorCssAnimation
 #else
 #define MAYBE_CompositorCssAnimation CompositorCssAnimation
@@ -151,7 +151,7 @@ HEADLESS_COMPOSITOR_TEST(RendererCssUrlFilter,
                          "virtual-time/renderer-css-url-filter.js")
 HEADLESS_COMPOSITOR_TEST(RendererCanvas, "virtual-time/renderer-canvas.js")
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 // Flaky on at least Linux and Windows: crbug.com/1294751.
 #define MAYBE_RendererOpacityAnimation DISABLED_RendererOpacityAnimation
 #else

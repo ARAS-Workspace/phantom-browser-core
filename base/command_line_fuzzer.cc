@@ -23,11 +23,7 @@ namespace {
 
 CommandLine::StringType GenerateNativeString(FuzzedDataProvider& provider) {
   const std::string raw_string = provider.ConsumeRandomLengthString();
-#if BUILDFLAG(IS_WIN)
-  return UTF8ToWide(raw_string);
-#else
   return raw_string;
-#endif
 }
 
 CommandLine::StringVector GenerateNativeStringVector(
@@ -74,9 +70,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
       command_line = CommandLine(GenerateNativeStringVector(provider));
       break;
     case 3:
-#if BUILDFLAG(IS_WIN)
-      command_line.ParseFromString(GenerateNativeString(provider));
-#endif
       break;
   }
 
@@ -134,10 +127,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     // Smoke-test various accessors.
     std::ignore = command_line.GetCommandLineString();
     std::ignore = command_line.GetArgumentsString();
-#if BUILDFLAG(IS_WIN)
-    std::ignore = command_line.GetCommandLineStringForShell();
-    std::ignore = command_line.GetCommandLineStringWithUnsafeInsertSequences();
-#endif
   }
 
   return 0;

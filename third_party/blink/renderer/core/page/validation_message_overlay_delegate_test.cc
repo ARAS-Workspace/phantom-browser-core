@@ -15,27 +15,10 @@
 #include "third_party/blink/renderer/platform/testing/paint_test_configurations.h"
 #include "third_party/blink/renderer/platform/web_test_support.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#include "third_party/blink/public/web/win/web_font_rendering.h"
-#endif
-
 namespace blink {
 
 class ValidationMessageOverlayDelegateTest : public PaintTestConfigurations,
                                              public RenderingTest {
-#if BUILDFLAG(IS_WIN)
- public:
-  void SetUp() override {
-    RenderingTest::SetUp();
-
-    // These tests appear to trigger a requirement for system fonts. On windows,
-    // an extra step is required to ensure that the system font is configured.
-    // See https://crbug.com/969622
-    blink::WebFontRendering::SetMenuFontMetrics(
-        blink::WebString::FromAscii("Arial"), 12);
-  }
-#endif
 
  private:
   // When WebTestSupport::IsRunningWebTest is set, the animations in

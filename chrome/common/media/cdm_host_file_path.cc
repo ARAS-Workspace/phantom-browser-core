@@ -42,38 +42,7 @@ void AddCdmHostFilePaths(
   DCHECK(cdm_host_file_paths);
   DCHECK(cdm_host_file_paths->empty());
 
-#if BUILDFLAG(IS_WIN)
-
-  // Find where kBrowserProcessExecutableName is installed. Signature file is
-  // in the assets directory. FILE_EXE may not be kBrowserProcessExecutableName,
-  // e.g. browser_tests.exe, which is fine since we don't verify those
-  // signatures in tests.
-  base::FilePath dir_exe;
-  CHECK(base::PathService::Get(base::DIR_EXE, &dir_exe));
-  base::FilePath chrome_exe =
-      dir_exe.Append(chrome::kBrowserProcessExecutableName);
-
-  // Signature files and kBrowserResourcesDll are typically in a
-  // separate versioned directory, but may be the same directory as
-  // kBrowserProcessExecutableName (e.g. for a local build of Chrome).
-  // DIR_ASSETS sorts this out for us.
-  base::FilePath chrome_assets_dir;
-  CHECK(base::PathService::Get(base::DIR_ASSETS, &chrome_assets_dir));
-  const auto chrome_exe_sig = GetSigFilePath(
-      chrome_assets_dir.Append(chrome::kBrowserProcessExecutableName));
-  DVLOG(2) << __func__ << ":" << chrome_exe.value() << ", signature file "
-           << chrome_exe_sig.value();
-  cdm_host_file_paths->emplace_back(chrome_exe, chrome_exe_sig);
-
-  // kBrowserResourcesDll and it's signature file are in the assets directory.
-  const auto chrome_dll =
-      chrome_assets_dir.Append(chrome::kBrowserResourcesDll);
-  const auto chrome_dll_sig = GetSigFilePath(chrome_dll);
-  DVLOG(2) << __func__ << ":" << chrome_dll.value() << ", signature file "
-           << chrome_dll_sig.value();
-  cdm_host_file_paths->emplace_back(chrome_dll, chrome_dll_sig);
-
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 
   base::FilePath framework_dir = base::apple::FrameworkBundlePath();
   base::FilePath chrome_framework_path =
@@ -102,7 +71,7 @@ void AddCdmHostFilePaths(
   DVLOG(2) << __func__ << ": chrome_path=" << chrome_path.value();
   cdm_host_file_paths->emplace_back(chrome_path, GetSigFilePath(chrome_path));
 
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 }
 
 #else  // BUILDFLAG(GOOGLE_CHROME_BRANDING)

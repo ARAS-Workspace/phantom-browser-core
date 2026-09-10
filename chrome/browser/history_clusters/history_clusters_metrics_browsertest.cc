@@ -139,8 +139,7 @@ IN_PROC_BROWSER_TEST_F(HistoryClustersMetricsBrowserTest,
 }
 
 // Flaky on Win, Linux and Mac. http://crbug.com/40812648
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_DirectNavigationNoInteraction \
   DISABLED_DirectNavigationNoInteraction
 #else
@@ -168,8 +167,7 @@ IN_PROC_BROWSER_TEST_F(HistoryClustersMetricsBrowserTest,
 }
 
 // TODO(crbug.com/40812616): Flaky on Linux, Windows and Mac.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_DirectNavigationWithQuery DISABLED_DirectNavigationWithQuery
 #else
 #define MAYBE_DirectNavigationWithQuery DirectNavigationWithQuery
@@ -213,8 +211,7 @@ IN_PROC_BROWSER_TEST_F(HistoryClustersMetricsBrowserTest,
 
 // Disabled on Windows, ChromeOS, and Linux due to flakes: crbug.com/40800225.
 // Disabled on Mac due to flakes: crbug.com/40817130.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_DirectNavigationWithToggleToBasic \
   DISABLED_DirectNavigationWithToggleToBasic
 #else
@@ -272,8 +269,7 @@ IN_PROC_BROWSER_TEST_F(
 }
 
 // Assumed to be flaky since the above tests are flaky.
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || \
-    BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #define MAYBE_IndirectNavigation DISABLED_IndirectNavigation
 #else
 #define MAYBE_IndirectNavigation IndirectNavigation

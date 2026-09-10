@@ -381,7 +381,7 @@ void AddWidevine(const media::KeySystemCapability& capability,
   // Others.
   auto persistent_state_support = EmeFeatureSupport::REQUESTABLE;
   auto distinctive_identifier_support = EmeFeatureSupport::NOT_SUPPORTED;
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
   distinctive_identifier_support = EmeFeatureSupport::REQUESTABLE;
 #elif BUILDFLAG(IS_ANDROID)
   // Since we do not control the implementation of the MediaDrm API on Android,
@@ -412,93 +412,6 @@ void AddExternalClearKey(const media::KeySystemCapability& /*capability*/,
   // capabilities.
   key_systems->push_back(std::make_unique<ExternalClearKeyKeySystemInfo>());
 }
-
-#if BUILDFLAG(IS_WIN)
-#if BUILDFLAG(ENABLE_PLAYREADY)
-void AddPlayReady(const media::KeySystemCapability& capability,
-                  bool can_persist_data,
-                  KeySystemInfos* key_systems) {
-  DVLOG(1) << __func__;
-
-  // When using MediaFoundation, it is assumed that it will try to persist some
-  // data. If incognito mode is enabled and MediaFoundation were to persist data
-  // this would violate the incognito assumption.
-  if (!can_persist_data) {
-    DVLOG(2) << __func__ << ": Persistent data not supported.";
-    return;
-  }
-
-  if (!media::SupportMediaFoundationEncryptedPlayback()) {
-    DLOG(ERROR) << __func__
-                << ": Media Foundation encrypted playback not supported.";
-    return;
-  }
-
-  if (capability.sw_cdm_capability_or_status.has_value()) {
-    DVLOG(2) << "Software secure PlayReady supported but not expected";
-  }
-
-  // Codecs and encryption schemes.
-  SupportedCodecs hw_secure_codecs = media::EME_CODEC_NONE;
-  base::flat_set<::media::EncryptionScheme> hw_secure_encryption_schemes;
-  if (!capability.hw_cdm_capability_or_status.has_value()) {
-    DVLOG(2) << __func__ << ": Hardware secure PlayReady NOT supported";
-    return;
-  }
-
-  const auto& hw_secure_capability =
-      capability.hw_cdm_capability_or_status.value();
-  // For the default PlayReady key system, we support a codec only when it
-  // supports clear lead.
-  hw_secure_codecs = GetSupportedCodecs(hw_secure_capability);
-  hw_secure_encryption_schemes =
-      capability.hw_cdm_capability_or_status->encryption_schemes;
-  if (!capability.hw_cdm_capability_or_status->session_types.contains(
-          CdmSessionType::kTemporary)) {
-    DVLOG(1) << "Temporary sessions must be supported for hardware secure "
-                "PlayReady";
-    return;
-  }
-  DVLOG(2) << __func__ << ": Hardware secure PlayReady supported";
-
-  key_systems->emplace_back(new PlayReadyKeySystemInfo(
-      hw_secure_codecs, hw_secure_encryption_schemes));
-}
-#endif  // BUILDFLAG(ENABLE_PLAYREADY)
-
-void AddMediaFoundationClearKey(
-    const media::KeySystemCapability& /*capability*/,
-    KeySystemInfos* key_systems) {
-  DVLOG(1) << __func__;
-
-  if (!base::FeatureList::IsEnabled(media::kExternalClearKeyForTesting)) {
-    DLOG(ERROR) << "ExternalClearKey supported despite not enabled.";
-    return;
-  }
-
-#if BUILDFLAG(USE_PROPRIETARY_CODECS)
-  // TODO(crbug.com/40890911): Remove this hard-codeded supported codecs so that
-  // real hardware capabilities can be checked.
-  key_systems->push_back(std::make_unique<ExternalClearKeyKeySystemInfo>(
-      media::kMediaFoundationClearKeyKeySystem, std::vector<std::string>(),
-      // MediaFoundation Clear Key Key System uses Windows Media Foundation's
-      // decoders. H264 ("avc1.64001E") for video and MP4 AAC ("mp4a.40.2") for
-      // audio are always supported. VideoCodec::kH264 is an EME_CODEC_AVC1.
-      // AudioCodec::kAAC is an EME_CODEC_AAC. DolbyVision Profile 5
-      // ("dvh1.05.06") and 8.1/8.4 ("dvhe.08.07") are also always supported.
-      media::EME_CODEC_AVC1 | media::EME_CODEC_AAC |
-          media::EME_CODEC_DOLBY_VISION_HEVC,
-      // On Windows, MediaFoundation Clear Key CDM requires identifier,
-      // persistent state and HW secure codecs. We pretent to require these for
-      // testing purposes.
-      media::EmeConfig{
-          .identifier = media::EmeConfigRuleState::kRequired,
-          .persistence = media::EmeConfigRuleState::kRequired,
-          .hw_secure_codecs = media::EmeConfigRuleState::kRequired},
-      EmeFeatureSupport::ALWAYS_ENABLED, EmeFeatureSupport::ALWAYS_ENABLED));
-#endif  // BUILDFLAG(USE_PROPRIETARY_CODECS)
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
 void AddAndroidPlatformKeySystem(const std::string& key_system,
@@ -560,20 +473,6 @@ void OnKeySystemSupportUpdated(
       AddExternalClearKey(capability, &key_systems);
       continue;
     }
-
-#if BUILDFLAG(IS_WIN)
-#if BUILDFLAG(ENABLE_PLAYREADY)
-    if (key_system == kPlayReadyKeySystemRecommendationDefault) {
-      AddPlayReady(capability, can_persist_data, &key_systems);
-      continue;
-    }
-#endif  // BUILDFLAG(ENABLE_PLAYREADY)
-
-    if (key_system == media::kMediaFoundationClearKeyKeySystem) {
-      AddMediaFoundationClearKey(capability, &key_systems);
-      continue;
-    }
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_ANDROID)
     AddAndroidPlatformKeySystem(key_system, capability, can_persist_data,

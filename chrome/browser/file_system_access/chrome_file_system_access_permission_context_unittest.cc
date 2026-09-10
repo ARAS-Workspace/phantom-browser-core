@@ -197,52 +197,13 @@ bool CreateNonEmptyFile(const base::FilePath& path) {
 }
 #endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
 
-#if BUILDFLAG(IS_WIN)
-CreateSymbolicLinkResult CreateWinSymbolicLink(const base::FilePath& target,
-                                               const base::FilePath& symlink,
-                                               bool is_directory) {
-  // Creating symbolic links on Windows requires Administrator privileges.
-  // However, recent versions of Windows introduced the
-  // SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE flag, which allows the
-  // creation of symbolic links by processes with lower privileges, provided
-  // that Developer Mode is enabled.
-  //
-  // On older versions of Windows where the
-  // SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE flag does not exist, the OS
-  // will return the error code ERROR_INVALID_PARAMETER when attempting to
-  // create a symbolic link without sufficient privileges.
-  if (base::win::GetVersion() < base::win::Version::WIN10_RS3) {
-    return CreateSymbolicLinkResult::kUnsupported;
-  }
-
-  DWORD flags = is_directory ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0;
-
-  if (!::CreateSymbolicLink(
-          symlink.value().c_str(), target.value().c_str(),
-          flags | SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE)) {
-    // SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE works only if Developer Mode
-    // is enabled.
-    if (::GetLastError() == ERROR_PRIVILEGE_NOT_HELD) {
-      return CreateSymbolicLinkResult::kUnsupported;
-    }
-    return CreateSymbolicLinkResult::kFailed;
-  }
-
-  return CreateSymbolicLinkResult::kSucceeded;
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 CreateSymbolicLinkResult CreateSymbolicLinkForTesting(
     const base::FilePath& target,
     const base::FilePath& symlink) {
-#if BUILDFLAG(IS_WIN)
-  return CreateWinSymbolicLink(target, symlink, /*is_directory=*/true);
-#else
   if (!base::CreateSymbolicLink(target, symlink)) {
     return CreateSymbolicLinkResult::kFailed;
   }
   return CreateSymbolicLinkResult::kSucceeded;
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 }  // namespace
@@ -752,23 +713,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  // `DIR_IE_INTERNET_CACHE` is an example of a directory where nested
-  // directories are blocked, but nested files should be allowed.
-  base::FilePath internet_cache = user_data_dir.AppendASCII("INetCache");
-  base::ScopedPathOverride internet_cache_override(base::DIR_IE_INTERNET_CACHE,
-                                                   internet_cache, true, true);
-  ResetBlockPath();
-
-  // The nested INetCache directory itself should not be allowed.
-  EXPECT_FALSE(IsOpenAllowed(internet_cache, HandleType::kDirectory));
-  // Files inside of the nested INetCache directory should be allowed.
-  EXPECT_TRUE(
-      IsOpenAllowed(internet_cache.AppendASCII("foo"), HandleType::kFile));
-  // The directories should be blocked.
-  EXPECT_FALSE(
-      IsOpenAllowed(internet_cache.AppendASCII("foo"), HandleType::kDirectory));
-#endif
 }
 
 #if BUILDFLAG(IS_CHROMEOS)
@@ -842,12 +786,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
   EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
                 permission_context(), PathInfo(FILE_PATH_LITERAL("/dev")),
                 HandleType::kDirectory, UserAction::kNone),
-            SensitiveDirectoryResult::kAbort);
-#elif BUILDFLAG(IS_WIN)
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("c:\\Program Files")),
-                HandleType::kDirectory, UserAction::kOpen),
             SensitiveDirectoryResult::kAbort);
 #endif
 }
@@ -958,175 +896,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
             SensitiveDirectoryResult::kAbort);
 }
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(ChromeFileSystemAccessPermissionContextTest,
-       ConfirmSensitiveEntryAccess_UNCPath) {
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\server\\share\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAllowed);
-
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\server-a\\share\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAllowed);
-
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\server_a\\share\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAllowed);
-
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\server\\share$\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAllowed);
-
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\server~a\\share\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAbort);
-
-  EXPECT_EQ(
-      ConfirmSensitiveEntryAccessSync(
-          permission_context(), PathInfo(FILE_PATH_LITERAL("c:\\\\foo\\bar")),
-          HandleType::kDirectory, UserAction::kOpen),
-      SensitiveDirectoryResult::kAllowed);
-
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\localhost\\c$\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAbort);
-
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\LOCALHOST\\c$\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAbort);
-
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\127.0.0.1\\c$\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAbort);
-
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\.\\c:\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAbort);
-
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\?\\c:\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAbort);
-
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL(
-                    "\\\\;LanmanRedirector\\localhost\\c$\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAbort);
-
-  EXPECT_EQ(
-      ConfirmSensitiveEntryAccessSync(
-          permission_context(),
-          PathInfo(FILE_PATH_LITERAL("\\\\.\\UNC\\LOCALHOST\\c:\\foo\\bar")),
-          HandleType::kDirectory, UserAction::kOpen),
-      SensitiveDirectoryResult::kAbort);
-
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\myhostname\\c$\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAbort);
-
-  // Drive admin shares should be blocked on any server
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\server\\C$\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAbort);
-
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\server\\d$\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAbort);
-
-  // Named admin shares should be blocked on any server
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\server\\ADMIN$\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAbort);
-
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\server\\PRINT$\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAbort);
-
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\server\\IPC$\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAbort);
-
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\server\\FAX$\\foo\\bar")),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAbort);
-}
-
-// Testing that the */.git/hooks are all blocked.
-TEST_F(ChromeFileSystemAccessPermissionContextTest,
-       ConfirmSensitiveEntryAccess_SuffixWriteBlock) {
-  // Parent folder is not blocked.
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(), PathInfo(FILE_PATH_LITERAL("\\\\.git")),
-                HandleType::kDirectory, UserAction::kSave),
-            SensitiveDirectoryResult::kAllowed);
-  // .git/hooks is blocked for save.
-  EXPECT_EQ(
-      ConfirmSensitiveEntryAccessSync(
-          permission_context(), PathInfo(FILE_PATH_LITERAL("\\\\.git\\hooks")),
-          HandleType::kDirectory, UserAction::kSave),
-      SensitiveDirectoryResult::kAbort);
-  // .git/hooks is not blocked for read.
-  EXPECT_EQ(
-      ConfirmSensitiveEntryAccessSync(
-          permission_context(), PathInfo(FILE_PATH_LITERAL("\\\\.git\\hooks")),
-          HandleType::kDirectory, UserAction::kOpen),
-      SensitiveDirectoryResult::kAllowed);
-  // .git/hooks inside another folder is blocked for save.
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\a\\.git\\hooks")),
-                HandleType::kDirectory, UserAction::kSave),
-            SensitiveDirectoryResult::kAbort);
-  // The subfolder under .git/hooks folder is blocked for save.
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(),
-                PathInfo(FILE_PATH_LITERAL("\\\\a\\.git\\hooks\\b")),
-                HandleType::kDirectory, UserAction::kSave),
-            SensitiveDirectoryResult::kAbort);
-  // Other suffix is allowed.
-  EXPECT_EQ(
-      ConfirmSensitiveEntryAccessSync(
-          permission_context(), PathInfo(FILE_PATH_LITERAL("\\\\.git\\hook")),
-          HandleType::kDirectory, UserAction::kSave),
-      SensitiveDirectoryResult::kAllowed);
-}
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 TEST_F(ChromeFileSystemAccessPermissionContextTest,
@@ -1322,17 +1091,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
       {chrome::DIR_USER_DATA, nullptr, true, false},
       {base::DIR_HOME, FILE_PATH_LITERAL(".ssh"), true, false},
       {base::DIR_HOME, FILE_PATH_LITERAL(".gnupg"), true, false},
-
-#if BUILDFLAG(IS_WIN)
-      {base::DIR_PROGRAM_FILES, nullptr, true, false},
-      {base::DIR_PROGRAM_FILESX86, nullptr, true, false},
-      {base::DIR_PROGRAM_FILES6432, nullptr, true, false},
-      {base::DIR_WINDOWS, nullptr, true, false},
-      {base::DIR_ROAMING_APP_DATA, nullptr, true, false},
-      {base::DIR_LOCAL_APP_DATA, nullptr, true, false},
-      {base::DIR_COMMON_APP_DATA, nullptr, true, false},
-      {base::DIR_IE_INTERNET_CACHE, nullptr, false, true},
-#endif
 
 #if BUILDFLAG(IS_MAC)
       {base::DIR_APP_DATA, nullptr, true, false},
@@ -4546,27 +4304,6 @@ TEST_F(ChromeFileSystemAccessPermissionContextTest,
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
 #endif  // BUILDFLAG(ENTERPRISE_CLOUD_CONTENT_ANALYSIS)
-
-#if BUILDFLAG(IS_WIN)
-// Regression test for crbug.com/428455312.
-// `GetUserDocumentsDirectory()` may return invalid paths on Windows by calling
-// `SHGetFolderPath()` Windows OS API, which may return a path value that
-// customers and enterprises can override to be an invalid path like
-// "C:PC\\Documents".
-TEST_F(ChromeFileSystemAccessPermissionContextTest,
-       ConfirmSensitiveEntryAccess_DontBlockOnInvalidPath) {
-  base::FilePath home_dir(FILE_PATH_LITERAL("C:PC\\Documents"));
-  ScopedHomeDirOverride home_override =
-      OverrideHomeDir(home_dir, /*should_skip_check=*/true);
-
-  // The path should not have any effect, and path like the `temp_dir_` should
-  // not be blocked. There should be no crash either.
-  EXPECT_EQ(ConfirmSensitiveEntryAccessSync(
-                permission_context(), PathInfo(temp_dir_.GetPath()),
-                HandleType::kDirectory, UserAction::kOpen),
-            SensitiveDirectoryResult::kAllowed);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if !BUILDFLAG(IS_CHROMEOS)
 // ChromeOS doesn't use the same method for setting the home path override.

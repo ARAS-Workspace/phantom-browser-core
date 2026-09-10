@@ -610,8 +610,7 @@ bool Rule::AddUnsupportedAttributeErrors(
                   kKeySources,
               },
           },
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
           {
               Restriction::kFileDownload,
               {
@@ -623,8 +622,7 @@ bool Rule::AddUnsupportedAttributeErrors(
                   kKeySources,
               },
           },
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
       });
 
   static const base::NoDestructor<
@@ -730,8 +728,7 @@ bool Rule::AddUnsupportedRestrictionErrors(
               },
           },
 #endif  // BUILDFLAG(ENTERPRISE_SCREENSHOT_PROTECTION)
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
           {
               Restriction::kFileDownload,
               {
@@ -741,8 +738,7 @@ bool Rule::AddUnsupportedRestrictionErrors(
                   Level::kBlock,
               },
           },
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
       });
 
   bool valid = true;

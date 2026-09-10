@@ -66,11 +66,6 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #endif
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/win/access_token.h"
-#endif
 #if BUILDFLAG(IS_APPLE)
 #include <mach/vm_param.h>
 #include <malloc/malloc.h>
@@ -99,11 +94,7 @@ const char kTestHelper[] = "test_child_process";
 const char kSignalFileTerm[] = "TerminatedChildProcess.die";
 #endif
 
-
-#if BUILDFLAG(IS_WIN)
-const int kExpectedStillRunningExitCode = 0x102;
-const int kExpectedKilledExitCode = 1;
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 const int kExpectedStillRunningExitCode = 0;
 #endif
 
@@ -332,18 +323,6 @@ TEST_F(ProcessUtilTest, CurrentDirectory) {
 #endif  // !defined(MEMORY_SANITIZER)
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-// TODO(cpu): figure out how to test this in other platforms.
-TEST_F(ProcessUtilTest, GetProcId) {
-  ProcessId id1 = GetProcId(GetCurrentProcess());
-  EXPECT_NE(0ul, id1);
-  Process process = SpawnChild("SimpleChildProcess");
-  ASSERT_TRUE(process.IsValid());
-  ProcessId id2 = process.Pid();
-  EXPECT_NE(0ul, id2);
-  EXPECT_NE(id1, id2);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID)
 // This test is disabled on Mac, since it's flaky due to ReportCrash
@@ -396,9 +375,7 @@ TEST_F(ProcessUtilTest, MAYBE_GetTerminationStatusCrash) {
       WaitForChildTermination(process.Handle(), &exit_code);
   EXPECT_EQ(TERMINATION_STATUS_PROCESS_CRASHED, status);
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(static_cast<int>(0xc0000005), exit_code);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   int signaled = WIFSIGNALED(exit_code);
   EXPECT_NE(0, signaled);
   int signal = WTERMSIG(exit_code);
@@ -413,11 +390,7 @@ TEST_F(ProcessUtilTest, MAYBE_GetTerminationStatusCrash) {
 
 MULTIPROCESS_TEST_MAIN(KilledChildProcess) {
   WaitToDie(ProcessUtilTest::GetSignalFilePath(kSignalFileKill).c_str());
-#if BUILDFLAG(IS_WIN)
-  // Kill ourselves.
-  HANDLE handle = ::OpenProcess(PROCESS_ALL_ACCESS, 0, ::GetCurrentProcessId());
-  ::TerminateProcess(handle, kExpectedKilledExitCode);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   // Send a SIGKILL to this process, just like the OOM killer would.
   ::kill(getpid(), SIGKILL);
 #endif
@@ -454,9 +427,7 @@ TEST_F(ProcessUtilTest, GetTerminationStatusSigKill) {
   EXPECT_EQ(TERMINATION_STATUS_PROCESS_WAS_KILLED, status);
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(kExpectedKilledExitCode, exit_code);
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
   int signaled = WIFSIGNALED(exit_code);
   EXPECT_NE(0, signaled);
   int signal = WTERMSIG(exit_code);
@@ -547,81 +518,6 @@ MULTIPROCESS_TEST_MAIN(process_util_test_die_immediately) {
   return kSuccess;
 }
 
-#if BUILDFLAG(IS_WIN)
-// TODO(estade): if possible, port this test.
-TEST_F(ProcessUtilTest, LaunchAsUser) {
-  UserTokenHandle token;
-  ASSERT_TRUE(OpenProcessToken(GetCurrentProcess(), TOKEN_ALL_ACCESS, &token));
-  LaunchOptions options;
-  options.as_user = token;
-  EXPECT_TRUE(
-      LaunchProcess(MakeCmdLine("SimpleChildProcess"), options).IsValid());
-}
-
-MULTIPROCESS_TEST_MAIN(ChildVerifiesCetDisabled) {
-  // Policy not defined for Win < Win10 20H1 but that's ok.
-  PROCESS_MITIGATION_USER_SHADOW_STACK_POLICY policy = {};
-  if (GetProcessMitigationPolicy(GetCurrentProcess(),
-                                 ProcessUserShadowStackPolicy, &policy,
-                                 sizeof(policy))) {
-    if (policy.EnableUserShadowStack) {
-      return 1;
-    }
-  }
-  return kSuccess;
-}
-
-TEST_F(ProcessUtilTest, LaunchDisablingCetCompat) {
-  LaunchOptions options;
-  // This only has an effect on Windows > 20H2 with CET hardware but
-  // is safe on every platform.
-  options.disable_cetcompat = true;
-  EXPECT_TRUE(LaunchProcess(MakeCmdLine("ChildVerifiesCetDisabled"), options)
-                  .IsValid());
-}
-
-static const char kEventToTriggerHandleSwitch[] = "event-to-trigger-handle";
-
-MULTIPROCESS_TEST_MAIN(TriggerEventChildProcess) {
-  std::string handle_value_string =
-      CommandLine::ForCurrentProcess()->GetSwitchValueASCII(
-          kEventToTriggerHandleSwitch);
-  CHECK(!handle_value_string.empty());
-
-  uint64_t handle_value_uint64;
-  CHECK(StringToUint64(handle_value_string, &handle_value_uint64));
-  // Give ownership of the handle to |event|.
-  WaitableEvent event(
-      win::ScopedHandle(reinterpret_cast<HANDLE>(handle_value_uint64)));
-
-  event.Signal();
-
-  return 0;
-}
-
-TEST_F(ProcessUtilTest, InheritSpecifiedHandles) {
-  // Manually create the event, so that it can be inheritable.
-  SECURITY_ATTRIBUTES security_attributes = {};
-  security_attributes.nLength = static_cast<DWORD>(sizeof(security_attributes));
-  security_attributes.lpSecurityDescriptor = NULL;
-  security_attributes.bInheritHandle = true;
-
-  // Takes ownership of the event handle.
-  WaitableEvent event(
-      win::ScopedHandle(CreateEvent(&security_attributes, true, false, NULL)));
-  LaunchOptions options;
-  options.handles_to_inherit.emplace_back(event.handle());
-
-  CommandLine cmd_line = MakeCmdLine("TriggerEventChildProcess");
-  cmd_line.AppendSwitchASCII(
-      kEventToTriggerHandleSwitch,
-      NumberToString(reinterpret_cast<uint64_t>(event.handle())));
-
-  // Launch the process and wait for it to trigger the event.
-  ASSERT_TRUE(LaunchProcess(cmd_line, options).IsValid());
-  EXPECT_TRUE(event.TimedWait(TestTimeouts::action_max_timeout()));
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_F(ProcessUtilTest, GetAppOutput) {
   CommandLine command(test_helper_path_);
@@ -963,22 +859,11 @@ std::string TestLaunchProcess(const CommandLine& cmdline,
   options.environment = env_changes;
   options.clear_environment = clear_environment;
 
-#if BUILDFLAG(IS_WIN)
-  HANDLE read_handle, write_handle;
-  PCHECK(CreatePipe(&read_handle, &write_handle, nullptr, 0));
-  File read_pipe(read_handle);
-  File write_pipe(write_handle);
-  options.stdin_handle = INVALID_HANDLE_VALUE;
-  options.stdout_handle = write_handle;
-  options.stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
-  options.handles_to_inherit.push_back(write_handle);
-#else
   int fds[2];
   PCHECK(pipe(fds) == 0);
   File read_pipe(fds[0]);
   File write_pipe(fds[1]);
   options.fds_to_remap.emplace_back(fds[1], STDOUT_FILENO);
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   options.clone_flags = clone_flags;
@@ -991,13 +876,6 @@ std::string TestLaunchProcess(const CommandLine& cmdline,
 
   uint8_t buf[512];
   std::optional<size_t> n_opt = read_pipe.ReadAtCurrentPos(buf);
-#if BUILDFLAG(IS_WIN)
-  // Closed pipes fail with ERROR_BROKEN_PIPE on Windows, rather than
-  // successfully reporting EOF.
-  if (!n_opt.has_value() && GetLastError() == ERROR_BROKEN_PIPE) {
-    n_opt = 0;
-  }
-#endif  // BUILDFLAG(IS_WIN)
   PCHECK(n_opt.has_value());
   return std::string(as_string_view(span(buf).first(n_opt.value())));
 }
@@ -1063,81 +941,6 @@ TEST_F(ProcessUtilTest, LaunchProcess) {
                                   true /* clear_environ */, no_clone_flags));
 }
 
-#if BUILDFLAG(IS_WIN)
-MULTIPROCESS_TEST_MAIN(CheckTokenPrivileges) {
-  // The child process should be running with the mutated token.
-  // The test removes SE_CHANGE_NOTIFY_NAME from the token as an indicator to
-  // distinguish it from the original token. Check if the indicator privilege is
-  // missing to verify that the right token was used.
-  std::optional<base::win::AccessToken> token =
-      base::win::AccessToken::FromCurrentProcess();
-  CHECK(token);
-  bool has_privilege = false;
-  for (const auto& priv : token->Privileges()) {
-    if (priv.GetName() == SE_CHANGE_NOTIFY_NAME) {
-      has_privilege = true;
-      break;
-    }
-  }
-
-  std::unique_ptr<base::Environment> env = base::Environment::Create();
-  std::optional<std::string> env_val =
-      env->GetVar("LAUNCH_PROCESS_TOKEN_ENV_TEST");
-  if (!env_val || *env_val != "1") {
-    return 2;
-  }
-
-  // Return 0 if the privilege is successfully removed (which means the mutated
-  // token was used). Return 1 if it is still present.
-  return has_privilege ? 1 : 0;
-}
-
-TEST_F(ProcessUtilTest, LaunchProcessUsingToken) {
-  std::optional<base::win::AccessToken> process_token =
-      base::win::AccessToken::FromCurrentProcess(
-          /*impersonation=*/false, TOKEN_DUPLICATE);
-  ASSERT_TRUE(process_token);
-  std::optional<base::win::AccessToken> mutated_token =
-      process_token->DuplicatePrimary(TOKEN_ALL_ACCESS);
-  ASSERT_TRUE(mutated_token);
-
-  // The child process needs a way to verify it's running with the newly
-  // created token instead of the original process token.
-  // As a trick, the token can be mutated by removing a privilege that is
-  // guaranteed to be there. SE_CHANGE_NOTIFY_NAME is a good candidate because
-  // it is granted to everyone by default. The child process will use this
-  // missing privilege as an indicator to ensure the correct token was used.
-  bool has_privilege = false;
-  for (const auto& priv : mutated_token->Privileges()) {
-    if (priv.GetName() == SE_CHANGE_NOTIFY_NAME) {
-      has_privilege = true;
-      break;
-    }
-  }
-  ASSERT_TRUE(has_privilege);
-
-  ASSERT_TRUE(mutated_token->RemovePrivilege(SE_CHANGE_NOTIFY_NAME));
-
-  // Verify environment is passed correctly.
-  std::unique_ptr<Environment> env = Environment::Create();
-  EXPECT_TRUE(env->SetVar("LAUNCH_PROCESS_TOKEN_ENV_TEST", "1"));
-  absl::Cleanup env_cleanup = [&env] {
-    EXPECT_TRUE(env->UnSetVar("LAUNCH_PROCESS_TOKEN_ENV_TEST"));
-  };
-
-  CommandLine cmd_line = MakeCmdLine("CheckTokenPrivileges");
-  LaunchOptions options;
-  options.start_hidden = true;
-  options.using_token = mutated_token->get();
-
-  Process process = LaunchProcess(cmd_line, options);
-  ASSERT_TRUE(process.IsValid());
-
-  int exit_code = -1;
-  ASSERT_TRUE(process.WaitForExit(&exit_code));
-  EXPECT_EQ(0, exit_code);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 MULTIPROCESS_TEST_MAIN(CheckPidProcess) {

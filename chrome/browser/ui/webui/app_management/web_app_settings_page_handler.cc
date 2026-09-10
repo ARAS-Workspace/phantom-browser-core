@@ -24,10 +24,6 @@
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "ui/webui/resources/cr_components/app_management/app_management.mojom.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/default_apps_util.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/mac/mac_util.h"
 #include "chrome/browser/web_applications/os_integration/mac/web_app_shortcut_mac.h"
@@ -234,11 +230,7 @@ void WebAppSettingsPageHandler::SetRunOnOsLoginMode(
 }
 
 void WebAppSettingsPageHandler::ShowDefaultAppAssociationsUi() {
-#if BUILDFLAG(IS_WIN)
-  base::win::LaunchDefaultAppsSettingsModernDialog({});
-#else
   NOTIMPLEMENTED();
-#endif
 }
 
 void WebAppSettingsPageHandler::OpenStorePage(const std::string& app_id) {

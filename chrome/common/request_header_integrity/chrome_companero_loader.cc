@@ -51,11 +51,7 @@ base::FilePath GetLibraryPath() {
   if (!base::PathService::Get(base::DIR_MODULE, &module_dir)) {
     return base::FilePath();
   }
-#if BUILDFLAG(IS_WIN)
-  return module_dir.Append(FILE_PATH_LITERAL("chromecompaneros.dll"));
-#else
   return module_dir.Append(FILE_PATH_LITERAL("libchromecompaneros.so"));
-#endif  // BUILDFLAG(IS_WIN)
 #endif  // BUILDFLAG(IS_MAC)
 }
 

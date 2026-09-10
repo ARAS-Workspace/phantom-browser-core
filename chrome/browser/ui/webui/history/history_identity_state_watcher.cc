@@ -122,7 +122,7 @@ HistoryIdentityStateWatcher::GetSyncStateForType(
   }
   const signin_util::SignedInState signed_in_state =
       signin_util::GetSignedInState(identity_manager_);
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // if the promo is related to history type, we need to check if any of the
   // History-related types is explicitly disabled via the toggles.
   if (type == syncer::UserSelectableType::kHistory &&
@@ -131,7 +131,7 @@ HistoryIdentityStateWatcher::GetSyncStateForType(
                                                     identity_manager_)) {
     return HistoryIdentityState::SyncState::kDisabled;
   }
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   if (sync_service_ &&
       sync_service_->GetUserSettings()->GetSelectedTypes().Has(type)) {
     return HistoryIdentityState::SyncState::kTurnedOn;

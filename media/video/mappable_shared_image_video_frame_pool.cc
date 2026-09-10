@@ -1219,12 +1219,6 @@ MappableSharedImageVideoFramePool::PoolImpl::GetOrCreateFrameResource(
   // use case is supported.
   auto si_caps = sii->GetCapabilities();
   bool add_scanout_usage = false;
-#if BUILDFLAG(IS_WIN)
-  // Direct composition path only supports NV12 video overlays.
-  add_scanout_usage =
-      si_caps.supports_scanout_shared_images_for_software_video_frames &&
-      output_format_ == GpuVideoAcceleratorFactories::OutputFormat::NV12;
-#else
   add_scanout_usage = si_caps.supports_scanout_shared_images;
   switch (output_format_) {
     case GpuVideoAcceleratorFactories::OutputFormat::YV12:
@@ -1244,7 +1238,6 @@ MappableSharedImageVideoFramePool::PoolImpl::GetOrCreateFrameResource(
       add_scanout_usage = false;
       break;
   }
-#endif
 
   auto it = resources_pool_.begin();
   while (it != resources_pool_.end()) {

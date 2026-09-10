@@ -1597,48 +1597,6 @@ void AXObject::SerializeHTMLAttributesForSnapshot(
 // do not require support.
 void AXObject::SerializeHTMLNonStandardAttributesForJAWS(
     ui::AXNodeData* node_data) const {
-#if BUILDFLAG(IS_WIN)
-  DEFINE_STATIC_LOCAL(
-      HashSet<AtomicString>, attributes_for_jaws,
-      ({// brailleonlyregion: a nonstandard attribute used by national testing
-        // orgs to allow testing of reading ability by rendering only to Braille
-        // display, and not to TTS.
-        // TODO(https://github.com/w3c/aria/issues/2352): replace with ARIA
-        // feature.
-        AtomicString("brailleonlyregion"),
-        // data-at-shortcutkeys: a nonstandard attribute used by Twitter and
-        // Facebook to provide keyboard shortcuts for an entire web page, in the
-        // form of a parseable JSON map, which AT can use to help avoid keyboard
-        // conflicts.
-        // TODO(https://github.com/w3c/aria/issues/2351): Replace with ARIA
-        // feature.
-        AtomicString("data-at-shortcutkeys"),
-        // formcontrolname: a nonstandard attribute used by Angular and consumed
-        // by some password managers (see https://crbug.com/378908266).
-        AtomicString("formcontrolname"),
-        // The rest of these are used by proprietary JAWS scripts needed by
-        // customers of JAWS/Vispero.
-        AtomicString("headers"),
-        AtomicString("_segmentid"),  // Nonstandard.
-        AtomicString("aria-activedescendant"), AtomicString("aria-checked"),
-        AtomicString("aria-describedby"), AtomicString("aria-expanded"),
-        AtomicString("aria-labelledby"), AtomicString("aria-pressed"),
-        AtomicString("aria-selected"),
-        AtomicString("display"),  // Nonstandard.
-        AtomicString("size"), AtomicString("tabindex"),
-        AtomicString("title")}));
-
-  for (const Attribute& attr : GetElement()->AttributesWithoutUpdate()) {
-    // Add attribute if in the allow list.
-    const QualifiedName& attr_qname = attr.GetName();
-    const AtomicString& attr_name = attr_qname.LocalName();
-    if (attributes_for_jaws.Contains(attr_name)) {
-      std::string value = attr.Value().Utf8();
-      node_data->html_attributes.push_back(
-          std::make_pair(attr_name.Utf8(), value));
-    }
-  }
-#endif
 }
 
 void AXObject::SerializeInlineTextBox(ui::AXNodeData* node_data) const {
@@ -2059,7 +2017,7 @@ void AXObject::SerializeMathContent(ui::AXNodeData* node_data) const {
     return;
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
   if (node_data->role == ax::mojom::blink::Role::kMath ||
       node_data->role == ax::mojom::blink::Role::kMathMLMath) {
     TruncateAndAddStringAttribute(

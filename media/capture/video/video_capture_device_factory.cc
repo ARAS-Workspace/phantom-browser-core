@@ -41,13 +41,4 @@ VideoCaptureDeviceFactory::VideoCaptureDeviceFactory() {
 
 VideoCaptureDeviceFactory::~VideoCaptureDeviceFactory() = default;
 
-#if BUILDFLAG(IS_WIN)
-scoped_refptr<DXGIDeviceManager>
-VideoCaptureDeviceFactory::GetDxgiDeviceManager() {
-  return nullptr;
-}
-
-void VideoCaptureDeviceFactory::OnGpuInfoUpdate(const CHROME_LUID& luid) {}
-#endif
-
 }  // namespace media

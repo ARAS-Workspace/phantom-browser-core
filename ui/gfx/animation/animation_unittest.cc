@@ -12,10 +12,6 @@
 #include "ui/gfx/animation/test_animation_delegate.h"
 #include "ui/gfx/switches.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
-
 namespace gfx {
 
 class AnimationTest : public testing::Test {
@@ -144,16 +140,7 @@ TEST_F(AnimationTest, DeleteFromEnd) {
 }
 
 TEST_F(AnimationTest, ShouldRenderRichAnimation) {
-#if BUILDFLAG(IS_WIN)
-  BOOL result;
-  ASSERT_NE(0,
-            ::SystemParametersInfo(SPI_GETCLIENTAREAANIMATION, 0, &result, 0));
-  // ShouldRenderRichAnimation() should check the SPI_GETCLIENTAREAANIMATION
-  // value on Vista.
-  EXPECT_EQ(!!result, Animation::ShouldRenderRichAnimation());
-#else
   EXPECT_TRUE(Animation::ShouldRenderRichAnimation());
-#endif
 }
 
 // Test that current value is always 0 after Start() is called.

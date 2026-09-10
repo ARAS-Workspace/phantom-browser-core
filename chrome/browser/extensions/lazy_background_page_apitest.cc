@@ -371,7 +371,7 @@ IN_PROC_BROWSER_TEST_F(LazyBackgroundPageApiTest,
 // Tests that the lazy background page stays alive until all visible views are
 // closed.
 // TODO: crbug.com/379109454 - Fix flakiness of the test.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_WaitForView DISABLED_WaitForView
 #else
 #define MAYBE_WaitForView WaitForView
@@ -439,7 +439,7 @@ IN_PROC_BROWSER_TEST_F(LazyBackgroundPageApiTest, DISABLED_WaitForRequest) {
 // closed.
 // http://crbug.com/40963152; test fails frequently on OS X
 // TODO: crbug.com/379109454 - Fix flakiness of the test.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #define MAYBE_WaitForNTP DISABLED_WaitForNTP
 #else
 #define MAYBE_WaitForNTP WaitForNTP

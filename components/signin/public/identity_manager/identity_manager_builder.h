@@ -17,10 +17,6 @@
 #include "base/memory/scoped_refptr.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/functional/callback.h"
-#endif
-
 class AccountFetcherFactory;
 class PrefService;
 class SigninClient;
@@ -91,9 +87,6 @@ struct IdentityManagerBuildParams {
   std::unique_ptr<DeviceAccountsProvider> device_accounts_provider;
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  base::RepeatingCallback<bool()> reauth_callback;
-#endif
 };
 
 // Builds all required dependencies to initialize the IdentityManager instance.

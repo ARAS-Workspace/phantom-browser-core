@@ -409,7 +409,7 @@ END_METADATA
 // detector state.
 std::u16string GetUpgradeDialogSubstringText() {
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
-    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
+    (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
   if (!UpgradeDetector::GetInstance()->is_outdated_install() &&
       !UpgradeDetector::GetInstance()->is_outdated_install_no_au()) {
     {

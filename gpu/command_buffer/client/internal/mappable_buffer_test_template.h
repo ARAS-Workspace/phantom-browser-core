@@ -31,7 +31,7 @@
 #include "ui/gfx/mojom/buffer_types.mojom.h"
 #include "ui/gl/gl_display.h"
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_OZONE)
 #include "ui/gl/init/gl_factory.h"
 #include "ui/gl/test/gl_surface_test_support.h"
 #include "ui/ozone/public/ozone_platform.h"
@@ -51,10 +51,6 @@
 #include "gpu/command_buffer/client/internal/mappable_buffer_native_pixmap.h"
 #include "ui/ozone/public/client_native_pixmap_factory_ozone.h"
 #include "ui/ozone/public/ozone_platform.h"
-#endif
-
-#if BUILDFLAG(IS_WIN)
-#include "gpu/command_buffer/client/internal/mappable_buffer_dxgi.h"
 #endif
 
 #if BUILDFLAG(IS_ANDROID)
@@ -99,11 +95,6 @@ class MappableBufferTest : public testing::Test {
             client_native_pixmap_factory_.get(), std::move(handle), size,
             format, usage);
 #endif
-#if BUILDFLAG(IS_WIN)
-      case gfx::DXGI_SHARED_HANDLE:
-        return MappableBufferDXGI::CreateFromHandleForTesting(std::move(handle),
-                                                              size, format);
-#endif
 #if BUILDFLAG(IS_ANDROID)
       case gfx::ANDROID_HARDWARE_BUFFER:
         return MappableBufferAHB::CreateFromHandleForTesting(std::move(handle),
@@ -114,7 +105,7 @@ class MappableBufferTest : public testing::Test {
     }
   }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_OZONE)
   // Overridden from testing::Test:
   void SetUp() override {
     // https://crrev.com/c/5348599
@@ -198,17 +189,6 @@ class MappableBufferTest : public testing::Test {
   };
   std::array<viz::SharedImageFormat, 1> formats_ = {
       viz::MultiPlaneFormat::kNV12,
-  };
-#elif BUILDFLAG(IS_WIN)
-  std::array<gfx::BufferUsage, 2> usages_ = {
-      gfx::BufferUsage::GPU_READ,
-      gfx::BufferUsage::SCANOUT,
-  };
-  std::array<viz::SharedImageFormat, 4> formats_ = {
-      viz::SinglePlaneFormat::kRGBA_8888,
-      viz::SinglePlaneFormat::kRGBX_8888,
-      viz::SinglePlaneFormat::kBGRA_8888,
-      viz::SinglePlaneFormat::kBGRX_8888,
   };
 #elif BUILDFLAG(IS_APPLE)
   std::array<gfx::BufferUsage, 6> usages_ = {

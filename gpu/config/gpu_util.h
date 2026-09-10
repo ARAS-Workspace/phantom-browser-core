@@ -128,21 +128,7 @@ GPU_CONFIG_EXPORT void RecordDiscreteGpuHistograms(const GPUInfo& gpu_info);
 // Currently only record for Intel NPUs.
 GPU_CONFIG_EXPORT void RecordNpuHistograms(const GPUInfo& gpu_info);
 
-#if BUILDFLAG(IS_WIN)
-// BufferCount for the root surface swap chain.
-GPU_CONFIG_EXPORT unsigned int DirectCompositionRootSurfaceBufferCount(
-    GrContextType gr_context_type);
-
-GPU_CONFIG_EXPORT std::string DirectMLFeatureLevelToString(
-    uint32_t directml_feature_level);
-GPU_CONFIG_EXPORT std::string D3DFeatureLevelToString(
-    uint32_t d3d_feature_level);
-GPU_CONFIG_EXPORT std::string D3DFeatureLevelToNumberString(
-    uint32_t d3d_feature_level);
-GPU_CONFIG_EXPORT std::string VulkanVersionToString(uint32_t vulkan_version);
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 GPU_CONFIG_EXPORT void TrySetNonSoftwareDevicePreferenceForTesting(
     gl::GpuPreference gpu_preference);
 #endif

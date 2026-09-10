@@ -30,10 +30,6 @@
 #include "chrome/common/printing/printer_capabilities_mac.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/threading/thread_restrictions.h"
-#endif
-
 #if BUILDFLAG(ENABLE_OOP_PRINTING)
 #include "chrome/browser/printing/oop_features.h"
 #include "chrome/browser/printing/print_backend_service_manager.h"
@@ -47,18 +43,12 @@ namespace {
 
 scoped_refptr<base::TaskRunner> CreatePrinterHandlerTaskRunner() {
   // USER_VISIBLE because the result is displayed in the print preview dialog.
-#if !BUILDFLAG(IS_WIN)
   static constexpr base::TaskTraits kTraits = {
       base::MayBlock(), base::TaskPriority::USER_VISIBLE};
-#endif
 
 #if BUILDFLAG(USE_CUPS)
   // CUPS is thread safe.
   return base::ThreadPool::CreateTaskRunner(kTraits);
-#elif BUILDFLAG(IS_WIN)
-  // Windows drivers are likely not thread-safe and need to be accessed on the
-  // UI thread.
-  return content::GetUIThreadTaskRunner({base::TaskPriority::USER_VISIBLE});
 #else
   // Be conservative on unsupported platforms.
   return base::ThreadPool::CreateSingleThreadTaskRunner(kTraits);
@@ -75,11 +65,6 @@ void ReportFetchCapabilitiesTime(base::TimeTicks start_time) {
 // static
 PrinterList LocalPrinterHandlerDefault::EnumeratePrintersOnBlockingTaskRunner(
     const std::string& locale) {
-#if BUILDFLAG(IS_WIN)
-  // Blocking is needed here because Windows printer drivers are oftentimes
-  // not thread-safe and have to be accessed on the UI thread.
-  base::ScopedAllowBlocking allow_blocking;
-#endif
 
   auto query_start_time = base::TimeTicks::Now();
 
@@ -119,12 +104,6 @@ LocalPrinterHandlerDefault::FetchCapabilitiesOnBlockingTaskRunner(
   user_defined_papers = GetMacCustomPaperSizes();
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  // Blocking is needed here because Windows printer drivers are oftentimes
-  // not thread-safe and have to be accessed on the UI thread.
-  base::ScopedAllowBlocking allow_blocking;
-#endif
-
   PrinterBasicInfo basic_info;
   mojom::ResultCode result =
       print_backend->GetPrinterBasicInfo(device_name, &basic_info);
@@ -142,11 +121,6 @@ LocalPrinterHandlerDefault::FetchCapabilitiesOnBlockingTaskRunner(
 // static
 std::string LocalPrinterHandlerDefault::GetDefaultPrinterOnBlockingTaskRunner(
     const std::string& locale) {
-#if BUILDFLAG(IS_WIN)
-  // Blocking is needed here because Windows printer drivers are oftentimes
-  // not thread-safe and have to be accessed on the UI thread.
-  base::ScopedAllowBlocking allow_blocking;
-#endif
 
   auto query_start_time = base::TimeTicks::Now();
 

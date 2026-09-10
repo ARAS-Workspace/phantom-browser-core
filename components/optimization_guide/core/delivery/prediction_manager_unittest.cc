@@ -785,7 +785,6 @@ TEST_F(PredictionManagerTest,
 }
 
 // See crbug/1227996.
-#if !BUILDFLAG(IS_WIN)
 TEST_F(PredictionManagerTest,
        AddObserverForOptimizationTargetModelCommandLineOverride) {
   base::HistogramTester histogram_tester;
@@ -860,7 +859,6 @@ TEST_F(PredictionManagerTest,
                        proto::OPTIMIZATION_TARGET_PAINFUL_PAGE_LOAD)
                    .has_value());
 }
-#endif
 
 TEST_F(PredictionManagerTest,
        NoPredictionModelForRegisteredOptimizationTarget) {

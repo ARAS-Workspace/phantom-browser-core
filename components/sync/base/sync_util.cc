@@ -50,8 +50,6 @@ std::string GetSystemString() {
   } else {
     system = "IOS-PHONE ";
   }
-#elif BUILDFLAG(IS_WIN)
-  system = "WIN ";
 #elif BUILDFLAG(IS_LINUX)
   system = "LINUX ";
 #elif BUILDFLAG(IS_FREEBSD)

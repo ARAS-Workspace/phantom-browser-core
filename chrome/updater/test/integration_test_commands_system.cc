@@ -36,10 +36,6 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/utf_string_conversions.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace updater::test {
 
 namespace {
@@ -451,102 +447,6 @@ class IntegrationTestCommandsSystem : public IntegrationTestCommands {
                                Param("app_version", version.GetString())});
   }
 
-#if BUILDFLAG(IS_WIN)
-  void ExpectInterfacesRegistered() const override {
-    RunCommand("expect_interfaces_registered");
-  }
-
-  void ExpectMarshalInterfaceSucceeds() const override {
-    RunCommand("expect_marshal_interface_succeeds");
-  }
-
-  void ExpectLegacyUpdate3WebSucceeds(
-      const std::string& app_id,
-      AppBundleWebCreateMode app_bundle_web_create_mode,
-      int expected_final_state,
-      int expected_error_code,
-      bool cancel_when_downloading) const override {
-    RunCommand("expect_legacy_update3web_succeeds",
-               {Param("app_id", app_id),
-                Param("app_bundle_web_create_mode",
-                      base::NumberToString(
-                          std::to_underlying(app_bundle_web_create_mode))),
-                Param("expected_final_state",
-                      base::NumberToString(expected_final_state)),
-                Param("expected_error_code",
-                      base::NumberToString(expected_error_code)),
-                Param("cancel_when_downloading",
-                      BoolToString(cancel_when_downloading))});
-  }
-
-  void ExpectLegacyProcessLauncherSucceeds() const override {
-    RunCommand("expect_legacy_process_launcher_succeeds");
-  }
-
-  void ExpectProcessLauncherLaunchCmdLineSucceeds() const override {
-    RunCommand("expect_process_launcher_launch_cmd_line_succeeds");
-  }
-
-  void ExpectLegacyAppCommandWebSucceeds(
-      const std::string& app_id,
-      const std::string& command_id,
-      const base::ListValue& parameters,
-      int expected_exit_code) const override {
-    RunCommand(
-        "expect_legacy_app_command_web_succeeds",
-        {Param("app_id", app_id), Param("command_id", command_id),
-         Param("parameters", StringFromValue(base::Value(parameters.Clone()))),
-         Param("expected_exit_code",
-               base::NumberToString(expected_exit_code))});
-  }
-
-  void ExpectLegacyPolicyStatusSucceeds(
-      const base::Version& updater_version) const override {
-    RunCommand("expect_legacy_policy_status_succeeds",
-               {Param("updater_version", updater_version.GetString())});
-  }
-
-  void LegacyInstallApp(const std::string& app_id,
-                        const base::Version& version) const override {
-    RunCommand(
-        "legacy_install_app",
-        {Param("app_id", app_id), Param("app_version", version.GetString())});
-  }
-
-  void RunUninstallCmdLine() const override {
-    RunCommand("run_uninstall_cmd_line");
-  }
-
-  void RunHandoff(const std::string& app_id) const override {
-    RunCommand("run_handoff", {Param("app_id", app_id)});
-  }
-
-  void InstallScheduledTask(bool run_elevated,
-                            const std::string& task_name,
-                            bool use_task_subfolders) const override {
-    RunCommand(
-        run_elevated, "install_scheduled_task",
-        {Param("task_name", task_name),
-         Param("use_task_subfolders", BoolToString(use_task_subfolders))});
-  }
-  void IsScheduledTaskRegistered(bool run_elevated,
-                                 const std::string& task_name,
-                                 bool use_task_subfolders) const override {
-    RunCommand(
-        run_elevated, "is_scheduled_task_registered",
-        {Param("task_name", task_name),
-         Param("use_task_subfolders", BoolToString(use_task_subfolders))});
-  }
-  void DeleteScheduledTask(bool run_elevated,
-                           const std::string& task_name,
-                           bool use_task_subfolders) const override {
-    RunCommand(
-        run_elevated, "delete_scheduled_task",
-        {Param("task_name", task_name),
-         Param("use_task_subfolders", BoolToString(use_task_subfolders))});
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   void InstallAppViaService(
       const std::string& app_id,
       const base::DictValue& expected_final_values) const override {
@@ -588,12 +488,6 @@ class IntegrationTestCommandsSystem : public IntegrationTestCommands {
   void SetupFakeLegacyUpdater() const override {
     RunCommand("setup_fake_legacy_updater");
   }
-
-#if BUILDFLAG(IS_WIN)
-  void RunFakeLegacyUpdater() const override {
-    RunCommand("run_fake_legacy_updater");
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
   void PrivilegedHelperInstall() const override {
@@ -767,18 +661,13 @@ class IntegrationTestCommandsSystem : public IntegrationTestCommands {
     const base::CommandLine command_line =
         *base::CommandLine::ForCurrentProcess();
     base::FilePath path(command_line.GetProgram());
-#if !BUILDFLAG(IS_WIN)
     // Check the presence of the program on non-Windows platform only, because
     // on Windows the program may run without extension.
     EXPECT_TRUE(base::PathExists(path));
-#endif
     path = path.DirName();
     EXPECT_TRUE(base::PathExists(path));
     path = MakeAbsoluteFilePath(path);
     path = path.Append(FILE_PATH_LITERAL("updater_integration_tests_helper"));
-#if BUILDFLAG(IS_WIN)
-    path = path.AddExtension(L"exe");
-#endif
     EXPECT_TRUE(base::PathExists(path));
 
     base::CommandLine helper_command(path);

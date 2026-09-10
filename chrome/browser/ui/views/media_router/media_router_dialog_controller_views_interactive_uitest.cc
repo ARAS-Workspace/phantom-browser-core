@@ -30,7 +30,7 @@
 #include "ui/views/widget/native_widget_private.h"
 #include "ui/views/widget/widget.h"
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/views/global_media_controls/media_dialog_view.h"
 #endif
 
@@ -142,7 +142,7 @@ IN_PROC_BROWSER_TEST_F(MediaRouterDialogControllerViewsTest,
 }
 
 // Global Media Controls are supported on Mac, Linux and Windows only.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 class GlobalMediaControlsDialogTest
     : public MediaRouterDialogControllerViewsTest {
  public:

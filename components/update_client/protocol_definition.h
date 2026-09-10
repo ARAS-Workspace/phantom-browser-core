@@ -202,10 +202,6 @@ struct Request {
   std::string operating_system;
   std::string arch;
 
-#if BUILDFLAG(IS_WIN)
-  bool is_wow64 = false;
-#endif
-
   // Provides a hint for what download urls should be returned by server.
   // This data member is controlled by group policy settings.
   // The only group policy value supported so far is |cacheable|.

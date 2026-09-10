@@ -9,14 +9,8 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-/* Structure for scatter/gather I/O.  */
-struct iovec {
-  void* iov_base; /* Pointer to data.  */
-  size_t iov_len; /* Length of data.  */
-};
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include <sys/uio.h>
-#endif  // BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_POSIX)
 
 #endif  // NET_THIRD_PARTY_QUICHE_OVERRIDES_QUICHE_PLATFORM_IMPL_QUICHE_IOVEC_IMPL_H_

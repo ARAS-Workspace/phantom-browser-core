@@ -19,10 +19,6 @@
 #include "net/base/network_change_notifier_apple_buildflags.h"
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#endif
-
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/android_info.h"
 #endif  // BUILDFLAG(IS_ANDROID)
@@ -41,7 +37,7 @@ BASE_FEATURE(kDeriveConnectionTypeFromCapabilities,
 
 BASE_FEATURE(kAsyncDns,
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+    BUILDFLAG(IS_LINUX)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -303,26 +299,6 @@ BASE_FEATURE(kAlpsClientHintParsing, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kEnableWebsocketsOverHttp3, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if BUILDFLAG(IS_WIN)
-// Disabled because of https://crbug.com/1489696.
-BASE_FEATURE(kEnableGetNetworkConnectivityHintAPI,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kTcpPortRandomizationWin, base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE_PARAM(int,
-                   kTcpPortRandomizationWinVersionMinimum,
-                   &kTcpPortRandomizationWin,
-                   "TcpPortRandomizationWinVersionMinimum",
-                   static_cast<int>(base::win::Version::WIN11_22H2));
-
-BASE_FEATURE(kTcpPortReuseMetricsWin, base::FEATURE_ENABLED_BY_DEFAULT);
-
-BASE_FEATURE(kTcpSocketIoCompletionPortWin, base::FEATURE_DISABLED_BY_DEFAULT);
-
-BASE_FEATURE(kDeferConnectionTypeAtStartup, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
-
 #if BUILDFLAG(IS_MAC)
 BASE_FEATURE(kTcpPortRandomizationMac, base::FEATURE_DISABLED_BY_DEFAULT);
 const base::FeatureParam<int> kTcpPortRandomizationReuseDelaySec{
@@ -336,11 +312,7 @@ const base::FeatureParam<int> kAvoidEntryCreationForNoStoreCacheSize{
 
 // A flag to use asynchronous session creation for new QUIC sessions.
 BASE_FEATURE(kAsyncQuicSession,
-#if BUILDFLAG(IS_WIN)
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#else
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 // A flag to use QuicSessionPool::AsyncDnsJob, which resolves hostnames with
 // HostResolver::ServiceEndpointRequest, for direct QUIC sessions.
@@ -353,7 +325,7 @@ BASE_FEATURE_PARAM(base::TimeDelta,
 
 // A flag to make multiport context creation asynchronous.
 BASE_FEATURE(kAsyncMultiPortPath,
-#if !BUILDFLAG(CRONET_BUILD) && (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_ANDROID))
+#if !BUILDFLAG(CRONET_BUILD) && BUILDFLAG(IS_ANDROID)
              base::FEATURE_ENABLED_BY_DEFAULT);
 #else
              base::FEATURE_DISABLED_BY_DEFAULT);
@@ -438,11 +410,7 @@ BASE_FEATURE(kUseNetworkPathMonitorForNetworkChangeNotifier,
 );
 #endif  // BUILDFLAG(IS_APPLE)
 
-#if BUILDFLAG(IS_WIN)
-BASE_FEATURE(kDeviceBoundSessions, base::FEATURE_ENABLED_BY_DEFAULT);
-#else
 BASE_FEATURE(kDeviceBoundSessions, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 BASE_FEATURE(kDeviceBoundSessionsBypassDeferralsForRefreshRequests,
              base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kDeviceBoundSessionsRetryTransientRefreshErrors,
@@ -493,7 +461,7 @@ BASE_FEATURE(kReportingApiEnableEnterpriseCookieIssues,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kSimdutfBase64Support,
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
              base::FEATURE_ENABLED_BY_DEFAULT
 #else
              base::FEATURE_DISABLED_BY_DEFAULT
@@ -659,10 +627,6 @@ const base::FeatureParam<base::TimeDelta>
         /*default_value=*/base::Days(1)};
 
 BASE_FEATURE(kHstsTopLevelNavigationsOnly, base::FEATURE_DISABLED_BY_DEFAULT);
-
-#if BUILDFLAG(IS_WIN)
-BASE_FEATURE(kHttpCacheMappedFileFlushWin, base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 BASE_FEATURE(kHttpCacheNoVarySearch, base::FEATURE_ENABLED_BY_DEFAULT);
 
@@ -1035,10 +999,5 @@ BASE_FEATURE_PARAM(base::TimeDelta,
                    kMaxDelayForBrokenAlternativeServiceParam,
                    &kMaxDelayForBrokenAlternativeService,
                    base::Days(2));
-
-#if BUILDFLAG(IS_WIN)
-BASE_FEATURE(kEnableWindowsTcpLoopbackFastFail,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
 
 }  // namespace net::features

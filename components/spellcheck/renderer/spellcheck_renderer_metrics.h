@@ -25,24 +25,6 @@ void RecordCheckedTextLengthNoSuggestions(int length);
 // requested.
 void RecordCheckedTextLengthWithSuggestions(int length);
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-// Records the duration of gathering spelling suggestions. This variation is for
-// when spell check is performed only by Hunspell.
-void RecordHunspellSuggestionDuration(base::TimeDelta duration);
-
-// Records the duration of gathering spelling suggestions. This variation is for
-// when spell check is performed by both Hunspell and the OS spell checker.
-void RecordHybridSuggestionDuration(base::TimeDelta duration);
-
-// Records the total time it took to complete an end-to-end spell check.
-// If at least one locale was checked by Hunspell, |used_hunspell| should be set
-// to |true|. If at least one locale was checked by the Windows native spell
-// checker, |used_native| should be set to |true|.
-void RecordSpellcheckDuration(base::TimeDelta duration,
-                              bool used_hunspell,
-                              bool used_native);
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-
 }  // namespace spellcheck_renderer_metrics
 
 #endif  // COMPONENTS_SPELLCHECK_RENDERER_SPELLCHECK_RENDERER_METRICS_H_

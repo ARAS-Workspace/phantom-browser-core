@@ -17,22 +17,14 @@
 #include "ui/gfx/geometry/test/geometry_util.h"
 #include "ui/gfx/test/sk_color_eq.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <float.h>
-#endif
-
 namespace gfx {
 namespace {
 
 double next_double(double d) {
-#if BUILDFLAG(IS_WIN)
-  return _nextafter(d, d + 1);
-#else
   // Step two units of least precision towards positive infinity. On some 32
   // bit x86 compilers a single step was not enough due to loss of precision in
   // optimized code.
   return nextafter(nextafter(d, d + 1), d + 1);
-#endif
 }
 
 // Validates that the same interpolations are made as in Blink.

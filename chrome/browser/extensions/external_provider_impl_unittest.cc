@@ -57,11 +57,6 @@
 #include "chrome/browser/extensions/preinstalled_extensions.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/test/test_reg_util_win.h"
-#include "base/win/registry.h"
-#endif
-
 namespace extensions {
 
 namespace {
@@ -89,13 +84,6 @@ constexpr const TestServerExtension kTestServerExtensions[] = {
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 const char kExternalExtensionId[] = "ghpipljflpbfljcfjlhfbfcpoklobpji";
-#endif
-
-#if BUILDFLAG(IS_WIN)
-const char kExternalExtensionCrxPath[] =
-    "external\\ghpipljflpbfljcfjlhfbfcpoklobpji.crx";
-const wchar_t kExternalExtensionRegistryKey[] =
-    L"Software\\Google\\Chrome\\Extensions\\ghpipljflpbfljcfjlhfbfcpoklobpji";
 #endif
 
 class ExternalProviderImplTest : public ExtensionServiceTestBase {
@@ -162,26 +150,10 @@ class ExternalProviderImplTest : public ExtensionServiceTestBase {
     // Windows doesn't use the provider that installs the |kExternalAppId|
     // extension implicitly, so to test that the blocking policy works on
     // Windows it is installed through a Windows-specific registry provider.
-#if BUILDFLAG(IS_WIN)
-    EXPECT_NO_FATAL_FAILURE(
-        registry_override_manager_.OverrideRegistry(HKEY_CURRENT_USER));
-    EXPECT_EQ(
-        ERROR_SUCCESS,
-        external_extension_key_.Create(
-            HKEY_CURRENT_USER, kExternalExtensionRegistryKey, KEY_ALL_ACCESS));
-    EXPECT_EQ(
-        ERROR_SUCCESS,
-        external_extension_key_.WriteValue(
-            L"path",
-            data_dir().AppendASCII(kExternalExtensionCrxPath).value().c_str()));
-    EXPECT_EQ(ERROR_SUCCESS,
-              external_extension_key_.WriteValue(L"version", L"1"));
-#else
     external_externsions_overrides_ =
         std::make_unique<base::ScopedPathOverride>(
             chrome::DIR_EXTERNAL_EXTENSIONS,
             data_dir().AppendASCII("external_extension"));
-#endif
   }
 
   void SetExternalExtensionsBlockedByPolicy(const bool block_external) {
@@ -282,11 +254,6 @@ class ExternalProviderImplTest : public ExtensionServiceTestBase {
   ash::system::ScopedFakeStatisticsProvider fake_statistics_provider_;
 #endif
 
-#if BUILDFLAG(IS_WIN)
-  // Registry key pointing to the external extension for Windows.
-  base::win::RegKey external_extension_key_;
-  registry_util::RegistryOverrideManager registry_override_manager_;
-#endif
 };
 
 }  // namespace

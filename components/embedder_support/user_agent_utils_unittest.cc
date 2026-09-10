@@ -41,16 +41,6 @@
 #include <sys/utsname.h>
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.foundation.metadata.h>
-#include <wrl.h>
-
-#include "base/win/core_winrt_util.h"
-#include "base/win/hstring_reference.h"
-#include "base/win/scoped_hstring.h"
-#include "base/win/scoped_winrt_initializer.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/device_info.h"
 #endif  // BUILDFLAG(IS_ANDROID)
@@ -100,21 +90,7 @@ void CheckUserAgentStringOrdering(bool mobile_device) {
 
   pieces = base::SplitStringUsingSubstr(os_str, "; ", base::KEEP_WHITESPACE,
                                         base::SPLIT_WANT_ALL);
-#if BUILDFLAG(IS_WIN)
-  // Post-UA Reduction there is a single <unifiedPlatform> value for Windows:
-  // Windows NT 10.0; Win64; x64
-  ASSERT_TRUE(pieces[1] == "Win64");
-  ASSERT_TRUE(pieces[2] == "x64");
-  pieces = base::SplitStringUsingSubstr(pieces[0], " ", base::KEEP_WHITESPACE,
-                                        base::SPLIT_WANT_ALL);
-  ASSERT_EQ(3u, pieces.size());
-  ASSERT_EQ("Windows", pieces[0]);
-  ASSERT_EQ("NT", pieces[1]);
-  double version;
-  ASSERT_TRUE(base::StringToDouble(pieces[2], &version));
-  ASSERT_LE(4.0, version);
-  ASSERT_GT(11.0, version);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // Post-UA Reduction there is a single <unifiedPlatform> value for macOS:
   // Macintosh; Intel Mac OS X 10_15_7
   ASSERT_EQ(2u, pieces.size());
@@ -229,75 +205,6 @@ void CheckUserAgentStringOrdering(bool mobile_device) {
   }
 }
 
-#if BUILDFLAG(IS_WIN)
-
-// On Windows, the client hint sec-ch-ua-platform-version should be
-// the highest supported version of the UniversalApiContract.
-void VerifyWinPlatformVersion(std::string version) {
-  base::win::ScopedWinrtInitializer scoped_winrt_initializer;
-  ASSERT_TRUE(scoped_winrt_initializer.Succeeded());
-
-  base::win::HStringReference api_info_class_name(
-      RuntimeClass_Windows_Foundation_Metadata_ApiInformation);
-
-  Microsoft::WRL::ComPtr<
-      ABI::Windows::Foundation::Metadata::IApiInformationStatics>
-      api;
-  HRESULT result = base::win::RoGetActivationFactory(api_info_class_name.Get(),
-                                                     IID_PPV_ARGS(&api));
-  ASSERT_EQ(result, S_OK);
-
-  base::win::HStringReference universal_contract_name(
-      L"Windows.Foundation.UniversalApiContract");
-
-  std::vector<std::string> version_parts = base::SplitString(
-      version, ".", base::TRIM_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
-
-  EXPECT_EQ(version_parts[2], "0");
-
-  int major_version;
-  base::StringToInt(version_parts[0], &major_version);
-
-  // If this check fails, our highest known UniversalApiContract version
-  // needs to be updated.
-  EXPECT_LE(major_version,
-            GetHighestKnownUniversalApiContractVersionForTesting());
-
-  int minor_version;
-  base::StringToInt(version_parts[1], &minor_version);
-
-  boolean is_supported = false;
-  // Verify that the major and minor versions are supported.
-  result = api->IsApiContractPresentByMajor(universal_contract_name.Get(),
-                                            major_version, &is_supported);
-  EXPECT_EQ(result, S_OK);
-  EXPECT_TRUE(is_supported)
-      << " expected major version " << major_version << " to be supported.";
-  result = api->IsApiContractPresentByMajorAndMinor(
-      universal_contract_name.Get(), major_version, minor_version,
-      &is_supported);
-  EXPECT_EQ(result, S_OK);
-  EXPECT_TRUE(is_supported)
-      << " expected major version " << major_version << " and minor version "
-      << minor_version << " to be supported.";
-
-  // Verify that the next highest value is not supported.
-  result = api->IsApiContractPresentByMajorAndMinor(
-      universal_contract_name.Get(), major_version, minor_version + 1,
-      &is_supported);
-  EXPECT_EQ(result, S_OK);
-  EXPECT_FALSE(is_supported) << " expected minor version " << minor_version + 1
-                             << " to not be supported with a major version of "
-                             << major_version << ".";
-  result = api->IsApiContractPresentByMajor(universal_contract_name.Get(),
-                                            major_version + 1, &is_supported);
-  EXPECT_EQ(result, S_OK);
-  EXPECT_FALSE(is_supported) << " expected major version " << major_version + 1
-                             << " to not be supported.";
-}
-
-#endif  // BUILDFLAG(IS_WIN)
-
 bool ContainsBrandVersion(const blink::UserAgentBrandList& brand_list,
                           const blink::UserAgentBrandVersion brand_version) {
   for (const auto& brand_list_entry : brand_list) {
@@ -331,8 +238,6 @@ class UserAgentUtilsTest : public testing::Test,
         "X11; Linux x86_64";
 #elif BUILDFLAG(IS_MAC)
         "Macintosh; Intel Mac OS X 10_15_7";
-#elif BUILDFLAG(IS_WIN)
-        "Windows NT 10.0; Win64; x64";
 #elif BUILDFLAG(IS_ANDROID)
         "Linux; Android 10; K";
 #elif BUILDFLAG(IS_IOS)
@@ -623,9 +528,7 @@ TEST_F(UserAgentUtilsTest, UserAgentMetadata) {
                                    product_brand_full_version));
   EXPECT_EQ(metadata.full_version, full_version);
 
-#if BUILDFLAG(IS_WIN)
-  VerifyWinPlatformVersion(metadata.platform_version);
-#elif BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
   EXPECT_EQ(metadata.platform_version, "");
 #else
   int32_t major, minor, bugfix = 0;
@@ -638,9 +541,7 @@ TEST_F(UserAgentUtilsTest, UserAgentMetadata) {
   // If you're here because your change to GetOSType broke this test, it likely
   // means that GetPlatformForUAMetadata needs a new special case to prevent
   // breaking client hints. Check with the code owners for further guidance.
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(metadata.platform, "Windows");
-#elif BUILDFLAG(IS_IOS)
+#if BUILDFLAG(IS_IOS)
   EXPECT_EQ(metadata.platform, "iOS");
 #elif BUILDFLAG(IS_MAC)
   EXPECT_EQ(metadata.platform, "macOS");
@@ -1051,41 +952,7 @@ struct BuildOSCpuInfoTestCases {
 TEST_F(UserAgentUtilsTest, BuildOSCpuInfoFromOSVersionAndCpuType) {
   // clang-format off
   const BuildOSCpuInfoTestCases test_cases[] = {
-#if BUILDFLAG(IS_WIN)
-    // On Windows, it's possible to have an empty string for CPU type.
-    {
-        /*os_version=*/"10.0",
-        /*cpu_type=*/"",
-        /*expected_os_cpu_info=*/"Windows NT 10.0",
-    },
-    {
-        /*os_version=*/"10.0",
-        /*cpu_type=*/"WOW64",
-        /*expected_os_cpu_info=*/"Windows NT 10.0; WOW64",
-    },
-    {
-        /*os_version=*/"10.0",
-        /*cpu_type=*/"Win64; x64",
-        /*expected_os_cpu_info=*/"Windows NT 10.0; Win64; x64",
-    },
-    {
-        /*os_version=*/"7.0",
-        /*cpu_type=*/"",
-        /*expected_os_cpu_info=*/"Windows NT 7.0",
-    },
-    // These cases should never happen in real life, but may be useful to detect
-    // changes when things are refactored.
-    {
-        /*os_version=*/"",
-        /*cpu_type=*/"",
-        /*expected_os_cpu_info=*/"Windows NT ",
-    },
-    {
-        /*os_version=*/"VERSION",
-        /*cpu_type=*/"CPU TYPE",
-        /*expected_os_cpu_info=*/"Windows NT VERSION; CPU TYPE",
-    },
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     {
         /*os_version=*/"10_15_4",
         /*cpu_type=*/"Intel",
@@ -1155,7 +1022,7 @@ TEST_F(UserAgentUtilsTest, GetCpuArchitecture) {
 
 #if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ("", arch);
-#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
+#elif BUILDFLAG(IS_POSIX)
   EXPECT_TRUE("arm" == arch || "x86" == arch);
 #else
 #error Unsupported platform
@@ -1167,7 +1034,7 @@ TEST_F(UserAgentUtilsTest, GetCpuBitness) {
 
 #if BUILDFLAG(IS_ANDROID)
   EXPECT_EQ("", bitness);
-#elif BUILDFLAG(IS_WIN) || BUILDFLAG(IS_POSIX)
+#elif BUILDFLAG(IS_POSIX)
   EXPECT_TRUE("32" == bitness || "64" == bitness);
 #else
 #error Unsupported platform

@@ -47,11 +47,6 @@
 #include "content/public/browser/browser_thread.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/enterprise_util.h"
-#include "chrome/installer/util/google_update_settings.h"
-#endif
-
 #if BUILDFLAG(CHROME_FOR_TESTING)
 #include "chrome/browser/chrome_for_testing/config.h"
 #endif
@@ -203,15 +198,7 @@ ChromeConfigurator::ExtraRequestParams() const {
 
 std::string ChromeConfigurator::GetDownloadPreference() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-#if BUILDFLAG(IS_WIN)
-  // This group policy is supported only on Windows and only for enterprises.
-  return base::IsEnterpriseDevice()
-             ? base::SysWideToUTF8(
-                   GoogleUpdateSettings::GetDownloadPreference())
-             : std::string();
-#else
   return std::string();
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 scoped_refptr<update_client::NetworkFetcherFactory>
@@ -299,11 +286,11 @@ std::optional<bool> ChromeConfigurator::IsMachineExternallyManaged() const {
 update_client::UpdaterStateProvider
 ChromeConfigurator::GetUpdaterStateProvider() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   return base::BindRepeating(&UpdaterState::GetState);
 #else
   return configurator_impl_.GetUpdaterStateProvider();
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#endif  // BUILDFLAG(IS_MAC)
 }
 
 scoped_refptr<update_client::CrxCache> ChromeConfigurator::GetCrxCache() const {

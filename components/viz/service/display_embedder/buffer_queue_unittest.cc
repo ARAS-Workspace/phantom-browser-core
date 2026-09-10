@@ -38,12 +38,7 @@ constexpr gfx::ColorSpace kBufferQueueColorSpace =
 
 }  // namespace
 
-#if BUILDFLAG(IS_WIN)
-const gpu::SurfaceHandle kFakeSurfaceHandle =
-    reinterpret_cast<gpu::SurfaceHandle>(1);
-#else
 const gpu::SurfaceHandle kFakeSurfaceHandle = 1;
-#endif
 
 class BufferQueueTest : public ::testing::Test {
  public:

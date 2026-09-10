@@ -168,7 +168,7 @@ base::Value MemoryMapsAsValue(
     }
 
 // The following stats are only well defined on Linux-derived OSes.
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_MAC)
     // byte stats
     region_dict.Set(
         "bs",

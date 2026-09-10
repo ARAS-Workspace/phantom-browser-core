@@ -23,21 +23,6 @@ void DummyInputMethod::OnFocus() {
 void DummyInputMethod::OnBlur() {
 }
 
-#if BUILDFLAG(IS_WIN)
-bool DummyInputMethod::OnUntranslatedIMEMessage(const CHROME_MSG event,
-                                                NativeEventResult* result) {
-  return false;
-}
-
-void DummyInputMethod::OnInputLocaleChanged() {}
-
-bool DummyInputMethod::IsInputLocaleCJK() const {
-  return false;
-}
-
-void DummyInputMethod::OnUrlChanged() {}
-#endif
-
 void DummyInputMethod::SetFocusedTextInputClient(TextInputClient* client) {
 }
 

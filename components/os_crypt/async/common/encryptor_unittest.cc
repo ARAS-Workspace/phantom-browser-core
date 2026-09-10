@@ -21,14 +21,6 @@
 #include "mojo/public/cpp/test_support/test_utils.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <wincrypt.h>
-
-#include "base/win/scoped_localalloc.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace os_crypt_async {
 
 enum class TestType {
@@ -209,28 +201,6 @@ TEST_P(EncryptorParamTest, DecryptEmpty) {
 }
 
 // Non-Windows platforms can decrypt random data fine.
-#if BUILDFLAG(IS_WIN)
-TEST_P(EncryptorParamTest, DecryptInvalid) {
-  const scoped_refptr<Encryptor> encryptor = GetTestEncryptor();
-
-  {
-    std::vector<uint8_t> invalid_cipher(100);
-    for (size_t c = 0u; c < invalid_cipher.size(); c++) {
-      invalid_cipher[c] = c;
-    }
-
-    Encryptor::DecryptFlags flags;
-    auto plaintext = encryptor->DecryptData(invalid_cipher, &flags);
-    ASSERT_FALSE(flags.should_reencrypt);
-    ASSERT_FALSE(plaintext);
-  }
-  {
-    std::string plaintext;
-    ASSERT_FALSE(encryptor->DecryptString("a", &plaintext));
-    ASSERT_TRUE(plaintext.empty());
-  }
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 INSTANTIATE_TEST_SUITE_P(All,
                          EncryptorParamTest,

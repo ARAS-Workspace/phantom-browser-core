@@ -122,18 +122,7 @@
 #include "chrome/browser/web_applications/os_integration/mac/app_shim_registry.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/string_util.h"
-#include "base/strings/utf_string_conversions.h"
-#include "chrome/browser/notifications/notification_platform_bridge_win.h"
-#include "chrome/browser/notifications/win/notification_launch_id.h"
-#include "chrome/browser/ui/startup/credential_provider_signin_dialog_win.h"
-#include "chrome/browser/ui/webui/settings/reset_settings_handler.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
-#include "chrome/credential_provider/common/gcp_strings.h"
-#endif  // BUILDFLAG(IS_WIN)
-
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 #include "chrome/browser/headless/headless_mode_util.h"
 #include "chrome/browser/ui/startup/web_app_info_recorder_utils.h"
 #include "components/headless/policy/headless_mode_policy.h"
@@ -238,34 +227,6 @@ StartupProfileMode GetStartupProfileMode(
       command_line.HasSwitch(switches::kAppId)) {
     return StartupProfileMode::kBrowserWindow;
   }
-
-#if BUILDFLAG(IS_WIN)
-  // Don't show the picker if trying to uninstall an app. This URL param should
-  // be paired with switches::kProfileDirectory but it's better to err on the
-  // side of opening the last profile (and maybe fail uninstalling the app
-  // there) than to err on the side of unexpectedly showing the picker UI.
-  if (command_line.HasSwitch(switches::kUninstallAppId)) {
-    return StartupProfileMode::kBrowserWindow;
-  }
-
-  // Don't show the picker if we want to perform a GCPW Sign In. It will want to
-  // only launch an incognito window.
-  if (command_line.HasSwitch(credential_provider::kGcpwSigninSwitch)) {
-    return StartupProfileMode::kBrowserWindow;
-  }
-
-  // If the browser is launched due to activation on Windows native
-  // notification, the profile id encoded in the notification launch id should
-  // be chosen over the profile picker.
-  base::FilePath profile_basename =
-      NotificationLaunchId::GetNotificationLaunchProfileBaseName(command_line);
-  if (!profile_basename.empty()) {
-    // TODO(crbug.com/40257919): The notification ID was already tested
-    // in the calling function `GetStartupProfilePath()`. Consolidate these
-    // checks.
-    return StartupProfileMode::kBrowserWindow;
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   // Don't show the picker if Chrome should be launched without window. This
   // will also cause a profile to be loaded which Chrome needs for performing
@@ -377,9 +338,6 @@ bool MaybeLaunchAppShortcutWindow(const base::CommandLine& command_line,
     return false;
   }
 
-#if BUILDFLAG(IS_WIN)  // Fix up Windows shortcuts.
-  base::ReplaceSubstringsAfterOffset(&url_string, 0, "\\x", "%");
-#endif
   GURL url(url_string);
 
   // Restrict allowed URLs for --app switch.
@@ -703,10 +661,6 @@ void StartupBrowserCreator::LaunchBrowser(
   SCOPED_UMA_HISTOGRAM_TIMER("Startup.StartupBrowserCreator.LaunchBrowser");
 
   DCHECK(profile);
-#if BUILDFLAG(IS_WIN)
-  DCHECK(!command_line.HasSwitch(credential_provider::kGcpwSigninSwitch));
-  DCHECK(!command_line.HasSwitch(switches::kNotificationLaunchId));
-#endif  // BUILDFLAG(IS_WIN)
   in_synchronous_profile_launch_ =
       process_startup == chrome::startup::IsProcessStartup::kYes;
 
@@ -754,10 +708,6 @@ void StartupBrowserCreator::LaunchBrowserForLastProfiles(
   // kNotificationLaunchId switch is used, always use `profile` which contains
   // the profile id extracted from the notification launch id.
   bool was_windows_notification_launch = false;
-#if BUILDFLAG(IS_WIN)
-  was_windows_notification_launch =
-      command_line.HasSwitch(switches::kNotificationLaunchId);
-#endif  // BUILDFLAG(IS_WIN)
 
   if (profile_info.mode == StartupProfileMode::kProfilePicker) {
 #if BUILDFLAG(IS_CHROMEOS)
@@ -942,18 +892,10 @@ void StartupBrowserCreator::RegisterLocalStatePrefs(
   registry->RegisterBooleanPref(prefs::kSuppressUnsupportedOSWarning, false);
   registry->RegisterBooleanPref(prefs::kWasRestarted, false);
 
-#if BUILDFLAG(IS_WIN)
-  registry->RegisterStringPref(prefs::kShortcutMigrationVersion, std::string());
-#endif
 }
 
 // static
 void StartupBrowserCreator::RegisterProfilePrefs(PrefRegistrySimple* registry) {
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  // This will be set for newly created profiles, and is used to indicate which
-  // users went through onboarding with the current experiment group.
-  registry->RegisterStringPref(prefs::kNaviOnboardGroup, "");
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
 }
 
 // static
@@ -979,7 +921,7 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
   TRACE_EVENT0("startup", "StartupBrowserCreator::ProcessCmdLineImpl");
   ComputeAndRecordLaunchMode(command_line);
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   if (headless::IsHeadlessMode() &&
       headless::HeadlessModePolicy::IsHeadlessModeDisabled(
           g_browser_process->local_state())) {
@@ -1062,7 +1004,7 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
     silent_launch = true;
   }
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // Writes open and installed web apps to the specified file without
   // launching a new browser window or tab.
   if (base::FeatureList::IsEnabled(features::kListWebAppsSwitch) &&
@@ -1076,7 +1018,7 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
     }
     return true;
   }
-#endif  //  BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 
 #if !BUILDFLAG(IS_CHROMEOS)
   if (base::FeatureList::IsEnabled(features::kOnConnectNative) &&
@@ -1153,32 +1095,6 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
     return true;
   }
 
-#if BUILDFLAG(IS_WIN)
-  // If --uninstall-app-id is specified, remove the target web app.
-  if (command_line.HasSwitch(switches::kUninstallAppId)) {
-    // `switches::kUninstallAppId` is expected to be set together with a
-    // specific profile dir, which suppresses the profile picker, see
-    // `ShouldShowProfilePickerAtProcessLaunch()`.
-    // TODO(http://crbug.com/40819749): Refactor command line processing logic
-    // to validate the flag sets and reliably determine the startup mode.
-    CHECK_EQ(profile_info.mode, StartupProfileMode::kBrowserWindow)
-        << "Failed to uninstall app: couldn't pick a profile";
-    std::string app_id =
-        command_line.GetSwitchValueASCII(switches::kUninstallAppId);
-
-    web_app::WebAppProvider::GetForWebApps(privacy_safe_profile)
-        ->ui_manager()
-        .AsImpl()
-        ->UninstallWebAppFromStartupSwitch(app_id);
-
-    // Return true to allow startup to continue and for the main event loop to
-    // run. The process will shut down if no browser windows are open when the
-    // uninstall completes thanks to UninstallWebAppFromStartupSwitch's
-    // ScopedKeepAlive.
-    return true;
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   if (command_line.HasSwitch(extensions::switches::kLoadApps) &&
       can_use_profile) {
     if (!ProcessLoadApps(command_line, cur_dir, privacy_safe_profile)) {
@@ -1219,62 +1135,6 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
     }
   }
 
-#if BUILDFLAG(IS_WIN)
-  if (command_line.HasSwitch(switches::kWinJumplistAction)) {
-    // `switches::kWinJumplistAction` is expected to be set together with a
-    // URL to open and with a specific profile dir.
-    if (profile_info.mode == StartupProfileMode::kBrowserWindow) {
-      // Use a non-NULL pointer to indicate JumpList has been used. We re-use
-      // chrome::kJumpListIconDirname as the key to the data.
-      privacy_safe_profile->SetUserData(
-          chrome::kJumpListIconDirname,
-          base::WrapUnique(new base::SupportsUserData::Data()));
-    } else {
-      // TODO(http://crbug.com/40819749): Refactor command line processing logic
-      // to validate the flag sets and reliably determine the startup mode.
-      DUMP_WILL_BE_NOTREACHED()
-          << "Failed start for jumplist action: couldn't pick a profile";
-    }
-  }
-
-  // If the command line has the kNotificationLaunchId switch, then this
-  // call is from notification_helper.exe to process toast activation.
-  // Delegate to the notification system; do not open a browser window here.
-  if (command_line.HasSwitch(switches::kNotificationLaunchId)) {
-    if (NotificationPlatformBridgeWin::HandleActivation(command_line)) {
-      return true;
-    }
-    return false;
-  }
-
-  // If being started for credential provider logon purpose, only show the
-  // signin page.
-  if (command_line.HasSwitch(credential_provider::kGcpwSigninSwitch)) {
-    // Having access to an incognito profile for this action (as checked below)
-    // requires starting with a regular user profile (non-guest) and suppresses
-    // profile picker startups, see `ShouldShowProfilePickerAtProcessLaunch()`.
-    // TODO(http://crbug.com/40819749): Refactor command line processing logic
-    // to validate the flag sets and reliably determine the startup mode.
-    CHECK_EQ(profile_info.mode, StartupProfileMode::kBrowserWindow)
-        << "Failed start for GCPW signin: couldn't pick a profile";
-
-    // Use incognito profile since this is a credential provider logon.
-    Profile* incognito_profile =
-        privacy_safe_profile->GetPrimaryOTRProfile(/*create_if_needed=*/true);
-    DCHECK(incognito_profile->IsIncognitoProfile());
-    // NOTE: All launch urls are ignored when running with --gcpw-signin since
-    // this mode only loads Google's sign in page.
-
-    // If GCPW signin dialog fails, returning false here will allow Chrome to
-    // exit gracefully during the launch.
-    if (!StartGCPWSignin(command_line, incognito_profile)) {
-      return false;
-    }
-
-    return true;
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   if (command_line.HasSwitch(switches::kAppId)) {
     // `switches::kAppId` presence suppresses the profile picker, see
     // `ShouldShowProfilePickerAtProcessLaunch()`.
@@ -1283,7 +1143,7 @@ bool StartupBrowserCreator::ProcessCmdLineImpl(
     CHECK_EQ(profile_info.mode, StartupProfileMode::kBrowserWindow)
         << "Failed launch with app: couldn't pick a profile";
     std::string app_id = command_line.GetSwitchValueASCII(switches::kAppId);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     // If Chrome Apps are deprecated and |app_id| is a Chrome App, display the
     // deprecation UI instead of launching the app.
     if (apps::OpenDeprecatedApplicationPrompt(privacy_safe_profile, app_id)) {
@@ -1561,14 +1421,6 @@ StartupProfilePathInfo GetStartupProfilePath(
 // If the browser is launched due to activation on Windows native notification,
 // the profile id encoded in the notification launch id should be chosen over
 // all others.
-#if BUILDFLAG(IS_WIN)
-  base::FilePath profile_basename =
-      NotificationLaunchId::GetNotificationLaunchProfileBaseName(command_line);
-  if (!profile_basename.empty()) {
-    return {.path = user_data_dir.Append(profile_basename),
-            .mode = StartupProfileMode::kBrowserWindow};
-  }
-#endif  // BUILDFLAG(IS_WIN)
 
   // If opening in Guest mode is requested, load the default profile so that
   // last opened profile would not trigger a user management dialog.
@@ -1633,11 +1485,7 @@ StartupProfilePathInfo GetStartupProfilePath(
         command_line.GetSwitchValueNative(switches::kProfileEmail);
     if (!email_native.empty()) {
       std::string email;
-#if BUILDFLAG(IS_WIN)
-      email = base::WideToUTF8(email_native);
-#else
       email = std::move(email_native);
-#endif
       base::FilePath profile_dir =
           g_browser_process->profile_manager()->GetProfileDirForEmail(email);
       if (!profile_dir.empty()) {

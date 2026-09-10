@@ -2096,11 +2096,7 @@ TEST_F(DownloadTargetDeterminerTest, NotifyExtensionsLocalFile) {
   const DownloadTestCase kNotifyExtensionsTestCases[] = {
       {AUTOMATIC, download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
        DownloadFileType::NOT_DANGEROUS,
-#if BUILDFLAG(IS_WIN)
-       "file:///usr/local/xyz",
-#else
        "file:///c:/usr/local/xyz",
-#endif  // BUILDFLAG(IS_WIN)
        "text/plain", FILE_PATH_LITERAL(""),
 
        FILE_PATH_LITERAL("xyz.txt"), DownloadItem::TARGET_DISPOSITION_OVERWRITE,
@@ -2818,115 +2814,14 @@ TEST_F(DownloadTargetDeterminerTest, TargetSameAsSource) {
   RunTestCase(test_case, expected_path, item.get());
 }
 
-#if BUILDFLAG(IS_WIN)
-// Test that env variables will be removed from file name before prompting Save
-// As dialog.
-TEST_F(DownloadTargetDeterminerTest, TestSanitizeEnvVariable) {
-  const DownloadTestCase kSaveEnvPathTestCases[] = {
-      {// 0: File name contains env var delimits.
-       SAVE_AS, download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
-       DownloadFileType::NOT_DANGEROUS, "http://example.com/f%oo%.tx%xyz%t",
-       "text/plain", FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("f.txt"), DownloadItem::TARGET_DISPOSITION_PROMPT,
-
-       EXPECT_CRDOWNLOAD},
-
-      {// 1: File name contains dangerous extensions after removing env var.
-       SAVE_AS, download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
-       DownloadFileType::NOT_DANGEROUS, "http://example.com/foo.ln%xyz%k",
-       "application/octet-stream", FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("foo.download"),
-       DownloadItem::TARGET_DISPOSITION_PROMPT,
-
-       EXPECT_CRDOWNLOAD},
-      {// 2: File name falling back to dangerous extensions after removing env
-       // var.
-       SAVE_AS, download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
-       DownloadFileType::NOT_DANGEROUS, "http://example.com/foo2.lnk.%%",
-       "application/octet-stream", FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("foo2.download"),
-       DownloadItem::TARGET_DISPOSITION_PROMPT,
-
-       EXPECT_CRDOWNLOAD},
-      {// 3: Double extension bug leading to dangerous extensions after removing
-       // env var.
-       SAVE_AS, download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
-       DownloadFileType::NOT_DANGEROUS, "http://example.com/foo2.lnk %%",
-       "application/octet-stream", FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("foo2.download"),
-       DownloadItem::TARGET_DISPOSITION_PROMPT,
-
-       EXPECT_CRDOWNLOAD},
-      {// 4: Unicode char bug leading to dangerous extensions after removing env
-       // var. NOTE: The space before "%%" is a non-breaking space (U+00A0), not
-       // a normal space.
-       SAVE_AS, download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
-       DownloadFileType::NOT_DANGEROUS, "http://example.com/foo2.lnk %%",
-       "application/octet-stream", FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("foo2.download"),
-       DownloadItem::TARGET_DISPOSITION_PROMPT,
-
-       EXPECT_CRDOWNLOAD},
-      {// 5: File name is an env var.
-       SAVE_AS, download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
-       DownloadFileType::NOT_DANGEROUS, "http://example.com/%foo.txt%",
-       "text/plain", FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("download"), DownloadItem::TARGET_DISPOSITION_PROMPT,
-
-       EXPECT_CRDOWNLOAD},
-      {// 6: Multiple env vars need to be filtered out.
-       SAVE_AS, download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
-       DownloadFileType::NOT_DANGEROUS, "http://example.com/foo.lnk .%% .%%",
-       "application/octet-stream", FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("foo.download"),
-       DownloadItem::TARGET_DISPOSITION_PROMPT,
-
-       EXPECT_CRDOWNLOAD},
-      {// 7: Prevent hiding extensions (like .url) in the Windows Save As dialog
-       // by wrapping trailing spaces inside environment variables.
-       SAVE_AS, download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
-       DownloadFileType::NOT_DANGEROUS,
-       "http://example.com/photo.jpg%20%25%25.url", "text/plain",
-       FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("photo.jpg.download"),
-       DownloadItem::TARGET_DISPOSITION_PROMPT,
-
-       EXPECT_CRDOWNLOAD},
-
-      {// 8: Ensure completely empty filenames made of just dots and environment
-       // variables collapse safely without retaining any dangerous extensions.
-       SAVE_AS, download::DOWNLOAD_DANGER_TYPE_NOT_DANGEROUS,
-       DownloadFileType::NOT_DANGEROUS, "http://example.com/.%25%25.%25%25",
-       "text/plain", FILE_PATH_LITERAL(""),
-
-       FILE_PATH_LITERAL("download"), DownloadItem::TARGET_DISPOSITION_PROMPT,
-
-       EXPECT_CRDOWNLOAD}};
-
-  RunTestCasesWithActiveItem(kSaveEnvPathTestCases);
-}
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(ENABLE_PLUGINS)
 
 void ForceRefreshOfPlugins() {
-#if !BUILDFLAG(IS_WIN)
   // Prevent creation of a utility process for loading plugins. Doing so breaks
   // unit_tests since /proc/self/exe can't be run as a utility process.
   content::RenderProcessHost::SetRunRendererInProcess(true);
-#endif
   content::PluginService::GetInstance()->GetPlugins();
-#if !BUILDFLAG(IS_WIN)
   content::RenderProcessHost::SetRunRendererInProcess(false);
-#endif
 }
 
 class MockPluginServiceFilter : public content::PluginServiceFilter {

@@ -35,8 +35,7 @@ TEST(VizCompositorThreadRunnerImplTest, HangWatcherEnabledByDefault) {
   ManualHangWatcher hang_watcher(HangWatcher::ProcessType::kGPUProcess);
   VizCompositorThreadRunnerImpl thread_runner;
   WaitForThreadRunnerToStart(thread_runner);
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
   EXPECT_TRUE(hang_watcher.IsWatchingThreads());
 #else
   EXPECT_FALSE(hang_watcher.IsWatchingThreads());

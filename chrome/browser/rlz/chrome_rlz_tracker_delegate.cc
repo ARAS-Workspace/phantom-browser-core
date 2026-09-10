@@ -32,10 +32,6 @@
 #include "rlz/buildflags/buildflags.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/installer/util/google_update_settings.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "ash/constants/ash_switches.h"
 #endif
@@ -138,41 +134,23 @@ bool ChromeRLZTrackerDelegate::ShouldEnableZeroDelayForTesting() {
 }
 
 bool ChromeRLZTrackerDelegate::GetLanguage(std::u16string* language) {
-#if BUILDFLAG(IS_WIN)
-  std::wstring wide_language;
-  bool result = GoogleUpdateSettings::GetLanguage(&wide_language);
-  *language = base::AsString16(wide_language);
-  return result;
-#else
   // On other systems, we don't know the install language of promotions. That's
   // OK, for now all promotions on non-Windows systems will be reported as "en".
   // If non-Windows promotions end up requiring language code reporting, that
   // code will need to go here.
   return false;
-#endif
 }
 
 bool ChromeRLZTrackerDelegate::GetReferral(std::u16string* referral) {
-#if BUILDFLAG(IS_WIN)
-  std::wstring wide_referral;
-  bool result = GoogleUpdateSettings::GetReferral(&wide_referral);
-  *referral = base::AsString16(wide_referral);
-  return result;
-#else
   // The referral program is defunct and not used. No need to implement this
   // function on non-Win platforms.
   return true;
-#endif
 }
 
 bool ChromeRLZTrackerDelegate::ClearReferral() {
-#if BUILDFLAG(IS_WIN)
-  return GoogleUpdateSettings::ClearReferral();
-#else
   // The referral program is defunct and not used. No need to implement this
   // function on non-Win platforms.
   return true;
-#endif
 }
 
 void ChromeRLZTrackerDelegate::SetOmniboxSearchCallback(

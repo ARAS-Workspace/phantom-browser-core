@@ -75,14 +75,6 @@ void SetNonCanonicalAccessAddress(
   exception.SetExceptionAddress(address);
 #endif  // defined(ARCH_CPU_X86_64)
 
-#elif BUILDFLAG(IS_WIN)
-  exception.SetException(EXCEPTION_ACCESS_VIOLATION);
-#if defined(ARCH_CPU_X86_64)
-  exception.SetCodes({0, std::numeric_limits<uint64_t>::max()});
-  context->x86_64->rax = address;
-#else   // defined(ARCH_CPU_X86_64)
-  exception.SetCodes({0, address});
-#endif  // defined(ARCH_CPU_X86_64)
 #else
 #error "Unknown platform"
 #endif

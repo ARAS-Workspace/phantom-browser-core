@@ -290,7 +290,7 @@ TEST_P(SupervisedUserUrlCheckerClientTest, AccessTokenError) {
   StopAutomaticIssueOfAccessTokens();
 
   // This outcome depends on the feature flag values.
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   // We fallback to making an uncredentialed request to ClassifyUrl, which
   // succeeds.
   EXPECT_CALL(*this,
@@ -306,7 +306,7 @@ TEST_P(SupervisedUserUrlCheckerClientTest, AccessTokenError) {
 
   CheckUrl("http://example.com");
   SimulateAccessTokenError();
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
   SimulateKidsApiResponse(kidsmanagement::ClassifyUrlResponse::ALLOWED);
 #endif
 }

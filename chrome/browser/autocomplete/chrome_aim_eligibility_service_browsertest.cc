@@ -353,8 +353,7 @@ INSTANTIATE_TEST_SUITE_P(,
                              // Values for Pdf server response eligibility.
                              ::testing::Values(true, false)));
 
-#if (BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)) || \
-    (BUILDFLAG(IS_WIN) && defined(ADDRESS_SANITIZER))
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 // TODO(crbug.com/488467253): Fix and re-enable this test for all platforms.
 #define MAYBE_ComprehensiveEligibilityTest DISABLED_ComprehensiveEligibilityTest
 #else

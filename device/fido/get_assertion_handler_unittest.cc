@@ -49,11 +49,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "device/fido/hid/fake_hid_impl_for_testing.h"
-#include "device/fido/win/fake_webauthn_api.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chromeos/dbus/u2f/u2f_client.h"
 #endif
@@ -834,50 +829,6 @@ TEST_F(FidoGetAssertionHandlerTest,
             std::get<0>(get_assertion_future().Get()));
   EXPECT_TRUE(std::get<1>(get_assertion_future().Get()));
 }
-
-#if BUILDFLAG(IS_WIN)
-
-// Verify that the request handler instantiates a HID device backed
-// FidoDeviceAuthenticator or a WinNativeCrossPlatformAuthenticator, depending
-// on API availability.
-TEST(GetAssertionRequestHandlerWinTest, TestWinUsbDiscovery) {
-  base::test::TaskEnvironment task_environment;
-  for (const bool enable_api : {false, true}) {
-    SCOPED_TRACE(::testing::Message() << "enable_api=" << enable_api);
-    FakeWinWebAuthnApi api;
-    api.set_available(enable_api);
-    api.InjectNonDiscoverableCredential(
-        test_data::kTestGetAssertionCredentialId, test_data::kRelyingPartyId);
-    WinWebAuthnApi::ScopedOverride win_webauthn_api_override(&api);
-
-    // Simulate a connected HID device.
-    ScopedFakeFidoHidManager fake_hid_manager;
-    fake_hid_manager.AddFidoHidDevice("guid");
-
-    TestGetAssertionRequestFuture future;
-    FidoDiscoveryFactory fido_discovery_factory;
-    CtapGetAssertionRequest request(test_data::kRelyingPartyId,
-                                    test_data::kClientDataJson);
-    request.allow_list = {PublicKeyCredentialDescriptor(
-        CredentialType::kPublicKey,
-        base::ToVector(test_data::kTestGetAssertionCredentialId))};
-    auto handler = std::make_unique<GetAssertionRequestHandler>(
-        &fido_discovery_factory,
-        std::vector<std::unique_ptr<FidoDiscoveryBase>>(),
-        base::flat_set<FidoTransportProtocol>(
-            {FidoTransportProtocol::kUsbHumanInterfaceDevice}),
-        std::move(request), CtapGetAssertionOptions(),
-        /*allow_skipping_pin_touch=*/true, future.GetCallback());
-    task_environment.RunUntilIdle();
-
-    EXPECT_EQ(handler->AuthenticatorsForTesting().size(), 1u);
-    EXPECT_EQ(handler->AuthenticatorsForTesting().begin()->second->GetType() ==
-                  AuthenticatorType::kWinNative,
-              enable_api);
-  }
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 TEST_F(FidoGetAssertionHandlerTest, CrossDeviceFallbackUrl_Usb) {
   set_supported_transports({FidoTransportProtocol::kUsbHumanInterfaceDevice});

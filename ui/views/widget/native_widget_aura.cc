@@ -81,10 +81,6 @@
 #include "ui/views/widget/desktop_aura/desktop_window_tree_host_platform.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/views/widget/desktop_aura/desktop_window_tree_host_win.h"
-#endif
-
 DEFINE_UI_CLASS_PROPERTY_TYPE(views::internal::NativeWidgetPrivate*)
 
 namespace views {
@@ -1099,12 +1095,6 @@ void NativeWidgetAura::OnNativeViewHierarchyWillChange() {}
 
 void NativeWidgetAura::OnNativeViewHierarchyChanged() {}
 
-#if BUILDFLAG(IS_WIN)
-void NativeWidgetAura::SetExcludeFromScreenCapture(bool exclude) {
-  // Nothing to be done for native widgets.
-}
-#endif
-
 bool NativeWidgetAura::SetAllowScreenshots(bool allow) {
   // TODO(crbug.com/322519161): Revisit this to delegate the call to
   // `WindowTreeHost`.
@@ -1471,7 +1461,7 @@ void NativeWidgetAura::SetInitialFocus(ui::mojom::WindowShowState show_state) {
 // Widget, public:
 
 namespace {
-#if BUILDFLAG(ENABLE_DESKTOP_AURA) && (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_OZONE))
+#if BUILDFLAG(ENABLE_DESKTOP_AURA) && BUILDFLAG(IS_OZONE)
 void CloseWindow(aura::Window* window) {
   if (window) {
     if (Widget* widget = Widget::GetWidgetForNativeView(window)) {
@@ -1485,21 +1475,10 @@ void CloseWindow(aura::Window* window) {
 }
 #endif
 
-#if BUILDFLAG(IS_WIN)
-BOOL CALLBACK WindowCallbackProc(HWND hwnd, LPARAM lParam) {
-  aura::Window* root_window =
-      DesktopWindowTreeHostWin::GetContentWindowForHWND(hwnd);
-  CloseWindow(root_window);
-  return TRUE;
-}
-#endif
 }  // namespace
 
 // static
 void Widget::CloseAllWidgets() {
-#if BUILDFLAG(IS_WIN)
-  EnumThreadWindows(GetCurrentThreadId(), WindowCallbackProc, 0);
-#endif
 
 #if BUILDFLAG(ENABLE_DESKTOP_AURA) && BUILDFLAG(IS_OZONE)
   DesktopWindowTreeHostPlatform::CleanUpWindowList(CloseWindow);

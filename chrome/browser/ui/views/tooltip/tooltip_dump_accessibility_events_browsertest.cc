@@ -14,12 +14,6 @@
 #include "ui/views/widget/widget.h"
 #include "ui/wm/core/cursor_manager.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/accessibility/platform/inspect/ax_event_recorder_win.h"
-#include "ui/accessibility/platform/inspect/ax_event_recorder_win_uia.h"
-#include "ui/aura/window_tree_host.h"
-#endif
-
 namespace views {
 namespace {
 
@@ -71,35 +65,13 @@ class TooltipDumpAccessibilityEventsTest
   // Tooltip creates a separate HWND, so UIA TreeScope_Subtree on the test
   // widget won't see its events. Scope UIA to the desktop instead.
   std::unique_ptr<ui::AXEventRecorder> CreateEventRecorder() override {
-#if BUILDFLAG(IS_WIN)
-    ui::AXTreeSelector selector;
-    switch (GetApiType()) {
-      case ui::AXApiType::kWinIA2:
-        selector.widget = reinterpret_cast<gfx::AcceleratedWidget>(
-            widget()->GetNativeWindow()->GetHost()->GetAcceleratedWidget());
-        return std::make_unique<ui::AXEventRecorderWin>(
-            base::GetCurrentProcId(), selector, ui::AXEventRecorderWin::kSync);
-      case ui::AXApiType::kWinUIA:
-        selector.widget =
-            reinterpret_cast<gfx::AcceleratedWidget>(GetDesktopWindow());
-        return std::make_unique<ui::AXEventRecorderWinUia>(selector);
-      default:
-        return nullptr;
-    }
-#else
     return DumpAccessibilityEventsViewsTestBase::CreateEventRecorder();
-#endif
   }
 
   // Desktop-scoped UIA receives events from all windows. Only allow
   // tooltip-specific events.
   std::vector<ui::AXPropertyFilter> DefaultFilters() const override {
     std::vector<ui::AXPropertyFilter> filters;
-#if BUILDFLAG(IS_WIN)
-    filters.emplace_back("*ROLE_SYSTEM_TOOLTIP*", ui::AXPropertyFilter::ALLOW);
-    filters.emplace_back("ToolTipOpened*", ui::AXPropertyFilter::ALLOW);
-    filters.emplace_back("ToolTipClosed*", ui::AXPropertyFilter::ALLOW);
-#endif
     return filters;
   }
 
@@ -168,13 +140,6 @@ IN_PROC_BROWSER_TEST_P(TooltipDumpAccessibilityEventsTest,
   BEGIN_RECORDING_EVENTS_OR_SKIP("tooltip-opened");
   ShowTooltip();
 
-#if BUILDFLAG(IS_WIN)
-  // UIA delivers tooltip events from a different HWND than TestComplete,
-  // so wait for the event before stopping to avoid a race.
-  if (GetApiType() == ui::AXApiType::kWinUIA) {
-    ASSERT_TRUE(WaitForCapturedEvent("ToolTipOpened"));
-  }
-#endif
 }
 
 IN_PROC_BROWSER_TEST_P(TooltipDumpAccessibilityEventsTest,
@@ -187,13 +152,6 @@ IN_PROC_BROWSER_TEST_P(TooltipDumpAccessibilityEventsTest,
   ShowTooltip();
   HideTooltip();
 
-#if BUILDFLAG(IS_WIN)
-  // UIA delivers tooltip events from a different HWND than TestComplete,
-  // so wait for the event before stopping to avoid a race.
-  if (GetApiType() == ui::AXApiType::kWinUIA) {
-    ASSERT_TRUE(WaitForCapturedEvent("ToolTipClosed"));
-  }
-#endif
 }
 
 INSTANTIATE_TEST_SUITE_P(

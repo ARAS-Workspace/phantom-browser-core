@@ -163,7 +163,7 @@ signin_metrics::ProfileSignout kAlwaysAllowedSignoutSources[] = {
 std::string HatsSurveyTriggerForAccessPoint(
     signin_metrics::AccessPoint access_point) {
   switch (access_point) {
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     case signin_metrics::AccessPoint::kAddressBubble:
       return kHatsSurveyTriggerIdentityAddressBubbleSignin;
     case signin_metrics::AccessPoint::kAvatarBubbleSignIn:
@@ -177,7 +177,7 @@ std::string HatsSurveyTriggerForAccessPoint(
       return kHatsSurveyTriggerIdentitySigninInterceptProfileSeparation;
     case signin_metrics::AccessPoint::kUserManager:
       return kHatsSurveyTriggerIdentityProfilePickerAddProfileSignin;
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
     default:
       // No HaTS survey is defined for the rest of the access point.
       return std::string();

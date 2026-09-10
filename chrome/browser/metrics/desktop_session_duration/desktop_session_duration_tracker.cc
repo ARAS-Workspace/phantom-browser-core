@@ -35,12 +35,7 @@ constexpr ui::EventType kNonInteractiveEvents[] = {
 // Returns whether this instance was launched automatically by the OS as part of
 // its startup.
 bool IsAutoLaunchedByOs() {
-#if BUILDFLAG(IS_WIN)
-  return base::CommandLine::ForCurrentProcess()->HasSwitch(
-      switches::kStartupForegroundLaunch);
-#else
   return false;
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 }  // namespace

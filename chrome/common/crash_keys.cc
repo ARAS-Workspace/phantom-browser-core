@@ -23,11 +23,6 @@
 #include "components/webui/flags/flags_ui_switches.h"
 #include "content/public/common/content_switches.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/access_token.h"
-#include "chrome/installer/util/isolation_support.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "components/crash/core/app/crash_switches.h"
 #include "gpu/command_buffer/service/gpu_switches.h"
@@ -153,12 +148,6 @@ bool IsBoringSwitch(const std::string& flag) {
 #endif
   });
 
-#if BUILDFLAG(IS_WIN)
-  // Just about everything has this, don't bother.
-  if (base::StartsWith(flag, "/prefetch:", base::CompareCase::SENSITIVE))
-    return true;
-#endif
-
   if (!base::StartsWith(flag, "--", base::CompareCase::SENSITIVE))
     return false;
   size_t end = flag.find("=");
@@ -220,14 +209,6 @@ void SetCrashKeysFromCommandLine(const base::CommandLine& command_line) {
   HandleEnableDisableFeatures(command_line);
   SetSwitchesFromCommandLine(command_line, &IsBoringSwitch);
 
-#if BUILDFLAG(IS_WIN)
-  auto process_token = base::win::AccessToken::FromCurrentProcess();
-  if (process_token && process_token->GetSecurityAttribute(
-                           installer::GetIsolationAttributeName())) {
-    static crash_reporter::CrashKeyString<32> is_isolated("is-isolated");
-    is_isolated.Set("yes");
-  }
-#endif
 }
 
 }  // namespace crash_keys

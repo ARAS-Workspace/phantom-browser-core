@@ -192,13 +192,6 @@ constexpr bool kPrintSettingsRasterizePdf2 = false;
 constexpr bool kPrintSettingsLandscape1 = false;
 constexpr bool kPrintSettingsLandscape2 = true;
 
-#if BUILDFLAG(IS_WIN)
-constexpr mojom::PrinterLanguageType kPrintSettingsPrinterLanguageType1 =
-    mojom::PrinterLanguageType::kTextOnly;
-constexpr mojom::PrinterLanguageType kPrintSettingsPrinterLanguageType2 =
-    mojom::PrinterLanguageType::kXps;
-#endif  // BUILDFLAG(IS_WIN)
-
 constexpr bool kPrintSettingsModifiable1 = true;
 constexpr bool kPrintSettingsModifiable2 = false;
 
@@ -257,10 +250,6 @@ PrintSettings GenerateSamplePrintSettingsDefaultMargins() {
   settings.set_rasterize_pdf(kPrintSettingsRasterizePdf1);
   settings.SetOrientation(kPrintSettingsLandscape1);
 
-#if BUILDFLAG(IS_WIN)
-  settings.set_printer_language_type(kPrintSettingsPrinterLanguageType1);
-#endif
-
   settings.set_is_modifiable(kPrintSettingsModifiable1);
   settings.set_pages_per_sheet(kPrintSettingsPagesPerSheet1);
 
@@ -290,10 +279,6 @@ PrintSettings GenerateSamplePrintSettingsCustomMarginsWithParams(
   settings.SetOrientation(kPrintSettingsLandscape2);
 
   settings.SetCustomMargins(kPrintSettingsCustomMarginsInMicrons);
-
-#if BUILDFLAG(IS_WIN)
-  settings.set_printer_language_type(kPrintSettingsPrinterLanguageType2);
-#endif
 
   settings.set_is_modifiable(kPrintSettingsModifiable2);
   settings.set_pages_per_sheet(kPrintSettingsPagesPerSheet2);
@@ -549,10 +534,6 @@ TEST(PrintingContextMojomTraitsTest,
   EXPECT_EQ(output.rasterize_pdf(), kPrintSettingsRasterizePdf1);
   EXPECT_EQ(output.landscape(), kPrintSettingsLandscape1);
 
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(output.printer_language_type(), kPrintSettingsPrinterLanguageType1);
-#endif
-
   EXPECT_EQ(output.is_modifiable(), kPrintSettingsModifiable1);
 
   // Since `kPrintSettingsMarginType1` is not `kCustomMargins` then expect the
@@ -605,10 +586,6 @@ TEST(PrintingContextMojomTraitsTest,
   EXPECT_EQ(output.scale_factor(), kPrintSettingsScaleFactor2);
   EXPECT_EQ(output.rasterize_pdf(), kPrintSettingsRasterizePdf2);
   EXPECT_EQ(output.landscape(), kPrintSettingsLandscape2);
-
-#if BUILDFLAG(IS_WIN)
-  EXPECT_EQ(output.printer_language_type(), kPrintSettingsPrinterLanguageType2);
-#endif
 
   EXPECT_EQ(output.is_modifiable(), kPrintSettingsModifiable2);
   EXPECT_TRUE(PageMarginsEqual(output.requested_custom_margins_in_microns(),

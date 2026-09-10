@@ -310,10 +310,6 @@ TEST_F(WebAppUninstallCommandTest, PolicyAppUninstallRemovesOsIntegration) {
       test::InstallWebApp(profile(), std::move(web_app_info),
                           /*overwrite_existing_manifest_fields=*/false,
                           webapps::WebappInstallSource::EXTERNAL_POLICY);
-#if BUILDFLAG(IS_WIN)
-  EXPECT_TRUE(fake_os_integration().HasOsIntegrationResourcesDirectory(
-      profile(), app_id));
-#endif  // BUILDFLAG(IS_WIN)
   base::FilePath deletion_path = GetManifestResourcesDirectoryForApp(
       GetWebAppsRootDirectory(profile()), app_id);
 

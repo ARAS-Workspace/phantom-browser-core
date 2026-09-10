@@ -274,7 +274,7 @@ TEST_F(GeolocationLocationProviderManagerTest, NetworkOnly) {
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 // Tests basic operation (valid position and error position update) for system
 // location provider.
 TEST_F(GeolocationLocationProviderManagerTest, PlatformOnly) {
@@ -318,7 +318,7 @@ TEST_F(GeolocationLocationProviderManagerTest, PlatformOnly) {
   EXPECT_EQ(platform_location_provider()->GetPosition()->get_error(),
             observer_->last_result()->get_error());
 }
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID)
 
 // Tests basic operation (single position fix) with no network location
 // provider, no system location provider and a custom system location provider.

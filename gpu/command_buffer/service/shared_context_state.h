@@ -39,11 +39,6 @@
 #include "third_party/skia/include/gpu/ganesh/GrDirectContext.h"
 #include "ui/gl/progress_reporter.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <d3d11.h>
-#include <wrl/client.h>
-#endif
-
 namespace gl {
 class GLContext;
 class GLDisplay;
@@ -245,7 +240,7 @@ class GPU_GLES2_EXPORT SharedContextState
   gpu::MemoryTypeTracker* memory_type_tracker() {
     return &memory_type_tracker_;
   }
-#if BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN))
+#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_LINUX)
   ExternalSemaphorePool* external_semaphore_pool() {
     return external_semaphore_pool_.get();
   }
@@ -299,11 +294,6 @@ class GPU_GLES2_EXPORT SharedContextState
   void ScheduleSkiaCleanup();
 
   int32_t GetMaxTextureSize();
-
-#if BUILDFLAG(IS_WIN)
-  // Get the D3D11 device used for the compositing.
-  Microsoft::WRL::ComPtr<ID3D11Device> GetD3D11Device() const;
-#endif
 
  private:
   friend class base::RefCounted<SharedContextState>;
@@ -412,7 +402,7 @@ class GPU_GLES2_EXPORT SharedContextState
   base::Time last_gl_check_graphics_reset_status_;
   bool disable_check_reset_status_throttling_for_test_ = false;
 
-#if BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN))
+#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_LINUX)
   std::unique_ptr<ExternalSemaphorePool> external_semaphore_pool_;
 #endif
 

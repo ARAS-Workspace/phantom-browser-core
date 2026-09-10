@@ -44,10 +44,6 @@
 #include "base/android/content_uri_utils.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "content/browser/network/network_service_process_tracker_win.h"
-#endif
-
 #if BUILDFLAG(IS_MAC)
 #include "base/task/current_thread.h"
 #endif
@@ -209,14 +205,6 @@ void NetworkServiceClient::OnIPAddressChanged(
           net::NetworkChangeNotifier::GetConnectionSubtype()));
 }
 #endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
-
-#if BUILDFLAG(IS_WIN)
-mojo::PendingRemote<network::mojom::SocketBroker>
-NetworkServiceClient::BindSocketBroker() {
-  EnsureNetworkServiceListenerStarted();
-  return socket_broker_.BindNewRemote();
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 mojo::PendingRemote<network::mojom::URLLoaderNetworkServiceObserver>
 NetworkServiceClient::BindURLLoaderNetworkServiceObserver() {

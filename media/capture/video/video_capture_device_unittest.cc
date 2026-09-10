@@ -34,13 +34,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <mfcaptureengine.h>
-#include "base/win/scoped_com_initializer.h"
-#include "media/capture/video/win/video_capture_device_factory_win.h"
-#include "media/capture/video/win/video_capture_device_mf_win.h"
-#endif
-
 #if BUILDFLAG(IS_APPLE)
 #include "media/capture/video/apple/video_capture_device_factory_apple.h"
 #endif
@@ -81,7 +74,7 @@
 
 #define MAYBE_UsingRealWebcam_CheckPhotoCallbackRelease \
   UsingRealWebcam_CheckPhotoCallbackRelease
-#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#elif BUILDFLAG(IS_LINUX)
 // Windows test bots don't have camera.
 // Linux test bots don't have camera.
 // On Fuchsia the tests run under emulator that doesn't support camera.
@@ -150,34 +143,7 @@ void DumpError(media::VideoCaptureError,
 
 enum VideoCaptureImplementationTweak {
   NONE,
-#if BUILDFLAG(IS_WIN)
-  WIN_MEDIA_FOUNDATION
-#endif
 };
-
-#if BUILDFLAG(IS_WIN)
-class MockMFPhotoCallback final : public IMFCaptureEngineOnSampleCallback {
- public:
-  ~MockMFPhotoCallback() {}
-
-  MOCK_METHOD2(DoQueryInterface, HRESULT(REFIID, void**));
-  MOCK_METHOD0(DoAddRef, ULONG(void));
-  MOCK_METHOD0(DoRelease, ULONG(void));
-  MOCK_METHOD1(DoOnSample, HRESULT(IMFSample*));
-
-  IFACEMETHODIMP QueryInterface(REFIID riid, void** object) override {
-    return DoQueryInterface(riid, object);
-  }
-
-  IFACEMETHODIMP_(ULONG) AddRef() override { return DoAddRef(); }
-
-  IFACEMETHODIMP_(ULONG) Release() override { return DoRelease(); }
-
-  IFACEMETHODIMP OnSample(IMFSample* sample) override {
-    return DoOnSample(sample);
-  }
-};
-#endif
 
 class MockImageCaptureClient
     : public base::RefCountedThreadSafe<MockImageCaptureClient> {
@@ -239,14 +205,6 @@ class VideoCaptureDeviceTest
     : public testing::TestWithParam<
           std::tuple<gfx::Size, VideoCaptureImplementationTweak>> {
  public:
-#if BUILDFLAG(IS_WIN)
-  scoped_refptr<IMFCaptureEngineOnSampleCallback> CreateMockPhotoCallback(
-      MockMFPhotoCallback* mock_photo_callback,
-      VideoCaptureDevice::TakePhotoCallback callback,
-      VideoCaptureFormat format) {
-    return scoped_refptr<IMFCaptureEngineOnSampleCallback>(mock_photo_callback);
-  }
-#endif
 
   void RunOpenInvalidDeviceTestCase();
   void RunCaptureWithSizeTestCase();
@@ -271,23 +229,13 @@ class VideoCaptureDeviceTest
   }
 
   void SetUp() override {
-#if BUILDFLAG(IS_WIN)
-    static_cast<VideoCaptureDeviceFactoryWin*>(
-        video_capture_device_factory_.get())
-        ->set_use_media_foundation_for_testing(UseWinMediaFoundation());
-#endif
   }
 
   void TearDown() override {
     task_environment_.RunUntilIdle();
   }
 
-#if BUILDFLAG(IS_WIN)
-  bool UseWinMediaFoundation() {
-    return std::get<1>(GetParam()) == WIN_MEDIA_FOUNDATION &&
-           VideoCaptureDeviceFactoryWin::PlatformSupportsMediaFoundation();
-  }
-#elif BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
   void WaitForCameraServiceReady() {
     if (media::ShouldUseCrosCameraService()) {
       VideoCaptureDeviceFactoryChromeOS* vcd_factory_chromeos =
@@ -411,9 +359,6 @@ class VideoCaptureDeviceTest
 #endif
   }
 
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedCOMInitializer initialize_com_;
-#endif
   base::test::TaskEnvironment task_environment_;
   std::vector<VideoCaptureDeviceInfo> devices_info_;
   std::unique_ptr<base::RunLoop> run_loop_;
@@ -425,13 +370,8 @@ class VideoCaptureDeviceTest
 };
 
 // Cause hangs on Windows Debug. http://crbug.com/417824
-#if (BUILDFLAG(IS_WIN) && !defined(NDEBUG))
-#define MAYBE_UsingRealWebcam_OpenInvalidDevice \
-  DISABLED_UsingRealWebcam_OpenInvalidDevice
-#else
 #define MAYBE_UsingRealWebcam_OpenInvalidDevice \
   UsingRealWebcam_OpenInvalidDevice
-#endif
 // Tries to allocate an invalid device and verifies it doesn't work.
 WRAPPED_TEST_P(VideoCaptureDeviceTest,
                MAYBE_UsingRealWebcam_OpenInvalidDevice) {
@@ -443,12 +383,7 @@ void VideoCaptureDeviceTest::RunOpenInvalidDeviceTestCase() {
   VideoCaptureDeviceDescriptor invalid_descriptor;
   invalid_descriptor.device_id = "jibberish";
   invalid_descriptor.set_display_name("jibberish");
-#if BUILDFLAG(IS_WIN)
-  invalid_descriptor.capture_api =
-      VideoCaptureDeviceFactoryWin::PlatformSupportsMediaFoundation()
-          ? VideoCaptureApi::WIN_MEDIA_FOUNDATION
-          : VideoCaptureApi::WIN_DIRECT_SHOW;
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
   invalid_descriptor.capture_api = VideoCaptureApi::MACOSX_AVFOUNDATION;
 #endif
   VideoCaptureErrorOrDevice device_status =
@@ -524,9 +459,6 @@ void VideoCaptureDeviceTest::RunCaptureWithSizeTestCase() {
 const gfx::Size kCaptureSizes[] = {gfx::Size(640, 480), gfx::Size(1280, 720)};
 const VideoCaptureImplementationTweak kCaptureImplementationTweaks[] = {
     NONE,
-#if BUILDFLAG(IS_WIN)
-    WIN_MEDIA_FOUNDATION
-#endif
 };
 
 INSTANTIATE_TEST_SUITE_P(
@@ -636,9 +568,6 @@ void VideoCaptureDeviceTest::RunCaptureMjpegTestCase() {
   auto device_info = GetFirstDeviceSupportingPixelFormat(PIXEL_FORMAT_MJPEG);
   ASSERT_TRUE(device_info);
 
-#if BUILDFLAG(IS_WIN)
-  GTEST_SKIP() << "Skipped on Windows:  https://crbug.com/570604";
-#else
   VideoCaptureErrorOrDevice device_status =
       video_capture_device_factory_->CreateDevice(device_info->descriptor);
   ASSERT_TRUE(device_status.ok());
@@ -661,7 +590,6 @@ void VideoCaptureDeviceTest::RunCaptureMjpegTestCase() {
             media::VideoFrame::AllocationSize(last_format().pixel_format,
                                               last_format().frame_size));
   device->StopAndDeAllocate();
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 #define MAYBE_UsingRealWebcam_NoCameraSupportsPixelFormatMax \
@@ -782,63 +710,5 @@ void VideoCaptureDeviceTest::RunGetPhotoStateTestCase() {
 
   device->StopAndDeAllocate();
 }
-
-#if BUILDFLAG(IS_WIN)
-// Verifies that the photo callback is correctly released by MediaFoundation
-WRAPPED_TEST_P(VideoCaptureDeviceTest,
-               MAYBE_UsingRealWebcam_CheckPhotoCallbackRelease) {
-  if (!UseWinMediaFoundation())
-    return;
-
-  auto device_info = GetFirstDeviceSupportingPixelFormat(PIXEL_FORMAT_MJPEG);
-  ASSERT_TRUE(device_info);
-
-  EXPECT_CALL(*video_capture_client_, OnError(_, _, _)).Times(0);
-  EXPECT_CALL(*video_capture_client_, OnStarted());
-
-  VideoCaptureErrorOrDevice device_status =
-      video_capture_device_factory_->CreateDevice(device_info->descriptor);
-  ASSERT_TRUE(device_status.ok());
-  std::unique_ptr<VideoCaptureDevice> device(device_status.ReleaseDevice());
-
-  VideoCaptureParams capture_params;
-  capture_params.requested_format.frame_size.SetSize(320, 240);
-  capture_params.requested_format.frame_rate = 30;
-  capture_params.requested_format.pixel_format = PIXEL_FORMAT_MJPEG;
-  device->AllocateAndStart(capture_params, std::move(video_capture_client_));
-
-  if (!static_cast<VideoCaptureDeviceMFWin*>(device.get())
-           ->get_use_photo_stream_to_take_photo_for_testing()) {
-    DVLOG(1) << "The device is not using the MediaFoundation photo callback. "
-                "Exiting test.";
-    device->StopAndDeAllocate();
-    return;
-  }
-
-  MockMFPhotoCallback* callback = new MockMFPhotoCallback();
-  EXPECT_CALL(*callback, DoQueryInterface(_, _)).WillRepeatedly(Return(S_OK));
-  EXPECT_CALL(*callback, DoAddRef()).WillOnce(Return(1U));
-  EXPECT_CALL(*callback, DoRelease()).WillOnce(Return(1U));
-  EXPECT_CALL(*callback, DoOnSample(_)).WillOnce(Return(S_OK));
-  static_cast<VideoCaptureDeviceMFWin*>(device.get())
-      ->set_create_mf_photo_callback_for_testing(base::BindRepeating(
-          &VideoCaptureDeviceTest::CreateMockPhotoCallback,
-          base::Unretained(this), base::Unretained(callback)));
-
-  VideoCaptureDevice::TakePhotoCallback scoped_callback = base::BindOnce(
-      &MockImageCaptureClient::DoOnPhotoTaken, image_capture_client_);
-
-  base::RunLoop run_loop(base::RunLoop::Type::kNestableTasksAllowed);
-  base::RepeatingClosure quit_closure =
-      base::BindPostTaskToCurrentDefault(run_loop.QuitClosure());
-  EXPECT_CALL(*image_capture_client_.get(), OnCorrectPhotoTaken())
-      .WillOnce(RunClosure(quit_closure));
-
-  device->TakePhoto(std::move(scoped_callback));
-  run_loop.Run();
-
-  device->StopAndDeAllocate();
-}
-#endif
 
 }  // namespace media

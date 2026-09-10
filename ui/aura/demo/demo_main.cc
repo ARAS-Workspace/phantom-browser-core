@@ -41,10 +41,6 @@
 #include "ui/gl/gl_utils.h"
 #include "ui/gl/init/gl_factory.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/display/win/dpi.h"
-#endif
-
 #if BUILDFLAG(IS_OZONE)
 #include "ui/ozone/public/ozone_platform.h"
 #endif
@@ -172,10 +168,6 @@ int DemoMain() {
   ui::OzonePlatform::InitializeForGPU(params);
 #endif
   gl::init::InitializeGLOneOff(/*gpu_preference=*/gl::GpuPreference::kDefault);
-
-#if BUILDFLAG(IS_WIN)
-  display::win::SetDefaultDeviceScaleFactor(1.0f);
-#endif
 
   // Create the task executor here before creating the root window.
   base::SingleThreadTaskExecutor main_task_executor(base::MessagePumpType::UI);

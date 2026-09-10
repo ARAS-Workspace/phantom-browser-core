@@ -86,19 +86,12 @@ TEST(FileInfoTest, Backslashes) {
     std::optional<base::FilePath::StringType> path_roundtrip;
   };
   const TestCase tests[] = {
-#if BUILDFLAG(IS_WIN)
-    // File paths with backslash should roundtrip on windows.
-    {FPL("C:\\path"), "file:///C:/path"},
-    {FPL("\\path"), "file:///path"},
-    {FPL("\\\\host\\path"), "file://host/path"},
-#else
     // File paths with backslash should be escaped on posix, and relative path
     // becomes absolute path.
     {FPL("C:\\path"), "file:///C:%5Cpath", FPL("/C:\\path")},
     {FPL("\\path"), "file:///%5Cpath", FPL("/\\path")},
     {FPL("\\\\host\\path"), "file:///%5C%5Chost%5Cpath",
      FPL("/\\\\host\\path")},
-#endif
   };
   for (const TestCase& test : tests) {
     FileInfo file_info(base::FilePath(test.path), base::FilePath());

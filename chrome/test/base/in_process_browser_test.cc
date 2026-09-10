@@ -111,17 +111,9 @@
 #include "components/os_crypt/common/os_crypt_switches.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/test/test_file_util.h"
-#include "base/win/scoped_com_initializer.h"
-#include "base/win/windows_version.h"
-#include "components/version_info/version_info.h"
-#include "ui/base/win/atl_module.h"
-#endif
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 #include "services/device/public/cpp/test/fake_geolocation_system_permission_manager.h"
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 #if BUILDFLAG(ENABLE_CAPTIVE_PORTAL_DETECTION)
 #include "components/captive_portal/content/captive_portal_service.h"
@@ -162,9 +154,9 @@
 #include "ui/views/widget/widget.h"
 #endif
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/ui/ui_features.h"
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 namespace {
 
@@ -197,7 +189,7 @@ FakeDeviceSyncImplFactory* GetFakeDeviceSyncImplFactory() {
 }
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 class ChromeBrowserMainExtraPartsBrowserProcessInjection
     : public ChromeBrowserMainExtraParts {
  public:
@@ -228,7 +220,7 @@ class ChromeBrowserMainExtraPartsBrowserProcessInjection
   ChromeBrowserMainExtraPartsBrowserProcessInjection& operator=(
       const ChromeBrowserMainExtraPartsBrowserProcessInjection&) = delete;
 };
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
 
 // This extra parts adds a test key provider to make sure that async
 // initialization of OSCrypt Async always happens during browser_tests, but
@@ -383,7 +375,7 @@ void InProcessBrowserTest::Initialize() {
   disabled_features.push_back(
       performance_manager::features::kTransientKeepAlivePolicy);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   // Disable session restore infobar the experiment as it causes test failures.
   disabled_features.push_back(features::kSessionRestoreInfobar);
 #endif
@@ -403,10 +395,6 @@ void InProcessBrowserTest::Initialize() {
   launch_browser_for_testing_ =
       std::make_unique<ash::full_restore::ScopedLaunchBrowserForTesting>();
 #endif
-#if BUILDFLAG(IS_WIN)
-  base::GetPathsAllowedToLeak() = {L"\\Sync Data", L"\\Local Storage\\leveldb",
-                                   L"\\DataSharing", L"\\Collaboration"};
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 InProcessBrowserTest::~InProcessBrowserTest() {
@@ -589,9 +577,6 @@ void InProcessBrowserTest::SetUpDefaultCommandLine(
 
 void InProcessBrowserTest::TearDown() {
   DCHECK(!g_browser_process);
-#if BUILDFLAG(IS_WIN)
-  com_initializer_.reset();
-#endif
   BrowserTestBase::TearDown();
 
   if (embedded_https_test_server().Started()) {
@@ -621,10 +606,10 @@ size_t InProcessBrowserTest::GetTestPreCount() {
 void InProcessBrowserTest::CreatedBrowserMainParts(
     content::BrowserMainParts* parts) {
   BrowserTestBase::CreatedBrowserMainParts(parts);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   static_cast<ChromeBrowserMainParts*>(parts)->AddParts(
       std::make_unique<ChromeBrowserMainExtraPartsBrowserProcessInjection>());
-#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_MAC)
   static_cast<ChromeBrowserMainParts*>(parts)->AddParts(
       std::make_unique<OSCryptAsyncExtraSetUp>());
 }
@@ -654,12 +639,6 @@ void InProcessBrowserTest::RecordPropertyFromMap(
 
 void InProcessBrowserTest::SetUpLocalStatePrefService(
     PrefService* local_state) {
-#if BUILDFLAG(IS_WIN)
-  // Put the current build version number in the prefs, so that pinned taskbar
-  // icons aren't migrated.
-  local_state->SetString(prefs::kShortcutMigrationVersion,
-                         std::string(version_info::GetVersionNumber()));
-#endif  // BUILDFLAG(IS_WIN);
 }
 
 Profile* InProcessBrowserTest::GetProfile() const {

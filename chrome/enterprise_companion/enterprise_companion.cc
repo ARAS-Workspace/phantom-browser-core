@@ -34,14 +34,6 @@
 #include "chrome/enterprise_companion/installer_paths.h"
 #include "chrome/enterprise_companion/ipc_support.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/strings/stringprintf.h"
-#include "base/win/windows_version.h"
-#include "chrome/enterprise_companion/installer.h"
-#include "chrome/updater/util/win_util.h"
-#include "partition_alloc/page_allocator.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace enterprise_companion {
 
 namespace {
@@ -136,27 +128,14 @@ constexpr const char* BuildArch() {
 }
 
 std::string OperatingSystemVersion() {
-#if BUILDFLAG(IS_WIN)
-  const base::win::OSInfo::VersionNumber v =
-      base::win::OSInfo::GetInstance()->version_number();
-  return base::StringPrintf("%u.%u.%u.%u", v.major, v.minor, v.build, v.patch);
-#else
   return base::SysInfo().OperatingSystemVersion();
-#endif
 }
 
 }  // namespace
 
 int EnterpriseCompanionMain(int argc, const char* const* argv) {
-#if BUILDFLAG(IS_WIN)
-  CHECK(updater::EnableSecureDllLoading());
-#endif
 
   // Make the process more resilient to memory allocation issues.
-#if BUILDFLAG(IS_WIN)
-  updater::EnableProcessHeapMetadataProtection();
-  partition_alloc::SetRetryOnCommitFailure(true);
-#endif
   base::EnableTerminationOnHeapCorruption();
   base::EnableTerminationOnOutOfMemory();
   logging::RegisterAbslAbortHook();

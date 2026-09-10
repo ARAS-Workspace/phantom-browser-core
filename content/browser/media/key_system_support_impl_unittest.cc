@@ -293,13 +293,8 @@ TEST_F(KeySystemSupportImplTest, AllowHWSecureCapability) {
   key_system_support_->SetObserver(std::move(observer_remote));
 
 // Only windows can disallow hw secure capability.
-#if BUILDFLAG(IS_WIN)
-  EXPECT_CALL(get_support_cb_, Run(testing::IsFalse(), _))
-      .WillOnce(RunOnceCallback<1>(KeySystemCapabilities()));
-#else
   EXPECT_CALL(get_support_cb_, Run(testing::IsTrue(), _))
       .WillOnce(RunOnceCallback<1>(KeySystemCapabilities()));
-#endif
 
   SetPermissionStatus(blink::mojom::PermissionStatus::DENIED);
   run_loop_1.RunUntilIdle();

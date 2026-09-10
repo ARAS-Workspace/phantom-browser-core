@@ -15,11 +15,7 @@ bool GetPython3Command(base::CommandLine* python_cmd) {
   DCHECK(python_cmd);
 
 // Use vpython3 to pick up src.git's vpython3 VirtualEnv spec.
-#if BUILDFLAG(IS_WIN)
-  python_cmd->SetProgram(base::FilePath(FILE_PATH_LITERAL("vpython3.bat")));
-#else
   python_cmd->SetProgram(base::FilePath(FILE_PATH_LITERAL("vpython3")));
-#endif
 
   // Launch python in unbuffered mode, so that python output doesn't mix with
   // gtest output in buildbot log files. See http://crbug.com/147368.

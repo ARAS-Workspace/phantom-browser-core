@@ -33,10 +33,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/win_util.h"
-#endif
-
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ash/net/secure_dns_manager.h"
 #endif
@@ -120,11 +116,6 @@ IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest, ConfigFromPrefs) {
   bool async_dns_feature_enabled = GetParam();
 
   // Mark as not enterprise managed.
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedDomainStateForTesting scoped_domain(false);
-  // TODO(crbug.com/40229843): What is the correct function to use here?
-  EXPECT_FALSE(base::win::IsEnrolledToDomain());
-#endif
 
   std::string good_post_template = "https://foo.test/";
   std::string good_get_template = "https://bar.test/dns-query{?dns}";
@@ -243,10 +234,6 @@ IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
                        DefaultNonSetPolicies) {
   bool async_dns_feature_enabled = GetParam();
 // Mark as not enterprise managed.
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedDomainStateForTesting scoped_domain(false);
-  EXPECT_FALSE(base::IsEnterpriseDevice());
-#endif
 
   SecureDnsConfig secure_dns_config = config_reader_->GetSecureDnsConfiguration(
       /*force_check_parental_controls_for_automatic_mode=*/false);
@@ -275,10 +262,6 @@ IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest, SpecialPolicies) {
 IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
                        DisableDohByPolicy) {
 // Mark as not enterprise managed.
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedDomainStateForTesting scoped_domain(false);
-  EXPECT_FALSE(base::IsEnterpriseDevice());
-#endif
 
   SetSecureDnsModePolicy("off");
   SecureDnsConfig secure_dns_config = config_reader_->GetSecureDnsConfiguration(
@@ -290,10 +273,6 @@ IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
 IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
                        AutomaticModeByPolicy) {
 // Mark as not enterprise managed.
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedDomainStateForTesting scoped_domain(false);
-  EXPECT_FALSE(base::IsEnterpriseDevice());
-#endif
 
   SetSecureDnsModePolicy("automatic");
   SecureDnsConfig secure_dns_config = config_reader_->GetSecureDnsConfiguration(
@@ -305,10 +284,6 @@ IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
 IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
                        SecureModeByPolicy) {
 // Mark as not enterprise managed.
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedDomainStateForTesting scoped_domain(false);
-  EXPECT_FALSE(base::IsEnterpriseDevice());
-#endif
 
   SetSecureDnsModePolicy("secure");
   SetDohTemplatesPolicy("https://doh.test/");
@@ -322,10 +297,6 @@ IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
 IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
                        InvalidTemplatePolicy) {
 // Mark as not enterprise managed.
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedDomainStateForTesting scoped_domain(false);
-  EXPECT_FALSE(base::IsEnterpriseDevice());
-#endif
 
   SetSecureDnsModePolicy("secure");
   SetDohTemplatesPolicy("invalid template");
@@ -343,10 +314,6 @@ IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
 
 IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest, InvalidModePolicy) {
 // Mark as not enterprise managed.
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedDomainStateForTesting scoped_domain(false);
-  EXPECT_FALSE(base::IsEnterpriseDevice());
-#endif
 
   SetSecureDnsModePolicy("invalid");
   SetDohTemplatesPolicy("https://doh.test/");
@@ -362,10 +329,6 @@ IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest, InvalidModePolicy) {
 IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
                        ConfigFromParentalControls) {
 // Mark as not enterprise managed.
-#if BUILDFLAG(IS_WIN)
-  base::win::ScopedDomainStateForTesting scoped_domain(false);
-  EXPECT_FALSE(base::IsEnterpriseDevice());
-#endif
 
   config_reader_->OverrideParentalControlsForTesting(
       /*parental_controls_override=*/true);
@@ -387,61 +350,6 @@ IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
   EXPECT_EQ(secure_dns_config.mode(), net::SecureDnsMode::kAutomatic);
   EXPECT_THAT(secure_dns_config.doh_servers().servers(), testing::IsEmpty());
 }
-
-#if BUILDFLAG(IS_WIN)
-IN_PROC_BROWSER_TEST_P(StubResolverConfigReaderBrowsertest,
-                       AsyncDnsDisabledWhenZTDNSEnabled) {
-  // This test focuses on the interaction of ZTDNS with the AsyncDns feature.
-  // The StubResolverConfigReader constructor, which runs during
-  // SetUpOnMainThread, sets the *default* value of
-  // prefs::kBuiltInDnsClientEnabled based on ShouldEnableAsyncDns(). To test
-  // the effect of ZTDNS, we set the override *before* a relevant
-  // StubResolverConfigReader instance evaluates this default. We achieve this
-  // by creating a new instance after setting the override.
-
-  // Simulate ZTDNS is ON
-  StubResolverConfigReader::SetZTDNSEnabledForTesting(true);
-
-  // Create a new StubResolverConfigReader instance. Its constructor will use
-  // the ZTDNS override when calling ShouldEnableAsyncDns() to set the default
-  // value for prefs::kBuiltInDnsClientEnabled in the local_state's
-  // PrefRegistry. We pass 'true' for set_up_pref_defaults to ensure this
-  // happens.
-  StubResolverConfigReader test_config_reader(g_browser_process->local_state(),
-                                              true /* set_up_pref_defaults */);
-
-  PrefService* local_state = g_browser_process->local_state();
-
-  // Case 1: AsyncDns feature is ON.
-  // With ZTDNS enabled (mocked), ShouldEnableAsyncDns() should return false.
-  // Therefore, the default for kBuiltInDnsClientEnabled should be false.
-  // Case 2: AsyncDns feature is OFF.
-  // ShouldEnableAsyncDns() should return false (regardless of ZTDNS).
-  // Therefore, the default for kBuiltInDnsClientEnabled should be false.
-  EXPECT_FALSE(local_state->GetBoolean(prefs::kBuiltInDnsClientEnabled))
-      << "kBuiltInDnsClientEnabled should default to false when AsyncDns "
-         "feature is off.";
-  EXPECT_FALSE(test_config_reader.GetInsecureStubResolverEnabled())
-      << "GetInsecureStubResolverEnabled should be false when AsyncDns "
-         "feature is off.";
-
-  // Sanity check SecureDnsConfig (DoH settings should be unaffected by this
-  // specific test, assuming default DoH mode 'automatic' and no templates,
-  // leading to 'off' effectively unless other conditions for 'automatic' are
-  // met, which are not the focus here). This part primarily ensures
-  // GetSecureDnsConfiguration can be called without crashing.
-  SecureDnsConfig secure_dns_config =
-      test_config_reader.GetSecureDnsConfiguration(
-          false /* force_check_parental_controls_for_automatic_mode */);
-  // Default DoH mode is kAutomatic, which without explicit templates often
-  // resolves to effectively off for the purpose of doh_servers(), unless probes
-  // succeed. The exact mode isn't the primary assert here, but rather that
-  // GetInsecureStubResolverEnabled is correct. Depending on default DoH
-  // settings, mode might be kAutomatic or kOff.
-  EXPECT_TRUE(secure_dns_config.mode() == net::SecureDnsMode::kAutomatic ||
-              secure_dns_config.mode() == net::SecureDnsMode::kOff);
-}
-#endif
 
 INSTANTIATE_TEST_SUITE_P(All,
                          StubResolverConfigReaderBrowsertest,

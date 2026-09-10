@@ -42,9 +42,6 @@
 #include "base/process/launch.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif
 
 
 namespace base {

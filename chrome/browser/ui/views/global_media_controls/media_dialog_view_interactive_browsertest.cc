@@ -733,8 +733,7 @@ IN_PROC_BROWSER_TEST_F(MediaDialogViewBrowserTest,
 
 // TODO(crbug.com/40898509): Live captioning not supported on Arm64 Windows or
 // Linux.
-#if (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)) && defined(ARCH_CPU_ARM64) || \
-    BUILDFLAG(IS_MAC)
+#if (BUILDFLAG(IS_LINUX) && defined(ARCH_CPU_ARM64)) || BUILDFLAG(IS_MAC)
 #define MAYBE_LiveCaption DISABLED_LiveCaption
 #else
 #define MAYBE_LiveCaption LiveCaption
@@ -809,8 +808,7 @@ IN_PROC_BROWSER_TEST_F(MediaDialogViewBrowserTest, MAYBE_LiveCaption) {
             GetLiveCaptionTitleLabel()->GetText());
 }
 
-#if (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)) && defined(ARCH_CPU_ARM64) || \
-    BUILDFLAG(IS_MAC)
+#if (BUILDFLAG(IS_LINUX) && defined(ARCH_CPU_ARM64)) || BUILDFLAG(IS_MAC)
 // https://crbug.com/40187385
 // Flaky on all Mac bots: https://crbug.com/40807988
 // TODO(crbug.com/40898509): Renable on WinArm64 or Linux Arm64 when live
@@ -883,8 +881,7 @@ IN_PROC_BROWSER_TEST_F(MediaDialogViewBrowserTest,
 // TODO(crbug.com/40775869, crbug.com/40187385): Flaky.
 // TODO(crbug.com/40898509): Renable on WinArm64 or Linux Arm64 when live
 // captioning is enabled.
-#if (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)) && defined(ARCH_CPU_ARM64) || \
-    BUILDFLAG(IS_MAC)
+#if (BUILDFLAG(IS_LINUX) && defined(ARCH_CPU_ARM64)) || BUILDFLAG(IS_MAC)
 #define MAYBE_LiveCaptionShowLanguage DISABLED_LiveCaptionShowLanguage
 #else
 #define MAYBE_LiveCaptionShowLanguage LiveCaptionShowLanguage

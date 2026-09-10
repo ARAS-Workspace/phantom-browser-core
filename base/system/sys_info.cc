@@ -233,8 +233,7 @@ bool SysInfo::IsLowEndDeviceImpl() {
   return instance.value();
 }
 
-#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_WIN) && \
-    !BUILDFLAG(IS_CHROMEOS)
+#if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
 std::string SysInfo::HardwareModelName() {
   return std::string();
 }

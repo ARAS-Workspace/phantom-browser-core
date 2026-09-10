@@ -127,11 +127,7 @@ class DownloadBubbleRowViewTest : public ChromeViewsTestBase {
 };
 
 TEST_F(DownloadBubbleRowViewTest, CopyAcceleratorCopiesFile) {
-#if BUILDFLAG(IS_WIN)
-  base::FilePath target_path(FILE_PATH_LITERAL("\\test.exe"));
-#else
   base::FilePath target_path(FILE_PATH_LITERAL("/test.exe"));
-#endif
   ON_CALL(*download_item(), GetState())
       .WillByDefault(Return(download::DownloadItem::COMPLETE));
   ON_CALL(*download_item(), GetTargetFilePath())

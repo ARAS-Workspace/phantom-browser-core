@@ -66,9 +66,6 @@ const BoolFieldMap& GetBoolFieldsMap() {
 #if BUILDFLAG(IS_MAC)
       {kSessionOptionEnableSckCapturer, &SessionOptions::enable_sck_capturer},
 #endif  // BUILDFLAG(IS_MAC)
-#if BUILDFLAG(IS_WIN)
-      {kSessionOptionAllowDxgiCapturer, &SessionOptions::allow_dxgi_capturer},
-#endif  // BUILDFLAG(IS_WIN)
       {kSessionOptionDisableUdp, &SessionOptions::disable_udp},
       {kSessionOptionAv1ActiveMap, &SessionOptions::av1_active_map},
   });

@@ -83,7 +83,7 @@ class MouseEventsTest : public InProcessBrowserTest {
   }
 };
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 // Flaky; http://crbug.com/40845791.
 #define MAYBE_MouseOver DISABLED_MouseOver
 #else
@@ -111,8 +111,7 @@ IN_PROC_BROWSER_TEST_F(MouseEventsTest, MAYBE_ClickAndDoubleClick) {
   WaitForTitle("ondblclick");
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || \
-    BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Flaky; http://crbug.com/40845791.
 #define MAYBE_TestOnMouseOut DISABLED_TestOnMouseOut
 #else
@@ -123,18 +122,7 @@ IN_PROC_BROWSER_TEST_F(MouseEventsTest, MAYBE_TestOnMouseOut) {
   NavigateAndWaitForMouseOverThenMouseOut();
 }
 
-#if BUILDFLAG(IS_WIN)
-// Mac/Linux are flaky; http://crbug.com/40845791.
-IN_PROC_BROWSER_TEST_F(MouseEventsTest, MouseDownOnBrowserCaption) {
-  gfx::Rect browser_bounds = browser()->GetWindow()->GetBounds();
-  ui_controls::SendMouseMove(browser_bounds.x() + 200, browser_bounds.y() + 10);
-  ui_controls::SendMouseClick(ui_controls::LEFT);
-
-  NavigateAndWaitForMouseOverThenMouseOut();
-}
-#endif
-
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_OZONE)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_OZONE)
 // Test that a mouseleave is not triggered when showing the context menu.
 // If the test is failed, it means that Blink gets the mouseleave event
 // when showing the context menu and it could make the unexpecting
@@ -164,8 +152,7 @@ IN_PROC_BROWSER_TEST_F(MouseEventsTest, MAYBE_ContextMenu) {
   EXPECT_EQ(success_title, done_title_watcher.WaitAndGetTitle());
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 // Test that a mouseleave is not triggered when showing a modal dialog.
 // Sample regression: crbug.com/41120621
 // Flaky; http://crbug.com/41386176

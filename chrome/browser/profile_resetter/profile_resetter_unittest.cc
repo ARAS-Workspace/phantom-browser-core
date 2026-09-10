@@ -65,15 +65,6 @@
 #include "services/network/test/test_utils.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "base/files/file_util.h"
-#include "base/path_service.h"
-#include "base/process/process_handle.h"
-#include "base/rand_util.h"
-#include "base/strings/string_number_conversions.h"
-#include "base/win/scoped_com_initializer.h"
-#include "base/win/shortcut.h"
-#endif
 
 using extensions::mojom::ManifestLocation;
 
@@ -168,22 +159,9 @@ class ProfileResetterTest : public extensions::ExtensionServiceTestBase,
   void SetUp() override;
 
  private:
-#if BUILDFLAG(IS_WIN)
-  base::ScopedPathOverride user_desktop_override_;
-  base::ScopedPathOverride app_dir_override_;
-  base::ScopedPathOverride start_menu_override_;
-  base::ScopedPathOverride taskbar_pins_override_;
-  base::win::ScopedCOMInitializer com_init_;
-#endif
 };
 
 ProfileResetterTest::ProfileResetterTest()
-#if BUILDFLAG(IS_WIN)
-    : user_desktop_override_(base::DIR_USER_DESKTOP),
-      app_dir_override_(base::DIR_ROAMING_APP_DATA),
-      start_menu_override_(base::DIR_START_MENU),
-      taskbar_pins_override_(base::DIR_TASKBAR_PINS)
-#endif
 {}
 
 ProfileResetterTest::~ProfileResetterTest() = default;
@@ -270,73 +248,8 @@ class ShortcutHandler {
   bool IsFileHidden() const;
 
  private:
-#if BUILDFLAG(IS_WIN)
-  base::FilePath shortcut_path_;
-#endif
 };
 
-#if BUILDFLAG(IS_WIN)
-ShortcutHandler::ShortcutHandler() = default;
-
-ShortcutHandler::~ShortcutHandler() {
-  if (!shortcut_path_.empty())
-    Delete();
-}
-
-// static
-bool ShortcutHandler::IsSupported() {
-  return true;
-}
-
-ShortcutCommand ShortcutHandler::CreateWithArguments(const std::wstring& name,
-                                                     const std::wstring& args) {
-  EXPECT_TRUE(shortcut_path_.empty());
-  base::FilePath path_to_create;
-  EXPECT_TRUE(base::PathService::Get(base::DIR_USER_DESKTOP, &path_to_create));
-  path_to_create = path_to_create.Append(name);
-  EXPECT_FALSE(base::PathExists(path_to_create)) << path_to_create.value();
-
-  base::FilePath path_exe;
-  EXPECT_TRUE(base::PathService::Get(base::FILE_EXE, &path_exe));
-  base::win::ShortcutProperties shortcut_properties;
-  shortcut_properties.set_target(path_exe);
-  shortcut_properties.set_arguments(args);
-  EXPECT_TRUE(base::win::CreateOrUpdateShortcutLink(
-      path_to_create, shortcut_properties,
-      base::win::ShortcutOperation::kCreateAlways))
-      << path_to_create.value();
-  shortcut_path_ = path_to_create;
-  return ShortcutCommand(shortcut_path_, args);
-}
-
-void ShortcutHandler::CheckShortcutHasArguments(
-    const std::wstring& desired_args) const {
-  EXPECT_FALSE(shortcut_path_.empty());
-  std::wstring args;
-  EXPECT_TRUE(base::win::ResolveShortcut(shortcut_path_, NULL, &args));
-  EXPECT_EQ(desired_args, args);
-}
-
-void ShortcutHandler::Delete() {
-  EXPECT_FALSE(shortcut_path_.empty());
-  EXPECT_TRUE(base::DeleteFile(shortcut_path_));
-  shortcut_path_.clear();
-}
-
-void ShortcutHandler::HideFile() {
-  DWORD attributes = ::GetFileAttributes(shortcut_path_.value().c_str());
-  ASSERT_NE(attributes, INVALID_FILE_ATTRIBUTES);
-  ASSERT_TRUE(::SetFileAttributes(shortcut_path_.value().c_str(),
-                                  attributes | FILE_ATTRIBUTE_HIDDEN));
-}
-
-bool ShortcutHandler::IsFileHidden() const {
-  DWORD attributes = ::GetFileAttributes(shortcut_path_.value().c_str());
-  EXPECT_NE(attributes, INVALID_FILE_ATTRIBUTES);
-  return attributes & FILE_ATTRIBUTE_HIDDEN;
-}
-
-#else
 ShortcutHandler::ShortcutHandler() = default;
 
 ShortcutHandler::~ShortcutHandler() = default;
@@ -362,7 +275,6 @@ void ShortcutHandler::HideFile() {}
 bool ShortcutHandler::IsFileHidden() const {
   return false;
 }
-#endif  // BUILDFLAG(IS_WIN)
 
 // helper functions -----------------------------------------------------------
 
@@ -762,9 +674,6 @@ TEST_F(ProfileResetterTest, ResetShortcuts) {
       L"chrome.lnk", L"--profile-directory=Default foo.com");
   shortcut.HideFile();
   shortcut.CheckShortcutHasArguments(L"--profile-directory=Default foo.com");
-#if BUILDFLAG(IS_WIN)
-  ASSERT_TRUE(shortcut.IsFileHidden());
-#endif
 
   ResetAndWait(ProfileResetter::SHORTCUTS);
 

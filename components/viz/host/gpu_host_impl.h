@@ -45,13 +45,6 @@
 #include "ui/gfx/gpu_extra_info.h"
 #include "url/gurl.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "services/viz/privileged/mojom/gl/info_collection_gpu_service.mojom.h"
-#include "services/webnn/public/mojom/ep_package_info.mojom.h"
-#include "services/webnn/public/mojom/webnn_context_provider.mojom.h"
-#include "ui/gfx/mojom/dxgi_info.mojom.h"
-#endif
-
 namespace gfx {
 struct FontRenderParams;
 }
@@ -60,13 +53,6 @@ namespace gpu {
 class GpuDiskCacheFactory;
 class GpuDiskCache;
 }  // namespace gpu
-
-#if BUILDFLAG(IS_WIN)
-namespace webnn {
-struct ContextProperties;
-struct EpDeviceInfo;
-}  // namespace webnn
-#endif
 
 namespace viz {
 
@@ -93,10 +79,6 @@ class VIZ_HOST_EXPORT GpuHostImpl : public mojom::GpuHost,
     virtual void DidCreateContextSuccessfully() = 0;
     virtual void MaybeShutdownGpuProcess() = 0;
     virtual void DidUpdateGPUInfo(const gpu::GPUInfo& gpu_info) = 0;
-#if BUILDFLAG(IS_WIN)
-    virtual void DidUpdateOverlayInfo(const gpu::OverlayInfo& overlay_info) = 0;
-    virtual void DidUpdateDXGIInfo(gfx::mojom::DXGIInfoPtr dxgi_info) = 0;
-#endif
     virtual void BlockDomainsFrom3DAPIs(const std::set<GURL>& urls,
                                         gpu::DomainGuilt guilt) = 0;
     virtual std::string GetIsolationKey(
@@ -117,18 +99,6 @@ class VIZ_HOST_EXPORT GpuHostImpl : public mojom::GpuHost,
         mojo::ScopedMessagePipeHandle interface_pipe) = 0;
 #if BUILDFLAG(IS_OZONE)
     virtual void TerminateGpuProcess(const std::string& message) = 0;
-#endif
-#if BUILDFLAG(IS_WIN)
-    // Requests the Browser to create a CompilerContext in the Compiler
-    // process, launching it first if needed.
-    virtual void RequestWebNNCompilerContext(
-        webnn::mojom::CreateContextOptionsPtr context_options,
-        const webnn::ContextProperties& context_properties,
-        const webnn::EpDeviceInfo& target_device,
-        mojo::PendingReceiver<webnn::mojom::WebNNCompilerContext>
-            compiler_context_receiver,
-        mojo::PendingRemote<webnn::mojom::WebNNModelLoader>
-            model_loader_remote);
 #endif
 
    protected:
@@ -243,12 +213,6 @@ class VIZ_HOST_EXPORT GpuHostImpl : public mojom::GpuHost,
 
   mojom::GpuService* gpu_service();
 
-#if BUILDFLAG(IS_WIN)
-  mojom::InfoCollectionGpuService* info_collection_gpu_service();
-  void AddChildWindow(gpu::SurfaceHandle parent_window,
-                      gpu::SurfaceHandle child_window);
-#endif
-
   void MaybeSendFontRenderParams();
   gpu::GpuProcessHostShmCount* GetShaderCacheShmCountForTesting();
 
@@ -300,10 +264,6 @@ class VIZ_HOST_EXPORT GpuHostImpl : public mojom::GpuHost,
                       const GURL& active_url) override;
   void DisableGpuCompositing() override;
   void DidUpdateGPUInfo(const gpu::GPUInfo& gpu_info) override;
-#if BUILDFLAG(IS_WIN)
-  void DidUpdateOverlayInfo(const gpu::OverlayInfo& overlay_info) override;
-  void DidUpdateDXGIInfo(gfx::mojom::DXGIInfoPtr dxgi_info) override;
-#endif
   void GetIsolationKey(int32_t client_id,
                        const blink::WebGPUExecutionContextToken& token,
                        GetIsolationKeyCallback cb) override;
@@ -311,18 +271,6 @@ class VIZ_HOST_EXPORT GpuHostImpl : public mojom::GpuHost,
                        const std::string& key,
                        const std::string& blob) override;
   void ClearGrShaderDiskCache() override;
-#if BUILDFLAG(IS_WIN)
-  void EnsureWebNNExecutionProvidersReady(
-      EnsureWebNNExecutionProvidersReadyCallback cb) override;
-  void RequestWebNNCompilerContext(
-      webnn::mojom::CreateContextOptionsPtr context_options,
-      const webnn::ContextProperties& context_properties,
-      const webnn::EpDeviceInfo& target_device,
-      mojo::PendingReceiver<webnn::mojom::WebNNCompilerContext>
-          compiler_context_receiver,
-      mojo::PendingRemote<webnn::mojom::WebNNModelLoader> model_loader_remote)
-      override;
-#endif
   void CreateWebNNWeightsFile(CreateWebNNWeightsFileCallback cb) override;
 
   // mojom::GpuLogging:
@@ -347,10 +295,6 @@ class VIZ_HOST_EXPORT GpuHostImpl : public mojom::GpuHost,
   const InitParams params_;
 
   mojo::Remote<mojom::GpuService> gpu_service_remote_;
-#if BUILDFLAG(IS_WIN)
-  mojo::Remote<mojom::InfoCollectionGpuService>
-      info_collection_gpu_service_remote_;
-#endif
   mojo::Receiver<mojom::GpuHost> gpu_host_receiver_{this};
   mojo::Receiver<mojom::GpuLogging> gpu_logging_receiver_{this};
 

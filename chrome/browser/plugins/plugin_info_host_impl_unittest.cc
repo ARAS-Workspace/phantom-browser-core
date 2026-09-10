@@ -122,14 +122,10 @@ class PluginInfoHostImplTest : public ::testing::Test {
   }
 
   void RefreshPlugins() {
-#if !BUILDFLAG(IS_WIN)
     // Can't go out of process in unit tests.
     content::RenderProcessHost::SetRunRendererInProcess(true);
-#endif
     PluginService::GetInstance()->GetPlugins();
-#if !BUILDFLAG(IS_WIN)
     content::RenderProcessHost::SetRunRendererInProcess(false);
-#endif
   }
 
   void RegisterAndRefreshPlugin(const content::WebPluginInfo& plugin) {

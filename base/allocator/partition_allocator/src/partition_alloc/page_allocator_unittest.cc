@@ -178,11 +178,7 @@ TEST(PartitionAllocPageAllocatorTest, AllocFailure) {
 }
 
 // TODO(crbug.com/41344946): Test failed on chromium.win/Win10 Tests x64.
-#if PA_BUILDFLAG(IS_WIN) && PA_BUILDFLAG(PA_ARCH_CPU_64_BITS)
-#define MAYBE_ReserveAddressSpace DISABLED_ReserveAddressSpace
-#else
 #define MAYBE_ReserveAddressSpace ReserveAddressSpace
-#endif  // PA_BUILDFLAG(IS_WIN) && PA_BUILDFLAG(PA_ARCH_CPU_64_BITS)
 
 // Test that reserving address space can fail.
 TEST(PartitionAllocPageAllocatorTest, MAYBE_ReserveAddressSpace) {

@@ -23,8 +23,6 @@
 #include "services/device/usb/usb_service_linux.h"
 #elif BUILDFLAG(IS_MAC)
 #include "services/device/usb/usb_service_impl.h"
-#elif BUILDFLAG(IS_WIN)
-#include "services/device/usb/usb_service_win.h"
 #endif
 
 namespace device {
@@ -49,8 +47,6 @@ std::unique_ptr<UsbService> UsbService::Create() {
   return base::WrapUnique(new UsbServiceAndroid());
 #elif defined(USE_UDEV)
   return base::WrapUnique(new UsbServiceLinux());
-#elif BUILDFLAG(IS_WIN)
-  return base::WrapUnique(new UsbServiceWin());
 #elif BUILDFLAG(IS_MAC)
   return base::WrapUnique(new UsbServiceImpl());
 #else

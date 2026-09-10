@@ -14,10 +14,6 @@
 #include "components/device_signals/core/common/common_types.h"
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "components/device_signals/core/common/win/win_types.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace enterprise_connectors {
 enum EnterpriseRealTimeUrlCheckMode : int;
 }  // namespace enterprise_connectors
@@ -89,43 +85,6 @@ struct BaseSignalResponse {
   // signal.
   std::optional<SignalCollectionError> collection_error = std::nullopt;
 };
-
-#if BUILDFLAG(IS_WIN)
-// Values representing the overall antivirus software state of a device.
-enum class InstalledAntivirusState {
-  kNone = 0,
-  kDisabled = 1,
-  kEnabled = 2,
-};
-
-struct AntiVirusSignalResponse : BaseSignalResponse {
-  AntiVirusSignalResponse();
-
-  AntiVirusSignalResponse(const AntiVirusSignalResponse&);
-  AntiVirusSignalResponse& operator=(const AntiVirusSignalResponse&);
-
-  bool operator==(const AntiVirusSignalResponse&) const;
-
-  ~AntiVirusSignalResponse() override;
-
-  std::vector<AvProduct> av_products{};
-
-  InstalledAntivirusState antivirus_state{InstalledAntivirusState::kNone};
-};
-
-struct HotfixSignalResponse : BaseSignalResponse {
-  HotfixSignalResponse();
-
-  HotfixSignalResponse(const HotfixSignalResponse&);
-  HotfixSignalResponse& operator=(const HotfixSignalResponse&);
-
-  bool operator==(const HotfixSignalResponse&) const;
-
-  ~HotfixSignalResponse() override;
-
-  std::vector<InstalledHotfix> hotfixes{};
-};
-#endif  // BUILDFLAG(IS_WIN)
 
 enum class RegistryHive {
   kHkeyClassesRoot,
@@ -387,10 +346,6 @@ struct SignalsAggregationResponse {
   // collected.
   std::optional<SignalCollectionError> top_level_error = std::nullopt;
 
-#if BUILDFLAG(IS_WIN)
-  std::optional<AntiVirusSignalResponse> av_signal_response = std::nullopt;
-  std::optional<HotfixSignalResponse> hotfix_signal_response = std::nullopt;
-#endif  // BUILDFLAG(IS_WIN)
   std::optional<SettingsResponse> settings_response = std::nullopt;
   std::optional<OsSignalsResponse> os_signals_response = std::nullopt;
   std::optional<ProfileSignalsResponse> profile_signals_response = std::nullopt;

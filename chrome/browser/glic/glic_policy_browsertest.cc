@@ -620,7 +620,7 @@ IN_PROC_BROWSER_TEST_F(GlicPolicyTest, DisableGlicWhenIsOpen) {
   ASSERT_TRUE(GetGlicInstance()->IsShowing());
 
 // Flakiness on linux.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // TODO(crbug.com/426583248) Wait for animation to finish instead of using the
   // arbitrary 1000ms wait.
   base::RunLoop run_loop;

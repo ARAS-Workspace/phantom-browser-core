@@ -66,8 +66,6 @@
 #include "media/audio/android/audio_manager_android.h"
 #elif BUILDFLAG(IS_MAC)
 #include "media/audio/mac/audio_manager_mac.h"
-#elif BUILDFLAG(IS_WIN)
-#include "media/audio/win/audio_manager_win.h"
 #else
 #include "media/audio/fake_audio_manager.h"
 #endif
@@ -96,8 +94,6 @@ namespace content {
 typedef media::AudioManagerAlsa AudioManagerPlatform;
 #elif BUILDFLAG(IS_MAC)
 typedef media::AudioManagerMac AudioManagerPlatform;
-#elif BUILDFLAG(IS_WIN)
-typedef media::AudioManagerWin AudioManagerPlatform;
 #elif BUILDFLAG(IS_ANDROID)
 typedef media::AudioManagerAndroid AudioManagerPlatform;
 #else
@@ -1330,7 +1326,7 @@ TEST_F(MediaStreamManagerTest,
       }));
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 
 TEST_F(MediaStreamManagerTest,
        GetDisplayMediaRequestApplicationAudioShareIsHashed) {

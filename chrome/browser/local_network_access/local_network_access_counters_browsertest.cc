@@ -391,12 +391,7 @@ IN_PROC_BROWSER_TEST_F(
 // In this case, 0.0.0.0 can be used to access localhost on MacOS and Linux
 // and bypass Local Network Access checks, so that we would like to forbid
 // fetches to 0.0.0.0. See more: https://crbug.com/40058874
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_FetchNullIpAddressForNavigation \
-  DISABLED_FetchNullIpAddressForNavigation
-#else
 #define MAYBE_FetchNullIpAddressForNavigation FetchNullIpAddressForNavigation
-#endif
 IN_PROC_BROWSER_TEST_F(LocalNetworkAccessCountersBrowserTest,
                        MAYBE_FetchNullIpAddressForNavigation) {
   WebFeatureHistogramTester feature_histogram_tester;
@@ -411,12 +406,7 @@ IN_PROC_BROWSER_TEST_F(LocalNetworkAccessCountersBrowserTest,
                        }));
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_FetchNullIpAddressFromDocument \
-  DISABLED_FetchNullIpAddressFromDocument
-#else
 #define MAYBE_FetchNullIpAddressFromDocument FetchNullIpAddressFromDocument
-#endif
 IN_PROC_BROWSER_TEST_F(LocalNetworkAccessCountersBrowserTest,
                        MAYBE_FetchNullIpAddressFromDocument) {
   WebFeatureHistogramTester feature_histogram_tester;
@@ -441,11 +431,7 @@ IN_PROC_BROWSER_TEST_F(LocalNetworkAccessCountersBrowserTest,
                        }));
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_FetchNullIpAddressFromWorker DISABLED_FetchNullIpAddressFromWorker
-#else
 #define MAYBE_FetchNullIpAddressFromWorker FetchNullIpAddressFromWorker
-#endif
 IN_PROC_BROWSER_TEST_F(LocalNetworkAccessCountersBrowserTest,
                        MAYBE_FetchNullIpAddressFromWorker) {
   WebFeatureHistogramTester feature_histogram_tester;
@@ -503,12 +489,7 @@ class LocalNetworkAccessWebSocketCountersBrowserTest
 // When WebSocket is connected to a more-private ip address space, log a use
 // counter.
 // TODO(crbug.com/336429017): Flaky on Win.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_WebSocketConnectedPublicToLocal \
-  DISABLED_WebSocketConnectedPublicToLocal
-#else
 #define MAYBE_WebSocketConnectedPublicToLocal WebSocketConnectedPublicToLocal
-#endif
 IN_PROC_BROWSER_TEST_F(LocalNetworkAccessWebSocketCountersBrowserTest,
                        MAYBE_WebSocketConnectedPublicToLocal) {
   WebFeatureHistogramTester feature_histogram_tester;
@@ -535,13 +516,8 @@ IN_PROC_BROWSER_TEST_F(LocalNetworkAccessWebSocketCountersBrowserTest,
       }));
 }
 
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_WebSocketConnectedPublicToLocalNonLocalHost \
-  DISABLED_WebSocketConnectedPublicToLocalNonLocalHost
-#else
 #define MAYBE_WebSocketConnectedPublicToLocalNonLocalHost \
   WebSocketConnectedPublicToLocalNonLocalHost
-#endif
 IN_PROC_BROWSER_TEST_F(LocalNetworkAccessWebSocketCountersBrowserTest,
                        MAYBE_WebSocketConnectedPublicToLocalNonLocalHost) {
   WebFeatureHistogramTester feature_histogram_tester;
@@ -572,12 +548,7 @@ IN_PROC_BROWSER_TEST_F(LocalNetworkAccessWebSocketCountersBrowserTest,
 // When WebSocket is connected to the same ip address space, do not log a use
 // counter.
 // TODO(crbug.com/336429017): Flaky on Win.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_WebSocketConnectedLocalToLocal \
-  DISABLED_WebSocketConnectedLocalToLocal
-#else
 #define MAYBE_WebSocketConnectedLocalToLocal WebSocketConnectedLocalToLocal
-#endif
 IN_PROC_BROWSER_TEST_F(LocalNetworkAccessWebSocketCountersBrowserTest,
                        MAYBE_WebSocketConnectedLocalToLocal) {
   WebFeatureHistogramTester feature_histogram_tester;

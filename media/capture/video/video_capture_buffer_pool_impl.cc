@@ -189,13 +189,6 @@ VideoCaptureBufferPoolImpl::ReserveIdForExternalBuffer(
     tracker = buffer_tracker_factory_->CreateTrackerForExternalBuffer(
         std::move(factory_buffer));
 
-#if BUILDFLAG(IS_WIN)
-    // Windows needs to create buffer from external handle, but mac doesn't.
-    if (tracker &&
-        tracker->Init(dimensions, buffer.format.pixel_format, nullptr)) {
-      tracker->UpdateExternalData(std::move(buffer));
-    }
-#endif
   }
 
   if (!tracker) {
@@ -298,7 +291,7 @@ VideoCaptureBufferPoolImpl::ReserveForProducerInternal(
 
   // Create the new tracker.
   VideoCaptureBufferType buffer_type = buffer_type_;
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   // If MediaFoundationD3D11VideoCapture or VideoCaptureDeviceAVFoundation fails
   // to produce NV12 as is expected on these platforms when the target buffer
   // type is `kGpuMemoryBuffer`, a shared memory buffer may be sent instead.

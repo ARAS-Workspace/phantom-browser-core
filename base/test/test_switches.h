@@ -51,10 +51,6 @@ extern const char kEnableRunIOSUnittestsWithXCTest[];
 extern const char kWriteCompiledTestsJsonToWritablePath[];
 #endif
 
-#if BUILDFLAG(IS_WIN)
-extern const char kDisableStrictHandleCheckingForTesting[];
-#endif
-
 }  // namespace switches
 
 #endif  // BASE_TEST_TEST_SWITCHES_H_

@@ -35,9 +35,6 @@ static_assert(sizeof(cstring_view) == sizeof(uintptr_t) + sizeof(size_t));
 static_assert(cstring_view::npos == std::string_view::npos);
 static_assert(u16cstring_view::npos == std::u16string_view::npos);
 static_assert(u16cstring_view::npos == std::u32string_view::npos);
-#if BUILDFLAG(IS_WIN)
-static_assert(wcstring_view::npos == std::wstring_view::npos);
-#endif
 
 TEST(CStringViewTest, DefaultConstructed) {
   constexpr auto c = cstring_view();
@@ -114,14 +111,6 @@ TEST(CStringViewTest, StringConstructed) {
     EXPECT_EQ(c.c_str(), stuff32.c_str());
     EXPECT_EQ(c.size(), 5u);
   }
-#if BUILDFLAG(IS_WIN)
-  std::wstring stuffw = L"stuff";
-  {
-    auto c = wcstring_view(stuffw);
-    EXPECT_EQ(c.c_str(), stuffw.c_str());
-    EXPECT_EQ(c.size(), 5u);
-  }
-#endif
 
   // Implicit construction.
   {
@@ -296,14 +285,6 @@ TEST(CStringViewTest, Size) {
   static_assert(stuff32.size() == 5u);
   static_assert(stuff32.size_bytes() == 20u);
 
-#if BUILDFLAG(IS_WIN)
-  constexpr auto emptyw = wcstring_view();
-  static_assert(emptyw.size() == 0u);
-  static_assert(emptyw.size_bytes() == 0u);
-  constexpr auto stuffw = wcstring_view(L"stuff");
-  static_assert(stuffw.size() == 5u);
-  static_assert(stuffw.size_bytes() == 10u);
-#endif
 }
 
 TEST(CStringViewTest, Empty) {
@@ -324,12 +305,6 @@ TEST(CStringViewTest, Empty) {
   constexpr auto stuff32 = u32cstring_view(U"stuff");
   static_assert(!stuff32.empty());
 
-#if BUILDFLAG(IS_WIN)
-  constexpr auto emptyw = wcstring_view();
-  static_assert(emptyw.empty());
-  constexpr auto stuffw = wcstring_view(L"stuff");
-  static_assert(!stuffw.empty());
-#endif
 }
 
 TEST(CStringViewTest, MaxSize) {
@@ -339,10 +314,6 @@ TEST(CStringViewTest, MaxSize) {
                 std::numeric_limits<size_t>::max() / 2u);
   static_assert(u32cstring_view().max_size() ==
                 std::numeric_limits<size_t>::max() / 4u);
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view().max_size() ==
-                std::numeric_limits<size_t>::max() / 2u);
-#endif
 }
 
 TEST(CStringViewTest, ToSpan) {
@@ -449,13 +420,6 @@ TEST(CStringViewTest, RemovePrefix) {
   EXPECT_EQ(mod_stuff32.data(), &stuff32[2u]);
   EXPECT_EQ(mod_stuff32.size(), 3u);
 
-#if BUILDFLAG(IS_WIN)
-  auto stuffw = wcstring_view(L"stuff");
-  auto mod_stuffw = stuffw;
-  mod_stuffw.remove_prefix(2u);
-  EXPECT_EQ(mod_stuffw.data(), &stuffw[2u]);
-  EXPECT_EQ(mod_stuffw.size(), 3u);
-#endif
 }
 
 TEST(CStringViewDeathTest, RemovePrefixChecked) {
@@ -533,9 +497,6 @@ TEST(CStringViewTest, StartsWith) {
 
   static_assert(u16cstring_view(u"hello").starts_with(u"he"));
   static_assert(u32cstring_view(U"hello").starts_with(U"he"));
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello").starts_with(L"he"));
-#endif
 
   // Comparison with `string/string_view/cstring_view`.
   static_assert(cstring_view("hello").starts_with(std::string("he")));
@@ -551,9 +512,6 @@ TEST(CStringViewTest, StartsWith) {
 
   static_assert(u16cstring_view(u"hello").starts_with(std::u16string(u"he")));
   static_assert(u32cstring_view(U"hello").starts_with(std::u32string(U"he")));
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello").starts_with(std::wstring(L"he")));
-#endif
 
   // Comparison with a character.
   static_assert(!cstring_view("").starts_with('h'));
@@ -562,9 +520,6 @@ TEST(CStringViewTest, StartsWith) {
 
   static_assert(u16cstring_view(u"hello").starts_with(u'h'));
   static_assert(u32cstring_view(U"hello").starts_with(U'h'));
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello").starts_with(L'h'));
-#endif
 }
 
 TEST(CStringViewTest, EndsWith) {
@@ -580,9 +535,6 @@ TEST(CStringViewTest, EndsWith) {
 
   static_assert(u16cstring_view(u"hello").ends_with(u"lo"));
   static_assert(u32cstring_view(U"hello").ends_with(U"lo"));
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello").ends_with(L"lo"));
-#endif
 
   // Comparison with `string/string_view/cstring_view`.
   static_assert(cstring_view("hello").ends_with(std::string("lo")));
@@ -598,9 +550,6 @@ TEST(CStringViewTest, EndsWith) {
 
   static_assert(u16cstring_view(u"hello").ends_with(std::u16string(u"lo")));
   static_assert(u32cstring_view(U"hello").ends_with(std::u32string(U"lo")));
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello").ends_with(std::wstring(L"lo")));
-#endif
 
   // Comparison with a character.
   static_assert(!cstring_view("").ends_with('h'));
@@ -609,9 +558,6 @@ TEST(CStringViewTest, EndsWith) {
 
   static_assert(u16cstring_view(u"hello").ends_with(u'o'));
   static_assert(u32cstring_view(U"hello").ends_with(U'o'));
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello").ends_with(L'o'));
-#endif
 }
 
 TEST(CStringViewTest, Find) {
@@ -635,13 +581,6 @@ TEST(CStringViewTest, Find) {
   static_assert(u32cstring_view(U"hello").find(U'l') == 2u);
   static_assert(u32cstring_view(U"hello").find(U'l', 3u) == 3u);
 
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello").find(L'e') == 1u);
-  static_assert(wcstring_view(L"hello").find(L'z') == cstring_view::npos);
-  static_assert(wcstring_view(L"hello").find(L'l') == 2u);
-  static_assert(wcstring_view(L"hello").find(L'l', 3u) == 3u);
-#endif
-
   // Searching for a string.
   static_assert(cstring_view("hello hello").find("lo") == 3u);
   static_assert(cstring_view("hello hello").find("lol") == cstring_view::npos);
@@ -651,11 +590,6 @@ TEST(CStringViewTest, Find) {
   static_assert(u32cstring_view(U"hello hello").find(U"lo") == 3u);
   static_assert(u32cstring_view(U"hello hello").find(U"lol") ==
                 cstring_view::npos);
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello hello").find(L"lo") == 3u);
-  static_assert(wcstring_view(L"hello hello").find(L"lol") ==
-                cstring_view::npos);
-#endif
 }
 
 TEST(CStringViewTest, Contains) {
@@ -688,13 +622,6 @@ TEST(CStringViewTest, Rfind) {
   static_assert(u32cstring_view(U"hello").rfind(U'l') == 3u);
   static_assert(u32cstring_view(U"hello").rfind(U'l', 2u) == 2u);
 
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello").rfind(L'e') == 1u);
-  static_assert(wcstring_view(L"hello").rfind(L'z') == cstring_view::npos);
-  static_assert(wcstring_view(L"hello").rfind(L'l') == 3u);
-  static_assert(wcstring_view(L"hello").rfind(L'l', 2u) == 2u);
-#endif
-
   // Searching for a string.
   static_assert(cstring_view("hello hello").rfind("lo") == 9u);
   static_assert(cstring_view("hello hello").rfind("lol") == cstring_view::npos);
@@ -704,11 +631,6 @@ TEST(CStringViewTest, Rfind) {
   static_assert(u32cstring_view(U"hello hello").rfind(U"lo") == 9u);
   static_assert(u32cstring_view(U"hello hello").rfind(U"lol") ==
                 cstring_view::npos);
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello hello").rfind(L"lo") == 9u);
-  static_assert(wcstring_view(L"hello hello").rfind(L"lol") ==
-                cstring_view::npos);
-#endif
 }
 
 TEST(CStringViewTest, FindFirstOf) {
@@ -736,14 +658,6 @@ TEST(CStringViewTest, FindFirstOf) {
   static_assert(u32cstring_view(U"hello").find_first_of(U'l') == 2u);
   static_assert(u32cstring_view(U"hello").find_first_of(U'l', 3u) == 3u);
 
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello").find_first_of(L'e') == 1u);
-  static_assert(wcstring_view(L"hello").find_first_of(L'z') ==
-                cstring_view::npos);
-  static_assert(wcstring_view(L"hello").find_first_of(L'l') == 2u);
-  static_assert(wcstring_view(L"hello").find_first_of(L'l', 3u) == 3u);
-#endif
-
   // Searching for a string.
   static_assert(cstring_view("hello hello").find_first_of("ol") == 2u);
   static_assert(cstring_view("hello hello").find_first_of("zz") ==
@@ -754,11 +668,6 @@ TEST(CStringViewTest, FindFirstOf) {
   static_assert(u32cstring_view(U"hello hello").find_first_of(U"ol") == 2u);
   static_assert(u32cstring_view(U"hello hello").find_first_of(U"zz") ==
                 cstring_view::npos);
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello hello").find_first_of(L"ol") == 2u);
-  static_assert(wcstring_view(L"hello hello").find_first_of(L"zz") ==
-                cstring_view::npos);
-#endif
 }
 
 TEST(CStringViewTest, FindLastOf) {
@@ -786,14 +695,6 @@ TEST(CStringViewTest, FindLastOf) {
   static_assert(u32cstring_view(U"hello").find_last_of(U'l') == 3u);
   static_assert(u32cstring_view(U"hello").find_last_of(U'l', 2u) == 2u);
 
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello").find_last_of(L'e') == 1u);
-  static_assert(wcstring_view(L"hello").find_last_of(L'z') ==
-                cstring_view::npos);
-  static_assert(wcstring_view(L"hello").find_last_of(L'l') == 3u);
-  static_assert(wcstring_view(L"hello").find_last_of(L'l', 2u) == 2u);
-#endif
-
   // Searching for a string.
   static_assert(cstring_view("hello hello").find_last_of("lo") == 10u);
   static_assert(cstring_view("hello hello").find_last_of("zz") ==
@@ -804,11 +705,6 @@ TEST(CStringViewTest, FindLastOf) {
   static_assert(u32cstring_view(U"hello hello").find_last_of(U"lo") == 10u);
   static_assert(u32cstring_view(U"hello hello").find_last_of(U"zz") ==
                 cstring_view::npos);
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello hello").find_last_of(L"lo") == 10u);
-  static_assert(wcstring_view(L"hello hello").find_last_of(L"zz") ==
-                cstring_view::npos);
-#endif
 }
 
 TEST(CStringViewTest, FindFirstNotOf) {
@@ -834,13 +730,6 @@ TEST(CStringViewTest, FindFirstNotOf) {
   static_assert(u32cstring_view(U"hello").find_first_not_of(U"eloh") ==
                 cstring_view::npos);
 
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello").find_first_not_of(L'h') == 1u);
-  static_assert(wcstring_view(L"hello").find_first_not_of(L'e') == 0u);
-  static_assert(wcstring_view(L"hello").find_first_not_of(L"eloh") ==
-                cstring_view::npos);
-#endif
-
   // Searching for a string.
   static_assert(cstring_view("hello hello").find_first_not_of("eh") == 2u);
   static_assert(cstring_view("hello hello").find_first_not_of("hello ") ==
@@ -851,11 +740,6 @@ TEST(CStringViewTest, FindFirstNotOf) {
   static_assert(u32cstring_view(U"hello hello").find_first_not_of(U"eh") == 2u);
   static_assert(u32cstring_view(U"hello hello").find_first_not_of(U"hello ") ==
                 cstring_view::npos);
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello hello").find_first_not_of(L"eh") == 2u);
-  static_assert(wcstring_view(L"hello hello").find_first_not_of(L"hello ") ==
-                cstring_view::npos);
-#endif
 }
 
 TEST(CStringViewTest, FindLastNotOf) {
@@ -879,13 +763,6 @@ TEST(CStringViewTest, FindLastNotOf) {
   static_assert(u32cstring_view(U"hello").find_last_not_of(U"eloh") ==
                 cstring_view::npos);
 
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello").find_last_not_of(L'l') == 4u);
-  static_assert(wcstring_view(L"hello").find_last_not_of(L'o') == 3u);
-  static_assert(wcstring_view(L"hello").find_last_not_of(L"eloh") ==
-                cstring_view::npos);
-#endif
-
   // Searching for a string.
   static_assert(cstring_view("hello hello").find_last_not_of("lo") == 7u);
   static_assert(cstring_view("hello hello").find_last_not_of("hello ") ==
@@ -896,11 +773,6 @@ TEST(CStringViewTest, FindLastNotOf) {
   static_assert(u32cstring_view(U"hello hello").find_last_not_of(U"lo") == 7u);
   static_assert(u32cstring_view(U"hello hello").find_last_not_of(U"hello ") ==
                 cstring_view::npos);
-#if BUILDFLAG(IS_WIN)
-  static_assert(wcstring_view(L"hello hello").find_last_not_of(L"lo") == 7u);
-  static_assert(wcstring_view(L"hello hello").find_last_not_of(L"hello ") ==
-                cstring_view::npos);
-#endif
 }
 
 TEST(CStringViewTest, ToString) {
@@ -908,12 +780,6 @@ TEST(CStringViewTest, ToString) {
   std::ostringstream s;
   s << cstring_view("hello");
   EXPECT_EQ(s.view(), "hello");
-
-#if BUILDFLAG(IS_WIN)
-  std::wostringstream sw;
-  sw << wcstring_view(L"hello");
-  EXPECT_EQ(sw.view(), L"hello");
-#endif
 
   // Gtest printing support.
   EXPECT_EQ(testing::PrintToString(cstring_view("hello")), "hello");
@@ -931,11 +797,6 @@ TEST(CStringViewTest, Hash) {
       std::hash<u32cstring_view>()(u32cstring_view(U"hello"));
   static_assert(std::same_as<size_t, decltype(s)>);
 
-#if BUILDFLAG(IS_WIN)
-  [[maybe_unused]] auto sw =
-      std::hash<wcstring_view>()(wcstring_view(L"hello"));
-  static_assert(std::same_as<size_t, decltype(s)>);
-#endif
 }
 
 TEST(CStringViewTest, IntoStdStringView) {
@@ -988,11 +849,6 @@ TEST(CStringViewTest, StringPlus) {
     EXPECT_EQ(s, U"helloworld");
   }
   {
-#if BUILDFLAG(IS_WIN)
-    auto s = std::wstring(L"hello") + wcstring_view(L"world");
-    static_assert(std::same_as<std::wstring, decltype(s)>);
-    EXPECT_EQ(s, L"helloworld");
-#endif
   }
 
   // From lvalues.
@@ -1087,10 +943,6 @@ TEST(CStringViewTest, ConstructFromStringLiteralWithEmbeddedNul) {
   EXPECT_EQ(cv16, std::u16string_view(u"abc"));
   constexpr base::u32cstring_view cv32 = U"abc\0de";
   EXPECT_EQ(cv32, std::u32string_view(U"abc"));
-#if BUILDFLAG(IS_WIN)
-  constexpr base::wcstring_view cvw = L"abc\0de";
-  EXPECT_EQ(cvw, std::wstring_view(L"abc"));
-#endif
 }
 
 }  // namespace

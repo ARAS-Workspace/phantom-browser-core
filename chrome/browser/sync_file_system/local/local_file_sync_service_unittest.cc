@@ -304,14 +304,8 @@ TEST_F(LocalFileSyncServiceTest, LocalChangeObserver) {
   EXPECT_EQ(2, num_changes_);
 }
 
-#if BUILDFLAG(IS_WIN)
-// Flaky: http://crbug.com/40960777
-#define MAYBE_LocalChangeObserverMultipleContexts\
-    DISABLED_LocalChangeObserverMultipleContexts
-#else
 #define MAYBE_LocalChangeObserverMultipleContexts\
     LocalChangeObserverMultipleContexts
-#endif
 
 TEST_F(LocalFileSyncServiceTest, MAYBE_LocalChangeObserverMultipleContexts) {
   const char kOrigin2[] = "chrome-extension://foo";

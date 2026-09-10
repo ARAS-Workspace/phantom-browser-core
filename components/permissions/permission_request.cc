@@ -447,7 +447,7 @@ std::u16string PermissionRequest::GetMessageTextFragment() const {
     case RequestType::kPointerLock:
       message_id = IDS_POINTER_LOCK_PERMISSIONS_FRAGMENT;
       break;
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
     case RequestType::kProtectedMediaIdentifier:
       message_id = IDS_PROTECTED_MEDIA_IDENTIFIER_PERMISSION_FRAGMENT;
       break;

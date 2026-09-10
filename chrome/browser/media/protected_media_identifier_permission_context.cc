@@ -40,7 +40,7 @@
 #include "components/user_prefs/user_prefs.h"
 #endif
 
-#if !(BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS))
+#if !(BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS))
 #error This file currently only supports Chrome OS, Android and Windows.
 #endif
 
@@ -141,7 +141,7 @@ void ProtectedMediaIdentifierPermissionContext::UpdateTabContext(
 // static
 bool ProtectedMediaIdentifierPermissionContext::
     IsProtectedMediaIdentifierEnabled(Profile* profile) {
-#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_CHROMEOS)
   // Identifier is not allowed in incognito or guest mode.
   if (profile != nullptr &&
       (profile->IsOffTheRecord() || profile->IsGuestSession())) {
@@ -171,7 +171,7 @@ bool ProtectedMediaIdentifierPermissionContext::
     return false;
   }
 #endif  // BUILDFLAG(IS_CHROMEOS)
-#endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
   if (!IsProtectedContentIdentifierAllowedByPolicy(profile)) {
     DVLOG(1)

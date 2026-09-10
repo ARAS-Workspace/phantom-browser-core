@@ -13,13 +13,6 @@
 #include "base/power_monitor/power_observer.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include "base/power_monitor/speed_limit_observer_win.h"
-#include "base/threading/sequence_bound.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_MAC)
 #include <IOKit/IOTypes.h>
 
@@ -70,33 +63,10 @@ class BASE_EXPORT PowerMonitorDeviceSource : public PowerMonitorSource {
  private:
   friend class PowerMonitorDeviceSourceTest;
 
-#if BUILDFLAG(IS_WIN)
-  // Represents a message-only window for power message handling on Windows.
-  // Only allow PowerMonitor to create it.
-  class PowerMessageWindow {
-   public:
-    PowerMessageWindow();
-    ~PowerMessageWindow();
-
-   private:
-    static LRESULT CALLBACK WndProcThunk(HWND hwnd,
-                                         UINT message,
-                                         WPARAM wparam,
-                                         LPARAM lparam);
-
-    // Instance of the module containing the window procedure.
-    HMODULE instance_ = nullptr;
-    // A hidden message-only window.
-    HWND message_hwnd_ = nullptr;
-    // A handle, returned when we register for power setting notification
-    HPOWERNOTIFY power_notify_handle_ = nullptr;
-  };
-#endif  // BUILDFLAG(IS_WIN)
-
-#if (BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_IOS_TVOS)) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_IOS_TVOS)
   void PlatformInit();
   void PlatformDestroy();
-#endif  // BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#endif  // BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_IOS_TVOS)
 
 #if BUILDFLAG(IS_MAC)
   // Callback from IORegisterForSystemPower(). |refcon| is the |this| pointer.
@@ -117,11 +87,6 @@ class BASE_EXPORT PowerMonitorDeviceSource : public PowerMonitorSource {
   PowerThermalObserver::DeviceThermalState GetCurrentThermalState()
       const override;
 #endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_WIN)
-  // PowerMonitorSource:
-  int GetInitialSpeedLimit() const override;
-#endif  // BUILDFLAG(IS_WIN)
 
 #if BUILDFLAG(IS_MAC)
   // PowerMonitorSource:
@@ -158,13 +123,6 @@ class BASE_EXPORT PowerMonitorDeviceSource : public PowerMonitorSource {
 #if BUILDFLAG(IS_IOS)
   // Holds pointers to system event notification observers.
   std::vector<id> notification_observers_;
-#endif
-
-#if BUILDFLAG(IS_WIN)
-  PowerMessageWindow power_message_window_;
-  // |speed_limit_observer_| is owned by the main/UI thread but the
-  // SpeedLimitObserverWin is bound to a different sequence.
-  base::SequenceBound<SpeedLimitObserverWin> speed_limit_observer_;
 #endif
 
 #if BUILDFLAG(IS_CHROMEOS)

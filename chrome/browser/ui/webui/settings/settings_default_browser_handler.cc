@@ -23,12 +23,6 @@
 #include "components/prefs/pref_service.h"
 #include "content/public/browser/web_ui.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/win/taskbar_manager.h"
-#include "chrome/installer/util/install_util.h"
-#include "chrome/installer/util/shell_util.h"
-#endif
-
 namespace settings {
 
 namespace {
@@ -41,12 +35,6 @@ bool DefaultBrowserIsDisabledByPolicy() {
   DCHECK(pref->GetValue()->is_bool());
   return pref->IsManaged() && !pref->GetValue()->GetBool();
 }
-
-#if BUILDFLAG(IS_WIN)
-void PinToTaskbarResult(bool result) {
-  base::UmaHistogramBoolean("Windows.TaskbarPinFromSettingsSucceeded", result);
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace
 
@@ -127,15 +115,6 @@ void DefaultBrowserHandler::SetAsDefaultBrowser(const base::ListValue& args) {
   AllowJavascript();
   RecordSetAsDefaultUMA();
 
-#if BUILDFLAG(IS_WIN)
-  if (!args.empty() && args[0].GetBool()) {
-    browser_util::PinAppToTaskbar(
-        ShellUtil::GetBrowserModelId(InstallUtil::IsPerUserInstall()),
-        browser_util::PinAppToTaskbarChannel::kSettingsPage,
-        base::BindOnce(&PinToTaskbarResult));
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
   did_user_interact_ = true;
   default_browser_controller_->OnAccepted(
       base::BindOnce(&DefaultBrowserHandler::OnDefaultBrowserWorkerFinished,
@@ -177,14 +156,6 @@ void DefaultBrowserHandler::OnDefaultBrowserWorkerFinished(
     chrome::startup::default_prompt::ResetPromptPrefs(
         Profile::FromWebUI(web_ui()));
   } else {
-#if BUILDFLAG(IS_WIN)
-    browser_util::ShouldOfferToPin(
-        ShellUtil::GetBrowserModelId(InstallUtil::IsPerUserInstall()),
-        browser_util::PinAppToTaskbarChannel::kSettingsPage,
-        base::BindOnce(&DefaultBrowserHandler::OnCanPinToTaskbarResult,
-                       weak_ptr_factory_.GetWeakPtr(), js_callback_id, state));
-    return;
-#endif  // BUILDFLAG(IS_WIN)
   }
   OnDefaultCheckFinished(js_callback_id, /*can_pin=*/false, state);
 }

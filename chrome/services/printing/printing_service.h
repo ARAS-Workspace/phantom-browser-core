@@ -41,10 +41,6 @@ class PrintingService : public mojom::PrintingService {
   void BindPdfFlattener(
       mojo::PendingReceiver<mojom::PdfFlattener> receiver) override;
 #endif
-#if BUILDFLAG(IS_WIN)
-  void BindPdfToEmfConverterFactory(
-      mojo::PendingReceiver<mojom::PdfToEmfConverterFactory> receiver) override;
-#endif
 
   scoped_refptr<discardable_memory::ClientDiscardableSharedMemoryManager>
       discardable_shared_memory_manager_;

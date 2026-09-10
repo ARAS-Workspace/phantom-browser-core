@@ -59,12 +59,6 @@ UrgentPageDiscardingPolicy::UrgentPageDiscardingPolicy()
           base::BindRepeating(
               &UrgentPageDiscardingPolicy::HandleMemoryPressureEvent,
               base::Unretained(this))) {
-#if BUILDFLAG(IS_WIN)
-  if (base::FeatureList::IsEnabled(
-          performance_manager::features::kDiscardOnCommitLimit)) {
-    monitor_ = base::AvailableMemoryMonitor::Get();
-  }
-#endif
 
   if (base::FeatureList::IsEnabled(features::kSustainedPMUrgentDiscarding)) {
     sustained_memory_pressure_evaluator_.emplace(base::BindRepeating(
@@ -148,22 +142,6 @@ void UrgentPageDiscardingPolicy::OnReleaseMemory() {
 
 void UrgentPageDiscardingPolicy::OnAvailableMemoryUpdated(
     const base::AvailableMemoryMonitor::MemorySample& sample) {
-#if BUILDFLAG(IS_WIN)
-  if (sample.total_commit_bytes.is_zero()) {
-    return;
-  }
-
-  double available_percent = (sample.available_commit_bytes.InBytesF() /
-                              sample.total_commit_bytes.InBytesF()) *
-                             100.0;
-  double threshold =
-      performance_manager::features::kDiscardOnCommitLimit_MinAvailablePercent
-          .Get();
-
-  if (available_percent < threshold) {
-    HandleMemoryPressureEvent();
-  }
-#endif
 }
 
 void UrgentPageDiscardingPolicy::OnSustainedMemoryPressure(

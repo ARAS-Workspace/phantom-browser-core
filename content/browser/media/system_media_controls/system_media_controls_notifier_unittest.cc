@@ -16,10 +16,6 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/base/idle/scoped_set_idle_state.h"
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace {
 std::u16string hidden_metadata_placeholder_title = u"placeholder_title";
 std::u16string hidden_metadata_placeholder_artist = u"placeholder_artist";
@@ -157,14 +153,6 @@ class SystemMediaControlsNotifierTest : public testing::Test {
   base::OneShotTimer& actions_update_timer() {
     return notifier_->actions_update_timer_;
   }
-
-#if BUILDFLAG(IS_WIN)
-  base::RepeatingTimer& lock_polling_timer() {
-    return notifier_->lock_polling_timer_;
-  }
-
-  base::OneShotTimer& hide_smtc_timer() { return notifier_->hide_smtc_timer_; }
-#endif  // BUILDFLAG(IS_WIN)
 
   TestMediaSessionClient client_;
 
@@ -563,84 +551,5 @@ TEST_F(SystemMediaControlsNotifierTest, HideMediaImageIfNeeded) {
   SimulateImageChanged(thumbnail_size);
   icon_update_timer().FireNow();
 }
-
-#if BUILDFLAG(IS_WIN)
-TEST_F(SystemMediaControlsNotifierTest, DisablesOnLockAndEnablesOnUnlock) {
-  EXPECT_CALL(mock_system_media_controls(), SetEnabled(false));
-
-  {
-    // Lock the screen.
-    ui::ScopedSetIdleState locked(ui::IDLE_STATE_LOCKED);
-
-    // Make sure that the lock polling timer is running and then force it to
-    // fire so that we don't need to wait. This should disable the service.
-    EXPECT_TRUE(lock_polling_timer().IsRunning());
-    lock_polling_timer().user_task().Run();
-  }
-
-  // Ensure that the service was disabled.
-  testing::Mock::VerifyAndClearExpectations(&mock_system_media_controls());
-
-  // The service should be reenabled on unlock.
-  EXPECT_CALL(mock_system_media_controls(), SetEnabled(true));
-
-  {
-    // Unlock the screen.
-    ui::ScopedSetIdleState unlocked(ui::IDLE_STATE_ACTIVE);
-
-    // Make sure that the lock polling timer is running and then force it to
-    // fire so that we don't need to wait. This should enable the service.
-    EXPECT_TRUE(lock_polling_timer().IsRunning());
-    lock_polling_timer().user_task().Run();
-  }
-}
-
-TEST_F(SystemMediaControlsNotifierTest, DoesNotDisableOnLockWhenPlaying) {
-  EXPECT_CALL(mock_system_media_controls(), SetEnabled(_)).Times(0);
-
-  SimulatePlaying();
-
-  // Lock the screen.
-  ui::ScopedSetIdleState locked(ui::IDLE_STATE_LOCKED);
-
-  // Make sure that the lock polling timer is running and then force it to
-  // fire so that we don't need to wait. This should not disable the service.
-  EXPECT_TRUE(lock_polling_timer().IsRunning());
-  lock_polling_timer().user_task().Run();
-}
-
-TEST_F(SystemMediaControlsNotifierTest, DisablesAfterPausingOnLockScreen) {
-  Expectation playing =
-      EXPECT_CALL(mock_system_media_controls(),
-                  SetPlaybackStatus(PlaybackStatus::kPlaying));
-  Expectation paused = EXPECT_CALL(mock_system_media_controls(),
-                                   SetPlaybackStatus(PlaybackStatus::kPaused))
-                           .After(playing);
-  EXPECT_CALL(mock_system_media_controls(), SetEnabled(false)).After(paused);
-
-  SimulatePlaying();
-  metadata_update_timer().FireNow();
-
-  // Lock the screen.
-  ui::ScopedSetIdleState locked(ui::IDLE_STATE_LOCKED);
-
-  // Make sure that the lock polling timer is running and then force it to
-  // fire so that we don't need to wait. This should not disable the service.
-  EXPECT_TRUE(lock_polling_timer().IsRunning());
-  lock_polling_timer().user_task().Run();
-
-  // Since we're playing, the timer to hide the SMTC should not be running.
-  EXPECT_FALSE(hide_smtc_timer().IsRunning());
-
-  SimulatePaused();
-  metadata_update_timer().FireNow();
-
-  // Now that we're paused, the timer to hide the SMTC should be running.
-  EXPECT_TRUE(hide_smtc_timer().IsRunning());
-
-  // Force the timer to fire now. This should disable the service.
-  hide_smtc_timer().FireNow();
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 }  // namespace content

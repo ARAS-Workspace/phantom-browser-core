@@ -26,12 +26,7 @@ class TreeViewDumpAccessibilityEventsTestBase
   std::vector<ui::AXPropertyFilter> DefaultFilters() const override {
     std::vector<ui::AXPropertyFilter> filters;
 
-#if BUILDFLAG(IS_WIN)
-    filters.emplace_back("ExpandCollapseExpandCollapseState*",
-                         ui::AXPropertyFilter::ALLOW);
-    filters.emplace_back("StructureChanged*", ui::AXPropertyFilter::DENY);
-    filters.emplace_back("AriaProperties*", ui::AXPropertyFilter::DENY);
-#elif BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     filters.emplace_back("AXRowExpanded*", ui::AXPropertyFilter::ALLOW);
     filters.emplace_back("AXRowCollapsed*", ui::AXPropertyFilter::ALLOW);
     // ViewsAXEnabled fires AXRowCountChanged (via AXEventGenerator) in addition
@@ -87,12 +82,7 @@ class TreeViewSelectDumpAccessibilityEventsTest
     : public TreeViewDumpAccessibilityEventsTestBase {};
 
 std::vector<ViewsEventTestParams> ExpandCollapseEventTestPasses() {
-#if BUILDFLAG(IS_WIN)
-  return {{ui::AXApiType::kWinUIA, false},
-          {ui::AXApiType::kWinUIA, true}};
-#else
   return DumpAccessibilityEventsViewsTestBase::EventTestPasses();
-#endif
 }
 
 IN_PROC_BROWSER_TEST_P(TreeViewDumpAccessibilityEventsTest, ExpandNode) {

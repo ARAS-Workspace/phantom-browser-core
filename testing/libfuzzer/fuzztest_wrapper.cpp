@@ -53,11 +53,7 @@ void HandleReplayMode(auto& args) {
   }
 
   auto env = base::Environment::Create();
-#if BUILDFLAG(IS_WIN)
-  auto env_value = base::WideToUTF8(args.back());
-#else
   auto env_value = args.back();
-#endif
   env->SetVar("FUZZTEST_REPLAY", env_value);
   env->UnSetVar("CENTIPEDE_RUNNER_FLAGS");
   std::cerr << "FuzzTest wrapper setting env var: FUZZTEST_REPLAY="

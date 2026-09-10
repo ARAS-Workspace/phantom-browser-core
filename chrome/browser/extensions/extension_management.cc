@@ -79,7 +79,7 @@
 #include "components/enterprise/browser/reporting/common_pref_names.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 #include "chrome/browser/extensions/management/management_util.h"
 #endif
 
@@ -87,7 +87,7 @@ static_assert(BUILDFLAG(ENABLE_EXTENSIONS_CORE));
 
 namespace extensions {
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 // Disables off-store force-installed extensions in low trust environments.
 BASE_FEATURE(kDisableOffstoreForceInstalledExtensionsInLowTrustEnviroment,
              base::FEATURE_ENABLED_BY_DEFAULT);
@@ -396,7 +396,7 @@ bool ExtensionManagement::IsAllowedByUnpackedDeveloperModePolicy(
 
 bool ExtensionManagement::IsGreylistedForceInstalledInLowTrustEnvironment(
     const ExtensionId& extension_id) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (!base::FeatureList::IsEnabled(
           kDisableForceInstalledExtensionsInLowTrustEnviromentWhenGreylisted)) {
     return false;
@@ -422,7 +422,7 @@ bool ExtensionManagement::IsGreylistedForceInstalledInLowTrustEnvironment(
 
 bool ExtensionManagement::IsForceInstalledInLowTrustEnvironment(
     const Extension& extension) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (GetInstallationMode(&extension) != ManagedInstallationMode::kForced) {
     return false;
   }
@@ -440,7 +440,7 @@ bool ExtensionManagement::IsForceInstalledInLowTrustEnvironment(
 
 bool ExtensionManagement::ShouldBlockForceInstalledOffstoreExtension(
     const Extension& extension) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (!base::FeatureList::IsEnabled(
           kDisableOffstoreForceInstalledExtensionsInLowTrustEnviroment)) {
     return false;

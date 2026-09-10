@@ -79,11 +79,6 @@ class NetworkServiceClient
       net::NetworkChangeNotifier::IPAddressChangeType change_type) override;
 #endif  // BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 
-#if BUILDFLAG(IS_WIN)
-  // Called when the network service sandbox is enabled.
-  mojo::PendingRemote<network::mojom::SocketBroker> BindSocketBroker();
-#endif
-
  private:
   // network::mojom::URLLoaderNetworkServiceObserver overrides.
   void OnSSLCertificateError(const GURL& url,
@@ -145,10 +140,6 @@ class NetworkServiceClient
 #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
   mojo::Remote<network::mojom::NetworkChangeManager> network_change_manager_;
 #endif  // BUILDFLAG(IS_ANDROID)
-
-#if BUILDFLAG(IS_WIN)
-  network::SocketBrokerImpl socket_broker_;
-#endif  // BUILDFLAG(IS_WIN)
 
   mojo::ReceiverSet<network::mojom::URLLoaderNetworkServiceObserver>
       url_loader_network_service_observers_;

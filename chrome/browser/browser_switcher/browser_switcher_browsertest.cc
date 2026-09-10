@@ -41,31 +41,16 @@ namespace {
 const char kTestUrl[] = "http://example.com/foobar";
 const char kTestUrlWithSpaces[] = "http://example.com/foobar baz";
 
-#if BUILDFLAG(IS_WIN)
-// Only referenced on Windows.
-const char kTestUrlWithQuotes[] = "http://example.com/?q='world'";
-#endif
-
 // A URL that shouldn't trigger a switch.
 const char kOtherUrl[] = "http://google.com/";
 
 // |echo| adds a newline at the end of the file. CRLF on Windows, but just LF on
 // POSIX systems.
-#if BUILDFLAG(IS_WIN)
-const char kTestUrlWithLineEnding[] = "http://example.com/foobar\r\n";
-#else
 const char kTestUrlWithLineEnding[] = "http://example.com/foobar\n";
-#endif
 
-#if BUILDFLAG(IS_WIN)
-std::string NativeToUTF8(const std::wstring& native) {
-  return base::WideToUTF8(native);
-}
-#else
 std::string NativeToUTF8(const std::string& native) {
   return native;
 }
-#endif
 
 void SetPolicy(policy::PolicyMap* map,
                const std::string& policy_name,
@@ -106,13 +91,6 @@ void InitPolicies(policy::MockConfigurationPolicyProvider* provider,
 // the navigation URL and |output_file| don't contain any special characters or
 // whitespace.
 base::CommandLine GenerateEchoCommandLine(const base::FilePath& output_file) {
-#if BUILDFLAG(IS_WIN)
-  // cmd.exe /C echo ${url} > "output_file"
-  std::vector<std::wstring> args = {
-      L"cmd.exe", L"/C", L"echo", L"${url}>", output_file.value().c_str(),
-  };
-  return base::CommandLine(std::move(args));
-#else
   // bin/sh -c 'echo "${url}"> "output_file"'
   std::vector<std::string> args = {
       "/bin/sh", "-c",
@@ -120,7 +98,6 @@ base::CommandLine GenerateEchoCommandLine(const base::FilePath& output_file) {
                          output_file.MaybeAsASCII().c_str()),
   };
   return base::CommandLine(std::move(args));
-#endif
 }
 
 }  // namespace
@@ -201,36 +178,6 @@ IN_PROC_BROWSER_TEST_F(BrowserSwitcherBrowserTest, DoesNotKeepSpaces) {
   EXPECT_FALSE(output.contains(' '));
   EXPECT_TRUE(output.contains("%20"));
 }
-
-#if BUILDFLAG(IS_WIN)
-// IE has some quirks with quote characters. Make sure IE doesn't receive them
-// percent-encoded.
-IN_PROC_BROWSER_TEST_F(BrowserSwitcherBrowserTest, UnencodesSingleQUotes) {
-  base::FilePath temp_file =
-      GetTempDir().AppendASCII("UnencodesSingleQuotes.txt");
-  base::CommandLine cmd_line = GenerateEchoCommandLine(temp_file);
-
-  InitPolicies(provider(), cmd_line);
-
-  // We open a new tab, because closing the last tab in the browser
-  // causes the whole browser to close.
-  ui_test_utils::NavigateToURLWithDisposition(
-      browser(), GURL(kTestUrlWithQuotes),
-      WindowOpenDisposition::NEW_FOREGROUND_TAB,
-      ui_test_utils::BROWSER_TEST_NO_WAIT);
-
-  base::RunLoop run_loop;
-  base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
-      FROM_HERE, run_loop.QuitClosure(), TestTimeouts::action_timeout());
-  run_loop.Run();
-
-  // Check that single-quotes aren't encoded in the URL.
-  base::ScopedAllowBlockingForTesting allow_blocking;
-  std::string output;
-  ASSERT_TRUE(base::ReadFileToString(temp_file, &output));
-  EXPECT_EQ("http://example.com/?q='world'\r\n", output);
-}
-#endif
 
 IN_PROC_BROWSER_TEST_F(BrowserSwitcherBrowserTest, DoesNotRunOnRandomUrls) {
   base::FilePath temp_file =

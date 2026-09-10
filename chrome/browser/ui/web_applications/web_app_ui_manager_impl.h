@@ -225,12 +225,6 @@ class WebAppUiManagerImpl : public BrowserCollectionObserver,
   void OnTabCloseCancelled(const tabs::TabInterface* contents) override;
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-  // Attempts to uninstall the given web app id. Meant to be used with OS-level
-  // uninstallation support/hooks.
-  void UninstallWebAppFromStartupSwitch(const webapps::AppId& app_id);
-#endif
-
  private:
   // Returns true if Browser is for an installed App.
   bool IsBrowserForInstalledApp(const BrowserWindowInterface* browser) const;
@@ -270,8 +264,7 @@ class WebAppUiManagerImpl : public BrowserCollectionObserver,
       UninstallCompleteCallback uninstall_complete_callback,
       webapps::UninstallResultCode uninstall_code);
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
   void ShowIPHPromoForAppsLaunchedViaLinkCapturing(
       BrowserWindowInterface* browser,
       const webapps::AppId& app_id,
@@ -281,8 +274,7 @@ class WebAppUiManagerImpl : public BrowserCollectionObserver,
 
   void OnTabChangedDuringIph(BrowserWindowInterface* browser);
 
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_CHROMEOS)
   void OnBrowserCloseCancelled(

@@ -58,28 +58,13 @@
 #include "ash/constants/ash_features.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-#include "components/spellcheck/common/spellcheck_features.h"
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-
 using content::BrowserContext;
 using content::RenderProcessHost;
 
 class SpellcheckServiceBrowserTest : public InProcessBrowserTest,
                                      public spellcheck::mojom::SpellChecker {
  public:
-#if BUILDFLAG(IS_WIN)
-  explicit SpellcheckServiceBrowserTest(
-      bool use_browser_spell_checker = false) {
-    if (!use_browser_spell_checker) {
-      // Tests were designed assuming Hunspell dictionary used and many fail
-      // when Windows spellcheck is enabled.
-      disable_browser_spell_checker_.emplace();
-    }
-  }
-#else
   SpellcheckServiceBrowserTest() = default;
-#endif
 
   SpellcheckServiceBrowserTest(const SpellcheckServiceBrowserTest&) = delete;
   SpellcheckServiceBrowserTest& operator=(const SpellcheckServiceBrowserTest&) =
@@ -136,13 +121,6 @@ class SpellcheckServiceBrowserTest : public InProcessBrowserTest,
 
     SpellcheckService* spellcheck =
         SpellcheckServiceFactory::GetForContext(renderer_->GetBrowserContext());
-
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-    if (spellcheck::UseBrowserSpellChecker()) {
-      // If the Windows native spell checker is in use, initialization is async.
-      RunTestRunLoop();
-    }
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 
     ASSERT_NE(nullptr, spellcheck);
   }
@@ -255,15 +233,11 @@ class SpellcheckServiceBrowserTest : public InProcessBrowserTest,
   // Quits the RunLoop on Mojo request flow completion.
   base::OnceClosure quit_;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(IS_CHROMEOS)
   base::test::ScopedFeatureList feature_list_;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
  private:
-#if BUILDFLAG(IS_WIN)
-  std::optional<spellcheck::ScopedDisableBrowserSpellCheckerForTesting>
-      disable_browser_spell_checker_;
-#endif
 
   // Mocked RenderProcessHost.
   std::unique_ptr<content::MockRenderProcessHost> renderer_;
@@ -532,14 +506,6 @@ IN_PROC_BROWSER_TEST_F(SpellcheckServiceHostBrowserTest, CallSpellingService) {
 // Tests that we can delete a corrupted BDICT file used by hunspell. We do not
 // run this test on Mac because Mac does not use hunspell by default.
 IN_PROC_BROWSER_TEST_F(SpellcheckServiceBrowserTest, DeleteCorruptedBDICT) {
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-  if (spellcheck::UseBrowserSpellChecker()) {
-    // If doing native spell checking on Windows, Hunspell dictionaries are not
-    // used for en-US, so the corrupt dictionary event will never be raised.
-    // Skip this test.
-    return;
-  }
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 
   // Corrupted BDICT data: please do not use this BDICT data for other tests.
   const uint8_t kCorruptedBDICT[] = {
@@ -703,169 +669,3 @@ IN_PROC_BROWSER_TEST_F(SpellcheckServiceBrowserTest,
                       ->GetList(spellcheck::prefs::kSpellCheckDictionaries)[1]
                       .GetString());
 }
-
-#if BUILDFLAG(IS_WIN)
-class SpellcheckServiceWindowsHybridBrowserTest
-    : public SpellcheckServiceBrowserTest {
- public:
-  SpellcheckServiceWindowsHybridBrowserTest()
-      : SpellcheckServiceBrowserTest(/* use_browser_spell_checker=*/true) {}
-};
-
-class SpellcheckServiceWindowsHybridBrowserTestDelayInit
-    : public SpellcheckServiceBrowserTest {
- public:
-  SpellcheckServiceWindowsHybridBrowserTestDelayInit()
-      : SpellcheckServiceBrowserTest(/* use_browser_spell_checker=*/true) {}
-
-  void SetUp() override {
-    // Add command line switch that forces first run state, to test whether
-    // primary preferred language has its spellcheck dictionary enabled by
-    // default for non-Hunspell languages.
-    first_run::ResetCachedSentinelDataForTesting();
-    base::CommandLine::ForCurrentProcess()->AppendSwitch(
-        switches::kForceFirstRun);
-
-    InProcessBrowserTest::SetUp();
-  }
-
-  void OnDictionariesInitialized() {
-    dictionaries_initialized_received_ = true;
-    if (quit_on_callback_)
-      std::move(quit_on_callback_).Run();
-  }
-
- protected:
-  void RunUntilCallbackReceived() {
-    if (dictionaries_initialized_received_)
-      return;
-    base::RunLoop run_loop;
-    quit_on_callback_ = run_loop.QuitClosure();
-    run_loop.Run();
-
-    // reset status.
-    dictionaries_initialized_received_ = false;
-  }
-
- private:
-  bool dictionaries_initialized_received_ = false;
-
-  // Quits the RunLoop on receiving the callback from InitializeDictionaries.
-  base::OnceClosure quit_on_callback_;
-};
-
-// Used for faking the presence of Windows spellcheck dictionaries.
-const std::vector<std::string> kWindowsSpellcheckLanguages = {
-    "fi-FI",  // Finnish has no Hunspell support.
-    "fr-FR",  // French has both Windows and Hunspell support.
-    "pt-BR"   // Portuguese (Brazil) has both Windows and Hunspell support, but
-              // generic pt does not have Hunspell support.
-};
-
-// Used for testing whether primary preferred language is enabled by default for
-// spellchecking.
-const char kAcceptLanguages[] = "fi-FI,fi,ar-AR,fr-FR,fr,hr,ceb,pt-BR,pt";
-const std::vector<std::string> kSpellcheckDictionariesBefore = {
-    // Note that Finnish is initially unset, but has Windows spellcheck
-    // dictionary present.
-    "ar",     // Arabic has no Hunspell support, and its Windows spellcheck
-              // dictionary is not present.
-    "fr-FR",  // French has both Windows and Hunspell support, and its Windows
-              // spellcheck dictionary is present.
-    "fr",     // Generic language should also be toggleable for spellcheck.
-    "hr",     // Croatian has Hunspell support.
-    "ceb",    // Cebuano doesn't have any dictionary support and should be
-              // removed from preferences.
-    "pt-BR",  // Portuguese (Brazil) has both Windows and Hunspell support, and
-              // its Windows spellcheck dictionary is present.
-    "pt"      // Generic language should also be toggleable for spellcheck.
-};
-
-const std::vector<std::string> kSpellcheckDictionariesAfter = {
-    "fi",     // Finnish should have been enabled for spellchecking since
-              // it's the primary language.
-    "fr-FR",  // French should still be there.
-    "fr",     // Should still be entry for generic French.
-    "hr",     // So should Croatian.
-    "pt-BR",  // Portuguese (Brazil) should still be there.
-    "pt"      // Should still be entry for generic Portuguese.
-};
-
-// As a prelude to the next test, sets the initial accept languages and
-// spellcheck language preferences for the test profile.
-IN_PROC_BROWSER_TEST_F(SpellcheckServiceWindowsHybridBrowserTestDelayInit,
-                       PRE_WindowsHybridSpellcheckDelayInit) {
-  GetPrefs()->SetString(language::prefs::kSelectedLanguages, kAcceptLanguages);
-  base::ListValue spellcheck_dictionaries_list;
-  for (const auto& dictionary : kSpellcheckDictionariesBefore) {
-    spellcheck_dictionaries_list.Append(std::move(dictionary));
-  }
-  GetPrefs()->SetList(spellcheck::prefs::kSpellCheckDictionaries,
-                      std::move(spellcheck_dictionaries_list));
-}
-
-IN_PROC_BROWSER_TEST_F(SpellcheckServiceWindowsHybridBrowserTestDelayInit,
-                       WindowsHybridSpellcheckDelayInit) {
-  ASSERT_TRUE(spellcheck::UseBrowserSpellChecker());
-
-  // The base class forces dictionary sync to be skipped, so the
-  // SpellcheckService object should not have been created on browser startup
-  // because. Verify this is the case.
-  SpellcheckService* service = static_cast<SpellcheckService*>(
-      SpellcheckServiceFactory::GetInstance()->GetServiceForBrowserContext(
-          GetContext(), /* create */ false));
-  EXPECT_EQ(nullptr, service);
-
-  // Now create the SpellcheckService but don't call InitializeDictionaries().
-  service = static_cast<SpellcheckService*>(
-      SpellcheckServiceFactory::GetInstance()->GetServiceForBrowserContext(
-          GetContext(), /* create */ true));
-
-  ASSERT_NE(nullptr, service);
-
-  // The list of Windows spellcheck languages should not have been populated
-  // yet since InitializeDictionaries() has not been called.
-  EXPECT_FALSE(service->dictionaries_loaded());
-  EXPECT_TRUE(service->windows_spellcheck_dictionary_map_.empty());
-
-  // Fake the presence of Windows spellcheck dictionaries.
-  service->AddSpellcheckLanguagesForTesting(kWindowsSpellcheckLanguages);
-
-  service->InitializeDictionaries(
-      base::BindOnce(&SpellcheckServiceWindowsHybridBrowserTestDelayInit::
-                         OnDictionariesInitialized,
-                     base::Unretained(this)));
-
-  RunUntilCallbackReceived();
-  EXPECT_TRUE(service->dictionaries_loaded());
-  // The list of Windows spellcheck languages should now have been populated.
-  std::map<std::string, std::string>
-      windows_spellcheck_dictionary_map_first_call =
-          service->windows_spellcheck_dictionary_map_;
-  EXPECT_FALSE(windows_spellcheck_dictionary_map_first_call.empty());
-
-  // Check that the primary accept language has spellchecking enabled and
-  // that languages with no spellcheck support have spellchecking disabled.
-  EXPECT_EQ(kAcceptLanguages,
-            GetPrefs()->GetString(language::prefs::kAcceptLanguages));
-  const base::ListValue& dictionaries_list =
-      GetPrefs()->GetList(spellcheck::prefs::kSpellCheckDictionaries);
-  std::vector<std::string> actual_dictionaries;
-  for (const auto& dictionary : dictionaries_list) {
-    actual_dictionaries.push_back(dictionary.GetString());
-  }
-  EXPECT_EQ(kSpellcheckDictionariesAfter, actual_dictionaries);
-
-  // It should be safe to call InitializeDictionaries again (it should
-  // immediately run the callback).
-  service->InitializeDictionaries(
-      base::BindOnce(&SpellcheckServiceWindowsHybridBrowserTestDelayInit::
-                         OnDictionariesInitialized,
-                     base::Unretained(this)));
-
-  RunUntilCallbackReceived();
-  EXPECT_TRUE(service->dictionaries_loaded());
-  EXPECT_EQ(windows_spellcheck_dictionary_map_first_call,
-            service->windows_spellcheck_dictionary_map_);
-}
-#endif  // BUILDFLAG(IS_WIN)

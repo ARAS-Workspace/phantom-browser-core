@@ -17,12 +17,6 @@
 #include "content/public/browser/browser_child_process_host.h"
 #include "content/public/browser/browser_thread.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-
-#include <psapi.h>
-#endif
-
 namespace task_manager {
 
 namespace {

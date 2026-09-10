@@ -32,12 +32,8 @@ class LocalInputMonitorTest : public testing::Test {
   void SetUp() override;
 
   base::test::TaskEnvironment task_environment_ {
-#if BUILDFLAG(IS_WIN)
-    base::test::TaskEnvironment::MainThreadType::UI
-#else   // !BUILDFLAG(IS_WIN)
     // Required to watch a file descriptor from NativeMessageProcessHost.
     base::test::TaskEnvironment::MainThreadType::IO
-#endif  // !BUILDFLAG(IS_WIN)
   };
 
   scoped_refptr<base::SingleThreadTaskRunner> task_runner_;

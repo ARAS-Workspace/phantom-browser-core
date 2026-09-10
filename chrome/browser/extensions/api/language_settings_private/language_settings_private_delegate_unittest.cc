@@ -46,13 +46,6 @@ class LanguageSettingsPrivateDelegateTest
     EventRouterFactory::GetInstance()->SetTestingFactory(
         profile(), base::BindRepeating(&BuildEventRouter));
 
-#if BUILDFLAG(IS_WIN)
-    // Tests were designed assuming Hunspell dictionary used and may fail when
-    // Windows spellcheck is enabled by default.
-    spellcheck::ScopedDisableBrowserSpellCheckerForTesting
-        disable_browser_spell_checker;
-#endif  // BUILDFLAG(IS_WIN)
-
     base::ListValue language_codes;
     language_codes.Append("fr");
     profile()->GetPrefs()->Set(spellcheck::prefs::kSpellCheckDictionaries,
@@ -95,9 +88,6 @@ class LanguageSettingsPrivateDelegateTest
     }
   }
 
-#if BUILDFLAG(IS_WIN)
-  base::test::ScopedFeatureList feature_list_;
-#endif  // BUILDFLAG(IS_WIN)
   std::unique_ptr<LanguageSettingsPrivateDelegate> delegate_;
   std::unique_ptr<base::RunLoop> run_loop_;
 };

@@ -34,14 +34,6 @@
 #include "base/notreached.h"
 #endif
 
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_OOP_PRINTING)
-#include <vector>
-
-#include "base/task/thread_pool.h"
-#include "base/test/bind.h"
-#include "base/test/values_test_util.h"
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_OOP_PRINTING)
-
 namespace printing {
 
 namespace {
@@ -164,11 +156,6 @@ class LocalPrinterHandlerDefaultTestBase : public testing::Test {
         unsandboxed_print_backend_ = base::MakeRefCounted<TestPrintBackend>();
       }
 
-#if BUILDFLAG(IS_WIN)
-      // To test OOP for Windows, the Print Backend service is launched on a
-      // separate thread. This setup is required to unblock Mojo calls.
-      SetUpServiceThread();
-#else
       sandboxed_print_backend_service_ =
           PrintBackendServiceTestImpl::LaunchForTesting(
               sandboxed_print_backend_remote_, sandboxed_print_backend_,
@@ -179,7 +166,6 @@ class LocalPrinterHandlerDefaultTestBase : public testing::Test {
                 unsandboxed_print_backend_remote_, unsandboxed_print_backend_,
                 /*sandboxed=*/false);
       }
-#endif  // BUILDFLAG(IS_WIN)
 
       // Client registration is normally covered by `PrintPreviewUI`, so mimic
       // that here.
@@ -202,14 +188,6 @@ class LocalPrinterHandlerDefaultTestBase : public testing::Test {
     if (UseService()) {
       PrintBackendServiceManager::GetInstance().UnregisterClient(
           service_manager_client_id_);
-#if BUILDFLAG(IS_WIN)
-      service_task_runner_->DeleteSoon(
-          FROM_HERE, std::move(sandboxed_print_backend_service_));
-      if (SupportFallback()) {
-        service_task_runner_->DeleteSoon(
-            FROM_HERE, std::move(unsandboxed_print_backend_service_));
-      }
-#endif  // BUILDFLAG(IS_WIN)
     } else {
       PrintBackend::SetPrintBackendForTesting(nullptr);
     }
@@ -278,24 +256,6 @@ class LocalPrinterHandlerDefaultTestBase : public testing::Test {
   }
 
  private:
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_OOP_PRINTING)
-  void SetUpServiceThread() {
-    service_task_runner_ = base::ThreadPool::CreateSingleThreadTaskRunner(
-        {}, base::SingleThreadTaskRunnerThreadMode::DEDICATED);
-
-    sandboxed_print_backend_service_ =
-        PrintBackendServiceTestImpl::LaunchForTestingWithServiceThread(
-            sandboxed_print_backend_remote_, sandboxed_print_backend_,
-            /*sandboxed=*/true, service_task_runner_);
-
-    if (SupportFallback()) {
-      unsandboxed_print_backend_service_ =
-          PrintBackendServiceTestImpl::LaunchForTestingWithServiceThread(
-              unsandboxed_print_backend_remote_, unsandboxed_print_backend_,
-              /*sandboxed=*/false, service_task_runner_);
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN) && BUILDFLAG(ENABLE_OOP_PRINTING)
 
   // Must outlive `profile_`.
   content::BrowserTaskEnvironment task_environment_;
@@ -314,10 +274,6 @@ class LocalPrinterHandlerDefaultTestBase : public testing::Test {
   std::unique_ptr<PrintBackendServiceTestImpl>
       unsandboxed_print_backend_service_;
   PrintBackendServiceManager::ClientId service_manager_client_id_;
-
-#if BUILDFLAG(IS_WIN)
-  scoped_refptr<base::SingleThreadTaskRunner> service_task_runner_;
-#endif  // BUILDFLAG(IS_WIN)
 
 #else
   scoped_refptr<TestPrintBackend> default_print_backend_;

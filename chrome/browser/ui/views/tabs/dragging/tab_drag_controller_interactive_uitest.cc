@@ -172,9 +172,6 @@
 #include "ui/ozone/public/ozone_platform.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/base/ui_base_features.h"
-#endif
 
 using content::WebContents;
 using display::Display;
@@ -865,11 +862,6 @@ class DetachToBrowserTabDragControllerTest
 
     std::vector<base::test::FeatureRef> disabled_features;
 
-#if BUILDFLAG(IS_WIN)
-    // Disable NativeWinOcclusion to avoid it interfering with test for dragging
-    // over occluded browser window.
-    disabled_features.push_back(features::kCalculateNativeWinOcclusion);
-#endif  // BUILDFLAG(IS_WIN)
     if (std::get<0>(GetParam())) {
       enabled_features_with_params.push_back(
           {features::kTearOffWebAppTabOpensWebAppWindow, {}});
@@ -2255,40 +2247,6 @@ IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTest,
   EXPECT_EQ("0 1", IDString(browser()->tab_strip_model()));
 }
 
-#if BUILDFLAG(IS_WIN)
-
-// Create two browsers, with the second one occluded, and drag from first over
-// second. This should create a third browser, w/o bringing forward the second
-// browser, because it's occluded.
-IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTest,
-                       DragToOccludedWindow) {
-  TabStrip* tab_strip = GetTabStripForBrowser(browser());
-
-  AddTabsAndResetBrowser(browser(), 1);
-
-  // Create another browser.
-  BrowserWindowInterface* browser2 = CreateAnotherBrowserAndResize();
-  TabStrip* tab_strip2 = GetTabStripForBrowser(browser2);
-
-  // Mark the second browser as occluded. NativeWindow occlusion calculation has
-  // been disabled in test constructor, so we don't need an actual occluding
-  // window.
-  browser2->GetWindow()
-      ->GetNativeWindow()
-      ->GetHost()
-      ->SetNativeWindowOcclusionState(aura::Window::OcclusionState::OCCLUDED,
-                                      {});
-
-  // Drag a tab from first browser to middle of first tab of the second,
-  // occluded browser, and drop. This should create a third browser window.
-  ASSERT_TRUE(PressInputAtCenter(tab_strip->tab_at(1)));
-  ASSERT_TRUE(DragInputToCenterAsync(tab_strip2->tab_at(0)));
-  ASSERT_TRUE(ReleaseInput());
-
-  EXPECT_EQ(3u, GlobalBrowserCollection::GetInstance()->GetSize());
-}
-
-#endif  // BUILDFLAG(IS_WIN)
 
 namespace {
 
@@ -3112,11 +3070,11 @@ IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTest,
       IsWindowPositionManaged(new_browser->GetWindow()->GetNativeWindow()));
 
   const bool kMaximizedStateRetainedOnTabDrag =
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_LINUX)
       false;
 #else
       true;
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_LINUX)
 
   if (kMaximizedStateRetainedOnTabDrag) {
     ASSERT_TRUE(base::test::RunUntil(
@@ -3546,11 +3504,7 @@ void DragAllStep2(DetachToBrowserTabDragControllerTest* test) {
 
 // Selects multiple tabs and starts dragging the window.
 // TODO(crbug.com/509555634): Test is flaky on windows. Reenable once deflaked.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_DragAll DISABLED_DragAll
-#else
 #define MAYBE_DragAll DragAll
-#endif
 IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTest, MAYBE_DragAll) {
 #if BUILDFLAG(IS_MAC)
   // TODO(crbug.com/510801992): Re-enable on macOS 26 once test is deflaked
@@ -4032,11 +3986,7 @@ IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTest,
         ASSERT_TRUE(IsDragSessionActive(new_tab_strip));
         ASSERT_TRUE(TabDragController::IsActive());
 
-#if BUILDFLAG(IS_WIN)
-        ReleaseInput(0, /*async=*/true);
-#else
         ReleaseInput();
-#endif
       }));
 
   // Drag out of tab_strip2 again.
@@ -5315,7 +5265,7 @@ void DragWindowAndVerifyOffset(DetachToBrowserTabDragControllerTest* test,
 
 }  // namespace
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
 // TODO(mukai): enable this test on Linux.
 // TODO(crbug.com/41468034): flaky on Mac, Linux and Windows.
 #define MAYBE_OffsetForDraggingTab DISABLED_OffsetForDraggingTab
@@ -6826,11 +6776,7 @@ IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTest,
 // Regression test for http://crbug.com/505371980.
 // Verifies that the correct tab is detached even if the selection changes
 // mid-drag.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_SelectTabDuringDragAndDetach SelectTabDuringDragAndDetach
-#else
 #define MAYBE_SelectTabDuringDragAndDetach DISABLED_SelectTabDuringDragAndDetach
-#endif
 IN_PROC_BROWSER_TEST_P(DetachToBrowserTabDragControllerTest,
                        MAYBE_SelectTabDuringDragAndDetach) {
   TabStripModel* model = browser()->tab_strip_model();

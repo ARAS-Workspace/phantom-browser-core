@@ -25,17 +25,6 @@ class AXPlatformNode;
 // Process-wide accessibility platform state.
 class COMPONENT_EXPORT(AX_PLATFORM) AXPlatform {
  public:
-#if BUILDFLAG(IS_WIN)
-  // These strings are only needed for IA2 support.
-  struct ProductStrings {
-    // Product name, e.g. "Chrome".
-    std::string product_name;
-    // Version number, e.g. "aa.bb.cc.dd".
-    std::string product_version;
-    // Toolkit version of the product, for example, the User Agent string.
-    std::string toolkit_version;
-  };
-#endif
 
   class COMPONENT_EXPORT(AX_PLATFORM) Delegate {
    public:
@@ -45,13 +34,6 @@ class COMPONENT_EXPORT(AX_PLATFORM) AXPlatform {
 
     // Returns the effective process-wide accessibility mode.
     virtual AXMode GetAccessibilityMode() = 0;
-
-#if BUILDFLAG(IS_WIN)
-    // Used to retrieve the product name, version, and toolkit version for IA2.
-    // Only called the first time the data is needed to fill in the
-    // product_strings_ member of AXPlatform.
-    virtual ProductStrings GetProductStrings() = 0;
-#endif
 
     // A very basic accessible property was used, such as role, name or
     // location. Only enables AXMode::kNativeAPIs unless the screen reader
@@ -127,70 +109,6 @@ class COMPONENT_EXPORT(AX_PLATFORM) AXPlatform {
   bool IsCaretBrowsingEnabled();
   void SetCaretBrowsingState(bool enabled);
 
-#if BUILDFLAG(IS_WIN)
-  // Returns the product name, e.g. "Chrome".
-  const std::string& GetProductName() const;
-
-  // Returns the version number, e.g. "aa.bb.cc.dd".
-  const std::string& GetProductVersion() const;
-
-  // Returns the toolkit version of the product, for example, the User Agent
-  // string.
-  const std::string& GetToolkitVersion() const;
-
-  // Disables the UI Automation Provider on Windows, and signals to UIA that the
-  // previous providers that might have been returned are no longer valid.
-  void DisableActiveUiaProvider();
-
-  // Returns true if the UI Automation Provider for Windows is enabled.
-  bool IsUiaProviderEnabled() const;
-
-  // Three levels of Windows API tracking:
-  // - "Serviced": a UIA provider was returned to the OS. Runtime flag used
-  //   for cleanup (e.g. disconnecting providers on window destroy).
-  // - "Requested": a WM_GETOBJECT was received for MSAA or UIA. One-way
-  //   flag for histogram reporting, fires even if UIA is disabled.
-  // - "Active": an API call reached a function that activates AXMode.
-  //   One-way flag for histogram reporting, scoped to AXMode-modifying paths.
-
-  // Notes that an inbound request from a UIA client has been serviced; for
-  // example, by calling UiaReturnRawElementProvider to give it a window's
-  // root object.
-  void SetUiaClientServiced(bool uia_client_serviced);
-
-  // Returns true if a UIA client has been serviced; see above.
-  bool HasServicedUiaClients();
-
-  // Identifies which Windows accessibility client APIs were active or
-  // requested. These values are persisted to logs. Entries should not be
-  // renumbered and numeric values should never be reused.
-  //
-  // LINT.IfChange(ActiveClientApi)
-  enum class ActiveClientApi {
-    kUiaOnly = 0,
-    kMsaaOnly = 1,
-    kBoth = 2,
-    kMaxValue = kBoth,
-  };
-  // LINT.ThenChange(/tools/metrics/histograms/metadata/accessibility/enums.xml:ActiveClientApi)
-
-  // Records that a WM_GETOBJECT message was received for a specific platform
-  // API. Does not necessarily reflect a real AXMode activation.
-  void SetMsaaRequested();
-  void SetUiaRequested();
-
-  // Returns which APIs were requested via WM_GETOBJECT, or nullopt if neither.
-  std::optional<ActiveClientApi> GetRequestedClientApi() const;
-
-  // Records that a specific platform API call led to a function that
-  // activates the process-wide AXMode.
-  void SetMsaaActive();
-  void SetUiaActive();
-
-  // Returns which APIs activated AXMode, or nullopt if neither has.
-  std::optional<ActiveClientApi> GetActiveClientApi() const;
-#endif
-
   // A very basic accessible property was used, such as role, name or location.
   // Always enables AXMode::kNativeAPIs by calling OnMinimalPropertiesUsed() on
   // the delegate. If the screen reader honeypot is used (currently windows
@@ -209,27 +127,12 @@ class COMPONENT_EXPORT(AX_PLATFORM) AXPlatform {
   void OnHTMLAttributesUsed();
   // An a11y action was used in web content.
   void OnActionFromAssistiveTech();
-#if BUILDFLAG(IS_WIN)
-  // The honeypot is a fake alert object that is created, with a fake alert
-  // event fired on it. It is considered unlikely that anything but a screen
-  // reader would be query that object, and also query other minimal properties.
-  // TODO(accessibility): We may no longer need this method because we
-  // detect all screen readers directly, although this may happen earlier.
-  void OnScreenReaderHoneyPotQueried();
-#endif
 
   void DetachFromThreadForTesting();
 
  private:
   friend class ::ui::AXPlatformNode;
   FRIEND_TEST_ALL_PREFIXES(AXPlatformTest, Observer);
-
-#if BUILDFLAG(IS_WIN)
-  // Retrieves the product name, version, and toolkit version from the delegate
-  // if they have not already been retrieved.
-  void RetrieveProductStringsIfNeeded() const
-      VALID_CONTEXT_REQUIRED(thread_checker_);
-#endif
 
   // The embedder's delegate.
   const raw_ref<Delegate> delegate_ GUARDED_BY_CONTEXT(thread_checker_);
@@ -238,17 +141,6 @@ class COMPONENT_EXPORT(AX_PLATFORM) AXPlatform {
                      /*check_empty=*/true,
                      base::ObserverListReentrancyPolicy::kDisallowReentrancy>
       observers_ GUARDED_BY_CONTEXT(thread_checker_);
-
-#if BUILDFLAG(IS_WIN)
-  // See product_name() product_version(), and toolkit_version().
-  // These are lazily cached upon first use. Mutable to allow caching.
-  mutable std::optional<ProductStrings> product_strings_
-      GUARDED_BY_CONTEXT(thread_checker_);
-
-  // The UI Automation provider may be disabled if incompatible accessibility
-  // tools are detected.
-  bool uia_provider_enabled_ GUARDED_BY_CONTEXT(thread_checker_) = true;
-#endif  // BUILDFLAG(IS_WIN)
 
   // Keeps track of the active AssistiveTech.
   AssistiveTech active_assistive_tech_ GUARDED_BY_CONTEXT(thread_checker_) =
@@ -262,17 +154,6 @@ class COMPONENT_EXPORT(AX_PLATFORM) AXPlatform {
 
   // Keeps track of whether caret browsing is enabled.
   bool caret_browsing_enabled_ GUARDED_BY_CONTEXT(thread_checker_) = false;
-
-#if BUILDFLAG(IS_WIN)
-  bool screen_reader_honeypot_queried_ GUARDED_BY_CONTEXT(thread_checker_) =
-      false;
-  bool is_name_used_ GUARDED_BY_CONTEXT(thread_checker_) = false;
-  bool has_serviced_uia_clients_ GUARDED_BY_CONTEXT(thread_checker_) = false;
-  bool msaa_requested_ GUARDED_BY_CONTEXT(thread_checker_) = false;
-  bool uia_requested_ GUARDED_BY_CONTEXT(thread_checker_) = false;
-  bool msaa_active_ GUARDED_BY_CONTEXT(thread_checker_) = false;
-  bool uia_active_ GUARDED_BY_CONTEXT(thread_checker_) = false;
-#endif
 
   THREAD_CHECKER(thread_checker_);
 };

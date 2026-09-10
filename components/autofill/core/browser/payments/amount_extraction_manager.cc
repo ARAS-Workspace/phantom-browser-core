@@ -318,7 +318,7 @@ void AmountExtractionManager::OnCheckoutAmountReceived(
   std::move(result_callback)
       .Run(parsed_extracted_amount,
            /*timeout_reached=*/false);
-  if constexpr (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
+  if constexpr (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
                 BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)) {
     if (base::FeatureList::IsEnabled(
             features::kAutofillEnableAmountExtractionTesting)) {
@@ -388,7 +388,7 @@ void AmountExtractionManager::OnTimeoutReached(
     has_logged_amount_extraction_result_ = true;
   }
 
-  if constexpr (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
+  if constexpr (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
                 BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)) {
     if (base::FeatureList::IsEnabled(
             features::kAutofillEnableAmountExtractionTesting)) {
@@ -413,7 +413,7 @@ void AmountExtractionManager::OnTimeoutReachedWithAi(
   LogAiAmountExtractionResultIfApplicable(result, /*latency=*/std::nullopt);
   std::move(callback).Run(std::move(result));
 
-  if constexpr (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
+  if constexpr (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
                 BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)) {
     if (base::FeatureList::IsEnabled(
             features::kAutofillEnableAmountExtractionTesting)) {
@@ -433,7 +433,7 @@ AmountExtractionManager::CheckEligibilityForFeaturesRequiringAmountExtraction()
   DenseSet<EligibleFeature> eligible_features;
 
   // Check eligibility of BNPL feature.
-  if constexpr (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
+  if constexpr (BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
                 BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID)) {
     if (IsEligibleForBnpl(autofill_manager_->client())) {
       eligible_features.insert(EligibleFeature::kBnpl);

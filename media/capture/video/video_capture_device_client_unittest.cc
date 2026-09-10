@@ -431,17 +431,12 @@ TEST_F(VideoCaptureDeviceClientTest, DataCaptureGoodPixelFormats) {
   // Only use the VideoPixelFormats that we know supported. Do not add
   // PIXEL_FORMAT_MJPEG since it would need a real JPEG header.
   const VideoPixelFormat kSupportedFormats[] = {
-    PIXEL_FORMAT_I420,
-    PIXEL_FORMAT_YV12,
-    PIXEL_FORMAT_NV12,
-    PIXEL_FORMAT_NV21,
-    PIXEL_FORMAT_YUY2,
-    PIXEL_FORMAT_UYVY,
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-    PIXEL_FORMAT_RGB24,
+      PIXEL_FORMAT_I420,  PIXEL_FORMAT_YV12, PIXEL_FORMAT_NV12,
+      PIXEL_FORMAT_NV21,  PIXEL_FORMAT_YUY2, PIXEL_FORMAT_UYVY,
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
+      PIXEL_FORMAT_RGB24,
 #endif
-    PIXEL_FORMAT_ARGB,
-    PIXEL_FORMAT_Y16,
+      PIXEL_FORMAT_ARGB,  PIXEL_FORMAT_Y16,
   };
   const gfx::ColorSpace kColorSpace = gfx::ColorSpace::CreateSRGB();
 

@@ -30,9 +30,6 @@ extern const char kCL[];
 extern const char kCommandLine[];
 extern const char kCommandLineName[];
 extern const char kCompany[];
-#if BUILDFLAG(IS_WIN)
-extern const char kUpdateCohortName[];
-#endif
 extern const char kCopyright[];
 #if BUILDFLAG(IS_CHROMEOS)
 extern const char kCustomizationId[];

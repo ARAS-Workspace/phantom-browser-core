@@ -953,7 +953,7 @@ const std::vector<std::string> kSupportsOriginFilteringImpl{
     "TrustTokens",
 };
 const std::vector<std::string> kSupportsOriginFilteringDelegate{
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
     "CdmLicenses",
 #endif
     "Cookies",           "DisableAutoSigninForProfilePasswords",

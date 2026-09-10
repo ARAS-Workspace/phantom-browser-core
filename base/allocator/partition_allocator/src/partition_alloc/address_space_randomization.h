@@ -54,19 +54,6 @@ AslrMask(uintptr_t bits) {
       return AslrAddress(0x7e8000000000ULL);
     }
 
-  #elif PA_BUILDFLAG(IS_WIN)
-
-    // Windows 8.10 and newer support the full 48 bit address range. Since
-    // ASLROffset() is non-zero and may cause a carry, use 47 bit masks. See
-    // http://www.alex-ionescu.com/?p=246
-    PA_ALWAYS_INLINE constexpr uintptr_t ASLRMask() {
-      return AslrMask(47);
-    }
-    // Try not to map pages into the range where Windows loads DLLs by default.
-    PA_ALWAYS_INLINE constexpr uintptr_t ASLROffset() {
-      return 0x80000000ULL;
-    }
-
   #elif PA_BUILDFLAG(IS_APPLE)
     PA_ALWAYS_INLINE PAGE_ALLOCATOR_CONSTANTS_DECLARE_CONSTEXPR uintptr_t
     ASLRMask() {

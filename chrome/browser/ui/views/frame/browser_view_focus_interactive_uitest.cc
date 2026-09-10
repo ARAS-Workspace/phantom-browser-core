@@ -162,44 +162,6 @@ IN_PROC_BROWSER_TEST_F(BrowserViewFocusTest, BrowsersRememberFocus) {
 
   // The rest of this test does not make sense on Linux because the behavior
   // of Activate() is not well defined and can vary by window manager.
-#if BUILDFLAG(IS_WIN)
-  // Open a new browser window.
-  BrowserWindowInterface* browser2 = CreateBrowserWindow(
-      BrowserWindowCreateParams(browser()->GetProfile(),
-                                /*from_user_gesture=*/true));
-  ASSERT_TRUE(browser2);
-  chrome::AddTabAt(browser2, GURL(), -1, true);
-  browser2->GetWindow()->Show();
-  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser2, url));
-
-  gfx::NativeWindow window2 = browser2->GetWindow()->GetNativeWindow();
-  BrowserView* browser_view2 = BrowserView::GetBrowserViewForBrowser(browser2);
-  ASSERT_TRUE(browser_view2);
-  const views::Widget* widget2 =
-      views::Widget::GetWidgetForNativeWindow(window2);
-  ASSERT_TRUE(widget2);
-  const views::FocusManager* focus_manager2 = widget2->GetFocusManager();
-  ASSERT_TRUE(focus_manager2);
-  EXPECT_EQ(browser_view2->contents_web_view(),
-            focus_manager2->GetFocusedView());
-
-  // Switch to the 1st browser window, focus should still be on the location
-  // bar and the second browser should have nothing focused.
-  browser()->GetWindow()->Activate();
-  ASSERT_TRUE(IsViewFocused(VIEW_ID_OMNIBOX));
-  EXPECT_EQ(nullptr, focus_manager2->GetFocusedView());
-
-  // Switch back to the second browser, focus should still be on the page.
-  browser2->GetWindow()->Activate();
-  views::Widget* widget = views::Widget::GetWidgetForNativeWindow(window);
-  ASSERT_TRUE(widget);
-  EXPECT_EQ(nullptr, widget->GetFocusManager()->GetFocusedView());
-  EXPECT_EQ(browser_view2->contents_web_view(),
-            focus_manager2->GetFocusedView());
-
-  // Close the 2nd browser to avoid a DCHECK().
-  browser_view2->Close();
-#endif
 }
 
 // Helper class that tracks view classes receiving focus.

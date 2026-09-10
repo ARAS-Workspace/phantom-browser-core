@@ -213,12 +213,7 @@ CronetPrefsManager::CronetPrefsManager(
   DCHECK(network_task_runner->BelongsToCurrentThread());
   DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
 
-#if BUILDFLAG(IS_WIN)
-  base::FilePath storage_file_path(
-      base::FilePath::FromUTF8Unsafe(storage_path));
-#else
   base::FilePath storage_file_path(storage_path);
-#endif
 
   // Make sure storage directory has correct version.
   {

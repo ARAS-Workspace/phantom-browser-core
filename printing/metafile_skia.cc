@@ -294,17 +294,7 @@ printing::NativeDrawingContext MetafileSkia::context() const {
   NOTREACHED();
 }
 
-#if BUILDFLAG(IS_WIN)
-bool MetafileSkia::Playback(printing::NativeDrawingContext hdc,
-                            const RECT* rect) const {
-  NOTREACHED();
-}
-
-bool MetafileSkia::SafePlayback(printing::NativeDrawingContext hdc) const {
-  NOTREACHED();
-}
-
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 /* TODO(caryclark): The set up of PluginInstance::PrintPDFOutput may result in
    rasterized output.  Even if that flow uses PdfMetafileCg::RenderPage,
    the drawing of the PDF into the canvas may result in a rasterized output.

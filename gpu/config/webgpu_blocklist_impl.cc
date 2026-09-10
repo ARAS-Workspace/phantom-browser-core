@@ -69,41 +69,6 @@ WebGPUBlocklistReason GetWebGPUAdapterBlocklistReason(
     const WebGPUBlocklistOptions& options) {
   WebGPUBlocklistReason reason = WebGPUBlocklistReason::None;
 
-#if BUILDFLAG(IS_WIN)
-  constexpr uint32_t kAMDVendorID = 0x1002;
-  constexpr uint32_t kIntelVendorID = 0x8086;
-  constexpr uint32_t kMicrosoftVendorID = 0x1414;
-  constexpr uint32_t kNVIDIAVendorID = 0x10DE;
-  constexpr uint32_t kQualcommVendorID = 0x4D4F4351;
-
-  if (info.backendType == wgpu::BackendType::D3D12) {
-    switch (info.vendorID) {
-      case kNVIDIAVendorID:
-#if defined(ARCH_CPU_X86)
-        reason = reason | WebGPUBlocklistReason::IndirectComputeRootConstants;
-#endif  // defined(ARCH_CPU_X86)
-        break;
-
-      case kQualcommVendorID:
-        if (!base::FeatureList::IsEnabled(features::kWebGPUQualcommWindows)) {
-          reason = reason | WebGPUBlocklistReason::QualcommWindows;
-        }
-        break;
-
-      case kAMDVendorID:
-      case kIntelVendorID:
-      case kMicrosoftVendorID:
-        break;
-
-      default:
-        // Other OS versions/GPU vendor combinations may be fine, but have not
-        // had sufficient testing yet.
-        reason = reason | WebGPUBlocklistReason::WindowsLimitedSupport;
-        break;
-    }
-  }
-#endif  // BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_ANDROID)
   constexpr uint32_t kARMVendorID = 0x13B5;
   constexpr uint32_t kQualcommVendorID = 0x5143;
@@ -227,13 +192,7 @@ WebGPUBlocklistReason GetWebGPUAdapterBlocklistReason(
     }
 
     // Adapter is blocked.
-#if BUILDFLAG(IS_WIN)
-    if (info.vendorID == kQualcommVendorID) {
-      reason = reason | WebGPUBlocklistReason::StringPatternQualcommWindows;
-    } else {
-      reason = reason | WebGPUBlocklistReason::StringPatternOther;
-    }
-#elif BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
     if (info.vendorID == kImgTecVendorID) {
       reason = reason | WebGPUBlocklistReason::StringPatternImgTec;
     } else {

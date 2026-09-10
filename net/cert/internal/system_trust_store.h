@@ -128,11 +128,6 @@ CreateSystemTrustStoreChromeForTesting(
 NET_EXPORT void InitializeTrustStoreMacCache();
 #endif
 
-#if BUILDFLAG(IS_WIN)
-// Initializes windows system trust store on a worker thread, if the builtin
-// verifier is enabled.
-NET_EXPORT void InitializeTrustStoreWinSystem();
-#endif
 
 #if BUILDFLAG(IS_ANDROID)
 // Initializes Android system trust store on a worker thread, if the builtin

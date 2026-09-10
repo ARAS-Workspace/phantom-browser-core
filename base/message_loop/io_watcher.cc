@@ -22,17 +22,7 @@ IOWatcher* IOWatcher::Get() {
   return CurrentThread::Get()->GetIOWatcher();
 }
 
-#if BUILDFLAG(IS_WIN)
-bool IOWatcher::RegisterIOHandler(HANDLE file,
-                                  MessagePumpForIO::IOHandler* handler) {
-  return RegisterIOHandlerImpl(file, handler);
-}
-
-bool IOWatcher::RegisterJobObject(HANDLE job,
-                                  MessagePumpForIO::IOHandler* handler) {
-  return RegisterJobObjectImpl(job, handler);
-}
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 std::unique_ptr<IOWatcher::FdWatch> IOWatcher::WatchFileDescriptor(
     int fd,
     FdWatchDuration duration,

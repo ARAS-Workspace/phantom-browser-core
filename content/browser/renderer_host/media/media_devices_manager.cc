@@ -61,7 +61,7 @@ namespace content {
 // Release video source provider in VideoCaptureDevicesChangedObserver
 // if it is not used.
 // Do not enable by default until https://crbug.com/377749384 is fixed.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
 BASE_FEATURE(kReleaseVideoSourceProviderIfNotInUse,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
@@ -71,11 +71,7 @@ const base::FeatureParam<base::TimeDelta> kReleaseVideoSourceProviderTimeout{
 #endif
 
 BASE_FEATURE(kEnumerateDevicesRelaxedCache,
-#if BUILDFLAG(IS_WIN)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
              base::FEATURE_DISABLED_BY_DEFAULT
-#endif
 );
 
 BASE_FEATURE(kEnumerateDevicesAlwaysProcessRequestsOnDevicesEnumerated,
@@ -599,7 +595,7 @@ MediaDevicesManager::MediaDevicesManager(
 }
 MediaDevicesManager::~MediaDevicesManager() {
   CHECK_CURRENTLY_ON(BrowserThread::IO, base::NotFatalUntil::M155);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   if (base::FeatureList::IsEnabled(kReleaseVideoSourceProviderIfNotInUse)) {
     disconnect_video_source_provider_timer_.Stop();
   }
@@ -777,7 +773,7 @@ uint32_t MediaDevicesManager::SubscribeDeviceChangeNotifications(
       subscription_id,
       SubscriptionRequest(render_frame_host_id, subscribe_types,
                           std::move(media_devices_listener)));
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   if (base::FeatureList::IsEnabled(kReleaseVideoSourceProviderIfNotInUse)) {
     MaybeScheduleDisconnectVideoSourceProviderTimer();
   }
@@ -812,7 +808,7 @@ void MediaDevicesManager::UnsubscribeDeviceChangeNotifications(
     uint32_t subscription_id) {
   CHECK_CURRENTLY_ON(BrowserThread::IO, base::NotFatalUntil::M155);
   subscriptions_.erase(subscription_id);
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   if (base::FeatureList::IsEnabled(kReleaseVideoSourceProviderIfNotInUse)) {
     MaybeScheduleDisconnectVideoSourceProviderTimer();
   }
@@ -854,7 +850,7 @@ void MediaDevicesManager::StartMonitoringAndPopulateCache(
       (start_monitoring_mode == DeviceStartMonitoringMode::kStartVideo) ||
       (start_monitoring_mode == DeviceStartMonitoringMode::kStartAudioAndVideo);
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
   if (monitoring_started_for_video_ &&
       base::FeatureList::IsEnabled(kReleaseVideoSourceProviderIfNotInUse)) {
     if (video_capture_service_device_changed_observer_) {
@@ -867,7 +863,7 @@ void MediaDevicesManager::StartMonitoringAndPopulateCache(
   if (!base::SystemMonitor::Get())
     return;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
   if (start_audio_device_monitoring && !monitoring_started_for_audio_ &&
       base::FeatureList::IsEnabled(features::kAudioServiceOutOfProcess)) {
     CHECK(!audio_service_device_listener_, base::NotFatalUntil::M155);
@@ -916,16 +912,6 @@ void MediaDevicesManager::StartMonitoringAndPopulateCache(
 #if BUILDFLAG(IS_MAC)
     RegisterVideoCaptureDevicesChangedObserver();
 #endif
-#if BUILDFLAG(IS_WIN)
-    if ((base::FeatureList::IsEnabled(
-             video_capture::features::
-                 kWinCameraMonitoringInVideoCaptureService) ||
-         switches::IsMediaFoundationCameraUsageMonitoringEnabled()) &&
-        !base::FeatureList::IsEnabled(
-            features::kRunVideoCaptureServiceInBrowserProcess)) {
-      RegisterVideoCaptureDevicesChangedObserver();
-    }
-#endif
   }
 
   monitoring_started_for_video_ |= start_video_device_monitoring_mode;
@@ -961,7 +947,7 @@ void MediaDevicesManager::StopMonitoring(
   }
 
   if (stop_video_device_monitoring_mode && monitoring_started_for_video_) {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
+#if BUILDFLAG(IS_MAC)
     if (base::FeatureList::IsEnabled(kReleaseVideoSourceProviderIfNotInUse)) {
       disconnect_video_source_provider_timer_.Stop();
     }
@@ -1835,7 +1821,7 @@ void MediaDevicesManager::NotifyDeviceChange(
                                     enumeration[static_cast<size_t>(type)]));
 }
 
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_MAC)
 void MediaDevicesManager::RegisterVideoCaptureDevicesChangedObserver() {
   CHECK(!video_capture_service_device_changed_observer_);
   if (base::FeatureList::IsEnabled(

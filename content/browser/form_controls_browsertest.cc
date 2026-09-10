@@ -54,7 +54,7 @@ class FormControlsBrowserTest : public ContentBrowserTest {
 #endif
   }
 
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN) || OS_LINUX
+#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_ANDROID) || OS_LINUX
   typedef cc::FuzzyPixelComparator PixelComparatorType;
 #else
   typedef cc::AlphaDiscardingExactPixelComparator PixelComparatorType;
@@ -85,8 +85,6 @@ class FormControlsBrowserTest : public ContentBrowserTest {
     std::string platform_suffix;
 #if BUILDFLAG(IS_MAC)
     platform_suffix = "_mac";
-#elif BUILDFLAG(IS_WIN)
-    platform_suffix = "_win";
 #elif BUILDFLAG(IS_LINUX)
     platform_suffix = "_linux";
 #elif BUILDFLAG(IS_CHROMEOS)
@@ -139,7 +137,7 @@ class FormControlsBrowserTest : public ContentBrowserTest {
                           .SetErrorPixelsPercentageLimit(11.f)
                           .SetAvgAbsErrorLimit(20.f)
                           .SetAbsErrorLimit(140);
-#elif BUILDFLAG(IS_WIN) || OS_LINUX
+#elif OS_LINUX
     // This also applies to different versions of other OSes.
     auto comparator = cc::FuzzyPixelComparator()
                           .DiscardAlpha()
@@ -177,11 +175,7 @@ class FormControlsBrowserTest : public ContentBrowserTest {
 };
 
 // TODO(crbug.com/401594933): The test fails on Windows ARM64.
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-#define MAYBE_Checkbox DISABLED_Checkbox
-#else
 #define MAYBE_Checkbox Checkbox
-#endif
 IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, MAYBE_Checkbox) {
   if (SkipTestForOldAndroidVersions())
     return;
@@ -273,7 +267,7 @@ IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, Input) {
 }
 
 // The test fails on Windows ARM64: crbug.com/401594933.
-#if BUILDFLAG(IS_CHROMEOS) || (BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64))
+#if BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_Textarea DISABLED_Textarea
 #else
 #define MAYBE_Textarea Textarea
@@ -342,11 +336,7 @@ IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, Button) {
 }
 
 // TODO(crbug.com/401594933): The test fails on Windows ARM64.
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-#define MAYBE_ColorInput DISABLED_ColorInput
-#else
 #define MAYBE_ColorInput ColorInput
-#endif
 IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, MAYBE_ColorInput) {
   if (SkipTestForOldAndroidVersions())
     return;
@@ -367,11 +357,7 @@ IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, MAYBE_ColorInput) {
 }
 
 // TODO(crbug.com/401594933): The test fails on Windows ARM64.
-#if BUILDFLAG(IS_WIN) && defined(ARCH_CPU_ARM64)
-#define MAYBE_Select DISABLED_Select
-#else
 #define MAYBE_Select Select
-#endif
 IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, MAYBE_Select) {
   if (SkipTestForOldAndroidVersions())
     return;
@@ -407,8 +393,7 @@ IN_PROC_BROWSER_TEST_F(FormControlsBrowserTest, MAYBE_Select) {
 // TODO(crbug.com/448656594): The test fails on Android. Probably we need
 // separate baselines for phone and tablet devices.
 // TODO(crbug.com/449053040): Re-enable the test on Linux.
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || \
-    BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX)
 #define MAYBE_MultiSelect DISABLED_MultiSelect
 #else
 #define MAYBE_MultiSelect MultiSelect

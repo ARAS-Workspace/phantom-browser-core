@@ -17,14 +17,14 @@ class MockSignalsAggregator : public SignalsAggregator {
   MockSignalsAggregator();
   ~MockSignalsAggregator() override;
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
   MOCK_METHOD(void,
               GetSignalsForUser,
               (const UserContext&,
                const SignalsAggregationRequest&,
                SignalsAggregator::GetSignalsCallback),
               (override));
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
   MOCK_METHOD(void,
               GetSignals,

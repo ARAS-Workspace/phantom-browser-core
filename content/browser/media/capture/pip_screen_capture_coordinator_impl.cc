@@ -17,9 +17,6 @@
 
 #if BUILDFLAG(IS_MAC)
 #include "content/browser/media/capture/desktop_capture_util_mac.h"
-#elif BUILDFLAG(IS_WIN)
-#include "ui/aura/window.h"
-#include "ui/aura/window_tree_host.h"
 #endif
 
 namespace content {
@@ -28,14 +25,7 @@ std::optional<DesktopMediaID::Id> GetPipWindowId(
     WebContents& pip_web_contents) {
 #if BUILDFLAG(IS_MAC)
   return GetNativeWindowIdMac(pip_web_contents);
-#elif BUILDFLAG(IS_WIN)
-  gfx::NativeWindow native_window = pip_web_contents.GetTopLevelNativeWindow();
-  if (native_window != nullptr && native_window->GetHost()) {
-    HWND hwnd = native_window->GetHost()->GetAcceleratedWidget();
-    return reinterpret_cast<DesktopMediaID::Id>(hwnd);
-  }
-  return std::nullopt;
-#elif
+#else
 #error "Unsupported platform"
 #endif
 }

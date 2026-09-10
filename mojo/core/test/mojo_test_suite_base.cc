@@ -70,11 +70,6 @@ class MojoSupportForEachTest : public testing::EmptyTestEventListener {
 MojoTestSuiteBase::MojoTestSuiteBase(int argc, char** argv)
     : base::TestSuite(argc, argv) {}
 
-#if BUILDFLAG(IS_WIN)
-MojoTestSuiteBase::MojoTestSuiteBase(int argc, wchar_t** argv)
-    : base::TestSuite(argc, argv) {}
-#endif  // BUILDFLAG(IS_WIN)
-
 MojoTestSuiteBase::~MojoTestSuiteBase() = default;
 
 void MojoTestSuiteBase::Initialize() {

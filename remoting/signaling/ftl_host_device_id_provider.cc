@@ -10,9 +10,7 @@ namespace remoting {
 
 namespace {
 
-#if BUILDFLAG(IS_WIN)
-constexpr char kDeviceIdPrefix[] = "crd-win-host-";
-#elif BUILDFLAG(IS_APPLE)
+#if BUILDFLAG(IS_APPLE)
 constexpr char kDeviceIdPrefix[] = "crd-mac-host-";
 #elif BUILDFLAG(IS_CHROMEOS)
 constexpr char kDeviceIdPrefix[] = "crd-cros-host-";

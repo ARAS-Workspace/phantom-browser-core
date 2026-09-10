@@ -373,10 +373,6 @@ void TestClipboard::WritePortableAndPlatformRepresentations(
 
 void TestClipboard::WriteText(std::string_view text) {
   GetDefaultStore().data[ClipboardFormatType::PlainTextType()] = text;
-#if BUILDFLAG(IS_WIN)
-  // Create a dummy entry.
-  GetDefaultStore().data[ClipboardFormatType::PlainTextAType()];
-#endif
   if (IsSupportedClipboardBuffer(ClipboardBuffer::kSelection))
     GetStore(ClipboardBuffer::kSelection)
         .data[ClipboardFormatType::PlainTextType()] = text;
@@ -405,9 +401,7 @@ void TestClipboard::WriteFilenames(std::vector<ui::FileInfo> filenames) {
 
 void TestClipboard::WriteURL(const ClipboardUrlInfo& url_info) {
   GetDefaultStore().data[ClipboardFormatType::UrlType()] = url_info.url.spec();
-#if !BUILDFLAG(IS_WIN)
   GetDefaultStore().url_title = base::UTF16ToUTF8(url_info.title);
-#endif
 }
 
 void TestClipboard::WriteWebSmartPaste() {

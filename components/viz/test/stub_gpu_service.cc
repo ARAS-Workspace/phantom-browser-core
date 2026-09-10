@@ -52,14 +52,6 @@ void StubGpuService::CreateJpegEncodeAccelerator(
         jea_receiver) {}
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_WIN)
-void StubGpuService::RegisterDCOMPSurfaceHandle(
-    mojo::PlatformHandle surface_handle,
-    RegisterDCOMPSurfaceHandleCallback callback) {}
-void StubGpuService::UnregisterDCOMPSurfaceHandle(
-    const base::UnguessableToken& token) {}
-#endif
-
 void StubGpuService::CreateVideoEncodeAcceleratorProvider(
     mojo::PendingReceiver<media::mojom::VideoEncodeAcceleratorProvider>
         receiver) {}
@@ -75,10 +67,6 @@ void StubGpuService::BindWebNNServiceIntrospection(
 
 void StubGpuService::GetVideoMemoryUsageStats(
     GetVideoMemoryUsageStatsCallback callback) {}
-
-#if BUILDFLAG(IS_WIN)
-void StubGpuService::RequestDXGIInfo(RequestDXGIInfoCallback callback) {}
-#endif
 
 void StubGpuService::LoadedBlob(const gpu::GpuDiskCacheHandle& handle,
                                 const std::string& key,

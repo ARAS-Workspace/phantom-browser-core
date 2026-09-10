@@ -33,7 +33,7 @@ namespace {
 
 // TODO(crbug.com/414590951): Tab DnD tests not working on Mac.
 // TODO(crbug.com/500937645): Re-enable the test on Windows.
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#if !BUILDFLAG(IS_MAC)
 
 DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kNewTab);
 DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kSecondTab);
@@ -315,6 +315,6 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::Values(MultiContentsDropTargetView::DropSide::START,
                       MultiContentsDropTargetView::DropSide::END,
                       MultiContentsDropTargetView::DropSide::BOTTOM));
-#endif  // !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_WIN)
+#endif  // !BUILDFLAG(IS_MAC)
 
 }  // namespace

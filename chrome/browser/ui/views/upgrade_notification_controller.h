@@ -14,10 +14,6 @@
 #include "chrome/browser/upgrade_detector/upgrade_observer.h"
 #include "ui/base/unowned_user_data/scoped_unowned_user_data.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/browser/ui/views/critical_notification_bubble_view.h"
-#endif
-
 class BrowserWindowInterface;
 
 // Responsible for observing outdated install and critical upgrade notifications
@@ -38,10 +34,6 @@ class UpgradeNotificationController : public UpgradeObserver {
   void OnOutdatedInstall() override;
   void OnOutdatedInstallNoAutoUpdate() override;
   void OnCriticalUpgradeInstalled() override;
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<CriticalNotificationBubbleView>
-  GetCriticalNotificationBubbleViewForTest();
-#endif
  private:
   const raw_ref<BrowserWindowInterface> browser_;
   base::ScopedObservation<UpgradeDetector, UpgradeObserver>

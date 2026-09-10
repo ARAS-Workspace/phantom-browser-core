@@ -31,22 +31,12 @@
 #include "components/update_client/crx_cache.h"
 #include "components/update_client/utils.h"
 
-#if BUILDFLAG(IS_WIN)
-#include "chrome/updater/util/win_util.h"
-#endif
-
 namespace updater {
 namespace {
 
 constexpr int kMilestoneDeletionThreshold = 8;
 
 void CleanupGoogleUpdate(UpdaterScope scope) {
-#if BUILDFLAG(IS_WIN)
-  // Delete anything other than `GoogleUpdate.exe` under `\Google\Update`.
-  bool deleted = DeleteExcept(GetGoogleUpdateExePath(scope));
-  VLOG_IF(1, !deleted) << "Failed to delete obsolete files near "
-                       << GetGoogleUpdateExePath(scope);
-#endif  // BUILDFLAG(IS_WIN)
 }
 
 void CleanupOldUpdaterVersions(UpdaterScope scope) {

@@ -180,18 +180,12 @@ class SoftwareKeyImpl : public BaseInterface {
 
 #if BUILDFLAG(IS_APPLE)
   SecKeyRef GetSecKeyRef() const override { NOTREACHED(); }
-#elif BUILDFLAG(IS_WIN)
-  NCRYPT_KEY_HANDLE GetNCryptKeyHandle() const override { NOTREACHED(); }
 #endif
 
   std::optional<std::vector<uint8_t>> SignSlowly(
       base::span<const uint8_t> data) override {
     return sign::Sign(GetSignatureKind(), key(), data);
   }
-
-#if BUILDFLAG(IS_WIN)
-  bool SupportsTls13() override { return true; }
-#endif  // BUILDFLAG(IS_WIN)
 
  protected:
   const crypto::keypair::PrivateKey& key() const { return key_; }

@@ -53,10 +53,6 @@
 #include "ui/gfx/switches.h"
 #include "ui/platform_window/platform_window_init_properties.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#endif  // BUILDFLAG(IS_WIN)
-
 namespace aura {
 
 namespace {
@@ -125,11 +121,6 @@ WindowTreeHost::~WindowTreeHost() {
 // static
 WindowTreeHost* WindowTreeHost::GetForAcceleratedWidget(
     gfx::AcceleratedWidget widget) {
-#if BUILDFLAG(IS_WIN)
-  if (ui::ViewProp::GetValue(widget, kWindowTreeHostUsesParent)) {
-    widget = ::GetParent(widget);
-  }
-#endif  // BUILDFLAG(IS_WIN)
   return reinterpret_cast<WindowTreeHost*>(
       ui::ViewProp::GetValue(widget, kWindowTreeHostForAcceleratedWidget));
 }
@@ -474,13 +465,6 @@ WindowTreeHost::WindowTreeHost(std::unique_ptr<Window> window)
   device_scale_factor_ = display::Screen::Get()
                              ->GetPreferredScaleFactorForWindow(window_)
                              .value_or(1.f);
-#if BUILDFLAG(IS_WIN)
-  // The feature state is necessary but not sufficient for checking if
-  // occlusion is enabled. It may be disabled by other means (e.g., policy).
-  native_window_occlusion_enabled_ =
-      !base::CommandLine::ForCurrentProcess()->HasSwitch(switches::kHeadless) &&
-      base::FeatureList::IsEnabled(features::kCalculateNativeWinOcclusion);
-#endif
 }
 
 void WindowTreeHost::UpdateCompositorVisibility(bool visible) {
@@ -748,39 +732,11 @@ bool WindowTreeHost::CalculateCompositorVisibilityFromOcclusionState() const {
 }
 
 bool WindowTreeHost::NativeOcclusionAffectsThrottle() const {
-#if BUILDFLAG(IS_WIN)
-  if (!base::FeatureList::IsEnabled(
-          features::kApplyNativeOcclusionToCompositor) ||
-      !IsNativeWindowOcclusionEnabled()) {
-    return false;
-  }
-
-  const std::string type =
-      features::kApplyNativeOcclusionToCompositorType.Get();
-  return type == features::kApplyNativeOcclusionToCompositorTypeThrottle ||
-         type ==
-             features::kApplyNativeOcclusionToCompositorTypeThrottleAndRelease;
-#else
   return false;
-#endif
 }
 
 bool WindowTreeHost::NativeOcclusionAffectsVisibility() const {
-#if BUILDFLAG(IS_WIN)
-  if (!base::FeatureList::IsEnabled(
-          features::kApplyNativeOcclusionToCompositor) ||
-      !IsNativeWindowOcclusionEnabled()) {
-    return false;
-  }
-
-  const std::string type =
-      features::kApplyNativeOcclusionToCompositorType.Get();
-  return type == features::kApplyNativeOcclusionToCompositorTypeRelease ||
-         type ==
-             features::kApplyNativeOcclusionToCompositorTypeThrottleAndRelease;
-#else
   return false;
-#endif
 }
 
 bool WindowTreeHost::ShouldThrottle() const {

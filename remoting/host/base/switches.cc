@@ -37,12 +37,6 @@ const char kEnableWtmpdb[] = "enable-wtmpdb";
 
 const char kEnableCorpMessaging[] = "enable-corp-messaging";
 
-#if BUILDFLAG(IS_WIN)
-const char kEvaluateD3D[] = "d3d-support";
-const char kEvaluate3dDisplayMode[] = "3d-display-mode";
-const char kSetUpUrlForwarderSwitchName[] = "setup";
-#endif
-
 const char kParentWindowSwitchName[] = "parent-window";
 
 const char kInputSwitchName[] = "input";

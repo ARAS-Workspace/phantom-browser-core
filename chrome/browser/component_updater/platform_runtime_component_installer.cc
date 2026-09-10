@@ -216,41 +216,6 @@ bool PlatformRuntimeComponentInstallerPolicy::ShouldTriggerInstallOrUpdate(
 }
 
 void MaybeRegisterPlatformRuntimeComponent(ComponentUpdateService* cus) {
-#if BUILDFLAG(IS_WIN) && BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  if (!base::FeatureList::IsEnabled(kEnablePlatformRuntimeComponent)) {
-    return;
-  }
-
-  std::unique_ptr<PlatformRuntimeComponentInstallerPolicy> policy =
-      std::make_unique<PlatformRuntimeComponentInstallerPolicy>();
-  PlatformRuntimeComponentInstallerPolicy* policy_ptr = policy.get();
-  std::vector<uint8_t> public_key_hash;
-  policy->GetHash(&public_key_hash);
-  const std::string crx_id =
-      crx_file::id_util::GenerateIdFromHash(public_key_hash);
-  auto installer = base::MakeRefCounted<ComponentInstaller>(std::move(policy));
-
-  // The lifecycle of `policy_ptr` is managed by `installer` which owns the
-  // policy. Since the callback is executed during the registration of the
-  // ref-counted `installer` (which is kept alive during registration and
-  // retained by the ComponentUpdateService afterward), the policy is
-  // guaranteed to outlive the callback.
-  installer->Register(
-      cus,
-      base::BindOnce(
-          [](PlatformRuntimeComponentInstallerPolicy* policy,
-             const std::string& crx_id, ComponentUpdateService* cus) {
-            PrefService* local_state = g_browser_process->local_state();
-            if (policy->ShouldTriggerInstallOrUpdate(cus, local_state,
-                                                     crx_id)) {
-              VLOG(1) << "Platform Runtime component not installed or stale "
-                         "locally. Triggering on-demand install.";
-              PlatformRuntimeComponentInstallerPolicy::UpdateOnDemand(
-                  cus, crx_id, OnDemandUpdater::Priority::FOREGROUND);
-            }
-          },
-          base::Unretained(policy_ptr), crx_id, cus));
-#endif
 }
 
 }  // namespace component_updater

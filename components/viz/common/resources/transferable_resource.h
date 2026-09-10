@@ -213,8 +213,6 @@ struct VIZ_COMMON_EXPORT TransferableResource {
 #if BUILDFLAG(IS_ANDROID)
            is_backed_by_surface_view == o.is_backed_by_surface_view &&
            wants_promotion_hint == o.wants_promotion_hint &&
-#elif BUILDFLAG(IS_WIN)
-           wants_promotion_hint == o.wants_promotion_hint &&
 #endif
            synchronization_type == o.synchronization_type &&
            resource_source == o.resource_source;
@@ -249,7 +247,7 @@ struct VIZ_COMMON_EXPORT TransferableResource {
   bool is_backed_by_surface_view = false;
 #endif
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_ANDROID)
   // Indicates that this resource would like a promotion hint.
   bool wants_promotion_hint = false;
 #endif

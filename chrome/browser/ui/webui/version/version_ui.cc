@@ -63,12 +63,6 @@
 #include "base/mac/mac_util.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/windows_version.h"
-#include "chrome/browser/ui/webui/version/version_handler_win.h"
-#include "chrome/browser/ui/webui/version/version_util_win.h"
-#endif
-
 using content::WebUIDataSource;
 
 namespace {
@@ -155,8 +149,6 @@ VersionUI::VersionUI(content::WebUI* web_ui)
 
 #if BUILDFLAG(IS_CHROMEOS)
   web_ui->AddMessageHandler(std::make_unique<VersionHandlerChromeOS>());
-#elif BUILDFLAG(IS_WIN)
-  web_ui->AddMessageHandler(std::make_unique<VersionHandlerWindows>());
 #else
   web_ui->AddMessageHandler(std::make_unique<VersionHandler>());
 #endif
@@ -192,23 +184,6 @@ int VersionUI::VersionProcessorVariation() {
     case base::mac::CPUType::kArm:
       return IDS_VERSION_UI_64BIT_ARM;
   }
-#elif BUILDFLAG(IS_WIN)
-#if defined(ARCH_CPU_ARM64)
-  return IDS_VERSION_UI_64BIT_ARM;
-#else
-  bool emulated = base::win::OSInfo::IsRunningEmulatedOnArm64();
-#if defined(ARCH_CPU_X86)
-  if (emulated) {
-    return IDS_VERSION_UI_32BIT_TRANSLATED_INTEL;
-  }
-  return IDS_VERSION_UI_32BIT;
-#else   // defined(ARCH_CPU_X86)
-  if (emulated) {
-    return IDS_VERSION_UI_64BIT_TRANSLATED_INTEL;
-  }
-  return IDS_VERSION_UI_64BIT;
-#endif  // defined(ARCH_CPU_X86)
-#endif  // defined(ARCH_CPU_ARM64)
 #elif BUILDFLAG(IS_LINUX)
 #if defined(ARCH_CPU_X86_64)
   return IDS_VERSION_UI_64BIT_INTEL;
@@ -292,12 +267,6 @@ void VersionUI::AddVersionDetailStrings(content::WebUIDataSource* html_source) {
                          base::android::apk_info::package_version_code());
 #endif  // BUILDFLAG(IS_ANDROID)
 
-#if BUILDFLAG(IS_WIN)
-  html_source->AddString(
-      version_ui::kCommandLine,
-      base::AsString16(
-          base::CommandLine::ForCurrentProcess()->GetCommandLineString()));
-#else
   std::string command_line;
   using ArgvList = std::vector<std::string>;
   const ArgvList& argv = base::CommandLine::ForCurrentProcess()->argv();
@@ -307,16 +276,10 @@ void VersionUI::AddVersionDetailStrings(content::WebUIDataSource* html_source) {
   // TODO(viettrungluu): |command_line| could really have any encoding, whereas
   // below we assumes it's UTF-8.
   html_source->AddString(version_ui::kCommandLine, command_line);
-#endif
 
 #if BUILDFLAG(IS_MAC)
   html_source->AddString("linker", CHROMIUM_LINKER_NAME);
 #endif  // BUILDFLAG(IS_MAC)
-
-#if BUILDFLAG(IS_WIN)
-  html_source->AddString(version_ui::kUpdateCohortName,
-                         version_utils::win::GetCohortVersionInfo());
-#endif  // BUILDFLAG(IS_WIN)
 
   auto* variations_service = g_browser_process->variations_service();
   html_source->AddString(version_ui::kVariationsSource,

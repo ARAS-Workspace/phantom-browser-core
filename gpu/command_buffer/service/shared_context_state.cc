@@ -66,7 +66,7 @@
 #include "gpu/vulkan/vulkan_implementation.h"
 #include "gpu/vulkan/vulkan_util.h"
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_LINUX)
 #include "gpu/command_buffer/service/external_semaphore_pool.h"
 #endif
 
@@ -77,9 +77,6 @@
 #include "gpu/command_buffer/service/dawn_context_provider.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "ui/gl/gl_angle_util_win.h"
-#endif
 
 namespace gpu {
 namespace {
@@ -299,7 +296,7 @@ SharedContextState::SharedContextState(
 #endif
   ) {
     if (vk_context_provider_) {
-#if BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN))
+#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_LINUX)
       external_semaphore_pool_ = std::make_unique<ExternalSemaphorePool>(this);
 #endif
     }
@@ -339,7 +336,7 @@ SharedContextState::~SharedContextState() {
     UnbindCacheFromCurrentOpenGLContext();
   }
 
-#if BUILDFLAG(ENABLE_VULKAN) && (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN))
+#if BUILDFLAG(ENABLE_VULKAN) && BUILDFLAG(IS_LINUX)
   external_semaphore_pool_.reset();
 #endif
 
@@ -776,15 +773,9 @@ bool SharedContextState::InitializeGLWithFeatureInfo(
             ? gpu::VulkanImplementationName::kSwiftshader
             : gpu::VulkanImplementationName::kNative;
     auto* device_queue = vk_context_provider_->GetDeviceQueue();
-#if BUILDFLAG(IS_WIN)
-    vk_supports_external_memory =
-        gfx::HasExtension(device_queue->enabled_extensions(),
-                          VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME);
-#else
     vk_supports_external_memory =
         gfx::HasExtension(device_queue->enabled_extensions(),
                           VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME);
-#endif
     vk_supports_external_semaphore =
         IsVkOpaqueExternalSemaphoreSupported(device_queue);
   }
@@ -1396,23 +1387,5 @@ int32_t SharedContextState::GetMaxTextureSize() {
   return max_texture_size;
 }
 
-#if BUILDFLAG(IS_WIN)
-Microsoft::WRL::ComPtr<ID3D11Device> SharedContextState::GetD3D11Device()
-    const {
-  switch (gr_context_type_) {
-    case GrContextType::kNone:
-      return nullptr;
-    case GrContextType::kGL:
-    case GrContextType::kVulkan:
-      return gl::QueryD3D11DeviceObjectFromANGLE();
-#if BUILDFLAG(SKIA_USE_DAWN)
-    case GrContextType::kGraphiteDawn:
-      return dawn_context_provider_->GetD3D11Device();
-#endif
-    default:
-      NOTREACHED();
-  }
-}
-#endif
 
 }  // namespace gpu

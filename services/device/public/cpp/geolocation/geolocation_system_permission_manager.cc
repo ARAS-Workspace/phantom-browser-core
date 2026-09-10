@@ -98,7 +98,7 @@ GeolocationSystemPermissionManager::GetSystemPermission() const {
 }
 
 void GeolocationSystemPermissionManager::RequestSystemPermission() {
-#if BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_APPLE)
   system_geolocation_source_->RequestPermission();
 #endif
 }

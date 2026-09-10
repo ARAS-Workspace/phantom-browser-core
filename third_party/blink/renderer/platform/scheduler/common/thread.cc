@@ -21,9 +21,7 @@
 #include "third_party/blink/renderer/platform/wtf/std_lib_extras.h"
 #include "third_party/blink/renderer/platform/wtf/threading.h"
 
-#if BUILDFLAG(IS_WIN)
-#include <windows.h>
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 #include <unistd.h>
 #endif
 
@@ -147,10 +145,7 @@ void Thread::RemoveTaskObserver(TaskObserver* task_observer) {
   Scheduler()->RemoveTaskObserver(task_observer);
 }
 
-#if BUILDFLAG(IS_WIN)
-static_assert(sizeof(blink::PlatformThreadId) >= sizeof(DWORD),
-              "size of platform thread id is too small");
-#elif BUILDFLAG(IS_POSIX)
+#if BUILDFLAG(IS_POSIX)
 static_assert(sizeof(blink::PlatformThreadId) >= sizeof(pid_t),
               "size of platform thread id is too small");
 #else

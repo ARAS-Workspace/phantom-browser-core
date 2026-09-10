@@ -34,10 +34,6 @@
 #include "base/files/file_descriptor_watcher_posix.h"
 #endif
 
-#if BUILDFLAG(IS_WIN)
-#include "base/win/scoped_com_initializer.h"
-#endif
-
 namespace base {
 
 #if DCHECK_IS_ON()
@@ -176,11 +172,6 @@ bool Thread::Start() {
   DCHECK(owning_sequence_checker_.CalledOnValidSequence());
 
   Options options;
-#if BUILDFLAG(IS_WIN)
-  if (com_status_ == STA) {
-    options.message_pump_type = MessagePumpType::UI;
-  }
-#endif
   return StartWithOptions(std::move(options));
 }
 
@@ -193,10 +184,6 @@ bool Thread::StartWithOptions(Options options) {
       << "Trying to start a thread that's already running.";
   DCHECK(state_ == State::kInitial || restartable_)
       << "Trying to restart a thread that doesn't support restarting.";
-#if BUILDFLAG(IS_WIN)
-  DCHECK((com_status_ != STA) ||
-         (options.message_pump_type == MessagePumpType::UI));
-#endif
 
   // Reset |id_| here to support restarting the thread.
   id_event_.Reset();
@@ -406,16 +393,6 @@ void Thread::ThreadMain() {
   }
 #endif  // BUILDFLAG(IS_POSIX)
 
-#if BUILDFLAG(IS_WIN)
-  std::unique_ptr<win::ScopedCOMInitializer> com_initializer;
-  if (com_status_ != NONE) {
-    com_initializer.reset(
-        (com_status_ == STA)
-            ? new win::ScopedCOMInitializer()
-            : new win::ScopedCOMInitializer(win::ScopedCOMInitializer::kMTA));
-  }
-#endif
-
   // Let the thread do extra initialization.
   Init();
 
@@ -427,10 +404,6 @@ void Thread::ThreadMain() {
 
   // Let the thread do extra cleanup.
   CleanUp();
-
-#if BUILDFLAG(IS_WIN)
-  com_initializer.reset();
-#endif
 
   DCHECK(GetThreadWasQuitProperly());
 
